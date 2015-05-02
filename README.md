@@ -1,0 +1,2 @@
+# FlexibleAdapter
+FlexibleAdapter for RecyclerView
