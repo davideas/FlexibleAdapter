@@ -21,6 +21,7 @@ I would like to add some new functionalities, like the Undo (Time is always miss
 ***
 #Usage for Multi Selection
 In your activity change the Mode for the _ActionMode_ object.
+
 	@Override
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 		mode.getMenuInflater().inflate(R.menu.menu_context, menu);
