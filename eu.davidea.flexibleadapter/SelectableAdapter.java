@@ -16,27 +16,59 @@ import android.util.Log;
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 	
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
+	/**
+	 * Default mode for selection
+	 */
+	public static final int MODE_SINGLE = 1;
+	/**
+	 * Multi selection will be activated
+	 */
+	public static final int MODE_MULTI = 2;
 
 	private ArrayList<Integer> selectedItems;
+	private int mode;
 
 	public SelectableAdapter() {
-		selectedItems = new ArrayList<Integer>();
+		this.selectedItems = new ArrayList<Integer>();
+		this.mode = MODE_SINGLE;
+	}
+	
+	/**
+	 * Set the mode of the selection, MODE_SINGLE is the default:
+	 * <ul>
+	 * <li> if {@link #MODE_SINGLE}, it will switch the selection position (previous selection is cleared automatically);
+	 * <li> if {@link #MODE_MULTI}, it will add the position to the list of the items selected.
+	 * </ul>
+	 * @param mode
+	 */
+	public void setMode(int mode) {
+		this.mode = mode;
 	}
 
 	/**
-	 * Indicates if the item at position position is selected
-	 * @param position Position of the item to check
-	 * @return true if the item is selected, false otherwise
+	 * Indicates if the item at position position is selected.
+	 * @param position Position of the item to check.
+	 * @return true if the item is selected, false otherwise.
 	 */
 	protected boolean isSelected(int position) {
 		return selectedItems.contains(Integer.valueOf(position));
 	}
 
 	/**
-	 * Toggle the selection status of the item at a given position
-	 * @param position Position of the item to toggle the selection status for
+	 * Toggle the selection status of the item at a given position.<br/>
+	 * The behaviour depends on the selection mode previously set with {@link #setMode}.
+	 * 
+	 * <br/><br/>
+	 * <b>Note 1:</b> If you don't want any item to be selected/activated at all, just don't call this method.
+	 * <br/>
+	 * <b>Note 2:</b> To have actually the item visually selected you need to add a custom <i>Selector Drawable</i> to your layout/view of the Item.
+	 * 
+	 * @param position Position of the item to toggle the selection status for.
 	 */
 	public void toggleSelection(int position) {
+		if (position < 0) return;
+		if (mode == MODE_SINGLE) clearSelection();
+		
 		Integer positionTapped = Integer.valueOf(position);
 		int index = selectedItems.indexOf(positionTapped);
 		if (index != -1) {
@@ -53,17 +85,18 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	
 	/**
 	 * This method remove the selection if at the specified
-	 * position the item was previously selected.
-	 * Note: notifyItemChanged on the position is NOT called!
+	 * position the item was previously selected.<br/><br/>
+	 * <b>Note:</b> <i>notifyItemChanged</i> on the position is NOT called!
 	 *  This is useful when an item is mainly removed from the
-	 *  implementation of the Adapter 
+	 *  implementation of the Adapter.
+	 *  
 	 * @param position
 	 */
 	protected void removeSelection(int position) {
 		Log.d(TAG, "removeSelection on position "+position);
 		int index = selectedItems.indexOf(Integer.valueOf(position));
 		if (index != -1) selectedItems.remove(index);
-		//The notification is made outside this method
+		//Usually the notification is made in the caller of this method
 		//notifyItemChanged(position);
 	}
 	
@@ -91,7 +124,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	public void clearSelection() {
 		if (selectedItems.size() == getItemCount()) {
 			selectedItems.clear();
-			//TODO: Not sure about this call notifyDataSetChanged() when ALL items needs to be refreshed.
+			//TODO: Not sure about this call notifyDataSetChanged() when ALL items need to be refreshed.
 			Log.d(TAG, "clearSelection notifyDataSetChanged on all position");
 			notifyDataSetChanged();
 		} else {

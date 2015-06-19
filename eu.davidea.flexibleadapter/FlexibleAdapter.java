@@ -31,9 +31,27 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		
 	}
 	
-	public abstract void updateDataSet();
+	/**
+	 * This method will refresh the entire DataSet content.<br/>
+	 * The parameter is useful to filter the DataSet. It can be removed
+	 * or the type can be changed accordingly (String is the most used value).
+	 * <br/>Pass null value in case not used.
+	 * 
+	 * @param param A custom parameter to filter the DataSet
+	 */
+	public abstract void updateDataSet(String param);
 	
 	public abstract T getItem(int position);
+	
+	public int getPositionForItem(T item) {
+		if (mItems != null && mItems.size() > 0) return mItems.indexOf(item);
+		return -1;
+	}
+	
+	public boolean contains(T item) {
+		if (mItems != null) return mItems.contains(item);
+		return false;
+	}
 	
 	@Override
 	public abstract VH onCreateViewHolder(ViewGroup parent, int viewType);

@@ -19,7 +19,35 @@ There's an example adapter which does not compile because you need to change the
 I still have to improve it, so keep an eye on it.
 I would like to add some new functionalities, like the Undo.
 
+***
+#Usage for Multi Selection
+	@Override
+	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+		mode.getMenuInflater().inflate(R.menu.menu_context, menu);
+		mAdapter.setMode(YourAdapterClass.MODE_MULTI);
+		return true;
+	}
 
+	@Override
+	public void onDestroyActionMode(ActionMode mode) {
+		mAdapter.setMode(YourAdapterClass.MODE_SINGLE);
+		mAdapter.clearSelection();
+		mActionMode = null;
+	}
+
+***
+#Change Log
+**2015.06.19**
+- Added **Mode** for multi and single fixed selection.
+  The Multi selection was already active, but the Single fixed selection mode still not.
+- Reviewed method: _toggleSelection(int position)_ (adapted for Mode functionality)
+	For more details see the comment of the method!
+- Added new method _getPositionForItem(T item)_    (self explanatory)
+- Added new method _contains(T item)_              (another useful method)
+- Reviewed method _updateDataSet(String param)_    (added the parameter to filter DataSet)
+
+**2015.05.03**
+- Initial release
 
 ***
 #Thanks
