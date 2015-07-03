@@ -41,16 +41,24 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	public abstract void updateDataSet(String param);
 	
+	/**
+	 * Needs to be implemented to return the custom object "Item".
+	 * @param position
+	 * @return the custom "Item" object
+	 */
 	public abstract T getItem(int position);
 	
+	/**
+	 * Retrieve the position of the Item in the Adapter
+	 * @param item
+	 * @return the position in the Adapter if found, -1 otherwise
+	 */
 	public int getPositionForItem(T item) {
-		if (mItems != null && mItems.size() > 0) return mItems.indexOf(item);
-		return -1;
+		return mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
 	}
 	
 	public boolean contains(T item) {
-		if (mItems != null) return mItems.contains(item);
-		return false;
+		return mItems != null && mItems.contains(item);
 	}
 	
 	@Override
@@ -64,14 +72,22 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		return mItems.size();
 	}
 	
+	public void updateItem(int position, T item) {
+		if (position < 0) return;
+		mItems.set(position, item);
+		Log.d(TAG, "updateItem notifyItemChanged on position "+position);
+		notifyItemChanged(position);
+	}
+	
 	public void addItem(int position, T item) {
+		if (position < 0) return;
 		mItems.add(position, item);
 		Log.d(TAG, "addItem notifyItemInserted on position "+position);
 		notifyItemInserted(position);
 	}
 	
 	private void removeItem(int position) {
-		Log.d(TAG, "removeItem on position "+position);
+		if (position < 0) return;
 		mItems.remove(position);
 		Log.d(TAG, "removeItem notifyItemRemoved on position "+position);
 		notifyItemRemoved(position);
