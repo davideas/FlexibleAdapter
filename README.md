@@ -43,6 +43,13 @@ In your activity change the Mode for the _ActionMode_ object.
 
 
 #Change Log
+**2015.07.03**
+- Added new method _updateItem()_
+- Deprecated _removeSelection()_ -> Use _toggleSelection()_ instead!
+- In _clearSelection_ removed call to _notifyDataSetChanged()_.
+- Improved others methods.
+- Added more comments.
+
 **2015.06.19**
 - Added **Mode** for Multi and Single fixed selection. The Multi selection was already active, but the Single fixed selection mode still not.
 - Reviewed method: _toggleSelection(int position)_ - Adapted for Mode functionality. For more details see the comment of the method!
