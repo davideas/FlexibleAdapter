@@ -17,12 +17,12 @@ There's an example adapter which does not compile because you need to change the
 I still have to improve it, so keep an eye on it.
 I would like to add some new functionalities, like the Undo (Time is always missing).
 
-####Pull requests / Issues / Improvements requests
-Feel free to do and ask!
-
 #Setup
 Ultra simple:
 No needs to create and import library for just 2 files, so just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my example Adapter).
+
+####Pull requests / Issues / Improvement requests
+Feel free to do and ask!
 
 #Usage for Multi Selection
 In your activity change the Mode for the _ActionMode_ object.
