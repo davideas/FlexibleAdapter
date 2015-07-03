@@ -1,4 +1,5 @@
 # FlexibleAdapter
+#### Version of 2015.07.03
 #### A pattern for every RecycleView
 
 The functionalities are taken from different blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecycleView.
