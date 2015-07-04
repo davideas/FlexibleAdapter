@@ -66,8 +66,23 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
+	 * This method never invalidates the Item.
+	 *
+	 * @param position
+	 * @see #toggleSelection(int, boolean)
+	 */
+	public void toggleSelection(int position) {
+		toggleSelection(position, false);
+	}
+	
+	/**
 	 * Toggle the selection status of the item at a given position.<br/>
 	 * The behaviour depends on the selection mode previously set with {@link #setMode}.
+	 *
+	 * <br/><br/>Optionally the item can be invalidated.<br/>
+	 * However it is preferable to set <i>false</i> and to handle the Activated/Selected State of
+	 * the ItemView in the Click events of the ViewHolder after the selection is registered and
+	 * up to date: Very Useful if the item has views with own animation to perform!
 	 * 
 	 * <br/><br/>
 	 * <b>Note:</b>
@@ -75,14 +90,15 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * <li>If you don't want any item to be selected/activated at all, just don't call this method.</li>
 	 * <li>To have actually the item visually selected you need to add a custom <i>Selector Drawable</i> to your layout/view of the Item.
 	 * or to add <i>android:background="?attr/selectableItemBackground"</i> in your layout pointing to a custom Drawable in the style.xml</li>
-	 * <li>{@link #notifyItemChanged} is called and {@link #onBindViewHolder} will be automatically called afterwards.</li>
+	 * <li>If <i>invalidate</i> is set true, {@link #notifyItemChanged} is called and {@link #onBindViewHolder} will be automatically called
+	 * afterwards overriding any animation in the ItemView!</li>
 	 *</ul>
 	 * @param position Position of the item to toggle the selection status for.
+	 * @param invalidate Boolean to indicate if the row must be invalidated and item rebinded.
 	 */
-	public void toggleSelection(int position) {
+	public void toggleSelection(int position, boolean invalidate) {
 		if (position < 0) return;
-		if (mode == MODE_SINGLE) clearSelection();
-		
+
 		int index = selectedItems.indexOf(position);
 		if (index != -1) {
 			Log.d(TAG, "toggleSelection removing selection on position "+position);
@@ -91,34 +107,48 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 			Log.d(TAG, "toggleSelection adding selection on position "+position);
 			selectedItems.add(position);
 		}
-		Log.d(TAG, "toggleSelection notifyItemChanged on position "+position);
-		notifyItemChanged(position);
-		Log.d(TAG, "toggleSelection current selection "+selectedItems);
+		if (invalidate) {
+			Log.d(TAG, "toggleSelection notifyItemChanged on position "+position);
+			notifyItemChanged(position);
+		}
+		Log.d(TAG, "toggleSelection current selection " + selectedItems);
 	}
-	
+
 	/**
-	 * Deprecated. This method is actually never used. Use {@link #toggleSelection} instead.
+	 * Deprecated! Reasons:
+	 * <br/>- Use {@link #toggleSelection} for normal situation instead.
+	 * <br/>- Use {@link #getSelectedItems}.iterator() to avoid java.util.ConcurrentModificationException.
+	 *
+	 * <br/><br/>This method is used only after a removal of an Item <u>and</u> useful only in certain
+	 * situations such when not all selected Items can be removed (business exceptions dependencies)
+	 * while others still remains selected.
+	 * <br/>For normal situations use {@link #toggleSelection} instead.
+	 *
 	 * <br/><br/>
 	 * Remove the selection if at the specified
-	 * position the item was previously selected.<br/><br/>
-	 * <b>Note:</b> <i>notifyItemChanged</i> on the position is NOT called!
-	 *  This is useful when an item is mainly removed from the
-	 *  implementation of the Adapter.
-	 *  
+	 * position the item was previously selected.
+	 *
+	 * <br/><br/>
+	 * <b>Note:</b> <i>notifyItemChanged</i> on the position is NOT called to avoid double call
+	 * when removeItems!
+	 *
 	 * @param position
 	 */
 	@Deprecated
 	protected void removeSelection(int position) {
+		if (position < 0) return;
 		Log.d(TAG, "removeSelection on position "+position);
 		int index = selectedItems.indexOf(Integer.valueOf(position));
 		if (index != -1) selectedItems.remove(index);
-		//Usually the notification is made in the caller of this method
+		//Avoid double notification:
+		//Usually the notification is made in FlexibleAdapter.removeItem();
 		//notifyItemChanged(position);
 	}
 	
 	/**
 	 * Add the selection status for all items.
 	 * The selector container is sequentially filled with All items positions.
+	 * <br/><b>Note:</b> All items are invalidated and rebinded!
 	 */
 	public void selectAll() {
 		Log.d(TAG, "selectAll");
@@ -131,7 +161,9 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Clear the selection status for all items one by one to not kill animations in the items
+	 * Clear the selection status for all items one by one to not kill animations in the items.
+	 * <br/><b>Note:</b> Items are invalidated and rebinded!
+	 * <br/>This method use Iterator to avoid java.util.ConcurrentModificationException.
 	 */
 	public void clearSelection() {
 		Iterator<Integer> iterator = selectedItems.iterator();
