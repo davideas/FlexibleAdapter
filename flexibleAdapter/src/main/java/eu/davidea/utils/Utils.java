@@ -3,11 +3,16 @@ package eu.davidea.utils;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -73,6 +78,72 @@ public final class Utils {
 	 */
 	public static boolean hasLollipop() {
 		return Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP;
+	}
+
+	public static String getVersionName(Context context) {
+		try {
+			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+			return "v"+pInfo.versionName;
+		} catch (PackageManager.NameNotFoundException e) {
+			return context.getString(android.R.string.unknownName);
+		}
+	}
+
+	public static int getVersionCode(Context context) {
+		try {
+			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+			return pInfo.versionCode;
+		} catch (PackageManager.NameNotFoundException e) {
+			return 0;
+		}
+	}
+
+	/**
+	 * Show Soft Keyboard with new Thread
+	 * @param activity
+	 */
+	public static void hideSoftInput(final Activity activity) {
+		if (activity.getCurrentFocus() != null) {
+			new Runnable() {
+				public void run() {
+					InputMethodManager imm =
+							(InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+				}
+			}.run();
+		}
+	}
+
+	/**
+	 * Hide Soft Keyboard from Dialogs with new Thread
+	 * @param context
+	 * @param view
+	 */
+	public static void hideSoftInputFrom(final Context context, final View view) {
+		new Runnable() {
+			@Override
+			public void run() {
+				InputMethodManager imm =
+						(InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+			}
+		}.run();
+	}
+
+	/**
+	 * Show Soft Keyboard with new Thread
+	 * @param context
+	 * @param view
+	 */
+	public static void showSoftInput(final Context context, final View view) {
+		new Runnable() {
+			@Override
+			public void run() {
+				InputMethodManager imm =
+						(InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}.run();
 	}
 
 	/**

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/AppTheme.DialogMetrics">
+
+	<android.support.design.widget.TextInputLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<EditText
+			android:id="@+id/text_edit_title"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:scrollHorizontally="true"
+			android:maxLines="1"
+			android:inputType="text|textCapSentences"
+			android:imeOptions="actionDone|flagNoFullscreen"
+			android:hint="@string/dialog_edit_title_hint"/>
+
+	</android.support.design.widget.TextInputLayout>
+
+</FrameLayout>

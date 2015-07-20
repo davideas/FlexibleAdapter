@@ -1,8 +1,8 @@
 # FlexibleAdapter
-#### Version of 2015.07.03
-#### A pattern for every RecycleView
+#### Version of 2015.07.20
+#### A pattern for every RecyclerView
 
-The functionalities are taken from different blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecycleView.
+The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecycleView.
 
 * At lower class there is SelectableAdapter that provides selection functionalities and it's able to _maintain the state_ after the rotation, you just need to call the onSave/onRestore methods from the Activity!
 * Then, the class FlexibleAdapter handles the content paying attention at the animations (calling notify only for the position. _Note:_ you still need to set your animation to the RecyclerView when you create it in the Activity).
@@ -12,15 +12,15 @@ I've put the click listeners inside the ViewHolder and the Set is done at the cr
 
 Also note that this adapter handles the basic clicks: _single_ and _long clicks_. If you need a double tap you need to implement the android.view.GestureDetector.
 
-**Notes:**
-There's an example adapter which does not compile because you need to change the classes with the ones you have in your project :-)
-
 I still have to improve it, so keep an eye on it.
-I would like to add some new functionalities, like the Undo (Time is always missing).
+I would like to add some new functionalities, like the Undo.
+
+# Screenshots
+![Main screen](/screenshots/main_screen.png) ![Multi Selection](/screenshots/multi_selection.png)
 
 #Setup
 Ultra simple:
-No needs to create and import library for just 2 files, so just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my example Adapter).
+No needs to create and import library for just 2 files, so just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).
 
 ####Pull requests / Issues / Improvement requests
 Feel free to do and ask!
@@ -42,8 +42,10 @@ In your activity change the Mode for the _ActionMode_ object.
 		mActionMode = null;
 	}
 
-
 #Change Log
+**2015.07.20**
+- New full working example Android Studio project! (with some nice extra-features)
+
 **2015.07.03**
 - Added new method _updateItem()_
 - Deprecated _removeSelection()_ -> Use _toggleSelection()_ instead!
@@ -62,7 +64,6 @@ In your activity change the Mode for the _ActionMode_ object.
 - Initial release
 
 #Thanks
-
 I've used these blogs as starting point:
 
 http://enoent.fr/blog/2015/01/18/recyclerview-basics/

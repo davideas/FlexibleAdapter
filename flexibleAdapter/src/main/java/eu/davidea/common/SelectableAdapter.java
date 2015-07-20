@@ -1,4 +1,4 @@
-package eu.davidea.flexibleadapter;
+package eu.davidea.common;
 
 import java.util.ArrayList;
 import java.util.Iterator;

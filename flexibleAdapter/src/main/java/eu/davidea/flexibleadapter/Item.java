@@ -1,6 +1,11 @@
-package eu.davidea.example;
+package eu.davidea.flexibleadapter;
 
-public class Item {
+import java.io.Serializable;
+
+public class Item implements Serializable {
+
+	private static final long serialVersionUID = -6882745111884490060L;
+
 	private int id;
 	private String title;
 	private String subtitle;

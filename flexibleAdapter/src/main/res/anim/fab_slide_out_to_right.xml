@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:interpolator/anticipate_overshoot">
+    <translate
+        android:fromXDelta="0"
+        android:toXDelta="100%p"
+        android:duration="400" />
+</set>

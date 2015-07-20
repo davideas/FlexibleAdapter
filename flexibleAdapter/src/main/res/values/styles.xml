@@ -17,4 +17,17 @@
 		<item name="primaryTextSelector">@drawable/primary_text_selector_light</item>
     </style>
 
+	<style name="animation_slide_from_right">
+		<item name="android:windowEnterAnimation">@anim/fab_slide_in_from_right</item>
+		<item name="android:windowExitAnimation">@anim/fab_slide_out_to_left</item>
+	</style>
+
+    <style name="AppTheme.DialogMetrics">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/dialog_padding_horizontal</item>
+        <item name="android:paddingRight">@dimen/dialog_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/dialog_padding_vertical</item>
+    </style>
+
 </resources>

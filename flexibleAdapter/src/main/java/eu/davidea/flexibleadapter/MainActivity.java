@@ -1,4 +1,4 @@
-package eu.davidea.example;
+package eu.davidea.flexibleadapter;
 
 import android.annotation.TargetApi;
 import android.os.Build;
@@ -14,14 +14,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import eu.davidea.flexibleadapter.R;
+import eu.davidea.common.SimpleDividerItemDecoration;
 import eu.davidea.utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements
-		ActionMode.Callback,
+		ActionMode.Callback, EditItemDialog.OnEditItemListener,
 		ExampleAdapter.OnItemClickListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
@@ -71,21 +72,26 @@ public class MainActivity extends AppCompatActivity implements
 		mFab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				destroyActionModeIfNeeded();
+
 				Item item = null;
 				for (int i = 0; i<mAdapter.getItemCount()+1; i++) {
 					item = mAdapter.getNewExampleItem(i);
-					Log.d(TAG, "check "+item.getId());
 					if (!mAdapter.contains(item)) {
 						mAdapter.addItem(i, item);
 						Toast.makeText(MainActivity.this, "Added New "+item.getTitle(), Toast.LENGTH_SHORT).show();
 						mRecyclerView.smoothScrollToPosition(i);
+
+						//EmptyView
+						updateEmptyView();
+
 						break;
 					}
 				}
 			}
 		});
 
-		//EmptyView
+		//Update EmptyView (by default EmptyView is visible)
 		updateEmptyView();
 
 		//Restore previous state
@@ -107,7 +113,12 @@ public class MainActivity extends AppCompatActivity implements
 	public void onSaveInstanceState(Bundle outState) {
 		Log.v(TAG, "onSaveInstanceState start!");
 
-		mAdapter.onSaveInstanceState(outState);
+		if (mActivatedPosition != AdapterView.INVALID_POSITION) {
+			//Serialize and persist the activated item position.
+			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+			Log.d(TAG, STATE_ACTIVATED_POSITION + "=" + mActivatedPosition);
+		}
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -121,7 +132,11 @@ public class MainActivity extends AppCompatActivity implements
 		int id = item.getItemId();
 		//noinspection SimplifiableIfStatement
 		if (id == R.id.action_about) {
-			Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show();
+			MessageDialog.newInstance(
+					R.drawable.ic_info_grey600_24dp,
+					getString(R.string.about_title),
+					getString(R.string.about_body, Utils.getVersionName(this)) )
+					.show(getFragmentManager(), MessageDialog.TAG);
 			return true;
 		}
 
@@ -161,6 +176,14 @@ public class MainActivity extends AppCompatActivity implements
 		mActivatedPosition = position;
 	}
 
+
+	@Override
+	public void onTitleModified(int position, String newTitle) {
+		Item item = mAdapter.getItem(position);
+		item.setTitle(newTitle);
+		mAdapter.updateItem(position, item);
+	}
+
 	@Override
 	public boolean onListItemClick(int position) {
 		if (mActionMode != null && position != INVALID_POSITION) {
@@ -173,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements
 				if (position != mActivatedPosition) setActivatedPosition(position);
 				Item item = mAdapter.getItem(position);
 				//TODO: call your custom Callback, for example mCallback.onItemSelected(item.getId());
-				Toast.makeText(this, "Click on "+item.getTitle(), Toast.LENGTH_SHORT).show();
+				EditItemDialog.newInstance(item, position).show(getFragmentManager(), EditItemDialog.TAG);
 			}
 			return false;
 		}

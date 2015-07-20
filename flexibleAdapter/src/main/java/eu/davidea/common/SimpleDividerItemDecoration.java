@@ -1,4 +1,4 @@
-package eu.davidea.example;
+package eu.davidea.common;
 
 import android.content.Context;
 import android.content.res.TypedArray;

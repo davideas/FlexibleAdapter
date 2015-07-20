@@ -8,8 +8,8 @@ android {
 		applicationId "eu.davidea.flexibleadapter"
 		minSdkVersion 14
 		targetSdkVersion 22
-		versionCode 1
-		versionName "1.0"
+		versionCode 4
+		versionName "2015.07.20"
 	}
 	buildTypes {
 		release {

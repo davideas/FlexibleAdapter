@@ -8,7 +8,40 @@
 	<string name="action_deleted">deleted</string>
 
 	<!-- User Learns Selection -->
-	<string name="uls_title"><![CDATA[<i>Click on Image [or LongClick on Item] to select that Item</i>]]></string>
-	<string name="uls_subtitle"><![CDATA[<i>This is an example of 2nd view</i>]]></string>
+	<string name="uls_title"><![CDATA[<i>Click on Image (or LongClick on Item) to select that Item</i>]]></string>
+	<string name="uls_subtitle"><![CDATA[<i>This is an example of 2nd view type</i>]]></string>
 	<string name="no_items">No items</string>
+	<string name="dialog_edit_title_hint">Title</string>
+	<string name="dialog_edit_title">Edit title</string>
+	<string name="CANCEL">Cancel</string>
+	<string name="OK">OK</string>
+	<string name="err_no_edit">Nothing to modify</string>
+
+	<!-- About -->
+	<string name="about_title">About</string>
+	<string name="about_body"><![CDATA[
+<b>Flexible Adapter</b><br/>
+%1$s
+
+<br/><br/><b>Author</b><br/>
+<a href="https://plus.google.com/u/0/108655371836503419479">Davide Steduto on G+</a>
+
+<br/><br/><b>Contact</b><br/>
+<a href="https://github.com/davideas">Github Profile</a>
+
+<br/><br/><b>Licence</b><br/>
+Copyright © 2015 Davide Steduto.
+<br/><br/>Licensed under the Apache License, Version 2.0 (the "License");
+You may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+<br/><br/><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>
+
+<br/><br/>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<br/>See the License for the specific language governing permissions and
+limitations under the License.
+]]></string>
+
 </resources>

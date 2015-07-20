@@ -1,4 +1,4 @@
-package eu.davidea.example;
+package eu.davidea.flexibleadapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -13,8 +13,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.R;
+import eu.davidea.common.FlexibleAdapter;
 
 
 public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item> {
@@ -157,13 +156,13 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		} else {
 			//Display the current flip status
 			//setFlipped(holder.mImageView, isSelected(position));
+		}
 
-			//This "if-else" is just an example
-			if (isSelected(position)) {
-				holder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_selected));
-			} else {
-				holder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
-			}
+		//This "if-else" is just an example
+		if (isSelected(position)) {
+			holder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_selected));
+		} else {
+			holder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
 		}
 
 		holder.mTitle.setText(item.getTitle());

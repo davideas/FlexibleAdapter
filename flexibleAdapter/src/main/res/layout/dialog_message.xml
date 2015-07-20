@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:scrollbars="vertical"
+	android:scrollbarStyle="outsideInset">
+		
+	<TextView 
+	   	android:id="@+id/message"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingTop="@dimen/dialog_padding_vertical"
+		android:layout_marginLeft="@dimen/dialog_padding_horizontal"
+		android:layout_marginStart="@dimen/dialog_padding_horizontal"
+		android:layout_marginRight="@dimen/dialog_padding_horizontal"
+		android:layout_marginEnd="@dimen/dialog_padding_horizontal"
+		android:paddingBottom="@dimen/dialog_padding_vertical"
+		tools:text="Message"/>
+
+</ScrollView>
