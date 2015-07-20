@@ -81,16 +81,26 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	
 	public void addItem(int position, T item) {
 		if (position < 0) return;
-		mItems.add(position, item);
-		Log.d(TAG, "addItem notifyItemInserted on position "+position);
-		notifyItemInserted(position);
+		if (position < mItems.size()) {
+			Log.d(TAG, "addItem notifyItemInserted on position "+position);
+			mItems.add(position, item);
+			notifyItemInserted(position);
+		} else {
+			Log.d(TAG, "addItem notifyItemInserted on last position");
+			mItems.add(item);
+			notifyItemInserted(mItems.size());
+		}
 	}
 	
-	private void removeItem(int position) {
+	public void removeItem(int position) {
 		if (position < 0) return;
-		mItems.remove(position);
-		Log.d(TAG, "removeItem notifyItemRemoved on position "+position);
-		notifyItemRemoved(position);
+		if (position < mItems.size()) {
+			Log.d(TAG, "removeItem notifyItemRemoved on position " + position);
+			mItems.remove(position);
+			notifyItemRemoved(position);
+		} else {
+			Log.w(TAG, "removeItem WARNING! Position OutOfBound! Review the position to remove!");
+		}
 	}
 	
 	public void removeItems(List<Integer> selectedPositions) {

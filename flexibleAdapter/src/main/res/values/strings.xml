@@ -1,0 +1,14 @@
+<resources>
+	<string name="app_name">Flexible Adapter</string>
+	<string name="action_about">About</string>
+	<string name="action_delete">Delete</string>
+	<string name="action_select_all">Select All</string>
+	<string name="action_selected_one">selected</string>
+	<string name="action_selected_many">selected</string>
+	<string name="action_deleted">deleted</string>
+
+	<!-- User Learns Selection -->
+	<string name="uls_title"><![CDATA[<i>Click on Image [or LongClick on Item] to select that Item</i>]]></string>
+	<string name="uls_subtitle"><![CDATA[<i>This is an example of 2nd view</i>]]></string>
+	<string name="no_items">No items</string>
+</resources>
