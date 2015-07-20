@@ -113,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements
 	public void onSaveInstanceState(Bundle outState) {
 		Log.v(TAG, "onSaveInstanceState start!");
 
+		mAdapter.onSaveInstanceState(outState);
+
 		if (mActivatedPosition != AdapterView.INVALID_POSITION) {
 			//Serialize and persist the activated item position.
 			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
