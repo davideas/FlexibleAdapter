@@ -8,6 +8,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.view.View;
@@ -18,9 +19,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import eu.davidea.flexibleadapter.R;
+
 public final class Utils {
 
 	public static final String DATE_TIME = "dd MMM yyyy HH:mm:ss z";
+	private static int colorAccent = -1;
 
 	private Utils() {
 	}
@@ -96,6 +100,16 @@ public final class Utils {
 		} catch (PackageManager.NameNotFoundException e) {
 			return 0;
 		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static int getColorAccent(Context context) {
+		if (colorAccent < 0) {
+			int accentAttr = Utils.hasLollipop() ? android.R.attr.colorAccent : R.attr.colorAccent;
+			TypedArray androidAttr = context.getTheme().obtainStyledAttributes(new int[] { accentAttr });
+			colorAccent = androidAttr.getColor(0, 0xFF009688); //Default: material_deep_teal_500
+		}
+		return colorAccent;
 	}
 
 	/**

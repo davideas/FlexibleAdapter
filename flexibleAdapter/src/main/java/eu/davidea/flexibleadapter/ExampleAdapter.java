@@ -1,8 +1,12 @@
 package eu.davidea.flexibleadapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,15 +16,17 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import eu.davidea.common.FlexibleAdapter;
+import eu.davidea.utils.Utils;
 
 
 public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item> {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 	private static final int ITEMS = 20;
-	
+
 	public interface OnItemClickListener {
 		/**
 		 * Delegate the click event to the listener and check if selection MULTI enabled.<br/>
@@ -41,14 +47,16 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	private static final int
 			EXAMPLE_VIEW_TYPE = 0,
 			ROW_VIEW_TYPE = 1;
+
 	private LayoutInflater mInflater;
 	private OnItemClickListener mClickListener;
+
 	//Selection fields
 	private boolean
 			mUserLearnedSelection = false,
 			mLastItemInActionMode = false,
 			mSelectAll = false;
-    
+
 	public ExampleAdapter(Context context, OnItemClickListener listener, String listId) {
 		this.mContext = context;
 		this.mClickListener = listener;
@@ -56,15 +64,15 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	}
 	
 	public void updateDataSet(String param) {
-		//Fill mItems with your custom list
-		this.mItems = createExampleItems();
-		if (!mUserLearnedSelection && mItems.size() > 0) {
+		//Fill mObjects with your custom list
+		this.mObjects = createExampleItems();
+		if (!mUserLearnedSelection && getItemCount() > 0) {
 			//Define Example View
 			Item item = new Item();
 			item.setId(0);
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			this.mItems.add(0, item);
+			this.mObjects.add(0, item);
 		}
 	}
 
@@ -82,11 +90,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		}
 		return items;
 	}
-	
-	public Item getItem(int position) {
-		return mItems.get(position);
-	}
-	
+
 	@Override
 	public void setMode(int mode) {
 		super.setMode(mode);
@@ -101,7 +105,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 	@Override
 	public int getItemViewType(int position) {
-		return (position == 0 && !mUserLearnedSelection ? EXAMPLE_VIEW_TYPE : ROW_VIEW_TYPE);
+		return (position == 0 && !mUserLearnedSelection && !hasSearchText() ? EXAMPLE_VIEW_TYPE : ROW_VIEW_TYPE);
 	}
 
 	@Override
@@ -125,7 +129,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	@Override
 	public void onBindViewHolder(SimpleViewHolder holder, final int position) {
 		Log.d(TAG, "onBindViewHolder for position " + position);
-		final Item item = mItems.get(position);
+		final Item item = getItem(position);
 
 		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 
@@ -165,10 +169,44 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			holder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
 		}
 
-		holder.mTitle.setText(item.getTitle());
-		holder.mSubtitle.setText(item.getSubtitle());
+		//In case of searchText matches with Title or with an Item's field
+		// this will be highlighted
+		if (hasSearchText()) {
+			setHighlightText(holder.mTitle, item.getTitle(), mSearchText);
+			setHighlightText(holder.mSubtitle, item.getSubtitle(), mSearchText);
+		} else {
+			holder.mTitle.setText(item.getTitle());
+			holder.mSubtitle.setText(item.getSubtitle());
+		}
+
 	}
-	
+
+	private void setHighlightText(TextView textView, String text, String searchText) {
+		Spannable spanText = Spannable.Factory.getInstance().newSpannable(text);
+		int i = text.toLowerCase(Locale.getDefault()).indexOf(searchText);
+		if (i != -1) {
+			spanText.setSpan(new ForegroundColorSpan(Utils.getColorAccent(mContext)), i,
+					i + searchText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			spanText.setSpan(new StyleSpan(Typeface.BOLD), i,
+					i + searchText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			textView.setText(spanText, TextView.BufferType.SPANNABLE);
+		} else {
+			textView.setText(text, TextView.BufferType.NORMAL);
+		}
+	}
+
+	@Override
+	protected boolean filterObject(Item myObject, String constraint) {
+		String valueText = myObject.getTitle();
+		//Filter on Title
+		if (valueText != null && valueText.toLowerCase().contains(constraint)) {
+			return true;
+		}
+		//Filter on Subtitle
+		valueText = myObject.getSubtitle();
+		return valueText != null && valueText.toLowerCase().contains(constraint);
+	}
+
 	/**
 	 * Used for UserLearnsSelection.
 	 * Must be the base class of extension for Adapter Class.

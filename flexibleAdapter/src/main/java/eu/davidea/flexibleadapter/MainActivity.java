@@ -1,19 +1,25 @@
 package eu.davidea.flexibleadapter;
 
 import android.annotation.TargetApi;
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +29,7 @@ import eu.davidea.utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener,
+		SearchView.OnQueryTextListener,
 		ExampleAdapter.OnItemClickListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
@@ -125,8 +132,37 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		Log.v(TAG, "onCreateOptionsMenu called!");
 		getMenuInflater().inflate(R.menu.menu_main, menu);
+		initSearchView(menu);
 		return true;
+	}
+
+	private void initSearchView(Menu menu) {
+		//Associate searchable configuration with the SearchView
+		Log.d(TAG, "onCreateOptionsMenu setup SearchView!");
+		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+		SearchView searchView = (SearchView) MenuItemCompat
+				.getActionView(menu.findItem(R.id.action_search));
+		searchView.setInputType(InputType.TYPE_TEXT_VARIATION_FILTER);
+		searchView.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_FULLSCREEN);
+		searchView.setQueryHint(getString(R.string.action_search));
+		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+		searchView.setOnQueryTextListener(this);
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		Log.v(TAG, "onPrepareOptionsMenu called!");
+		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+		if (!mAdapter.hasSearchText()) {
+			Log.d(TAG, "onPrepareOptionsMenu Clearing SearchView!");
+			searchView.setIconified(true);// This also clears the text in SearchView widget
+		} else {
+			searchView.setQuery(mAdapter.getSearchText(), false);
+			searchView.setIconified(false);
+		}
+		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
@@ -255,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements
 			//getWindow().setNavigationBarColor(getResources().getColor(R.color.colorAccentDark_light));
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorAccentDark_light));
 		}
+
 		return true;
 	}
 
@@ -319,6 +356,22 @@ public class MainActivity extends AppCompatActivity implements
 
 		//Close the App
 		super.onBackPressed();
+	}
+
+	@Override
+	public boolean onQueryTextChange(String newText) {
+		if (!ExampleAdapter.getSearchText().equalsIgnoreCase(newText)) {
+			Log.d(TAG, "onQueryTextChange newText: " + newText);
+			ExampleAdapter.setSearchText(newText);
+			mAdapter.getFilter().filter(newText);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onQueryTextSubmit(String query) {
+		Log.v(TAG, "onQueryTextSubmit called!");
+		return onQueryTextChange(query);
 	}
 
 }
