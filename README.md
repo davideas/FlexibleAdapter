@@ -1,5 +1,5 @@
 # FlexibleAdapter
-#### Version of 2015.07.20
+#### Version of 2015.07.21
 #### A pattern for every RecyclerView
 
 The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecycleView.
@@ -43,6 +43,10 @@ In your activity change the Mode for the _ActionMode_ object.
 	}
 
 #Change Log
+**2015.07.21**
+- Added filter engine (experimental), it works but not practical if you perform operations (Add/Del/Mod) on filtered list.
+- Added Undo functionality.
+
 **2015.07.20**
 - New full working example Android Studio project! (with some nice extra-features)
 

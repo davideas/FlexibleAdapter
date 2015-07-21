@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import eu.davidea.flexibleadapter.Item;
 
@@ -31,6 +33,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		implements Filterable {
 
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();
+	public static final long UNDO_TIMEOUT = 5000L;
 
 	/**
 	 * Lock used to modify the content of {@link #mObjects}. Any write operation performed on the array should be
@@ -40,7 +43,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	private final Object mLock = new Object();
 
 	protected List<T> mObjects;
-	//TODO: Handling the undo functionality
+	protected List<T> mDeletedObjects;
+	protected List<Integer> mOriginalPosition;
+	private Timer mUndoTimer;
 
 	//Searchable fields
 	protected static String mSearchText; //Static: It can exist only 1 searchText
@@ -149,12 +154,15 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 
 		notifyItemInserted(position);
 	}
+
+	/* DELETE ITEMS METHODS */
 	
 	public void removeItem(int position) {
 		if (position < 0) return;
 		if (position < mObjects.size()) {
 			Log.d(TAG, "removeItem notifyItemRemoved on position " + position);
 			synchronized (mLock) {
+				saveDeletedItem(position);
 				if (mOriginalValues != null) {
 					mOriginalValues.remove(getOriginalPositionForItem(mObjects.get(position)));
 				}
@@ -206,6 +214,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		Log.d(TAG, "removeRange positionStart="+positionStart+ " itemCount="+itemCount);
 		for (int i = 0; i < itemCount; ++i) {
 			synchronized (mLock) {
+				saveDeletedItem(positionStart);
 				if (mOriginalValues != null) {
 					mOriginalValues.remove(getOriginalPositionForItem(mObjects.get(positionStart)));
 				}
@@ -216,6 +225,56 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		notifyItemRangeRemoved(positionStart, itemCount);
 	}
 
+	/* UNDO METHODS */
+
+	private void saveDeletedItem(int position) {
+		if (mDeletedObjects == null) {
+			mDeletedObjects = new ArrayList<T>();
+			mOriginalPosition = new ArrayList<Integer>();
+		}
+		Log.d(TAG, "Recycled "+getItem(position)+" on position="+position);
+		mDeletedObjects.add(mObjects.get(position));
+		mOriginalPosition.add(position);
+	}
+
+	public void restoreDeletedItems() {
+		stopUndoTimer();
+		//Reverse insert (list was reverse ordered on Delete)
+		for (int i = mOriginalPosition.size()-1; i >= 0; i--) {
+			addItem(mOriginalPosition.get(i), mDeletedObjects.get(i));
+		}
+		emptyBin();
+	}
+
+	public void emptyBin() {
+		mDeletedObjects = null;
+		mOriginalPosition = null;
+	}
+
+	public void startUndoTimer() {
+		startUndoTimer(0);
+	}
+	public void startUndoTimer(long timeout) {
+		stopUndoTimer();
+		this.mUndoTimer = new Timer();
+		this.mUndoTimer.schedule(new UndoTimer(), timeout > 0 ? timeout : UNDO_TIMEOUT);
+	}
+
+	private void stopUndoTimer() {
+		if (this.mUndoTimer != null) {
+			this.mUndoTimer.cancel();
+			this.mUndoTimer = null;
+		}
+	}
+
+	private class UndoTimer extends TimerTask {
+		public void run() {
+			mUndoTimer = null;
+			emptyBin();
+		}
+	}
+
+	/* SEARCH-FILTER */
 
 	public static String getSearchText() {
 		return mSearchText != null ? mSearchText : "";

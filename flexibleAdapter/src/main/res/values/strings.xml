@@ -44,5 +44,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 limitations under the License.
 ]]></string>
 	<string name="action_search">Search...</string>
+	<string name="undo">Undo</string>
 
 </resources>

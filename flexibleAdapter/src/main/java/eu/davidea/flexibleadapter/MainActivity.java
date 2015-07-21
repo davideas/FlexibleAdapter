@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -312,11 +313,20 @@ public class MainActivity extends AppCompatActivity implements
 					//TODO: Remove items from your database. Example:
 					//DatabaseService.getInstance().removeItem(mAdapter.getItem(i));
 				}
-				Toast.makeText(this,
-						mAdapter.getSelectedItems() + " " + getString(R.string.action_deleted),
-						Toast.LENGTH_SHORT).show();
 				//Keep synchronized the Adapter: Remove selected items from Adapter
 				mAdapter.removeItems(mAdapter.getSelectedItems());
+				//Snackbar for Undo
+				Snackbar.make(findViewById(R.id.main_view),
+							mAdapter.getSelectedItems() + " " + getString(R.string.action_deleted),
+							Snackbar.LENGTH_LONG) //This duration should be customizable when Google decides to make it.
+						.setAction(R.string.undo, new View.OnClickListener() {
+							@Override
+								public void onClick(View v) {
+									mAdapter.restoreDeletedItems();
+								}
+							})
+						.show();
+				mAdapter.startUndoTimer();
 				mActionMode.finish();
 				return true;
 			default:
