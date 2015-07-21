@@ -14,7 +14,7 @@ Also note that this adapter handles the basic clicks: _single_ and _long clicks_
 
 # Screenshots
 ![Main screen](/screenshots/main_screen.png) ![Multi Selection](/screenshots/multi_selection.png)
-![Search screen](/screenshots/filter.png) ![Undo Screen](/screenshots/undo.png)
+![Search screen](/screenshots/search.png) ![Undo Screen](/screenshots/undo.png)
 
 #Setup
 Ultra simple:
