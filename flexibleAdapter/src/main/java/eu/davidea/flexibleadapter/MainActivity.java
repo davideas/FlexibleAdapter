@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
@@ -139,17 +140,30 @@ public class MainActivity extends AppCompatActivity implements
 		return true;
 	}
 
-	private void initSearchView(Menu menu) {
+	private void initSearchView(final Menu menu) {
 		//Associate searchable configuration with the SearchView
 		Log.d(TAG, "onCreateOptionsMenu setup SearchView!");
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-		SearchView searchView = (SearchView) MenuItemCompat
+		final SearchView searchView = (SearchView) MenuItemCompat
 				.getActionView(menu.findItem(R.id.action_search));
 		searchView.setInputType(InputType.TYPE_TEXT_VARIATION_FILTER);
 		searchView.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_FULLSCREEN);
 		searchView.setQueryHint(getString(R.string.action_search));
 		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 		searchView.setOnQueryTextListener(this);
+		searchView.setOnSearchClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				menu.findItem(R.id.action_about).setVisible(false);
+			}
+		});
+		searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+			@Override
+			public boolean onClose() {
+				menu.findItem(R.id.action_about).setVisible(true);
+				return false;
+			}
+		});
 	}
 
 	@Override
@@ -164,6 +178,31 @@ public class MainActivity extends AppCompatActivity implements
 			searchView.setIconified(false);
 		}
 		return super.onPrepareOptionsMenu(menu);
+	}
+
+
+	@Override
+	public boolean onQueryTextChange(String newText) {
+		if (!ExampleAdapter.getSearchText().equalsIgnoreCase(newText)) {
+			Log.d(TAG, "onQueryTextChange newText: " + newText);
+			ExampleAdapter.setSearchText(newText);
+			mAdapter.getFilter().filter(newText);
+		}
+		//Due to Filter background Thread, give some short time to finish filtering
+		//Otherwise Adapter could not be synchronized with the new content
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				updateEmptyView();
+			}
+		}, 100L);
+		return true;
+	}
+
+	@Override
+	public boolean onQueryTextSubmit(String query) {
+		Log.v(TAG, "onQueryTextSubmit called!");
+		return onQueryTextChange(query);
 	}
 
 	@Override
@@ -313,21 +352,24 @@ public class MainActivity extends AppCompatActivity implements
 					//TODO: Remove items from your database. Example:
 					//DatabaseService.getInstance().removeItem(mAdapter.getItem(i));
 				}
+
 				//Keep synchronized the Adapter: Remove selected items from Adapter
+				String message = mAdapter.getSelectedItems() + " " + getString(R.string.action_deleted);
 				mAdapter.removeItems(mAdapter.getSelectedItems());
+
 				//Snackbar for Undo
-				Snackbar.make(findViewById(R.id.main_view),
-							mAdapter.getSelectedItems() + " " + getString(R.string.action_deleted),
-							Snackbar.LENGTH_LONG) //This duration should be customizable when Google decides to make it.
+				//The duration should be customizable when Google decides to make it...
+				Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_LONG)
 						.setAction(R.string.undo, new View.OnClickListener() {
 							@Override
-								public void onClick(View v) {
+							public void onClick(View v) {
 									mAdapter.restoreDeletedItems();
 								}
 							})
 						.show();
 				mAdapter.startUndoTimer();
 				mActionMode.finish();
+
 				return true;
 			default:
 				return false;
@@ -366,22 +408,6 @@ public class MainActivity extends AppCompatActivity implements
 
 		//Close the App
 		super.onBackPressed();
-	}
-
-	@Override
-	public boolean onQueryTextChange(String newText) {
-		if (!ExampleAdapter.getSearchText().equalsIgnoreCase(newText)) {
-			Log.d(TAG, "onQueryTextChange newText: " + newText);
-			ExampleAdapter.setSearchText(newText);
-			mAdapter.getFilter().filter(newText);
-		}
-		return true;
-	}
-
-	@Override
-	public boolean onQueryTextSubmit(String query) {
-		Log.v(TAG, "onQueryTextSubmit called!");
-		return onQueryTextChange(query);
 	}
 
 }

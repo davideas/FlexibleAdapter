@@ -12,11 +12,9 @@ I've put the click listeners inside the ViewHolder and the Set is done at the cr
 
 Also note that this adapter handles the basic clicks: _single_ and _long clicks_. If you need a double tap you need to implement the android.view.GestureDetector.
 
-I still have to improve it, so keep an eye on it.
-I would like to add some new functionalities, like the Undo.
-
 # Screenshots
 ![Main screen](/screenshots/main_screen.png) ![Multi Selection](/screenshots/multi_selection.png)
+![Search screen](/screenshots/filter.png) ![Undo Screen](/screenshots/undo.png)
 
 #Setup
 Ultra simple:
