@@ -48,7 +48,7 @@ In your activity change the Mode for the _ActionMode_ object.
 			//...
 			case R.id.action_delete:
 				for (int i : mAdapter.getSelectedItems()) {
-					//TODO: Remove items from your database. Example:
+					//Remove items from your Database. Example:
 					DatabaseService.getInstance().removeItem(mAdapter.getItem(i));
 				}
 				//Keep synchronized the Adapter: Remove selected items from Adapter
