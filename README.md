@@ -21,7 +21,7 @@ Ultra simple:
 No needs to create and import library for just 2 files, so just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).
 
 ####Pull requests / Issues / Improvement requests
-Feel free to pull and ask!
+Feel free to write and ask!
 
 #Usage for Multi Selection
 In your activity change the Mode for the _ActionMode_ object.
