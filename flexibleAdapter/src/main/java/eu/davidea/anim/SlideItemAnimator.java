@@ -1,4 +1,4 @@
-package com.twotoasters.anim;
+package eu.davidea.anim;
 
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
@@ -6,9 +6,10 @@ import android.view.View;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.BounceInterpolator;
 
-import com.twotoasters.android.support.v7.widget.RecyclerView.LayoutParams;
-import com.twotoasters.android.support.v7.widget.RecyclerView.ViewHolder;
-import com.twotoasters.utils.DisplayUtils;
+import android.support.v7.widget.RecyclerView.LayoutParams;
+import android.support.v7.widget.RecyclerView.ViewHolder;
+
+import eu.davidea.utils.Utils;
 
 public class SlideItemAnimator extends PendingItemAnimator {
     public SlideItemAnimator() {
@@ -26,7 +27,7 @@ public class SlideItemAnimator extends PendingItemAnimator {
         final View view = holder.itemView;
         ViewCompat.animate(view).cancel();
         return ViewCompat.animate(view)
-                .translationX(DisplayUtils.getScreenDimensions(holder.itemView.getContext()).x)
+                .translationX(Utils.getScreenDimensions(holder.itemView.getContext()).x)
                 .setInterpolator(new AnticipateOvershootInterpolator());
     }
 

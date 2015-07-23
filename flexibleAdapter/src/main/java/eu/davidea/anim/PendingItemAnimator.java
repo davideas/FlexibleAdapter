@@ -1,4 +1,4 @@
-package com.twotoasters.anim;
+package eu.davidea.anim;
 
 /**
  * This class handles the pending que for you.
@@ -9,8 +9,8 @@ import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.view.View;
 
-import com.twotoasters.android.support.v7.widget.RecyclerView;
-import com.twotoasters.android.support.v7.widget.RecyclerView.ViewHolder;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.ViewHolder;
 
 import java.util.ArrayList;
 
@@ -253,7 +253,13 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends Recycler
         return prepHolderForAnimateMove((H) holder, fromX, fromY, toX, toY);
     }
 
-    /** Do whatever you need to do before animation. **/
+	@Override
+	public boolean animateChange(ViewHolder oldHolder, ViewHolder newHolder,
+			 int fromLeft, int fromTop, int toLeft, int toTop) {
+		return false;
+	}
+
+	/** Do whatever you need to do before animation. **/
     protected boolean prepHolderForAnimateMove(final H holder, int fromX, int fromY, int toX, int toY) {
         final View view = holder.itemView;
         int deltaX = toX - fromX;

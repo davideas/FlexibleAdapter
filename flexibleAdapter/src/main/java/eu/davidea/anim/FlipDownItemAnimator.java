@@ -1,11 +1,11 @@
-package com.twotoasters.anim;
+package eu.davidea.anim;
 
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
 
-import com.twotoasters.android.support.v7.widget.RecyclerView.ViewHolder;
+import android.support.v7.widget.RecyclerView.ViewHolder;
 
 public class FlipDownItemAnimator extends PendingItemAnimator {
 

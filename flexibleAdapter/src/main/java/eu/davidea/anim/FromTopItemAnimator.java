@@ -1,4 +1,4 @@
-package com.twotoasters.anim;
+package eu.davidea.anim;
 
 import android.graphics.Point;
 import android.support.v4.view.ViewCompat;
@@ -6,8 +6,9 @@ import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 
-import com.twotoasters.android.support.v7.widget.RecyclerView.ViewHolder;
-import com.twotoasters.utils.DisplayUtils;
+import android.support.v7.widget.RecyclerView.ViewHolder;
+
+import eu.davidea.utils.Utils;
 
 public class FromTopItemAnimator extends PendingItemAnimator {
 
@@ -24,7 +25,7 @@ public class FromTopItemAnimator extends PendingItemAnimator {
 
     @Override
     protected ViewPropertyAnimatorCompat animateRemoveImpl(ViewHolder holder) {
-        Point screen = DisplayUtils.getScreenDimensions(holder.itemView.getContext());
+        Point screen = Utils.getScreenDimensions(holder.itemView.getContext());
         int top = holder.itemView.getTop();
         return ViewCompat.animate(holder.itemView)
                 .rotation(80)
