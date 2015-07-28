@@ -1,5 +1,6 @@
 # FlexibleAdapter
-#### Version of 2015.07.20
+##### Dev branch version: 2015.07.21 (New! Search &amp; Undo)
+##### Master branch version: 2015.07.20
 #### A pattern for every RecyclerView
 
 The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecycleView.
