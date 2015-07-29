@@ -64,15 +64,15 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	}
 	
 	public void updateDataSet(String param) {
-		//Fill mObjects with your custom list
-		this.mObjects = createExampleItems();
-		if (!mUserLearnedSelection && getItemCount() > 0) {
+		//Fill mItems with your custom list
+		this.mItems = createExampleItems();
+		if (!mUserLearnedSelection && mItems.size() > 0) {
 			//Define Example View
 			Item item = new Item();
 			item.setId(0);
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			this.mObjects.add(0, item);
+			this.mItems.add(0, item);
 		}
 	}
 

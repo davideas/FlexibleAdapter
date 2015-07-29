@@ -371,6 +371,7 @@ public class MainActivity extends AppCompatActivity implements
 				mActionMode.finish();
 
 				return true;
+
 			default:
 				return false;
 		}

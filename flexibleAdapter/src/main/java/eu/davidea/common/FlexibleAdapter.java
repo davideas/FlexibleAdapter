@@ -14,7 +14,9 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import eu.davidea.flexibleadapter.Item;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.ViewGroup;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set
@@ -36,17 +38,16 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	public static final long UNDO_TIMEOUT = 5000L;
 
 	/**
-	 * Lock used to modify the content of {@link #mObjects}. Any write operation performed on the array should be
+	 * Lock used to modify the content of {@link #mItems}. Any write operation performed on the array should be
 	 * synchronized on this lock. This lock is also used by the filter (see {@link #getFilter()} to make a synchronized
 	 * copy of the original array of data.
 	 */
 	private final Object mLock = new Object();
 
-	protected List<T> mObjects;
-	protected List<T> mDeletedObjects;
+	protected List<T> mItems;
+	protected List<T> mDeletedItems;
 	protected List<Integer> mOriginalPosition;
 	private Timer mUndoTimer;
-
 	//Searchable fields
 	protected static String mSearchText; //Static: It can exist only 1 searchText
 	private FlexibleFilter mFilter;
@@ -74,17 +75,19 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	 * @return the custom "Item" object
 	 */
 	public T getItem(int position) {
-		return mObjects.get(position);
+		return mItems.get(position);
 	}
 	
 	/**
 	 * Retrieve the position of the Item in the Adapter
+	 *
 	 * @param item
 	 * @return the position in the Adapter if found, -1 otherwise
 	 */
 	public int getPositionForItem(T item) {
-		return mObjects != null && mObjects.size() > 0 ? mObjects.indexOf(item) : -1;
+		return mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
 	}
+
 
 	private int getOriginalPositionForItem(T item) {
 		return mOriginalValues != null && mOriginalValues.size() > 0 ? mOriginalValues.indexOf(item) : -1;
@@ -94,7 +97,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		if (mOriginalValues != null) {
 			return mOriginalValues.contains(item);
 		} else {
-			return mObjects != null && mObjects.contains(item);
+			return mItems != null && mItems.contains(item);
 		}
 	}
 	
@@ -106,7 +109,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 
 	@Override
 	public int getItemCount() {
-		return mObjects.size();
+		return mItems.size();
 	}
 	
 	public void updateItem(int position, T item) {
@@ -115,7 +118,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 			if (mOriginalValues != null) {
 				mOriginalValues.set(getOriginalPositionForItem(item), item);
 			}
-			mObjects.set(position, item);
+			mItems.set(position, item);
 		}
 		Log.d(TAG, "updateItem notifyItemChanged on position "+position);
 		notifyItemChanged(position);
@@ -129,15 +132,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	 */
 	public void addItem(int position, T item) {
 		if (position < 0) return;
-
 		//Insert Item
-		if (position < mObjects.size()) {
+		if (position < mItems.size()) {
 			Log.d(TAG, "addItem notifyItemInserted on position " + position);
 			synchronized (mLock) {
 				if (mOriginalValues != null) {
 					mOriginalValues.add(position, item);
 				}
-				mObjects.add(position, item);
+				mItems.add(position, item);
 			}
 
 		//Add Item at the last position
@@ -147,8 +149,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 				if (mOriginalValues != null) {
 					mOriginalValues.add(item);
 				}
-				mObjects.add(item);
-				position = mObjects.size();
+				mItems.add(item);
+				position = mItems.size();
 			}
 		}
 
@@ -159,14 +161,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	
 	public void removeItem(int position) {
 		if (position < 0) return;
-		if (position < mObjects.size()) {
+		if (position < mItems.size()) {
 			Log.d(TAG, "removeItem notifyItemRemoved on position " + position);
 			synchronized (mLock) {
 				saveDeletedItem(position);
 				if (mOriginalValues != null) {
-					mOriginalValues.remove(getOriginalPositionForItem(mObjects.get(position)));
+					mOriginalValues.remove(getOriginalPositionForItem(mItems.get(position)));
 				}
-				mObjects.remove(position);
+				mItems.remove(position);
 			}
 			notifyItemRemoved(position);
 		} else {
@@ -227,39 +229,64 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 
 	/* UNDO METHODS */
 
+	/**
+	 * Save temporary Items for an eventual Undo.
+	 *
+	 * @param position
+	 */
 	private void saveDeletedItem(int position) {
-		if (mDeletedObjects == null) {
-			mDeletedObjects = new ArrayList<T>();
+		if (mDeletedItems == null) {
+			mDeletedItems = new ArrayList<T>();
 			mOriginalPosition = new ArrayList<Integer>();
 		}
 		Log.d(TAG, "Recycled "+getItem(position)+" on position="+position);
-		mDeletedObjects.add(mObjects.get(position));
+		mDeletedItems.add(mItems.get(position));
 		mOriginalPosition.add(position);
 	}
 
+	/**
+	 * Restore items just removed.
+	 */
 	public void restoreDeletedItems() {
 		stopUndoTimer();
 		//Reverse insert (list was reverse ordered on Delete)
 		for (int i = mOriginalPosition.size()-1; i >= 0; i--) {
-			addItem(mOriginalPosition.get(i), mDeletedObjects.get(i));
+			addItem(mOriginalPosition.get(i), mDeletedItems.get(i));
 		}
 		emptyBin();
 	}
 
+	/**
+	 * Clean memory.
+	 * <br/><b>Note:</b> This method is automatically called after timer is over and after a restoration.
+	 */
 	public void emptyBin() {
-		mDeletedObjects = null;
+		mDeletedItems = null;
 		mOriginalPosition = null;
 	}
 
+	/**
+	 * Convenience method to start Undo timer with default timeout of 5''
+	 */
 	public void startUndoTimer() {
 		startUndoTimer(0);
 	}
+
+	/**
+	 * Start Undo timer with custom timeout
+	 *
+	 * @param timeout
+	 */
 	public void startUndoTimer(long timeout) {
 		stopUndoTimer();
 		this.mUndoTimer = new Timer();
 		this.mUndoTimer.schedule(new UndoTimer(), timeout > 0 ? timeout : UNDO_TIMEOUT);
 	}
 
+	/**
+	 * Stop Undo timer.
+	 * <br/><b>Note:</b> This method is automatically called in case of restoration.
+	 */
 	private void stopUndoTimer() {
 		if (this.mUndoTimer != null) {
 			this.mUndoTimer.cancel();
@@ -267,6 +294,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		}
 	}
 
+	/**
+	 * Inner class for TimerTask.
+	 */
 	private class UndoTimer extends TimerTask {
 		public void run() {
 			mUndoTimer = null;
