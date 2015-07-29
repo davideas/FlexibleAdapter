@@ -81,7 +81,8 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 #Change Log
 **2015.07.29**
 - Added **Undo** functionality
-- Moved getItem() into FlexibleAdapter that now is part of the library
+- Moved getItem() into FlexibleAdapter, method now is part of the library
+- Added synchronized blocks for write operations on mItems list
 
 **2015.07.20**
 - New full working example Android Studio project! (with some nice extra-features)
