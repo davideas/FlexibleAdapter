@@ -3,7 +3,7 @@
 ##### Master branch version: 2015.07.20
 #### A pattern for every RecyclerView
 
-The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecycleView.
+The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
 
 * At lower class there is SelectableAdapter that provides selection functionalities and it's able to _maintain the state_ after the rotation, you just need to call the onSave/onRestore methods from the Activity!
 * Then, the class FlexibleAdapter handles the content paying attention at the animations (calling notify only for the position. _Note:_ you still need to set your animation to the RecyclerView when you create it in the Activity).
@@ -29,19 +29,21 @@ Feel free to do and ask!
 #Usage for Multi Selection
 In your activity change the Mode for the _ActionMode_ object.
 
-	@Override
-	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-		mode.getMenuInflater().inflate(R.menu.menu_context, menu);
-		mAdapter.setMode(YourAdapterClass.MODE_MULTI);
-		return true;
-	}
+``` java
+@Override
+public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+	mode.getMenuInflater().inflate(R.menu.menu_context, menu);
+	mAdapter.setMode(YourAdapterClass.MODE_MULTI);
+	return true;
+}
 
-	@Override
-	public void onDestroyActionMode(ActionMode mode) {
-		mAdapter.setMode(YourAdapterClass.MODE_SINGLE);
-		mAdapter.clearSelection();
-		mActionMode = null;
-	}
+@Override
+public void onDestroyActionMode(ActionMode mode) {
+	mAdapter.setMode(YourAdapterClass.MODE_SINGLE);
+	mAdapter.clearSelection();
+	mActionMode = null;
+}
+```
 
 #Change Log
 **2015.07.20**
