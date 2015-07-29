@@ -218,9 +218,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 			synchronized (mLock) {
 				saveDeletedItem(positionStart);
 				if (mOriginalValues != null) {
-					mOriginalValues.remove(getOriginalPositionForItem(mObjects.get(positionStart)));
+					mOriginalValues.remove(getOriginalPositionForItem(mItems.get(positionStart)));
 				}
-				mObjects.remove(positionStart);
+				mItems.remove(positionStart);
 			}
 		}
 		Log.d(TAG, "removeRange notifyItemRangeRemoved");
@@ -372,7 +372,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 			//Save Original objects
 			if (mOriginalValues == null) {
 				synchronized (mLock) {
-					mOriginalValues = new ArrayList<T>(mObjects);
+					mOriginalValues = new ArrayList<T>(mItems);
 				}
 			}
 
@@ -414,7 +414,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		@Override
 		protected void publishResults(CharSequence constraint, FilterResults results) {
 			//noinspection unchecked
-			mObjects = (List<T>) results.values;
+			mItems = (List<T>) results.values;
 			notifyDataSetChanged();
 		}
 	}

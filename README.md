@@ -1,7 +1,8 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207)
 
 # FlexibleAdapter
-#### Version of 2015.07.20
+##### Dev branch version has an experimental Search engine.
+##### Master branch version: 2015.07.29
 #### A pattern for every RecyclerView
 
 The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
@@ -13,9 +14,6 @@ The functionalities are taken from different Blogs (see at the bottom of the pag
 I've put the Set click listeners at the creation and not in the Binding method, because onBindViewHolder is called at each invalidate (each notify..() methods).
 
 Also note that this adapter handles the basic clicks: _single_ and _long clicks_. If you need a double tap you need to implement the android.view.GestureDetector.
-
-I still have to improve it, so keep an eye on it.
-I would like to add some new functionalities, like the Undo.
 
 # Screenshots
 ![Main screen](/screenshots/main_screen.png) ![Multi Selection](/screenshots/multi_selection.png)
@@ -82,8 +80,10 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 ```
 
 #Change Log
+**Experimental**
+- Added filter engine. Filter works **but not** basic operations (Add/Del/Mod) on filtered list: removing the filter it brings back the original list
+
 **2015.07.29**
-- Added filter engine (experimental), it works but not practical if you perform operations (Add/Del/Mod) on filtered list.
 - Added **Undo** functionality
 - Moved getItem() into FlexibleAdapter, method now is part of the library
 - Added synchronized blocks for write operations on mItems list
