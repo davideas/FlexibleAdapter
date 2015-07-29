@@ -43,4 +43,8 @@ public class Item implements Serializable {
 		this.subtitle = subtitle;
 	}
 
+	@Override
+	public String toString() {
+		return title;
+	}
 }

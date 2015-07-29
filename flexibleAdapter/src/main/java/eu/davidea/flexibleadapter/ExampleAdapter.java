@@ -20,7 +20,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 	private static final int ITEMS = 20;
-	
+
 	public interface OnItemClickListener {
 		/**
 		 * Delegate the click event to the listener and check if selection MULTI enabled.<br/>
@@ -41,14 +41,16 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	private static final int
 			EXAMPLE_VIEW_TYPE = 0,
 			ROW_VIEW_TYPE = 1;
+
 	private LayoutInflater mInflater;
 	private OnItemClickListener mClickListener;
+
 	//Selection fields
 	private boolean
 			mUserLearnedSelection = false,
 			mLastItemInActionMode = false,
 			mSelectAll = false;
-    
+
 	public ExampleAdapter(Context context, OnItemClickListener listener, String listId) {
 		this.mContext = context;
 		this.mClickListener = listener;
@@ -58,7 +60,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	public void updateDataSet(String param) {
 		//Fill mItems with your custom list
 		this.mItems = createExampleItems();
-		if (!mUserLearnedSelection && mItems.size() > 0) {
+		if (!mUserLearnedSelection && getItemCount() > 0) {
 			//Define Example View
 			Item item = new Item();
 			item.setId(0);
@@ -82,11 +84,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		}
 		return items;
 	}
-	
-	public Item getItem(int position) {
-		return mItems.get(position);
-	}
-	
+
 	@Override
 	public void setMode(int mode) {
 		super.setMode(mode);
@@ -125,7 +123,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	@Override
 	public void onBindViewHolder(SimpleViewHolder holder, final int position) {
 		Log.d(TAG, "onBindViewHolder for position " + position);
-		final Item item = mItems.get(position);
+		final Item item = getItem(position);
 
 		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 
