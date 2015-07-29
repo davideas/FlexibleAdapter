@@ -1,3 +1,5 @@
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207)
+
 # FlexibleAdapter
 ##### Dev branch version has an experimental Search engine.
 ##### Master branch version: 2015.07.29
@@ -79,6 +81,7 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 #Change Log
 **2015.07.29**
 - Added **Undo** functionality
+- Moved getItem() into FlexibleAdapter that now is part of the library
 
 **2015.07.20**
 - New full working example Android Studio project! (with some nice extra-features)
