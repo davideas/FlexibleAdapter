@@ -40,6 +40,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * <li>if {@link #MODE_MULTI}, it will add the position to the list of the items selected.
 	 * </ul>
 	 * <b>NOTE:</b> #mModeMultiJustFinished is set true when #MODE_MULTI is finished.
+	 *
 	 * @param mode
 	 */
 	public void setMode(int mode) {
@@ -47,7 +48,8 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * The current selection mode of the Adapter
+	 * The current selection mode of the Adapter.
+	 *
 	 * @return current mode
 	 * @see #MODE_SINGLE
 	 * @see #MODE_MULTI
@@ -58,6 +60,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 
 	/**
 	 * Indicates if the item at position position is selected.
+	 *
 	 * @param position Position of the item to check.
 	 * @return true if the item is selected, false otherwise.
 	 */
@@ -93,6 +96,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * <li>If <i>invalidate</i> is set true, {@link #notifyItemChanged} is called and {@link #onBindViewHolder} will be automatically called
 	 * afterwards overriding any animation in the ItemView!</li>
 	 *</ul>
+	 *
 	 * @param position Position of the item to toggle the selection status for.
 	 * @param invalidate Boolean to indicate if the row must be invalidated and item rebinded.
 	 */
@@ -177,7 +181,8 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Count the selected items
+	 * Count the selected items.
+	 *
 	 * @return Selected items count
 	 */
 	public int getSelectedItemCount() {
@@ -185,7 +190,8 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Indicates the list of selected items
+	 * Indicates the list of selected items.
+	 *
 	 * @return List of selected items ids
 	 */
 	public List<Integer> getSelectedItems() {
@@ -194,6 +200,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	
 	/**
 	 * Save the state of the current selection on the items.
+	 *
 	 * @param outState
 	 */
 	public void onSaveInstanceState(Bundle outState) {
@@ -202,6 +209,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	
 	/**
 	 * Restore the previous state of the selection on the items.
+	 *
 	 * @param savedInstanceState
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {

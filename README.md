@@ -1,23 +1,22 @@
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207)
+
 # FlexibleAdapter
-##### Dev branch version: 2015.07.21 (New! Search &amp; Undo)
-##### Master branch version: 2015.07.20
+##### Dev branch version has an experimental Search engine.
+##### Master branch version: 2015.07.29
 #### A pattern for every RecyclerView
 
-The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecycleView.
+The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
 
 * At lower class there is SelectableAdapter that provides selection functionalities and it's able to _maintain the state_ after the rotation, you just need to call the onSave/onRestore methods from the Activity!
 * Then, the class FlexibleAdapter handles the content paying attention at the animations (calling notify only for the position. _Note:_ you still need to set your animation to the RecyclerView when you create it in the Activity).
 * Then you need to extend over again this class. Here you add and implement methods as you wish for your own ViewHolder and your Domain/Model class (data holder).
 
-I've put the click listeners inside the ViewHolder and the Set is done at the creation and not in the Binding method, that is called at each invalidate when calling notify..() methods.
+I've put the Set click listeners at the creation and not in the Binding method, because onBindViewHolder is called at each invalidate (each notify..() methods).
 
 Also note that this adapter handles the basic clicks: _single_ and _long clicks_. If you need a double tap you need to implement the android.view.GestureDetector.
 
-I still have to improve it, so keep an eye on it.
-I would like to add some new functionalities, like the Undo.
-
 # Screenshots
-![Main screen](/screenshots/main_screen.png) ![Multi Selection](/screenshots/multi_selection.png)
+![Main screen](/screenshots/main_screen.png) ![Multi Selection](/screenshots/multi_selection.png) ![Undo Screen](/screenshots/undo.png)
 
 #Setup
 Ultra simple:
@@ -25,26 +24,67 @@ No needs to create and import a library for just 2 files, so just *copy* Selecta
 Remember to initialize `mItems` (List already included in FlexibleAdapter) in order to manage list items. Method `updateDataSet(..)` can help in this.
 
 ####Pull requests / Issues / Improvement requests
-Feel free to do and ask!
+Feel free to contribute and ask!
 
 #Usage for Multi Selection
 In your activity change the Mode for the _ActionMode_ object.
 
-	@Override
-	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-		mode.getMenuInflater().inflate(R.menu.menu_context, menu);
-		mAdapter.setMode(YourAdapterClass.MODE_MULTI);
-		return true;
-	}
+``` java
+@Override
+public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+	mode.getMenuInflater().inflate(R.menu.menu_context, menu);
+	mAdapter.setMode(YourAdapterClass.MODE_MULTI);
+	return true;
+}
 
-	@Override
-	public void onDestroyActionMode(ActionMode mode) {
-		mAdapter.setMode(YourAdapterClass.MODE_SINGLE);
-		mAdapter.clearSelection();
-		mActionMode = null;
+@Override
+public void onDestroyActionMode(ActionMode mode) {
+	mAdapter.setMode(YourAdapterClass.MODE_SINGLE);
+	mAdapter.clearSelection();
+	mActionMode = null;
+}
+```
+
+#Usage for Undo
+
+``` java
+@Override
+public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+	switch (item.getItemId()) {
+		//...
+		case R.id.action_delete:
+			for (int i : mAdapter.getSelectedItems()) {
+				//Remove items from your Database. Example:
+				DatabaseService.getInstance().removeItem(mAdapter.getItem(i));
+			}
+
+			//Keep synchronized the Adapter: Remove selected items from Adapter
+			String message = mAdapter.getSelectedItems() + " " + getString(R.string.action_deleted);
+			mAdapter.removeItems(mAdapter.getSelectedItems());
+
+			//Any view for Undo, ex. Snackbar
+			Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_LONG)
+					.setAction(R.string.undo, new View.OnClickListener() {
+						@Override
+						public void onClick(View v) { mAdapter.restoreDeletedItems(); }
+					})
+					.show();
+
+			//Start countdown with startUndoTimer(millisec)
+			mAdapter.startUndoTimer(); //Default 5''
+			mActionMode.finish();
+			return true;
+		//...
 	}
+}
+```
 
 #Change Log
+**2015.07.29**
+- Added **Undo** functionality
+- Moved getItem() into FlexibleAdapter, method now is part of the library
+- Added synchronized blocks for write operations on mItems list
+
 **2015.07.20**
 - New full working example Android Studio project! (with some nice extra-features)
 
