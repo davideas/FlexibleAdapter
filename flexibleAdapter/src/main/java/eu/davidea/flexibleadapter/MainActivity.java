@@ -138,7 +138,9 @@ public class MainActivity extends AppCompatActivity implements
 			MessageDialog.newInstance(
 					R.drawable.ic_info_grey600_24dp,
 					getString(R.string.about_title),
-					getString(R.string.about_body, Utils.getVersionName(this)) )
+					getString(R.string.about_body,
+							Utils.getVersionName(this),
+							Utils.getVersionCode(this)) )
 					.show(getFragmentManager(), MessageDialog.TAG);
 			return true;
 		}
@@ -283,15 +285,16 @@ public class MainActivity extends AppCompatActivity implements
 
 				//Snackbar for Undo
 				//The duration should be customizable when Google decides to make it...
-				Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_LONG)
+				//noinspection ResourceType
+				Snackbar.make(findViewById(R.id.main_view), message, 7000)
 						.setAction(R.string.undo, new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-									mAdapter.restoreDeletedItems();
-								}
-							})
+								mAdapter.restoreDeletedItems();
+							}
+						})
 						.show();
-				mAdapter.startUndoTimer();
+				mAdapter.startUndoTimer(7000L);
 				mActionMode.finish();
 				return true;
 

@@ -2,7 +2,7 @@
 
 # FlexibleAdapter
 ##### Dev branch version has an experimental Search engine.
-##### Master branch version: 2015.07.29
+##### Master branch version: 2015.09.05
 #### A pattern for every RecyclerView
 
 The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
@@ -62,7 +62,7 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			mAdapter.removeItems(mAdapter.getSelectedItems());
 
 			//Any view for Undo, ex. Snackbar
-			Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_LONG)
+			Snackbar.make(findViewById(R.id.main_view), message, 5000)
 					.setAction(R.string.undo, new View.OnClickListener() {
 						@Override
 						public void onClick(View v) { mAdapter.restoreDeletedItems(); }
@@ -79,10 +79,14 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 ```
 
 #Change Log
+**2015.09.05**
+- Updated compileSdkVersion and Support libraries to v23
+- Customised Undo timeout in the example Activity with original _Snackbar_
+
 **2015.07.29**
 - Added **Undo** functionality
 - Moved getItem() into FlexibleAdapter, method now is part of the library
-- Added synchronized blocks for write operations on mItems list
+- Added synchronized blocks for write operations on _mItems_ list
 
 **2015.07.20**
 - New full working example Android Studio project! (with some nice extra-features)
@@ -90,9 +94,9 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 **2015.07.03**
 - Added new method _updateItem()_
 - Deprecated _removeSelection()_ -> Use _toggleSelection()_ instead!
-- In _clearSelection_ removed call to _notifyDataSetChanged()_.
-- Improved others methods.
-- Added more comments.
+- In _clearSelection_ removed call to _notifyDataSetChanged()_
+- Improved others methods
+- Added more comments
 
 **2015.06.19**
 - Added **Mode** for Multi and Single fixed selection. The Multi selection was already active, but the Single fixed selection mode still not.
