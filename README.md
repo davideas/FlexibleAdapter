@@ -20,7 +20,9 @@ Also note that this adapter handles the basic clicks: _single_ and _long clicks_
 
 #Setup
 Ultra simple:
-No needs to create and import library for just 2 files, so just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).
+No needs to create and import a library for just 2 files, so just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).
+
+Remember to initialize `mItems` (List already included in FlexibleAdapter) in order to manage list items. Method `updateDataSet(..)` can help in this.
 
 ####Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!
