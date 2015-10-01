@@ -12,56 +12,57 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import eu.davidea.utils.Utils;
 
 public class SlideItemAnimator extends PendingItemAnimator {
-    public SlideItemAnimator() {
-        setAddDuration(1000);
-        setRemoveDuration(500);
-        setMoveDuration(500);
-    }
 
-    @Override
-    protected boolean prepHolderForAnimateRemove(ViewHolder holder) {
-        return true;
-    }
+	public SlideItemAnimator() {
+		setAddDuration(1000);
+		setRemoveDuration(500);
+		setMoveDuration(500);
+	}
 
-    protected ViewPropertyAnimatorCompat animateRemoveImpl(ViewHolder holder) {
-        final View view = holder.itemView;
-        ViewCompat.animate(view).cancel();
-        return ViewCompat.animate(view)
-                .translationX(Utils.getScreenDimensions(holder.itemView.getContext()).x)
-                .setInterpolator(new AnticipateOvershootInterpolator());
-    }
+	@Override
+	protected boolean prepHolderForAnimateRemove(ViewHolder holder) {
+		return true;
+	}
 
-    @Override
-    protected void onRemoveCanceled(ViewHolder holder) {
-        ViewCompat.setTranslationX(holder.itemView, 0);
-    }
+	protected ViewPropertyAnimatorCompat animateRemoveImpl(ViewHolder holder) {
+		final View view = holder.itemView;
+		ViewCompat.animate(view).cancel();
+		return ViewCompat.animate(view)
+				.translationX(Utils.getScreenDimensions(holder.itemView.getContext()).x)
+				.setInterpolator(new AnticipateOvershootInterpolator());
+	}
 
-    @Override
-    protected boolean prepHolderForAnimateAdd(ViewHolder holder) {
-        int width = getWidth(holder);
-        ViewCompat.setTranslationX(holder.itemView, width);
-        return true;
-    }
+	@Override
+	protected void onRemoveCanceled(ViewHolder holder) {
+		ViewCompat.setTranslationX(holder.itemView, 0);
+	}
 
-    protected ViewPropertyAnimatorCompat animateAddImpl(ViewHolder holder) {
-        final View view = holder.itemView;
-        ViewCompat.animate(view).cancel();
-        int width = getWidth(holder);
-        return ViewCompat.animate(view)
-                .translationXBy(-width)
-                .setInterpolator(new BounceInterpolator());
-    }
+	@Override
+	protected boolean prepHolderForAnimateAdd(ViewHolder holder) {
+		int width = getWidth(holder);
+		ViewCompat.setTranslationX(holder.itemView, width);
+		return true;
+	}
 
-    @Override
-    protected void onAddCanceled(ViewHolder holder) {
-        ViewCompat.setTranslationX(holder.itemView, 0);
-    }
+	protected ViewPropertyAnimatorCompat animateAddImpl(ViewHolder holder) {
+		final View view = holder.itemView;
+		ViewCompat.animate(view).cancel();
+		int width = getWidth(holder);
+		return ViewCompat.animate(view)
+				.translationXBy(-width)
+				.setInterpolator(new BounceInterpolator());
+	}
 
-    public int getWidth(ViewHolder holder) {
-        return getWidth(holder.itemView);
-    }
+	@Override
+	protected void onAddCanceled(ViewHolder holder) {
+		ViewCompat.setTranslationX(holder.itemView, 0);
+	}
 
-    public int getWidth(View itemView) {
-        return itemView.getMeasuredWidth() + itemView.getPaddingRight() + ((LayoutParams) itemView.getLayoutParams()).rightMargin;
-    }
+	public int getWidth(ViewHolder holder) {
+		return getWidth(holder.itemView);
+	}
+
+	public int getWidth(View itemView) {
+		return itemView.getMeasuredWidth() + itemView.getPaddingRight() + ((LayoutParams) itemView.getLayoutParams()).rightMargin;
+	}
 }

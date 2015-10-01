@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import eu.davidea.anim.SlideItemAnimator;
 import eu.davidea.common.FlexibleAdapter;
 import eu.davidea.common.SimpleDividerItemDecoration;
 import eu.davidea.utils.Utils;
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+		mRecyclerView.setItemAnimator(new SlideItemAnimator());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
