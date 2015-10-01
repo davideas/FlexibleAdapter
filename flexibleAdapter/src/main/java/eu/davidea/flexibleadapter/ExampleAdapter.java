@@ -107,7 +107,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	@Override
 	public void selectAll() {
 		mSelectAll = true;
-		super.selectAll();
+		super.selectAll(EXAMPLE_VIEW_TYPE);
 	}
 
 	@Override

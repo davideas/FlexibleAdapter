@@ -82,8 +82,12 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 ```
 
 #Change Log
-**Experimental**
-- Added filter engine. Filter works **but not** basic operations (Add/Del/Mod) on filtered list: removing the filter it brings back the original list
+**Experimental 2015.10.01**
+- Added **FilterAsyncTask** to asynchronously load the list
+- Enabled **Search** filter through _updateDataSet_ method
+- _FlexibleAdapter_ can now return deleted items before they are removed from memory
+- _SelectableAdapter.selectAll()_ can now skip selection on one specific ViewType
+- Adapted MainActivity
 
 **2015.07.29**
 - Added **Undo** functionality
