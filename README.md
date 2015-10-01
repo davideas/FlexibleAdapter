@@ -1,8 +1,8 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207)
 
 # FlexibleAdapter
-##### Dev branch version has an experimental Search engine.
-##### Master branch version: 2015.07.29
+##### Dev branch version 2015.10.01 beta
+##### Master branch version 2015.09.05
 #### A pattern for every RecyclerView
 
 The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
@@ -65,7 +65,7 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			mAdapter.removeItems(mAdapter.getSelectedItems());
 
 			//Any view for Undo, ex. Snackbar
-			Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_LONG)
+			Snackbar.make(findViewById(R.id.main_view), message, 7000)
 					.setAction(R.string.undo, new View.OnClickListener() {
 						@Override
 						public void onClick(View v) { mAdapter.restoreDeletedItems(); }
@@ -73,7 +73,7 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 					.show();
 
 			//Start countdown with startUndoTimer(millisec)
-			mAdapter.startUndoTimer(); //Default 5''
+			mAdapter.startUndoTimer(7000); //Default 5''
 			mActionMode.finish();
 			return true;
 		//...
@@ -82,7 +82,7 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 ```
 
 #Change Log
-**Experimental 2015.10.01**
+**2015.10.01 beta**
 - Added **FilterAsyncTask** to asynchronously load the list
 - Enabled **Search** filter through _updateDataSet_ method
 - _FlexibleAdapter_ can now return deleted items before they are removed from memory
