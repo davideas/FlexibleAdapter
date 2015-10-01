@@ -89,6 +89,10 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 - _SelectableAdapter.selectAll()_ can now skip selection on one specific ViewType
 - Adapted MainActivity
 
+**2015.09.05**
+- Updated compileSdkVersion and Support libraries to v23
+- Customised Undo timeout in the example Activity with original _Snackbar_
+
 **2015.07.29**
 - Added **Undo** functionality
 - Moved getItem() into FlexibleAdapter, method now is part of the library
