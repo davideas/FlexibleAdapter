@@ -148,16 +148,25 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		//Usually the notification is made in FlexibleAdapter.removeItem();
 		//notifyItemChanged(position);
 	}
-	
+
+	/**
+	 * Convenience method when there is nothing to skip.
+	 */
+	public void selectAll() {
+		selectAll(-1);
+	}
 	/**
 	 * Add the selection status for all items.
 	 * The selector container is sequentially filled with All items positions.
 	 * <br/><b>Note:</b> All items are invalidated and rebinded!
+	 *
+	 * @param skipViewType ViewType for which we don't want selection
 	 */
-	public void selectAll() {
+	public void selectAll(int skipViewType) {
 		Log.d(TAG, "selectAll");
 		selectedItems = new ArrayList<Integer>(getItemCount());
 		for (int i = 0; i < getItemCount(); i++) {
+			if (getItemViewType(i) == skipViewType) continue;
 			selectedItems.add(i);
 			Log.d(TAG, "selectAll notifyItemChanged on position "+i);
 			notifyItemChanged(i);

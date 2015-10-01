@@ -1,10 +1,9 @@
 package eu.davidea.common;
 
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,10 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.ViewGroup;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set
@@ -30,17 +25,19 @@ import android.view.ViewGroup;
  * 
  * @author Davide Steduto
  */
-public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
-		extends SelectableAdapter<VH>
-		implements Filterable {
-
+public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> extends SelectableAdapter<VH> {
+	
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();
 	public static final long UNDO_TIMEOUT = 5000L;
 
+	public interface OnUpdateListener {
+		void onLoadComplete();
+		//void onProgressUpdate(int progress);
+	}
+
 	/**
 	 * Lock used to modify the content of {@link #mItems}. Any write operation performed on the array should be
-	 * synchronized on this lock. This lock is also used by the filter (see {@link #getFilter()} to make a synchronized
-	 * copy of the original array of data.
+	 * synchronized on this lock.
 	 */
 	private final Object mLock = new Object();
 
@@ -50,28 +47,53 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	private Timer mUndoTimer;
 	//Searchable fields
 	protected static String mSearchText; //Static: It can exist only 1 searchText
-	private FlexibleFilter mFilter;
-	//A copy of the original mObjects array, initialized from and then used instead as soon as
-	// the mFilter ArrayFilter is used. mObjects will then only contain the filtered values.
-	private ArrayList<T> mOriginalValues;
-
+	protected OnUpdateListener mUpdateListener;
 
 	public FlexibleAdapter() {
 	}
-	
+
+	public FlexibleAdapter(Object listener) {
+		if (listener instanceof OnUpdateListener)
+			this.mUpdateListener = (OnUpdateListener) listener;
+		else
+			Log.w(TAG, "Listener is not an instance of OnUpdateListener!");
+	}
+
+	/**
+	 * Convenience method to call {@link #updateDataSet(String)} with {@link null} as param.
+	 */
+	public void updateDataSet() {
+		updateDataSet(null);
+	};
 	/**
 	 * This method will refresh the entire DataSet content.<br/>
 	 * The parameter is useful to filter the DataSet. It can be removed
-	 * or the type can be changed accordingly (String is the most used value).
-	 * <br/>Pass null value in case not used.
+	 * or the type can be changed accordingly (String is the most used value).<br/>
+	 * Pass null value in case not used.
 	 * 
 	 * @param param A custom parameter to filter the DataSet
 	 */
 	public abstract void updateDataSet(String param);
+
+	/**
+	 * This method execute {@link #updateDataSet(String)} asynchronously
+	 * with {@link FilterAsyncTask}.<br/><br/>
+	 * <b>Note:</b> {@link #notifyDataSetChanged()} is automatically called at the end of the process.
+	 *
+	 * @param param A custom parameter to filter the DataSet
+	 */
+	public void updateDataSetAsync(String param) {
+		if (mUpdateListener == null) {
+			Log.w(TAG, "OnUpdateListener is not initialized. UpdateDataSet is not using FilterAsyncTask!");
+			updateDataSet(param);
+			return;
+		}
+		new FilterAsyncTask().execute(param);
+	}
 	
 	/**
 	 * Returns the custom object "Item".
-	 * @param position
+	 * @param position The position of the item in the list
 	 * @return the custom "Item" object
 	 */
 	public T getItem(int position) {
@@ -81,24 +103,15 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	/**
 	 * Retrieve the position of the Item in the Adapter
 	 *
-	 * @param item
+	 * @param item The item
 	 * @return the position in the Adapter if found, -1 otherwise
 	 */
 	public int getPositionForItem(T item) {
 		return mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
 	}
 
-
-	private int getOriginalPositionForItem(T item) {
-		return mOriginalValues != null && mOriginalValues.size() > 0 ? mOriginalValues.indexOf(item) : -1;
-	}
-
 	public boolean contains(T item) {
-		if (mOriginalValues != null) {
-			return mOriginalValues.contains(item);
-		} else {
-			return mItems != null && mItems.contains(item);
-		}
+		return mItems != null && mItems.contains(item);
 	}
 	
 	@Override
@@ -109,15 +122,12 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 
 	@Override
 	public int getItemCount() {
-		return mItems.size();
+		return mItems != null ? mItems.size() : 0;
 	}
 	
 	public void updateItem(int position, T item) {
 		if (position < 0) return;
 		synchronized (mLock) {
-			if (mOriginalValues != null) {
-				mOriginalValues.set(getOriginalPositionForItem(item), item);
-			}
 			mItems.set(position, item);
 		}
 		Log.d(TAG, "updateItem notifyItemChanged on position "+position);
@@ -127,18 +137,16 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	/**
 	 * Insert given Item at position or Add Item at last position.
 	 *
-	 * @param position
-	 * @param item
+	 * @param position Position of the item to add
+	 * @param item The item to add
 	 */
 	public void addItem(int position, T item) {
 		if (position < 0) return;
+
 		//Insert Item
 		if (position < mItems.size()) {
 			Log.d(TAG, "addItem notifyItemInserted on position " + position);
 			synchronized (mLock) {
-				if (mOriginalValues != null) {
-					mOriginalValues.add(position, item);
-				}
 				mItems.add(position, item);
 			}
 
@@ -146,9 +154,6 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		} else {
 			Log.d(TAG, "addItem notifyItemInserted on last position");
 			synchronized (mLock) {
-				if (mOriginalValues != null) {
-					mOriginalValues.add(item);
-				}
 				mItems.add(item);
 				position = mItems.size();
 			}
@@ -158,16 +163,21 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	}
 
 	/* DELETE ITEMS METHODS */
-	
+
+	/**
+	 * The item is retained in a list for an eventual Undo.
+	 *
+	 * @param position The position of item to remove
+	 * @see #startUndoTimer()
+	 * @see #restoreDeletedItems()
+	 * @see #emptyBin()
+	 */
 	public void removeItem(int position) {
 		if (position < 0) return;
 		if (position < mItems.size()) {
 			Log.d(TAG, "removeItem notifyItemRemoved on position " + position);
 			synchronized (mLock) {
 				saveDeletedItem(position);
-				if (mOriginalValues != null) {
-					mOriginalValues.remove(getOriginalPositionForItem(mItems.get(position)));
-				}
 				mItems.remove(position);
 			}
 			notifyItemRemoved(position);
@@ -175,7 +185,15 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 			Log.w(TAG, "removeItem WARNING! Position OutOfBound! Review the position to remove!");
 		}
 	}
-	
+
+	/**
+	 * Every item is retained in a list for an eventual Undo.
+	 *
+	 * @param selectedPositions List of item positions to remove
+	 * @see #startUndoTimer()
+	 * @see #restoreDeletedItems()
+	 * @see #emptyBin()
+	 */
 	public void removeItems(List<Integer> selectedPositions) {
 		Log.d(TAG, "removeItems reverse Sorting positions --------------");
 		// Reverse-sort the list
@@ -217,9 +235,6 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		for (int i = 0; i < itemCount; ++i) {
 			synchronized (mLock) {
 				saveDeletedItem(positionStart);
-				if (mOriginalValues != null) {
-					mOriginalValues.remove(getOriginalPositionForItem(mItems.get(positionStart)));
-				}
 				mItems.remove(positionStart);
 			}
 		}
@@ -232,7 +247,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	/**
 	 * Save temporary Items for an eventual Undo.
 	 *
-	 * @param position
+	 * @param position The position of the item to retain.
 	 */
 	private void saveDeletedItem(int position) {
 		if (mDeletedItems == null) {
@@ -242,6 +257,17 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		Log.d(TAG, "Recycled "+getItem(position)+" on position="+position);
 		mDeletedItems.add(mItems.get(position));
 		mOriginalPosition.add(position);
+	}
+
+	/**
+	 * @return The list of deleted items
+	 */
+	public List<T> getDeletedItems() {
+		return mDeletedItems;
+	}
+
+	public boolean isRestoreInTime() {
+		return mDeletedItems != null && mDeletedItems.size() > 0;
 	}
 
 	/**
@@ -257,12 +283,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	}
 
 	/**
-	 * Clean memory.
+	 * Clean memory from items just removed.
 	 * <br/><b>Note:</b> This method is automatically called after timer is over and after a restoration.
 	 */
 	public void emptyBin() {
-		mDeletedItems = null;
-		mOriginalPosition = null;
+		if (mDeletedItems != null) {
+			mDeletedItems.clear();
+			mOriginalPosition.clear();
+		}
 	}
 
 	/**
@@ -275,7 +303,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 	/**
 	 * Start Undo timer with custom timeout
 	 *
-	 * @param timeout
+	 * @param timeout Custom timeout
 	 */
 	public void startUndoTimer(long timeout) {
 		stopUndoTimer();
@@ -304,30 +332,18 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		}
 	}
 
-	/* SEARCH-FILTER */
+	public static boolean hasSearchText() {
+		return mSearchText != null && mSearchText.length() > 0;
+	}
 
 	public static String getSearchText() {
-		return mSearchText != null ? mSearchText : "";
+		return mSearchText;
 	}
 
 	public static void setSearchText(String searchText) {
 		if (searchText != null)
 			mSearchText = searchText.trim().toLowerCase(Locale.getDefault());
 		else mSearchText = "";
-	}
-
-	public static boolean hasSearchText() {
-		return mSearchText != null && mSearchText.length() > 0;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Filter getFilter() {
-		if (mFilter == null) {
-			mFilter = new FlexibleFilter();
-		}
-		return mFilter;
 	}
 
 	/**
@@ -362,59 +378,22 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T>
 		return false;
 	}
 
+	public class FilterAsyncTask extends AsyncTask<String, Void, Void> {
 
-	private class FlexibleFilter extends Filter {
+		private final String TAG = FilterAsyncTask.class.getSimpleName();
 
 		@Override
-		protected FilterResults performFiltering(CharSequence prefix) {
-			final FilterResults results = new FilterResults();
-
-			//Save Original objects
-			if (mOriginalValues == null) {
-				synchronized (mLock) {
-					mOriginalValues = new ArrayList<T>(mItems);
-				}
-			}
-
-			//Prepare base list for each search
-			List<T> values;
-			synchronized (mLock) {
-				values = new ArrayList<T>(mOriginalValues);
-			}
-
-			if (prefix == null || prefix.length() == 0) {
-				//Restore original objects when filter is empty
-				results.values = values;
-				results.count = values.size();
-				//This is extremely important otherwise it continues
-				// to add/remove from OriginalValues
-				mOriginalValues = null;
-
-			} else { //FilterIn the objects
-				String prefixString = prefix.toString().toLowerCase();
-
-				final int count = values.size();
-				final ArrayList<T> newValues = new ArrayList<T>();
-
-				for (int i = 0; i < count; i++) {
-					final T value = values.get(i);
-					if (filterObject(value, prefixString)) {
-						newValues.add(value);
-					}
-				}
-
-				results.values = newValues;
-				results.count = newValues.size();
-			}
-
-			Log.d(TAG, "performFiltering Size="+results.count+ " values="+results.values);
-			return results;
+		protected Void doInBackground(String... params) {
+			Log.i(TAG, "doInBackground - started FilterAsyncTask!");
+			updateDataSet(params[0]);
+			Log.i(TAG, "doInBackground - ended FilterAsyncTask!");
+			return null;
 		}
 
 		@Override
-		protected void publishResults(CharSequence constraint, FilterResults results) {
-			//noinspection unchecked
-			mItems = (List<T>) results.values;
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			mUpdateListener.onLoadComplete();
 			notifyDataSetChanged();
 		}
 	}

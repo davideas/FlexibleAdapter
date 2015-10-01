@@ -21,17 +21,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import eu.davidea.common.FlexibleAdapter;
 import eu.davidea.common.SimpleDividerItemDecoration;
 import eu.davidea.utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener,
-		SearchView.OnQueryTextListener,
+		SearchView.OnQueryTextListener, FlexibleAdapter.OnUpdateListener,
 		ExampleAdapter.OnItemClickListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements
 	private RecyclerView mRecyclerView;
 	private ExampleAdapter mAdapter;
 	private ActionMode mActionMode;
+	private ProgressBar mProgressBar;
 
 	/**
 	 * FAB
@@ -66,8 +69,11 @@ public class MainActivity extends AppCompatActivity implements
 		setContentView(R.layout.activity_main);
 		Log.d(TAG, "onCreate");
 
+		mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+		mProgressBar.setVisibility(View.VISIBLE);
+
 		//Adapter & RecyclerView
-		mAdapter = new ExampleAdapter(this, this, "example parameter for List1");
+		mAdapter = new ExampleAdapter(this, "example parameter for List1");
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
@@ -133,6 +139,12 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
+	public void onLoadComplete() {
+		mProgressBar.setVisibility(View.INVISIBLE);
+		updateEmptyView();
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		Log.v(TAG, "onCreateOptionsMenu called!");
 		getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -170,11 +182,12 @@ public class MainActivity extends AppCompatActivity implements
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		Log.v(TAG, "onPrepareOptionsMenu called!");
 		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-		if (!mAdapter.hasSearchText()) {
+		//Has searchText?
+		if (!ExampleAdapter.hasSearchText()) {
 			Log.d(TAG, "onPrepareOptionsMenu Clearing SearchView!");
 			searchView.setIconified(true);// This also clears the text in SearchView widget
 		} else {
-			searchView.setQuery(mAdapter.getSearchText(), false);
+			searchView.setQuery(ExampleAdapter.getSearchText(), false);
 			searchView.setIconified(false);
 		}
 		return super.onPrepareOptionsMenu(menu);
@@ -183,10 +196,12 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onQueryTextChange(String newText) {
-		if (!ExampleAdapter.getSearchText().equalsIgnoreCase(newText)) {
+		if (!ExampleAdapter.hasSearchText()
+				|| !ExampleAdapter.getSearchText().equalsIgnoreCase(newText)) {
+			mProgressBar.setVisibility(View.VISIBLE);
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			ExampleAdapter.setSearchText(newText);
-			mAdapter.getFilter().filter(newText);
+			mAdapter.updateDataSetAsync(newText);
 		}
 		//Due to Filter background Thread, give some short time to finish filtering
 		//Otherwise Adapter could not be synchronized with the new content
@@ -213,7 +228,9 @@ public class MainActivity extends AppCompatActivity implements
 			MessageDialog.newInstance(
 					R.drawable.ic_info_grey600_24dp,
 					getString(R.string.about_title),
-					getString(R.string.about_body, Utils.getVersionName(this)) )
+					getString(R.string.about_body,
+							Utils.getVersionName(this),
+							Utils.getVersionCode(this)) )
 					.show(getFragmentManager(), MessageDialog.TAG);
 			return true;
 		}
@@ -331,7 +348,6 @@ public class MainActivity extends AppCompatActivity implements
 			//getWindow().setNavigationBarColor(getResources().getColor(R.color.colorAccentDark_light));
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorAccentDark_light));
 		}
-
 		return true;
 	}
 
@@ -358,8 +374,8 @@ public class MainActivity extends AppCompatActivity implements
 				mAdapter.removeItems(mAdapter.getSelectedItems());
 
 				//Snackbar for Undo
-				//The duration should be customizable when Google decides to make it...
-				Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_LONG)
+				//noinspection ResourceType
+				Snackbar.make(findViewById(R.id.main_view), message, 7000)
 						.setAction(R.string.undo, new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
@@ -367,9 +383,8 @@ public class MainActivity extends AppCompatActivity implements
 								}
 							})
 						.show();
-				mAdapter.startUndoTimer();
+				mAdapter.startUndoTimer(7000L);
 				mActionMode.finish();
-
 				return true;
 
 			default:

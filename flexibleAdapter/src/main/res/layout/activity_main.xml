@@ -13,6 +13,8 @@
 
 	<include layout="@layout/empty_view"/>
 
+	<include layout="@layout/progress_bar"/>
+
 	<android.support.design.widget.FloatingActionButton
 		android:id="@+id/fab"
 		android:layout_height="wrap_content"

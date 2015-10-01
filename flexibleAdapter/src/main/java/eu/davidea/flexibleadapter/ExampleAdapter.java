@@ -57,12 +57,17 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			mLastItemInActionMode = false,
 			mSelectAll = false;
 
-	public ExampleAdapter(Context context, OnItemClickListener listener, String listId) {
-		this.mContext = context;
-		this.mClickListener = listener;
-		updateDataSet(listId);
+	public ExampleAdapter(Object activity, String listId) {
+		super(activity);
+		this.mContext = (Context) activity;
+		this.mClickListener = (OnItemClickListener) activity;
+		updateDataSetAsync(listId);
 	}
-	
+
+	/**
+	 * Param in this example is not used.
+	 * @param param A custom parameter to filter the DataSet
+	 */
 	public void updateDataSet(String param) {
 		//Fill mItems with your custom list
 		this.mItems = createExampleItems();
@@ -86,7 +91,9 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	private List<Item> createExampleItems() {
 		List<Item> items = new ArrayList<Item>();
 		for (int i = 1; i <= ITEMS; i++) {
-			items.add(getNewExampleItem(i));
+			Item item = getNewExampleItem(i);
+			if (!hasSearchText() || (hasSearchText() && filterObject(item, getSearchText())) )
+				items.add(item);
 		}
 		return items;
 	}
