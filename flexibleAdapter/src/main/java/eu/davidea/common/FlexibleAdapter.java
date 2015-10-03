@@ -177,8 +177,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		if (position < mItems.size()) {
 			Log.d(TAG, "removeItem notifyItemRemoved on position " + position);
 			synchronized (mLock) {
-				saveDeletedItem(position);
-				mItems.remove(position);
+				saveDeletedItem(position, mItems.remove(position));
 			}
 			notifyItemRemoved(position);
 		} else {
@@ -234,8 +233,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		Log.d(TAG, "removeRange positionStart="+positionStart+ " itemCount="+itemCount);
 		for (int i = 0; i < itemCount; ++i) {
 			synchronized (mLock) {
-				saveDeletedItem(positionStart);
-				mItems.remove(positionStart);
+				saveDeletedItem(positionStart, mItems.remove(positionStart));
 			}
 		}
 		Log.d(TAG, "removeRange notifyItemRangeRemoved");
@@ -249,13 +247,13 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 *
 	 * @param position The position of the item to retain.
 	 */
-	private void saveDeletedItem(int position) {
+	private void saveDeletedItem(int position, T item) {
 		if (mDeletedItems == null) {
 			mDeletedItems = new ArrayList<T>();
 			mOriginalPosition = new ArrayList<Integer>();
 		}
 		Log.d(TAG, "Recycled "+getItem(position)+" on position="+position);
-		mDeletedItems.add(mItems.get(position));
+		mDeletedItems.add(item);
 		mOriginalPosition.add(position);
 	}
 
