@@ -93,10 +93,12 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	
 	/**
 	 * Returns the custom object "Item".
+	 *
 	 * @param position The position of the item in the list
-	 * @return the custom "Item" object
+	 * @return The custom "Item" object or null if item not found
 	 */
 	public T getItem(int position) {
+		if (position < 0 || position >= mItems.size()) return null;
 		return mItems.get(position);
 	}
 	
@@ -104,7 +106,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Retrieve the position of the Item in the Adapter
 	 *
 	 * @param item The item
-	 * @return the position in the Adapter if found, -1 otherwise
+	 * @return The position in the Adapter if found, -1 otherwise
 	 */
 	public int getPositionForItem(T item) {
 		return mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
@@ -247,7 +249,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 *
 	 * @param position The position of the item to retain.
 	 */
-	private void saveDeletedItem(int position, T item) {
+	public void saveDeletedItem(int position, T item) {
 		if (mDeletedItems == null) {
 			mDeletedItems = new ArrayList<T>();
 			mOriginalPosition = new ArrayList<Integer>();
@@ -347,7 +349,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
 	 *
-	 * <br/><br/>Performs filtering on the provided object and returns true, if the object should be in the filtered collection,
+	 * <br/><br/>
+	 * Performs filtering on the provided object and returns true, if the object should be in the filtered collection,
 	 * or false if it shouldn't.
 	 *
 	 * @param myObject The object to be inspected
@@ -362,11 +365,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			return true;
 		} else {
 			final String[] words = valueText.split(" ");
-			final int wordCount = words.length;
 
 			//Start at index 0, in case valueText starts with space(s)
-			for (int k = 0; k < wordCount; k++) {
-				if (words[k].startsWith(constraint)) {
+			for (String word : words) {
+				if (word.startsWith(constraint)) {
 					return true;
 				}
 			}
