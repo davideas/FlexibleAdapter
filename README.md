@@ -1,7 +1,7 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207)
 
 # FlexibleAdapter
-##### Dev branch version 2015.10.01 beta
+##### Dev branch version 2015.10.17 rc1
 ##### Master branch version 2015.09.05
 #### A pattern for every RecyclerView
 
