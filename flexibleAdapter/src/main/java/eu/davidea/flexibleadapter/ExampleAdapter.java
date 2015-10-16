@@ -58,10 +58,11 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			mSelectAll = false;
 
 	public ExampleAdapter(Object activity, String listId) {
-		super(activity);
+		//super(activity);
 		this.mContext = (Context) activity;
 		this.mClickListener = (OnItemClickListener) activity;
-		updateDataSetAsync(listId);
+		updateDataSet(listId);
+//		updateDataSetAsync(listId);
 	}
 
 	/**

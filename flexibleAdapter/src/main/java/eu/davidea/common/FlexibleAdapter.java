@@ -1,6 +1,8 @@
 package eu.davidea.common;
 
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -10,8 +12,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set
@@ -30,10 +30,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();
 	public static final long UNDO_TIMEOUT = 5000L;
 
-	public interface OnUpdateListener {
-		void onLoadComplete();
-		//void onProgressUpdate(int progress);
-	}
+//	public interface OnUpdateListener {
+//		void onLoadComplete();
+//		//void onProgressUpdate(int progress);
+//	}
 
 	/**
 	 * Lock used to modify the content of {@link #mItems}. Any write operation performed on the array should be
@@ -44,20 +44,26 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	protected List<T> mItems;
 	protected List<T> mDeletedItems;
 	protected List<Integer> mOriginalPosition;
-	private Timer mUndoTimer;
 	//Searchable fields
 	protected static String mSearchText; //Static: It can exist only 1 searchText
-	protected OnUpdateListener mUpdateListener;
+//	protected OnUpdateListener mUpdateListener;
+	protected Handler mHandler;
 
 	public FlexibleAdapter() {
 	}
 
-	public FlexibleAdapter(Object listener) {
-		if (listener instanceof OnUpdateListener)
-			this.mUpdateListener = (OnUpdateListener) listener;
-		else
-			Log.w(TAG, "Listener is not an instance of OnUpdateListener!");
-	}
+	/**
+	 * Constructor for Asynchronous loading.<br/>
+	 * Experimental: not working very well, it might be slow.
+	 *
+	 * @param listener {@link OnUpdateListener}
+	 */
+//	public FlexibleAdapter(Object listener) {
+//		if (listener instanceof OnUpdateListener)
+//			this.mUpdateListener = (OnUpdateListener) listener;
+//		else
+//			Log.w(TAG, "Listener is not an instance of OnUpdateListener!");
+//	}
 
 	/**
 	 * Convenience method to call {@link #updateDataSet(String)} with {@link null} as param.
@@ -82,14 +88,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 *
 	 * @param param A custom parameter to filter the DataSet
 	 */
-	public void updateDataSetAsync(String param) {
-		if (mUpdateListener == null) {
-			Log.w(TAG, "OnUpdateListener is not initialized. UpdateDataSet is not using FilterAsyncTask!");
-			updateDataSet(param);
-			return;
-		}
-		new FilterAsyncTask().execute(param);
-	}
+//	public void updateDataSetAsync(String param) {
+//		if (mUpdateListener == null) {
+//			Log.w(TAG, "OnUpdateListener is not initialized. UpdateDataSet is not using FilterAsyncTask!");
+//			updateDataSet(param);
+//			return;
+//		}
+//		new FilterAsyncTask().execute(param);
+//	}
 	
 	/**
 	 * Returns the custom object "Item".
@@ -283,8 +289,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Clean memory from items just removed.
-	 * <br/><b>Note:</b> This method is automatically called after timer is over and after a restoration.
+	 * Clean memory from items just removed.<br/>
+	 * <b>Note:</b> This method is automatically called after timer is over and after a restoration.
 	 */
 	public void emptyBin() {
 		if (mDeletedItems != null) {
@@ -306,9 +312,13 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @param timeout Custom timeout
 	 */
 	public void startUndoTimer(long timeout) {
-		stopUndoTimer();
-		this.mUndoTimer = new Timer();
-		this.mUndoTimer.schedule(new UndoTimer(), timeout > 0 ? timeout : UNDO_TIMEOUT);
+		mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+				public boolean handleMessage(Message message) {
+					emptyBin();
+					return true;
+				}
+			});
+		mHandler.sendMessageDelayed(Message.obtain(mHandler), timeout > 0 ? timeout : UNDO_TIMEOUT);
 	}
 
 	/**
@@ -316,19 +326,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * <br/><b>Note:</b> This method is automatically called in case of restoration.
 	 */
 	private void stopUndoTimer() {
-		if (this.mUndoTimer != null) {
-			this.mUndoTimer.cancel();
-			this.mUndoTimer = null;
-		}
-	}
-
-	/**
-	 * Inner class for TimerTask.
-	 */
-	private class UndoTimer extends TimerTask {
-		public void run() {
-			mUndoTimer = null;
-			emptyBin();
+		if (mHandler != null) {
+			mHandler.removeCallbacksAndMessages(null);
+			mHandler = null;
 		}
 	}
 
@@ -373,29 +373,28 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 				}
 			}
 		}
-
 		//No match, so don't add to collection
 		return false;
 	}
 
-	public class FilterAsyncTask extends AsyncTask<String, Void, Void> {
-
-		private final String TAG = FilterAsyncTask.class.getSimpleName();
-
-		@Override
-		protected Void doInBackground(String... params) {
-			Log.i(TAG, "doInBackground - started FilterAsyncTask!");
-			updateDataSet(params[0]);
-			Log.i(TAG, "doInBackground - ended FilterAsyncTask!");
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			mUpdateListener.onLoadComplete();
-			notifyDataSetChanged();
-		}
-	}
+//	public class FilterAsyncTask extends AsyncTask<String, Void, Void> {
+//
+//		private final String TAG = FilterAsyncTask.class.getSimpleName();
+//
+//		@Override
+//		protected Void doInBackground(String... params) {
+//			Log.i(TAG, "doInBackground - started FilterAsyncTask!");
+//			updateDataSet(params[0]);
+//			Log.i(TAG, "doInBackground - ended FilterAsyncTask!");
+//			return null;
+//		}
+//
+//		@Override
+//		protected void onPostExecute(Void result) {
+//			super.onPostExecute(result);
+//			mUpdateListener.onLoadComplete();
+//			notifyDataSetChanged();
+//		}
+//	}
 
 }

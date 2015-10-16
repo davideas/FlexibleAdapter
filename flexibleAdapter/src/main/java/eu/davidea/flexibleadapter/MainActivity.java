@@ -12,7 +12,6 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -26,16 +25,14 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import eu.davidea.anim.GarageDoorItemAnimator;
 import eu.davidea.anim.SlideInRightAnimator;
-import eu.davidea.anim.SlideItemAnimator;
-import eu.davidea.common.FlexibleAdapter;
 import eu.davidea.common.SimpleDividerItemDecoration;
 import eu.davidea.utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener,
-		SearchView.OnQueryTextListener, FlexibleAdapter.OnUpdateListener,
+		SearchView.OnQueryTextListener,
+//		FlexibleAdapter.OnUpdateListener,
 		ExampleAdapter.OnItemClickListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
@@ -58,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements
 	private RecyclerView mRecyclerView;
 	private ExampleAdapter mAdapter;
 	private ActionMode mActionMode;
-	private ProgressBar mProgressBar;
+//	private ProgressBar mProgressBar;
 
 	/**
 	 * FAB
@@ -71,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements
 		setContentView(R.layout.activity_main);
 		Log.d(TAG, "onCreate");
 
-		mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
-		mProgressBar.setVisibility(View.VISIBLE);
+//		mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+//		mProgressBar.setVisibility(View.VISIBLE);
 
 		//Adapter & RecyclerView
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
@@ -140,11 +137,11 @@ public class MainActivity extends AppCompatActivity implements
 		super.onSaveInstanceState(outState);
 	}
 
-	@Override
-	public void onLoadComplete() {
-		mProgressBar.setVisibility(View.INVISIBLE);
-		updateEmptyView();
-	}
+//	@Override
+//	public void onLoadComplete() {
+//		mProgressBar.setVisibility(View.INVISIBLE);
+//		updateEmptyView();
+//	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -200,10 +197,11 @@ public class MainActivity extends AppCompatActivity implements
 	public boolean onQueryTextChange(String newText) {
 		if (!ExampleAdapter.hasSearchText()
 				|| !ExampleAdapter.getSearchText().equalsIgnoreCase(newText)) {
-			mProgressBar.setVisibility(View.VISIBLE);
+//			mProgressBar.setVisibility(View.VISIBLE);
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			ExampleAdapter.setSearchText(newText);
-			mAdapter.updateDataSetAsync(newText);
+			mAdapter.updateDataSet(newText);
+//			mAdapter.updateDataSetAsync(newText);
 		}
 		//Due to Filter background Thread, give some short time to finish filtering
 		//Otherwise Adapter could not be synchronized with the new content
