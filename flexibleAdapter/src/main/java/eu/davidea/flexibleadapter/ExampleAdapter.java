@@ -1,8 +1,12 @@
 package eu.davidea.flexibleadapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,14 +16,18 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import eu.davidea.common.FlexibleAdapter;
+import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.utils.Utils;
 
 
-public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item> {
+public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item>
+		implements FastScroller.BubbleTextGetter {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
-	private static final int ITEMS = 20;
+	private static final int ITEMS = 1000;
 
 	public interface OnItemClickListener {
 		/**
@@ -51,16 +59,22 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			mLastItemInActionMode = false,
 			mSelectAll = false;
 
-	public ExampleAdapter(Context context, OnItemClickListener listener, String listId) {
-		this.mContext = context;
-		this.mClickListener = listener;
-		updateDataSet(listId);
+	public ExampleAdapter(Object activity, String listId) {
+		super(activity);
+		this.mContext = (Context) activity;
+		this.mClickListener = (OnItemClickListener) activity;
+//		updateDataSet(listId);
+		updateDataSetAsync(listId);
 	}
-	
+
+	/**
+	 * Param in this example is not used.
+	 * @param param A custom parameter to filter the DataSet
+	 */
 	public void updateDataSet(String param) {
 		//Fill mItems with your custom list
 		this.mItems = createExampleItems();
-		if (!mUserLearnedSelection && getItemCount() > 0) {
+		if (!mUserLearnedSelection && mItems.size() > 0 && !hasSearchText()) {
 			//Define Example View
 			Item item = new Item();
 			item.setId(0);
@@ -80,7 +94,9 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	private List<Item> createExampleItems() {
 		List<Item> items = new ArrayList<Item>();
 		for (int i = 1; i <= ITEMS; i++) {
-			items.add(getNewExampleItem(i));
+			Item item = getNewExampleItem(i);
+			if (!hasSearchText() || (hasSearchText() && filterObject(item, getSearchText())) )
+				items.add(item);
 		}
 		return items;
 	}
@@ -94,12 +110,12 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	@Override
 	public void selectAll() {
 		mSelectAll = true;
-		super.selectAll();
+		super.selectAll(EXAMPLE_VIEW_TYPE);
 	}
 
 	@Override
 	public int getItemViewType(int position) {
-		return (position == 0 && !mUserLearnedSelection ? EXAMPLE_VIEW_TYPE : ROW_VIEW_TYPE);
+		return (position == 0 && !mUserLearnedSelection && !hasSearchText() ? EXAMPLE_VIEW_TYPE : ROW_VIEW_TYPE);
 	}
 
 	@Override
@@ -127,7 +143,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 
-		//NOTE: ViewType Must be checked also here to bind the correct view
+		//NOTE: ViewType Must be checked ALSO here to bind the correct view
 		if (getItemViewType(position) == EXAMPLE_VIEW_TYPE) {
 			holder.itemView.setActivated(true);
 			holder.mTitle.setSelected(true);//For marquee
@@ -163,10 +179,50 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			holder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
 		}
 
-		holder.mTitle.setText(item.getTitle());
-		holder.mSubtitle.setText(item.getSubtitle());
+		//In case of searchText matches with Title or with an Item's field
+		// this will be highlighted
+		if (hasSearchText()) {
+			setHighlightText(holder.mTitle, item.getTitle(), mSearchText);
+			setHighlightText(holder.mSubtitle, item.getSubtitle(), mSearchText);
+		} else {
+			holder.mTitle.setText(item.getTitle());
+			holder.mSubtitle.setText(item.getSubtitle());
+		}
+
 	}
-	
+
+	@Override
+	public String getTextToShowInBubble(int position) {
+		//return getItem(position).getTitle().substring(0,1).toUpperCase(); //Usually it's the first letter
+		return getItem(position).getTitle().substring(5); //This is an example
+	}
+
+	private void setHighlightText(TextView textView, String text, String searchText) {
+		Spannable spanText = Spannable.Factory.getInstance().newSpannable(text);
+		int i = text.toLowerCase(Locale.getDefault()).indexOf(searchText);
+		if (i != -1) {
+			spanText.setSpan(new ForegroundColorSpan(Utils.getColorAccent(mContext)), i,
+					i + searchText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			spanText.setSpan(new StyleSpan(Typeface.BOLD), i,
+					i + searchText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			textView.setText(spanText, TextView.BufferType.SPANNABLE);
+		} else {
+			textView.setText(text, TextView.BufferType.NORMAL);
+		}
+	}
+
+	@Override
+	protected boolean filterObject(Item myObject, String constraint) {
+		String valueText = myObject.getTitle();
+		//Filter on Title
+		if (valueText != null && valueText.toLowerCase().contains(constraint)) {
+			return true;
+		}
+		//Filter on Subtitle
+		valueText = myObject.getSubtitle();
+		return valueText != null && valueText.toLowerCase().contains(constraint);
+	}
+
 	/**
 	 * Used for UserLearnsSelection.
 	 * Must be the base class of extension for Adapter Class.

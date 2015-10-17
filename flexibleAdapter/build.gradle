@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
 	compileSdkVersion 23
-	buildToolsVersion "23"
+	buildToolsVersion "23.0.1"
 
 	defaultConfig {
 		applicationId "eu.davidea.flexibleadapter"
 		minSdkVersion 14
 		targetSdkVersion 23
-		versionCode 6
-		versionName "2015.09.05"
+		versionCode 7
+		versionName "4.0 of 2015.10.18"
 	}
 	buildTypes {
 		release {
@@ -20,12 +20,14 @@ android {
 }
 
 dependencies {
-	compile 'com.android.support:appcompat-v7:23.0.0'
-	compile ('com.android.support:recyclerview-v7:23.0.0') {
+	compile ('com.android.support:appcompat-v7:23.0.1') {
+
+	}
+	compile ('com.android.support:recyclerview-v7:23.0.1') {
 		exclude module: 'support-v4';
 		exclude module: 'support-annotations'
 	}
-	compile ('com.android.support:design:23.0.0') {
+	compile ('com.android.support:design:23.0.1') {
 		exclude module: 'support-v4'
 		exclude module: 'support-annotations'
 	}

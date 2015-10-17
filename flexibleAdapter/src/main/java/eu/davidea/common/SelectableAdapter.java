@@ -10,11 +10,11 @@ import android.util.Log;
 
 /**
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
- * 
+ *
  * @author Davide Steduto
  */
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
-	
+
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
 	/**
 	 * Default mode for selection
@@ -32,7 +32,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		this.selectedItems = new ArrayList<Integer>();
 		this.mode = MODE_SINGLE;
 	}
-	
+
 	/**
 	 * Set the mode of the selection, MODE_SINGLE is the default:
 	 * <ul>
@@ -41,7 +41,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * </ul>
 	 * <b>NOTE:</b> #mModeMultiJustFinished is set true when #MODE_MULTI is finished.
 	 *
-	 * @param mode
+	 * @param mode MODE_SINGLE or MODE_MULTI
 	 */
 	public void setMode(int mode) {
 		this.mode = mode;
@@ -69,24 +69,25 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * This method never invalidates the Item.
+	 * Convenience method to never invalidate the Item.
 	 *
-	 * @param position
+	 * @param position Position of the item to toggle the selection status for.
 	 * @see #toggleSelection(int, boolean)
 	 */
 	public void toggleSelection(int position) {
 		toggleSelection(position, false);
 	}
-	
+
 	/**
 	 * Toggle the selection status of the item at a given position.<br/>
 	 * The behaviour depends on the selection mode previously set with {@link #setMode}.
 	 *
-	 * <br/><br/>Optionally the item can be invalidated.<br/>
+	 * <br/><br/>
+	 * Optionally the item can be invalidated.<br/>
 	 * However it is preferable to set <i>false</i> and to handle the Activated/Selected State of
 	 * the ItemView in the Click events of the ViewHolder after the selection is registered and
 	 * up to date: Very Useful if the item has views with own animation to perform!
-	 * 
+	 *
 	 * <br/><br/>
 	 * <b>Note:</b>
 	 * <ul>
@@ -102,6 +103,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	public void toggleSelection(int position, boolean invalidate) {
 		if (position < 0) return;
+		if (mode == MODE_SINGLE) clearSelection();
 
 		int index = selectedItems.indexOf(position);
 		if (index != -1) {
@@ -123,7 +125,8 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * <br/>- Use {@link #toggleSelection} for normal situation instead.
 	 * <br/>- Use {@link #getSelectedItems}.iterator() to avoid java.util.ConcurrentModificationException.
 	 *
-	 * <br/><br/>This method is used only after a removal of an Item <u>and</u> useful only in certain
+	 * <br/><br/>
+	 * This method is used only after a removal of an Item <u>and</u> useful only in certain
 	 * situations such when not all selected Items can be removed (business exceptions dependencies)
 	 * while others still remains selected.
 	 * <br/>For normal situations use {@link #toggleSelection} instead.
@@ -148,16 +151,25 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		//Usually the notification is made in FlexibleAdapter.removeItem();
 		//notifyItemChanged(position);
 	}
-	
+
+	/**
+	 * Convenience method when there is nothing to skip.
+	 */
+	public void selectAll() {
+		selectAll(-1);
+	}
 	/**
 	 * Add the selection status for all items.
 	 * The selector container is sequentially filled with All items positions.
 	 * <br/><b>Note:</b> All items are invalidated and rebinded!
+	 *
+	 * @param skipViewType ViewType for which we don't want selection
 	 */
-	public void selectAll() {
+	public void selectAll(int skipViewType) {
 		Log.d(TAG, "selectAll");
 		selectedItems = new ArrayList<Integer>(getItemCount());
 		for (int i = 0; i < getItemCount(); i++) {
+			if (getItemViewType(i) == skipViewType) continue;
 			selectedItems.add(i);
 			Log.d(TAG, "selectAll notifyItemChanged on position "+i);
 			notifyItemChanged(i);
@@ -166,8 +178,9 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 
 	/**
 	 * Clear the selection status for all items one by one to not kill animations in the items.
-	 * <br/><b>Note:</b> Items are invalidated and rebinded!
-	 * <br/>This method use Iterator to avoid java.util.ConcurrentModificationException.
+	 * <br/><br/>
+	 * <b>Note 1:</b> Items are invalidated and rebinded!<br/>
+	 * <b>Note 2:</b> This method use java.util.Iterator to avoid java.util.ConcurrentModificationException.
 	 */
 	public void clearSelection() {
 		Iterator<Integer> iterator = selectedItems.iterator();
@@ -197,7 +210,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	public List<Integer> getSelectedItems() {
 		return selectedItems;
 	}
-	
+
 	/**
 	 * Save the state of the current selection on the items.
 	 *
@@ -206,7 +219,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putIntegerArrayList(TAG, selectedItems);
 	}
-	
+
 	/**
 	 * Restore the previous state of the selection on the items.
 	 *
@@ -215,5 +228,5 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		selectedItems = savedInstanceState.getIntegerArrayList(TAG);
 	}
-	
+
 }

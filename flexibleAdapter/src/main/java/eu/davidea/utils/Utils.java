@@ -9,10 +9,14 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import java.text.SimpleDateFormat;
@@ -27,6 +31,22 @@ public final class Utils {
 	private static int colorAccent = -1;
 
 	private Utils() {
+	}
+
+	public static Point getScreenDimensions(Context context) {
+		WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+
+		DisplayMetrics dm = new DisplayMetrics();
+		display.getMetrics(dm);
+
+		Point point = new Point();
+		point.set(dm.widthPixels, dm.heightPixels);
+		return point;
+	}
+
+	public static DisplayMetrics getDisplayMetrics(Context context) {
+		return context.getResources().getDisplayMetrics();
 	}
 
 	public static int dpToPx(Context context, float dp) {

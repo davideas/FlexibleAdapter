@@ -1,8 +1,8 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207)
 
 # FlexibleAdapter
-##### Dev branch version has an experimental Search engine.
-##### Master branch version: 2015.09.05
+##### Dev branch version v4 of 2015.10.18
+##### Master branch version v3.1 of 2015.09.05
 #### A pattern for every RecyclerView
 
 The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
@@ -16,7 +16,8 @@ I've put the Set click listeners at the creation and not in the Binding method, 
 Also note that this adapter handles the basic clicks: _single_ and _long clicks_. If you need a double tap you need to implement the android.view.GestureDetector.
 
 # Screenshots
-![Main screen](/screenshots/main_screen.png) ![Multi Selection](/screenshots/multi_selection.png) ![Undo Screen](/screenshots/undo.png)
+![Main screen](/screenshots/main_screen.png) ![Multi Selection](/screenshots/multi_selection.png)
+![Search screen](/screenshots/search.png) ![Undo Screen](/screenshots/undo.png)
 
 #Setup
 Ultra simple:
@@ -64,7 +65,7 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			mAdapter.removeItems(mAdapter.getSelectedItems());
 
 			//Any view for Undo, ex. Snackbar
-			Snackbar.make(findViewById(R.id.main_view), message, 5000)
+			Snackbar.make(findViewById(R.id.main_view), message, 7000)
 					.setAction(R.string.undo, new View.OnClickListener() {
 						@Override
 						public void onClick(View v) { mAdapter.restoreDeletedItems(); }
@@ -72,7 +73,7 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 					.show();
 
 			//Start countdown with startUndoTimer(millisec)
-			mAdapter.startUndoTimer(); //Default 5''
+			mAdapter.startUndoTimer(7000); //Default 5''
 			mActionMode.finish();
 			return true;
 		//...
@@ -80,34 +81,72 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 }
 ```
 
+#Usage for FastScroller
+First add the drawable files to the project, then the layout, finally add the implementation for the Adapter and Activity:
+
+``` java
+public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item>
+		implements FastScroller.BubbleTextGetter {
+	...
+	@Override
+	public String getTextToShowInBubble(int position) {
+		return getItem(position).getTitle().substring(0,1).toUpperCase();
+	}
+}
+
+public class MainActivity extends AppCompatActivity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		...
+		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
+		fastScroller.setRecyclerView(mRecyclerView);
+		fastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle);
+	}
+	...
+}
+```
+
 #Change Log
-**2015.09.05**
+v4 **2015.10.18**
+- Added **FilterAsyncTask** to asynchronously load the list (This might not work well and binding is excluded from Async)
+- Enabled **Search** filter through _updateDataSet_ method (Note: as the example is made, the search regenerate the list!)
+- Included some ItemAnimators from https://github.com/wasabeef/recyclerview-animators
+  (in the example SlideInRightAnimator is used), but all need to be adapted if used with Support v23.1.0
+- Included and customized **FastScroller** library from https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller
+  My version has FrameLayout extended instead of LinearLayout, and a friendly layout.
+- Added **SwipeRefreshLayout**, just an usage example
+- Use of Handler instead of TimerTask while Undo
+- _FlexibleAdapter_ can now return deleted items before they are removed from memory
+- _SelectableAdapter.selectAll()_ can now skip selection on one specific ViewType
+- Adapted MainActivity
+
+v3.1 **2015.09.05**
 - Updated compileSdkVersion and Support libraries to v23
 - Customised Undo timeout in the example Activity with original _Snackbar_
 
-**2015.07.29**
+v3 **2015.07.29**
 - Added **Undo** functionality
 - Moved getItem() into FlexibleAdapter, method now is part of the library
-- Added synchronized blocks for write operations on _mItems_ list
+- Added synchronized blocks for write operations on mItems list
 
-**2015.07.20**
+v2.2 **2015.07.20**
 - New full working example Android Studio project! (with some nice extra-features)
 
-**2015.07.03**
+v2.1 **2015.07.03**
 - Added new method _updateItem()_
 - Deprecated _removeSelection()_ -> Use _toggleSelection()_ instead!
-- In _clearSelection_ removed call to _notifyDataSetChanged()_
-- Improved others methods
-- Added more comments
+- In _clearSelection_ removed call to _notifyDataSetChanged()_.
+- Improved others methods.
+- Added more comments.
 
-**2015.06.19**
+v2 **2015.06.19**
 - Added **Mode** for Multi and Single fixed selection. The Multi selection was already active, but the Single fixed selection mode still not.
 - Reviewed method: _toggleSelection(int position)_ - Adapted for Mode functionality. For more details see the comment of the method!
 - Added new method _getPositionForItem(T item)_ - Self explanatory
 - Added new method _contains(T item)_ - Another useful method
 - Reviewed method _updateDataSet(String param)_ - Added the parameter to filter DataSet
 
-**2015.05.03**
+v1 **2015.05.03**
 - Initial release
 
 #Thanks
