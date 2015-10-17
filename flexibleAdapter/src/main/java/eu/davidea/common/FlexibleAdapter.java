@@ -1,5 +1,6 @@
 package eu.davidea.common;
 
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -30,10 +31,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();
 	public static final long UNDO_TIMEOUT = 5000L;
 
-//	public interface OnUpdateListener {
-//		void onLoadComplete();
-//		//void onProgressUpdate(int progress);
-//	}
+	public interface OnUpdateListener {
+		void onLoadComplete();
+		//void onProgressUpdate(int progress);
+	}
 
 	/**
 	 * Lock used to modify the content of {@link #mItems}. Any write operation performed on the array should be
@@ -46,7 +47,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	protected List<Integer> mOriginalPosition;
 	//Searchable fields
 	protected static String mSearchText; //Static: It can exist only 1 searchText
-//	protected OnUpdateListener mUpdateListener;
+	protected OnUpdateListener mUpdateListener;
 	protected Handler mHandler;
 
 	public FlexibleAdapter() {
@@ -58,12 +59,12 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 *
 	 * @param listener {@link OnUpdateListener}
 	 */
-//	public FlexibleAdapter(Object listener) {
-//		if (listener instanceof OnUpdateListener)
-//			this.mUpdateListener = (OnUpdateListener) listener;
-//		else
-//			Log.w(TAG, "Listener is not an instance of OnUpdateListener!");
-//	}
+	public FlexibleAdapter(Object listener) {
+		if (listener instanceof OnUpdateListener)
+			this.mUpdateListener = (OnUpdateListener) listener;
+		else
+			Log.w(TAG, "Listener is not an instance of OnUpdateListener!");
+	}
 
 	/**
 	 * Convenience method to call {@link #updateDataSet(String)} with {@link null} as param.
@@ -88,14 +89,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 *
 	 * @param param A custom parameter to filter the DataSet
 	 */
-//	public void updateDataSetAsync(String param) {
-//		if (mUpdateListener == null) {
-//			Log.w(TAG, "OnUpdateListener is not initialized. UpdateDataSet is not using FilterAsyncTask!");
-//			updateDataSet(param);
-//			return;
-//		}
-//		new FilterAsyncTask().execute(param);
-//	}
+	public void updateDataSetAsync(String param) {
+		if (mUpdateListener == null) {
+			Log.w(TAG, "OnUpdateListener is not initialized. UpdateDataSet is not using FilterAsyncTask!");
+			updateDataSet(param);
+			return;
+		}
+		new FilterAsyncTask().execute(param);
+	}
 	
 	/**
 	 * Returns the custom object "Item".
@@ -377,24 +378,24 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		return false;
 	}
 
-//	public class FilterAsyncTask extends AsyncTask<String, Void, Void> {
-//
-//		private final String TAG = FilterAsyncTask.class.getSimpleName();
-//
-//		@Override
-//		protected Void doInBackground(String... params) {
-//			Log.i(TAG, "doInBackground - started FilterAsyncTask!");
-//			updateDataSet(params[0]);
-//			Log.i(TAG, "doInBackground - ended FilterAsyncTask!");
-//			return null;
-//		}
-//
-//		@Override
-//		protected void onPostExecute(Void result) {
-//			super.onPostExecute(result);
-//			mUpdateListener.onLoadComplete();
-//			notifyDataSetChanged();
-//		}
-//	}
+	public class FilterAsyncTask extends AsyncTask<String, Void, Void> {
+
+		private final String TAG = FilterAsyncTask.class.getSimpleName();
+
+		@Override
+		protected Void doInBackground(String... params) {
+			Log.i(TAG, "doInBackground - started FilterAsyncTask!");
+			updateDataSet(params[0]);
+			Log.i(TAG, "doInBackground - ended FilterAsyncTask!");
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			mUpdateListener.onLoadComplete();
+			notifyDataSetChanged();
+		}
+	}
 
 }

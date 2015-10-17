@@ -19,13 +19,15 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.common.FlexibleAdapter;
+import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.utils.Utils;
 
 
-public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item> {
+public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item>
+		implements FastScroller.BubbleTextGetter {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
-	private static final int ITEMS = 20;
+	private static final int ITEMS = 1000;
 
 	public interface OnItemClickListener {
 		/**
@@ -58,11 +60,11 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			mSelectAll = false;
 
 	public ExampleAdapter(Object activity, String listId) {
-		//super(activity);
+		super(activity);
 		this.mContext = (Context) activity;
 		this.mClickListener = (OnItemClickListener) activity;
-		updateDataSet(listId);
-//		updateDataSetAsync(listId);
+//		updateDataSet(listId);
+		updateDataSetAsync(listId);
 	}
 
 	/**
@@ -72,7 +74,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	public void updateDataSet(String param) {
 		//Fill mItems with your custom list
 		this.mItems = createExampleItems();
-		if (!mUserLearnedSelection && mItems.size() > 0) {
+		if (!mUserLearnedSelection && mItems.size() > 0 && !hasSearchText()) {
 			//Define Example View
 			Item item = new Item();
 			item.setId(0);
@@ -141,7 +143,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 
-		//NOTE: ViewType Must be checked also here to bind the correct view
+		//NOTE: ViewType Must be checked ALSO here to bind the correct view
 		if (getItemViewType(position) == EXAMPLE_VIEW_TYPE) {
 			holder.itemView.setActivated(true);
 			holder.mTitle.setSelected(true);//For marquee
@@ -187,6 +189,12 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			holder.mSubtitle.setText(item.getSubtitle());
 		}
 
+	}
+
+	@Override
+	public String getTextToShowInBubble(int position) {
+		//return getItem(position).getTitle().substring(0,1).toUpperCase(); //Usually it's the first letter
+		return getItem(position).getTitle().substring(5); //This is an example
 	}
 
 	private void setHighlightText(TextView textView, String text, String searchText) {

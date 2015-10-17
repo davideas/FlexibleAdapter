@@ -6,10 +6,13 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,13 +29,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import eu.davidea.anim.SlideInRightAnimator;
+import eu.davidea.common.FlexibleAdapter;
 import eu.davidea.common.SimpleDividerItemDecoration;
+import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener,
 		SearchView.OnQueryTextListener,
-//		FlexibleAdapter.OnUpdateListener,
+		FlexibleAdapter.OnUpdateListener,
 		ExampleAdapter.OnItemClickListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
@@ -50,13 +55,29 @@ public class MainActivity extends AppCompatActivity implements
 	private int mActivatedPosition = INVALID_POSITION;
 
 	/**
-	 * RecyclerView
+	 * RecyclerView and related objects
 	 */
 	private RecyclerView mRecyclerView;
 	private ExampleAdapter mAdapter;
 	private ActionMode mActionMode;
-//	private ProgressBar mProgressBar;
-
+	private ProgressBar mProgressBar;
+	private SwipeRefreshLayout mSwipeRefreshLayout;
+	private final Handler mSwipeHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+			public boolean handleMessage(Message message) {
+				switch(message.what) {
+					case 0: //Stop
+						mSwipeRefreshLayout.setRefreshing(false);
+						mSwipeRefreshLayout.setEnabled(true);
+						return true;
+					case 1: //1 Start
+						mSwipeRefreshLayout.setRefreshing(true);
+						mSwipeRefreshLayout.setEnabled(false);
+						return true;
+					default:
+						return false;
+				}
+			}
+		});
 	/**
 	 * FAB
 	 */
@@ -68,8 +89,8 @@ public class MainActivity extends AppCompatActivity implements
 		setContentView(R.layout.activity_main);
 		Log.d(TAG, "onCreate");
 
-//		mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
-//		mProgressBar.setVisibility(View.VISIBLE);
+		mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+		mProgressBar.setVisibility(View.VISIBLE);
 
 		//Adapter & RecyclerView
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
@@ -80,6 +101,11 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
 				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null))) ;
+
+		//Add FastScroll to the RecyclerView
+		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
+		fastScroller.setRecyclerView(mRecyclerView);
+		fastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle);
 
 		//FAB
 		mFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -108,6 +134,9 @@ public class MainActivity extends AppCompatActivity implements
 		//Update EmptyView (by default EmptyView is visible)
 		updateEmptyView();
 
+		//SwipeToRefresh
+		initializeSwipeToRefresh();
+
 		//Restore previous state
 		if (savedInstanceState != null) {
 			//Selection
@@ -121,6 +150,24 @@ public class MainActivity extends AppCompatActivity implements
 				setSelection(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 
 		}
+	}
+
+	private void initializeSwipeToRefresh() {
+		//Swipe down to force synchronize
+		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+		mSwipeRefreshLayout.setDistanceToTriggerSync(390);
+		mSwipeRefreshLayout.setEnabled(true);
+		mSwipeRefreshLayout.setColorSchemeResources(
+				android.R.color.holo_purple, android.R.color.holo_blue_light,
+				android.R.color.holo_green_light, android.R.color.holo_orange_light);
+		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				mAdapter.updateDataSetAsync("example parameter for List1");
+				mSwipeRefreshLayout.setEnabled(false);
+				mSwipeHandler.sendEmptyMessageDelayed(0, ExampleAdapter.UNDO_TIMEOUT);
+			}
+		});
 	}
 
 	@Override
@@ -137,11 +184,11 @@ public class MainActivity extends AppCompatActivity implements
 		super.onSaveInstanceState(outState);
 	}
 
-//	@Override
-//	public void onLoadComplete() {
-//		mProgressBar.setVisibility(View.INVISIBLE);
-//		updateEmptyView();
-//	}
+	@Override
+	public void onLoadComplete() {
+		mProgressBar.setVisibility(View.INVISIBLE);
+		updateEmptyView();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -197,20 +244,12 @@ public class MainActivity extends AppCompatActivity implements
 	public boolean onQueryTextChange(String newText) {
 		if (!ExampleAdapter.hasSearchText()
 				|| !ExampleAdapter.getSearchText().equalsIgnoreCase(newText)) {
-//			mProgressBar.setVisibility(View.VISIBLE);
+			mProgressBar.setVisibility(View.VISIBLE);
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			ExampleAdapter.setSearchText(newText);
-			mAdapter.updateDataSet(newText);
-//			mAdapter.updateDataSetAsync(newText);
+//			mAdapter.updateDataSet(newText);
+			mAdapter.updateDataSetAsync(newText);
 		}
-		//Due to Filter background Thread, give some short time to finish filtering
-		//Otherwise Adapter could not be synchronized with the new content
-		new Handler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				updateEmptyView();
-			}
-		}, 100L);
 		return true;
 	}
 
@@ -239,16 +278,20 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	/**
-	 * Handling RecyclerView when empty
+	 * Handling RecyclerView when empty.
+	 * <br/><br/>
+	 * <b>Note:</b> The order how the 3 Views (RecyclerView, EmptyView, FastScroller)
+	 *   are placed in the Layout is important
 	 */
 	private void updateEmptyView() {
+		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
 		TextView emptyView = (TextView) findViewById(R.id.empty);
 		emptyView.setText(getString(R.string.no_items));
 		if (mAdapter.getItemCount() > 0) {
-			mRecyclerView.setVisibility(View.VISIBLE);
+			fastScroller.setVisibility(View.VISIBLE);
 			emptyView.setVisibility(View.GONE);
 		} else {
-			mRecyclerView.setVisibility(View.GONE);
+			fastScroller.setVisibility(View.GONE);
 			emptyView.setVisibility(View.VISIBLE);
 		}
 	}
@@ -380,10 +423,13 @@ public class MainActivity extends AppCompatActivity implements
 							@Override
 							public void onClick(View v) {
 									mAdapter.restoreDeletedItems();
+									mSwipeHandler.sendEmptyMessage(0);
 								}
 							})
 						.show();
 				mAdapter.startUndoTimer(7000L);
+				mSwipeHandler.sendEmptyMessage(1);
+				mSwipeHandler.sendEmptyMessageDelayed(0, ExampleAdapter.UNDO_TIMEOUT);
 				mActionMode.finish();
 				return true;
 
