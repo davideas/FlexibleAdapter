@@ -1,8 +1,8 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207)
 
 # FlexibleAdapter
-##### Dev branch version v4 of 2015.10.18
-##### Master branch version v3.1 of 2015.09.05
+##### Master branch: v4 of 2015.10.18
+##### Dev branch: v4 of 2015.10.18
 #### A pattern for every RecyclerView
 
 The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
