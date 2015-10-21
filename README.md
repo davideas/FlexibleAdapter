@@ -1,11 +1,17 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207)
 
-# FlexibleAdapter
-##### Master branch: v4 of 2015.10.18
-##### Dev branch: v4 of 2015.10.18
-#### A pattern for every RecyclerView
+# Flexible Adapter
 
-The functionalities are taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
+###### A pattern for every RecyclerView - Master branch: v4 of 2015.10.18
+
+#### Main functionalities
+* Base item selection (but also SINGLE & MULTI selection mode) in the Recycler View with ripple effect.
+* Undo the deleted items with custom animations.
+* Customizable FastScroller (imported library, see change log for details).
+* SearchFilter with string selection in Item titles and subtitles.
+
+#### How is made
+The base functionality is taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
 
 * At lower class there is SelectableAdapter that provides selection functionalities and it's able to _maintain the state_ after the rotation, you just need to call the onSave/onRestore methods from the Activity!
 * Then, the class FlexibleAdapter handles the content paying attention at the animations (calling notify only for the position. _Note:_ you still need to set your animation to the RecyclerView when you create it in the Activity).
@@ -13,7 +19,7 @@ The functionalities are taken from different Blogs (see at the bottom of the pag
 
 I've put the Set click listeners at the creation and not in the Binding method, because onBindViewHolder is called at each invalidate (each notify..() methods).
 
-Also note that this adapter handles the basic clicks: _single_ and _long clicks_. If you need a double tap you need to implement the android.view.GestureDetector.
+Finally note that, this adapter handles the basic clicks: _single_ and _long clicks_. If you need a double tap you need to implement the android.view.GestureDetector.
 
 # Screenshots
 ![Main screen](/screenshots/main_screen.png) ![Multi Selection](/screenshots/multi_selection.png)
@@ -25,10 +31,10 @@ No needs to create and import a library for just 2 files, so just *copy* Selecta
 
 Remember to initialize `mItems` (List already included in FlexibleAdapter) in order to manage list items. Method `updateDataSet(..)` can help in this.
 
-####Pull requests / Issues / Improvement requests
+#### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!
 
-#Usage for Multi Selection
+# Usage for Multi Selection
 In your activity change the Mode for the _ActionMode_ object.
 
 ``` java
@@ -47,7 +53,7 @@ public void onDestroyActionMode(ActionMode mode) {
 }
 ```
 
-#Usage for Undo
+# Usage for Undo
 
 ``` java
 @Override
@@ -81,7 +87,7 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 }
 ```
 
-#Usage for FastScroller
+# Usage for FastScroller
 First add the drawable files to the project, then the layout, finally add the implementation for the Adapter and Activity:
 
 ``` java
@@ -106,8 +112,8 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-#Change Log
-v4 **2015.10.18**
+# Change Log
+###### v4 - 2015.10.18
 - Added **FilterAsyncTask** to asynchronously load the list (This might not work well and binding is excluded from Async)
 - Enabled **Search** filter through _updateDataSet_ method (Note: as the example is made, the search regenerate the list!)
 - Included some ItemAnimators from https://github.com/wasabeef/recyclerview-animators
@@ -120,43 +126,43 @@ v4 **2015.10.18**
 - _SelectableAdapter.selectAll()_ can now skip selection on one specific ViewType
 - Adapted MainActivity
 
-v3.1 **2015.09.05**
+###### v3.1 - 2015.09.05
 - Updated compileSdkVersion and Support libraries to v23
 - Customised Undo timeout in the example Activity with original _Snackbar_
 
-v3 **2015.07.29**
+###### v3 - 2015.07.29
 - Added **Undo** functionality
 - Moved getItem() into FlexibleAdapter, method now is part of the library
 - Added synchronized blocks for write operations on mItems list
 
-v2.2 **2015.07.20**
+###### v2.2 - 2015.07.20
 - New full working example Android Studio project! (with some nice extra-features)
 
-v2.1 **2015.07.03**
+###### v2.1 - 2015.07.03
 - Added new method _updateItem()_
 - Deprecated _removeSelection()_ -> Use _toggleSelection()_ instead!
 - In _clearSelection_ removed call to _notifyDataSetChanged()_.
 - Improved others methods.
 - Added more comments.
 
-v2 **2015.06.19**
+###### v2 - 2015.06.19
 - Added **Mode** for Multi and Single fixed selection. The Multi selection was already active, but the Single fixed selection mode still not.
 - Reviewed method: _toggleSelection(int position)_ - Adapted for Mode functionality. For more details see the comment of the method!
 - Added new method _getPositionForItem(T item)_ - Self explanatory
 - Added new method _contains(T item)_ - Another useful method
 - Reviewed method _updateDataSet(String param)_ - Added the parameter to filter DataSet
 
-v1 **2015.05.03**
+###### v1 - 2015.05.03
 - Initial release
 
-#Thanks
+# Thanks
 I've used these blogs as starting point:
 
 http://enoent.fr/blog/2015/01/18/recyclerview-basics/
 
 https://www.grokkingandroid.com/statelistdrawables-for-recyclerview-selection/
 
-#License
+# License
 
     Copyright 2015 Davide Steduto
 
