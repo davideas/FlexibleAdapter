@@ -35,7 +35,7 @@ Remember to initialize `mItems` (List already included in FlexibleAdapter) in or
 Feel free to contribute and ask!
 
 # Usage for Single Selection
-See [Wiki](../../wiki) for full details! In your Activity/Fragment creation set the Mode SINGLE.
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In your Activity/Fragment creation set the Mode SINGLE.
 In onListItemClick, call *toggleSeletion* to register the selection on that position:
 ``` java
 public class MainActivity extends AppCompatActivity {
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 # Usage for Multi Selection
-See [Wiki](../../wiki) for full details! In your Activity/Fragment change the Modes for the _ActionMode_ object.
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In your Activity/Fragment change the Modes for the _ActionMode_ object.
 ``` java
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback {
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements
 ```
 
 # Usage for Undo
-See [Wiki](../../wiki) for full details!
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 ``` java
 @Override
 public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -101,7 +101,7 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 ```
 
 # Usage for FastScroller
-See [Wiki](../../wiki) for full details! First add the drawable files to the project, then the layout, finally add the implementation for the Adapter and Activity/Fragment:
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! First add the drawable files to the project, then the layout, finally add the implementation for the Adapter and Activity/Fragment:
 ``` java
 public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item>
 		implements FastScroller.BubbleTextGetter {
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 - Adapted MainActivity
 
 ###### Old releases
-See [releases](../../releases) for old versions.
+See [releases](https://github.com/davideas/FlexibleAdapter/releases) for old versions.
 
 v3.1 - 2015.08.18 | v3.0 - 2015.07.29
 v2.2 - 2015.07.20 | v2.1 - 2015.07.03
