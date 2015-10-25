@@ -34,32 +34,55 @@ Remember to initialize `mItems` (List already included in FlexibleAdapter) in or
 #### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!
 
-# Usage for Multi Selection
-In your activity change the Mode for the _ActionMode_ object.
-
+# Usage for Single Selection
+See [Wiki](../../wiki) for full details! In your Activity/Fragment creation set the Mode SINGLE.
+In onListItemClick, call *toggleSeletion* to register the selection on that position:
 ``` java
-@Override
-public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-	mode.getMenuInflater().inflate(R.menu.menu_context, menu);
-	mAdapter.setMode(YourAdapterClass.MODE_MULTI);
-	return true;
-}
+public class MainActivity extends AppCompatActivity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		...
+		mAdapter = new YoursAdapter(..., ..., ...);
+		mAdapter.setMode(YoursAdapter.MODE_SINGLE);
+		...
+	}
 
-@Override
-public void onDestroyActionMode(ActionMode mode) {
-	mAdapter.setMode(YourAdapterClass.MODE_SINGLE);
-	mAdapter.clearSelection();
-	mActionMode = null;
+	@Override
+	public boolean onListItemClick(int position) {
+		toggleSelection(position);
+	}
+}
+```
+
+# Usage for Multi Selection
+See [Wiki](../../wiki) for full details! In your Activity/Fragment change the Modes for the _ActionMode_ object.
+``` java
+public class MainActivity extends AppCompatActivity implements
+		ActionMode.Callback {
+	...
+	@Override
+	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+		mode.getMenuInflater().inflate(R.menu.menu_context, menu);
+		mAdapter.setMode(YourAdapterClass.MODE_MULTI);
+		return true;
+	}
+	
+	@Override
+	public void onDestroyActionMode(ActionMode mode) {
+		mAdapter.setMode(YourAdapterClass.MODE_SINGLE);
+		mAdapter.clearSelection();
+		mActionMode = null;
+	}
 }
 ```
 
 # Usage for Undo
-
+See [Wiki](../../wiki) for full details!
 ``` java
 @Override
 public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 	switch (item.getItemId()) {
-		//...
+		...
 		case R.id.action_delete:
 			for (int i : mAdapter.getSelectedItems()) {
 				//Remove items from your Database. Example:
@@ -67,29 +90,18 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			}
 
 			//Keep synchronized the Adapter: Remove selected items from Adapter
-			String message = mAdapter.getSelectedItems() + " " + getString(R.string.action_deleted);
 			mAdapter.removeItems(mAdapter.getSelectedItems());
-
-			//Any view for Undo, ex. Snackbar
-			Snackbar.make(findViewById(R.id.main_view), message, 7000)
-					.setAction(R.string.undo, new View.OnClickListener() {
-						@Override
-						public void onClick(View v) { mAdapter.restoreDeletedItems(); }
-					})
-					.show();
 
 			//Start countdown with startUndoTimer(millisec)
 			mAdapter.startUndoTimer(7000); //Default 5''
 			mActionMode.finish();
 			return true;
-		//...
 	}
 }
 ```
 
 # Usage for FastScroller
-First add the drawable files to the project, then the layout, finally add the implementation for the Adapter and Activity:
-
+See [Wiki](../../wiki) for full details! First add the drawable files to the project, then the layout, finally add the implementation for the Adapter and Activity/Fragment:
 ``` java
 public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item>
 		implements FastScroller.BubbleTextGetter {
@@ -99,7 +111,8 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		return getItem(position).getTitle().substring(0,1).toUpperCase();
 	}
 }
-
+```
+``` java
 public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -126,34 +139,12 @@ public class MainActivity extends AppCompatActivity {
 - _SelectableAdapter.selectAll()_ can now skip selection on one specific ViewType
 - Adapted MainActivity
 
-###### v3.1 - 2015.09.05
-- Updated compileSdkVersion and Support libraries to v23
-- Customised Undo timeout in the example Activity with original _Snackbar_
+###### Old releases
+See [releases](../../releases) for old versions.
 
-###### v3 - 2015.07.29
-- Added **Undo** functionality
-- Moved getItem() into FlexibleAdapter, method now is part of the library
-- Added synchronized blocks for write operations on mItems list
-
-###### v2.2 - 2015.07.20
-- New full working example Android Studio project! (with some nice extra-features)
-
-###### v2.1 - 2015.07.03
-- Added new method _updateItem()_
-- Deprecated _removeSelection()_ -> Use _toggleSelection()_ instead!
-- In _clearSelection_ removed call to _notifyDataSetChanged()_.
-- Improved others methods.
-- Added more comments.
-
-###### v2 - 2015.06.19
-- Added **Mode** for Multi and Single fixed selection. The Multi selection was already active, but the Single fixed selection mode still not.
-- Reviewed method: _toggleSelection(int position)_ - Adapted for Mode functionality. For more details see the comment of the method!
-- Added new method _getPositionForItem(T item)_ - Self explanatory
-- Added new method _contains(T item)_ - Another useful method
-- Reviewed method _updateDataSet(String param)_ - Added the parameter to filter DataSet
-
-###### v1 - 2015.05.03
-- Initial release
+v3.1 - 2015.08.18 | v3.0 - 2015.07.29
+v2.2 - 2015.07.20 | v2.1 - 2015.07.03
+v2.0 - 2015.06.19 | v1.0 - 2015.05.03
 
 # Thanks
 I've used these blogs as starting point:

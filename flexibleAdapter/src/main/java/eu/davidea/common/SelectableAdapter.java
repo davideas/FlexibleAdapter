@@ -1,12 +1,12 @@
 package eu.davidea.common;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
@@ -89,14 +89,18 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * up to date: Very Useful if the item has views with own animation to perform!
 	 *
 	 * <br/><br/>
-	 * <b>Note:</b>
+	 * <b>Usage:</b>
 	 * <ul>
 	 * <li>If you don't want any item to be selected/activated at all, just don't call this method.</li>
 	 * <li>To have actually the item visually selected you need to add a custom <i>Selector Drawable</i> to your layout/view of the Item.
-	 * or to add <i>android:background="?attr/selectableItemBackground"</i> in your layout pointing to a custom Drawable in the style.xml</li>
+	 * It's preferable: <i>android:background="?attr/selectableItemBackground"</i> in your layout, pointing to a custom Drawable in the style.xml
+	 * (note: prefix <i>?android:attr</i> seems to <u>not</u> work).</li>
+	 * <li>In <i>onClick</i>, enable the Activated/Selected State of the ItemView of the ViewHolder <u>after</u> the listener consumed the event:
+	 * <i>itemView.setActivated(mAdapter.isSelected(getAdapterPosition()));</i></li>
+	 * <li>In <i>onBindViewHolder</i>, adjust the selection status: <i>holder.itemView.setActivated(isSelected(position));</i></li>
 	 * <li>If <i>invalidate</i> is set true, {@link #notifyItemChanged} is called and {@link #onBindViewHolder} will be automatically called
 	 * afterwards overriding any animation in the ItemView!</li>
-	 *</ul>
+	 *</ul>T
 	 *
 	 * @param position Position of the item to toggle the selection status for.
 	 * @param invalidate Boolean to indicate if the row must be invalidated and item rebinded.

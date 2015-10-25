@@ -352,10 +352,10 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	/**
-	 * Toggle the selection state of an item.
-	 *
+	 * Toggle the selection state of an item.<br/><br/>
 	 * If the item was the last one in the selection and is unselected, the selection is stopped.
 	 * Note that the selection must already be started (actionMode must not be null).
+	 *
 	 * @param position Position of the item to toggle the selection state
 	 */
 	private void toggleSelection(int position) {
