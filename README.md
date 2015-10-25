@@ -142,8 +142,8 @@ public class MainActivity extends AppCompatActivity {
 ###### Old releases
 See [releases](https://github.com/davideas/FlexibleAdapter/releases) for old versions.
 
-v3.1 - 2015.08.18 | v3.0 - 2015.07.29
-v2.2 - 2015.07.20 | v2.1 - 2015.07.03
+v3.1 - 2015.08.18 | v3.0 - 2015.07.29 |
+v2.2 - 2015.07.20 | v2.1 - 2015.07.03 |
 v2.0 - 2015.06.19 | v1.0 - 2015.05.03
 
 # Thanks
