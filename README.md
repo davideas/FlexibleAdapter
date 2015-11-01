@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
 - Refactored module names, package signatures and gradle build files. Code remains unchanged.
 - Configuration for JCenter, now FlexibleAdapter is a lightweight standalone library!
   **Note:** FastScroller and ItemAnimators are excluded from the library, but you can see them in the example App.
+- New icon.
 
 ###### v4.0 - 2015.10.18
 - Added **FilterAsyncTask** to asynchronously load the list (This might not work well and binding is excluded from Async).
