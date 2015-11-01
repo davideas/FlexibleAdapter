@@ -8,7 +8,7 @@ android {
 		applicationId "eu.davidea.examples.flexibleadapter"
 		minSdkVersion minSdk
 		targetSdkVersion targetSdk
-		versionCode versionCode
+		versionCode libraryCode
 		versionName libraryVersion + libraryDate
 	}
 	buildTypes {
@@ -21,7 +21,7 @@ android {
 
 dependencies {
 	//compile 'eu.davidea:flexible-adapter:4.0.1'
-	compile project (":flexible-adapter-lib")
+	compile project (":flexible-adapter")
 	compile supportDependencies.appcompat
 	compile (supportDependencies.design) {
 		exclude module: 'support-v4'
