@@ -1,8 +1,8 @@
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207) [![Download](https://api.bintray.com/packages/davideas/maven/flexible-adapter/images/download.svg) ](https://bintray.com/davideas/maven/flexible-adapter/_latestVersion)
 
 # Flexible Adapter
 
-###### A pattern for every RecyclerView - Master branch: v4 of 2015.10.18
+###### A pattern for every RecyclerView - Master branch: v4 of 2015.11.01
 
 #### Main functionalities
 * Base item selection (but also SINGLE & MULTI selection mode) in the Recycler View with ripple effect.
@@ -26,11 +26,15 @@ Finally note that, this adapter handles the basic clicks: _single_ and _long cli
 ![Search screen](/screenshots/search.png) ![Undo Screen](/screenshots/undo.png)
 
 #Setup
-Ultra simple:
-No needs to create and import a library for just 2 files, so just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).
+Using JCenter repo (bintray.com)
+```
+dependencies {
+	compile 'eu.davidea:flexible-adapter:4.0.1'
+}
+```
+Or you can just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).
 
 Remember to initialize `mItems` (List already included in FlexibleAdapter) in order to manage list items. Method `updateDataSet(..)` can help in this.
-
 #### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!
 
@@ -126,18 +130,23 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 # Change Log
-###### v4 - 2015.10.18
-- Added **FilterAsyncTask** to asynchronously load the list (This might not work well and binding is excluded from Async)
-- Enabled **Search** filter through _updateDataSet_ method (Note: as the example is made, the search regenerate the list!)
+###### v4.0.1 - 2015.11.01
+- Refactored module names, package signatures and gradle build files. Code remains unchanged.
+- Configuration for JCenter, now FlexibleAdapter is a lightweight standalone library!
+  **Note:** FastScroller and ItemAnimators are excluded from the library, but you can see them in the example App.
+
+###### v4.0 - 2015.10.18
+- Added **FilterAsyncTask** to asynchronously load the list (This might not work well and binding is excluded from Async).
+- Enabled **Search** filter through _updateDataSet_ method (Note: as the example is made, the search regenerate the list!).
 - Included some ItemAnimators from https://github.com/wasabeef/recyclerview-animators
-  (in the example SlideInRightAnimator is used), but all need to be adapted if used with Support v23.1.0
+  (in the example SlideInRightAnimator is used), but all need to be adapted if used with Support v23.1.0.
 - Included and customized **FastScroller** library from https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller
   My version has FrameLayout extended instead of LinearLayout, and a friendly layout.
-- Added **SwipeRefreshLayout**, just an usage example
-- Use of Handler instead of TimerTask while Undo
-- _FlexibleAdapter_ can now return deleted items before they are removed from memory
-- _SelectableAdapter.selectAll()_ can now skip selection on one specific ViewType
-- Adapted MainActivity
+- Added **SwipeRefreshLayout**, just an usage example.
+- Use of Handler instead of TimerTask while Undo.
+- _FlexibleAdapter_ can now return deleted items before they are removed from memory.
+- _SelectableAdapter.selectAll()_ can now skip selection on one specific ViewType.
+- Adapted MainActivity.
 
 ###### Old releases
 See [releases](https://github.com/davideas/FlexibleAdapter/releases) for old versions.

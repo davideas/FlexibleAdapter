@@ -1,0 +1,26 @@
+apply plugin: 'com.android.library'
+
+android {
+	compileSdkVersion targetSdk
+	buildToolsVersion buildTools
+
+	defaultConfig {
+		minSdkVersion minSdk
+		targetSdkVersion targetSdk
+		versionCode libraryCode
+		versionName libraryVersion + libraryDate
+	}
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
+}
+
+dependencies {
+	compile supportDependencies.recyclerview
+}
+
+apply from: '../install.gradle'
+apply from: '../bintray.gradle'
