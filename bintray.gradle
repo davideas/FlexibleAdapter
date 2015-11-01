@@ -25,27 +25,26 @@ artifacts {
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
+
 bintray {
 	user = properties.getProperty("bintray.user")
 	key = properties.getProperty("bintray.apikey")
 
-	configurations = ['archives']
+	//configurations = ['archives']
 	pkg {
 		repo = bintrayRepo
 		name = bintrayName
 		desc = libraryDescription
 		websiteUrl = siteUrl
-		vcsUrl = gitUrl
 		licenses = allLicenses
+		vcsUrl = gitUrl
+		labels = ['android', 'recyclerview', 'adapter', 'selection', 'actionmode', 'search', 'undo', 'ripple', 'itemanimator']
 		publish = true
 		publicDownloadNumbers = true
 		version {
+			name = libraryVersion
 			desc = libraryDescription
-			gpg {
-				sign = true //Determines whether to GPG sign the files. The default is false
-				passphrase = properties.getProperty("bintray.gpg.password")
-				//Optional. The passphrase for GPG signing'
-			}
+			vcsTag = libraryVersion
 		}
 	}
 }

@@ -26,10 +26,19 @@ Finally note that, this adapter handles the basic clicks: _single_ and _long cli
 ![Search screen](/screenshots/search.png) ![Undo Screen](/screenshots/undo.png)
 
 #Setup
-Using JCenter repo (bintray.com)
+Using JCenter
 ```
 dependencies {
 	compile 'eu.davidea:flexible-adapter:4.0.1'
+}
+```
+Using bintray.com
+```
+repositories {
+	maven { url "http://dl.bintray.com/davideas/maven" }
+}
+dependencies {
+	compile 'eu.davidea:flexible-adapter:4.0.1@aar'
 }
 ```
 Or you can just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).

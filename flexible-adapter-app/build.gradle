@@ -20,7 +20,7 @@ android {
 }
 
 dependencies {
-	//compile 'eu.davidea:flexible-adapter:4.0.1'
+	//compile 'eu.davidea:flexible-adapter:4.0.1@aar'
 	compile project (":flexible-adapter")
 	compile supportDependencies.appcompat
 	compile (supportDependencies.design) {
