@@ -14,8 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.examples.fastscroller.FastScroller;
@@ -27,7 +25,6 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		implements FastScroller.BubbleTextGetter {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
-	private static final int ITEMS = 1000;
 
 	public interface OnItemClickListener {
 		/**
@@ -68,13 +65,15 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	}
 
 	/**
-	 * Param in this example is not used.
+	 * Param, in this example, is not used.
 	 * @param param A custom parameter to filter the DataSet
 	 */
 	public void updateDataSet(String param) {
 		//Fill mItems with your custom list
-		this.mItems = createExampleItems();
-		if (!mUserLearnedSelection && mItems.size() > 0 && !hasSearchText()) {
+		this.mItems = DatabaseService.getInstance().getListById(param, getSearchText());
+
+		if (!mUserLearnedSelection && mItems.size() > 0 && !hasSearchText()
+				&& mItems.get(0).getId() != 0) { //It's not already added
 			//Define Example View
 			Item item = new Item();
 			item.setId(0);
@@ -82,23 +81,6 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
 			this.mItems.add(0, item);
 		}
-	}
-
-	public Item getNewExampleItem(int i) {
-		Item item = new Item();
-		item.setId(i);
-		item.setTitle("Item "+i);
-		item.setSubtitle("Subtitle " + i);
-		return item;
-	}
-	private List<Item> createExampleItems() {
-		List<Item> items = new ArrayList<Item>();
-		for (int i = 1; i <= ITEMS; i++) {
-			Item item = getNewExampleItem(i);
-			if (!hasSearchText() || (hasSearchText() && filterObject(item, getSearchText())) )
-				items.add(item);
-		}
-		return items;
 	}
 
 	@Override

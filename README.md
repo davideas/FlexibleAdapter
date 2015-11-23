@@ -2,7 +2,7 @@
 
 # Flexible Adapter
 
-###### A pattern for every RecyclerView - Master branch: v4 of 2015.11.01
+###### A pattern for every RecyclerView - Master branch: v4.1 of 2015.11.23
 
 #### Main functionalities
 * Base item selection (but also SINGLE & MULTI selection mode) in the Recycler View with ripple effect.
@@ -29,7 +29,7 @@ Finally note that, this adapter handles the basic clicks: _single_ and _long cli
 Using JCenter
 ```
 dependencies {
-	compile 'eu.davidea:flexible-adapter:4.0.1'
+	compile 'eu.davidea:flexible-adapter:4.1.0'
 }
 ```
 Using bintray.com
@@ -38,7 +38,7 @@ repositories {
 	maven { url "http://dl.bintray.com/davideas/maven" }
 }
 dependencies {
-	compile 'eu.davidea:flexible-adapter:4.0.1@aar'
+	compile 'eu.davidea:flexible-adapter:4.1.0@aar'
 }
 ```
 Or you can just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).
@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		...
-		mAdapter = new YoursAdapter(..., ..., ...);
-		mAdapter.setMode(YoursAdapter.MODE_SINGLE);
+		mAdapter = new YourAdapter(..., ..., ...);
+		mAdapter.setMode(YourAdapter.MODE_SINGLE);
 		...
 	}
 
@@ -97,11 +97,6 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 	switch (item.getItemId()) {
 		...
 		case R.id.action_delete:
-			for (int i : mAdapter.getSelectedItems()) {
-				//Remove items from your Database. Example:
-				DatabaseService.getInstance().removeItem(mAdapter.getItem(i));
-			}
-
 			//Keep synchronized the Adapter: Remove selected items from Adapter
 			mAdapter.removeItems(mAdapter.getSelectedItems());
 
@@ -109,6 +104,14 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			mAdapter.startUndoTimer(7000); //Default 5''
 			mActionMode.finish();
 			return true;
+	}
+}
+
+@Override
+public void onUndo() {
+	for (Item item : mAdapter.getDeletedItems()) {
+		//Remove items from your database. Example:
+		DatabaseService.getInstance().removeItem(item);
 	}
 }
 ```
@@ -139,6 +142,10 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 # Change Log
+###### v4.1.0 - 2015.11.23
+- Improved Undo functionality: added new callback _onUndo_ in OnUpdateListener.
+- Adapted example App accordingly.
+
 ###### v4.0.1 - 2015.11.01
 - Refactored module names, package signatures and gradle build files. Code remains unchanged.
 - Configuration for JCenter, now FlexibleAdapter is a lightweight standalone library!

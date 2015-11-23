@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
 		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
-				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null))) ;
+				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
 
 		//Add FastScroll to the RecyclerView
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
@@ -116,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements
 
 				Item item = null;
 				for (int i = 0; i<mAdapter.getItemCount()+1; i++) {
-					item = mAdapter.getNewExampleItem(i);
+					item = DatabaseService.getNewExampleItem(i);
 					if (!mAdapter.contains(item)) {
-						mAdapter.addItem(i, item);
+						mAdapter.addItem(i, item);//In this case the list is My Database list and not a copy since getListById returns that list when not filtered.
 						Toast.makeText(MainActivity.this, "Added New "+item.getTitle(), Toast.LENGTH_SHORT).show();
 						mRecyclerView.smoothScrollToPosition(i);
 
@@ -185,12 +185,6 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onLoadComplete() {
-		mProgressBar.setVisibility(View.INVISIBLE);
-		updateEmptyView();
-	}
-
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		Log.v(TAG, "onCreateOptionsMenu called!");
 		getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -248,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			ExampleAdapter.setSearchText(newText);
 //			mAdapter.updateDataSet(newText);
-			mAdapter.updateDataSetAsync(newText);
+			mAdapter.updateDataSetAsync(null);//param not used
 		}
 		return true;
 	}
@@ -379,6 +373,20 @@ public class MainActivity extends AppCompatActivity implements
 				getString(R.string.action_selected_many)));
 	}
 
+	@Override
+	public void onLoadComplete() {
+		mProgressBar.setVisibility(View.INVISIBLE);
+		updateEmptyView();
+	}
+
+	@Override
+	public void onUndo() {
+		for (Item item : mAdapter.getDeletedItems()) {
+			//Remove items from your database. Example:
+			DatabaseService.getInstance().removeItem(item);
+		}
+	}
+
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	@Override
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -407,12 +415,7 @@ public class MainActivity extends AppCompatActivity implements
 				setContextTitle(mAdapter.getSelectedItemCount());
 				return true;
 			case R.id.action_delete:
-				for (int i : mAdapter.getSelectedItems()) {
-					//TODO: Remove items from your database. Example:
-					//DatabaseService.getInstance().removeItem(mAdapter.getItem(i));
-				}
-
-				//Keep synchronized the Adapter: Remove selected items from Adapter
+				//Remove selected items from Adapter list
 				String message = mAdapter.getSelectedItems() + " " + getString(R.string.action_deleted);
 				mAdapter.removeItems(mAdapter.getSelectedItems());
 
@@ -432,7 +435,6 @@ public class MainActivity extends AppCompatActivity implements
 				mSwipeHandler.sendEmptyMessageDelayed(0, ExampleAdapter.UNDO_TIMEOUT);
 				mActionMode.finish();
 				return true;
-
 			default:
 				return false;
 		}

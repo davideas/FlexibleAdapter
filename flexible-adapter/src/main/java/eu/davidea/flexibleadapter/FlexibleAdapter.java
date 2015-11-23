@@ -32,13 +32,23 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public static final long UNDO_TIMEOUT = 5000L;
 
 	public interface OnUpdateListener {
+		/**
+		 * Called when Async load is completed.
+		 */
 		void onLoadComplete();
+		/**
+		 * Due to Java Generic, it's too complicated and not
+		 * well manageable if we return the List&lt;T&gt; object.<br/>
+		 * To get deleted items, use {@link #getDeletedItems()} from the
+		 * implementation of this method.
+		 */
+		void onUndo();
 		//void onProgressUpdate(int progress);
 	}
 
 	/**
-	 * Lock used to modify the content of {@link #mItems}. Any write operation performed on the array should be
-	 * synchronized on this lock.
+	 * Lock object used to modify the content of {@link #mItems}.
+	 * Any write operation performed on the list items should be synchronized on this lock.
 	 */
 	private final Object mLock = new Object();
 
@@ -315,6 +325,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public void startUndoTimer(long timeout) {
 		mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 				public boolean handleMessage(Message message) {
+					if (mUpdateListener != null) mUpdateListener.onUndo();
 					emptyBin();
 					return true;
 				}

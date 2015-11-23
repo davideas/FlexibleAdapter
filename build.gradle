@@ -6,9 +6,9 @@ ext {
 	developerEmail = 'dave.dna@gmail.com'
 
 	//Library
-	libraryCode = 8
-	libraryVersion = '4.0.1'
-	libraryDate = " of 2015.11.01"
+	libraryCode = 9
+	libraryVersion = '4.1.0'
+	libraryDate = " of 2015.11.23"
 	libraryDescription = 'A pattern for every RecyclerView'
 	libraryName = 'FlexibleAdapter'
 
@@ -23,7 +23,7 @@ ext {
 	//Support and Build tools version
 	minSdk = 14
 	targetSdk = 23
-	buildTools = '23.0.1'
+	buildTools = '23.0.2'
 	supportLibrary = '23.0.1'
 
 	//Support Libraries dependencies
