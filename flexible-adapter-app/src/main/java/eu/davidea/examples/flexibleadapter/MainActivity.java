@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements
 	private RecyclerView mRecyclerView;
 	private ExampleAdapter mAdapter;
 	private ActionMode mActionMode;
+	private Snackbar mSnackBar;
 	private ProgressBar mProgressBar;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private final Handler mSwipeHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
@@ -115,12 +116,22 @@ public class MainActivity extends AppCompatActivity implements
 				destroyActionModeIfNeeded();
 
 				Item item = null;
-				for (int i = 0; i<mAdapter.getItemCount()+1; i++) {
-					item = DatabaseService.getNewExampleItem(i);
-					if (!mAdapter.contains(item)) {
-						mAdapter.addItem(i, item);//In this case the list is My Database list and not a copy since getListById returns that list when not filtered.
-						Toast.makeText(MainActivity.this, "Added New "+item.getTitle(), Toast.LENGTH_SHORT).show();
+				for (int i = 0; i <= mAdapter.getItemCount(); i++) {
+					item = DatabaseService.newExampleItem(i);
+					if (!DatabaseService.getInstance().getListById(null).contains(item)) {
+
+						Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
+						Log.v(TAG, "Adapter: " + mAdapter.toString());
+
+						DatabaseService.getInstance().addItem(i, item);//This is the original list
+						if (!DatabaseService.userLearnedSelection) i++;//Adapter will never go in Exception! :-)
+						mAdapter.addItem(i, item);//Adapter's list is a copy, to animate the item you must call addItem on the new position
+						Log.d(TAG, "Added New " + item.getTitle());
+						Toast.makeText(MainActivity.this, "Added New " + item.getTitle(), Toast.LENGTH_SHORT).show();
 						mRecyclerView.smoothScrollToPosition(i);
+
+						Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
+						Log.v(TAG, "Adapter: " + mAdapter.toString());
 
 						//EmptyView
 						updateEmptyView();
@@ -165,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements
 			public void onRefresh() {
 				mAdapter.updateDataSetAsync("example parameter for List1");
 				mSwipeRefreshLayout.setEnabled(false);
-				mSwipeHandler.sendEmptyMessageDelayed(0, ExampleAdapter.UNDO_TIMEOUT);
+				mSwipeHandler.sendEmptyMessageDelayed(0, 2000L);
 			}
 		});
 	}
@@ -241,9 +252,23 @@ public class MainActivity extends AppCompatActivity implements
 			mProgressBar.setVisibility(View.VISIBLE);
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			ExampleAdapter.setSearchText(newText);
-//			mAdapter.updateDataSet(newText);
-			mAdapter.updateDataSetAsync(null);//param not used
+			//Filter the items and notify the change!
+//			mAdapter.updateDataSet();
+//			mAdapter.notifyDataSetChanged();
+			mAdapter.updateDataSetAsync(null);
 		}
+
+		if (ExampleAdapter.hasSearchText())
+			mFab.setVisibility(View.GONE);
+		else {
+			mFab.setVisibility(View.VISIBLE);
+			//This is quite important: since the deleted positions known have
+			// different references, the Undo is ended before it's time over:
+			// remove Snackbar and others animations.
+			if (mSnackBar != null) mSnackBar.dismiss();
+			mSwipeHandler.sendEmptyMessage(0);
+		}
+
 		return true;
 	}
 
@@ -275,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements
 	 * Handling RecyclerView when empty.
 	 * <br/><br/>
 	 * <b>Note:</b> The order how the 3 Views (RecyclerView, EmptyView, FastScroller)
-	 *   are placed in the Layout is important
+	 *   are placed in the Layout is important!
 	 */
 	private void updateEmptyView() {
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
@@ -380,11 +405,16 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onUndo() {
+	public void onDeleteConfirmed() {
+		Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
+		Log.v(TAG, "Adapter: " + mAdapter.toString());
 		for (Item item : mAdapter.getDeletedItems()) {
-			//Remove items from your database. Example:
+			//Remove items from your Database. Example:
+			Log.d(TAG, "Confirm removed " + item.getTitle());
 			DatabaseService.getInstance().removeItem(item);
 		}
+		Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
+		Log.v(TAG, "Adapter: " + mAdapter.toString());
 	}
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -415,24 +445,43 @@ public class MainActivity extends AppCompatActivity implements
 				setContextTitle(mAdapter.getSelectedItemCount());
 				return true;
 			case R.id.action_delete:
+				Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
+				Log.v(TAG, "Adapter: " + mAdapter.toString());
+
+				//Build message before delete, for the Snackbar
+				StringBuilder message = new StringBuilder();;
+				for (Integer pos : mAdapter.getSelectedItems()) {
+					message.append(mAdapter.getItem(pos).getTitle());
+					message.append(", ");
+				}
+				message.append(" ").append(getString(R.string.action_deleted));
+
 				//Remove selected items from Adapter list
-				String message = mAdapter.getSelectedItems() + " " + getString(R.string.action_deleted);
 				mAdapter.removeItems(mAdapter.getSelectedItems());
+
+				Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
+				Log.v(TAG, "Adapter: " + mAdapter.toString());
 
 				//Snackbar for Undo
 				//noinspection ResourceType
-				Snackbar.make(findViewById(R.id.main_view), message, 7000)
+				mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)
 						.setAction(R.string.undo, new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-									mAdapter.restoreDeletedItems();
-									mSwipeHandler.sendEmptyMessage(0);
-								}
-							})
-						.show();
-				mAdapter.startUndoTimer(7000L);
+								Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
+								Log.v(TAG, "Adapter: " + mAdapter.toString());
+
+								mAdapter.restoreDeletedItems();
+								mSwipeHandler.sendEmptyMessage(0);
+
+								Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
+								Log.v(TAG, "Adapter: " + mAdapter.toString());
+							}
+						});
+				mSnackBar.show();
+				mAdapter.startUndoTimer(7000L+200L);//+200: Using Snackbar, user can still click on the action button while dismissing the bar
 				mSwipeHandler.sendEmptyMessage(1);
-				mSwipeHandler.sendEmptyMessageDelayed(0, ExampleAdapter.UNDO_TIMEOUT);
+				mSwipeHandler.sendEmptyMessageDelayed(0, 7000L);
 				mActionMode.finish();
 				return true;
 			default:
@@ -471,6 +520,7 @@ public class MainActivity extends AppCompatActivity implements
 		if (destroyActionModeIfNeeded()) return;
 
 		//Close the App
+		DatabaseService.onDestroy();
 		super.onBackPressed();
 	}
 

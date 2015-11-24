@@ -2,7 +2,7 @@
 
 # Flexible Adapter
 
-###### A pattern for every RecyclerView - Master branch: v4.1 of 2015.11.23
+###### A pattern for every RecyclerView - Master branch: v4.1 of 2015.11.24
 
 #### Main functionalities
 * Base item selection (but also SINGLE & MULTI selection mode) in the Recycler View with ripple effect.
@@ -47,7 +47,7 @@ Remember to initialize `mItems` (List already included in FlexibleAdapter) in or
 #### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!
 
-# Usage for Single Selection
+# Usage of Single Selection
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In your Activity/Fragment creation set the Mode SINGLE.
 In onListItemClick, call *toggleSeletion* to register the selection on that position:
 ``` java
@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		...
-		mAdapter = new YourAdapter(..., ..., ...);
-		mAdapter.setMode(YourAdapter.MODE_SINGLE);
+		mAdapter = new YourAdapterClass(..., ..., ...);
+		mAdapter.setMode(YourAdapterClass.MODE_SINGLE);
 		...
 	}
 
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-# Usage for Multi Selection
+# Usage of Multi Selection
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In your Activity/Fragment change the Modes for the _ActionMode_ object.
 ``` java
 public class MainActivity extends AppCompatActivity implements
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements
 }
 ```
 
-# Usage for Undo
+# Usage of Undo
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 ``` java
 @Override
@@ -108,18 +108,18 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 }
 
 @Override
-public void onUndo() {
+public void onDeleteConfirmed() {
 	for (Item item : mAdapter.getDeletedItems()) {
-		//Remove items from your database. Example:
+		//Remove items from your Database. Example:
 		DatabaseService.getInstance().removeItem(item);
 	}
 }
 ```
 
-# Usage for FastScroller
+# Usage of FastScroller
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! First add the drawable files to the project, then the layout, finally add the implementation for the Adapter and Activity/Fragment:
 ``` java
-public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item>
+public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item>
 		implements FastScroller.BubbleTextGetter {
 	...
 	@Override
@@ -140,10 +140,23 @@ public class MainActivity extends AppCompatActivity {
 	...
 }
 ```
+# Usage of the Filter
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In _YourAdapterClass.updateDataSet()_, call _filterItems()_;
+``` java
+public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item> {
+	...
+	@Override
+	public void updateDataSet(String param) {
+		//Fill and Filter mItems with your custom list
+		filterItems(DatabaseService.getInstance().getListById(param));
+	}
+}
+```
 
 # Change Log
-###### v4.1.0 - 2015.11.23
-- Improved Undo functionality: added new callback _onUndo_ in OnUpdateListener.
+###### v4.1.0 - 2015.11.24
+- Improved Undo functionality: added new callback _onDeleteConfirmed_ in OnUpdateListener. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! 
+- Improved Filter functionality: added new protected function _filterItems_. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) and example for full details!
 - Adapted example App accordingly.
 
 ###### v4.0.1 - 2015.11.01
@@ -153,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 - New icon.
 
 ###### v4.0 - 2015.10.18
-- Added **FilterAsyncTask** to asynchronously load the list (This might not work well and binding is excluded from Async).
+- Added **FilterAsyncTask** to asynchronously load the list (This experimental and might not work well and binding is excluded from Async).
 - Enabled **Search** filter through _updateDataSet_ method (Note: as the example is made, the search regenerate the list!).
 - Included some ItemAnimators from https://github.com/wasabeef/recyclerview-animators
   (in the example SlideInRightAnimator is used), but all need to be adapted if used with Support v23.1.0.

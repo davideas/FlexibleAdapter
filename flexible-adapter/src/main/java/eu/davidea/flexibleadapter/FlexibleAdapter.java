@@ -42,7 +42,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		 * To get deleted items, use {@link #getDeletedItems()} from the
 		 * implementation of this method.
 		 */
-		void onUndo();
+		void onDeleteConfirmed();
 		//void onProgressUpdate(int progress);
 	}
 
@@ -84,11 +84,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	};
 	/**
 	 * This method will refresh the entire DataSet content.<br/>
-	 * The parameter is useful to filter the DataSet. It can be removed
-	 * or the type can be changed accordingly (String is the most used value).<br/>
+	 * The parameter is useful to filter the type of the DataSet.<br/>
 	 * Pass null value in case not used.
 	 * 
-	 * @param param A custom parameter to filter the DataSet
+	 * @param param A custom parameter to filter the type of the DataSet
 	 */
 	public abstract void updateDataSet(String param);
 
@@ -100,11 +99,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @param param A custom parameter to filter the DataSet
 	 */
 	public void updateDataSetAsync(String param) {
+		//Synchronous
 		if (mUpdateListener == null) {
-			Log.w(TAG, "OnUpdateListener is not initialized. UpdateDataSet is not using FilterAsyncTask!");
+			Log.w(TAG, "OnUpdateListener is not initialized. updateDataSetAsync is not using FilterAsyncTask!");
 			updateDataSet(param);
+			notifyDataSetChanged();
 			return;
 		}
+		//Asynchronous
 		new FilterAsyncTask().execute(param);
 	}
 	
@@ -325,7 +327,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public void startUndoTimer(long timeout) {
 		mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 				public boolean handleMessage(Message message) {
-					if (mUpdateListener != null) mUpdateListener.onUndo();
+					if (mUpdateListener != null) mUpdateListener.onDeleteConfirmed();
 					emptyBin();
 					return true;
 				}
@@ -356,6 +358,33 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		if (searchText != null)
 			mSearchText = searchText.trim().toLowerCase(Locale.getDefault());
 		else mSearchText = "";
+	}
+
+	/**
+	 * Filter the provided list with the search text previously set
+	 * with {@link #setSearchText(String)}.
+	 * <br/><br/>
+	 * <b>Note: </b>This method calls {@link #filterObject(Object, String)}.
+	 * <br/>If search text is empty or null, the provided list is the current list.
+	 *
+	 * @param itemsToFilter The list to filter
+	 * @see #filterObject(Object, String)
+	 *
+	 */
+	protected void filterItems(List<T> itemsToFilter) {
+		//In case user has deleted some items and filter the list just after,
+		// in order to be consistent, we need to remove those items!
+		if (hasSearchText()) {
+			mItems = new ArrayList<T>();
+			for (T item : itemsToFilter) {
+				if ( (mDeletedItems == null || (mDeletedItems != null && !mDeletedItems.contains(item))) &&
+						filterObject(item, getSearchText()))
+					mItems.add(item);
+			}
+		} else {
+			mItems = itemsToFilter;
+			if (mDeletedItems != null) mItems.removeAll(mDeletedItems);
+		}
 	}
 
 	/**

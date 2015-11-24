@@ -52,7 +52,6 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 	//Selection fields
 	private boolean
-			mUserLearnedSelection = false,
 			mLastItemInActionMode = false,
 			mSelectAll = false;
 
@@ -66,14 +65,14 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 	/**
 	 * Param, in this example, is not used.
-	 * @param param A custom parameter to filter the DataSet
+	 * @param param A custom parameter to filter the type of the DataSet
 	 */
+	@Override
 	public void updateDataSet(String param) {
-		//Fill mItems with your custom list
-		this.mItems = DatabaseService.getInstance().getListById(param, getSearchText());
+		//Fill and Filter mItems with your custom list
+		filterItems(DatabaseService.getInstance().getListById(param));
 
-		if (!mUserLearnedSelection && mItems.size() > 0 && !hasSearchText()
-				&& mItems.get(0).getId() != 0) { //It's not already added
+		if (!DatabaseService.userLearnedSelection && mItems.size() > 0 && !hasSearchText()) {
 			//Define Example View
 			Item item = new Item();
 			item.setId(0);
@@ -97,7 +96,8 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 	@Override
 	public int getItemViewType(int position) {
-		return (position == 0 && !mUserLearnedSelection && !hasSearchText() ? EXAMPLE_VIEW_TYPE : ROW_VIEW_TYPE);
+		return (position == 0 && !DatabaseService.userLearnedSelection
+				&& !hasSearchText() ? EXAMPLE_VIEW_TYPE : ROW_VIEW_TYPE);
 	}
 
 	@Override
@@ -193,6 +193,14 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		}
 	}
 
+	/**
+	 * Custom filter.
+	 *
+	 * @param myObject The item to filter
+	 * @param constraint the current searchText
+	 *
+	 * @return true if a match exists in the title or in the subtitle, false if no match found.
+	 */
 	@Override
 	protected boolean filterObject(Item myObject, String constraint) {
 		String valueText = myObject.getTitle();
@@ -231,12 +239,17 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					//TODO: Also save the boolean into Settings!
-					mAdapter.mUserLearnedSelection = true;
-					mAdapter.removeItem(0);
+					mAdapter.userLearnedSelection();
 				}
 			});
 		}
+	}
+
+	private void userLearnedSelection() {
+		//TODO: Save the boolean into Settings!
+		DatabaseService.userLearnedSelection = true;
+		mItems.remove(0);
+		notifyItemRemoved(0);
 	}
 
 	/**
@@ -313,4 +326,8 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		}
 	}
 
+	@Override
+	public String toString() {
+		return mItems.toString();
+	}
 }

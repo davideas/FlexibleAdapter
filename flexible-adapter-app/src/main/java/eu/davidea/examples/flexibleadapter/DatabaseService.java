@@ -11,6 +11,7 @@ public class DatabaseService {
 
 	private static DatabaseService mInstance;
 	private static final int ITEMS = 1000;
+	public static boolean userLearnedSelection = false;
 
 	private List<Item> mItems = new ArrayList<Item>();
 
@@ -26,47 +27,39 @@ public class DatabaseService {
 	}
 
 	private void init() {
-		for (int i = 1; i <= ITEMS; i++) {
-			mItems.add(getNewExampleItem(i));
+		for (int i = 0; i < ITEMS; i++) {
+			mItems.add(newExampleItem(i));
 		}
 	}
 
-	public static Item getNewExampleItem(int i) {
+	public static Item newExampleItem(int i) {
 		Item item = new Item();
-		item.setId(i);
+		item.setId(++i);
 		item.setTitle("Item "+i);
 		item.setSubtitle("Subtitle " + i);
 		return item;
 	}
 
-	public List<Item> getListById(String listId, String searchText) {
-		//listId is not used, we have only 1 type of list in this example
-
-		List<Item> filteredItems = new ArrayList<Item>();
-		if (searchText != null && searchText.length() > 0) {
-			for (Item item : mItems) {
-				if (filterItem(item, searchText))
-					filteredItems.add(item);
-			}
-			return filteredItems;
-		}
-		return mItems;
-	}
-
 	/**
-	 * Custom filter.
-	 *
-	 * @param item The item to filter
-	 * @param constraint the current searchText
-	 *
-	 * @return true if a match exists in the title or in the subtitle, false if no match found.
+	 * @param listId The type of the list
+	 * @return Always a copy of the original list.
 	 */
-	private static boolean filterItem(Item item, String constraint) {
-		return item.getTitle().contains(constraint) || item.getSubtitle().contains(constraint);
+	public List<Item> getListById(String listId) {
+		//listId is not used: we have only 1 type of list in this example
+		//Return a copy of the DB: we will perform some tricky code on this list.
+		return new ArrayList<Item>(mItems);
 	}
 
 	public void removeItem(Item item) {
 		mItems.remove(item);
+	}
+
+	public void addItem(int i, Item item) {
+		mItems.add(i, item);
+	}
+
+	public static void onDestroy() {
+		mInstance = null;
 	}
 
 }
