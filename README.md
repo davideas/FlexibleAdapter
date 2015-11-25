@@ -1,8 +1,8 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](https://android-arsenal.com/details/1/2207) [![Download](https://api.bintray.com/packages/davideas/maven/flexible-adapter/images/download.svg) ](https://bintray.com/davideas/maven/flexible-adapter/_latestVersion)
 
-# Flexible Adapter
+# FlexibleAdapter
 
-###### A pattern for every RecyclerView - Master branch: v4.1 of 2015.11.24
+###### A pattern for every RecyclerView - Master branch: v4.1 of 2015.11.25
 
 #### Main functionalities
 * Base item selection (but also SINGLE & MULTI selection mode) in the Recycler View with ripple effect.
@@ -47,7 +47,7 @@ Remember to initialize `mItems` (List already included in FlexibleAdapter) in or
 #### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!
 
-# Usage of Single Selection
+# Usage for Single Selection
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In your Activity/Fragment creation set the Mode SINGLE.
 In onListItemClick, call *toggleSeletion* to register the selection on that position:
 ``` java
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-# Usage of Multi Selection
+# Usage for Multi Selection
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In your Activity/Fragment change the Modes for the _ActionMode_ object.
 ``` java
 public class MainActivity extends AppCompatActivity implements
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements
 }
 ```
 
-# Usage of Undo
+# Usage for Undo
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 ``` java
 @Override
@@ -116,7 +116,7 @@ public void onDeleteConfirmed() {
 }
 ```
 
-# Usage of FastScroller
+# Usage for FastScroller
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! First add the drawable files to the project, then the layout, finally add the implementation for the Adapter and Activity/Fragment:
 ``` java
 public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item>
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 	...
 }
 ```
-# Usage of the Filter
+# Usage for the Filter
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In _YourAdapterClass.updateDataSet()_, call _filterItems()_;
 ``` java
 public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item> {
@@ -154,9 +154,10 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 ```
 
 # Change Log
-###### v4.1.0 - 2015.11.24
-- Improved Undo functionality: added new callback _onDeleteConfirmed_ in OnUpdateListener. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! 
-- Improved Filter functionality: added new protected function _filterItems_. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) and example for full details!
+###### v4.1.0 - 2015.11.25
+- Improved **Undo** functionality: added new callback _onDeleteConfirmed_ in OnUpdateListener. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! 
+- Improved **Filter** functionality: added new intelligent function _filterItems_. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
+- Logs are now in verbose level.
 - Adapted example App accordingly.
 
 ###### v4.0.1 - 2015.11.01
@@ -167,7 +168,7 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 
 ###### v4.0 - 2015.10.18
 - Added **FilterAsyncTask** to asynchronously load the list (This experimental and might not work well and binding is excluded from Async).
-- Enabled **Search** filter through _updateDataSet_ method (Note: as the example is made, the search regenerate the list!).
+- Enabled **Filter** through _updateDataSet_ method (Note: as the example is made, the search regenerate the list!).
 - Included some ItemAnimators from https://github.com/wasabeef/recyclerview-animators
   (in the example SlideInRightAnimator is used), but all need to be adapted if used with Support v23.1.0.
 - Included and customized **FastScroller** library from https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller

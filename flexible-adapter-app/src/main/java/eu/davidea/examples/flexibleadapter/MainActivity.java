@@ -115,23 +115,18 @@ public class MainActivity extends AppCompatActivity implements
 			public void onClick(View v) {
 				destroyActionModeIfNeeded();
 
-				Item item = null;
 				for (int i = 0; i <= mAdapter.getItemCount(); i++) {
-					item = DatabaseService.newExampleItem(i);
+					Item item = DatabaseService.newExampleItem(i);
+
 					if (!DatabaseService.getInstance().getListById(null).contains(item)) {
-
-						Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
-						Log.v(TAG, "Adapter: " + mAdapter.toString());
-
 						DatabaseService.getInstance().addItem(i, item);//This is the original list
-						if (!DatabaseService.userLearnedSelection) i++;//Adapter will never go in Exception! :-)
+						//TODO: Use userLearnedSelection from settings
+						if (!DatabaseService.userLearnedSelection) i++;//Fixing exampleAdapter for new position :-)
 						mAdapter.addItem(i, item);//Adapter's list is a copy, to animate the item you must call addItem on the new position
 						Log.d(TAG, "Added New " + item.getTitle());
+
 						Toast.makeText(MainActivity.this, "Added New " + item.getTitle(), Toast.LENGTH_SHORT).show();
 						mRecyclerView.smoothScrollToPosition(i);
-
-						Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
-						Log.v(TAG, "Adapter: " + mAdapter.toString());
 
 						//EmptyView
 						updateEmptyView();
@@ -159,7 +154,6 @@ public class MainActivity extends AppCompatActivity implements
 			//Previously serialized activated item position
 			if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
 				setSelection(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-
 		}
 	}
 
@@ -174,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements
 		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
+//				mAdapter.updateDataSet();
+//				mAdapter.notifyDataSetChanged();
 				mAdapter.updateDataSetAsync("example parameter for List1");
 				mSwipeRefreshLayout.setEnabled(false);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 2000L);
@@ -244,7 +240,6 @@ public class MainActivity extends AppCompatActivity implements
 		return super.onPrepareOptionsMenu(menu);
 	}
 
-
 	@Override
 	public boolean onQueryTextChange(String newText) {
 		if (!ExampleAdapter.hasSearchText()
@@ -262,11 +257,20 @@ public class MainActivity extends AppCompatActivity implements
 			mFab.setVisibility(View.GONE);
 		else {
 			mFab.setVisibility(View.VISIBLE);
-			//This is quite important: since the deleted positions known have
-			// different references, the Undo is ended before it's time over:
-			// remove Snackbar and others animations.
-			if (mSnackBar != null) mSnackBar.dismiss();
-			mSwipeHandler.sendEmptyMessage(0);
+			//This is quite important (all within the Undo time):
+			// Only when search is cancelled
+			// and only if user has deleted some items before he cancels the filter
+			// and only if he restore those items after.
+			//Since the known filtered deleted positions have different positions
+			// than the original list, the action for the user is removed
+			// before time is over, but the Undo will still terminate naturally:
+			//Therefore it's better if we remove the Snackbar action!
+			if (mSnackBar != null) {
+				mSnackBar.dismiss();
+				mSwipeHandler.sendEmptyMessage(0);
+				//You can keep the action, but if user clicks on it, the restored items
+				// cannot be ordered as before, it could appear as a bug, but it is not.
+			}
 		}
 
 		return true;
@@ -406,15 +410,11 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onDeleteConfirmed() {
-		Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
-		Log.v(TAG, "Adapter: " + mAdapter.toString());
 		for (Item item : mAdapter.getDeletedItems()) {
 			//Remove items from your Database. Example:
 			Log.d(TAG, "Confirm removed " + item.getTitle());
 			DatabaseService.getInstance().removeItem(item);
 		}
-		Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
-		Log.v(TAG, "Adapter: " + mAdapter.toString());
 	}
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -427,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.setMode(ExampleAdapter.MODE_MULTI);
 		if (Utils.hasLollipop()) {
 			//getWindow().setNavigationBarColor(getResources().getColor(R.color.colorAccentDark_light));
-			getWindow().setStatusBarColor(getResources().getColor(R.color.colorAccentDark_light));
+			getWindow().setStatusBarColor(getResources().getColor(R.color.colorAccentDark_light, this.getTheme()));
 		}
 		return true;
 	}
@@ -445,22 +445,16 @@ public class MainActivity extends AppCompatActivity implements
 				setContextTitle(mAdapter.getSelectedItemCount());
 				return true;
 			case R.id.action_delete:
-				Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
-				Log.v(TAG, "Adapter: " + mAdapter.toString());
-
 				//Build message before delete, for the Snackbar
-				StringBuilder message = new StringBuilder();;
+				StringBuilder message = new StringBuilder();
 				for (Integer pos : mAdapter.getSelectedItems()) {
 					message.append(mAdapter.getItem(pos).getTitle());
 					message.append(", ");
 				}
 				message.append(" ").append(getString(R.string.action_deleted));
 
-				//Remove selected items from Adapter list
+				//Remove selected items from Adapter list after message is built
 				mAdapter.removeItems(mAdapter.getSelectedItems());
-
-				Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
-				Log.v(TAG, "Adapter: " + mAdapter.toString());
 
 				//Snackbar for Undo
 				//noinspection ResourceType
@@ -468,18 +462,12 @@ public class MainActivity extends AppCompatActivity implements
 						.setAction(R.string.undo, new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
-								Log.v(TAG, "Adapter: " + mAdapter.toString());
-
 								mAdapter.restoreDeletedItems();
 								mSwipeHandler.sendEmptyMessage(0);
-
-								Log.v(TAG, "Database: " + DatabaseService.getInstance().getListById(null).toString());
-								Log.v(TAG, "Adapter: " + mAdapter.toString());
 							}
 						});
 				mSnackBar.show();
-				mAdapter.startUndoTimer(7000L+200L);//+200: Using Snackbar, user can still click on the action button while dismissing the bar
+				mAdapter.startUndoTimer(7000L+200L);//+200: Using Snackbar, user can still click on the action button while bar is dismissing for a fraction of time
 				mSwipeHandler.sendEmptyMessage(1);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 7000L);
 				mActionMode.finish();
@@ -498,7 +486,7 @@ public class MainActivity extends AppCompatActivity implements
 		mActionMode = null;
 		if (Utils.hasLollipop()) {
 			//getWindow().setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
-			getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark_light));
+			getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark_light, this.getTheme()));
 		}
 	}
 

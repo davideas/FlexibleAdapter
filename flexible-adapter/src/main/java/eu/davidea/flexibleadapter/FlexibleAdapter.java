@@ -81,7 +81,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	public void updateDataSet() {
 		updateDataSet(null);
-	};
+	}
 	/**
 	 * This method will refresh the entire DataSet content.<br/>
 	 * The parameter is useful to filter the type of the DataSet.<br/>
@@ -151,7 +151,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		synchronized (mLock) {
 			mItems.set(position, item);
 		}
-		Log.d(TAG, "updateItem notifyItemChanged on position "+position);
+		Log.v(TAG, "updateItem notifyItemChanged on position " + position);
 		notifyItemChanged(position);
 	}
 
@@ -166,14 +166,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 		//Insert Item
 		if (position < mItems.size()) {
-			Log.d(TAG, "addItem notifyItemInserted on position " + position);
+			Log.v(TAG, "addItem notifyItemInserted on position " + position);
 			synchronized (mLock) {
 				mItems.add(position, item);
 			}
 
 		//Add Item at the last position
 		} else {
-			Log.d(TAG, "addItem notifyItemInserted on last position");
+			Log.v(TAG, "addItem notifyItemInserted on last position");
 			synchronized (mLock) {
 				mItems.add(item);
 				position = mItems.size();
@@ -196,7 +196,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public void removeItem(int position) {
 		if (position < 0) return;
 		if (position < mItems.size()) {
-			Log.d(TAG, "removeItem notifyItemRemoved on position " + position);
+			Log.v(TAG, "removeItem notifyItemRemoved on position " + position);
 			synchronized (mLock) {
 				saveDeletedItem(position, mItems.remove(position));
 			}
@@ -215,7 +215,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @see #emptyBin()
 	 */
 	public void removeItems(List<Integer> selectedPositions) {
-		Log.d(TAG, "removeItems reverse Sorting positions --------------");
+		Log.v(TAG, "removeItems reverse Sorting positions --------------");
 		// Reverse-sort the list
 		Collections.sort(selectedPositions, new Comparator<Integer>() {
 			@Override
@@ -246,18 +246,18 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 					selectedPositions.remove(0);
 				}
 			}
-			Log.d(TAG, "removeItems current selection " + getSelectedItems());
+			Log.v(TAG, "removeItems current selection " + getSelectedItems());
 		}
 	}
 
 	private void removeRange(int positionStart, int itemCount) {
-		Log.d(TAG, "removeRange positionStart="+positionStart+ " itemCount="+itemCount);
+		Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
 		for (int i = 0; i < itemCount; ++i) {
 			synchronized (mLock) {
 				saveDeletedItem(positionStart, mItems.remove(positionStart));
 			}
 		}
-		Log.d(TAG, "removeRange notifyItemRangeRemoved");
+		Log.v(TAG, "removeRange notifyItemRangeRemoved");
 		notifyItemRangeRemoved(positionStart, itemCount);
 	}
 
@@ -273,7 +273,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			mDeletedItems = new ArrayList<T>();
 			mOriginalPosition = new ArrayList<Integer>();
 		}
-		Log.d(TAG, "Recycled "+getItem(position)+" on position="+position);
+		Log.v(TAG, "Recycled " + getItem(position) + " on position=" + position);
 		mDeletedItems.add(item);
 		mOriginalPosition.add(position);
 	}
@@ -364,26 +364,29 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Filter the provided list with the search text previously set
 	 * with {@link #setSearchText(String)}.
 	 * <br/><br/>
-	 * <b>Note: </b>This method calls {@link #filterObject(Object, String)}.
-	 * <br/>If search text is empty or null, the provided list is the current list.
+	 * <b>Note: </b>
+	 * <br/>- This method calls {@link #filterObject(T, String)}.
+	 * <br/>- If search text is empty or null, the provided list is the current list.
+	 * <br/>- Any pending deleted items are always filtered out from itemsToFilter.
 	 *
 	 * @param itemsToFilter The list to filter
 	 * @see #filterObject(Object, String)
 	 *
 	 */
 	protected void filterItems(List<T> itemsToFilter) {
-		//In case user has deleted some items and filter the list just after,
-		// in order to be consistent, we need to remove those items!
-		if (hasSearchText()) {
+		//In case user has deleted some items and he changes the filter again while
+		// deletion is pending (Undo started), in order to be consistent, we need to
+		// remove those items to avoid they are shown!
+		if (mDeletedItems != null) itemsToFilter.removeAll(mDeletedItems);
+
+		if (hasSearchText()) { //filter
 			mItems = new ArrayList<T>();
 			for (T item : itemsToFilter) {
-				if ( (mDeletedItems == null || (mDeletedItems != null && !mDeletedItems.contains(item))) &&
-						filterObject(item, getSearchText()))
+				if (filterObject(item, getSearchText()))
 					mItems.add(item);
 			}
 		} else {
-			mItems = itemsToFilter;
-			if (mDeletedItems != null) mItems.removeAll(mDeletedItems);
+			mItems = itemsToFilter; //no filter
 		}
 	}
 
@@ -424,9 +427,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 		@Override
 		protected Void doInBackground(String... params) {
-			Log.i(TAG, "doInBackground - started FilterAsyncTask!");
+			//Log.v(TAG, "doInBackground - started FilterAsyncTask!");
 			updateDataSet(params[0]);
-			Log.i(TAG, "doInBackground - ended FilterAsyncTask!");
+			//Log.v(TAG, "doInBackground - ended FilterAsyncTask!");
 			return null;
 		}
 

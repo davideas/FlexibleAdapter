@@ -111,49 +111,17 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 
 		int index = selectedItems.indexOf(position);
 		if (index != -1) {
-			Log.d(TAG, "toggleSelection removing selection on position "+position);
+			Log.v(TAG, "toggleSelection removing selection on position " + position);
 			selectedItems.remove(index);
 		} else {
-			Log.d(TAG, "toggleSelection adding selection on position "+position);
+			Log.v(TAG, "toggleSelection adding selection on position " + position);
 			selectedItems.add(position);
 		}
 		if (invalidate) {
-			Log.d(TAG, "toggleSelection notifyItemChanged on position "+position);
+			Log.v(TAG, "toggleSelection notifyItemChanged on position " + position);
 			notifyItemChanged(position);
 		}
-		Log.d(TAG, "toggleSelection current selection " + selectedItems);
-	}
-
-	/**
-	 * Deprecated! Reasons:
-	 * <br/>- Use {@link #toggleSelection} for normal situation instead.
-	 * <br/>- Use {@link #getSelectedItems}.iterator() to avoid java.util.ConcurrentModificationException.
-	 *
-	 * <br/><br/>
-	 * This method is used only after a removal of an Item <u>and</u> useful only in certain
-	 * situations such when not all selected Items can be removed (business exceptions dependencies)
-	 * while others still remains selected.
-	 * <br/>For normal situations use {@link #toggleSelection} instead.
-	 *
-	 * <br/><br/>
-	 * Remove the selection if at the specified
-	 * position the item was previously selected.
-	 *
-	 * <br/><br/>
-	 * <b>Note:</b> <i>notifyItemChanged</i> on the position is NOT called to avoid double call
-	 * when removeItems!
-	 *
-	 * @param position
-	 */
-	@Deprecated
-	protected void removeSelection(int position) {
-		if (position < 0) return;
-		Log.d(TAG, "removeSelection on position "+position);
-		int index = selectedItems.indexOf(Integer.valueOf(position));
-		if (index != -1) selectedItems.remove(index);
-		//Avoid double notification:
-		//Usually the notification is made in FlexibleAdapter.removeItem();
-		//notifyItemChanged(position);
+		Log.v(TAG, "toggleSelection current selection " + selectedItems);
 	}
 
 	/**
@@ -170,12 +138,12 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @param skipViewType ViewType for which we don't want selection
 	 */
 	public void selectAll(int skipViewType) {
-		Log.d(TAG, "selectAll");
+		Log.v(TAG, "selectAll");
 		selectedItems = new ArrayList<Integer>(getItemCount());
 		for (int i = 0; i < getItemCount(); i++) {
 			if (getItemViewType(i) == skipViewType) continue;
 			selectedItems.add(i);
-			Log.d(TAG, "selectAll notifyItemChanged on position "+i);
+			Log.v(TAG, "selectAll notifyItemChanged on position "+i);
 			notifyItemChanged(i);
 		}
 	}
@@ -192,7 +160,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 			//The notification is done only on items that are currently selected.
 			int i = iterator.next();
 			iterator.remove();
-			Log.d(TAG, "clearSelection notifyItemChanged on position "+i);
+			Log.v(TAG, "clearSelection notifyItemChanged on position "+i);
 			notifyItemChanged(i);
 		}
 	}
@@ -218,7 +186,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/**
 	 * Save the state of the current selection on the items.
 	 *
-	 * @param outState
+	 * @param outState Current state
 	 */
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putIntegerArrayList(TAG, selectedItems);
@@ -227,7 +195,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/**
 	 * Restore the previous state of the selection on the items.
 	 *
-	 * @param savedInstanceState
+	 * @param savedInstanceState Previous state
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		selectedItems = savedInstanceState.getIntegerArrayList(TAG);
