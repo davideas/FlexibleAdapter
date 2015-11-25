@@ -22,6 +22,7 @@ import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -29,7 +30,7 @@ import android.view.animation.LinearInterpolator;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseItemAnimator extends RecyclerView.ItemAnimator {
+public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
 	private static final boolean DEBUG = false;
 

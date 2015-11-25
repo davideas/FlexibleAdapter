@@ -7,10 +7,9 @@ package eu.davidea.examples.anim;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
-import android.view.View;
-
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.support.v7.widget.SimpleItemAnimator;
+import android.view.View;
 
 import java.util.ArrayList;
 
@@ -18,7 +17,7 @@ import java.util.ArrayList;
  * This was pulled from support 21 rc1. This makes sure your options always happen in a certain order
  * Remove -> Move -> Add.
  **/
-public abstract class PendingItemAnimator<H extends ViewHolder> extends RecyclerView.ItemAnimator {
+public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleItemAnimator {
 
 	private ArrayList<H> mPendingRemovals = new ArrayList<H>();
 	private ArrayList<H> mPendingAdditions = new ArrayList<H>();
