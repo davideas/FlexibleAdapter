@@ -290,13 +290,18 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Restore items just removed.
+	 * Restore items just removed.<br/>
+	 * <b>NOTE:</b> If filter is active, only items that match that filter will be shown(restored).
 	 */
 	public void restoreDeletedItems() {
 		stopUndoTimer();
 		//Reverse insert (list was reverse ordered on Delete)
 		for (int i = mOriginalPosition.size()-1; i >= 0; i--) {
-			addItem(mOriginalPosition.get(i), mDeletedItems.get(i));
+			T item = mDeletedItems.get(i);
+			//Avoid to restore(show) Items not filtered by the current filter
+			if (hasSearchText() && !filterObject(item, getSearchText()))
+				continue;
+			addItem(mOriginalPosition.get(i), item);
 		}
 		emptyBin();
 	}
@@ -305,7 +310,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Clean memory from items just removed.<br/>
 	 * <b>Note:</b> This method is automatically called after timer is over and after a restoration.
 	 */
-	public void emptyBin() {
+	public synchronized void emptyBin() {
 		if (mDeletedItems != null) {
 			mDeletedItems.clear();
 			mOriginalPosition.clear();
@@ -367,26 +372,43 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * <b>Note: </b>
 	 * <br/>- This method calls {@link #filterObject(T, String)}.
 	 * <br/>- If search text is empty or null, the provided list is the current list.
-	 * <br/>- Any pending deleted items are always filtered out from itemsToFilter.
+	 * <br/>- Any pending deleted items are always filtered out.
+	 * <br/>- Original positions of deleted items are recalculated.
 	 *
-	 * @param itemsToFilter The list to filter
+	 * @param unfilteredItems The list to filter
 	 * @see #filterObject(Object, String)
-	 *
 	 */
-	protected void filterItems(List<T> itemsToFilter) {
-		//In case user has deleted some items and he changes the filter again while
-		// deletion is pending (Undo started), in order to be consistent, we need to
-		// remove those items to avoid they are shown!
-		if (mDeletedItems != null) itemsToFilter.removeAll(mDeletedItems);
-
-		if (hasSearchText()) { //filter
-			mItems = new ArrayList<T>();
-			for (T item : itemsToFilter) {
-				if (filterObject(item, getSearchText()))
-					mItems.add(item);
+	protected synchronized void filterItems(List<T> unfilteredItems) {
+		// NOTE: In case user has deleted some items and he changes or applies a filter while
+		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
+		// the new position in the new list and finally skip those items to avoid they are shown!
+		if (hasSearchText()) {
+			mItems = new ArrayList<T>(); //with filter
+			int newOriginalPosition = -1, oldOriginalPosition = -1;
+			for (T item : unfilteredItems) {
+				if (filterObject(item, getSearchText())) {
+					if (mDeletedItems != null && mDeletedItems.contains(item)) {
+						int index = mDeletedItems.indexOf(item);
+						//Calculate new original position: skip counting position if item was deleted in range
+						if (mOriginalPosition.get(index) != oldOriginalPosition) {
+							newOriginalPosition++;
+							oldOriginalPosition = mOriginalPosition.get(index);
+						}
+						mOriginalPosition.set(index, newOriginalPosition + mItems.size());
+					} else {
+						mItems.add(item);
+					}
+				}
 			}
 		} else {
-			mItems = itemsToFilter; //no filter
+			mItems = unfilteredItems; //with no filter
+			if (mDeletedItems != null && !mDeletedItems.isEmpty()) {
+				mOriginalPosition = new ArrayList<Integer>(mDeletedItems.size());
+				for (T item : mDeletedItems) {
+					mOriginalPosition.add(mItems.indexOf(item));
+				}
+				mItems.removeAll(mDeletedItems);
+			}
 		}
 	}
 

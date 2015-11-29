@@ -103,6 +103,14 @@ public final class Utils {
 		return Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP;
 	}
 
+	/**
+	 * API 23
+	 * @see VERSION_CODES#M
+	 */
+	public static boolean hasMarshmallow() {
+		return Build.VERSION.SDK_INT >= VERSION_CODES.M;
+	}
+
 	public static String getVersionName(Context context) {
 		try {
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);

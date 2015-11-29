@@ -1,9 +1,7 @@
 package eu.davidea.examples.flexibleadapter;
 
-import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -253,24 +252,22 @@ public class MainActivity extends AppCompatActivity implements
 			mAdapter.updateDataSetAsync(null);
 		}
 
-		if (ExampleAdapter.hasSearchText())
-			mFab.setVisibility(View.GONE);
-		else {
-			mFab.setVisibility(View.VISIBLE);
-			//This is quite important (all within the Undo time):
-			// Only when search is cancelled
-			// and only if user has deleted some items before he cancels the filter
-			// and only if he restore those items after.
-			//Since the known filtered deleted positions have different positions
-			// than the original list, the action for the user is removed
-			// before time is over, but the Undo will still terminate naturally:
-			//Therefore it's better if we remove the Snackbar action!
-			if (mSnackBar != null) {
-				mSnackBar.dismiss();
-				mSwipeHandler.sendEmptyMessage(0);
-				//You can keep the action, but if user clicks on it, the restored items
-				// cannot be ordered as before, it could appear as a bug, but it is not.
-			}
+		if (ExampleAdapter.hasSearchText()) {
+			//mFab.setVisibility(View.GONE);
+			ViewCompat.animate(mFab)
+					.scaleX(0f)
+					.scaleY(0f)
+					.alpha(0f)
+					.setDuration(100)
+					.start();
+		} else {
+			//mFab.setVisibility(View.VISIBLE);
+			ViewCompat.animate(mFab)
+					.scaleX(1f)
+					.scaleY(1f)
+					.alpha(1f)
+					.setDuration(100)
+					.start();
 		}
 
 		return true;
@@ -417,7 +414,6 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	@Override
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 		//Inflate the correct Menu
@@ -425,9 +421,11 @@ public class MainActivity extends AppCompatActivity implements
 		mode.getMenuInflater().inflate(menuId, menu);
 		//Activate the ActionMode Multi
 		mAdapter.setMode(ExampleAdapter.MODE_MULTI);
-		if (Utils.hasLollipop()) {
-			//getWindow().setNavigationBarColor(getResources().getColor(R.color.colorAccentDark_light));
+		if (Utils.hasMarshmallow()) {
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorAccentDark_light, this.getTheme()));
+		} else {
+			//noinspection deprecation
+			getWindow().setStatusBarColor(getResources().getColor(R.color.colorAccentDark_light));
 		}
 		return true;
 	}
@@ -477,16 +475,17 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	@Override
 	public void onDestroyActionMode(ActionMode mode) {
 		Log.v(TAG, "onDestroyActionMode called!");
 		mAdapter.setMode(ExampleAdapter.MODE_SINGLE);
 		mAdapter.clearSelection();
 		mActionMode = null;
-		if (Utils.hasLollipop()) {
-			//getWindow().setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
+		if (Utils.hasMarshmallow()) {
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark_light, this.getTheme()));
+		} else {
+			//noinspection deprecation
+			getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark_light));
 		}
 	}
 

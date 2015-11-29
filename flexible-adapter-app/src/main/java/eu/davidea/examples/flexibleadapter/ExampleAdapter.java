@@ -69,17 +69,18 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	 */
 	@Override
 	public void updateDataSet(String param) {
-		//Fill and Filter mItems with your custom list
-		filterItems(DatabaseService.getInstance().getListById(param));
-
-		if (!DatabaseService.userLearnedSelection && mItems.size() > 0 && !hasSearchText()) {
+		mItems = DatabaseService.getInstance().getListById(param);
+		if (!DatabaseService.userLearnedSelection && !hasSearchText()) {
 			//Define Example View
 			Item item = new Item();
 			item.setId(0);
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			this.mItems.add(0, item);
+			this.mItems.set(0, item);
 		}
+		//Fill and Filter mItems with your custom list
+		//Note: In case of userLearnSelection mItems is pre-initialized and after filtered.
+		filterItems(mItems);
 	}
 
 	@Override
@@ -170,13 +171,15 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			holder.mTitle.setText(item.getTitle());
 			holder.mSubtitle.setText(item.getSubtitle());
 		}
-
 	}
 
 	@Override
 	public String getTextToShowInBubble(int position) {
-		//return getItem(position).getTitle().substring(0,1).toUpperCase(); //Usually it's the first letter
-		return getItem(position).getTitle().substring(5); //This is an example
+		if (!DatabaseService.userLearnedSelection && position == 0) {//This 'if' is for my example only
+			//This is the normal line you should use: Usually it's the first letter
+			return getItem(position).getTitle().substring(0, 1).toUpperCase();
+		}
+		return getItem(position).getTitle().substring(5); //This is for my example only
 	}
 
 	private void setHighlightText(TextView textView, String text, String searchText) {
@@ -330,4 +333,5 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	public String toString() {
 		return mItems.toString();
 	}
+
 }
