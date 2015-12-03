@@ -31,21 +31,6 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();
 	public static final long UNDO_TIMEOUT = 5000L;
 
-	public interface OnUpdateListener {
-		/**
-		 * Called when Async load is completed.
-		 */
-		void onLoadComplete();
-		/**
-		 * Due to Java Generic, it's too complicated and not
-		 * well manageable if we return the List&lt;T&gt; object.<br/>
-		 * To get deleted items, use {@link #getDeletedItems()} from the
-		 * implementation of this method.
-		 */
-		void onDeleteConfirmed();
-		//void onProgressUpdate(int progress);
-	}
-
 	/**
 	 * Lock object used to modify the content of {@link #mItems}.
 	 * Any write operation performed on the list items should be synchronized on this lock.
@@ -57,23 +42,13 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	protected List<Integer> mOriginalPosition;
 	//Searchable fields
 	protected static String mSearchText; //Static: It can exist only 1 searchText
-	protected OnUpdateListener mUpdateListener;
+
 	protected Handler mHandler;
 
-	public FlexibleAdapter() {
-	}
+	protected OnLoadCompleteListener onLoadCompleteListener;
+	protected OnDeleteCompleteListener onDeleteCompleteListener;
 
-	/**
-	 * Constructor for Asynchronous loading.<br/>
-	 * Experimental: not working very well, it might be slow.
-	 *
-	 * @param listener {@link OnUpdateListener}
-	 */
-	public FlexibleAdapter(Object listener) {
-		if (listener instanceof OnUpdateListener)
-			this.mUpdateListener = (OnUpdateListener) listener;
-		else
-			Log.w(TAG, "Listener is not an instance of OnUpdateListener!");
+	public FlexibleAdapter() {
 	}
 
 	/**
@@ -100,7 +75,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	public void updateDataSetAsync(String param) {
 		//Synchronous
-		if (mUpdateListener == null) {
+		if (onLoadCompleteListener == null) {
 			Log.w(TAG, "OnUpdateListener is not initialized. updateDataSetAsync is not using FilterAsyncTask!");
 			updateDataSet(param);
 			notifyDataSetChanged();
@@ -332,7 +307,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public void startUndoTimer(long timeout) {
 		mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 				public boolean handleMessage(Message message) {
-					if (mUpdateListener != null) mUpdateListener.onDeleteConfirmed();
+					if (onDeleteCompleteListener != null) onDeleteCompleteListener.onDeleteConfirmed();
 					emptyBin();
 					return true;
 				}
@@ -458,9 +433,30 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			mUpdateListener.onLoadComplete();
+			onLoadCompleteListener.onLoadComplete();
 			notifyDataSetChanged();
 		}
+	}
+
+	public interface OnDeleteCompleteListener {
+
+		/**
+		 * Due to Java Generic, it's too complicated and not
+		 * well manageable if we return the List&lt;T&gt; object.<br/>
+		 * To get deleted items, use {@link #getDeletedItems()} from the
+		 * implementation of this method.
+		 */
+		void onDeleteConfirmed();
+
+	}
+
+	public interface OnLoadCompleteListener {
+
+		/**
+		 * Called when Async load is completed.
+		 */
+		void onLoadComplete();
+
 	}
 
 }
