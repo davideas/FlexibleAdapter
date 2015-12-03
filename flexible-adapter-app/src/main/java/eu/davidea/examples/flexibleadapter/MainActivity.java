@@ -36,7 +36,8 @@ import eu.davidea.utils.Utils;
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener,
 		SearchView.OnQueryTextListener,
-		FlexibleAdapter.OnUpdateListener,
+		FlexibleAdapter.OnLoadCompleteListener,
+		FlexibleAdapter.OnDeleteCompleteListener,
 		ExampleAdapter.OnItemClickListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
