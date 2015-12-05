@@ -81,13 +81,13 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/**
 	 * Toggle the selection status of the item at a given position.<br/>
 	 * The behaviour depends on the selection mode previously set with {@link #setMode}.
-	 *
+	 * <p/>
 	 * <br/><br/>
 	 * Optionally the item can be invalidated.<br/>
 	 * However it is preferable to set <i>false</i> and to handle the Activated/Selected State of
 	 * the ItemView in the Click events of the ViewHolder after the selection is registered and
 	 * up to date: Very Useful if the item has views with own animation to perform!
-	 *
+	 * <p/>
 	 * <br/><br/>
 	 * <b>Usage:</b>
 	 * <ul>
@@ -100,9 +100,9 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * <li>In <i>onBindViewHolder</i>, adjust the selection status: <i>holder.itemView.setActivated(isSelected(position));</i></li>
 	 * <li>If <i>invalidate</i> is set true, {@link #notifyItemChanged} is called and {@link #onBindViewHolder} will be automatically called
 	 * afterwards overriding any animation in the ItemView!</li>
-	 *</ul>T
+	 * </ul>T
 	 *
-	 * @param position Position of the item to toggle the selection status for.
+	 * @param position   Position of the item to toggle the selection status for.
 	 * @param invalidate Boolean to indicate if the row must be invalidated and item rebinded.
 	 */
 	public void toggleSelection(int position, boolean invalidate) {
@@ -130,6 +130,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	public void selectAll() {
 		selectAll(-1);
 	}
+
 	/**
 	 * Add the selection status for all items.
 	 * The selector container is sequentially filled with All items positions.
@@ -143,7 +144,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		for (int i = 0; i < getItemCount(); i++) {
 			if (getItemViewType(i) == skipViewType) continue;
 			selectedItems.add(i);
-			Log.v(TAG, "selectAll notifyItemChanged on position "+i);
+			Log.v(TAG, "selectAll notifyItemChanged on position " + i);
 			notifyItemChanged(i);
 		}
 	}
@@ -160,7 +161,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 			//The notification is done only on items that are currently selected.
 			int i = iterator.next();
 			iterator.remove();
-			Log.v(TAG, "clearSelection notifyItemChanged on position "+i);
+			Log.v(TAG, "clearSelection notifyItemChanged on position " + i);
 			notifyItemChanged(i);
 		}
 	}

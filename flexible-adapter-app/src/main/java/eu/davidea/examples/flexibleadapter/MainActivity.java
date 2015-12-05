@@ -64,21 +64,21 @@ public class MainActivity extends AppCompatActivity implements
 	private ProgressBar mProgressBar;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private final Handler mSwipeHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
-			public boolean handleMessage(Message message) {
-				switch(message.what) {
-					case 0: //Stop
-						mSwipeRefreshLayout.setRefreshing(false);
-						mSwipeRefreshLayout.setEnabled(true);
-						return true;
-					case 1: //1 Start
-						mSwipeRefreshLayout.setRefreshing(true);
-						mSwipeRefreshLayout.setEnabled(false);
-						return true;
-					default:
-						return false;
-				}
+		public boolean handleMessage(Message message) {
+			switch (message.what) {
+				case 0: //Stop
+					mSwipeRefreshLayout.setRefreshing(false);
+					mSwipeRefreshLayout.setEnabled(true);
+					return true;
+				case 1: //1 Start
+					mSwipeRefreshLayout.setRefreshing(true);
+					mSwipeRefreshLayout.setEnabled(false);
+					return true;
+				default:
+					return false;
 			}
-		});
+		}
+	});
 	/**
 	 * FAB
 	 */
@@ -121,7 +121,8 @@ public class MainActivity extends AppCompatActivity implements
 					if (!DatabaseService.getInstance().getListById(null).contains(item)) {
 						DatabaseService.getInstance().addItem(i, item);//This is the original list
 						//TODO: Use userLearnedSelection from settings
-						if (!DatabaseService.userLearnedSelection) i++;//Fixing exampleAdapter for new position :-)
+						if (!DatabaseService.userLearnedSelection)
+							i++;//Fixing exampleAdapter for new position :-)
 						mAdapter.addItem(i, item);//Adapter's list is a copy, to animate the item you must call addItem on the new position
 						Log.d(TAG, "Added New " + item.getTitle());
 
@@ -290,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements
 					getString(R.string.about_title),
 					getString(R.string.about_body,
 							Utils.getVersionName(this),
-							Utils.getVersionCode(this)) )
+							Utils.getVersionCode(this)))
 					.show(getFragmentManager(), MessageDialog.TAG);
 			return true;
 		}
@@ -302,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements
 	 * Handling RecyclerView when empty.
 	 * <br/><br/>
 	 * <b>Note:</b> The order how the 3 Views (RecyclerView, EmptyView, FastScroller)
-	 *   are placed in the Layout is important!
+	 * are placed in the Layout is important!
 	 */
 	private void updateEmptyView() {
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
@@ -368,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements
 			Log.d(TAG, "onListItemLongClick actionMode activated!");
 			mActionMode = startSupportActionMode(this);
 		}
-		Toast.makeText(this, "ImageClick or LongClick on "+mAdapter.getItem(position).getTitle(), Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "ImageClick or LongClick on " + mAdapter.getItem(position).getTitle(), Toast.LENGTH_SHORT).show();
 		toggleSelection(position);
 	}
 
@@ -388,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements
 			Log.d(TAG, "toggleSelection finish the actionMode");
 			mActionMode.finish();
 		} else {
-			Log.d(TAG, "toggleSelection update title after selection count="+count);
+			Log.d(TAG, "toggleSelection update title after selection count=" + count);
 			setContextTitle(count);
 			mActionMode.invalidate();
 		}
@@ -466,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements
 							}
 						});
 				mSnackBar.show();
-				mAdapter.startUndoTimer(7000L+200L, this);//+200: Using Snackbar, user can still click on the action button while bar is dismissing for a fraction of time
+				mAdapter.startUndoTimer(7000L + 200L, this);//+200: Using Snackbar, user can still click on the action button while bar is dismissing for a fraction of time
 				mSwipeHandler.sendEmptyMessage(1);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 7000L);
 				mActionMode.finish();
@@ -492,6 +493,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	/**
 	 * Utility method called from MainActivity on BackPressed
+	 *
 	 * @return true if ActionMode was active (in case it is also terminated), false otherwise
 	 */
 	public boolean destroyActionModeIfNeeded() {

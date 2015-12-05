@@ -30,6 +30,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		/**
 		 * Delegate the click event to the listener and check if selection MULTI enabled.<br/>
 		 * If yes, call toggleActivation.
+		 *
 		 * @param position
 		 * @return true if MULTI selection is enabled, false for SINGLE selection
 		 */
@@ -37,6 +38,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 		/**
 		 * This always calls toggleActivation after listener event is consumed.
+		 *
 		 * @param position
 		 */
 		void onListItemLongClick(int position);
@@ -65,6 +67,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 	/**
 	 * Param, in this example, is not used.
+	 *
 	 * @param param A custom parameter to filter the type of the DataSet
 	 */
 	@Override
@@ -88,7 +91,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		super.setMode(mode);
 		if (mode == MODE_SINGLE) mLastItemInActionMode = true;
 	}
-	
+
 	@Override
 	public void selectAll() {
 		mSelectAll = true;
@@ -135,7 +138,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			//IMPORTANT: Example View finishes here!!
 			return;
 		}
-		
+
 		//When user scrolls this bind the correct selection status
 		holder.itemView.setActivated(isSelected(position));
 
@@ -199,9 +202,8 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	/**
 	 * Custom filter.
 	 *
-	 * @param myObject The item to filter
+	 * @param myObject   The item to filter
 	 * @param constraint the current searchText
-	 *
 	 * @return true if a match exists in the title or in the subtitle, false if no match found.
 	 */
 	@Override
