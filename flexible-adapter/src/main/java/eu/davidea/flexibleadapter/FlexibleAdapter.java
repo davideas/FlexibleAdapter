@@ -48,7 +48,6 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
     protected OnUpdateListener mUpdateListener;
 
     protected OnLoadCompleteListener onLoadCompleteListener;
-    protected OnDeleteCompleteListener onDeleteCompleteListener;
 
     public FlexibleAdapter() {
     }
@@ -314,7 +313,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
      * Convenience method to start Undo timer with default timeout of 5''
      */
     public void startUndoTimer() {
-        startUndoTimer(0);
+        startUndoTimer(0, null);
     }
 
     /**
@@ -322,11 +321,28 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
      *
      * @param timeout Custom timeout
      */
+    @Deprecated
     public void startUndoTimer(long timeout) {
         mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
             public boolean handleMessage(Message message) {
                 if (mUpdateListener != null) mUpdateListener.onDeleteConfirmed();
-                if (onDeleteCompleteListener != null) onDeleteCompleteListener.onDeleteConfirmed();
+                emptyBin();
+                return true;
+            }
+        });
+        mHandler.sendMessageDelayed(Message.obtain(mHandler), timeout > 0 ? timeout : UNDO_TIMEOUT);
+    }
+
+    /**
+     * Start Undo timer with custom timeout
+     *
+     * @param listener delete listener called after timeout
+     * @param timeout  Custom timeout
+     */
+    public void startUndoTimer(long timeout, final OnDeleteCompleteListener listener) {
+        mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+            public boolean handleMessage(Message message) {
+                if (listener != null) listener.onDeleteConfirmed();
                 emptyBin();
                 return true;
             }

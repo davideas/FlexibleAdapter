@@ -59,7 +59,6 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		this.mContext = (Context) activity;
 		this.mClickListener = (OnItemClickListener) activity;
 		this.onLoadCompleteListener = (OnLoadCompleteListener) activity;
-		this.onDeleteCompleteListener = (OnDeleteCompleteListener) activity;
 //		updateDataSet(listId);
 		updateDataSetAsync(listId);
 	}

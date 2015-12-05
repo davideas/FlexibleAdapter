@@ -466,7 +466,7 @@ public class MainActivity extends AppCompatActivity implements
 							}
 						});
 				mSnackBar.show();
-				mAdapter.startUndoTimer(7000L+200L);//+200: Using Snackbar, user can still click on the action button while bar is dismissing for a fraction of time
+				mAdapter.startUndoTimer(7000L+200L, this);//+200: Using Snackbar, user can still click on the action button while bar is dismissing for a fraction of time
 				mSwipeHandler.sendEmptyMessage(1);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 7000L);
 				mActionMode.finish();
