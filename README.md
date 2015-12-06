@@ -162,8 +162,8 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 - Added new constructor to initialize list items [See #12].
 - Moved _onDeletedConfirmed()_ in a new listener to pass as parameter to the method _startUndoTimer()_ [See #10].
 - Deprecated _OnUpdateListener_ and some relative functions.
-- **Note:** _updateDataSetAsync()_ has been **deprecated** and will be removed soon from next major version. Use _updateDataSet()_ instead.
-  **FilterAsyncTask** will not be used anymore to load data at startup: there's no advantage to use an Asynchronous loading,
+- **Note:** _updateDataSetAsync()_ has been **deprecated** and will be removed soon from next major version. Use _updateDataSet()_
+  instead. **FilterAsyncTask** will not be used anymore to load data at startup: there's no advantage to use an Asynchronous loading,
   usually the list is already loaded Asynchronously somewhere else.
 - Adapted example App accordingly.
 
