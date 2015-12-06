@@ -30,7 +30,7 @@ bintray {
 	user = properties.getProperty("bintray.user")
 	key = properties.getProperty("bintray.apikey")
 
-	//configurations = ['archives']
+	configurations = ['archives']
 	pkg {
 		repo = bintrayRepo
 		name = bintrayName
@@ -38,7 +38,7 @@ bintray {
 		websiteUrl = siteUrl
 		licenses = allLicenses
 		vcsUrl = gitUrl
-		labels = ['android', 'recyclerview', 'adapter', 'selection', 'actionmode', 'search', 'undo', 'ripple', 'itemanimator']
+		labels = ['android', 'recyclerview', 'adapter', 'selection', 'actionmode', 'search', 'filter', 'undo', 'ripple', 'itemanimator']
 		publish = true
 		publicDownloadNumbers = true
 		version {

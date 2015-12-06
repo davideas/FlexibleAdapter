@@ -6,9 +6,9 @@ ext {
 	developerEmail = 'dave.dna@gmail.com'
 
 	//Library
-	libraryCode = 9
-	libraryVersion = '4.1.0'
-	libraryDate = " of 2015.11.29"
+	libraryCode = 10
+	libraryVersion = '4.2.0'
+	libraryDate = " of 2015.12.10"
 	libraryDescription = 'A pattern for every RecyclerView'
 	libraryName = 'FlexibleAdapter'
 

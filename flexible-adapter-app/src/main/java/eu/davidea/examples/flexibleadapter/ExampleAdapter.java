@@ -58,11 +58,21 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			mSelectAll = false;
 
 	public ExampleAdapter(Object activity, String listId) {
+		mItems = DatabaseService.getInstance().getListById(listId);
 		this.mContext = (Context) activity;
 		this.mClickListener = (OnItemClickListener) activity;
-		this.onLoadCompleteListener = (OnLoadCompleteListener) activity;
-//		updateDataSet(listId);
-		updateDataSetAsync(listId);
+		addUserLearnedSelection();
+	}
+
+	private void addUserLearnedSelection() {
+		if (!DatabaseService.userLearnedSelection && !hasSearchText()) {
+			//Define Example View
+			Item item = new Item();
+			item.setId(0);
+			item.setTitle(mContext.getString(R.string.uls_title));
+			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
+			this.mItems.set(0, item);
+		}
 	}
 
 	/**
@@ -72,18 +82,15 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	 */
 	@Override
 	public void updateDataSet(String param) {
+		//Refresh the original content
 		mItems = DatabaseService.getInstance().getListById(param);
-		if (!DatabaseService.userLearnedSelection && !hasSearchText()) {
-			//Define Example View
-			Item item = new Item();
-			item.setId(0);
-			item.setTitle(mContext.getString(R.string.uls_title));
-			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			this.mItems.set(0, item);
-		}
+
+		addUserLearnedSelection();
+
 		//Fill and Filter mItems with your custom list
 		//Note: In case of userLearnSelection mItems is pre-initialized and after filtered.
 		filterItems(mItems);
+		notifyDataSetChanged();
 	}
 
 	@Override

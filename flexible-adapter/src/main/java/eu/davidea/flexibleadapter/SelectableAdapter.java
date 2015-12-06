@@ -100,10 +100,10 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * <li>In <i>onBindViewHolder</i>, adjust the selection status: <i>holder.itemView.setActivated(isSelected(position));</i></li>
 	 * <li>If <i>invalidate</i> is set true, {@link #notifyItemChanged} is called and {@link #onBindViewHolder} will be automatically called
 	 * afterwards overriding any animation in the ItemView!</li>
-	 * </ul>T
+	 * </ul>
 	 *
 	 * @param position   Position of the item to toggle the selection status for.
-	 * @param invalidate Boolean to indicate if the row must be invalidated and item rebinded.
+	 * @param invalidate Boolean to indicate if the row must be invalidated and item rebound.
 	 */
 	public void toggleSelection(int position, boolean invalidate) {
 		if (position < 0) return;

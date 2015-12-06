@@ -2,7 +2,7 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Master branch: v4.1 of 2015.11.29
+###### A pattern for every RecyclerView - Master branch: v4.2.0 of 2015.12.10
 
 #### Main functionalities
 * Base item selection (but also SINGLE & MULTI selection mode) in the Recycler View with ripple effect.
@@ -154,6 +154,10 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 ```
 
 # Change Log
+###### v4.2.0 - 2015.12.10
+- Moved _onDeletedConfirm()_ in a new listener to pass as parameter to _startUndoTimer()_.
+- Deprecated _OnUpdateListener_ and some relative functions.
+
 ###### v4.1.0 - 2015.11.29
 - Improved **Undo** functionality: added new callback _onDeleteConfirmed_ in OnUpdateListener. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! 
 - Improved **Filter** functionality: added new intelligent function _filterItems_. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!

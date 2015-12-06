@@ -36,7 +36,6 @@ import eu.davidea.utils.Utils;
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener,
 		SearchView.OnQueryTextListener,
-		FlexibleAdapter.OnLoadCompleteListener,
 		FlexibleAdapter.OnDeleteCompleteListener,
 		ExampleAdapter.OnItemClickListener {
 
@@ -61,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements
 	private ExampleAdapter mAdapter;
 	private ActionMode mActionMode;
 	private Snackbar mSnackBar;
-	private ProgressBar mProgressBar;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private final Handler mSwipeHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
@@ -89,9 +87,6 @@ public class MainActivity extends AppCompatActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		Log.d(TAG, "onCreate");
-
-		mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
-		mProgressBar.setVisibility(View.VISIBLE);
 
 		//Adapter & RecyclerView
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
@@ -169,9 +164,8 @@ public class MainActivity extends AppCompatActivity implements
 		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-//				mAdapter.updateDataSet();
-//				mAdapter.notifyDataSetChanged();
-				mAdapter.updateDataSetAsync("example parameter for List1");
+				mAdapter.updateDataSet();
+//				mAdapter.updateDataSetAsync("example parameter for List1");
 				mSwipeRefreshLayout.setEnabled(false);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 2000L);
 			}
@@ -245,13 +239,10 @@ public class MainActivity extends AppCompatActivity implements
 	public boolean onQueryTextChange(String newText) {
 		if (!ExampleAdapter.hasSearchText()
 				|| !ExampleAdapter.getSearchText().equalsIgnoreCase(newText)) {
-			mProgressBar.setVisibility(View.VISIBLE);
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			ExampleAdapter.setSearchText(newText);
 			//Filter the items and notify the change!
-//			mAdapter.updateDataSet();
-//			mAdapter.notifyDataSetChanged();
-			mAdapter.updateDataSetAsync(null);
+			mAdapter.updateDataSet();
 		}
 
 		if (ExampleAdapter.hasSearchText()) {
@@ -399,12 +390,6 @@ public class MainActivity extends AppCompatActivity implements
 		mActionMode.setTitle(String.valueOf(count) + " " + (count == 1 ?
 				getString(R.string.action_selected_one) :
 				getString(R.string.action_selected_many)));
-	}
-
-	@Override
-	public void onLoadComplete() {
-		mProgressBar.setVisibility(View.INVISIBLE);
-		updateEmptyView();
 	}
 
 	@Override
