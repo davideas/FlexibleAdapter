@@ -51,6 +51,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public FlexibleAdapter() {
 	}
 
+	public FlexibleAdapter(@NonNull List<T> items) {
+		mItems = items;
+	}
+
 	/**
 	 * Constructor for Asynchronous loading.<br/>
 	 * Experimental: not working very well, it might be slow.
@@ -512,6 +516,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		@Deprecated
 		void onDeleteConfirmed();
 
+		/**
+		 * Called at startup and every time an item is inserted or removed.
+		 */
+		//void onUpdateEmptyView();
 	}
 
 	public interface OnDeleteCompleteListener {

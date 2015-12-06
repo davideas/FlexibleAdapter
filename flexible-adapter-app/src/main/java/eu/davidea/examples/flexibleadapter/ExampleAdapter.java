@@ -58,7 +58,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			mSelectAll = false;
 
 	public ExampleAdapter(Object activity, String listId) {
-		mItems = DatabaseService.getInstance().getListById(listId);
+		super(DatabaseService.getInstance().getListById(listId));
 		this.mContext = (Context) activity;
 		this.mClickListener = (OnItemClickListener) activity;
 		addUserLearnedSelection();
