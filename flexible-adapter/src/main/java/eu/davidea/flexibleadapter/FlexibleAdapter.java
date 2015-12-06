@@ -476,6 +476,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		return false;
 	}
 
+	@Deprecated
 	public class FilterAsyncTask extends AsyncTask<String, Void, Void> {
 
 		//private final String TAG = FilterAsyncTask.class.getSimpleName();

@@ -4,6 +4,8 @@
 
 ###### A pattern for every RecyclerView - Master branch: v4.2.0 of 2015.12.10
 
+`**IMPORTANT CHANGES are foreseen for 5.0.0. Please see [releases](https://github.com/davideas/FlexibleAdapter/releases) and [issues](https://github.com/davideas/FlexibleAdapter/issues)**.`
+
 #### Main functionalities
 * Base item selection (but also SINGLE & MULTI selection mode) in the Recycler View with ripple effect.
 * Undo the deleted items with custom animations.
@@ -29,7 +31,7 @@ Finally note that, this adapter handles the basic clicks: _single_ and _long cli
 Using JCenter
 ```
 dependencies {
-	compile 'eu.davidea:flexible-adapter:4.1.0'
+	compile 'eu.davidea:flexible-adapter:4.2.0'
 }
 ```
 Using bintray.com
@@ -38,12 +40,12 @@ repositories {
 	maven { url "http://dl.bintray.com/davideas/maven" }
 }
 dependencies {
-	compile 'eu.davidea:flexible-adapter:4.1.0@aar'
+	compile 'eu.davidea:flexible-adapter:4.2.0@aar'
 }
 ```
 Or you can just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).
 
-Remember to initialize `mItems` (List already included in FlexibleAdapter) in order to manage list items. Method `updateDataSet(..)` can help in this.
+Remember to call `super(items)` or to initialize `mItems` (List already included in FlexibleAdapter) in order to manage list items.
 #### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!
 
@@ -141,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 # Usage for the Filter
-See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In _YourAdapterClass.updateDataSet()_, call _filterItems()_;
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
+First, call _YourAdapterClass.setSearchText()_ in the Activity, then in _YourAdapterClass.updateDataSet()_, call _filterItems()_;
 ``` java
 public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item> {
 	...
@@ -156,8 +159,13 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 # Change Log
 ###### v4.2.0 - 2015.12.10
 - Added _isEmpty()_.
-- Moved _onDeletedConfirm()_ in a new listener to pass as parameter to _startUndoTimer()_.
+- Added new constructor to initialize list items [See #12].
+- Moved _onDeletedConfirmed()_ in a new listener to pass as parameter to the method _startUndoTimer()_ [See #10].
 - Deprecated _OnUpdateListener_ and some relative functions.
+- **Note:** _updateDataSetAsync()_ has been **deprecated** and will be removed soon from next major version. Use _updateDataSet()_ instead.
+  **FilterAsyncTask** will not be used anymore to load data at startup: there's no advantage to use an Asynchronous loading,
+  usually the list is already loaded Asynchronously somewhere else.
+- Adapted example App accordingly.
 
 ###### v4.1.0 - 2015.11.29
 - Improved **Undo** functionality: added new callback _onDeleteConfirmed_ in OnUpdateListener. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! 
@@ -165,28 +173,10 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 - Logs are now in verbose level.
 - Adapted example App accordingly.
 
-###### v4.0.1 - 2015.11.01
-- Refactored module names, package signatures and gradle build files. Code remains unchanged.
-- Configuration for JCenter, now FlexibleAdapter is a lightweight standalone library!
-  **Note:** FastScroller and ItemAnimators are excluded from the library, but you can see them in the example App.
-- New icon.
-
-###### v4.0 - 2015.10.18
-- Added **FilterAsyncTask** to asynchronously load the list (This experimental and might not work well and binding is excluded from Async).
-- Enabled **Filter** through _updateDataSet_ method (Note: as the example is made, the search regenerate the list!).
-- Included some ItemAnimators from https://github.com/wasabeef/recyclerview-animators
-  (in the example SlideInRightAnimator is used), but all need to be adapted if used with Support v23.1.0.
-- Included and customized **FastScroller** library from https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller
-  My version has FrameLayout extended instead of LinearLayout, and a friendly layout.
-- Added **SwipeRefreshLayout**, just an usage example.
-- Use of Handler instead of TimerTask while Undo.
-- _FlexibleAdapter_ can now return deleted items before they are removed from memory.
-- _SelectableAdapter.selectAll()_ can now skip selection on one specific ViewType.
-- Adapted MainActivity.
-
 ###### Old releases
 See [releases](https://github.com/davideas/FlexibleAdapter/releases) for old versions.
 
+v4.0.1 - 2015.11.01 | v4.0 - 2015.10.18 |
 v3.1 - 2015.08.18 | v3.0 - 2015.07.29 |
 v2.2 - 2015.07.20 | v2.1 - 2015.07.03 |
 v2.0 - 2015.06.19 | v1.0 - 2015.05.03
