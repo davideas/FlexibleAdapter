@@ -2,9 +2,9 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Master branch: v4.2.0 of 2015.12.10
+###### A pattern for every RecyclerView - Master branch: v4.1 of 2015.11.29 - Dev branch: v4.2
 
-`**IMPORTANT CHANGES are foreseen for 5.0.0. Please see [releases](https://github.com/davideas/FlexibleAdapter/releases) and [issues](https://github.com/davideas/FlexibleAdapter/issues)**.`
+####ANNOUNCEMENT: Important changes are foreseen in v4.2.0 and in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
 #### Main functionalities
 * Base item selection (but also SINGLE & MULTI selection mode) in the Recycler View with ripple effect.
