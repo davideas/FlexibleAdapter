@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
 		TextView emptyView = (TextView) findViewById(R.id.empty);
 		emptyView.setText(getString(R.string.no_items));
-		if (mAdapter.getItemCount() > 0) {
+		if (!mAdapter.isEmpty()) {
 			fastScroller.setVisibility(View.VISIBLE);
 			emptyView.setVisibility(View.GONE);
 		} else {

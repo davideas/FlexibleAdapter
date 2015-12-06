@@ -155,6 +155,7 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 
 # Change Log
 ###### v4.2.0 - 2015.12.10
+- Added _isEmpty()_.
 - Moved _onDeletedConfirm()_ in a new listener to pass as parameter to _startUndoTimer()_.
 - Deprecated _OnUpdateListener_ and some relative functions.
 

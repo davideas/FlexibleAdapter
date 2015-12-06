@@ -135,6 +135,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		return mItems != null ? mItems.size() : 0;
 	}
 
+	public boolean isEmpty() {
+		return getItemCount() == 0;
+	}
+
 	public void updateItem(int position, T item) {
 		if (position < 0) {
 			Log.w(TAG, "Cannot updateItem on negative position");
