@@ -225,11 +225,11 @@ public class MainActivity extends AppCompatActivity implements
 		Log.v(TAG, "onPrepareOptionsMenu called!");
 		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 		//Has searchText?
-		if (!ExampleAdapter.hasSearchText()) {
+		if (!mAdapter.hasSearchText()) {
 			Log.d(TAG, "onPrepareOptionsMenu Clearing SearchView!");
 			searchView.setIconified(true);// This also clears the text in SearchView widget
 		} else {
-			searchView.setQuery(ExampleAdapter.getSearchText(), false);
+			searchView.setQuery(mAdapter.getSearchText(), false);
 			searchView.setIconified(false);
 		}
 		return super.onPrepareOptionsMenu(menu);
@@ -237,15 +237,15 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onQueryTextChange(String newText) {
-		if (!ExampleAdapter.hasSearchText()
-				|| !ExampleAdapter.getSearchText().equalsIgnoreCase(newText)) {
+		if (!mAdapter.hasSearchText()
+				|| !mAdapter.getSearchText().equalsIgnoreCase(newText)) {
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
-			ExampleAdapter.setSearchText(newText);
+			mAdapter.setSearchText(newText);
 			//Filter the items and notify the change!
 			mAdapter.updateDataSet();
 		}
 
-		if (ExampleAdapter.hasSearchText()) {
+		if (mAdapter.hasSearchText()) {
 			//mFab.setVisibility(View.GONE);
 			ViewCompat.animate(mFab)
 					.scaleX(0f)

@@ -41,11 +41,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	protected List<T> mItems;
 	protected List<T> mDeletedItems;
 	protected List<Integer> mOriginalPosition;
-	//Searchable fields
-	protected static String mSearchText; //Static: It can exist only 1 searchText
-
+	protected String mSearchText;
 	protected Handler mHandler;
-
 	protected OnUpdateListener mUpdateListener;
 
 	public FlexibleAdapter() {
@@ -384,15 +381,15 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 	}
 
-	public static boolean hasSearchText() {
+	public boolean hasSearchText() {
 		return mSearchText != null && mSearchText.length() > 0;
 	}
 
-	public static String getSearchText() {
+	public String getSearchText() {
 		return mSearchText;
 	}
 
-	public static void setSearchText(String searchText) {
+	public void setSearchText(String searchText) {
 		if (searchText != null)
 			mSearchText = searchText.trim().toLowerCase(Locale.getDefault());
 		else mSearchText = "";
@@ -497,9 +494,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 	}
 
-	/**
-	 * This interface will contains only
-	 */
+
 	@Deprecated
 	public interface OnUpdateListener {
 		/**

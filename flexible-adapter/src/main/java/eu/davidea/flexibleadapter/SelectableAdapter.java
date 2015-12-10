@@ -16,6 +16,7 @@ import java.util.List;
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
+
 	/**
 	 * Default mode for selection
 	 */
@@ -36,10 +37,11 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/**
 	 * Set the mode of the selection, MODE_SINGLE is the default:
 	 * <ul>
-	 * <li>if {@link #MODE_SINGLE}, it will switch the selection position (previous selection is cleared automatically);
-	 * <li>if {@link #MODE_MULTI}, it will add the position to the list of the items selected.
+	 * <li>{@link #MODE_SINGLE} configures the adapter to react at the single tap over an item
+	 * (previous selection is cleared automatically);
+	 * <li>{@link #MODE_MULTI} configures the adapter to save the position to the list of the
+	 * selected items.
 	 * </ul>
-	 * <b>NOTE:</b> #mModeMultiJustFinished is set true when #MODE_MULTI is finished.
 	 *
 	 * @param mode MODE_SINGLE or MODE_MULTI
 	 */
@@ -59,7 +61,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Indicates if the item at position position is selected.
+	 * Indicates if the item, at the provided position, is selected.
 	 *
 	 * @param position Position of the item to check.
 	 * @return true if the item is selected, false otherwise.
@@ -82,24 +84,26 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * Toggle the selection status of the item at a given position.<br/>
 	 * The behaviour depends on the selection mode previously set with {@link #setMode}.
 	 * <p/>
-	 * <br/><br/>
 	 * Optionally the item can be invalidated.<br/>
 	 * However it is preferable to set <i>false</i> and to handle the Activated/Selected State of
 	 * the ItemView in the Click events of the ViewHolder after the selection is registered and
 	 * up to date: Very Useful if the item has views with own animation to perform!
 	 * <p/>
-	 * <br/><br/>
 	 * <b>Usage:</b>
 	 * <ul>
 	 * <li>If you don't want any item to be selected/activated at all, just don't call this method.</li>
-	 * <li>To have actually the item visually selected you need to add a custom <i>Selector Drawable</i> to your layout/view of the Item.
-	 * It's preferable: <i>android:background="?attr/selectableItemBackground"</i> in your layout, pointing to a custom Drawable in the style.xml
-	 * (note: prefix <i>?android:attr</i> seems to <u>not</u> work).</li>
-	 * <li>In <i>onClick</i>, enable the Activated/Selected State of the ItemView of the ViewHolder <u>after</u> the listener consumed the event:
+	 * <li>To have actually the item visually selected you need to add a custom <i>Selector Drawable</i>
+	 * to your layout/view of the Item. It's preferable to set in your layout:
+	 * <i>android:background="?attr/selectableItemBackground"</i>, pointing to a custom Drawable
+	 * in the style.xml (note: prefix <i>?android:attr</i> <u>doesn't</u> work).</li>
+	 * <li>In <i>onClick</i> event, enable the Activated/Selected State of the ItemView of the
+	 * ViewHolder <u>after</u> the listener consumed the event:
 	 * <i>itemView.setActivated(mAdapter.isSelected(getAdapterPosition()));</i></li>
-	 * <li>In <i>onBindViewHolder</i>, adjust the selection status: <i>holder.itemView.setActivated(isSelected(position));</i></li>
-	 * <li>If <i>invalidate</i> is set true, {@link #notifyItemChanged} is called and {@link #onBindViewHolder} will be automatically called
-	 * afterwards overriding any animation in the ItemView!</li>
+	 * <li>In <i>onBindViewHolder</i>, adjust the selection status:
+	 * <i>holder.itemView.setActivated(isSelected(position));</i></li>
+	 * <li>If <i>invalidate</i> is set true, {@link #notifyItemChanged} is called and
+	 * {@link #onBindViewHolder} will be automatically called afterwards overriding any animation
+	 * inside the ItemView!</li>
 	 * </ul>
 	 *
 	 * @param position   Position of the item to toggle the selection status for.
@@ -125,16 +129,16 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Convenience method when there is nothing to skip.
+	 * Convenience method when there is no specific view to skip.
 	 */
 	public void selectAll() {
 		selectAll(-1);
 	}
 
 	/**
-	 * Add the selection status for all items.
+	 * Add the selection status for all items.<br/>
 	 * The selector container is sequentially filled with All items positions.
-	 * <br/><b>Note:</b> All items are invalidated and rebinded!
+	 * <br/><b>Note:</b> All items are invalidated and rebound one by one!
 	 *
 	 * @param skipViewType ViewType for which we don't want selection
 	 */
@@ -150,9 +154,9 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Clear the selection status for all items one by one to not kill animations in the items.
-	 * <br/><br/>
-	 * <b>Note 1:</b> Items are invalidated and rebinded!<br/>
+	 * Clear the selection status for all items one by one and it doesn't stop animations in the items.
+	 * <p/>
+	 * <b>Note 1:</b> Items are invalidated and rebound!<br/>
 	 * <b>Note 2:</b> This method use java.util.Iterator to avoid java.util.ConcurrentModificationException.
 	 */
 	public void clearSelection() {

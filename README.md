@@ -157,7 +157,7 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 ```
 
 # Change Log
-###### v4.2.0 - 2015.12.10
+###### v4.2.0 - 2015.12.12
 - Added _isEmpty()_.
 - Added new constructor to initialize list items [See #12].
 - Moved _onDeletedConfirmed()_ in a new listener to pass as parameter to the method _startUndoTimer()_ [See #10].
@@ -165,6 +165,7 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 - **Note:** _updateDataSetAsync()_ has been **deprecated** and will be removed soon from next major version. Use _updateDataSet()_
   instead. **FilterAsyncTask** will not be used anymore to load data at startup: there's no advantage to use an Asynchronous loading,
   usually the list is already loaded Asynchronously somewhere else.
+- Removed _static_ declaration from the following methods: _hasSearchText(); getSearchText(); setSearchText(String searchText)_.
 - Adapted example App accordingly.
 
 ###### v4.1.0 - 2015.11.29
