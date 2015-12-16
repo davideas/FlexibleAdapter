@@ -2,7 +2,7 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Master branch: v4.1 of 2015.11.29 - Dev branch: v4.2
+###### A pattern for every RecyclerView - Master branch: v4.2 of 2015.12.16 - Dev branch: v4.2
 
 ####ANNOUNCEMENT: Important changes are foreseen in v4.2.0 and in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
