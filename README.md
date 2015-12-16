@@ -103,7 +103,7 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			mAdapter.removeItems(mAdapter.getSelectedItems());
 
 			//Start countdown with startUndoTimer(millisec)
-			mAdapter.startUndoTimer(7000); //Default 5''
+			mAdapter.startUndoTimer(7000, this); //Default 5''; where "this" is the Activity that implements OnDeleteCompleteListener.
 			mActionMode.finish();
 			return true;
 	}
