@@ -31,6 +31,7 @@ import eu.davidea.common.SimpleDividerItemDecoration;
 import eu.davidea.examples.anim.SlideInRightAnimator;
 import eu.davidea.examples.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.FlexibleViewHolder;
 import eu.davidea.utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements
 		SearchView.OnQueryTextListener,
 		FlexibleAdapter.OnUpdateListener,
 		FlexibleAdapter.OnDeleteCompleteListener,
-		ExampleAdapter.OnItemClickListener {
+		FlexibleViewHolder.OnListItemClickListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
 

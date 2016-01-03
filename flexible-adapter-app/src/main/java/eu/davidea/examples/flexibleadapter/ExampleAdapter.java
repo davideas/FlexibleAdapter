@@ -2,7 +2,6 @@ package eu.davidea.examples.flexibleadapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
@@ -19,31 +18,15 @@ import java.util.Locale;
 
 import eu.davidea.examples.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.FlexibleViewHolder;
+import eu.davidea.flexibleadapter.FlexibleViewHolder.OnListItemClickListener;
 import eu.davidea.utils.Utils;
 
 
-public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item>
+public class ExampleAdapter extends FlexibleAdapter<FlexibleViewHolder, Item>
 		implements FastScroller.BubbleTextGetter {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
-
-	public interface OnItemClickListener {
-		/**
-		 * Delegate the click event to the listener and check if selection MULTI enabled.<br/>
-		 * If yes, call toggleActivation.
-		 *
-		 * @param position
-		 * @return true if MULTI selection is enabled, false for SINGLE selection
-		 */
-		boolean onListItemClick(int position);
-
-		/**
-		 * This always calls toggleActivation after listener event is consumed.
-		 *
-		 * @param position
-		 */
-		void onListItemLongClick(int position);
-	}
 
 	private Context mContext;
 	private static final int
@@ -51,7 +34,7 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			ROW_VIEW_TYPE = 1;
 
 	private LayoutInflater mInflater;
-	private OnItemClickListener mClickListener;
+	private OnListItemClickListener mClickListener;
 
 	//Selection fields
 	private boolean
@@ -61,27 +44,8 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	public ExampleAdapter(Object activity, String listId) {
 		super(DatabaseService.getInstance().getListById(listId), activity);
 		this.mContext = (Context) activity;
-		this.mClickListener = (OnItemClickListener) activity;
+		this.mClickListener = (OnListItemClickListener) activity;
 		if (!isEmpty()) addUserLearnedSelection();
-	}
-
-	private void addUserLearnedSelection() {
-		if (!DatabaseService.userLearnedSelection && !hasSearchText()) {
-			//Define Example View
-			Item item = new Item();
-			item.setId(0);
-			item.setTitle(mContext.getString(R.string.uls_title));
-			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			mItems.add(0, item);
-		}
-	}
-
-	private void removeUserLearnedSelection() {
-		Log.d(TAG, "removed UserLearnedSelection isEmpty=" + isEmpty());
-		if (!DatabaseService.userLearnedSelection && isEmpty()) {
-			mItems.remove(0);
-			notifyItemRemoved(0);
-		}
 	}
 
 	/**
@@ -103,6 +67,31 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 		//Update Empty View
 		mUpdateListener.onUpdateEmptyView(mItems.size());
+	}
+
+	private void addUserLearnedSelection() {
+		if (!DatabaseService.userLearnedSelection && !hasSearchText()) {
+			//Define Example View
+			Item item = new Item();
+			item.setId(0);
+			item.setTitle(mContext.getString(R.string.uls_title));
+			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
+			mItems.add(0, item);
+		}
+	}
+
+	private void removeUserLearnedSelection() {
+		if (!DatabaseService.userLearnedSelection && isEmpty()) {
+			mItems.remove(0);
+			notifyItemRemoved(0);
+		}
+	}
+
+	private void userLearnedSelection() {
+		//TODO: Save the boolean into Settings!
+		DatabaseService.userLearnedSelection = true;
+		mItems.remove(0);
+		notifyItemRemoved(0);
 	}
 
 	@Override
@@ -144,75 +133,79 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	}
 
 	@Override
-	public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		Log.d(TAG, "onCreateViewHolder for viewType " + viewType);
+	public FlexibleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		if (DEBUG) Log.d(TAG, "onCreateViewHolder for viewType " + viewType);
 		if (mInflater == null) {
 			mInflater = LayoutInflater.from(parent.getContext());
 		}
 		switch (viewType) {
 			case EXAMPLE_VIEW_TYPE:
-				return new SimpleViewHolder(
+				return new ExampleViewHolder(
 						mInflater.inflate(R.layout.recycler_uls_row, parent, false),
 						this);
 			default:
 				return new ViewHolder(
 						mInflater.inflate(R.layout.recycler_row, parent, false),
 						this);
-		}
+		}//end-switch
 	}
 
 	@Override
-	public void onBindViewHolder(SimpleViewHolder holder, final int position) {
-		Log.d(TAG, "onBindViewHolder for position " + position);
+	public void onBindViewHolder(FlexibleViewHolder holder, final int position) {
+		if (DEBUG) Log.d(TAG, "onBindViewHolder for position " + position);
 		final Item item = getItem(position);
 
-		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
-
 		//NOTE: ViewType Must be checked ALSO here to bind the correct view
-		if (getItemViewType(position) == EXAMPLE_VIEW_TYPE) {
-			holder.itemView.setActivated(true);
-			holder.mTitle.setSelected(true);//For marquee
-			holder.mTitle.setText(Html.fromHtml(item.getTitle()));
-			holder.mSubtitle.setText(Html.fromHtml(item.getSubtitle()));
-			//IMPORTANT: Example View finishes here!!
-			return;
-		}
+		switch (getItemViewType(position)) {
+			case EXAMPLE_VIEW_TYPE:
+				ExampleViewHolder sHolder = (ExampleViewHolder) holder;
+				sHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
+				sHolder.itemView.setActivated(true);
+				sHolder.mTitle.setSelected(true);//For marquee
+				sHolder.mTitle.setText(Html.fromHtml(item.getTitle()));
+				sHolder.mSubtitle.setText(Html.fromHtml(item.getSubtitle()));
+				return;
 
-		//When user scrolls this bind the correct selection status
-		holder.itemView.setActivated(isSelected(position));
+			default:
+				ViewHolder vHolder = (ViewHolder) holder;
+				//When user scrolls, this line binds the correct selection status
+				vHolder.itemView.setActivated(isSelected(position));
 
-		//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select and Deselect ALL
-		if (mSelectAll || mLastItemInActionMode) {
-			//Reset the flags with delay
-			holder.mImageView.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					mSelectAll = mLastItemInActionMode = false;
+				//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select and Deselect ALL
+				if (mSelectAll || mLastItemInActionMode) {
+					//Reset the flags with delay
+					vHolder.mImageView.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							mSelectAll = mLastItemInActionMode = false;
+						}
+					}, 200L);
+					//Consume the Animation
+					//flip(holder.mImageView, isSelected(position), 200L);
+				} else {
+					//Display the current flip status
+					//setFlipped(holder.mImageView, isSelected(position));
 				}
-			}, 200L);
-			//Consume the Animation
-			//flip(holder.mImageView, isSelected(position), 200L);
-		} else {
-			//Display the current flip status
-			//setFlipped(holder.mImageView, isSelected(position));
-		}
 
-		//This "if-else" is just an example
-		if (isSelected(position)) {
-			holder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_selected));
-		} else {
-			holder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
-		}
+				//This "if-else" is just an example
+				if (isSelected(position)) {
+					vHolder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_selected));
+				} else {
+					vHolder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
+				}
 
-		//In case of searchText matches with Title or with an Item's field
-		// this will be highlighted
-		if (hasSearchText()) {
-			setHighlightText(holder.mTitle, item.getTitle(), mSearchText);
-			setHighlightText(holder.mSubtitle, item.getSubtitle(), mSearchText);
-		} else {
-			holder.mTitle.setText(item.getTitle());
-			holder.mSubtitle.setText(item.getSubtitle());
-		}
+				vHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
+
+				//In case of searchText matches with Title or with an Item's field
+				// this will be highlighted
+				if (hasSearchText()) {
+					setHighlightText(vHolder.mTitle, item.getTitle(), mSearchText);
+					setHighlightText(vHolder.mSubtitle, item.getSubtitle(), mSearchText);
+				} else {
+					vHolder.mTitle.setText(item.getTitle());
+					vHolder.mSubtitle.setText(item.getSubtitle());
+				}
+		}//end-switch
 	}
 
 	@Override
@@ -259,23 +252,16 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 
 	/**
 	 * Used for UserLearnsSelection.
-	 * Must be the base class of extension for Adapter Class.
 	 */
-	static class SimpleViewHolder extends RecyclerView.ViewHolder {
+	static class ExampleViewHolder extends FlexibleViewHolder {
 
 		ImageView mImageView;
 		TextView mTitle;
 		TextView mSubtitle;
 		ImageView mDismissIcon;
-		ExampleAdapter mAdapter;
 
-		SimpleViewHolder(View view) {
-			super(view);
-		}
-
-		SimpleViewHolder(View view, ExampleAdapter adapter) {
-			super(view);
-			mAdapter = adapter;
+		ExampleViewHolder(View view, final ExampleAdapter adapter) {
+			super(view, adapter, null);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 			mImageView = (ImageView) view.findViewById(R.id.image);
@@ -283,17 +269,10 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					mAdapter.userLearnedSelection();
+					adapter.userLearnedSelection();
 				}
 			});
 		}
-	}
-
-	private void userLearnedSelection() {
-		//TODO: Save the boolean into Settings!
-		DatabaseService.userLearnedSelection = true;
-		mItems.remove(0);
-		notifyItemRemoved(0);
 	}
 
 	/**
@@ -301,72 +280,39 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	 * Complex data labels may need more than one view per item, and
 	 * you provide access to all the views for a data item in a view holder.
 	 */
-	static final class ViewHolder extends SimpleViewHolder implements View.OnClickListener,
-			View.OnLongClickListener {
+	static final class ViewHolder extends FlexibleViewHolder {
+		ImageView mImageView;
+		TextView mTitle;
+		TextView mSubtitle;
+		Context mContext;
 
 		ViewHolder(View view, final ExampleAdapter adapter) {
-			super(view);
+			super(view, adapter, adapter.mClickListener);
+			this.mContext = adapter.mContext;
 
-			this.mAdapter = adapter;
 			this.mTitle = (TextView) view.findViewById(R.id.title);
 			this.mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 			this.mImageView = (ImageView) view.findViewById(R.id.image);
 			this.mImageView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					mAdapter.mClickListener.onListItemLongClick(getAdapterPosition());
+					mListItemClickListener.onListItemLongClick(getAdapterPosition());
 					toggleActivation();
 				}
 			});
-
-			this.itemView.setOnClickListener(this);
-			this.itemView.setOnLongClickListener(this);
 		}
 
-		/**
-		 * Perform animation and selection on the current ItemView.
-		 * <br/><br/>
-		 * <b>IMPORTANT NOTE!</b> <i>setActivated</i> changes the selection color of the item
-		 * background if you added<i>android:background="?attr/selectableItemBackground"</i>
-		 * on the row layout AND in the style.xml.
-		 * <br/><br/>
-		 * This must be called after the listener consumed the event in order to add the
-		 * item number in the selection list.<br/>
-		 * Adapter must have a reference to its instance to check selection state.
-		 * <br/><br/>
-		 * If you do this, it's not necessary to invalidate the row (with notifyItemChanged): In this way
-		 * <i>onBindViewHolder</i> is NOT called on selection and custom animations on objects are NOT interrupted,
-		 * so you can SEE the animation in the Item and have the selection smooth with ripple.
-		 */
-		private void toggleActivation() {
-			itemView.setActivated(mAdapter.isSelected(getAdapterPosition()));
+		@Override
+		protected void toggleActivation() {
+			super.toggleActivation();
 			//This "if-else" is just an example
 			if (itemView.isActivated()) {
-				mImageView.setBackgroundDrawable(mAdapter.mContext.getResources().getDrawable(R.drawable.image_round_selected));
+				mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_selected));
 			} else {
-				mImageView.setBackgroundDrawable(mAdapter.mContext.getResources().getDrawable(R.drawable.image_round_normal));
+				mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
 			}
 			//Example of custom Animation inside the ItemView
 			//flip(mImageView, itemView.isActivated());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void onClick(View view) {
-			if (mAdapter.mClickListener.onListItemClick(getAdapterPosition()))
-				toggleActivation();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean onLongClick(View view) {
-			mAdapter.mClickListener.onListItemLongClick(getAdapterPosition());
-			toggleActivation();
-			return true;
 		}
 	}
 

@@ -2,7 +2,7 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Master branch: v4.2 of 2015.12.16 - Dev branch: v5.0.0-dev
+###### A pattern for every RecyclerView - Master branch: v4.2 of 2015.12.16 - Dev branch: v5.0.0-b1
 
 ####ANNOUNCEMENT: Important changes are foreseen in v4.2.0 and in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -31,7 +31,7 @@ Finally note that, this adapter handles the basic clicks: _single_ and _long cli
 Using JCenter
 ```
 dependencies {
-	compile 'eu.davidea:flexible-adapter:5.0.0-dev'
+	compile 'eu.davidea:flexible-adapter:5.0.0-b1'
 }
 ```
 Using bintray.com
@@ -40,7 +40,7 @@ repositories {
 	maven { url "http://dl.bintray.com/davideas/maven" }
 }
 dependencies {
-	compile 'eu.davidea:flexible-adapter:5.0.0-dev@aar'
+	compile 'eu.davidea:flexible-adapter:5.0.0-b1@aar'
 }
 ```
 Or you can just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).
@@ -122,7 +122,7 @@ public void onDeleteConfirmed() {
 # Usage for FastScroller
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! First add the drawable files to the project, then the layout, finally add the implementation for the Adapter and Activity/Fragment:
 ``` java
-public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item>
+public class YourAdapterClass extends FlexibleAdapter<FlexibleViewHolder, Item>
 		implements FastScroller.BubbleTextGetter {
 	...
 	@Override
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 First, call _YourAdapterClass.setSearchText()_ in the Activity, then in _YourAdapterClass.updateDataSet()_, call _filterItems()_;
 ``` java
-public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewHolder, Item> {
+public class YourAdapterClass extends FlexibleAdapter<FlexibleViewHolder, Item> {
 	...
 	@Override
 	public void updateDataSet(String param) {
@@ -158,10 +158,11 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 ```
 
 # Change Log
-###### v5.0.0 - 2016.01.10
-- Added _enableLogs()_ to see internal logs at runtime.
+###### v5.0.0-b1 - 2016.01.03
 - Removed _FilterAsyncTask_.
 - Removed all deprecated functions from _OnUpdateListener_ that now contains only the new _onUpdateEmptyView()_ [See #17].
+- Added FlexibleViewHolder [See #14].
+- Added _enableLogs()_ to see internal logs at runtime.
 - Adapted example App accordingly.
 
 ###### v4.2.0 - 2015.12.12
