@@ -36,6 +36,7 @@ import eu.davidea.utils.Utils;
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener,
 		SearchView.OnQueryTextListener,
+		FlexibleAdapter.OnUpdateListener,
 		FlexibleAdapter.OnDeleteCompleteListener,
 		ExampleAdapter.OnItemClickListener {
 
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements
 
 		//Adapter & RecyclerView
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
+		mAdapter.enableLogs(true);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
@@ -110,23 +112,20 @@ public class MainActivity extends AppCompatActivity implements
 			public void onClick(View v) {
 				destroyActionModeIfNeeded();
 
-				for (int i = 0; i <= mAdapter.getItemCount(); i++) {
+				for (int i = 0; i <= mAdapter.getItemCount() + 1; i++) {
 					Item item = DatabaseService.newExampleItem(i);
 
 					if (!DatabaseService.getInstance().getListById(null).contains(item)) {
 						DatabaseService.getInstance().addItem(i, item);//This is the original list
 						//TODO: Use userLearnedSelection from settings
-						if (!DatabaseService.userLearnedSelection)
+						if (!DatabaseService.userLearnedSelection) {
 							i++;//Fixing exampleAdapter for new position :-)
+						}
 						mAdapter.addItem(i, item);//Adapter's list is a copy, to animate the item you must call addItem on the new position
 						Log.d(TAG, "Added New " + item.getTitle());
 
 						Toast.makeText(MainActivity.this, "Added New " + item.getTitle(), Toast.LENGTH_SHORT).show();
 						mRecyclerView.smoothScrollToPosition(i);
-
-						//EmptyView
-						updateEmptyView();
-
 						break;
 					}
 				}
@@ -134,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
 		});
 
 		//Update EmptyView (by default EmptyView is visible)
-		updateEmptyView();
+//		updateEmptyView();
 
 		//SwipeToRefresh
 		initializeSwipeToRefresh();
@@ -296,11 +295,13 @@ public class MainActivity extends AppCompatActivity implements
 	 * <b>Note:</b> The order how the 3 Views (RecyclerView, EmptyView, FastScroller)
 	 * are placed in the Layout is important!
 	 */
-	private void updateEmptyView() {
+	@Override
+	public void onUpdateEmptyView(int size) {
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
 		TextView emptyView = (TextView) findViewById(R.id.empty);
 		emptyView.setText(getString(R.string.no_items));
-		if (!mAdapter.isEmpty()) {
+		if (!DatabaseService.userLearnedSelection && size == 1) size = 0;
+		if (size > 0) {
 			fastScroller.setVisibility(View.VISIBLE);
 			emptyView.setVisibility(View.GONE);
 		} else {

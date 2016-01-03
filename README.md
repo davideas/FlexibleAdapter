@@ -2,7 +2,7 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Master branch: v4.2 of 2015.12.16 - Dev branch: v4.2
+###### A pattern for every RecyclerView - Master branch: v4.2 of 2015.12.16 - Dev branch: v5.0.0-dev
 
 ####ANNOUNCEMENT: Important changes are foreseen in v4.2.0 and in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -31,7 +31,7 @@ Finally note that, this adapter handles the basic clicks: _single_ and _long cli
 Using JCenter
 ```
 dependencies {
-	compile 'eu.davidea:flexible-adapter:4.2.0'
+	compile 'eu.davidea:flexible-adapter:5.0.0-dev'
 }
 ```
 Using bintray.com
@@ -40,7 +40,7 @@ repositories {
 	maven { url "http://dl.bintray.com/davideas/maven" }
 }
 dependencies {
-	compile 'eu.davidea:flexible-adapter:4.2.0@aar'
+	compile 'eu.davidea:flexible-adapter:5.0.0-dev@aar'
 }
 ```
 Or you can just *copy* SelectableAdapter.java & FlexibleAdapter.java in your *common* package and start to *extend* FlexibleAdapter from your custom Adapter (see my ExampleAdapter).
@@ -103,7 +103,8 @@ public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			mAdapter.removeItems(mAdapter.getSelectedItems());
 
 			//Start countdown with startUndoTimer(millisec)
-			mAdapter.startUndoTimer(7000, this); //Default 5''; where "this" is the Activity that implements OnDeleteCompleteListener.
+			//"this" is the Activity that implements OnDeleteCompleteListener.
+			mAdapter.startUndoTimer(7000, this); //Default 5''
 			mActionMode.finish();
 			return true;
 	}
@@ -157,6 +158,12 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 ```
 
 # Change Log
+###### v5.0.0 - 2016.01.10
+- Added _enableLogs()_ to see internal logs at runtime.
+- Removed _FilterAsyncTask_.
+- Removed all deprecated functions from _OnUpdateListener_ that now contains only the new _onUpdateEmptyView()_ [See #17].
+- Adapted example App accordingly.
+
 ###### v4.2.0 - 2015.12.12
 - Added _isEmpty()_.
 - Added new constructor to initialize list items [See #12].
@@ -168,15 +175,10 @@ public class YourAdapterClass extends FlexibleAdapter<ExampleAdapter.SimpleViewH
 - Removed _static_ declaration from the following methods: _hasSearchText(); getSearchText(); setSearchText(String searchText)_.
 - Adapted example App accordingly.
 
-###### v4.1.0 - 2015.11.29
-- Improved **Undo** functionality: added new callback _onDeleteConfirmed_ in OnUpdateListener. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! 
-- Improved **Filter** functionality: added new intelligent function _filterItems_. See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
-- Logs are now in verbose level.
-- Adapted example App accordingly.
-
 ###### Old releases
 See [releases](https://github.com/davideas/FlexibleAdapter/releases) for old versions.
 
+v4.1.0 - 2015.11.29 |
 v4.0.1 - 2015.11.01 | v4.0 - 2015.10.18 |
 v3.1 - 2015.08.18 | v3.0 - 2015.07.29 |
 v2.2 - 2015.07.20 | v2.1 - 2015.07.03 |

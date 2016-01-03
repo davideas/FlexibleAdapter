@@ -16,6 +16,7 @@ import java.util.List;
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
+	protected static boolean DEBUG = false;
 
 	/**
 	 * Default mode for selection
@@ -32,6 +33,16 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	public SelectableAdapter() {
 		this.selectedItems = new ArrayList<Integer>();
 		this.mode = MODE_SINGLE;
+	}
+
+	/**
+	 * Call this once to enable or disable DEBUG logs.<br/>
+	 * DEBUG logs are disabled by default.
+	 *
+	 * @param enable true to show DEBUG logs, false to hide them.
+	 */
+	public static void enableLogs(boolean enable) {
+		DEBUG = enable;
 	}
 
 	/**
@@ -115,17 +126,17 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 
 		int index = selectedItems.indexOf(position);
 		if (index != -1) {
-			Log.v(TAG, "toggleSelection removing selection on position " + position);
+			if (DEBUG) Log.v(TAG, "toggleSelection removing selection on position " + position);
 			selectedItems.remove(index);
 		} else {
-			Log.v(TAG, "toggleSelection adding selection on position " + position);
+			if (DEBUG) Log.v(TAG, "toggleSelection adding selection on position " + position);
 			selectedItems.add(position);
 		}
 		if (invalidate) {
-			Log.v(TAG, "toggleSelection notifyItemChanged on position " + position);
+			if (DEBUG) Log.v(TAG, "toggleSelection notifyItemChanged on position " + position);
 			notifyItemChanged(position);
 		}
-		Log.v(TAG, "toggleSelection current selection " + selectedItems);
+		if (DEBUG) Log.v(TAG, "toggleSelection current selection " + selectedItems);
 	}
 
 	/**
@@ -143,12 +154,12 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @param skipViewType ViewType for which we don't want selection
 	 */
 	public void selectAll(int skipViewType) {
-		Log.v(TAG, "selectAll");
+		if (DEBUG) Log.v(TAG, "selectAll");
 		selectedItems = new ArrayList<Integer>(getItemCount());
 		for (int i = 0; i < getItemCount(); i++) {
 			if (getItemViewType(i) == skipViewType) continue;
 			selectedItems.add(i);
-			Log.v(TAG, "selectAll notifyItemChanged on position " + i);
+			if (DEBUG) Log.v(TAG, "selectAll notifyItemChanged on position " + i);
 			notifyItemChanged(i);
 		}
 	}
@@ -165,7 +176,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 			//The notification is done only on items that are currently selected.
 			int i = iterator.next();
 			iterator.remove();
-			Log.v(TAG, "clearSelection notifyItemChanged on position " + i);
+			if (DEBUG) Log.v(TAG, "clearSelection notifyItemChanged on position " + i);
 			notifyItemChanged(i);
 		}
 	}

@@ -1,6 +1,5 @@
 package eu.davidea.flexibleadapter;
 
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -56,11 +55,15 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Constructor for Asynchronous loading.<br/>
 	 * Experimental: not working very well, it might be slow.
 	 *
+	 * @param items
 	 * @param listener {@link OnUpdateListener}
 	 */
-	public FlexibleAdapter(Object listener) {
-		if (listener instanceof OnUpdateListener)
-			this.mUpdateListener = (OnUpdateListener) listener;
+	public FlexibleAdapter(@NonNull List<T> items, Object listener) {
+		this(items);
+		if (listener instanceof OnUpdateListener) {
+			mUpdateListener = (OnUpdateListener) listener;
+			if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
+		}
 	}
 
 	/**
@@ -78,27 +81,6 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @param param A custom parameter to filter the type of the DataSet
 	 */
 	public abstract void updateDataSet(String param);
-
-	/**
-	 * This method execute {@link #updateDataSet(String)} asynchronously
-	 * with {@link FilterAsyncTask}.<br/><br/>
-	 * <b>Note:</b> {@link #notifyDataSetChanged()} is automatically called at the end of the process.
-	 *
-	 * @param param A custom parameter to filter the DataSet
-	 * @deprecated Not giving any added values. Use {@link #updateDataSet()} instead.
-	 */
-	@Deprecated
-	public void updateDataSetAsync(String param) {
-		//Synchronous
-		if (mUpdateListener != null) {
-			Log.w(TAG, "OnUpdateListener is not initialized. updateDataSetAsync is not using FilterAsyncTask!");
-			updateDataSet(param);
-			notifyDataSetChanged();
-			return;
-		}
-		//Asynchronous
-		new FilterAsyncTask().execute(param);
-	}
 
 	/**
 	 * Returns the custom object "Item".
@@ -148,7 +130,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		synchronized (mLock) {
 			mItems.set(position, item);
 		}
-		Log.v(TAG, "updateItem notifyItemChanged on position " + position);
+		if (DEBUG) Log.v(TAG, "updateItem notifyItemChanged on position " + position);
 		notifyItemChanged(position);
 	}
 
@@ -165,18 +147,19 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 		//Insert Item
 		if (position < mItems.size()) {
-			Log.v(TAG, "addItem notifyItemInserted on position " + position);
+			if (DEBUG) Log.v(TAG, "addItem notifyItemInserted on position " + position);
 			synchronized (mLock) {
 				mItems.add(position, item);
 			}
 		} else { //Add Item at the last position
-			Log.v(TAG, "addItem notifyItemInserted on last position");
+			if (DEBUG) Log.v(TAG, "addItem notifyItemInserted on last position");
 			synchronized (mLock) {
 				mItems.add(item);
 				position = mItems.size();
 			}
 		}
 		notifyItemInserted(position);
+		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
 	/* DELETE ITEMS METHODS */
@@ -185,7 +168,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * The item is retained in a list for an eventual Undo.
 	 *
 	 * @param position The position of item to remove
-	 * @see #startUndoTimer()
+	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
 	 * @see #restoreDeletedItems()
 	 * @see #emptyBin()
 	 */
@@ -195,11 +178,12 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			return;
 		}
 		if (position < mItems.size()) {
-			Log.v(TAG, "removeItem notifyItemRemoved on position " + position);
+			if (DEBUG) Log.v(TAG, "removeItem notifyItemRemoved on position " + position);
 			synchronized (mLock) {
 				saveDeletedItem(position, mItems.remove(position));
 			}
 			notifyItemRemoved(position);
+			if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 		} else {
 			Log.w(TAG, "removeItem WARNING! Position OutOfBound! Review the position to remove!");
 		}
@@ -209,12 +193,12 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Every item is retained in a list for an eventual Undo.
 	 *
 	 * @param selectedPositions List of item positions to remove
-	 * @see #startUndoTimer()
+	 * @see #startUndoTimer(OnDeleteCompleteListener)
 	 * @see #restoreDeletedItems()
 	 * @see #emptyBin()
 	 */
 	public void removeItems(List<Integer> selectedPositions) {
-		Log.v(TAG, "removeItems reverse Sorting positions --------------");
+		if (DEBUG) Log.v(TAG, "removeItems reverse Sorting positions --------------");
 		// Reverse-sort the list
 		Collections.sort(selectedPositions, new Comparator<Integer>() {
 			@Override
@@ -245,19 +229,20 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 					selectedPositions.remove(0);
 				}
 			}
-			Log.v(TAG, "removeItems current selection " + getSelectedItems());
+			if (DEBUG) Log.v(TAG, "removeItems current selection " + getSelectedItems());
 		}
 	}
 
 	private void removeRange(int positionStart, int itemCount) {
-		Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
+		if (DEBUG) Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
 		for (int i = 0; i < itemCount; ++i) {
 			synchronized (mLock) {
 				saveDeletedItem(positionStart, mItems.remove(positionStart));
 			}
 		}
-		Log.v(TAG, "removeRange notifyItemRangeRemoved");
+		if (DEBUG) Log.v(TAG, "removeRange notifyItemRangeRemoved");
 		notifyItemRangeRemoved(positionStart, itemCount);
+		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
 	/* UNDO METHODS */
@@ -272,7 +257,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			mDeletedItems = new ArrayList<T>();
 			mOriginalPosition = new ArrayList<Integer>();
 		}
-		Log.v(TAG, "Recycled " + getItem(position) + " on position=" + position);
+		if (DEBUG) Log.v(TAG, "Recycled " + item + " on position=" + position);
 		mDeletedItems.add(item);
 		mOriginalPosition.add(position);
 	}
@@ -297,6 +282,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		//Reverse insert (list was reverse ordered on Delete)
 		for (int i = mOriginalPosition.size() - 1; i >= 0; i--) {
 			T item = mDeletedItems.get(i);
+			Log.d(TAG, "Restoring item " + item + " on position " + mOriginalPosition.get(i));
 			//Avoid to restore(show) Items not filtered by the current filter
 			if (hasSearchText() && !filterObject(item, getSearchText()))
 				continue;
@@ -314,34 +300,6 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			mDeletedItems.clear();
 			mOriginalPosition.clear();
 		}
-	}
-
-	/**
-	 * Convenience method to start Undo timer with default timeout of 5''
-	 *
-	 * @deprecated Use {@link #startUndoTimer(OnDeleteCompleteListener)} instead.
-	 */
-	@Deprecated
-	public void startUndoTimer() {
-		startUndoTimer(0, null);
-	}
-
-	/**
-	 * Start Undo timer with custom timeout.
-	 *
-	 * @param timeout Custom timeout
-	 * @deprecated Use {@link #startUndoTimer(long, OnDeleteCompleteListener)} instead.
-	 */
-	@Deprecated
-	public void startUndoTimer(long timeout) {
-		mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
-			public boolean handleMessage(Message message) {
-				if (mUpdateListener != null) mUpdateListener.onDeleteConfirmed();
-				emptyBin();
-				return true;
-			}
-		});
-		mHandler.sendMessageDelayed(Message.obtain(mHandler), timeout > 0 ? timeout : UNDO_TIMEOUT);
 	}
 
 	/**
@@ -473,49 +431,11 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		return false;
 	}
 
-	@Deprecated
-	public class FilterAsyncTask extends AsyncTask<String, Void, Void> {
-
-		//private final String TAG = FilterAsyncTask.class.getSimpleName();
-
-		@Override
-		protected Void doInBackground(String... params) {
-			//Log.v(TAG, "doInBackground - started FilterAsyncTask!");
-			updateDataSet(params[0]);
-			//Log.v(TAG, "doInBackground - ended FilterAsyncTask!");
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			mUpdateListener.onLoadComplete();
-			notifyDataSetChanged();
-		}
-	}
-
-
-	@Deprecated
 	public interface OnUpdateListener {
-		/**
-		 * Called when Async load is completed.
-		 */
-		@Deprecated
-		void onLoadComplete();
-
-		/**
-		 * Due to Java Generic, it's too complicated and not
-		 * well manageable if we pass the List&lt;T&gt; object.<br/>
-		 * To get deleted items, use {@link #getDeletedItems()} from the
-		 * implementation of this method.
-		 */
-		@Deprecated
-		void onDeleteConfirmed();
-
 		/**
 		 * Called at startup and every time an item is inserted or removed.
 		 */
-		//void onUpdateEmptyView();
+		void onUpdateEmptyView(int size);
 	}
 
 	public interface OnDeleteCompleteListener {

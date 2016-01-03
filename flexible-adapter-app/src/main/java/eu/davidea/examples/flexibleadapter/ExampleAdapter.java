@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.examples.fastscroller.FastScroller;
@@ -58,10 +59,10 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			mSelectAll = false;
 
 	public ExampleAdapter(Object activity, String listId) {
-		super(DatabaseService.getInstance().getListById(listId));
+		super(DatabaseService.getInstance().getListById(listId), activity);
 		this.mContext = (Context) activity;
 		this.mClickListener = (OnItemClickListener) activity;
-		addUserLearnedSelection();
+		if (!isEmpty()) addUserLearnedSelection();
 	}
 
 	private void addUserLearnedSelection() {
@@ -71,7 +72,15 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 			item.setId(0);
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			this.mItems.set(0, item);
+			mItems.add(0, item);
+		}
+	}
+
+	private void removeUserLearnedSelection() {
+		Log.d(TAG, "removed UserLearnedSelection isEmpty=" + isEmpty());
+		if (!DatabaseService.userLearnedSelection && isEmpty()) {
+			mItems.remove(0);
+			notifyItemRemoved(0);
 		}
 	}
 
@@ -85,12 +94,15 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 		//Refresh the original content
 		mItems = DatabaseService.getInstance().getListById(param);
 
-		addUserLearnedSelection();
+		if (!super.isEmpty()) addUserLearnedSelection();
 
 		//Fill and Filter mItems with your custom list
 		//Note: In case of userLearnSelection mItems is pre-initialized and after filtered.
 		filterItems(mItems);
 		notifyDataSetChanged();
+
+		//Update Empty View
+		mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
 	@Override
@@ -103,6 +115,26 @@ public class ExampleAdapter extends FlexibleAdapter<ExampleAdapter.SimpleViewHol
 	public void selectAll() {
 		mSelectAll = true;
 		super.selectAll(EXAMPLE_VIEW_TYPE);
+	}
+
+	@Override
+	public void addItem(int position, Item item) {
+		if (isEmpty()) {
+			addUserLearnedSelection();
+			notifyItemInserted(0);
+		}
+		super.addItem(position, item);
+	}
+
+	@Override
+	public void removeItems(List<Integer> selectedPositions) {
+		super.removeItems(selectedPositions);
+		removeUserLearnedSelection();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return !DatabaseService.userLearnedSelection && mItems.size() == 1 || super.isEmpty();
 	}
 
 	@Override
