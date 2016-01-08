@@ -49,6 +49,33 @@ Remember to call `super(items)` or to initialize `mItems` (List already included
 #### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!
 
+# Usage for listen click events
+``` java
+public class MainActivity extends AppCompatActivity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		...
+                mRecyclerView = (RecyclerView)findViewById(R.id.recyclerview);
+		mAdapter = new ExampleAdapter(..., ..., ...);
+		mAdapter.setOnClickItemListener(mRecyclerView, new ExampleAdapter.OnClickItemListener(){
+				@Override
+				public void onClicked(Object dataItem, int position, View view)
+				{
+					Toast.makeText(MainActivity.this,"onClickItem",0).show();
+				}
+		});    
+                mAdapter.setOnLongClickItemListener(mRecyclerView, new ExampleAdapter.OnLongClickItemListener(){
+				@Override
+				public boolean onLongClicked(Object dataItem, int position, View view)
+				{
+					Toast.makeText(MainActivity.this,"onLongClickItem",0).show();
+					return true;
+				}
+		});		...
+	}
+
+}
+```
 # Usage for Single Selection
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In your Activity/Fragment creation set the Mode SINGLE.
 In onListItemClick, call *toggleSeletion* to register the selection on that position:
