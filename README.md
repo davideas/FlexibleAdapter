@@ -56,15 +56,14 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		...
                 mRecyclerView = (RecyclerView)findViewById(R.id.recyclerview);
-		mAdapter = new YourAdapterClass(..., ..., ...);
+		mAdapter = new ExampleAdapter(..., ..., ...);
 		mAdapter.setOnClickItemListener(mRecyclerView, new ExampleAdapter.OnClickItemListener(){
 				@Override
 				public void onClicked(Object dataItem, int position, View view)
 				{
 					Toast.makeText(MainActivity.this,"onClickItem",0).show();
 				}
-		});                
-mAdapter.setOnLongClickItemListener(mRecyclerView, new ExampleAdapter.OnLongClickItemListener(){
+		});                    mAdapter.setOnLongClickItemListener(mRecyclerView, new ExampleAdapter.OnLongClickItemListener(){
 				@Override
 				public boolean onLongClicked(Object dataItem, int position, View view)
 				{
