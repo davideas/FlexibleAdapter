@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -37,6 +38,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Any write operation performed on the list items should be synchronized on this lock.
 	 */
 	private final Object mLock = new Object();
+	private OnClickItemListener mOnItemClickListener;
+	private OnLongClickItemListener mOnItemLongClickListener;
+	private RecyclerView mRecyclerView;
 
 	protected List<T> mItems;
 	protected List<T> mDeletedItems;
@@ -62,6 +66,104 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		if (listener instanceof OnUpdateListener)
 			this.mUpdateListener = (OnUpdateListener) listener;
 	}
+	
+	/**
+	 * Callback method to be invoked when an item in the RecyclerView
+	 * has been clicked.
+	 *
+	 * @param dataItem (T) The model in item 
+	 * @param position The position of the view in the list
+	 * @param view The view within the RecyclerView that was clicked and held
+	 */
+	public interface OnClickItemListener {
+
+        void onClicked(Object dataItem, int position, View view);
+    }
+
+	/**
+	 * Callback method to be invoked when an item in the RecyclerView
+	 * has been clicked and held.
+	 *
+	 * @param dataItem (T) The model in item 
+	 * @param position The position of the view in the list
+	 * @param view The view within the RecyclerView that was clicked and held
+	 *
+	 * @return true if the callback consumed the long click, false otherwise
+	 */
+    public interface OnLongClickItemListener {
+
+        boolean onLongClicked(Object dataItem, int position, View view);
+    }
+
+	/**
+     * Register a callback to be invoked when an item in the
+     * RecyclerView has been clicked.
+     *
+	 * @param recyclerView RecyclerView object to add an OnClickItemListener
+     * @param listener The callback that will be invoked.
+     */
+	public void setOnClickItemListener(RecyclerView recyclerView, OnClickItemListener listener) {
+        mOnItemClickListener = listener;
+		if(mRecyclerView == null){
+			mRecyclerView = recyclerView;
+			mRecyclerView.setTag(R.id.item_click_support, this);
+			mRecyclerView.addOnChildAttachStateChangeListener(mAttachListener);
+		}
+    }
+
+	/**
+     * Register a callback to be invoked when an item in the
+     * RecyclerView has been long clicked.
+     *
+	 * @param recyclerView RecyclerView object to add an OnClickItemListener
+     * @param listener The callback that will be invoked.
+     */
+    public void setOnLongClickItemListener(RecyclerView recyclerView, OnLongClickItemListener listener) {
+        mOnItemLongClickListener = listener;
+		if(mRecyclerView == null){
+			mRecyclerView = recyclerView;
+			mRecyclerView.setTag(R.id.item_click_support, this);
+			mRecyclerView.addOnChildAttachStateChangeListener(mAttachListener);
+		}
+    }
+
+	/**
+	 * ReciclerView.OnChildAttachStateChangeListener to listen changes
+	 */
+	private RecyclerView.OnChildAttachStateChangeListener mAttachListener = new RecyclerView.OnChildAttachStateChangeListener() {
+        @Override
+        public void onChildViewAttachedToWindow(View view) {
+            if (mOnItemClickListener != null) {
+                view.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View view) {
+							if (mOnItemClickListener != null) {
+								RecyclerView.ViewHolder holder = mRecyclerView.getChildViewHolder(view);
+								mOnItemClickListener.onClicked(getItem(holder.getAdapterPosition()), holder.getAdapterPosition(), view);
+							}
+						}
+					});
+            }
+
+            if (mOnItemLongClickListener != null) {
+                view.setOnLongClickListener(new View.OnLongClickListener() {
+						@Override
+						public boolean onLongClick(View view) {
+							if (mOnItemLongClickListener != null) {
+								RecyclerView.ViewHolder holder = mRecyclerView.getChildViewHolder(view);
+								return mOnItemLongClickListener.onLongClicked(getItem(holder.getAdapterPosition()), holder.getAdapterPosition(), view);
+							}
+							return false;
+						}
+					});
+            }
+        }
+
+        @Override
+        public void onChildViewDetachedFromWindow(View view) {
+
+        }
+    };
 
 	/**
 	 * Convenience method to call {@link #updateDataSet(String)} with {@link null} as param.
