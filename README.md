@@ -63,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
 				{
 					Toast.makeText(MainActivity.this,"onClickItem",0).show();
 				}
-		});                    mAdapter.setOnLongClickItemListener(mRecyclerView, new ExampleAdapter.OnLongClickItemListener(){
+		});    
+                mAdapter.setOnLongClickItemListener(mRecyclerView, new ExampleAdapter.OnLongClickItemListener(){
 				@Override
 				public boolean onLongClicked(Object dataItem, int position, View view)
 				{
