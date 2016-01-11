@@ -18,9 +18,6 @@ import java.util.Locale;
  * This class provides a set of standard methods to handle changes on the data set
  * such as adding, removing, moving an item.
  * <p/>
- * Remember to call {@link RecyclerView#scheduleLayoutAnimation()} after adding or
- * removing an item from the Adapter when the activity is paused.
- * <p/>
  * <strong>VH</strong> is your implementation of {@link RecyclerView.ViewHolder}.
  * <strong>T</strong> is your domain object containing the data.
  *
@@ -66,6 +63,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			mUpdateListener.onUpdateEmptyView(mItems.size());
 		}
 	}
+
+	/* MAIN METHODS */
 
 	/**
 	 * Convenience method to call {@link #updateDataSet(String)} with {@link null} as param.
@@ -341,6 +340,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 	}
 
+	/* FILTER METHODS */
+
 	public boolean hasSearchText() {
 		return mSearchText != null && mSearchText.length() > 0;
 	}
@@ -403,11 +404,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
-	 * <p/>
+	 * This method performs filtering on the provided object and returns true, if the object
+	 * should be in the filtered collection, or false if it shouldn't.
 	 * <br/><br/>
-	 * Performs filtering on the provided object and returns true, if the object should be in the filtered collection,
-	 * or false if it shouldn't.
+	 * DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
 	 *
 	 * @param myObject   The object to be inspected
 	 * @param constraint Constraint, that the object has to fulfil
@@ -432,6 +432,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		//No match, so don't add to collection
 		return false;
 	}
+
+	/* INNER INTERFACES */
 
 	public interface OnUpdateListener {
 		/**

@@ -19,8 +19,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 /**
- * Class that creates animation on Items when RecyclerView is firstly loaded. Bounded items are
- * animated initially and also when user starts to scroll the list.<br/>
+ * This Class is responsible to animate items when RecyclerView is firstly loaded. Bounded items
+ * are animated initially and also when user starts to scroll the list.<br/>
  * Animations can be customized for each items applying different logic based on item position and
  * beyond.
  * <p/>
@@ -33,7 +33,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	private RecyclerView mRecyclerView;
 	private Interpolator mInterpolator = new LinearInterpolator();
 
-	//Allows to remember the last item shown on screen
+	//Allows to remember the last animated item on screen
 	private int mLastAnimatedPosition = -1;
 
 	//Contains type of animators already added
@@ -54,7 +54,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 * Simple Constructor for Animator Adapter.<br/>
 	 *
 	 * @param items        Items to display
-	 * @param recyclerView NonNull RV Necessary to calculate the size of the ItemView on particular Animators
+	 * @param recyclerView NonNull RV necessary to calculate the size of the ItemView on particular Animators
 	 */
 	public FlexibleAnimatorAdapter(@NonNull List<T> items, @NonNull RecyclerView recyclerView) {
 		this(items, null, recyclerView);
@@ -65,7 +65,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 *
 	 * @param items        Items to display
 	 * @param listener     Must be an instance of {@link OnUpdateListener}
-	 * @param recyclerView NonNull RV Necessary to calculate the size of the ItemView on particular Animators
+	 * @param recyclerView NonNull RV necessary to calculate the size of the ItemView on particular Animators
 	 */
 	public FlexibleAnimatorAdapter(@NonNull List<T> items, Object listener, @NonNull RecyclerView recyclerView) {
 		super(items, listener);
@@ -76,11 +76,15 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 	/**
 	 * Build your custom list of {@link Animator} to apply on the ItemView.<br/>
-	 * Write the logic based on the position and/or the item selection.<br/><br/>
-	 * <b>Suggestion: </b>You can also use {@link #getItemViewType(int)} to apply
+	 * Write the logic based on the position and/or viewType and/or the item selection.<br/><br/>
+	 * <b>Suggestions: </b>
+	 * <br/>- A simple boolean for <i>isSelected</i> is preferable instead of {@link #isSelected(int)}
+	 * <br/>- You can also use {@link #getItemViewType(int)} to apply
 	 * different Animation for each view type.
+	 * <br/>- If you want to apply same animation for all items, create new list at class level
+	 * and initialize it in the constructor, not inside this method!
 	 *
-	 * @param itemView   The bound ItemView
+	 * @param itemView   The bounded ItemView
 	 * @param position   Position can be used to differentiate the list of Animators
 	 * @param isSelected boolean to be used to differentiate the list of Animators
 	 * @return The list of animators to animate all together.
@@ -91,8 +95,6 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 	/**
 	 * Animate the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
-	 *
-	 * @see #getAnimators(View, int, boolean)
 	 */
 	protected final void animateView(View itemView, int position, boolean isSelected) {
 		if (shouldAnimate && (!isBackwardEnabled || position > mLastAnimatedPosition)) {

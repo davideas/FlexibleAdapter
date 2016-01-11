@@ -45,6 +45,8 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		DEBUG = enable;
 	}
 
+	/* MAIN METHODS */
+
 	/**
 	 * Set the mode of the selection, MODE_SINGLE is the default:
 	 * <ul>
