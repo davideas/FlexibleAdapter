@@ -44,25 +44,26 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	protected Handler mHandler;
 	protected OnUpdateListener mUpdateListener;
 
-	public FlexibleAdapter() {
-	}
-
+	/**
+	 * Simple Constructor.
+	 *
+	 * @param items Items to display.
+	 */
 	public FlexibleAdapter(@NonNull List<T> items) {
-		mItems = items;
+		this(items, null);
 	}
 
 	/**
-	 * Constructor for Asynchronous loading.<br/>
-	 * Experimental: not working very well, it might be slow.
+	 * Main Constructor.
 	 *
-	 * @param items
-	 * @param listener {@link OnUpdateListener}
+	 * @param items    Items to display
+	 * @param listener Must be an instance of {@link OnUpdateListener}
 	 */
 	public FlexibleAdapter(@NonNull List<T> items, Object listener) {
-		this(items);
+		mItems = items;
 		if (listener instanceof OnUpdateListener) {
 			mUpdateListener = (OnUpdateListener) listener;
-			if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
+			mUpdateListener.onUpdateEmptyView(mItems.size());
 		}
 	}
 
@@ -234,7 +235,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	private void removeRange(int positionStart, int itemCount) {
-		if (DEBUG) Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
+		if (DEBUG)
+			Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
 		for (int i = 0; i < itemCount; ++i) {
 			synchronized (mLock) {
 				saveDeletedItem(positionStart, mItems.remove(positionStart));

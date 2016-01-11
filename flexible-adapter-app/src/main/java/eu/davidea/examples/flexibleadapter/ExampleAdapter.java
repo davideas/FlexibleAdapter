@@ -1,7 +1,9 @@
 package eu.davidea.examples.flexibleadapter;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
@@ -13,17 +15,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.examples.fastscroller.FastScroller;
-import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.FlexibleAnimatorAdapter;
 import eu.davidea.flexibleadapter.FlexibleViewHolder;
 import eu.davidea.flexibleadapter.FlexibleViewHolder.OnListItemClickListener;
 import eu.davidea.utils.Utils;
 
 
-public class ExampleAdapter extends FlexibleAdapter<FlexibleViewHolder, Item>
+public class ExampleAdapter extends FlexibleAnimatorAdapter<FlexibleViewHolder, Item>
 		implements FastScroller.BubbleTextGetter {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
@@ -35,16 +38,18 @@ public class ExampleAdapter extends FlexibleAdapter<FlexibleViewHolder, Item>
 
 	private LayoutInflater mInflater;
 	private OnListItemClickListener mClickListener;
+	private RecyclerView mRecyclerView;
 
 	//Selection fields
 	private boolean
 			mLastItemInActionMode = false,
 			mSelectAll = false;
 
-	public ExampleAdapter(Object activity, String listId) {
-		super(DatabaseService.getInstance().getListById(listId), activity);
+	public ExampleAdapter(Object activity, String listId, RecyclerView recyclerView) {
+		super(DatabaseService.getInstance().getListById(listId), activity, recyclerView);
 		this.mContext = (Context) activity;
 		this.mClickListener = (OnListItemClickListener) activity;
+		this.mRecyclerView = recyclerView;
 		if (!isEmpty()) addUserLearnedSelection();
 	}
 
@@ -164,6 +169,7 @@ public class ExampleAdapter extends FlexibleAdapter<FlexibleViewHolder, Item>
 				sHolder.mTitle.setSelected(true);//For marquee
 				sHolder.mTitle.setText(Html.fromHtml(item.getTitle()));
 				sHolder.mSubtitle.setText(Html.fromHtml(item.getSubtitle()));
+				animateView(holder.itemView, position, false);
 				return;
 
 			default:
@@ -190,8 +196,10 @@ public class ExampleAdapter extends FlexibleAdapter<FlexibleViewHolder, Item>
 				//This "if-else" is just an example
 				if (isSelected(position)) {
 					vHolder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_selected));
+					animateView(holder.itemView, position, true);
 				} else {
 					vHolder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
+					animateView(holder.itemView, position, false);
 				}
 
 				vHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
@@ -206,6 +214,34 @@ public class ExampleAdapter extends FlexibleAdapter<FlexibleViewHolder, Item>
 					vHolder.mSubtitle.setText(item.getSubtitle());
 				}
 		}//end-switch
+	}
+
+	@Override
+	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
+		List<Animator> animators = new ArrayList<Animator>();
+		//Alpha Animator is needed (it will be added automatically if not here)
+		addAlphaAnimator(animators, itemView, 0);
+
+		//LinearLayout
+		switch (getItemViewType(position)) {
+			case EXAMPLE_VIEW_TYPE:
+				addScaleInAnimator(animators, itemView, 0.0f);
+				break;
+			default:
+				if (isSelected)
+					addSlideInFromRightAnimator(animators, itemView, 0.5f);
+				else
+					addSlideInFromLeftAnimator(animators, itemView, 0.5f);
+				break;
+		}
+
+		//GridLayout
+//		if (position % 2 != 0)
+//			addSlideInFromRightAnimator(animators, view, 0.5f);
+//		else
+//			addSlideInFromLeftAnimator(animators, view, 0.5f);
+
+		return animators;
 	}
 
 	@Override

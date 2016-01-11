@@ -91,11 +91,13 @@ public class MainActivity extends AppCompatActivity implements
 		Log.d(TAG, "onCreate");
 
 		//Adapter & RecyclerView
-		mAdapter = new ExampleAdapter(this, "example parameter for List1");
-		mAdapter.enableLogs(true);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+		mAdapter = new ExampleAdapter(this, "example parameter for List1", mRecyclerView);
+		mAdapter.enableLogs(true);
+		mAdapter.setAnimationBackward(false);
 		mRecyclerView.setAdapter(mAdapter);
+		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+		//mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
 		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(

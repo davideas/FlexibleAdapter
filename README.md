@@ -2,22 +2,25 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Master branch: v4.2 of 2015.12.16 - Dev branch: v5.0.0-b1
+###### A pattern for every RecyclerView - Master branch: v4.2 of 2015.12.16 - Dev branch: v5.0.0-b2
 
 ####ANNOUNCEMENT: Important changes are foreseen in v4.2.0 and in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
 #### Main functionalities
-* Base item selection (but also SINGLE & MULTI selection mode) in the Recycler View with ripple effect.
-* Undo the deleted items with custom animations.
+* Base item selection with ripple effect.
+* SINGLE & MULTI selection mode, **NEW** now with FlexibleViewHolder.
+* Restore deleted items (undo delete).
 * Customizable FastScroller (imported library, see change log for details).
-* SearchFilter with string selection in Item titles and subtitles.
+* SearchFilter with string selection in Item titles and any subtext.
+* Add and Remove items with custom animations.
+* **NEW!** Initial item animations with custom configuration based on adapter position.
 
 #### How is made
 The base functionality is taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
 
 * At lower class there is SelectableAdapter that provides selection functionalities and it's able to _maintain the state_ after the rotation, you just need to call the onSave/onRestore methods from the Activity!
-* Then, the class FlexibleAdapter handles the content paying attention at the animations (calling notify only for the position. _Note:_ you still need to set your animation to the RecyclerView when you create it in the Activity).
-* Then you need to extend over again this class. Here you add and implement methods as you wish for your own ViewHolder and your Domain/Model class (data holder).
+* Then, the class FlexibleAdapter handles the content paying attention at the adding and removal item animations (calling notify only for the position).
+* Then you need to extend over again this class. Here you can add and implement methods as you wish for your own ViewHolder and your Domain/Model class (data holder).
 
 I've put the Set click listeners at the creation and not in the Binding method, because onBindViewHolder is called at each invalidate (each notify..() methods).
 
@@ -156,11 +159,37 @@ public class YourAdapterClass extends FlexibleAdapter<FlexibleViewHolder, Item> 
 	}
 }
 ```
+# Usage for initial item animations
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
+Implement your custom logic based on position with getAnimators(); Call animateView() at the end of onBindViewHolder();
+``` java
+public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder, Item> {
+	...
+	@Override
+    public void onBindViewHolder(FlexibleViewHolder holder, final int position) {
+    	//Bind the ViewHolder as usual
+    	...
+    	//Then call animateView which internally calls getAnimators()
+    	animateView(holder.itemView, position, true/false);
+    }
+
+	@Override
+    public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
+    	List<Animator> animators = new ArrayList<Animator>();
+    	//Implement your custom logic based on position and isSelected
+    	//Use predefined animators or create new custom animators, add them to the local list
+    }
+}
+```
 
 # Change Log
+###### v5.0.0-b2 - 2016.01.11
+- Easy initial item animation based on adapter position [See #15].
+- Adapted example App accordingly, working good with LinearLayoutManager, not well yet with GridLayoutManager.
+
 ###### v5.0.0-b1 - 2016.01.03
-- Removed _FilterAsyncTask_.
-- Removed all deprecated functions from _OnUpdateListener_ that now contains only the new _onUpdateEmptyView()_ [See #17].
+- Removed _FilterAsyncTask_ and all deprecated functions from _OnUpdateListener_ [See #18].
+- _OnUpdateListener_ now contains only the new _onUpdateEmptyView()_ [See #17].
 - Added FlexibleViewHolder [See #14].
 - Added _enableLogs()_ to see internal logs at runtime.
 - Adapted example App accordingly.

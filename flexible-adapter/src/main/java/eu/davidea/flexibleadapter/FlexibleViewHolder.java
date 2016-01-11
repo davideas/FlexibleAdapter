@@ -51,7 +51,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * <br/><br/>
 	 * <b>IMPORTANT NOTE!</b> <i>setActivated</i> changes the selection color of the item
 	 * background if you added<i>android:background="?attr/selectableItemBackground"</i>
-	 * on the row layout AND in the style.xml.
+	 * on the item layout AND in the style.xml.
 	 * <br/><br/>
 	 * This must be called after the listener consumed the event in order to add the
 	 * item number in the selection list.<br/>
@@ -67,18 +67,18 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 
 	public interface OnListItemClickListener {
 		/**
-		 * Delegate the click event to the listener and check if selection MULTI enabled.<br/>
+		 * Delegate the click event to the listener and check if selection MULTI is enabled.<br/>
 		 * If yes, call toggleActivation.
 		 *
-		 * @param position
-		 * @return true if MULTI selection is enabled, false for SINGLE selection
+		 * @param position Adapter position
+		 * @return true if MULTI selection is enabled, false for SINGLE selection and all others cases.
 		 */
 		boolean onListItemClick(int position);
 
 		/**
 		 * This always calls toggleActivation after listener event is consumed.
 		 *
-		 * @param position
+		 * @param position Adapter position
 		 */
 		void onListItemLongClick(int position);
 	}
