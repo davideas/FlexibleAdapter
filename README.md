@@ -185,7 +185,8 @@ public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder
 # Change Log
 ###### v5.0.0-b2 - 2016.01.11
 - Easy initial item animation based on adapter position [See #15].
-- Adapted example App accordingly, working good with LinearLayoutManager, not well yet with GridLayoutManager.
+- Adapted example App accordingly
+- Added support for Grid Layout
 
 ###### v5.0.0-b1 - 2016.01.03
 - Removed _FilterAsyncTask_ and all deprecated functions from _OnUpdateListener_ [See #18].

@@ -114,6 +114,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		Animator animator = mAnimators.get(hashCode);
 		if (animator != null) {
 			animator.end();
+			//TODO: Clear animators
 			mAnimators.remove(hashCode);
 		}
 	}
@@ -122,8 +123,11 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 * Animate the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
 	 */
 	protected final void animateView(final View itemView, int position, boolean isSelected) {
+		//TODO: Skip animation on fast scrolling
+		//TODO: Skip animation on select all
+		//TODO: Skip animation on clear selection
 		if (shouldAnimate && (!isReverseEnabled || position > mLastAnimatedPosition)) {
-			//Necessary if fastScrolling
+			//Necessary if fling
 			cancelExistingAnimation(itemView);
 
 			ViewCompat.setAlpha(itemView, 0);
