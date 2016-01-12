@@ -33,7 +33,7 @@
 		android:visibility="gone"
 		tools:visibility="visible"/>
 
-	<include layout="@layout/progress_bar"/>
+	<!--<include layout="@layout/progress_bar"/>-->
 
 	<android.support.design.widget.FloatingActionButton
 		android:id="@+id/fab"

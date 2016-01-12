@@ -12,6 +12,7 @@
 	<dimen name="icon_touchable_component_mini">40dp</dimen>
 	<dimen name="fab_margin">16dp</dimen>
 	<dimen name="butterbar_height">3dp</dimen>
+	<dimen name="toolbar_height">56dp</dimen>
 
 	<dimen name="dialog_padding_vertical">24dp</dimen>
 	<dimen name="dialog_padding_horizontal">24dp</dimen>

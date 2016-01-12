@@ -45,5 +45,7 @@ limitations under the License.
 ]]></string>
 	<string name="action_search">Search...</string>
 	<string name="undo">Undo</string>
+	<string name="linear_layout">Linear Layout</string>
+	<string name="grid_layout">Grid Layout</string>
 
 </resources>

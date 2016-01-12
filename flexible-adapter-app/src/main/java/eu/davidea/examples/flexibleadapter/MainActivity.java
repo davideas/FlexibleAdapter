@@ -14,9 +14,11 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements
 	private static final int INVALID_POSITION = -1;
 	private int mActivatedPosition = INVALID_POSITION;
 
+	private Toolbar mToolbar;
 	/**
 	 * RecyclerView and related objects
 	 */
@@ -92,12 +95,11 @@ public class MainActivity extends AppCompatActivity implements
 
 		//Adapter & RecyclerView
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mAdapter = new ExampleAdapter(this, "example parameter for List1", mRecyclerView);
 		mAdapter.enableLogs(true);
-		mAdapter.setAnimationBackward(false);
+		mAdapter.setAnimationReverse(false);
 		mRecyclerView.setAdapter(mAdapter);
-		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-		//mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
 		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
@@ -167,7 +169,6 @@ public class MainActivity extends AppCompatActivity implements
 			@Override
 			public void onRefresh() {
 				mAdapter.updateDataSet();
-//				mAdapter.updateDataSetAsync("example parameter for List1");
 				mSwipeRefreshLayout.setEnabled(false);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 2000L);
 			}
@@ -287,6 +288,16 @@ public class MainActivity extends AppCompatActivity implements
 							Utils.getVersionCode(this)))
 					.show(getFragmentManager(), MessageDialog.TAG);
 			return true;
+		} else if (id == R.id.action_list_type) {
+			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+				mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+				item.setIcon(R.drawable.ic_view_grid_white_24dp);
+				item.setTitle(R.string.grid_layout);
+			} else {
+				mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+				item.setIcon(R.drawable.ic_view_agenda_white_24dp);
+				item.setTitle(R.string.linear_layout);
+			}
 		}
 
 		return super.onOptionsItemSelected(item);

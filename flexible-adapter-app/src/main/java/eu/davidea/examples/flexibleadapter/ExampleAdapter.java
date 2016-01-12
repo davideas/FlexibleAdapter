@@ -3,6 +3,7 @@ package eu.davidea.examples.flexibleadapter;
 import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spannable;
@@ -222,24 +223,28 @@ public class ExampleAdapter extends FlexibleAnimatorAdapter<FlexibleViewHolder, 
 		//Alpha Animator is needed (it will be added automatically if not here)
 		addAlphaAnimator(animators, itemView, 0);
 
-		//LinearLayout
-		switch (getItemViewType(position)) {
-			case EXAMPLE_VIEW_TYPE:
-				addScaleInAnimator(animators, itemView, 0.0f);
-				break;
-			default:
-				if (isSelected)
-					addSlideInFromRightAnimator(animators, itemView, 0.5f);
-				else
-					addSlideInFromLeftAnimator(animators, itemView, 0.5f);
-				break;
-		}
-
 		//GridLayout
-//		if (position % 2 != 0)
-//			addSlideInFromRightAnimator(animators, view, 0.5f);
-//		else
-//			addSlideInFromLeftAnimator(animators, view, 0.5f);
+		if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+
+			if (position % 2 != 0)
+				addSlideInFromRightAnimator(animators, itemView, 0.5f);
+			else
+				addSlideInFromLeftAnimator(animators, itemView, 0.5f);
+
+		//LinearLayout
+		} else {
+			switch (getItemViewType(position)) {
+				case EXAMPLE_VIEW_TYPE:
+					addScaleInAnimator(animators, itemView, 0.0f);
+					break;
+				default:
+					if (isSelected)
+						addSlideInFromRightAnimator(animators, itemView, 0.5f);
+					else
+						addSlideInFromLeftAnimator(animators, itemView, 0.5f);
+					break;
+			}
+		}
 
 		return animators;
 	}
