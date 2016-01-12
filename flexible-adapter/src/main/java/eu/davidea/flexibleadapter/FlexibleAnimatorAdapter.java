@@ -11,6 +11,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -33,13 +34,24 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	private RecyclerView mRecyclerView;
 	private Interpolator mInterpolator = new LinearInterpolator();
 
-	//Allows to remember the last animated item on screen
+	/**
+	 * The active Animators. Keys are hashcodes of the Views that are animated.
+	 */
+	@NonNull
+	private final SparseArray<Animator> mAnimators = new SparseArray<>();
+
+	/** The position of the item that is the first that was animated. */
+	private int mFirstAnimatedPosition = -1;
+
+	/** The position of the last item that was animated. */
 	private int mLastAnimatedPosition = -1;
 
-	//Contains type of animators already added
+	private int mLastVisibleItems = -1;
+
+	/** Contains type of animators already added */
 	private EnumSet<AnimatorEnum> animatorsUsed = EnumSet.noneOf(AnimatorEnum.class);
 
-	private boolean isBackwardEnabled = true,
+	private boolean isReverseEnabled = true,
 			shouldAnimate = true;
 
 	private long mInitialDelay = 0L,
@@ -94,10 +106,28 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	public abstract List<Animator> getAnimators(View itemView, int position, boolean isSelected);
 
 	/**
+	 * Cancels any existing animations for given View.
+	 */
+	private void cancelExistingAnimation(@NonNull final View itemView) {
+		int hashCode = itemView.hashCode();
+		Log.d(TAG, mAnimators.size() + " animators running");
+		Animator animator = mAnimators.get(hashCode);
+		if (animator != null) {
+			animator.end();
+			mAnimators.remove(hashCode);
+		}
+	}
+
+	/**
 	 * Animate the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
 	 */
-	protected final void animateView(View itemView, int position, boolean isSelected) {
-		if (shouldAnimate && (!isBackwardEnabled || position > mLastAnimatedPosition)) {
+	protected final void animateView(final View itemView, int position, boolean isSelected) {
+		if (shouldAnimate && (!isReverseEnabled || position > mLastAnimatedPosition)) {
+			//Necessary if fastScrolling
+			cancelExistingAnimation(itemView);
+
+			ViewCompat.setAlpha(itemView, 0);
+
 			//Retrieve user animators
 			List<Animator> animators = getAnimators(itemView, position, isSelected);
 
@@ -105,41 +135,89 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			if (!animatorsUsed.contains(AnimatorEnum.ALPHA))
 				addAlphaAnimator(animators, itemView, 0f);
 
-			if (DEBUG) {
-				Log.d(TAG, "Start Animation on position " + position + " delay=" + mInitialDelay);
-				Log.d(TAG, "Animators to playTogether " + animatorsUsed);
-			}
+			if (DEBUG) Log.d(TAG, "Start Animation on position " + position + " Animators=" + animatorsUsed);
 			animatorsUsed.clear();
 
 			//Execute the animations all together
-			ViewCompat.setAlpha(itemView, 0);
 			AnimatorSet set = new AnimatorSet();
 			set.playTogether(animators);
-			set.setStartDelay(mInitialDelay += mStepDelay);
+			set.setStartDelay(calculateAnimationDelay(position));
+			//getVisibleItems(position);
+			//set.setStartDelay(mInitialDelay += mStepDelay);
 			set.setInterpolator(mInterpolator);
 			set.setDuration(mDuration);
 			set.start();
-			mLastAnimatedPosition = position;
+			mAnimators.put(itemView.hashCode(), set);
 		}
 
-		//Stop stepDelay when screen is filled
-		if (position > getVisibleItems()) {
-			if (DEBUG) Log.d(TAG, "Reset AnimationDelay on position " + position);
-			mInitialDelay = mStepDelay = 0L;
-		}
+		mLastAnimatedPosition = position;
 	}
 
-	private int getVisibleItems() {
+	private void getVisibleItems(int position) {
+
 		int lastVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
 		int firstVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+		if (mLastAnimatedPosition > lastVisiblePosition) lastVisiblePosition = mLastAnimatedPosition;
+		int visibleItems = lastVisiblePosition - firstVisiblePosition;
+
+		Log.d(TAG, "Position=" + position +
+				" FirstVisible=" + firstVisiblePosition +
+				" LastVisible=" + lastVisiblePosition +
+				" LastAnimated=" + mLastAnimatedPosition +
+				" VisibleItems=" + visibleItems +
+				" childCount=" + mRecyclerView.getChildCount());
+
+		//Stop stepDelay when screen is filled
+		if (mLastVisibleItems >= visibleItems ||
+				(firstVisiblePosition > 1 && firstVisiblePosition <= mRecyclerView.getChildCount()) ) {
+			if (DEBUG) Log.d(TAG, "Reset AnimationDelay on position " + position);
+			mInitialDelay = 0L;
+		}
+
+		mLastVisibleItems = visibleItems;
+	}
+
+	/**
+	 * Returns the delay in milliseconds after which, the animation for next ItemView should start.
+	 */
+	private long calculateAnimationDelay(final int position) {
+		long delay;
+
+		int lastVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
+		int firstVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+
 		if (mLastAnimatedPosition > lastVisiblePosition)
 			lastVisiblePosition = mLastAnimatedPosition;
-		if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-			Log.d(TAG, "VisibleItemsGrid=" + (lastVisiblePosition - firstVisiblePosition));
-			return lastVisiblePosition - firstVisiblePosition + 1;
+
+		int numberOfItemsOnScreen = lastVisiblePosition - firstVisiblePosition;
+		int numberOfAnimatedItems = position - 1;
+
+		if (numberOfItemsOnScreen < numberOfAnimatedItems || //forward scrolling after max itemOnScreen is reached
+				(firstVisiblePosition > 1 && firstVisiblePosition <= mRecyclerView.getChildCount()) ) { //reverse scrolling
+			delay = mStepDelay;
+
+			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+				int numColumns = ((GridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount();
+				delay += mStepDelay * (position % numColumns);
+			}
+			if (DEBUG) Log.d(TAG, "Delay[" + position + "]=*" + delay +
+					" FirstVisible=" + firstVisiblePosition +
+					" LastVisible=" + lastVisiblePosition +
+					" LastAnimated=" + mLastAnimatedPosition +
+					" VisibleItems=" + numberOfItemsOnScreen +
+					" childCount=" + mRecyclerView.getChildCount());
+
+		} else {//forward scrolling before max itemOnScreen is reached
+			delay = mInitialDelay + (position * mStepDelay);
+			if (DEBUG) Log.d(TAG, "Delay[" + position + "]=" + delay +
+					" FirstVisible=" + firstVisiblePosition +
+					" LastVisible=" + lastVisiblePosition +
+					" LastAnimated=" + mLastAnimatedPosition +
+					" VisibleItems=" + numberOfItemsOnScreen +
+					" childCount=" + mRecyclerView.getChildCount());
 		}
-		Log.d(TAG, "VisibleItemsLinear=" + (lastVisiblePosition - firstVisiblePosition));
-		return lastVisiblePosition - firstVisiblePosition - 1;
+
+		return delay;
 	}
 
 	/* CONFIGURATION SETTERS */
@@ -196,13 +274,13 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	}
 
 	/**
-	 * Enable backward animation depending on user scrolling.<br/>
+	 * Enable reverse animation depending on user scrolling.<br/>
 	 * Default disabled (only forward).
 	 *
-	 * @param enabled false to animate items only forward, true to animate also backward
+	 * @param enabled false to animate items only forward, true to reverse animate
 	 */
-	public void setAnimationBackward(boolean enabled) {
-		isBackwardEnabled = enabled;
+	public void setAnimationReverse(boolean enabled) {
+		isReverseEnabled = enabled;
 	}
 
 	/**
