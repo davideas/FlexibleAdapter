@@ -5,15 +5,20 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+
+import eu.davidea.fastscroller.FastScroller;
 
 /**
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
  *
  * @author Davide Steduto
  */
-public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>
+		implements FastScroller.ScrollerListener {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
 	protected static boolean DEBUG = false;
@@ -161,9 +166,10 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		for (int i = 0; i < getItemCount(); i++) {
 			if (getItemViewType(i) == skipViewType) continue;
 			selectedItems.add(i);
-			if (DEBUG) Log.v(TAG, "selectAll notifyItemChanged on position " + i);
-			notifyItemChanged(i);
 		}
+		if (DEBUG)
+			Log.v(TAG, "selectAll notifyItemRangeChanged from positionStart=0 itemCount=" + getItemCount());
+		notifyItemRangeChanged(0, getItemCount());
 	}
 
 	/**
@@ -173,13 +179,37 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * <b>Note 2:</b> This method use java.util.Iterator to avoid java.util.ConcurrentModificationException.
 	 */
 	public void clearSelection() {
+		Collections.sort(selectedItems, new Comparator<Integer>() {
+			@Override
+			public int compare(Integer lhs, Integer rhs) {
+				return lhs - rhs;
+			}
+		});
+		if (DEBUG) Log.v(TAG, "clearSelection current selection " + selectedItems);
 		Iterator<Integer> iterator = selectedItems.iterator();
+		int positionStart = 0, itemCount = 0;
+		//The notification is done only on items that are currently selected.
 		while (iterator.hasNext()) {
-			//The notification is done only on items that are currently selected.
-			int i = iterator.next();
+			int position = iterator.next();
 			iterator.remove();
-			if (DEBUG) Log.v(TAG, "clearSelection notifyItemChanged on position " + i);
-			notifyItemChanged(i);
+			//Optimization for ItemRangeChanged
+			if (positionStart + itemCount == position) {
+				itemCount++;
+			} else {
+				clearSelection(positionStart, itemCount);
+				itemCount = 1;
+				positionStart = position;
+			}
+		}
+		//Notify remaining Items
+		clearSelection(positionStart, itemCount);
+	}
+
+	private void clearSelection(int positionStart, int itemCount) {
+		if (itemCount > 0) {
+			if (DEBUG) Log.v(TAG, "clearSelection notifyItemRangeChanged from positionStart=" +
+					positionStart + " itemCount=" + itemCount);
+			notifyItemRangeChanged(positionStart, itemCount);
 		}
 	}
 
@@ -217,6 +247,16 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		selectedItems = savedInstanceState.getIntegerArrayList(TAG);
+	}
+
+	@Override
+	public String getTextToShowInBubble(int position) {
+		return String.valueOf(position+1);
+	}
+
+	@Override
+	public void onFastScroll(boolean scrolling) {
+		//nothing
 	}
 
 }

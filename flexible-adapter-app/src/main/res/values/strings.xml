@@ -47,5 +47,6 @@ limitations under the License.
 	<string name="undo">Undo</string>
 	<string name="linear_layout">Linear Layout</string>
 	<string name="grid_layout">Grid Layout</string>
+	<string name="reverse_scrolling">Reverse scrolling</string>
 
 </resources>

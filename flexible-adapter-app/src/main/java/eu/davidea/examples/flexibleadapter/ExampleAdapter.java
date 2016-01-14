@@ -20,15 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import eu.davidea.examples.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAnimatorAdapter;
 import eu.davidea.flexibleadapter.FlexibleViewHolder;
 import eu.davidea.flexibleadapter.FlexibleViewHolder.OnListItemClickListener;
 import eu.davidea.utils.Utils;
 
 
-public class ExampleAdapter extends FlexibleAnimatorAdapter<FlexibleViewHolder, Item>
-		implements FastScroller.BubbleTextGetter {
+public class ExampleAdapter extends FlexibleAnimatorAdapter<FlexibleViewHolder, Item> {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 

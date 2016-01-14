@@ -20,4 +20,9 @@
 	      android:icon="@drawable/ic_info_outline_white_24dp"
 	      app:showAsAction="ifRoom"/>
 
+	<!--<item android:id="@+id/action_reverse"-->
+	      <!--android:title="@string/reverse_scrolling"-->
+	      <!--android:icon="@drawable/ic_expand_more_grey600_24dp"-->
+	      <!--app:showAsAction="ifRoom"/>-->
+
 </menu>

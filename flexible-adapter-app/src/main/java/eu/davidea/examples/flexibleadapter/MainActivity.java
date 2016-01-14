@@ -18,7 +18,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -31,7 +30,7 @@ import android.widget.Toast;
 
 import eu.davidea.common.SimpleDividerItemDecoration;
 import eu.davidea.examples.anim.SlideInRightAnimator;
-import eu.davidea.examples.fastscroller.FastScroller;
+import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.FlexibleViewHolder;
 import eu.davidea.utils.Utils;
@@ -57,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements
 	private static final int INVALID_POSITION = -1;
 	private int mActivatedPosition = INVALID_POSITION;
 
-	private Toolbar mToolbar;
 	/**
 	 * RecyclerView and related objects
 	 */
@@ -98,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mAdapter = new ExampleAdapter(this, "example parameter for List1", mRecyclerView);
 		mAdapter.enableLogs(true);
-		mAdapter.setAnimationReverse(false);
+		mAdapter.setAnimateOnReverseScrolling(false);
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
 		mRecyclerView.setItemAnimator(new SlideInRightAnimator());

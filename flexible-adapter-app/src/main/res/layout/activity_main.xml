@@ -15,23 +15,13 @@
 		<android.support.v7.widget.RecyclerView
 			android:id="@+id/recycler_view"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent" />
+			android:layout_height="match_parent"/>
 
 	</android.support.v4.widget.SwipeRefreshLayout>
 
-	<include layout="@layout/empty_view"/>
 
-	<eu.davidea.examples.fastscroller.FastScroller
-		android:id="@+id/fast_scroller"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:layout_centerHorizontal="true"
-		android:layout_alignTop="@+id/swipeRefreshLayout"
-		android:layout_alignBottom="@+id/swipeRefreshLayout"
-		android:layout_alignParentEnd="true"
-		android:layout_alignParentRight="true"
-		android:visibility="gone"
-		tools:visibility="visible"/>
+
+
 
 	<!--<include layout="@layout/progress_bar"/>-->
 
@@ -44,5 +34,19 @@
 		android:clickable="true"
 		android:src="@drawable/fab_add"
 		app:borderWidth="0dp"/>
+
+	<include layout="@layout/empty_view"/>
+
+	<eu.davidea.fastscroller.FastScroller
+		android:id="@+id/fast_scroller"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_centerHorizontal="true"
+		android:layout_alignTop="@+id/swipeRefreshLayout"
+		android:layout_alignBottom="@+id/swipeRefreshLayout"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentRight="true"
+		android:visibility="gone"
+		tools:visibility="visible"/>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -1,4 +1,4 @@
-package eu.davidea.examples.fastscroller;
+package eu.davidea.fastscroller;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -23,8 +23,9 @@ public class FastScroller extends FrameLayout {
 	private static final int BUBBLE_ANIMATION_DURATION = 300;
 	private static final int TRACK_SNAP_RANGE = 5;
 
-	public interface BubbleTextGetter {
+	public interface ScrollerListener {
 		String getTextToShowInBubble(int pos);
+		void onFastScroll(boolean scrolling);
 	}
 
 	private TextView bubble;
@@ -89,8 +90,9 @@ public class FastScroller extends FrameLayout {
 			case MotionEvent.ACTION_DOWN:
 				if (event.getX() < handle.getX() - ViewCompat.getPaddingStart(handle)) return false;
 				if (currentAnimator != null) currentAnimator.cancel();
-				if (bubble != null && bubble.getVisibility() == INVISIBLE) showBubble();
 				handle.setSelected(true);
+				((ScrollerListener) recyclerView.getAdapter()).onFastScroll(true);
+				showBubble();
 			case MotionEvent.ACTION_MOVE:
 				final float y = event.getY();
 				setBubbleAndHandlePosition(y);
@@ -99,6 +101,7 @@ public class FastScroller extends FrameLayout {
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
 				handle.setSelected(false);
+				((ScrollerListener) recyclerView.getAdapter()).onFastScroll(false);
 				hideBubble();
 				return true;
 		}
@@ -140,7 +143,7 @@ public class FastScroller extends FrameLayout {
 			else
 				proportion = y / (float) height;
 			final int targetPos = getValueInRange(0, itemCount - 1, (int) (proportion * (float) itemCount));
-			final String bubbleText = ((BubbleTextGetter) recyclerView.getAdapter()).getTextToShowInBubble(targetPos);
+			final String bubbleText = ((ScrollerListener) recyclerView.getAdapter()).getTextToShowInBubble(targetPos);
 			((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(targetPos, 0);
 			if (bubble != null)
 				bubble.setText(bubbleText);
@@ -162,13 +165,13 @@ public class FastScroller extends FrameLayout {
 	}
 
 	private void showBubble() {
-		if (bubble == null)
-			return;
-		bubble.setVisibility(VISIBLE);
-		if (currentAnimator != null)
-			currentAnimator.cancel();
-		currentAnimator = ObjectAnimator.ofFloat(bubble, "alpha", 0f, 1f).setDuration(BUBBLE_ANIMATION_DURATION);
-		currentAnimator.start();
+		if (bubble != null && bubble.getVisibility() != VISIBLE) {
+			bubble.setVisibility(VISIBLE);
+			if (currentAnimator != null)
+				currentAnimator.cancel();
+			currentAnimator = ObjectAnimator.ofFloat(bubble, "alpha", 0f, 1f).setDuration(BUBBLE_ANIMATION_DURATION);
+			currentAnimator.start();
+		}
 	}
 
 	private void hideBubble() {
