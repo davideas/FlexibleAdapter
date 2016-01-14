@@ -3,6 +3,9 @@ package eu.davidea.flexibleadapter;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -33,6 +36,11 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 	private RecyclerView mRecyclerView;
 	private Interpolator mInterpolator = new LinearInterpolator();
+	private AnimatorAdapterDataObserver mNotifierObserver;
+
+	private enum AnimatorEnum {
+		ALPHA, SLIDE_IN_LEFT, SLIDE_IN_RIGHT, SLIDE_IN_BOTTOM, SCALE
+	}
 
 	/**
 	 * The active Animators. Keys are hashcodes of the Views that are animated.
@@ -40,27 +48,26 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	@NonNull
 	private final SparseArray<Animator> mAnimators = new SparseArray<>();
 
-	/** The position of the item that is the first that was animated. */
-	private int mFirstAnimatedPosition = -1;
-
-	/** The position of the last item that was animated. */
+	/**
+	 * The position of the last item that was animated.
+	 */
 	private int mLastAnimatedPosition = -1;
 
 	private int mLastVisibleItems = -1;
 
-	/** Contains type of animators already added */
+	/**
+	 * Contains type of animators already added
+	 */
 	private EnumSet<AnimatorEnum> animatorsUsed = EnumSet.noneOf(AnimatorEnum.class);
 
-	private boolean isReverseEnabled = true,
-			shouldAnimate = true;
+	private boolean isReverseEnabled = false,
+			shouldAnimate = true,
+			isFastScroll = false;
 
-	private long mInitialDelay = 0L,
+	private long mInitialDelay = 500L,
 			mStepDelay = 100L,
 			mDuration = 300L;
 
-	private enum AnimatorEnum {
-		ALPHA, SLIDE_IN_LEFT, SLIDE_IN_RIGHT, SLIDE_IN_BOTTOM, SCALE
-	}
 
 	/**
 	 * Simple Constructor for Animator Adapter.<br/>
@@ -105,29 +112,40 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 */
 	public abstract List<Animator> getAnimators(View itemView, int position, boolean isSelected);
 
+	@Override
+	public void onFastScroll(boolean scrolling) {
+		super.onFastScroll(scrolling);
+		isFastScroll = scrolling;
+	}
+
 	/**
-	 * Cancels any existing animations for given View.
+	 * Cancels any existing animations for given View. Useful when fling.
 	 */
 	private void cancelExistingAnimation(@NonNull final View itemView) {
 		int hashCode = itemView.hashCode();
-		Log.d(TAG, mAnimators.size() + " animators running");
 		Animator animator = mAnimators.get(hashCode);
-		if (animator != null) {
-			animator.end();
-			//TODO: Clear animators
-			mAnimators.remove(hashCode);
-		}
+		if (animator != null) animator.end();
 	}
 
 	/**
 	 * Animate the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
 	 */
 	protected final void animateView(final View itemView, int position, boolean isSelected) {
-		//TODO: Skip animation on fast scrolling
-		//TODO: Skip animation on select all
-		//TODO: Skip animation on clear selection
-		if (shouldAnimate && (!isReverseEnabled || position > mLastAnimatedPosition)) {
-			//Necessary if fling
+		//TODO: Skip animation on fast scrolling: DONE!
+		//TODO: Finish to include elements of fast scrolling in the library!
+		//TODO: Evaluate to include also EmptyView in the library...
+
+		Log.d(TAG, "shouldAnimate=" + shouldAnimate
+				+ " isFastScroll=" + isFastScroll
+				+ " isReverseEnabled=" + isReverseEnabled
+				+ (isReverseEnabled ? " isNotified=" + mNotifierObserver.isPositionNotified() : "")
+				+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
+		);
+
+		if (shouldAnimate && !isFastScroll && (isReverseEnabled && !mNotifierObserver.isPositionNotified())
+				|| (!isReverseEnabled && position > mLastAnimatedPosition)) {
+
+			//Cancel animation is necessary when fling
 			cancelExistingAnimation(itemView);
 
 			ViewCompat.setAlpha(itemView, 0);
@@ -139,7 +157,8 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			if (!animatorsUsed.contains(AnimatorEnum.ALPHA))
 				addAlphaAnimator(animators, itemView, 0f);
 
-			if (DEBUG) Log.d(TAG, "Start Animation on position " + position + " Animators=" + animatorsUsed);
+			if (DEBUG)
+				Log.d(TAG, "Start Animation on position " + position + " Animators=" + animatorsUsed);
 			animatorsUsed.clear();
 
 			//Execute the animations all together
@@ -150,9 +169,13 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			//set.setStartDelay(mInitialDelay += mStepDelay);
 			set.setInterpolator(mInterpolator);
 			set.setDuration(mDuration);
+			set.addListener(new HelperAnimatorListener(itemView.hashCode()));
 			set.start();
 			mAnimators.put(itemView.hashCode(), set);
 		}
+
+		if (isReverseEnabled && mNotifierObserver.isPositionNotified())
+			mNotifierObserver.removeNotified();
 
 		mLastAnimatedPosition = position;
 	}
@@ -161,7 +184,8 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 		int lastVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
 		int firstVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-		if (mLastAnimatedPosition > lastVisiblePosition) lastVisiblePosition = mLastAnimatedPosition;
+		if (mLastAnimatedPosition > lastVisiblePosition)
+			lastVisiblePosition = mLastAnimatedPosition;
 		int visibleItems = lastVisiblePosition - firstVisiblePosition;
 
 		Log.d(TAG, "Position=" + position +
@@ -173,7 +197,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 		//Stop stepDelay when screen is filled
 		if (mLastVisibleItems >= visibleItems ||
-				(firstVisiblePosition > 1 && firstVisiblePosition <= mRecyclerView.getChildCount()) ) {
+				(firstVisiblePosition > 1 && firstVisiblePosition <= mRecyclerView.getChildCount())) {
 			if (DEBUG) Log.d(TAG, "Reset AnimationDelay on position " + position);
 			mInitialDelay = 0L;
 		}
@@ -190,6 +214,11 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		int lastVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
 		int firstVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
 
+		//FIXME: Minor BUG on fast scrolling (occurs sometimes!): Position is animated with big delay!
+		//Delay[663]=66300 FirstVisible=-1 LastVisible=717 LastAnimated=717 VisibleItems=718 childCount=0
+		//Delay[182]=18200 FirstVisible=-1 LastVisible=196 LastAnimated=196 VisibleItems=197 childCount=0
+		//if (firstVisiblePosition < 0) firstVisiblePosition = 0;
+
 		if (mLastAnimatedPosition > lastVisiblePosition)
 			lastVisiblePosition = mLastAnimatedPosition;
 
@@ -197,8 +226,9 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		int numberOfAnimatedItems = position - 1;
 
 		if (numberOfItemsOnScreen < numberOfAnimatedItems || //forward scrolling after max itemOnScreen is reached
-				(firstVisiblePosition > 1 && firstVisiblePosition <= mRecyclerView.getChildCount()) ) { //reverse scrolling
+				(firstVisiblePosition > 1 && firstVisiblePosition <= mRecyclerView.getChildCount())) { //reverse scrolling
 			delay = mStepDelay;
+			mInitialDelay = 0L;
 
 			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 				int numColumns = ((GridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount();
@@ -283,8 +313,17 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 *
 	 * @param enabled false to animate items only forward, true to reverse animate
 	 */
-	public void setAnimationReverse(boolean enabled) {
+	public void setAnimateOnReverseScrolling(boolean enabled) {
 		isReverseEnabled = enabled;
+		if (enabled) {
+			//Get notified when item is changed (should skip animation)
+			mNotifierObserver = new AnimatorAdapterDataObserver();
+			registerAdapterDataObserver(mNotifierObserver);
+		} else if (mNotifierObserver != null) {
+			//Remove observer notification
+			unregisterAdapterDataObserver(mNotifierObserver);
+			mNotifierObserver = null;
+		}
 	}
 
 	/**
@@ -393,6 +432,83 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		animators.add(ObjectAnimator.ofFloat(view, "scaleX", scaleFrom, 1f));
 		animators.add(ObjectAnimator.ofFloat(view, "scaleY", scaleFrom, 1f));
 		animatorsUsed.add(AnimatorEnum.SCALE);
+	}
+
+	private class AnimatorAdapterDataObserver extends RecyclerView.AdapterDataObserver {
+		private Handler mAnimatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+			public boolean handleMessage(Message message) {
+				if (DEBUG) Log.d(TAG, "Clear notified for Animation");
+				isNotified = false;
+				return true;
+			}
+		});
+
+		private boolean isNotified;
+
+		public boolean isPositionNotified() {
+			return isNotified;
+		}
+
+		public void removeNotified() {
+			mAnimatorHandler.removeCallbacksAndMessages(null);
+			mAnimatorHandler.sendMessageDelayed(Message.obtain(mHandler), 200L);
+		}
+
+		private void markNotified(int positionStart, int itemCount) {
+			isNotified = true;
+		}
+
+		@Override
+		public void onItemRangeChanged(int positionStart, int itemCount) {
+			markNotified(positionStart, itemCount);
+		}
+
+		@Override
+		public void onItemRangeInserted(int positionStart, int itemCount) {
+			markNotified(positionStart, itemCount);
+		}
+
+		@Override
+		public void onItemRangeRemoved(int positionStart, int itemCount) {
+			markNotified(positionStart, itemCount);
+		}
+
+		@Override
+		public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+			markNotified(fromPosition, itemCount);
+		}
+	}
+
+	/**
+	 * Helper Class to clear Animators List used to avoid multiple Item animation on same
+	 * position when fling.
+	 */
+	private class HelperAnimatorListener implements Animator.AnimatorListener {
+		int key;
+
+		HelperAnimatorListener(int key) {
+			this.key = key;
+		}
+
+		@Override
+		public void onAnimationStart(Animator animation) {
+
+		}
+
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			mAnimators.remove(key);
+		}
+
+		@Override
+		public void onAnimationCancel(Animator animation) {
+
+		}
+
+		@Override
+		public void onAnimationRepeat(Animator animation) {
+
+		}
 	}
 
 }
