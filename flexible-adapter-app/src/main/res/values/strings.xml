@@ -48,5 +48,6 @@ limitations under the License.
 	<string name="linear_layout">Linear Layout</string>
 	<string name="grid_layout">Grid Layout</string>
 	<string name="reverse_scrolling">Reverse scrolling</string>
+	<string name="forward_scrolling">Forward scrolling</string>
 
 </resources>
