@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mAdapter = new ExampleAdapter(this, "example parameter for List1", mRecyclerView);
 		mAdapter.enableLogs(true);
-		mAdapter.setAnimateOnReverseScrolling(false);
+		mAdapter.setAnimateOnReverseScrolling(true);
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
 		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
@@ -276,7 +276,6 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
-		//noinspection SimplifiableIfStatement
 		if (id == R.id.action_about) {
 			MessageDialog.newInstance(
 					R.drawable.ic_info_grey600_24dp,
@@ -295,6 +294,16 @@ public class MainActivity extends AppCompatActivity implements
 				mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 				item.setIcon(R.drawable.ic_view_agenda_white_24dp);
 				item.setTitle(R.string.linear_layout);
+			}
+		} else if (id == R.id.action_reverse) {
+			if (mAdapter.isAnimateOnReverseScrolling()) {
+				mAdapter.setAnimateOnReverseScrolling(false);
+				item.setIcon(R.drawable.ic_sort_white_24dp);
+				item.setTitle(R.string.reverse_scrolling);
+			} else {
+				mAdapter.setAnimateOnReverseScrolling(true);
+				item.setIcon(R.drawable.ic_sort_descending_white_24dp);
+				item.setTitle(R.string.forward_scrolling);
 			}
 		}
 

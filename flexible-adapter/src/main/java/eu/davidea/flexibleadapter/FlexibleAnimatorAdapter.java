@@ -53,7 +53,10 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 */
 	private int mLastAnimatedPosition = -1;
 
-	private int mLastVisibleItems = -1;
+	/**
+	 * Max items RecyclerView displays
+	 */
+	private int mMaxChildViews = -1;
 
 	/**
 	 * Contains type of animators already added
@@ -91,6 +94,10 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		this.mRecyclerView = recyclerView;
 		if (recyclerView == null)
 			throw new IllegalArgumentException("RecyclerView must be initialized and not null");
+
+		//Get notified when an item is changed (should skip animation)
+		mNotifierObserver = new AnimatorAdapterDataObserver();
+		registerAdapterDataObserver(mNotifierObserver);
 	}
 
 	/**
@@ -131,29 +138,28 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 * Animate the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
 	 */
 	protected final void animateView(final View itemView, int position, boolean isSelected) {
-		//TODO: Skip animation on fast scrolling: DONE!
 		//TODO: Finish to include elements of fast scrolling in the library!
 		//TODO: Evaluate to include also EmptyView in the library...
 
-		Log.d(TAG, "shouldAnimate=" + shouldAnimate
-				+ " isFastScroll=" + isFastScroll
-				+ " isReverseEnabled=" + isReverseEnabled
-				+ (isReverseEnabled ? " isNotified=" + mNotifierObserver.isPositionNotified() : "")
-				+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
-		);
+		if (DEBUG)
+			Log.d(TAG, "shouldAnimate=" + shouldAnimate
+					+ " isFastScroll=" + isFastScroll
+					+ " isNotified=" + mNotifierObserver.isPositionNotified()
+					+ " isReverseEnabled=" + isReverseEnabled
+					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
+			);
 
-		if (shouldAnimate && !isFastScroll && (isReverseEnabled && !mNotifierObserver.isPositionNotified())
-				|| (!isReverseEnabled && position > mLastAnimatedPosition)) {
+		if (shouldAnimate && !isFastScroll && !mNotifierObserver.isPositionNotified() &&
+				(isReverseEnabled || (!isReverseEnabled && position > mLastAnimatedPosition)) ) {
 
 			//Cancel animation is necessary when fling
 			cancelExistingAnimation(itemView);
-
-			ViewCompat.setAlpha(itemView, 0);
 
 			//Retrieve user animators
 			List<Animator> animators = getAnimators(itemView, position, isSelected);
 
 			//Add Alpha animator if not yet
+			ViewCompat.setAlpha(itemView, 0);
 			if (!animatorsUsed.contains(AnimatorEnum.ALPHA))
 				addAlphaAnimator(animators, itemView, 0f);
 
@@ -164,9 +170,10 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			//Execute the animations all together
 			AnimatorSet set = new AnimatorSet();
 			set.playTogether(animators);
-			set.setStartDelay(calculateAnimationDelay(position));
-			//getVisibleItems(position);
-			//set.setStartDelay(mInitialDelay += mStepDelay);
+			//Solution 1
+			set.setStartDelay(calculateAnimationDelay1(position));
+			//Solution 2
+//			set.setStartDelay(calculateAnimationDelay2(position));
 			set.setInterpolator(mInterpolator);
 			set.setDuration(mDuration);
 			set.addListener(new HelperAnimatorListener(itemView.hashCode()));
@@ -174,18 +181,28 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			mAnimators.put(itemView.hashCode(), set);
 		}
 
-		if (isReverseEnabled && mNotifierObserver.isPositionNotified())
-			mNotifierObserver.removeNotified();
+		if (mNotifierObserver.isPositionNotified())
+			mNotifierObserver.clearNotified();
 
 		mLastAnimatedPosition = position;
 	}
 
-	private void getVisibleItems(int position) {
+	/**
+	 * Solution 1.
+	 * Reset stepDelay.
+	 */
+	private long calculateAnimationDelay1(int position) {
 
 		int lastVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
 		int firstVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+
+		//Use always the max child count reached
+		if (mMaxChildViews < mRecyclerView.getChildCount())
+			mMaxChildViews = mRecyclerView.getChildCount();
+
 		if (mLastAnimatedPosition > lastVisiblePosition)
 			lastVisiblePosition = mLastAnimatedPosition;
+
 		int visibleItems = lastVisiblePosition - firstVisiblePosition;
 
 		Log.d(TAG, "Position=" + position +
@@ -193,64 +210,57 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 				" LastVisible=" + lastVisiblePosition +
 				" LastAnimated=" + mLastAnimatedPosition +
 				" VisibleItems=" + visibleItems +
-				" childCount=" + mRecyclerView.getChildCount());
+				" ChildCount=" + mRecyclerView.getChildCount());
 
 		//Stop stepDelay when screen is filled
-		if (mLastVisibleItems >= visibleItems ||
-				(firstVisiblePosition > 1 && firstVisiblePosition <= mRecyclerView.getChildCount())) {
+		if (mLastAnimatedPosition > visibleItems || //Normal Forward scrolling
+				(firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews)) { //Reverse scrolling
 			if (DEBUG) Log.d(TAG, "Reset AnimationDelay on position " + position);
 			mInitialDelay = 0L;
 		}
 
-		mLastVisibleItems = visibleItems;
+		return mInitialDelay += mStepDelay;
 	}
 
 	/**
+	 * Solution 2.
 	 * Returns the delay in milliseconds after which, the animation for next ItemView should start.
 	 */
-	private long calculateAnimationDelay(final int position) {
+	private long calculateAnimationDelay2(int position) {
 		long delay;
 
 		int lastVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
 		int firstVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+		int numberOfItemsOnScreen = lastVisiblePosition - firstVisiblePosition;
+		int numberOfAnimatedItems = position - 1;
 
-		//FIXME: Minor BUG on fast scrolling (occurs sometimes!): Position is animated with big delay!
-		//Delay[663]=66300 FirstVisible=-1 LastVisible=717 LastAnimated=717 VisibleItems=718 childCount=0
-		//Delay[182]=18200 FirstVisible=-1 LastVisible=196 LastAnimated=196 VisibleItems=197 childCount=0
-		//if (firstVisiblePosition < 0) firstVisiblePosition = 0;
+		//Save max child count reached
+		if (mMaxChildViews < mRecyclerView.getChildCount())
+			mMaxChildViews = mRecyclerView.getChildCount();
 
 		if (mLastAnimatedPosition > lastVisiblePosition)
 			lastVisiblePosition = mLastAnimatedPosition;
 
-		int numberOfItemsOnScreen = lastVisiblePosition - firstVisiblePosition;
-		int numberOfAnimatedItems = position - 1;
-
-		if (numberOfItemsOnScreen < numberOfAnimatedItems || //forward scrolling after max itemOnScreen is reached
-				(firstVisiblePosition > 1 && firstVisiblePosition <= mRecyclerView.getChildCount())) { //reverse scrolling
+		if (numberOfItemsOnScreen < numberOfAnimatedItems || //Normal Forward scrolling after max itemOnScreen is reached
+				(firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews) || //Reverse scrolling
+				(position > mMaxChildViews && firstVisiblePosition == -1 && mRecyclerView.getChildCount() == 0)) { //Reverse scrolling and click on FastScroller
 			delay = mStepDelay;
 			mInitialDelay = 0L;
 
 			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 				int numColumns = ((GridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount();
-				delay += mStepDelay * (position % numColumns);
+				delay = mStepDelay * (position % numColumns);
 			}
-			if (DEBUG) Log.d(TAG, "Delay[" + position + "]=*" + delay +
-					" FirstVisible=" + firstVisiblePosition +
-					" LastVisible=" + lastVisiblePosition +
-					" LastAnimated=" + mLastAnimatedPosition +
-					" VisibleItems=" + numberOfItemsOnScreen +
-					" childCount=" + mRecyclerView.getChildCount());
 
 		} else {//forward scrolling before max itemOnScreen is reached
 			delay = mInitialDelay + (position * mStepDelay);
-			if (DEBUG) Log.d(TAG, "Delay[" + position + "]=" + delay +
-					" FirstVisible=" + firstVisiblePosition +
-					" LastVisible=" + lastVisiblePosition +
-					" LastAnimated=" + mLastAnimatedPosition +
-					" VisibleItems=" + numberOfItemsOnScreen +
-					" childCount=" + mRecyclerView.getChildCount());
 		}
-
+		if (DEBUG) Log.d(TAG, "Delay[" + position + "]=" + delay +
+				" FirstVisible=" + firstVisiblePosition +
+				" LastVisible=" + lastVisiblePosition +
+				" LastAnimated=" + mLastAnimatedPosition +
+				" VisibleItems=" + numberOfItemsOnScreen +
+				" ChildCount=" + mRecyclerView.getChildCount());
 		return delay;
 	}
 
@@ -315,15 +325,10 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 */
 	public void setAnimateOnReverseScrolling(boolean enabled) {
 		isReverseEnabled = enabled;
-		if (enabled) {
-			//Get notified when item is changed (should skip animation)
-			mNotifierObserver = new AnimatorAdapterDataObserver();
-			registerAdapterDataObserver(mNotifierObserver);
-		} else if (mNotifierObserver != null) {
-			//Remove observer notification
-			unregisterAdapterDataObserver(mNotifierObserver);
-			mNotifierObserver = null;
-		}
+	}
+
+	public boolean isAnimateOnReverseScrolling() {
+		return isReverseEnabled;
 	}
 
 	/**
@@ -334,6 +339,10 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 */
 	public void setAnimationEnabled(boolean enabled) {
 		shouldAnimate = enabled;
+	}
+
+	public boolean isAnimationEnabled() {
+		return shouldAnimate;
 	}
 
 	/* ANIMATORS */
@@ -434,6 +443,13 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		animatorsUsed.add(AnimatorEnum.SCALE);
 	}
 
+	/* INNER CLASSES */
+
+	/**
+	 * Observer Class responsible to skip animation when items are notified to avoid
+	 * double animation.
+	 * Also, some items at the edge, are rebounded by Android and should not be animated.
+	 */
 	private class AnimatorAdapterDataObserver extends RecyclerView.AdapterDataObserver {
 		private Handler mAnimatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 			public boolean handleMessage(Message message) {
@@ -449,7 +465,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			return isNotified;
 		}
 
-		public void removeNotified() {
+		public void clearNotified() {
 			mAnimatorHandler.removeCallbacksAndMessages(null);
 			mAnimatorHandler.sendMessageDelayed(Message.obtain(mHandler), 200L);
 		}

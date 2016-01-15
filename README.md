@@ -10,7 +10,7 @@
 * Base item selection with ripple effect.
 * SINGLE & MULTI selection mode, **NEW** now with FlexibleViewHolder.
 * Restore deleted items (undo delete).
-* Customizable FastScroller (imported library, see change log for details).
+* Customizable FastScroller, **NEW** now in the library
 * SearchFilter with string selection in Item titles and any subtext.
 * Add and Remove items with custom animations.
 * **NEW!** Initial item animations with custom configuration based on adapter position.
@@ -183,10 +183,11 @@ public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder
 ```
 
 # Change Log
-###### v5.0.0-b2 - 2016.01.11
+###### v5.0.0-b2 - 2016.01.15
 - Easy initial item animation based on adapter position [See #15].
-- Adapted example App accordingly
+- Added FastScroller in the library
 - Added support for Grid Layout
+- Adapted example App accordingly
 
 ###### v5.0.0-b1 - 2016.01.03
 - Removed _FilterAsyncTask_ and all deprecated functions from _OnUpdateListener_ [See #18].
