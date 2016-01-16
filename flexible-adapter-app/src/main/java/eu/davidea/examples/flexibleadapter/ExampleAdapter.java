@@ -65,7 +65,7 @@ public class ExampleAdapter extends FlexibleAnimatorAdapter<FlexibleViewHolder, 
 		if (!super.isEmpty()) addUserLearnedSelection();
 
 		//Fill and Filter mItems with your custom list
-		//Note: In case of userLearnSelection mItems is pre-initialized and after filtered.
+		//Note: In case of userLearnSelection, mItems is pre-initialized and after filtered.
 		filterItems(mItems);
 		notifyDataSetChanged();
 
@@ -92,7 +92,7 @@ public class ExampleAdapter extends FlexibleAnimatorAdapter<FlexibleViewHolder, 
 	}
 
 	private void userLearnedSelection() {
-		//TODO: Save the boolean into Settings!
+		//TODO FOR YOU: Save the boolean into Settings!
 		DatabaseService.userLearnedSelection = true;
 		mItems.remove(0);
 		notifyItemRemoved(0);

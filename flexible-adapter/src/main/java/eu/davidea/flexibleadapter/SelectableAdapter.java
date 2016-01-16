@@ -34,6 +34,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 
 	private ArrayList<Integer> selectedItems;
 	private int mode;
+	private FastScroller fastScroller;
 
 	public SelectableAdapter() {
 		this.selectedItems = new ArrayList<Integer>();
@@ -249,9 +250,17 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		selectedItems = savedInstanceState.getIntegerArrayList(TAG);
 	}
 
+	/* FAST SCROLLER */
+
+	public void setFastScroller(FastScroller fastScroller, RecyclerView recyclerView, int color) {
+		this.fastScroller = fastScroller;
+		fastScroller.setRecyclerView(recyclerView);
+		fastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle, color);
+	}
+
 	@Override
 	public String getTextToShowInBubble(int position) {
-		return String.valueOf(position+1);
+		return String.valueOf(position + 1);
 	}
 
 	@Override

@@ -13,16 +13,16 @@
 	<item android:id="@+id/action_list_type"
 	      android:title="@string/grid_layout"
 	      android:icon="@drawable/ic_view_grid_white_24dp"
-	      app:showAsAction="ifRoom"/>
+	      app:showAsAction="always"/>
 
 	<item android:id="@+id/action_reverse"
 	      android:title="@string/forward_scrolling"
 	      android:icon="@drawable/ic_sort_descending_white_24dp"
-	      app:showAsAction="ifRoom"/>
+	      app:showAsAction="never"/>
 
 	<item android:id="@+id/action_about"
 	      android:title="@string/action_about"
 	      android:icon="@drawable/ic_info_outline_white_24dp"
-	      app:showAsAction="ifRoom"/>
+	      app:showAsAction="never"/>
 	
 </menu>

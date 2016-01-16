@@ -138,8 +138,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 * Animate the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
 	 */
 	protected final void animateView(final View itemView, int position, boolean isSelected) {
-		//TODO: Finish to include elements of fast scrolling in the library!
-		//TODO: Evaluate to include also EmptyView in the library...
+		//FIXME: first completed visible item on rotation gets high delay
 
 		if (DEBUG)
 			Log.d(TAG, "shouldAnimate=" + shouldAnimate
@@ -171,9 +170,9 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			AnimatorSet set = new AnimatorSet();
 			set.playTogether(animators);
 			//Solution 1
-			set.setStartDelay(calculateAnimationDelay1(position));
+//			set.setStartDelay(calculateAnimationDelay1(position));
 			//Solution 2
-//			set.setStartDelay(calculateAnimationDelay2(position));
+			set.setStartDelay(calculateAnimationDelay2(position));
 			set.setInterpolator(mInterpolator);
 			set.setDuration(mDuration);
 			set.addListener(new HelperAnimatorListener(itemView.hashCode()));
@@ -231,15 +230,16 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 		int lastVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
 		int firstVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+
+		if (mLastAnimatedPosition > lastVisiblePosition)
+			lastVisiblePosition = mLastAnimatedPosition;
+
 		int numberOfItemsOnScreen = lastVisiblePosition - firstVisiblePosition;
 		int numberOfAnimatedItems = position - 1;
 
 		//Save max child count reached
 		if (mMaxChildViews < mRecyclerView.getChildCount())
 			mMaxChildViews = mRecyclerView.getChildCount();
-
-		if (mLastAnimatedPosition > lastVisiblePosition)
-			lastVisiblePosition = mLastAnimatedPosition;
 
 		if (numberOfItemsOnScreen < numberOfAnimatedItems || //Normal Forward scrolling after max itemOnScreen is reached
 				(firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews) || //Reverse scrolling
@@ -255,12 +255,14 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		} else {//forward scrolling before max itemOnScreen is reached
 			delay = mInitialDelay + (position * mStepDelay);
 		}
+
 		if (DEBUG) Log.d(TAG, "Delay[" + position + "]=" + delay +
 				" FirstVisible=" + firstVisiblePosition +
 				" LastVisible=" + lastVisiblePosition +
 				" LastAnimated=" + mLastAnimatedPosition +
 				" VisibleItems=" + numberOfItemsOnScreen +
 				" ChildCount=" + mRecyclerView.getChildCount());
+
 		return delay;
 	}
 

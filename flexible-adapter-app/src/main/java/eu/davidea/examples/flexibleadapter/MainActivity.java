@@ -92,10 +92,10 @@ public class MainActivity extends AppCompatActivity implements
 		Log.d(TAG, "onCreate");
 
 		//Adapter & RecyclerView
+		FlexibleAdapter.enableLogs(true);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mAdapter = new ExampleAdapter(this, "example parameter for List1", mRecyclerView);
-		mAdapter.enableLogs(true);
 		mAdapter.setAnimateOnReverseScrolling(true);
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
@@ -104,9 +104,10 @@ public class MainActivity extends AppCompatActivity implements
 				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
 
 		//Add FastScroll to the RecyclerView
-		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
-		fastScroller.setRecyclerView(mRecyclerView);
-		fastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle);
+		mAdapter.setFastScroller((FastScroller) findViewById(R.id.fast_scroller), mRecyclerView, Utils.getColorAccent(this));
+//		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
+//		fastScroller.setRecyclerView(mRecyclerView);
+//		fastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle);
 
 		//FAB
 		mFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements
 
 					if (!DatabaseService.getInstance().getListById(null).contains(item)) {
 						DatabaseService.getInstance().addItem(i, item);//This is the original list
-						//TODO: Use userLearnedSelection from settings
+						//TODO FOR YOU: Use userLearnedSelection from settings
 						if (!DatabaseService.userLearnedSelection) {
 							i++;//Fixing exampleAdapter for new position :-)
 						}
@@ -209,12 +210,16 @@ public class MainActivity extends AppCompatActivity implements
 		searchView.setOnSearchClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				menu.findItem(R.id.action_list_type).setVisible(false);
+				menu.findItem(R.id.action_reverse).setVisible(false);
 				menu.findItem(R.id.action_about).setVisible(false);
 			}
 		});
 		searchView.setOnCloseListener(new SearchView.OnCloseListener() {
 			@Override
 			public boolean onClose() {
+				menu.findItem(R.id.action_list_type).setVisible(true);
+				menu.findItem(R.id.action_reverse).setVisible(true);
 				menu.findItem(R.id.action_about).setVisible(true);
 				return false;
 			}
@@ -263,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements
 					.setDuration(100)
 					.start();
 		}
-
 		return true;
 	}
 
@@ -368,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements
 			if (mAdapter.getItemCount() > 0) {
 				if (position != mActivatedPosition) setActivatedPosition(position);
 				Item item = mAdapter.getItem(position);
-				//TODO: call your custom Callback, for example mCallback.onItemSelected(item.getId());
+				//TODO FOR YOU: call your custom Callback, for example mCallback.onItemSelected(item.getId());
 				EditItemDialog.newInstance(item, position).show(getFragmentManager(), EditItemDialog.TAG);
 			}
 			return false;

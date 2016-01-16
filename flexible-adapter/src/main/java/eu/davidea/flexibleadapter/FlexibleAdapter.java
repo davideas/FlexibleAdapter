@@ -58,6 +58,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	public FlexibleAdapter(@NonNull List<T> items, Object listener) {
 		mItems = items;
+		//TODO: initialize FastScroller with RecyclerView
 		if (listener instanceof OnUpdateListener) {
 			mUpdateListener = (OnUpdateListener) listener;
 			mUpdateListener.onUpdateEmptyView(mItems.size());

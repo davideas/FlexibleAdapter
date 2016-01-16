@@ -36,8 +36,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_alignParentRight="true"
-			android:paddingLeft="6dp"
-			android:paddingStart="6dp"
+			android:paddingLeft="5dp"
+			android:paddingStart="5dp"
 			android:contentDescription="@null"
 			android:src="@drawable/fast_scroller_handle"/>
 
