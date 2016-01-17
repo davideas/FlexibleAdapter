@@ -32,8 +32,9 @@ import eu.davidea.common.SimpleDividerItemDecoration;
 import eu.davidea.examples.anim.SlideInRightAnimator;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.FlexibleViewHolder;
+import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
 import eu.davidea.utils.Utils;
+import eu.davidea.viewholder.FlexibleViewHolder;
 
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener,
@@ -93,10 +94,10 @@ public class MainActivity extends AppCompatActivity implements
 
 		//Adapter & RecyclerView
 		FlexibleAdapter.enableLogs(true);
-		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-		mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-		mAdapter = new ExampleAdapter(this, "example parameter for List1", mRecyclerView);
+		mAdapter = new ExampleAdapter(this, "example parameter for List1");
 		mAdapter.setAnimateOnReverseScrolling(true);
+		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
 		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
@@ -104,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements
 				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
 
 		//Add FastScroll to the RecyclerView
-		mAdapter.setFastScroller((FastScroller) findViewById(R.id.fast_scroller), mRecyclerView, Utils.getColorAccent(this));
+
+		mAdapter.setFastScroller((FastScroller) findViewById(R.id.fast_scroller), Utils.getColorAccent(this));
 //		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
 //		fastScroller.setRecyclerView(mRecyclerView);
 //		fastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle);
@@ -126,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements
 							i++;//Fixing exampleAdapter for new position :-)
 						}
 						mAdapter.addItem(i, item);//Adapter's list is a copy, to animate the item you must call addItem on the new position
-						Log.d(TAG, "Added New " + item.getTitle());
 
 						Toast.makeText(MainActivity.this, "Added New " + item.getTitle(), Toast.LENGTH_SHORT).show();
 						mRecyclerView.smoothScrollToPosition(i);
@@ -291,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements
 			return true;
 		} else if (id == R.id.action_list_type) {
 			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-				mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+				mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this));
 				item.setIcon(R.drawable.ic_view_grid_white_24dp);
 				item.setTitle(R.string.grid_layout);
 			} else {
@@ -372,8 +373,10 @@ public class MainActivity extends AppCompatActivity implements
 			if (mAdapter.getItemCount() > 0) {
 				if (position != mActivatedPosition) setActivatedPosition(position);
 				Item item = mAdapter.getItem(position);
-				//TODO FOR YOU: call your custom Callback, for example mCallback.onItemSelected(item.getId());
-				EditItemDialog.newInstance(item, position).show(getFragmentManager(), EditItemDialog.TAG);
+				if (!item.isExpandable()) {
+					//TODO FOR YOU: call your custom Callback, for example mCallback.onItemSelected(item.getId());
+					EditItemDialog.newInstance(item, position).show(getFragmentManager(), EditItemDialog.TAG);
+				}
 			}
 			return false;
 		}

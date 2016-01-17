@@ -28,13 +28,13 @@ import java.util.List;
  * Animations can be customized for each items applying different logic based on item position and
  * beyond.
  * <p/>
- * Created by Davide on 10/01/2016.
+ * @author Davide Steduto
+ * @since 10/01/2016
  */
 public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder, T> extends FlexibleAdapter<VH, T> {
 
 	protected static final String TAG = FlexibleAnimatorAdapter.class.getSimpleName();
 
-	private RecyclerView mRecyclerView;
 	private Interpolator mInterpolator = new LinearInterpolator();
 	private AnimatorAdapterDataObserver mNotifierObserver;
 
@@ -71,15 +71,17 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			mStepDelay = 100L,
 			mDuration = 300L;
 
+	/*--------------*/
+	/* CONSTRUCTORS */
+	/*--------------*/
 
 	/**
 	 * Simple Constructor for Animator Adapter.<br/>
 	 *
 	 * @param items        Items to display
-	 * @param recyclerView NonNull RV necessary to calculate the size of the ItemView on particular Animators
 	 */
-	public FlexibleAnimatorAdapter(@NonNull List<T> items, @NonNull RecyclerView recyclerView) {
-		this(items, null, recyclerView);
+	public FlexibleAnimatorAdapter(@NonNull List<T> items) {
+		this(items, null);
 	}
 
 	/**
@@ -87,18 +89,18 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 *
 	 * @param items        Items to display
 	 * @param listener     Must be an instance of {@link OnUpdateListener}
-	 * @param recyclerView NonNull RV necessary to calculate the size of the ItemView on particular Animators
 	 */
-	public FlexibleAnimatorAdapter(@NonNull List<T> items, Object listener, @NonNull RecyclerView recyclerView) {
+	public FlexibleAnimatorAdapter(@NonNull List<T> items, Object listener) {
 		super(items, listener);
-		this.mRecyclerView = recyclerView;
-		if (recyclerView == null)
-			throw new IllegalArgumentException("RecyclerView must be initialized and not null");
 
 		//Get notified when an item is changed (should skip animation)
 		mNotifierObserver = new AnimatorAdapterDataObserver();
 		registerAdapterDataObserver(mNotifierObserver);
 	}
+
+	/*--------------*/
+	/* MAIN METHODS */
+	/*--------------*/
 
 	/**
 	 * Build your custom list of {@link Animator} to apply on the ItemView.<br/>
@@ -266,7 +268,9 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		return delay;
 	}
 
+	/*-----------------------*/
 	/* CONFIGURATION SETTERS */
+	/*-----------------------*/
 
 	/**
 	 * Customize the initial delay for the first item animation.<br/>
@@ -347,7 +351,9 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		return shouldAnimate;
 	}
 
+	/*-----------*/
 	/* ANIMATORS */
+	/*-----------*/
 
 	/**
 	 * This is the default animator.<br/>
@@ -445,7 +451,9 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		animatorsUsed.add(AnimatorEnum.SCALE);
 	}
 
+	/*---------------*/
 	/* INNER CLASSES */
+	/*---------------*/
 
 	/**
 	 * Observer Class responsible to skip animation when items are notified to avoid

@@ -2,7 +2,9 @@ package eu.davidea.examples.flexibleadapter;
 
 import java.io.Serializable;
 
-public class Item implements Serializable {
+import eu.davidea.flexibleadapter.item.AbstractFlexibleItem;
+
+public class Item extends AbstractFlexibleItem<Item> implements Serializable {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 
@@ -47,4 +49,5 @@ public class Item implements Serializable {
 	public String toString() {
 		return title;
 	}
+
 }

@@ -41,6 +41,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	protected Handler mHandler;
 	protected OnUpdateListener mUpdateListener;
 
+	/*--------------*/
+	/* CONSTRUCTORS */
+	/*--------------*/
+
 	/**
 	 * Simple Constructor.
 	 *
@@ -58,14 +62,16 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	public FlexibleAdapter(@NonNull List<T> items, Object listener) {
 		mItems = items;
-		//TODO: initialize FastScroller with RecyclerView
+
 		if (listener instanceof OnUpdateListener) {
 			mUpdateListener = (OnUpdateListener) listener;
 			mUpdateListener.onUpdateEmptyView(mItems.size());
 		}
 	}
 
+	/*--------------*/
 	/* MAIN METHODS */
+	/*--------------*/
 
 	/**
 	 * Convenience method to call {@link #updateDataSet(String)} with {@link null} as param.
@@ -163,7 +169,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
+	/*----------------------*/
 	/* DELETE ITEMS METHODS */
+	/*----------------------*/
 
 	/**
 	 * The item is retained in a list for an eventual Undo.
@@ -247,7 +255,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
+	/*--------------*/
 	/* UNDO METHODS */
+	/*--------------*/
 
 	/**
 	 * Save temporary Items for an eventual Undo.
@@ -341,7 +351,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 	}
 
+	/*----------------*/
 	/* FILTER METHODS */
+	/*----------------*/
 
 	public boolean hasSearchText() {
 		return mSearchText != null && mSearchText.length() > 0;
@@ -434,7 +446,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		return false;
 	}
 
+	/*------------------*/
 	/* INNER INTERFACES */
+	/*------------------*/
 
 	public interface OnUpdateListener {
 		/**

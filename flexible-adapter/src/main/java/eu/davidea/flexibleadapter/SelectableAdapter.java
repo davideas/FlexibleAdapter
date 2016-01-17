@@ -1,6 +1,7 @@
 package eu.davidea.flexibleadapter;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
@@ -32,14 +33,24 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	public static final int MODE_MULTI = 2;
 
+	//TODO: Evaluate TreeSet instead of ArrayList for selectedItems
 	private ArrayList<Integer> selectedItems;
 	private int mode;
-	private FastScroller fastScroller;
+	protected RecyclerView mRecyclerView;
+	protected FastScroller mFastScroller;
+
+	/*--------------*/
+	/* CONSTRUCTORS */
+	/*--------------*/
 
 	public SelectableAdapter() {
-		this.selectedItems = new ArrayList<Integer>();
-		this.mode = MODE_SINGLE;
+		selectedItems = new ArrayList<Integer>();
+		mode = MODE_SINGLE;
 	}
+
+	/*----------------*/
+	/* STATIC METHODS */
+	/*----------------*/
 
 	/**
 	 * Call this once to enable or disable DEBUG logs.<br/>
@@ -51,7 +62,9 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		DEBUG = enable;
 	}
 
+	/*--------------*/
 	/* MAIN METHODS */
+	/*--------------*/
 
 	/**
 	 * Set the mode of the selection, MODE_SINGLE is the default:
@@ -250,12 +263,33 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		selectedItems = savedInstanceState.getIntegerArrayList(TAG);
 	}
 
-	/* FAST SCROLLER */
+	@Override
+	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+		super.onAttachedToRecyclerView(recyclerView);
+		mRecyclerView = recyclerView;
+	}
 
-	public void setFastScroller(FastScroller fastScroller, RecyclerView recyclerView, int color) {
-		this.fastScroller = fastScroller;
-		fastScroller.setRecyclerView(recyclerView);
-		fastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle, color);
+	/*---------------*/
+	/* FAST SCROLLER */
+	/*---------------*/
+
+	public FastScroller getFastScroller() {
+		return mFastScroller;
+	}
+
+	/**
+	 * <b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.
+	 *
+	 * @param fastScroller Instance of {@link FastScroller}
+	 * @param accentColor  The color when the fast scroller is touched
+	 */
+	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor) {
+		if (mRecyclerView == null) {
+			throw new IllegalStateException("RecyclerView cannot be null. Call this method after the adapter is added to the RecyclerView.");
+		}
+		mFastScroller = fastScroller;
+		mFastScroller.setRecyclerView(mRecyclerView);
+		mFastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle, accentColor);
 	}
 
 	@Override

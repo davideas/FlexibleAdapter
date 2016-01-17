@@ -1,11 +1,16 @@
-package eu.davidea.flexibleadapter;
+package eu.davidea.viewholder;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import eu.davidea.flexibleadapter.FlexibleAdapter;
+
 /**
  * Helper Class that implements the single Tap and Long Tap.<br/>
  * Must be extended for the own ViewHolder.
+ *
+ * @author Davide Steduto
+ * @since 03/01/2016
  */
 public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		implements View.OnClickListener, View.OnLongClickListener {

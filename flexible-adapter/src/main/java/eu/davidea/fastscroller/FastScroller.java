@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
@@ -31,11 +30,6 @@ public class FastScroller extends FrameLayout {
 	private static final int BUBBLE_ANIMATION_DURATION = 300;
 	private static final int TRACK_SNAP_RANGE = 5;
 
-	public interface ScrollerListener {
-		String getTextToShowInBubble(int pos);
-		void onFastScroll(boolean scrolling);
-	}
-
 	private TextView bubble;
 	private ImageView handle;
 	private RecyclerView recyclerView;
@@ -45,28 +39,28 @@ public class FastScroller extends FrameLayout {
 
 	private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
 		@Override
-		public void onScrolled(final RecyclerView recyclerView, final int dx, final int dy) {
+		public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 			if (bubble == null || handle.isSelected())
 				return;
-			final int verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
-			final int verticalScrollRange = recyclerView.computeVerticalScrollRange();
+			int verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
+			int verticalScrollRange = recyclerView.computeVerticalScrollRange();
 			float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
 			setBubbleAndHandlePosition(height * proportion);
 		}
 	};
 
 
-	public FastScroller(final Context context, final AttributeSet attrs, final int defStyleAttr) {
+	public FastScroller(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		init();
 	}
 
-	public FastScroller(final Context context) {
+	public FastScroller(Context context) {
 		super(context);
 		init();
 	}
 
-	public FastScroller(final Context context, final AttributeSet attrs) {
+	public FastScroller(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
@@ -77,12 +71,25 @@ public class FastScroller extends FrameLayout {
 		setClipChildren(false);
 	}
 
+	/**
+	 * Layout customization.<br/>
+	 * Color for Selected State is the color defined inside the Drawables.
+	 *
+	 * @param layoutResId Main layout of Fast Scroller
+	 * @param bubbleResId Drawable resource for Bubble containing the Text
+	 * @param handleResId Drawable resource for the Handle
+	 */
 	public void setViewsToUse(@LayoutRes int layoutResId, @IdRes int bubbleResId, @IdRes int handleResId) {
-		setViewsToUse(layoutResId, bubbleResId, handleResId, Color.parseColor("#aaaaaa"));
+		LayoutInflater inflater = LayoutInflater.from(getContext());
+		inflater.inflate(layoutResId, this, true);
+		bubble = (TextView) findViewById(bubbleResId);
+		if (bubble != null) bubble.setVisibility(INVISIBLE);
+		handle = (ImageView) findViewById(handleResId);
 	}
 
 	/**
-	 * Layout customization
+	 * Layout customization<br/>
+	 * Color for Selected State is also customized by the user.
 	 *
 	 * @param layoutResId Main layout of Fast Scroller
 	 * @param bubbleResId Drawable resource for Bubble containing the Text
@@ -90,11 +97,7 @@ public class FastScroller extends FrameLayout {
 	 * @param accentColor Color for Selected state during touch and scrolling (usually accent color)
 	 */
 	public void setViewsToUse(@LayoutRes int layoutResId, @IdRes int bubbleResId, @IdRes int handleResId, int accentColor) {
-		final LayoutInflater inflater = LayoutInflater.from(getContext());
-		inflater.inflate(layoutResId, this, true);
-		bubble = (TextView) findViewById(bubbleResId);
-		if (bubble != null) bubble.setVisibility(INVISIBLE);
-		handle = (ImageView) findViewById(handleResId);
+		setViewsToUse(layoutResId, bubbleResId, handleResId);
 		setBubbleAndHandleColor(accentColor);
 	}
 
@@ -144,7 +147,7 @@ public class FastScroller extends FrameLayout {
 
 	@Override
 	public boolean onTouchEvent(@NonNull MotionEvent event) {
-		final int action = event.getAction();
+		int action = event.getAction();
 		switch (action) {
 			case MotionEvent.ACTION_DOWN:
 				if (event.getX() < handle.getX() - ViewCompat.getPaddingStart(handle)) return false;
@@ -153,7 +156,7 @@ public class FastScroller extends FrameLayout {
 				((ScrollerListener) recyclerView.getAdapter()).onFastScroll(true);
 				showBubble();
 			case MotionEvent.ACTION_MOVE:
-				final float y = event.getY();
+				float y = event.getY();
 				setBubbleAndHandlePosition(y);
 				setRecyclerViewPosition(y);
 				return true;
@@ -167,16 +170,16 @@ public class FastScroller extends FrameLayout {
 		return super.onTouchEvent(event);
 	}
 
-	public void setRecyclerView(final RecyclerView recyclerView) {
+	public void setRecyclerView(RecyclerView recyclerView) {
 		this.recyclerView = recyclerView;
-		recyclerView.addOnScrollListener(onScrollListener);
-		recyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+		this.recyclerView.addOnScrollListener(onScrollListener);
+		this.recyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 			@Override
 			public boolean onPreDraw() {
-				recyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
+				FastScroller.this.recyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
 				if (bubble == null || handle.isSelected()) return true;
-				final int verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
-				final int verticalScrollRange = recyclerView.computeVerticalScrollRange();
+				int verticalScrollOffset = FastScroller.this.recyclerView.computeVerticalScrollOffset();
+				int verticalScrollRange = FastScroller.this.computeVerticalScrollRange();
 				float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
 				setBubbleAndHandlePosition(height * proportion);
 				return true;
@@ -193,7 +196,7 @@ public class FastScroller extends FrameLayout {
 
 	private void setRecyclerViewPosition(float y) {
 		if (recyclerView != null) {
-			final int itemCount = recyclerView.getAdapter().getItemCount();
+			int itemCount = recyclerView.getAdapter().getItemCount();
 			float proportion;
 			if (handle.getY() == 0)
 				proportion = 0f;
@@ -201,8 +204,8 @@ public class FastScroller extends FrameLayout {
 				proportion = 1f;
 			else
 				proportion = y / (float) height;
-			final int targetPos = getValueInRange(0, itemCount - 1, (int) (proportion * (float) itemCount));
-			final String bubbleText = ((ScrollerListener) recyclerView.getAdapter()).getTextToShowInBubble(targetPos);
+			int targetPos = getValueInRange(0, itemCount - 1, (int) (proportion * (float) itemCount));
+			String bubbleText = ((ScrollerListener) recyclerView.getAdapter()).getTextToShowInBubble(targetPos);
 			((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(targetPos, 0);
 			if (bubble != null)
 				bubble.setText(bubbleText);
@@ -215,7 +218,7 @@ public class FastScroller extends FrameLayout {
 	}
 
 	private void setBubbleAndHandlePosition(float y) {
-		final int handleHeight = handle.getHeight();
+		int handleHeight = handle.getHeight();
 		handle.setY(getValueInRange(0, height - handleHeight, (int) (y - handleHeight / 2)));
 		if (bubble != null) {
 			int bubbleHeight = bubble.getHeight();
@@ -256,4 +259,11 @@ public class FastScroller extends FrameLayout {
 		});
 		currentAnimator.start();
 	}
+
+	public interface ScrollerListener {
+		String getTextToShowInBubble(int pos);
+
+		void onFastScroll(boolean scrolling);
+	}
+
 }

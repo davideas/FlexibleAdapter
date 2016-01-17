@@ -35,8 +35,19 @@ public class DatabaseService {
 	public static Item newExampleItem(int i) {
 		Item item = new Item();
 		item.setId(++i);
-		item.setTitle("Item "+i);
+		item.setTitle("Item " + i);
 		item.setSubtitle("Subtitle " + i);
+		item.withExpandable(true);
+		if (i % 5 == 0) {
+			item.setTitle("Expandable Item " + i);
+			item.setInitiallyExpanded(i == 5);
+			for (int j = 1; j <= 5; j++) {
+				Item subItem = new Item();
+				subItem.setId(++i * j *(-1));
+				subItem.setTitle("Sub Item " + j);
+				item.addSubItem(subItem);
+			}
+		}
 		return item;
 	}
 
@@ -55,7 +66,10 @@ public class DatabaseService {
 	}
 
 	public void addItem(int i, Item item) {
-		mItems.add(i, item);
+		if (i < mItems.size())
+			mItems.add(i, item);
+		else
+			mItems.add(item);
 	}
 
 	public static void onDestroy() {
