@@ -207,7 +207,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @see #emptyBin()
 	 */
 	public void removeItems(List<Integer> selectedPositions) {
-		if (DEBUG) Log.v(TAG, "removeItems reverse Sorting positions --------------");
+		if (DEBUG) Log.v(TAG, "removeItems reverse Sorting positions");
 		// Reverse-sort the list
 		Collections.sort(selectedPositions, new Comparator<Integer>() {
 			@Override

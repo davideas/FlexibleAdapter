@@ -59,6 +59,8 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		mItems = DatabaseService.getInstance().getListById(param);
 
 		if (!super.isEmpty()) addUserLearnedSelection();
+		//FIXME: This should be done automatically by the Library
+		expandInitialItems(mItems);
 
 		//Fill and Filter mItems with your custom list
 		//Note: In case of userLearnSelection, mItems is pre-initialized and after filtered.
@@ -113,6 +115,85 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			notifyItemInserted(0);
 		}
 		super.addItem(position, item);
+	}
+
+	/*---------------------------*/
+	/* REMOVE METHODS OVERRIDDEN */
+	/*---------------------------*/
+
+//	/**
+//	 * Internally called to search the Parent position of a Child item.
+//	 *
+//	 * @param position Child position
+//	 * @return the Parent position
+//	 */
+//	private int getParentPosition(int position) {
+//		position--;
+//		while (position > 0) {
+//			if (getItem(position).isExpandable()) {
+//				if (DEBUG) Log.d(TAG, "Found parent at position " + position);
+//				break;
+//			}
+//			position--;
+//		}
+//		return position;
+//	}
+
+	/**
+	 * @param position            The position of item to remove
+	 * @param notifyParentChanged true to Notify parent of a removal of a child
+	 */
+	public void removeItem(int position, boolean notifyParentChanged) {
+		Item item = getItem(position);
+		if (notifyParentChanged && !item.isExpandable()) {
+			//It's a child, so notify the parent
+//			int parentPosition = getParentPosition(position);
+			Item parent = item.getParentItem();
+			parent.removeSubItem(item);
+			parent.updateSubTitle();
+			notifyItemChanged(getPositionForItem(parent));
+		} else {
+			//Assert parent is collapsed before removal
+			collapse(position);
+		}
+		super.removeItem(position);
+	}
+
+	/**
+	 * Before remove Items identified by selectedPositions, this method scan all immediate
+	 * previous Items to retrieve parent position only in case of Child removal.
+	 * <br/>If parent was found it is notified of the change by {@link #notifyItemChanged(int)}.
+	 * <br/>If no children are selected, the scan is skipped and items are removed
+	 * as usual calling {@link #removeItems(List)}.
+	 *
+	 * @param selectedPositions   list of item positions to remove
+	 * @param notifyParentChanged true to Notify parent of a removal of the children
+	 */
+	public void removeItems(List<Integer> selectedPositions, boolean notifyParentChanged) {
+		List<Item> parentsToNotify = new ArrayList<Item>();
+		if (notifyParentChanged) {
+			for (Integer position : selectedPositions) {
+				//Take only children: verify that is a child
+				Item item = getItem(position);
+				if (!item.isExpandable() && item.getParentItem() != null) {
+					Item parent = item.getParentItem();
+					parent.removeSubItem(item);
+					//Assert to notify only once the parent
+					if (!parentsToNotify.contains(parent)) {
+						parentsToNotify.add(parent);
+					}
+				}
+			}
+		}
+		//Remove items as usual
+		super.removeItems(selectedPositions);
+		//Notify all identified parents of the removal of child items
+		Log.d(TAG, "Parents to notify " + parentsToNotify.size());
+		for (Item parent : parentsToNotify) {
+			parent.updateSubTitle();
+			Log.d(TAG, parent.getTitle() + " - " + parent.getSubtitle());
+			notifyItemChanged(getPositionForItem(parent));
+		}
 	}
 
 	@Override
@@ -305,7 +386,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			//TODO FOR YOU: This is the normal line you should use: Usually it's the first letter
 			return getItem(position).getTitle().substring(0, 1).toUpperCase();
 		}
-		return getItem(position).getTitle().substring(5); //This is for my example only
+		return super.getTextToShowInBubble(position);
 	}
 
 	private void setHighlightText(TextView textView, String text, String searchText) {

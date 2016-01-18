@@ -4,16 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Generic implementation of {@link FlexibleItem} interface with most useful methods to manage
+ * expansion, selection and sub items.
+ *
  * @author Davide Steduto
  * @since 17/01/2016
  */
 public abstract class AbstractFlexibleItem<T> implements FlexibleItem<T> {
 
+	/* Flags for FlexibleExpandableAdapter */
 	boolean mExpanded = false;
 	boolean mExpandable = false;
 	boolean mSelectable = true;
+	/** subItems list */
 	List<T> mSubItems;
+	/** Reference to the Parent Item */
+	T mParent;
 
+	/**
+	 * You should implement this method to compare items Identifiers.
+	 *
+	 * @param o Instance to compare
+	 * @return true if items are equals, false otherwise.
+	 */
 	@Override
 	public abstract boolean equals(Object o);
 
@@ -31,7 +44,6 @@ public abstract class AbstractFlexibleItem<T> implements FlexibleItem<T> {
 		this.mExpandable = expandable;
 	}
 
-	@Override
 	public T withExpandable(boolean expandable) {
 		this.mExpandable = expandable;
 		return (T) this;
@@ -47,15 +59,8 @@ public abstract class AbstractFlexibleItem<T> implements FlexibleItem<T> {
 		this.mExpanded = expanded;
 	}
 
-	@Override
 	public void setInitiallyExpanded(boolean expanded) {
 		this.mExpanded = expanded;
-	}
-
-	@Override
-	public T withInitiallyExpanded(boolean expanded) {
-		this.mExpanded = expanded;
-		return (T) this;
 	}
 
 	/*--------------------*/
@@ -72,7 +77,6 @@ public abstract class AbstractFlexibleItem<T> implements FlexibleItem<T> {
 		this.mSelectable = selectable;
 	}
 
-	@Override
 	public T withSelectable(boolean selectable) {
 		this.mSelectable = selectable;
 		return (T) this;
@@ -81,6 +85,18 @@ public abstract class AbstractFlexibleItem<T> implements FlexibleItem<T> {
 	/*-------------------*/
 	/* SUB ITEMS METHODS */
 	/*-------------------*/
+
+	public T getParentItem() {
+		return mParent;
+	}
+
+	public void setParentItem(T item) {
+		mParent = item;
+	}
+
+	public boolean hasSubItems() {
+		return mSubItems!= null && mSubItems.size() > 0;
+	}
 
 	@Override
 	public List<T> getSubItems() {
@@ -92,10 +108,13 @@ public abstract class AbstractFlexibleItem<T> implements FlexibleItem<T> {
 		mSubItems = items;
 	}
 
-	@Override
 	public T withSubItems(List<T> items) {
 		mSubItems = items;
 		return (T) this;
+	}
+
+	public int getSubItemsCount() {
+		return mSubItems != null ? mSubItems.size() : 0;
 	}
 
 	public T getSubItem(int position) {
@@ -120,17 +139,20 @@ public abstract class AbstractFlexibleItem<T> implements FlexibleItem<T> {
 			addSubItem(item);
 	}
 
-	public void removeSubItem(T item) {
-		if (mSubItems != null)
-			mSubItems.remove(item);
+	public boolean contains(T item) {
+		return mSubItems != null && mSubItems.contains(item);
 	}
 
-	public void removeSubItem(int position) {
-		if (mSubItems != null) {
-			int index = mSubItems.indexOf(position);
-			if (index != -1)
-				mSubItems.remove(position);
+	public boolean removeSubItem(T item) {
+		return mSubItems != null && mSubItems.remove(item);
+	}
+
+	public boolean removeSubItemAt(int position) {
+		if (mSubItems != null && position > 0 && position < mSubItems.size()) {
+			mSubItems.remove(position);
+			return true;
 		}
+		return false;
 	}
 
 }

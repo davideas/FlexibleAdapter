@@ -3,6 +3,10 @@ package eu.davidea.flexibleadapter.item;
 import java.util.List;
 
 /**
+ * Interface to manage Item operations with {@link eu.davidea.flexibleadapter.FlexibleExpandableAdapter}.
+ * <br/>Most of these methods are called in the Adapter.
+ * <br/>Implements this interface or use {@link AbstractFlexibleItem}.
+ *
  * @author Davide Steduto
  * @since 17/01/2016
  */
@@ -16,15 +20,9 @@ public interface FlexibleItem<T> {
 
 	void setExpandable(boolean expandable);
 
-	T withExpandable(boolean expandable);
-
 	boolean isExpanded();
 
 	void setExpanded(boolean expanded);
-
-	void setInitiallyExpanded(boolean expanded);
-
-	T withInitiallyExpanded(boolean expanded);
 
 	/*--------------------*/
 	/* SELECTABLE METHODS */
@@ -34,8 +32,6 @@ public interface FlexibleItem<T> {
 
 	void setSelectable(boolean selectable);
 
-	T withSelectable(boolean selectable);
-
 	/*-------------------*/
 	/* SUB ITEMS METHODS */
 	/*-------------------*/
@@ -43,7 +39,5 @@ public interface FlexibleItem<T> {
 	List<T> getSubItems();
 
 	void setSubItems(List<T> items);
-
-	T withSubItems(List<T> items);
 
 }

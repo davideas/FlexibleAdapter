@@ -245,6 +245,10 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		return selectedItems;
 	}
 
+	/*----------------*/
+	/* INSTANCE STATE */
+	/*----------------*/
+
 	/**
 	 * Save the state of the current selection on the items.
 	 *
@@ -261,12 +265,6 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		selectedItems = savedInstanceState.getIntegerArrayList(TAG);
-	}
-
-	@Override
-	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-		super.onAttachedToRecyclerView(recyclerView);
-		mRecyclerView = recyclerView;
 	}
 
 	/*---------------*/
@@ -300,6 +298,12 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	@Override
 	public void onFastScroll(boolean scrolling) {
 		//nothing
+	}
+
+	@Override
+	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+		super.onAttachedToRecyclerView(recyclerView);
+		mRecyclerView = recyclerView;
 	}
 
 }

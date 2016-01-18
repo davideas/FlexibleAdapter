@@ -50,4 +50,8 @@ public class Item extends AbstractFlexibleItem<Item> implements Serializable {
 		return title;
 	}
 
+	public void updateSubTitle() {
+		setSubtitle(getSubItemsCount() + " subItems");
+	}
+
 }

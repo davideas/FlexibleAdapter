@@ -84,7 +84,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 		int position = getAdapterPosition();
 		if (mAdapter.isExpanded(position)) {
 			collapseView(position);
-		} else if (mAdapter.getSelectedItemCount() == 0 && !mAdapter.isSelected(position)) {
+		} else if (!mAdapter.isSelected(position)) {
 			expandView(position);
 		}
 	}

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.item.FlexibleItem;
+import eu.davidea.viewholder.ExpandableViewHolder;
 import eu.davidea.viewholder.FlexibleViewHolder;
 
 /**
@@ -17,7 +18,7 @@ import eu.davidea.viewholder.FlexibleViewHolder;
  * @author Davide Steduto
  * @since 16/01/2016
  */
-public abstract class FlexibleExpandableAdapter<EVH extends FlexibleViewHolder, T extends FlexibleItem<T>>
+public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder, T extends FlexibleItem<T>>
 		extends FlexibleAnimatorAdapter<FlexibleViewHolder, T> {
 
 	private static final String TAG = FlexibleExpandableAdapter.class.getSimpleName();
@@ -41,13 +42,13 @@ public abstract class FlexibleExpandableAdapter<EVH extends FlexibleViewHolder, 
 		expandInitialItems(items);
 	}
 
-	private void expandInitialItems(List<T> items) {
+	protected void expandInitialItems(List<T> items) {
 		//Set initially expanded
 		Log.d(TAG, "Items=" + items.size());
 		for (int i = 0; i < items.size(); i++) {
 			T item = items.get(i);
 			//FIXME: Foreseen bug on Rotation: coordinate expansion with onRestoreInstanceState
-			if (item.isExpanded() && item.getSubItems() != null && item.getSubItems().size() > 0) {
+			if (item.isExpanded() && hasSubItems(item)) {
 				if (DEBUG) Log.d(TAG, "Initially expand item on position " + i);
 				mExpandedItems.put(i, item.getSubItems().size());
 				mItems.addAll(i + 1, item.getSubItems());
@@ -59,6 +60,15 @@ public abstract class FlexibleExpandableAdapter<EVH extends FlexibleViewHolder, 
 	/*--------------*/
 	/* MAIN METHODS */
 	/*--------------*/
+
+	//TODO: Add and Remove subItems for a specific parent
+	//TODO: Find a way to notify parent position if child is added or removed
+
+	//FIXME: Rewrite Filter logic: Expand Parent if subItem is filtered by searchText?
+	//FIXME: Rewrite Restore logic: Restore Deleted child items at right position. Check if Parent was collapsed in the meantime
+
+	//FIXME: Find a way to not animate items with ItemAnimator
+	//TODO: Customize child items animations (don't use add or remove ItemAnimator)
 
 	public boolean isExpanded(int position) {
 		T item = getItem(position);
@@ -80,34 +90,6 @@ public abstract class FlexibleExpandableAdapter<EVH extends FlexibleViewHolder, 
 			expandedItems[i] = mExpandedItems.keyAt(i);
 		}
 		return expandedItems;
-	}
-
-	@Override
-	public void toggleSelection(int position) {
-		this.toggleSelection(position, false);
-	}
-
-	@Override
-	public void toggleSelection(int position, boolean invalidate) {
-		T item = getItem(position);
-		//Allow selection only for selectable items
-		if (item.isSelectable()) {
-			if (item.isExpandable() && !childSelected) {
-				//Allow selection of Parent if no Child has been previously selected
-				parentSelected = true;
-				super.toggleSelection(position, invalidate);
-			} else if (!item.isExpandable() && !parentSelected) {
-				//Allow selection of Child if no Parent has been previously selected
-				childSelected = true;
-				super.toggleSelection(position, invalidate);
-			}
-		}
-	}
-
-	@Override
-	public void clearSelection() {
-		parentSelected = childSelected = false;
-		super.clearSelection();
 	}
 
 	@Override
@@ -160,10 +142,13 @@ public abstract class FlexibleExpandableAdapter<EVH extends FlexibleViewHolder, 
 		}
 	}
 
+	private boolean hasSubItems(T item) {
+		return item.getSubItems() != null && item.getSubItems().size() > 0;
+	}
+
 	public void expand(int position) {
 		T item = getItem(position);
-		if (item.isExpandable() && !item.isExpanded() &&
-				item.getSubItems() != null && item.getSubItems().size() > 0) {
+		if (item.isExpandable() && !item.isExpanded() && hasSubItems(item) && !parentSelected) {
 
 			int subItemsCount = item.getSubItems().size();
 			mExpandedItems.put(position, subItemsCount);
@@ -182,8 +167,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends FlexibleViewHolder, 
 
 	public void collapse(int position) {
 		T item = getItem(position);
-		if (item.isExpandable() && item.isExpanded() &&
-				item.getSubItems() != null && item.getSubItems().size() > 0) {
+		if (item.isExpandable() && item.isExpanded() && !hasSubItemsSelected(item)) {
 
 			int subItemsCount = item.getSubItems().size();
 			int indexOfKey = mExpandedItems.indexOfKey(position);
@@ -209,11 +193,52 @@ public abstract class FlexibleExpandableAdapter<EVH extends FlexibleViewHolder, 
 		}
 	}
 
+	/*------------------------------*/
+	/* SELECTION METHODS OVERRIDDEN */
+	/*------------------------------*/
+
 	@Override
-	public void removeItem(int position) {
-		collapse(position);
-		super.removeItem(position);
+	public void toggleSelection(int position) {
+		this.toggleSelection(position, false);
 	}
+
+	@Override
+	public void toggleSelection(int position, boolean invalidate) {
+		T item = getItem(position);
+		//Allow selection only for selectable items
+		if (item.isSelectable()) {
+			if (item.isExpandable() && !childSelected) {
+				//Allow selection of Parent if no Child has been previously selected
+				parentSelected = true;
+				super.toggleSelection(position, invalidate);
+			} else if (!item.isExpandable() && !parentSelected) {
+				//Allow selection of Child if no Parent has been previously selected
+				childSelected = true;
+				super.toggleSelection(position, invalidate);
+			}
+		}
+	}
+
+	@Override
+	public void clearSelection() {
+		parentSelected = childSelected = false;
+		super.clearSelection();
+	}
+
+	private boolean hasSubItemsSelected(T item) {
+		if (item.getSubItems() == null) return false;
+
+		for (T subItem : item.getSubItems()) {
+			if (isSelected(getPositionForItem(subItem))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/*----------------*/
+	/* INSTANCE STATE */
+	/*----------------*/
 
 	/**
 	 * Save the state of the current expanded items.

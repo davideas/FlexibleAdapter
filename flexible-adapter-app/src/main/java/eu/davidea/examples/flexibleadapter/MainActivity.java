@@ -170,7 +170,8 @@ public class MainActivity extends AppCompatActivity implements
 			public void onRefresh() {
 				mAdapter.updateDataSet();
 				mSwipeRefreshLayout.setEnabled(false);
-				mSwipeHandler.sendEmptyMessageDelayed(0, 2000L);
+				mSwipeHandler.sendEmptyMessageDelayed(0, 1000L);
+				destroyActionModeIfNeeded();
 			}
 		});
 	}
@@ -336,24 +337,26 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
+	//TODO: Include setActiveSelection in the library
 	public void setSelection(final int position) {
-		Log.v(TAG, "setSelection called!");
+		if (mAdapter.getMode() == FlexibleAdapter.MODE_SINGLE) {
+			Log.v(TAG, "setSelection called!");
 
-		setActivatedPosition(position);
+			setActivatedPosition(position);
 
-		mRecyclerView.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				mRecyclerView.smoothScrollToPosition(position);
-			}
-		}, 1000L);
+			mRecyclerView.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mRecyclerView.smoothScrollToPosition(position);
+				}
+			}, 1000L);
+		}
 	}
 
 	private void setActivatedPosition(int position) {
 		Log.d(TAG, "ItemList New mActivatedPosition=" + position);
 		mActivatedPosition = position;
 	}
-
 
 	@Override
 	public void onTitleModified(int position, String newTitle) {
@@ -373,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements
 			if (mAdapter.getItemCount() > 0) {
 				if (position != mActivatedPosition) setActivatedPosition(position);
 				Item item = mAdapter.getItem(position);
-				if (!item.isExpandable()) {
+				if (!item.hasSubItems()) {
 					//TODO FOR YOU: call your custom Callback, for example mCallback.onItemSelected(item.getId());
 					EditItemDialog.newInstance(item, position).show(getFragmentManager(), EditItemDialog.TAG);
 				}
@@ -462,15 +465,13 @@ public class MainActivity extends AppCompatActivity implements
 				//Build message before delete, for the Snackbar
 				StringBuilder message = new StringBuilder();
 				for (Integer pos : mAdapter.getSelectedItems()) {
+
 					message.append(mAdapter.getItem(pos).getTitle());
 					message.append(", ");
 				}
 				message.append(" ").append(getString(R.string.action_deleted));
 
-				//Remove selected items from Adapter list after message is built
-				mAdapter.removeItems(mAdapter.getSelectedItems());
-
-				//Snackbar for Undo
+				//SnackBar for Undo
 				//noinspection ResourceType
 				mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)
 						.setAction(R.string.undo, new View.OnClickListener() {
@@ -481,7 +482,11 @@ public class MainActivity extends AppCompatActivity implements
 							}
 						});
 				mSnackBar.show();
-				mAdapter.startUndoTimer(7000L + 200L, this);//+200: Using Snackbar, user can still click on the action button while bar is dismissing for a fraction of time
+
+				//Remove selected items from Adapter list after message is shown
+				mAdapter.removeItems(mAdapter.getSelectedItems(), true);
+				mAdapter.startUndoTimer(7000L + 200L, this);//+200: Using SnackBar, user can still click on the action button while bar is dismissing for a fraction of time
+
 				mSwipeHandler.sendEmptyMessage(1);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 7000L);
 				mActionMode.finish();

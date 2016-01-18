@@ -37,17 +37,26 @@ public class DatabaseService {
 		item.setId(++i);
 		item.setTitle("Item " + i);
 		item.setSubtitle("Subtitle " + i);
+
+		//All parent items are expandable
 		item.withExpandable(true);
+		//Let's initially expand the first father with subElements
+		item.setInitiallyExpanded(i == 5);
+
+		//Add subItems every 5 elements
+		//subItems are not expandable by default
 		if (i % 5 == 0) {
 			item.setTitle("Expandable Item " + i);
-			item.setInitiallyExpanded(i == 5);
 			for (int j = 1; j <= 5; j++) {
 				Item subItem = new Item();
-				subItem.setId(++i * j *(-1));
+				subItem.setId(i * j * (-1));
 				subItem.setTitle("Sub Item " + j);
+				subItem.setParentItem(item);
 				item.addSubItem(subItem);
 			}
+			item.updateSubTitle();
 		}
+
 		return item;
 	}
 
@@ -62,7 +71,16 @@ public class DatabaseService {
 	}
 
 	public void removeItem(Item item) {
-		mItems.remove(item);
+		//Is a Parent?
+		if (item.isExpandable()) {
+			mItems.remove(item);
+		} else {
+			Item parent = item.getParentItem();
+			if (parent.contains(item)) {
+				parent.removeSubItem(item);
+				parent.updateSubTitle();
+			}
+		}
 	}
 
 	public void addItem(int i, Item item) {
@@ -70,6 +88,11 @@ public class DatabaseService {
 			mItems.add(i, item);
 		else
 			mItems.add(item);
+	}
+
+	public void addSubItem(int i, Item parent, Item subItem) {
+		parent.addSubItem(i, subItem);
+		parent.setSubtitle(parent.getSubItemsCount() + " subItems");
 	}
 
 	public static void onDestroy() {
