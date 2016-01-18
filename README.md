@@ -13,7 +13,8 @@
 * Customizable FastScroller, **NEW** now in the library
 * SearchFilter with string selection in Item titles and any subtext.
 * Add and Remove items with custom animations.
-* **NEW!** Initial item animations with custom configuration based on adapter position.
+* **NEW!** Initial Item Animations with custom configuration based on adapter position.
+* **NEW!** Expandable Item with selection coherence.
 
 #### How is made
 The base functionality is taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
@@ -52,114 +53,22 @@ Remember to call `super(items)` or to initialize `mItems` (List already included
 #### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!
 
-# Usage for Single Selection
-See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In your Activity/Fragment creation set the Mode SINGLE.
-In onListItemClick, call *toggleSeletion* to register the selection on that position:
-``` java
-public class MainActivity extends AppCompatActivity {
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		...
-		mAdapter = new YourAdapterClass(..., ..., ...);
-		mAdapter.setMode(YourAdapterClass.MODE_SINGLE);
-		...
-	}
-
-	@Override
-	public boolean onListItemClick(int position) {
-		toggleSelection(position);
-	}
-}
-```
-
-# Usage for Multi Selection
-See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! In your Activity/Fragment change the Modes for the _ActionMode_ object.
-``` java
-public class MainActivity extends AppCompatActivity implements
-		ActionMode.Callback {
-	...
-	@Override
-	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-		mode.getMenuInflater().inflate(R.menu.menu_context, menu);
-		mAdapter.setMode(YourAdapterClass.MODE_MULTI);
-		return true;
-	}
-	
-	@Override
-	public void onDestroyActionMode(ActionMode mode) {
-		mAdapter.setMode(YourAdapterClass.MODE_SINGLE);
-		mAdapter.clearSelection();
-		mActionMode = null;
-	}
-}
-```
-
-# Usage for Undo
+### Usage for Single Selection
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
-``` java
-@Override
-public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-	switch (item.getItemId()) {
-		...
-		case R.id.action_delete:
-			//Keep synchronized the Adapter: Remove selected items from Adapter
-			mAdapter.removeItems(mAdapter.getSelectedItems());
-
-			//Start countdown with startUndoTimer(millisec)
-			//"this" is the Activity that implements OnDeleteCompleteListener.
-			mAdapter.startUndoTimer(7000, this); //Default 5''
-			mActionMode.finish();
-			return true;
-	}
-}
-
-@Override
-public void onDeleteConfirmed() {
-	for (Item item : mAdapter.getDeletedItems()) {
-		//Remove items from your Database. Example:
-		DatabaseService.getInstance().removeItem(item);
-	}
-}
-```
-
-# Usage for FastScroller
-See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details! First add the drawable files to the project, then the layout, finally add the implementation for the Adapter and Activity/Fragment:
-``` java
-public class YourAdapterClass extends FlexibleAdapter<FlexibleViewHolder, Item>
-		implements FastScroller.BubbleTextGetter {
-	...
-	@Override
-	public String getTextToShowInBubble(int position) {
-		return getItem(position).getTitle().substring(0,1).toUpperCase();
-	}
-}
-```
-``` java
-public class MainActivity extends AppCompatActivity {
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		...
-		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
-		fastScroller.setRecyclerView(mRecyclerView);
-		fastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle);
-	}
-	...
-}
-```
-# Usage for the Filter
+In your Activity/Fragment creation set the Mode SINGLE.
+In onListItemClick, call *toggleSeletion* to register the selection on that position:
+### Usage for Multi Selection
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
+In your Activity/Fragment change the Modes for the _ActionMode_ object, set the Mode MULTI.
+### Usage for Undo
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
+### Usage for FastScroller
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
+Use the internal layout and drawables or create custom files, finally add the implementation for the Adapter and Activity/Fragment:
+### Usage for the Filter
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 First, call _YourAdapterClass.setSearchText()_ in the Activity, then in _YourAdapterClass.updateDataSet()_, call _filterItems()_;
-``` java
-public class YourAdapterClass extends FlexibleAdapter<FlexibleViewHolder, Item> {
-	...
-	@Override
-	public void updateDataSet(String param) {
-		//Fill and Filter mItems with your custom list
-		filterItems(DatabaseService.getInstance().getListById(param));
-	}
-}
-```
-# Usage for initial item animations
+#### Usage for Initial Item Animations
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 Implement your custom logic based on position with getAnimators(); Call animateView() at the end of onBindViewHolder();
 ``` java
@@ -181,10 +90,13 @@ public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder
     }
 }
 ```
+#### Usage for Expandable items
+See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 
 # Change Log
-###### v5.0.0-b2 - 2016.01.15
-- Easy initial item animation based on adapter position [See #15].
+###### v5.0.0-b2 - 2016.01.20
+- Initial **Item Animation** with customization based on adapter position - viewType - selection [See #15].
+- Added **Expandable items** with selection coherence, to use with **ExpandableViewHolder** and **FlexibleItem**.
 - Added FastScroller in the library
 - Added support for Grid Layout
 - Adapted example App accordingly
@@ -192,7 +104,7 @@ public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder
 ###### v5.0.0-b1 - 2016.01.03
 - Removed _FilterAsyncTask_ and all deprecated functions from _OnUpdateListener_ [See #18].
 - _OnUpdateListener_ now contains only the new _onUpdateEmptyView()_ [See #17].
-- Added FlexibleViewHolder [See #14].
+- Added **FlexibleViewHolder** [See #14].
 - Added _enableLogs()_ to see internal logs at runtime.
 - Adapted example App accordingly.
 
