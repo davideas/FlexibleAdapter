@@ -68,7 +68,7 @@ Use the internal layout and drawables or create custom files, finally add the im
 ### Usage for the Filter
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 First, call _YourAdapterClass.setSearchText()_ in the Activity, then in _YourAdapterClass.updateDataSet()_, call _filterItems()_;
-#### Usage for Initial Item Animations
+### Usage for Initial Item Animations
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 Implement your custom logic based on position with getAnimators(); Call animateView() at the end of onBindViewHolder();
 ``` java
@@ -90,14 +90,14 @@ public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder
     }
 }
 ```
-#### Usage for Expandable items
+### Usage for Expandable items
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 
 # Change Log
 ###### v5.0.0-b2 - 2016.01.20
-- Initial **Item Animation** with customization based on adapter position - viewType - selection [See #15].
-- Added **Expandable items** with selection coherence, to use with **ExpandableViewHolder** and **FlexibleItem**.
-- Added FastScroller in the library
+- **Initial Item Animation** with customization based on adapter position - viewType - selection [See #15].
+- **Expandable items** with selection coherence [See #23].
+- Added FastScroller in the library [See #20].
 - Added support for Grid Layout
 - Adapted example App accordingly
 
