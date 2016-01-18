@@ -2,7 +2,7 @@ package eu.davidea.viewholder;
 
 import android.view.View;
 
-import eu.davidea.flexibleadapter.ExpandableAdapter;
+import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
 
 
 /**
@@ -14,18 +14,18 @@ import eu.davidea.flexibleadapter.ExpandableAdapter;
  */
 public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
-	protected final ExpandableAdapter mAdapter;
+	protected final FlexibleExpandableAdapter mAdapter;
 
 
 	/**
 	 * Default constructor.
 	 *
 	 * @param view The {@link View} being hosted in this ViewHolder
-	 * @param adapter Instance of {@link ExpandableAdapter}
+	 * @param adapter Instance of {@link FlexibleExpandableAdapter}
 	 * @param listItemClickListener Instance of {@link OnListItemClickListener}
 	 */
 	public ExpandableViewHolder(View view,
-								ExpandableAdapter adapter,
+								FlexibleExpandableAdapter adapter,
 								OnListItemClickListener listItemClickListener) {
 
 		super(view, adapter, listItemClickListener);

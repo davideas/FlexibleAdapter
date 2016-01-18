@@ -17,23 +17,25 @@ import eu.davidea.viewholder.FlexibleViewHolder;
  * @author Davide Steduto
  * @since 16/01/2016
  */
-public abstract class ExpandableAdapter<EVH extends FlexibleViewHolder, T extends FlexibleItem<T>>
+public abstract class FlexibleExpandableAdapter<EVH extends FlexibleViewHolder, T extends FlexibleItem<T>>
 		extends FlexibleAnimatorAdapter<FlexibleViewHolder, T> {
 
-	private static final String TAG = ExpandableAdapter.class.getSimpleName();
+	private static final String TAG = FlexibleExpandableAdapter.class.getSimpleName();
 	private static int EXPANDABLE_VIEW_TYPE = -1;
 
 	private SparseIntArray mExpandedItems;
+	boolean parentSelected = false;
+	boolean childSelected = false;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
 	/*--------------*/
 
-	public ExpandableAdapter(@NonNull List<T> items) {
+	public FlexibleExpandableAdapter(@NonNull List<T> items) {
 		this(items, null);
 	}
 
-	public ExpandableAdapter(@NonNull List<T> items, Object listener) {
+	public FlexibleExpandableAdapter(@NonNull List<T> items, Object listener) {
 		super(items, listener);
 		mExpandedItems = new SparseIntArray();
 		expandInitialItems(items);
@@ -59,12 +61,12 @@ public abstract class ExpandableAdapter<EVH extends FlexibleViewHolder, T extend
 	/*--------------*/
 
 	public boolean isExpanded(int position) {
-		FlexibleItem item = getItem(position);
+		T item = getItem(position);
 		return item.isExpandable() && item.isExpanded();
 	}
 
 	public boolean isExpandable(int position) {
-		FlexibleItem item = getItem(position);
+		T item = getItem(position);
 		return item.isExpandable();
 	}
 
@@ -87,8 +89,25 @@ public abstract class ExpandableAdapter<EVH extends FlexibleViewHolder, T extend
 
 	@Override
 	public void toggleSelection(int position, boolean invalidate) {
-		if (getItem(position).isSelectable())
-			super.toggleSelection(position, invalidate);
+		T item = getItem(position);
+		//Allow selection only for selectable items
+		if (item.isSelectable()) {
+			if (item.isExpandable() && !childSelected) {
+				//Allow selection of Parent if no Child has been previously selected
+				parentSelected = true;
+				super.toggleSelection(position, invalidate);
+			} else if (!item.isExpandable() && !parentSelected) {
+				//Allow selection of Child if no Parent has been previously selected
+				childSelected = true;
+				super.toggleSelection(position, invalidate);
+			}
+		}
+	}
+
+	@Override
+	public void clearSelection() {
+		parentSelected = childSelected = false;
+		super.clearSelection();
 	}
 
 	@Override
@@ -152,6 +171,7 @@ public abstract class ExpandableAdapter<EVH extends FlexibleViewHolder, T extend
 			item.setExpanded(true);
 
 			//Automatically scroll the current expandable item to the first visible position
+			//FIXME: Bug with SmoothScrollLinearLayoutManager: Parent Item content seems duplicated to previous item after the scroll
 			mRecyclerView.smoothScrollToPosition(position);
 
 			notifyItemRangeInserted(position + 1, subItemsCount);
