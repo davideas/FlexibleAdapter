@@ -6,6 +6,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -36,7 +37,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	protected List<T> mItems;
 	protected List<T> mDeletedItems;
-	protected List<Integer> mOriginalPosition;
+	protected SparseArray<T> mRemovedItems;
+	protected List<Integer> mOriginalPositions;
 	protected String mSearchText;
 	protected Handler mHandler;
 	protected OnUpdateListener mUpdateListener;
@@ -255,6 +257,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
+	/**
+	 * Wrapper method to remove Items that are currently selected.<br/>
+	 * @see #removeItems(List)
+	 */
+	public void removeAllSelectedItems() {
+		removeItems(getSelectedItems());
+	}
+
 	/*--------------*/
 	/* UNDO METHODS */
 	/*--------------*/
@@ -267,11 +277,13 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public void saveDeletedItem(int position, T item) {
 		if (mDeletedItems == null) {
 			mDeletedItems = new ArrayList<T>();
-			mOriginalPosition = new ArrayList<Integer>();
+			mOriginalPositions = new ArrayList<Integer>();
+			mRemovedItems = new SparseArray<T>();
 		}
 		if (DEBUG) Log.v(TAG, "Recycled " + item + " on position=" + position);
 		mDeletedItems.add(item);
-		mOriginalPosition.add(position);
+		mOriginalPositions.add(position);
+		mRemovedItems.put(position, item);
 	}
 
 	/**
@@ -292,13 +304,15 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public void restoreDeletedItems() {
 		stopUndoTimer();
 		//Reverse insert (list was reverse ordered on Delete)
-		for (int i = mOriginalPosition.size() - 1; i >= 0; i--) {
+		for (int i = mOriginalPositions.size() - 1; i >= 0; i--) {
 			T item = mDeletedItems.get(i);
-			Log.d(TAG, "Restoring item " + item + " on position " + mOriginalPosition.get(i));
+			T item2 = mRemovedItems.get(mRemovedItems.indexOfKey(i));
+			if (DEBUG) Log.d(TAG, "Restoring item " + item + " on position " + mOriginalPositions.get(i));
+			if (DEBUG) Log.d(TAG, "Restoring item2 " + item2 + " on position " + mRemovedItems.indexOfKey(i));
 			//Avoid to restore(show) Items not filtered by the current filter
 			if (hasSearchText() && !filterObject(item, getSearchText()))
 				continue;
-			addItem(mOriginalPosition.get(i), item);
+			addItem(mOriginalPositions.get(i), item);
 		}
 		emptyBin();
 	}
@@ -310,7 +324,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public synchronized void emptyBin() {
 		if (mDeletedItems != null) {
 			mDeletedItems.clear();
-			mOriginalPosition.clear();
+			mOriginalPositions.clear();
+			mRemovedItems.clear();
 		}
 	}
 
@@ -344,7 +359,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Stop Undo timer.
 	 * <br/><b>Note:</b> This method is automatically called in case of restoration.
 	 */
-	private void stopUndoTimer() {
+	protected void stopUndoTimer() {
 		if (mHandler != null) {
 			mHandler.removeCallbacksAndMessages(null);
 			mHandler = null;
@@ -394,11 +409,11 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 					if (mDeletedItems != null && mDeletedItems.contains(item)) {
 						int index = mDeletedItems.indexOf(item);
 						//Calculate new original position: skip counting position if item was deleted in range
-						if (mOriginalPosition.get(index) != oldOriginalPosition) {
+						if (mOriginalPositions.get(index) != oldOriginalPosition) {
 							newOriginalPosition++;
-							oldOriginalPosition = mOriginalPosition.get(index);
+							oldOriginalPosition = mOriginalPositions.get(index);
 						}
-						mOriginalPosition.set(index, newOriginalPosition + mItems.size());
+						mOriginalPositions.set(index, newOriginalPosition + mItems.size());
 					} else {
 						mItems.add(item);
 					}
@@ -407,9 +422,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		} else {
 			mItems = unfilteredItems; //with no filter
 			if (mDeletedItems != null && !mDeletedItems.isEmpty()) {
-				mOriginalPosition = new ArrayList<Integer>(mDeletedItems.size());
+				mOriginalPositions = new ArrayList<Integer>(mDeletedItems.size());
 				for (T item : mDeletedItems) {
-					mOriginalPosition.add(mItems.indexOf(item));
+					mOriginalPositions.add(mItems.indexOf(item));
 				}
 				mItems.removeAll(mDeletedItems);
 			}

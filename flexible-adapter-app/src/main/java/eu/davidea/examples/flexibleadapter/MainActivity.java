@@ -465,7 +465,6 @@ public class MainActivity extends AppCompatActivity implements
 				//Build message before delete, for the Snackbar
 				StringBuilder message = new StringBuilder();
 				for (Integer pos : mAdapter.getSelectedItems()) {
-
 					message.append(mAdapter.getItem(pos).getTitle());
 					message.append(", ");
 				}

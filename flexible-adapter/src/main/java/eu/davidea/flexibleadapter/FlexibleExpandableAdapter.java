@@ -3,12 +3,13 @@ package eu.davidea.flexibleadapter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.ViewGroup;
 
 import java.util.List;
 
-import eu.davidea.flexibleadapter.item.FlexibleItem;
+import eu.davidea.flexibleadapter.item.IExpandableItem;
 import eu.davidea.viewholder.ExpandableViewHolder;
 import eu.davidea.viewholder.FlexibleViewHolder;
 
@@ -18,13 +19,14 @@ import eu.davidea.viewholder.FlexibleViewHolder;
  * @author Davide Steduto
  * @since 16/01/2016
  */
-public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder, T extends FlexibleItem<T>>
+public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder, T extends IExpandableItem<T>>
 		extends FlexibleAnimatorAdapter<FlexibleViewHolder, T> {
 
 	private static final String TAG = FlexibleExpandableAdapter.class.getSimpleName();
 	private static int EXPANDABLE_VIEW_TYPE = -1;
 
 	private SparseIntArray mExpandedItems;
+	private SparseArray<T> removedChildForParents;
 	boolean parentSelected = false;
 	boolean childSelected = false;
 
@@ -78,6 +80,20 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	public boolean isExpandable(int position) {
 		T item = getItem(position);
 		return item.isExpandable();
+	}
+
+	/**
+	 * Retrieve the parent of any child.
+	 *
+	 * @param child Child item
+	 * @return The Parent of this child item or null if not found
+	 */
+	public T getExpandableOf(T child) {
+		for (T parent : mItems) {
+			if (parent.isExpandable() && parent.contains(child))
+				return parent;
+		}
+		return null;
 	}
 
 	/**
@@ -191,6 +207,54 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			if (DEBUG)
 				Log.d(TAG, "Collapsed " + subItemsCount + " subItems on position=" + position);
 		}
+	}
+
+	/*----------------------------*/
+	/* REMOVAL METHODS OVERRIDDEN */
+	/*----------------------------*/
+
+	/**
+	 * @param position            The position of item to remove
+	 * @param notifyParentChanged true to Notify parent of a removal of a child
+	 */
+	public void removeItem(int position, boolean notifyParentChanged) {
+		T item = getItem(position);
+		if (!item.isExpandable()) {
+			//It's a child, so notify the parent
+			T parent = getExpandableOf(item);
+			if (parent != null) {
+				int parentPosition = getPositionForItem(parent);
+				//removedChildForParents.put(position, parent);
+				parent.removeSubItem(item);
+				int indexOfKey = mExpandedItems.indexOfKey(parentPosition);
+				if (indexOfKey >= 0) {
+					mExpandedItems.put(indexOfKey, parent.getSubItems().size());
+				}
+				if (notifyParentChanged)
+					notifyItemChanged(parentPosition);
+			}
+		} else {
+			//Assert parent is collapsed before removal
+			collapse(position);
+		}
+		super.removeItem(position);
+	}
+
+	@Override
+	public void restoreDeletedItems() {
+		stopUndoTimer();
+		for (int i = 0; i < removedChildForParents.size(); i++) {
+			int indexOfKey = removedChildForParents.indexOfKey(i);
+			if (indexOfKey >= 0) {
+				T parent = removedChildForParents.get(indexOfKey);
+				int indexOfKey2 = mRemovedItems.indexOfKey(indexOfKey);
+				if (indexOfKey2 >= 0) {
+					T item = mRemovedItems.get(indexOfKey2);
+				}
+				mExpandedItems.put(indexOfKey, parent.getSubItems().size());
+			}
+		}
+		super.restoreDeletedItems();
 	}
 
 	/*------------------------------*/

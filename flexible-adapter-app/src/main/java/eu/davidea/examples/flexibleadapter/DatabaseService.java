@@ -36,10 +36,9 @@ public class DatabaseService {
 		Item item = new Item();
 		item.setId(++i);
 		item.setTitle("Item " + i);
-		item.setSubtitle("Subtitle " + i);
 
 		//All parent items are expandable
-		item.withExpandable(true);
+		item.setExpandable(true);
 		//Let's initially expand the first father with subElements
 		item.setInitiallyExpanded(i == 5);
 
@@ -51,11 +50,11 @@ public class DatabaseService {
 				Item subItem = new Item();
 				subItem.setId(i * j * (-1));
 				subItem.setTitle("Sub Item " + j);
-				subItem.setParentItem(item);
+				subItem.setParent(item);
 				item.addSubItem(subItem);
 			}
-			item.updateSubTitle();
 		}
+		item.updateSubTitle();
 
 		return item;
 	}
@@ -75,7 +74,7 @@ public class DatabaseService {
 		if (item.isExpandable()) {
 			mItems.remove(item);
 		} else {
-			Item parent = item.getParentItem();
+			Item parent = item.getParent();
 			if (parent.contains(item)) {
 				parent.removeSubItem(item);
 				parent.updateSubTitle();

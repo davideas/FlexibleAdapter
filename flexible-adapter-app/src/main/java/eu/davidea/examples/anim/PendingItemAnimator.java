@@ -201,7 +201,6 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
 		dispatchFinishedWhenDone();
 	}
 
-	@Override
 	/** Override prepHolderForAnimateAdd
 	 *
 	 * Called when an item is added to the RecyclerView. Implementors can choose
@@ -225,6 +224,7 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
 	 * @return true if a later call to {@link #runPendingAnimations()} is requested,
 	 * false otherwise.
 	 */
+	@Override
 	public boolean animateAdd(final ViewHolder holder) {
 		mPendingAdditions.add((H) holder);
 		return prepHolderForAnimateAdd((H) holder);
@@ -253,7 +253,6 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
 		dispatchFinishedWhenDone();
 	}
 
-	@Override
 	/** Override prepHolderForAnimateMove
 	 *
 	 * Called when an item is moved in the RecyclerView. Implementors can choose
@@ -272,6 +271,7 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
 	 * @return true if a later call to {@link #runPendingAnimations()} is requested,
 	 * false otherwise.
 	 */
+	@Override
 	public boolean animateMove(final ViewHolder holder, int fromX, int fromY, int toX, int toY) {
 		mPendingMoves.add(new MoveInfo((H) holder, fromX, fromY, toX, toY));
 		return prepHolderForAnimateMove((H) holder, fromX, fromY, toX, toY);

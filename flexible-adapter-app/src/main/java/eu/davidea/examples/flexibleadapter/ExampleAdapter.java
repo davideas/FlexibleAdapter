@@ -148,7 +148,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		if (notifyParentChanged && !item.isExpandable()) {
 			//It's a child, so notify the parent
 //			int parentPosition = getParentPosition(position);
-			Item parent = item.getParentItem();
+			Item parent = item.getParent();
 			parent.removeSubItem(item);
 			parent.updateSubTitle();
 			notifyItemChanged(getPositionForItem(parent));
@@ -175,8 +175,9 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			for (Integer position : selectedPositions) {
 				//Take only children: verify that is a child
 				Item item = getItem(position);
-				if (!item.isExpandable() && item.getParentItem() != null) {
-					Item parent = item.getParentItem();
+				Item parent = getExpandableOf(item);
+				if (parent != null) {
+					//TODO: Save position
 					parent.removeSubItem(item);
 					//Assert to notify only once the parent
 					if (!parentsToNotify.contains(parent)) {
@@ -281,10 +282,10 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		// this will be highlighted
 		if (hasSearchText()) {
 			setHighlightText(pvHolder.mTitle, item.getTitle(), mSearchText);
-			setHighlightText(pvHolder.mSubtitle, item.getSubtitle(), mSearchText);
+			setHighlightText(pvHolder.mSubtitle, item.updateSubTitle(), mSearchText);
 		} else {
 			pvHolder.mTitle.setText(item.getTitle());
-			pvHolder.mSubtitle.setText(item.getSubtitle());
+			pvHolder.mSubtitle.setText(item.updateSubTitle());
 		}
 	}
 
