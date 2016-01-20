@@ -1,10 +1,14 @@
 package eu.davidea.examples.flexibleadapter;
 
+import android.view.ViewGroup;
+
 import java.io.Serializable;
+import java.util.zip.Inflater;
 
 import eu.davidea.flexibleadapter.item.AbstractExpandableItem;
+import eu.davidea.viewholder.ExpandableViewHolder;
 
-public class Item extends AbstractExpandableItem<Item> implements Serializable {
+public class Item extends AbstractExpandableItem<Item, ExpandableViewHolder> implements Serializable {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 
@@ -53,6 +57,21 @@ public class Item extends AbstractExpandableItem<Item> implements Serializable {
 	public String updateSubTitle() {
 		setSubtitle(getSubItemsCount() + " subItems");
 		return subtitle;
+	}
+
+	@Override
+	public int getLayoutRes() {
+		return 0;
+	}
+
+	@Override
+	public ExpandableViewHolder getViewHolder(Inflater inflater, ViewGroup parent) {
+		return null;
+	}
+
+	@Override
+	public void bindViewHolder(ExpandableViewHolder holder) {
+
 	}
 
 }

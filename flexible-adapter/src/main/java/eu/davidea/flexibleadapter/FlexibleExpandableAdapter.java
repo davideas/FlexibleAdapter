@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
-import android.util.SparseIntArray;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -19,13 +18,13 @@ import eu.davidea.viewholder.FlexibleViewHolder;
  * @author Davide Steduto
  * @since 16/01/2016
  */
-public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder, T extends IExpandableItem<T>>
+public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder, T extends IExpandableItem<T, EVH>>
 		extends FlexibleAnimatorAdapter<FlexibleViewHolder, T> {
 
 	private static final String TAG = FlexibleExpandableAdapter.class.getSimpleName();
-	private static int EXPANDABLE_VIEW_TYPE = -1;
+	public static int EXPANDABLE_VIEW_TYPE = -1;
 
-	private SparseIntArray mExpandedItems;
+	private SparseArray<List<T>> mExpandedItems;
 	private SparseArray<T> removedChildForParents;
 	boolean parentSelected = false;
 	boolean childSelected = false;
@@ -40,7 +39,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	public FlexibleExpandableAdapter(@NonNull List<T> items, Object listener) {
 		super(items, listener);
-		mExpandedItems = new SparseIntArray();
+		mExpandedItems = new SparseArray<List<T>>();
 		expandInitialItems(items);
 	}
 
@@ -52,7 +51,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			//FIXME: Foreseen bug on Rotation: coordinate expansion with onRestoreInstanceState
 			if (item.isExpanded() && hasSubItems(item)) {
 				if (DEBUG) Log.d(TAG, "Initially expand item on position " + i);
-				mExpandedItems.put(i, item.getSubItems().size());
+				mExpandedItems.put(i, item.getSubItems());
 				mItems.addAll(i + 1, item.getSubItems());
 				i += item.getSubItems().size();
 			}
@@ -167,7 +166,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		if (item.isExpandable() && !item.isExpanded() && hasSubItems(item) && !parentSelected) {
 
 			int subItemsCount = item.getSubItems().size();
-			mExpandedItems.put(position, subItemsCount);
+			mExpandedItems.put(position, item.getSubItems());
 			mItems.addAll(position + 1, item.getSubItems());
 			item.setExpanded(true);
 
@@ -228,7 +227,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				parent.removeSubItem(item);
 				int indexOfKey = mExpandedItems.indexOfKey(parentPosition);
 				if (indexOfKey >= 0) {
-					mExpandedItems.put(indexOfKey, parent.getSubItems().size());
+					mExpandedItems.put(indexOfKey, parent.getSubItems());
 				}
 				if (notifyParentChanged)
 					notifyItemChanged(parentPosition);
@@ -249,9 +248,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				T parent = removedChildForParents.get(indexOfKey);
 				int indexOfKey2 = mRemovedItems.indexOfKey(indexOfKey);
 				if (indexOfKey2 >= 0) {
-					T item = mRemovedItems.get(indexOfKey2);
+					T items = mRemovedItems.get(indexOfKey2);
 				}
-				mExpandedItems.put(indexOfKey, parent.getSubItems().size());
+				mExpandedItems.put(indexOfKey, parent.getSubItems());
 			}
 		}
 		super.restoreDeletedItems();

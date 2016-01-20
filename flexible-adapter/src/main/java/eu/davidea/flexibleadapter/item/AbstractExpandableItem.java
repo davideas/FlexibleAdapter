@@ -1,39 +1,60 @@
 package eu.davidea.flexibleadapter.item;
 
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.util.SparseArray;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
+
+import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
+import eu.davidea.viewholder.ExpandableViewHolder;
 
 /**
  * Generic implementation of {@link IExpandableItem} interface with most useful methods to manage
- * expansion, selection and sub items.
+ * expansion and sub items.<br/>
+ * This abstract class expands also {@link AbstractFlexibleItem}.
  *
  * @author Davide Steduto
  * @since 17/01/2016
  */
-public abstract class AbstractExpandableItem<T extends IExpandableItem<T>> implements IExpandableItem<T> {
+public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, VH extends ExpandableViewHolder>
+		extends AbstractFlexibleItem<T, VH>
+		implements IExpandableItem<T, VH> {
 
 	/** Reference to the Parent Item */
 	T mParent;
 
 	/* Flags for FlexibleExpandableAdapter */
-	boolean mExpanded = false;
-	boolean mExpandable = false;
-	boolean mSelectable = true;
+	boolean mExpanded = false,
+			mExpandable = false;
 
 	/** subItems list */
 	List<T> mSubItems;
 	SparseArray<T> mRemovedItems = new SparseArray<T>();
 
-	/**
-	 * You should implement this method to compare items Identifiers.
-	 *
-	 * @param o Instance to compare
-	 * @return true if items are equals, false otherwise.
-	 */
+
+	/*---------------------*/
+	/* VIEW HOLDER METHODS */
+	/*---------------------*/
+
 	@Override
-	public abstract boolean equals(Object o);
+	@IdRes
+	public int getItemViewType() {
+		return FlexibleExpandableAdapter.EXPANDABLE_VIEW_TYPE;
+	}
+
+	@Override
+	@LayoutRes
+	public abstract int getLayoutRes();
+
+	@Override
+	public abstract VH getViewHolder(Inflater inflater, ViewGroup parent);
+
+	@Override
+	public abstract void bindViewHolder(VH holder);
 
 	/*--------------------*/
 	/* EXPANDABLE METHODS */
@@ -61,20 +82,6 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>> imple
 
 	public void setInitiallyExpanded(boolean expanded) {
 		this.mExpanded = expanded;
-	}
-
-	/*--------------------*/
-	/* SELECTABLE METHODS */
-	/*--------------------*/
-
-	@Override
-	public boolean isSelectable() {
-		return mSelectable;
-	}
-
-	@Override
-	public void setSelectable(boolean selectable) {
-		this.mSelectable = selectable;
 	}
 
 	/*-------------------*/

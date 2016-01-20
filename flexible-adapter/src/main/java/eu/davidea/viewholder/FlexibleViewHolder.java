@@ -52,7 +52,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	}
 
 	/**
-	 * Perform animation and selection on the current ItemView.
+	 * Allow to perform object animation in the ItemView and selection on it.
 	 * <br/><br/>
 	 * <b>IMPORTANT NOTE!</b> <i>setActivated</i> changes the selection color of the item
 	 * background if you added<i>android:background="?attr/selectableItemBackground"</i>

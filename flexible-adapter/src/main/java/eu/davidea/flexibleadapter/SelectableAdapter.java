@@ -33,7 +33,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	public static final int MODE_MULTI = 2;
 
-	//TODO: Evaluate TreeSet instead of ArrayList for selectedItems
+	//TODO: Evaluate TreeSet instead of ArrayList for selectedItems, TreeSet is a sortedList
 	private ArrayList<Integer> selectedItems;
 	private int mode;
 	protected RecyclerView mRecyclerView;
@@ -115,12 +115,12 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/**
 	 * Toggle the selection status of the item at a given position.<br/>
 	 * The behaviour depends on the selection mode previously set with {@link #setMode}.
-	 * <p/>
+	 * <br/><br/>
 	 * Optionally the item can be invalidated.<br/>
 	 * However it is preferable to set <i>false</i> and to handle the Activated/Selected State of
 	 * the ItemView in the Click events of the ViewHolder after the selection is registered and
 	 * up to date: Very Useful if the item has views with own animation to perform!
-	 * <p/>
+	 * <br/><br/>
 	 * <b>Usage:</b>
 	 * <ul>
 	 * <li>If you don't want any item to be selected/activated at all, just don't call this method.</li>
@@ -188,7 +188,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 
 	/**
 	 * Clear the selection status for all items one by one and it doesn't stop animations in the items.
-	 * <p/>
+	 * <br/><br/>
 	 * <b>Note 1:</b> Items are invalidated and rebound!<br/>
 	 * <b>Note 2:</b> This method use java.util.Iterator to avoid java.util.ConcurrentModificationException.
 	 */
@@ -273,6 +273,16 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 
 	public FastScroller getFastScroller() {
 		return mFastScroller;
+	}
+
+	/**
+	 * Method under development. It will be public when ready.
+	 *
+	 * @param fastScroller Instance of {@link FastScroller}
+	 */
+	private void setFastScroller(@NonNull FastScroller fastScroller) {
+		//TODO: Fetch accent color automatically if at least Android is Lollipop
+		setFastScroller(fastScroller, 0);
 	}
 
 	/**
