@@ -1,7 +1,5 @@
 package eu.davidea.flexibleadapter.item;
 
-import eu.davidea.viewholder.FlexibleViewHolder;
-
 /**
  * Generic implementation of {@link IFlexibleItem} interface with most useful methods to manage
  * selection and view holder methods.
@@ -9,8 +7,8 @@ import eu.davidea.viewholder.FlexibleViewHolder;
  * @author Davide Steduto
  * @since 20/01/2016
  */
-public abstract class AbstractFlexibleItem<T extends IFlexibleItem<T, VH>, VH extends FlexibleViewHolder>
-		implements IFlexibleItem<T, VH> {
+public abstract class AbstractFlexibleItem<T extends IFlexibleItem<T>>
+		implements IFlexibleItem<T> {
 
 	/* Flags for FlexibleExpandableAdapter */
 	boolean mEnabled = true,

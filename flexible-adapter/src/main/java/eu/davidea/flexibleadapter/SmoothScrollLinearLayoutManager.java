@@ -9,7 +9,6 @@ import android.util.DisplayMetrics;
 
 public class SmoothScrollLinearLayoutManager extends LinearLayoutManager {
 	private static final float MILLISECONDS_PER_INCH = 100f;
-	private Context mContext;
 
 	public SmoothScrollLinearLayoutManager(Context context) {
 		this(context, VERTICAL, false);
@@ -17,7 +16,6 @@ public class SmoothScrollLinearLayoutManager extends LinearLayoutManager {
 
 	public SmoothScrollLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
 		super(context, orientation, reverseLayout);
-		mContext = context;
 	}
 
 	@Override
@@ -40,11 +38,10 @@ public class SmoothScrollLinearLayoutManager extends LinearLayoutManager {
 		startSmoothScroll(smoothScroller);
 	}
 
-
 	private class TopSnappedSmoothScroller extends LinearSmoothScroller {
+
 		public TopSnappedSmoothScroller(Context context) {
 			super(context);
-
 		}
 
 		@Override

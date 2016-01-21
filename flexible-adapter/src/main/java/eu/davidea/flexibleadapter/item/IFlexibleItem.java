@@ -1,14 +1,12 @@
 package eu.davidea.flexibleadapter.item;
 
-import eu.davidea.viewholder.FlexibleViewHolder;
-
 /**
  * Basic Interface to manage Item operations like selection
  *
  * @author Davide Steduto
  * @since 19/01/2016
  */
-public interface IFlexibleItem<T, VH extends FlexibleViewHolder> {
+public interface IFlexibleItem<T> {
 
 	/*---------*/
 	/* METHODS */

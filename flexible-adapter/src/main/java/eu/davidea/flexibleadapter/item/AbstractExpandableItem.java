@@ -15,9 +15,9 @@ import eu.davidea.viewholder.ExpandableViewHolder;
  * @author Davide Steduto
  * @since 17/01/2016
  */
-public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, VH extends ExpandableViewHolder>
-		extends AbstractFlexibleItem<T, VH>
-		implements IExpandableItem<T, VH> {
+public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH extends ExpandableViewHolder>
+		extends AbstractFlexibleItem<T>
+		implements IExpandableItem<T> {
 
 	/** Reference to the Parent Item */
 	T mParent;
@@ -89,7 +89,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, V
 	}
 
 	@Override
-	public void setParent(T item) {
+	public final void setParent(T item) {
 		mParent = item;
 	}
 
@@ -104,6 +104,9 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, V
 
 	@Override
 	public void setSubItems(List<T> items) {
+		for (T item : items) {
+			item.setParent((T) this);
+		}
 		mSubItems = new ArrayList<>(items);
 	}
 
@@ -118,6 +121,11 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, V
 			return mSubItems.get(position);
 		}
 		return null;
+	}
+
+	@Override
+	public int getSubItemPosition(T item) {
+		return mSubItems.indexOf(item);
 	}
 
 	@Override
@@ -153,7 +161,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, V
 	}
 
 	@Override
-	public boolean removeSubItemAt(int position) {
+	public boolean removeSubItem(int position) {
 		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
 			mRemovedItems.put(position, mSubItems.remove(position));
 			return true;
@@ -175,4 +183,5 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, V
 				", mExpandable=" + mExpandable +
 				", mSubItems=" + (mSubItems != null ? mSubItems.size() : "null");
 	}
+
 }

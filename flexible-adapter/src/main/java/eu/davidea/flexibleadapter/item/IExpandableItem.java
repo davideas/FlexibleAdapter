@@ -2,8 +2,6 @@ package eu.davidea.flexibleadapter.item;
 
 import java.util.List;
 
-import eu.davidea.viewholder.ExpandableViewHolder;
-
 /**
  * Interface to manage Item operations with {@link eu.davidea.flexibleadapter.FlexibleExpandableAdapter}.
  * <br/>Most of these methods are called in the Adapter.
@@ -12,7 +10,7 @@ import eu.davidea.viewholder.ExpandableViewHolder;
  * @author Davide Steduto
  * @since 17/01/2016
  */
-public interface IExpandableItem<T, VH extends ExpandableViewHolder> extends IFlexibleItem<T, VH> {
+public interface IExpandableItem<T> extends IFlexibleItem<T> {
 
 	/*--------------------*/
 	/* EXPANDABLE METHODS */
@@ -42,6 +40,8 @@ public interface IExpandableItem<T, VH extends ExpandableViewHolder> extends IFl
 
 	T getSubItem(int position);
 
+	int getSubItemPosition(T item);
+
 	boolean contains(T item);
 
 	void addSubItem(T item);
@@ -50,7 +50,7 @@ public interface IExpandableItem<T, VH extends ExpandableViewHolder> extends IFl
 
 	boolean removeSubItem(T item);
 
-	boolean removeSubItemAt(int position);
+	boolean removeSubItem(int position);
 
 	int getPositionOfSubItem(T item);
 

@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
@@ -34,6 +35,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Any write operation performed on the list items should be synchronized on this lock.
 	 */
 	private final Object mLock = new Object();
+	private boolean isAdapterRunning;
 
 	protected List<T> mItems;
 	protected List<T> mDeletedItems;
@@ -50,7 +52,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Simple Constructor.
 	 *
-	 * @param items Items to display.
+	 * @param items items to display.
 	 */
 	public FlexibleAdapter(@NonNull List<T> items) {
 		this(items, null);
@@ -59,10 +61,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Main Constructor.
 	 *
-	 * @param items    Items to display
-	 * @param listener Must be an instance of {@link OnUpdateListener}
+	 * @param items    items to display
+	 * @param listener must be an instance of {@link OnUpdateListener}
 	 */
-	public FlexibleAdapter(@NonNull List<T> items, Object listener) {
+	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listener) {
 		mItems = items;
 
 		if (listener instanceof OnUpdateListener) {
@@ -76,7 +78,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/*--------------*/
 
 	/**
-	 * Convenience method to call {@link #updateDataSet(String)} with {@link null} as param.
+	 * Convenience method of {@link #updateDataSet(String)} with {@link null} as param.
 	 */
 	public void updateDataSet() {
 		updateDataSet(null);
@@ -94,7 +96,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Returns the custom object "Item".
 	 *
-	 * @param position The position of the item in the list
+	 * @param position the position of the item in the list
 	 * @return The custom "Item" object or null if item not found
 	 */
 	public T getItem(int position) {
@@ -105,14 +107,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Retrieve the position of the Item in the Adapter
 	 *
-	 * @param item The item
+	 * @param item the item
 	 * @return The position in the Adapter if found, -1 otherwise
 	 */
-	public int getPositionForItem(T item) {
+	public int getPositionForItem(@NonNull T item) {
 		return mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
 	}
 
-	public boolean contains(T item) {
+	public boolean contains(@NonNull T item) {
 		return mItems != null && mItems.contains(item);
 	}
 
@@ -131,7 +133,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		return getItemCount() == 0;
 	}
 
-	public void updateItem(int position, T item) {
+	public void updateItem(int position, @NonNull T item) {
 		if (position < 0) {
 			Log.w(TAG, "Cannot updateItem on negative position");
 			return;
@@ -144,12 +146,24 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Insert given Item at position or Add Item at last position.
+	 * Insert the given Item at last position.
 	 *
-	 * @param position Position of the item to add
-	 * @param item     The item to add
+	 * @param item the item to add
 	 */
-	public void addItem(int position, T item) {
+	public void addItem(@NonNull T item) {
+		if (DEBUG) Log.v(TAG, "addItem notifyItemInserted on last position");
+		synchronized (mLock) {
+			mItems.add(item);
+		}
+	}
+
+	/**
+	 * Insert the given Item at desired position or Add Item at last position.
+	 *
+	 * @param position position of the item to add
+	 * @param item     the item to add
+	 */
+	public void addItem(int position, @NonNull T item) {
 		if (position < 0) {
 			Log.w(TAG, "Cannot addItem on negative position");
 			return;
@@ -161,11 +175,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 				mItems.add(position, item);
 			}
 		} else { //Add Item at the last position
-			if (DEBUG) Log.v(TAG, "addItem notifyItemInserted on last position");
-			synchronized (mLock) {
-				mItems.add(item);
-				position = mItems.size();
-			}
+			addItem(item);
+			position = mItems.size();
 		}
 		notifyItemInserted(position);
 		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
@@ -178,7 +189,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * The item is retained in a list for an eventual Undo.
 	 *
-	 * @param position The position of item to remove
+	 * @param position the position of item to remove
 	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
 	 * @see #restoreDeletedItems()
 	 * @see #emptyBin()
@@ -194,7 +205,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 				saveDeletedItem(position, mItems.remove(position));
 			}
 			notifyItemRemoved(position);
-			if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
+			if (mUpdateListener != null && !isAdapterRunning)
+				mUpdateListener.onUpdateEmptyView(mItems.size());
 		} else {
 			Log.w(TAG, "removeItem WARNING! Position OutOfBound! Review the position to remove!");
 		}
@@ -203,10 +215,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Every item is retained in a list for an eventual Undo.
 	 *
-	 * @param selectedPositions List of item positions to remove
+	 * @param selectedPositions list of item positions to remove
 	 * @see #startUndoTimer(OnDeleteCompleteListener)
 	 * @see #restoreDeletedItems()
-	 * @see #emptyBin()
 	 */
 	public void removeItems(List<Integer> selectedPositions) {
 		if (DEBUG) Log.v(TAG, "removeItems reverse Sorting positions");
@@ -220,6 +231,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 		// Split the list in ranges
 		while (!selectedPositions.isEmpty()) {
+			isAdapterRunning = true;
 			if (selectedPositions.size() == 1) {
 				removeItem(selectedPositions.get(0));
 				//Align the selection list when removing the item
@@ -242,6 +254,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			}
 			if (DEBUG) Log.v(TAG, "removeItems current selection " + getSelectedItems());
 		}
+		isAdapterRunning = false;
+		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
 	private void removeRange(int positionStart, int itemCount) {
@@ -254,11 +268,11 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 		if (DEBUG) Log.v(TAG, "removeRange notifyItemRangeRemoved");
 		notifyItemRangeRemoved(positionStart, itemCount);
-		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
 	/**
-	 * Wrapper method to remove Items that are currently selected.<br/>
+	 * Convenience method to remove all Items that are currently selected.<br/>
+	 *
 	 * @see #removeItems(List)
 	 */
 	public void removeAllSelectedItems() {
@@ -272,9 +286,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Save temporary Items for an eventual Undo.
 	 *
-	 * @param position The position of the item to retain.
+	 * @param position the position of the item to retain.
 	 */
-	public void saveDeletedItem(int position, T item) {
+	public void saveDeletedItem(int position, @NonNull T item) {
 		if (mDeletedItems == null) {
 			mDeletedItems = new ArrayList<T>();
 			mOriginalPositions = new ArrayList<Integer>();
@@ -332,7 +346,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Convenience method to start Undo timer with default timeout of 5''
 	 *
-	 * @param listener Delete listener called after timeout
+	 * @param listener delete listener called after timeout
 	 */
 	public void startUndoTimer(OnDeleteCompleteListener listener) {
 		startUndoTimer(0, listener);
@@ -341,8 +355,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Start Undo timer with custom timeout
 	 *
-	 * @param listener Delete listener called after timeout
-	 * @param timeout  Custom timeout
+	 * @param listener delete listener called after timeout
+	 * @param timeout  custom timeout
 	 */
 	public void startUndoTimer(long timeout, final OnDeleteCompleteListener listener) {
 		mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
@@ -394,7 +408,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * <br/>- Any pending deleted items are always filtered out.
 	 * <br/>- Original positions of deleted items are recalculated.
 	 *
-	 * @param unfilteredItems The list to filter
+	 * @param unfilteredItems the list to filter
 	 * @see #filterObject(Object, String)
 	 */
 	protected synchronized void filterItems(@NonNull List<T> unfilteredItems) {
@@ -437,8 +451,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * <br/><br/>
 	 * DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
 	 *
-	 * @param myObject   The object to be inspected
-	 * @param constraint Constraint, that the object has to fulfil
+	 * @param myObject   the object to be inspected
+	 * @param constraint constraint, that the object has to fulfil
 	 * @return true, if the object should be in the filteredResult, false otherwise
 	 */
 	protected boolean filterObject(T myObject, String constraint) {
