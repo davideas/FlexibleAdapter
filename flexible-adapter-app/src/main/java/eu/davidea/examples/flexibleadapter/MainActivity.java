@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import eu.davidea.common.SimpleDividerItemDecoration;
+import eu.davidea.examples.anim.SlideInRightAnimator;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
-		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
+		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
 				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
 

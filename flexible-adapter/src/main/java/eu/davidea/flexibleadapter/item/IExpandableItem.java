@@ -52,6 +52,4 @@ public interface IExpandableItem<T> extends IFlexibleItem<T> {
 
 	boolean removeSubItem(int position);
 
-	int getPositionOfSubItem(T item);
-
 }

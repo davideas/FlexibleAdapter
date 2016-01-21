@@ -34,8 +34,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Lock object used to modify the content of {@link #mItems}.
 	 * Any write operation performed on the list items should be synchronized on this lock.
 	 */
-	private final Object mLock = new Object();
-	private boolean isAdapterRunning;
+	protected final Object mLock = new Object();
+	protected boolean isAdapterRunning;
 
 	protected List<T> mItems;
 	protected List<T> mDeletedItems;
@@ -237,6 +237,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 				//Align the selection list when removing the item
 				selectedPositions.remove(0);
 			} else {
+				if (DEBUG) Log.v(TAG, "removeItems current selection " + getSelectedItems());
 				int count = 1;
 				while (selectedPositions.size() > count && selectedPositions.get(count).equals(selectedPositions.get(count - 1) - 1)) {
 					++count;
@@ -252,13 +253,12 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 					selectedPositions.remove(0);
 				}
 			}
-			if (DEBUG) Log.v(TAG, "removeItems current selection " + getSelectedItems());
 		}
 		isAdapterRunning = false;
 		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
-	private void removeRange(int positionStart, int itemCount) {
+	public void removeRange(int positionStart, int itemCount) {
 		if (DEBUG)
 			Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
 		for (int i = 0; i < itemCount; ++i) {
