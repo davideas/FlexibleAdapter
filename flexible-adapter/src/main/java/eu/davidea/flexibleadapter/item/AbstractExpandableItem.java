@@ -161,7 +161,6 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, V
 		return false;
 	}
 
-	@Override
 	public void restoreDeletedSubItems() {
 		for (int i = 0; i < mRemovedItems.size(); i++) {
 			int indexOfKey = mRemovedItems.indexOfKey(i);
@@ -172,9 +171,8 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, V
 
 	@Override
 	public String toString() {
-		return "AbstractExpandableItem{" +
-				"mExpanded=" + mExpanded +
+		return ", mExpanded=" + mExpanded +
 				", mExpandable=" + mExpandable +
-				", mSubItems=" + (mSubItems != null ? mSubItems.size() : "null") + '}';
+				", mSubItems=" + (mSubItems != null ? mSubItems.size() : "null");
 	}
 }

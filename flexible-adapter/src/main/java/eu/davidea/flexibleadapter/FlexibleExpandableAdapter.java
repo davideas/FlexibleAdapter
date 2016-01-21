@@ -14,7 +14,7 @@ import eu.davidea.viewholder.ExpandableViewHolder;
 import eu.davidea.viewholder.FlexibleViewHolder;
 
 /**
- * This adapter provides a set of standard methods to expand and collapse an item.
+ * This adapter provides a set of standard methods to expand and collapse an Item.
  *
  * @author Davide Steduto
  * @since 16/01/2016
@@ -27,7 +27,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	private SparseIntArray mExpandedItems;
 	private SparseArray<T> removedChildForParents;
-	boolean parentSelected = false;
+	boolean parentSelected = false,
+			mScrollOnExpand = false;
 	boolean childSelected = false;
 
 	/*--------------*/
@@ -64,7 +65,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/* MAIN METHODS */
 	/*--------------*/
 
-	//TODO: Add and Remove subItems for a specific parent
+	//TODO: Add and Remove subItems for a specific parent, Remember positions of subItems
 	//TODO: Find a way to notify parent position if child is added or removed
 
 	//FIXME: Rewrite Filter logic: Expand Parent if subItem is filtered by searchText?
@@ -82,6 +83,17 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	public boolean isExpandable(int position) {
 		T item = getItem(position);
 		return item.isExpandable();
+	}
+
+	/**
+	 * Automatically scroll the clicked expandable item to the first visible position.<br/>
+	 * Default disabled.<br/><br/>
+	 * This only works in combination with {@link SmoothScrollLinearLayoutManager}.
+	 *
+	 * @param scrollOnExpand true to enable automatic scroll, false to disable
+	 */
+	public void setScrollOnExpand(boolean scrollOnExpand) {
+		mScrollOnExpand = scrollOnExpand;
 	}
 
 	/**
@@ -128,12 +140,12 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	public abstract EVH onCreateExpandableViewHolder(ViewGroup parent, int viewType);
 
 	/**
-	 * Create ViewHolder that are not expandable or that are children of the Expandable ViewHolder.
+	 * Create ViewHolder that is not expandable or it's a child of an ExpandableViewHolder.
 	 *
 	 * @param parent   The ViewGroup into which the new View will be added after it is bound to
 	 *                 an adapter position.
 	 * @param viewType The view type of the new View.
-	 * @return A new ViewHolder that holds a View that can are child of the expanded views.
+	 * @return A new FlexibleViewHolder that holds a View that can be child of the expanded views.
 	 */
 	public abstract FlexibleViewHolder onCreateFlexibleViewHolder(ViewGroup parent, int viewType);
 
@@ -171,7 +183,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			item.setExpanded(true);
 
 			//Automatically scroll the current expandable item to the first visible position
-			mRecyclerView.smoothScrollToPosition(position);
+			if (mScrollOnExpand)
+				mRecyclerView.smoothScrollToPosition(position);
 
 			notifyItemRangeInserted(position + 1, subItemsCount);
 			if (DEBUG)
@@ -222,8 +235,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	 * @param position            The position of item to remove
 	 * @param notifyParentChanged true to Notify parent of a removal of a child
 	 */
-	@Override
-	public void removeItem(int position) {
+	public void removeItem(int position, boolean notifyParentChanged) {
 		T item = getItem(position);
 		if (!item.isExpandable()) {
 			//It's a child, so notify the parent
@@ -236,7 +248,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				if (indexOfKey >= 0) {
 					mExpandedItems.put(indexOfKey, parent.getSubItems().size());
 				}
-				//if (notifyParentChanged)
+				if (notifyParentChanged)
 					notifyItemChanged(parentPosition);
 			}
 		} else {

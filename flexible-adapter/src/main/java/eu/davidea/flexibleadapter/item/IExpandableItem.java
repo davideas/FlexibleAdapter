@@ -52,6 +52,6 @@ public interface IExpandableItem<T, VH extends ExpandableViewHolder> extends IFl
 
 	boolean removeSubItemAt(int position);
 
-	void restoreDeletedSubItems();
+	int getPositionOfSubItem(T item);
 
 }

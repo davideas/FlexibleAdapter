@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
 		mAdapter.setAnimateOnReverseScrolling(true);
 		mAdapter.setAnimationEnabled(false);
+		mAdapter.setScrollOnExpand(true);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
