@@ -75,7 +75,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		if (!DatabaseService.userLearnedSelection && !hasSearchText()) {
 			//Define Example View
 			Item item = new Item();
-			item.setId(0);
+			item.setId("0");
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
 			mItems.add(0, item);
@@ -143,21 +143,21 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	 * @param position            The position of item to remove
 	 * @param notifyParentChanged true to Notify parent of a removal of a child
 	 */
-	public void removeItem(int position, boolean notifyParentChanged) {
-		Item item = getItem(position);
-		if (notifyParentChanged && !item.isExpandable()) {
-			//It's a child, so notify the parent
-//			int parentPosition = getParentPosition(position);
-			Item parent = item.getParent();
-			parent.removeSubItem(item);
-			parent.updateSubTitle();
-			notifyItemChanged(getPositionForItem(parent));
-		} else {
-			//Assert parent is collapsed before removal
-			collapse(position);
-		}
-		super.removeItem(position);
-	}
+//	public void removeItem(int position, boolean notifyParentChanged) {
+//		Item item = getItem(position);
+//		if (notifyParentChanged && !item.isExpandable()) {
+//			//It's a child, so notify the parent
+////			int parentPosition = getParentPosition(position);
+//			Item parent = item.getParent();
+//			parent.removeSubItem(item);
+//			parent.updateSubTitle();
+//			notifyItemChanged(getPositionForItem(parent));
+//		} else {
+//			//Assert parent is collapsed before removal
+//			collapse(position);
+//		}
+//		super.removeItem(position);
+//	}
 
 	/**
 	 * Before remove Items identified by selectedPositions, this method scan all immediate
@@ -169,33 +169,33 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	 * @param selectedPositions   list of item positions to remove
 	 * @param notifyParentChanged true to Notify parent of a removal of the children
 	 */
-	public void removeItems(List<Integer> selectedPositions, boolean notifyParentChanged) {
-		List<Item> parentsToNotify = new ArrayList<Item>();
-		if (notifyParentChanged) {
-			for (Integer position : selectedPositions) {
-				//Take only children: verify that is a child
-				Item item = getItem(position);
-				Item parent = getExpandableOf(item);
-				if (parent != null) {
-					//TODO: Save position
-					parent.removeSubItem(item);
-					//Assert to notify only once the parent
-					if (!parentsToNotify.contains(parent)) {
-						parentsToNotify.add(parent);
-					}
-				}
-			}
-		}
-		//Remove items as usual
-		super.removeItems(selectedPositions);
-		//Notify all identified parents of the removal of child items
-		Log.d(TAG, "Parents to notify " + parentsToNotify.size());
-		for (Item parent : parentsToNotify) {
-			parent.updateSubTitle();
-			Log.d(TAG, parent.getTitle() + " - " + parent.getSubtitle());
-			notifyItemChanged(getPositionForItem(parent));
-		}
-	}
+//	public void removeItems(List<Integer> selectedPositions, boolean notifyParentChanged) {
+//		List<Item> parentsToNotify = new ArrayList<Item>();
+//		if (notifyParentChanged) {
+//			for (Integer position : selectedPositions) {
+//				//Take only children: verify that is a child
+//				Item item = getItem(position);
+//				Item parent = getExpandableOf(item);
+//				if (parent != null) {
+//					//TODO: Save position
+//					parent.removeSubItem(item);
+//					//Assert to notify only once the parent
+//					if (!parentsToNotify.contains(parent)) {
+//						parentsToNotify.add(parent);
+//					}
+//				}
+//			}
+//		}
+//		//Remove items as usual
+//		super.removeItems(selectedPositions);
+//		//Notify all identified parents of the removal of child items
+//		Log.d(TAG, "Parents to notify " + parentsToNotify.size());
+//		for (Item parent : parentsToNotify) {
+//			parent.updateSubTitle();
+//			Log.d(TAG, parent.getTitle() + " - " + parent.getSubtitle());
+//			notifyItemChanged(getPositionForItem(parent));
+//		}
+//	}
 
 	@Override
 	public void removeItems(List<Integer> selectedPositions) {
@@ -244,7 +244,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 
 	@Override
 	public void onBindExpandableViewHolder(ExpandableViewHolder holder, int position) {
-		if (DEBUG) Log.d(TAG, "onBindParentViewHolder for position " + position);
+//		if (DEBUG) Log.d(TAG, "onBindParentViewHolder for position " + position);
 		final Item item = getItem(position);
 
 		ParentViewHolder pvHolder = (ParentViewHolder) holder;
@@ -291,7 +291,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 
 	@Override
 	public void onBindFlexibleViewHolder(FlexibleViewHolder holder, int position) {
-		if (DEBUG) Log.d(TAG, "onBindChildViewHolder for position " + position);
+//		if (DEBUG) Log.d(TAG, "onBindChildViewHolder for position " + position);
 		final Item item = getItem(position);
 
 		//NOTE: ViewType Must be checked ALSO here to bind the correct view

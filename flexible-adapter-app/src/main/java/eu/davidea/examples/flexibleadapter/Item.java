@@ -1,9 +1,6 @@
 package eu.davidea.examples.flexibleadapter;
 
-import android.view.ViewGroup;
-
 import java.io.Serializable;
-import java.util.zip.Inflater;
 
 import eu.davidea.flexibleadapter.item.AbstractExpandableItem;
 import eu.davidea.viewholder.ExpandableViewHolder;
@@ -12,7 +9,7 @@ public class Item extends AbstractExpandableItem<Item, ExpandableViewHolder> imp
 
 	private static final long serialVersionUID = -6882745111884490060L;
 
-	private int id;
+	private String id;
 	private String title;
 	private String subtitle;
 
@@ -20,16 +17,16 @@ public class Item extends AbstractExpandableItem<Item, ExpandableViewHolder> imp
 	public boolean equals(Object inObject) {
 		if (inObject instanceof Item) {
 			Item inItem = (Item) inObject;
-			return this.id == inItem.id;
+			return this.id.equals(inItem.id);
 		}
 		return false;
 	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -51,27 +48,16 @@ public class Item extends AbstractExpandableItem<Item, ExpandableViewHolder> imp
 
 	@Override
 	public String toString() {
-		return title;
+		return super.toString() + " Item{" +
+				"id=" + id +
+				", title='" + title + '\'' +
+				", subtitle='" + subtitle + '\'' +
+				'}';
 	}
 
 	public String updateSubTitle() {
 		setSubtitle(getSubItemsCount() + " subItems");
 		return subtitle;
-	}
-
-	@Override
-	public int getLayoutRes() {
-		return 0;
-	}
-
-	@Override
-	public ExpandableViewHolder getViewHolder(Inflater inflater, ViewGroup parent) {
-		return null;
-	}
-
-	@Override
-	public void bindViewHolder(ExpandableViewHolder holder) {
-
 	}
 
 }

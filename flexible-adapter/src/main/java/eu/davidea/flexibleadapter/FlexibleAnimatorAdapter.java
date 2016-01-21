@@ -142,13 +142,13 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	protected final void animateView(final View itemView, int position, boolean isSelected) {
 		//FIXME: first completed visible item on rotation gets high delay
 
-		if (DEBUG)
-			Log.d(TAG, "shouldAnimate=" + shouldAnimate
-					+ " isFastScroll=" + isFastScroll
-					+ " isNotified=" + mNotifierObserver.isPositionNotified()
-					+ " isReverseEnabled=" + isReverseEnabled
-					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
-			);
+//		if (DEBUG)
+//			Log.d(TAG, "shouldAnimate=" + shouldAnimate
+//					+ " isFastScroll=" + isFastScroll
+//					+ " isNotified=" + mNotifierObserver.isPositionNotified()
+//					+ " isReverseEnabled=" + isReverseEnabled
+//					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
+//			);
 
 		if (shouldAnimate && !isFastScroll && !mNotifierObserver.isPositionNotified() &&
 				(isReverseEnabled || (!isReverseEnabled && position > mLastAnimatedPosition)) ) {

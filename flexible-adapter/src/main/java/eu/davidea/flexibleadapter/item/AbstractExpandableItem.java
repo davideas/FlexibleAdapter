@@ -1,15 +1,10 @@
 package eu.davidea.flexibleadapter.item;
 
-import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
 import android.util.SparseArray;
-import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.Inflater;
 
-import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
 import eu.davidea.viewholder.ExpandableViewHolder;
 
 /**
@@ -40,21 +35,21 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, V
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/
 
-	@Override
-	@IdRes
-	public int getItemViewType() {
-		return FlexibleExpandableAdapter.EXPANDABLE_VIEW_TYPE;
-	}
-
-	@Override
-	@LayoutRes
-	public abstract int getLayoutRes();
-
-	@Override
-	public abstract VH getViewHolder(Inflater inflater, ViewGroup parent);
-
-	@Override
-	public abstract void bindViewHolder(VH holder);
+//	@Override
+//	@IdRes
+//	public int getItemViewType() {
+//		return FlexibleExpandableAdapter.EXPANDABLE_VIEW_TYPE;
+//	}
+//
+//	@Override
+//	@LayoutRes
+//	public abstract int getLayoutRes();
+//
+//	@Override
+//	public abstract VH getViewHolder(Inflater inflater, ViewGroup parent);
+//
+//	@Override
+//	public abstract void bindViewHolder(VH holder);
 
 	/*--------------------*/
 	/* EXPANDABLE METHODS */
@@ -175,4 +170,11 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T, VH>, V
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "AbstractExpandableItem{" +
+				"mExpanded=" + mExpanded +
+				", mExpandable=" + mExpandable +
+				", mSubItems=" + (mSubItems != null ? mSubItems.size() : "null") + '}';
+	}
 }

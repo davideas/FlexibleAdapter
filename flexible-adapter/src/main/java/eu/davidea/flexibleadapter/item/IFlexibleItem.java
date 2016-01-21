@@ -1,11 +1,5 @@
 package eu.davidea.flexibleadapter.item;
 
-import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
-import android.view.ViewGroup;
-
-import java.util.zip.Inflater;
-
 import eu.davidea.viewholder.FlexibleViewHolder;
 
 /**
@@ -44,8 +38,8 @@ public interface IFlexibleItem<T, VH extends FlexibleViewHolder> {
 	 *
 	 * @return Integer identifier.
 	 */
-	@IdRes
-	int getItemViewType();
+//	@IdRes
+//	int getItemViewType();
 
 	/**
 	 * Returns the layout resource Id to bind for the given Item.<br/>
@@ -53,12 +47,12 @@ public interface IFlexibleItem<T, VH extends FlexibleViewHolder> {
 	 *
 	 * @return Layout identifier.
 	 */
-	@LayoutRes
-	int getLayoutRes();
+//	@LayoutRes
+//	int getLayoutRes();
 
-	VH getViewHolder(Inflater inflater, ViewGroup parent);
+//	VH getViewHolder(Inflater inflater, ViewGroup parent);
 
-	void bindViewHolder(VH holder);
+//	void bindViewHolder(VH holder);
 
 	/*--------------------*/
 	/* SELECTABLE METHODS */

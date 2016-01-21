@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	private static final String TAG = FlexibleExpandableAdapter.class.getSimpleName();
 	public static int EXPANDABLE_VIEW_TYPE = -1;
 
-	private SparseArray<List<T>> mExpandedItems;
+	private SparseIntArray mExpandedItems;
 	private SparseArray<T> removedChildForParents;
 	boolean parentSelected = false;
 	boolean childSelected = false;
@@ -39,7 +40,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	public FlexibleExpandableAdapter(@NonNull List<T> items, Object listener) {
 		super(items, listener);
-		mExpandedItems = new SparseArray<List<T>>();
+		mExpandedItems = new SparseIntArray();
+		removedChildForParents = new SparseArray<T>();
 		expandInitialItems(items);
 	}
 
@@ -51,7 +53,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			//FIXME: Foreseen bug on Rotation: coordinate expansion with onRestoreInstanceState
 			if (item.isExpanded() && hasSubItems(item)) {
 				if (DEBUG) Log.d(TAG, "Initially expand item on position " + i);
-				mExpandedItems.put(i, item.getSubItems());
+				mExpandedItems.put(i, item.getSubItems().size());
 				mItems.addAll(i + 1, item.getSubItems());
 				i += item.getSubItems().size();
 			}
@@ -70,6 +72,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	//FIXME: Find a way to not animate items with ItemAnimator
 	//TODO: Customize child items animations (don't use add or remove ItemAnimator)
+	//TODO: Customize items animations on search
 
 	public boolean isExpanded(int position) {
 		T item = getItem(position);
@@ -157,31 +160,29 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		}
 	}
 
-	private boolean hasSubItems(T item) {
-		return item.getSubItems() != null && item.getSubItems().size() > 0;
-	}
-
 	public void expand(int position) {
 		T item = getItem(position);
+		Log.d(TAG, "Expand on position=" + position + " " + item);
 		if (item.isExpandable() && !item.isExpanded() && hasSubItems(item) && !parentSelected) {
 
 			int subItemsCount = item.getSubItems().size();
-			mExpandedItems.put(position, item.getSubItems());
+			mExpandedItems.put(position, item.getSubItems().size());
 			mItems.addAll(position + 1, item.getSubItems());
 			item.setExpanded(true);
 
 			//Automatically scroll the current expandable item to the first visible position
-			//FIXME: Bug with SmoothScrollLinearLayoutManager: Parent Item content seems duplicated to previous item after the scroll
 			mRecyclerView.smoothScrollToPosition(position);
 
 			notifyItemRangeInserted(position + 1, subItemsCount);
 			if (DEBUG)
 				Log.d(TAG, "Expanded " + subItemsCount + " subItems on position=" + position);
+			Log.d(TAG, item.toString());
 		}
 	}
 
 	public void collapse(int position) {
 		T item = getItem(position);
+		Log.d(TAG, "Collapse on position=" + position + " " + item);
 		if (item.isExpandable() && item.isExpanded() && !hasSubItemsSelected(item)) {
 
 			int subItemsCount = item.getSubItems().size();
@@ -205,7 +206,12 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 			if (DEBUG)
 				Log.d(TAG, "Collapsed " + subItemsCount + " subItems on position=" + position);
+			Log.d(TAG, item.toString());
 		}
+	}
+
+	private boolean hasSubItems(T item) {
+		return item.getSubItems() != null && item.getSubItems().size() > 0;
 	}
 
 	/*----------------------------*/
@@ -216,20 +222,21 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	 * @param position            The position of item to remove
 	 * @param notifyParentChanged true to Notify parent of a removal of a child
 	 */
-	public void removeItem(int position, boolean notifyParentChanged) {
+	@Override
+	public void removeItem(int position) {
 		T item = getItem(position);
 		if (!item.isExpandable()) {
 			//It's a child, so notify the parent
 			T parent = getExpandableOf(item);
 			if (parent != null) {
 				int parentPosition = getPositionForItem(parent);
-				//removedChildForParents.put(position, parent);
+				removedChildForParents.put(position, parent);
 				parent.removeSubItem(item);
 				int indexOfKey = mExpandedItems.indexOfKey(parentPosition);
 				if (indexOfKey >= 0) {
-					mExpandedItems.put(indexOfKey, parent.getSubItems());
+					mExpandedItems.put(indexOfKey, parent.getSubItems().size());
 				}
-				if (notifyParentChanged)
+				//if (notifyParentChanged)
 					notifyItemChanged(parentPosition);
 			}
 		} else {
@@ -237,6 +244,10 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			collapse(position);
 		}
 		super.removeItem(position);
+	}
+
+	public void removeItems(List<Integer> selectedPositions, boolean notifyParentChanged) {
+		super.removeItems(selectedPositions);
 	}
 
 	@Override
@@ -250,7 +261,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				if (indexOfKey2 >= 0) {
 					T items = mRemovedItems.get(indexOfKey2);
 				}
-				mExpandedItems.put(indexOfKey, parent.getSubItems());
+				mExpandedItems.put(indexOfKey, parent.getSubItems().size());
 			}
 		}
 		super.restoreDeletedItems();

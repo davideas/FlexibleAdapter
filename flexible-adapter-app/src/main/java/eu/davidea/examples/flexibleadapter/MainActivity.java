@@ -29,7 +29,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import eu.davidea.common.SimpleDividerItemDecoration;
-import eu.davidea.examples.anim.SlideInRightAnimator;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
@@ -96,11 +95,12 @@ public class MainActivity extends AppCompatActivity implements
 		FlexibleAdapter.enableLogs(true);
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
 		mAdapter.setAnimateOnReverseScrolling(true);
+		mAdapter.setAnimationEnabled(false);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
-		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
+		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
 				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
 
@@ -376,6 +376,7 @@ public class MainActivity extends AppCompatActivity implements
 			if (mAdapter.getItemCount() > 0) {
 				if (position != mActivatedPosition) setActivatedPosition(position);
 				Item item = mAdapter.getItem(position);
+				Log.d(TAG, "onListItemClick on position=" + position + " " + item);
 				if (!item.hasSubItems()) {
 					//TODO FOR YOU: call your custom Callback, for example mCallback.onItemSelected(item.getId());
 					EditItemDialog.newInstance(item, position).show(getFragmentManager(), EditItemDialog.TAG);

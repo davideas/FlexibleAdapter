@@ -23,8 +23,10 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		super(view);
 		this.mAdapter = adapter;
 		this.mListItemClickListener = listItemClickListener;
-		this.itemView.setOnClickListener(this);
-		this.itemView.setOnLongClickListener(this);
+		if (this.itemView.isEnabled()) {
+			this.itemView.setOnClickListener(this);
+			this.itemView.setOnLongClickListener(this);
+		}
 	}
 
 	/**

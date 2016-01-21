@@ -1,11 +1,5 @@
 package eu.davidea.flexibleadapter.item;
 
-import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
-import android.view.ViewGroup;
-
-import java.util.zip.Inflater;
-
 import eu.davidea.viewholder.FlexibleViewHolder;
 
 /**
@@ -44,19 +38,19 @@ public abstract class AbstractFlexibleItem<T extends IFlexibleItem<T, VH>, VH ex
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/
 
-	@Override
-	@IdRes
-	public abstract int getItemViewType();
-
-	@Override
-	@LayoutRes
-	public abstract int getLayoutRes();
-
-	@Override
-	public abstract VH getViewHolder(Inflater inflater, ViewGroup parent);
-
-	@Override
-	public abstract void bindViewHolder(VH holder);
+//	@Override
+//	@IdRes
+//	public abstract int getItemViewType();
+//
+//	@Override
+//	@LayoutRes
+//	public abstract int getLayoutRes();
+//
+//	@Override
+//	public abstract VH getViewHolder(Inflater inflater, ViewGroup parent);
+//
+//	@Override
+//	public abstract void bindViewHolder(VH holder);
 
 	/*--------------------*/
 	/* SELECTABLE METHODS */

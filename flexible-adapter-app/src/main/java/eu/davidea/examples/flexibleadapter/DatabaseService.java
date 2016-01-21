@@ -34,7 +34,7 @@ public class DatabaseService {
 
 	public static Item newExampleItem(int i) {
 		Item item = new Item();
-		item.setId(++i);
+		item.setId(""+(++i));
 		item.setTitle("Item " + i);
 
 		//All parent items are expandable
@@ -48,7 +48,7 @@ public class DatabaseService {
 			item.setTitle("Expandable Item " + i);
 			for (int j = 1; j <= 5; j++) {
 				Item subItem = new Item();
-				subItem.setId(i * j * (-1));
+				subItem.setId(i+"s"+j);
 				subItem.setTitle("Sub Item " + j);
 				subItem.setParent(item);
 				item.addSubItem(subItem);
