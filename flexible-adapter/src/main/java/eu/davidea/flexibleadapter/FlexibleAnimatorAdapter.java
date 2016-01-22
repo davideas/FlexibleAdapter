@@ -324,30 +324,30 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	}
 
 	/**
-	 * Enable reverse animation depending on user scrolling.<br/>
+	 * Enable reverse scrolling animation.<br/>
 	 * Default disabled (only forward).
 	 *
 	 * @param enabled false to animate items only forward, true to reverse animate
 	 */
-	public void setAnimateOnReverseScrolling(boolean enabled) {
+	public void setAnimationOnReverseScrolling(boolean enabled) {
 		isReverseEnabled = enabled;
 	}
 
-	public boolean isAnimateOnReverseScrolling() {
+	public boolean isAnimationOnReverseScrolling() {
 		return isReverseEnabled;
 	}
 
 	/**
-	 * Enable/Disable item animation on loading.<br/>
+	 * Enable/Disable item animation while scrolling and on loading.<br/>
 	 * Default enabled.
 	 *
 	 * @param enabled true to enable item animation, false to disable.
 	 */
-	public void setAnimationEnabled(boolean enabled) {
+	public void setAnimationOnScrolling(boolean enabled) {
 		shouldAnimate = enabled;
 	}
 
-	public boolean isAnimationEnabled() {
+	public boolean isAnimationOnScrollingEnabled() {
 		return shouldAnimate;
 	}
 

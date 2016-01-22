@@ -58,8 +58,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		mItems = DatabaseService.getInstance().getListById(param);
 
 		if (!super.isEmpty()) addUserLearnedSelection();
-		//FIXME: This should be done automatically by the Library
-		expandInitialItems(mItems);
 
 		//Fill and Filter mItems with your custom list
 		//Note: In case of userLearnSelection, mItems is pre-initialized and after filtered.
@@ -75,24 +73,23 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			//Define Example View
 			Item item = new Item();
 			item.setId("0");
+			item.setExpandable(true);//Mark Expandable also this (same level of others items)
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			mItems.add(0, item);
+			super.addItem(0, item);
 		}
 	}
 
 	private void removeUserLearnedSelection() {
 		if (!DatabaseService.userLearnedSelection && isEmpty()) {
-			mItems.remove(0);
-			notifyItemRemoved(0);
+			super.removeItem(0);
 		}
 	}
 
 	private void userLearnedSelection() {
 		//TODO FOR YOU: Save the boolean into Settings!
 		DatabaseService.userLearnedSelection = true;
-		mItems.remove(0);
-		notifyItemRemoved(0);
+		super.removeItem(0);
 	}
 
 	@Override

@@ -95,9 +95,10 @@ public class MainActivity extends AppCompatActivity implements
 		//Adapter & RecyclerView
 		FlexibleAdapter.enableLogs(true);
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
-		mAdapter.setAnimateOnReverseScrolling(true);
-		mAdapter.setAnimationEnabled(false);
-		mAdapter.setScrollOnExpand(true);
+		mAdapter.setAnimationOnScrolling(true);
+		mAdapter.setAnimationOnReverseScrolling(true);
+		mAdapter.setAutoCollapseOnExpand(true);
+		mAdapter.setAutoScrollOnExpand(true);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
@@ -304,12 +305,12 @@ public class MainActivity extends AppCompatActivity implements
 				item.setTitle(R.string.linear_layout);
 			}
 		} else if (id == R.id.action_reverse) {
-			if (mAdapter.isAnimateOnReverseScrolling()) {
-				mAdapter.setAnimateOnReverseScrolling(false);
+			if (mAdapter.isAnimationOnReverseScrolling()) {
+				mAdapter.setAnimationOnReverseScrolling(false);
 				item.setIcon(R.drawable.ic_sort_white_24dp);
 				item.setTitle(R.string.reverse_scrolling);
 			} else {
-				mAdapter.setAnimateOnReverseScrolling(true);
+				mAdapter.setAnimationOnReverseScrolling(true);
 				item.setIcon(R.drawable.ic_sort_descending_white_24dp);
 				item.setTitle(R.string.forward_scrolling);
 			}

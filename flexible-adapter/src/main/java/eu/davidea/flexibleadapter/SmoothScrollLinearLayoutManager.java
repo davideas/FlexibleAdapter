@@ -19,8 +19,7 @@ public class SmoothScrollLinearLayoutManager extends LinearLayoutManager {
 	}
 
 	@Override
-	public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state,
-									   int position) {
+	public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
 		RecyclerView.SmoothScroller smoothScroller = new TopSnappedSmoothScroller(recyclerView.getContext()) {
 			//This controls the direction in which smoothScroll looks for your view
 			@Override
