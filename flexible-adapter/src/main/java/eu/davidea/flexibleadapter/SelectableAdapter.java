@@ -103,16 +103,6 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Convenience method to never invalidate the Item.
-	 *
-	 * @param position Position of the item to toggle the selection status for.
-	 * @see #toggleSelection(int, boolean)
-	 */
-	public void toggleSelection(int position) {
-		toggleSelection(position, false);
-	}
-
-	/**
 	 * Toggle the selection status of the item at a given position.<br/>
 	 * The behaviour depends on the selection mode previously set with {@link #setMode}.
 	 * <br/><br/>
@@ -138,10 +128,9 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * inside the ItemView!</li>
 	 * </ul>
 	 *
-	 * @param position   Position of the item to toggle the selection status for.
-	 * @param invalidate Boolean to indicate if the row must be invalidated and item rebound.
+	 * @param position Position of the item to toggle the selection status for.
 	 */
-	public void toggleSelection(int position, boolean invalidate) {
+	public void toggleSelection(int position) {
 		if (position < 0) return;
 		if (mode == MODE_SINGLE) clearSelection();
 
@@ -153,10 +142,6 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 			if (DEBUG) Log.v(TAG, "toggleSelection adding selection on position " + position);
 			selectedItems.add(position);
 		}
-		if (invalidate) {
-			if (DEBUG) Log.v(TAG, "toggleSelection notifyItemChanged on position " + position);
-			notifyItemChanged(position);
-		}
 		if (DEBUG) Log.v(TAG, "toggleSelection current selection " + selectedItems);
 	}
 
@@ -164,26 +149,36 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * Convenience method when there is no specific view to skip.
 	 */
 	public void selectAll() {
-		selectAll(-1);
+		selectAll(-1000);
 	}
 
 	/**
-	 * Add the selection status for all items.<br/>
-	 * The selector container is sequentially filled with All items positions.
-	 * <br/><b>Note:</b> All items are invalidated and rebound one by one!
+	 * Set the selection status for all items which the ViewType is lower than specified param.
+	 * <br/><b>Note:</b> All items are invalidated and rebound!
 	 *
-	 * @param skipViewType ViewType for which we don't want selection
+	 * @param skipViewTypes All ViewTypes for which we don't want selection
 	 */
-	public void selectAll(int skipViewType) {
+	public void selectAll(int skipViewTypes) {
 		if (DEBUG) Log.v(TAG, "selectAll");
 		selectedItems = new ArrayList<Integer>(getItemCount());
+		int positionStart = 0, itemCount = 0;
 		for (int i = 0; i < getItemCount(); i++) {
-			if (getItemViewType(i) == skipViewType) continue;
+			Log.v(TAG, "selectAll ViewType=" + getItemViewType(i) + " position=" + i);
+			if (getItemViewType(i) >= skipViewTypes) {
+				//Optimization for ItemRangeChanged
+				if (positionStart + itemCount == i) {
+					handleSelection(positionStart, itemCount);
+					itemCount = 0;
+					positionStart = i;
+				}
+				continue;
+			}
+			itemCount++;
 			selectedItems.add(i);
 		}
 		if (DEBUG)
-			Log.v(TAG, "selectAll notifyItemRangeChanged from positionStart=0 itemCount=" + getItemCount());
-		notifyItemRangeChanged(0, getItemCount());
+			Log.v(TAG, "selectAll notifyItemRangeChanged from positionStart=" + positionStart + " itemCount=" + getItemCount());
+		notifyItemRangeChanged(positionStart, getItemCount());
 	}
 
 	/**
@@ -210,18 +205,18 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 			if (positionStart + itemCount == position) {
 				itemCount++;
 			} else {
-				clearSelection(positionStart, itemCount);
+				handleSelection(positionStart, itemCount);
 				itemCount = 1;
 				positionStart = position;
 			}
 		}
 		//Notify remaining Items
-		clearSelection(positionStart, itemCount);
+		handleSelection(positionStart, itemCount);
 	}
 
-	private void clearSelection(int positionStart, int itemCount) {
+	private void handleSelection(int positionStart, int itemCount) {
 		if (itemCount > 0) {
-			if (DEBUG) Log.v(TAG, "clearSelection notifyItemRangeChanged from positionStart=" +
+			if (DEBUG) Log.v(TAG, "handleSelection notifyItemRangeChanged from positionStart=" +
 					positionStart + " itemCount=" + itemCount);
 			notifyItemRangeChanged(positionStart, itemCount);
 		}

@@ -407,7 +407,7 @@ public class MainActivity extends AppCompatActivity implements
 	 * @param position Position of the item to toggle the selection state
 	 */
 	private void toggleSelection(int position) {
-		mAdapter.toggleSelection(position, false);
+		mAdapter.toggleSelection(position);
 
 		int count = mAdapter.getSelectedItemCount();
 

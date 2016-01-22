@@ -8,7 +8,6 @@ import android.text.Html;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,7 +104,8 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	@Override
 	public void selectAll() {
 		mSelectAll = true;
-		super.selectAll(EXAMPLE_VIEW_TYPE);
+		super.selectAll();
+		//super.selectAll(EXAMPLE_VIEW_TYPE);
 	}
 
 	@Override
@@ -116,86 +116,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		}
 		super.addItem(position, item);
 	}
-
-	/*---------------------------*/
-	/* REMOVE METHODS OVERRIDDEN */
-	/*---------------------------*/
-
-//	/**
-//	 * Internally called to search the Parent position of a Child item.
-//	 *
-//	 * @param position Child position
-//	 * @return the Parent position
-//	 */
-//	private int getParentPosition(int position) {
-//		position--;
-//		while (position > 0) {
-//			if (getItem(position).isExpandable()) {
-//				if (DEBUG) Log.d(TAG, "Found parent at position " + position);
-//				break;
-//			}
-//			position--;
-//		}
-//		return position;
-//	}
-
-	/**
-	 * @param position            The position of item to remove
-	 * @param notifyParentChanged true to Notify parent of a removal of a child
-	 */
-//	public void removeItem(int position, boolean notifyParentChanged) {
-//		Item item = getItem(position);
-//		if (notifyParentChanged && !item.isExpandable()) {
-//			//It's a child, so notify the parent
-////			int parentPosition = getParentPosition(position);
-//			Item parent = item.getParent();
-//			parent.removeSubItem(item);
-//			parent.updateSubTitle();
-//			notifyItemChanged(getPositionForItem(parent));
-//		} else {
-//			//Assert parent is collapsed before removal
-//			collapse(position);
-//		}
-//		super.removeItem(position);
-//	}
-
-	/**
-	 * Before remove Items identified by selectedPositions, this method scan all immediate
-	 * previous Items to retrieve parent position only in case of Child removal.
-	 * <br/>If parent was found it is notified of the change by {@link #notifyItemChanged(int)}.
-	 * <br/>If no children are selected, the scan is skipped and items are removed
-	 * as usual calling {@link #removeItems(List)}.
-	 *
-	 * @param selectedPositions   list of item positions to remove
-	 * @param notifyParentChanged true to Notify parent of a removal of the children
-	 */
-//	public void removeItems(List<Integer> selectedPositions, boolean notifyParentChanged) {
-//		List<Item> parentsToNotify = new ArrayList<Item>();
-//		if (notifyParentChanged) {
-//			for (Integer position : selectedPositions) {
-//				//Take only children: verify that is a child
-//				Item item = getItem(position);
-//				Item parent = getExpandableOf(item);
-//				if (parent != null) {
-//					//TODO: Save position
-//					parent.removeSubItem(item);
-//					//Assert to notify only once the parent
-//					if (!parentsToNotify.contains(parent)) {
-//						parentsToNotify.add(parent);
-//					}
-//				}
-//			}
-//		}
-//		//Remove items as usual
-//		super.removeItems(selectedPositions);
-//		//Notify all identified parents of the removal of child items
-//		Log.d(TAG, "Parents to notify " + parentsToNotify.size());
-//		for (Item parent : parentsToNotify) {
-//			parent.updateSubTitle();
-//			Log.d(TAG, parent.getTitle() + " - " + parent.getSubtitle());
-//			notifyItemChanged(getPositionForItem(parent));
-//		}
-//	}
 
 	@Override
 	public void removeItems(List<Integer> selectedPositions) {
@@ -210,8 +130,8 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 
 	@Override
 	public int getItemViewType(int position) {
-		return (position == 0 && !DatabaseService.userLearnedSelection
-				&& !hasSearchText() ? EXAMPLE_VIEW_TYPE : super.getItemViewType(position));
+		return (position == 0 && !DatabaseService.userLearnedSelection && !hasSearchText() ?
+				EXAMPLE_VIEW_TYPE : super.getItemViewType(position));
 	}
 
 	@Override
