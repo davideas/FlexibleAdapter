@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.ViewGroup;
@@ -15,9 +16,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import eu.davidea.flexibleadapter.item.IExpandableItem;
-import eu.davidea.viewholder.ExpandableViewHolder;
-import eu.davidea.viewholder.FlexibleViewHolder;
+import eu.davidea.flexibleadapter.items.IExpandableItem;
+import eu.davidea.viewholders.ExpandableViewHolder;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * This adapter provides a set of standard methods to expand and collapse an Item.
@@ -51,6 +52,10 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		mExpandedItems = new SparseArray<T>();
 		removedItems = new ArrayList<RemovedItem>();
 		expandInitialItems();
+
+		//Get notified when items are inserted or removed
+		//(should adjust selected, expanded and removed positions)
+		registerAdapterDataObserver(new ExpandableAdapterDataObserver());
 	}
 
 	protected void expandInitialItems() {
@@ -91,7 +96,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	@Override
 	public void selectAll() {
 		//FIXME: select view type of only 1 type
-		if (getSelectedItemCount() > 0 && getItem(getSelectedItems().get(0)).isExpandable())
+		if (getSelectedItemCount() > 0 && getItem(getSelectedPositions().get(0)).isExpandable())
 			super.selectAll(EXPANDABLE_VIEW_TYPE + 1);//Select only Parents
 		else
 			super.selectAll(1);//Select others Views 0(default) + 1
@@ -160,13 +165,22 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * @return a set with the global positions of all expanded items
+	 * @return a list with the global positions of all expanded items
 	 */
-	public int[] getExpandedItems() {
-		int[] expandedItems = new int[mExpandedItems.size()];
+	public List<T> getExpandedItems() {
 		int length = mExpandedItems.size();
+		List<T> expandedItems = new ArrayList<T>(length);
 		for (int i = 0; i < length; i++) {
-			expandedItems[i] = mExpandedItems.keyAt(i);
+			expandedItems.add(mExpandedItems.valueAt(i));
+		}
+		return expandedItems;
+	}
+
+	public List<Integer> getExpandedPositions() {
+		int length = mExpandedItems.size();
+		List<Integer> expandedItems = new ArrayList<Integer>(length);
+		for (int i = 0; i < length; i++) {
+			expandedItems.add(mExpandedItems.keyAt(i));
 		}
 		return expandedItems;
 	}
@@ -228,7 +242,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	public int expand(int position) {
-		Log.v(TAG, "Request to Expand on position " + position);
+		Log.v(TAG, "Request to Expand on position " + position + " ExpandedItems=" + mExpandedItems);
 		final T item = getItem(position);
 		int subItemsCount = 0;
 		if (item.isExpandable() && !item.isExpanded() && hasSubItems(item) && !parentSelected) {
@@ -249,9 +263,11 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			mItems.addAll(position + 1, item.getSubItems());
 			item.setExpanded(true);
 
+
 			//Adjust selection and expandable positions, that are grater than the expanded position
-			adjustSelected(position, subItemsCount);
-			adjustExpanded(position, subItemsCount);
+//			adjustSelected(position, subItemsCount);
+//			adjustExpanded(position, subItemsCount);
+			adjustRemoved(position, subItemsCount);
 
 			//Automatically scroll the current expandable item to show as much children as possible
 			if (mScrollOnExpand) {
@@ -271,13 +287,13 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			notifyItemRangeInserted(position + 1, subItemsCount);
 
 			if (DEBUG)
-				Log.v(TAG, "Expanded " + subItemsCount + " subItems on position=" + position);
+				Log.v(TAG, "Expanded " + subItemsCount + " subItems on position=" + position + " ExpandedItems=" + mExpandedItems);
 		}
 		return subItemsCount;
 	}
 
 	public int collapse(int position) {
-		Log.v(TAG, "Request to Collapse on position " + position);
+		Log.v(TAG, "Request to Collapse on position " + position + " ExpandedItems=" + mExpandedItems);
 		T item = getItem(position);
 		int subItemsCount = 0;
 		if (item.isExpandable() && item.isExpanded() &&
@@ -292,81 +308,17 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			item.setExpanded(false);
 
 			//Adjust selection and expandable positions, that are grater than the collapsed position
-			adjustSelected(position, -subItemsCount);
-			adjustExpanded(position, -subItemsCount);
+//			adjustSelected(position, -subItemsCount);
+//			adjustExpanded(position, -subItemsCount);
+			adjustRemoved(position, -subItemsCount);
 
 			//Collapse!
 			notifyItemRangeRemoved(position + 1, subItemsCount);
 
 			if (DEBUG)
-				Log.v(TAG, "Collapsed " + subItemsCount + " subItems on position=" + position);
+				Log.v(TAG, "Collapsed " + subItemsCount + " subItems on position=" + position + " ExpandedItems=" + mExpandedItems);
 		}
 		return subItemsCount;
-	}
-
-	private void autoScroll(int position, int subItemsCount) {
-		int firstVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-		int lastVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
-		int itemsToShow = position + subItemsCount - lastVisibleItem;
-		if (DEBUG)
-			Log.v(TAG, "itemsToShow=" + itemsToShow + " firstVisibleItem=" + firstVisibleItem + " lastVisibleItem=" + lastVisibleItem + " RvChildCount=" + mRecyclerView.getChildCount());
-		if (itemsToShow > 0) {
-			int scrollMax = position - firstVisibleItem;
-			int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
-			int scrollBy = Math.min(scrollMax, scrollMin);
-			//Adjust by 1 position for item not completely visible
-			int fix = 0;//(position > lastVisibleItem || itemsToShow >= mRecyclerView.getChildCount() ? 1 : 0);
-			int scrollTo = firstVisibleItem + scrollBy - fix;
-			if (DEBUG)
-				Log.v(TAG, "scrollMin=" + scrollMin + " scrollMax=" + scrollMax + " scrollBy=" + scrollBy + " scrollTo=" + scrollTo + " fix=" + fix);
-			mRecyclerView.smoothScrollToPosition(scrollTo);
-		}
-	}
-
-	/*-----------------*/
-	/* PRIVATE METHODS */
-	/*-----------------*/
-
-	private boolean hasSubItems(T item) {
-		return item.getSubItems() != null && item.getSubItems().size() > 0;
-	}
-
-	private boolean hasSubItemsSelected(T item) {
-		if (item.getSubItems() == null) return false;
-
-		for (T subItem : item.getSubItems()) {
-			if (isSelected(getPositionForItem(subItem))) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	protected void adjustSelected(int startPosition, int itemCount) {
-		List<Integer> selectedItems = getSelectedItems();
-		for (Integer position : selectedItems) {
-			if (position > startPosition) {
-				if (DEBUG)
-					Log.v(TAG, "Adjust Selected position " + position + " to " + (position + itemCount));
-				int index = selectedItems.indexOf(position);
-				position += itemCount;
-				selectedItems.set(index, position);
-			}
-		}
-	}
-
-	protected void adjustExpanded(int startPosition, int itemCount) {
-		for (int i = 0; i < mExpandedItems.size(); i++) {
-			int key = mExpandedItems.keyAt(i);
-			if (key > startPosition) {
-				if (DEBUG)
-					Log.v(TAG, "Adjust Expanded position " + key + " to " + (key + itemCount));
-				T item = mExpandedItems.get(key);
-				mExpandedItems.remove(key);
-				key += itemCount;
-				mExpandedItems.put(key, item);
-			}
-		}
 	}
 
 	/*---------------------------*/
@@ -405,7 +357,6 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			//If parent is collapsed there's no need to notify about the change.
 			if (parent.isExpanded()) {
 				int parentPosition = getPositionForItem(parent);
-				adjustExpanded(parentPosition + subPosition + 1, 1);
 				super.addItem(parentPosition + subPosition + 1, item);
 			}
 			//Notify the parent about the change if requested
@@ -416,10 +367,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	@Override
 	public void addItem(int position, T item) {
 		if (!item.isExpandable()) addSubItem(position, item, getExpandableOf(item));
-		else {
-			adjustExpanded(position, 1);
-			super.addItem(position, item);
-		}
+		else super.addItem(position, item);
 	}
 
 	/**
@@ -488,10 +436,23 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		Collections.sort(selectedPositions, new Comparator<Integer>() {
 			@Override
 			public int compare(Integer lhs, Integer rhs) {
-				return rhs - lhs;
+				return lhs - rhs;
 			}
 		});
+//		int positionStart = 0, itemCount = 0;
+//		for (Integer position : selectedPositions) {
+//			collapse(position);
+//			if (positionStart + itemCount == position) {
+//				itemCount++;
+//			} else {
+//				if (itemCount > 0) removeRange(positionStart, itemCount, notifyParentChanged);
+//				positionStart = position;
+//				itemCount = 1;
+//			}
+//		}
+//		if (itemCount > 0) removeRange(positionStart, itemCount, notifyParentChanged);
 		// Split the list in ranges
+		//TODO: Change logic for ranges (don't empty selectionPositions!)
 		while (!selectedPositions.isEmpty()) {
 			isAdapterRunning = true;
 			if (selectedPositions.size() == 1) {
@@ -499,8 +460,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				//Align the selection list when removing the item
 				selectedPositions.remove(0);
 			} else {
-				//TODO: Create separated private function removeItemOrRange(selectedPositions)
-				if (DEBUG) Log.v(TAG, "removeItems current selection " + getSelectedItems());
+				if (DEBUG) Log.v(TAG, "removeItems current selection " + getSelectedPositions());
 				int count = 1;
 				while (selectedPositions.size() > count && selectedPositions.get(count).equals(selectedPositions.get(count - 1) - 1)) {
 					++count;
@@ -524,11 +484,11 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	public void removeRange(int positionStart, int itemCount, boolean notifyParentChanged) {
 		if (DEBUG)
 			Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
-
 		T parent = null;
 		for (int i = 0; i < itemCount; ++i) {
 			T item = getItem(positionStart);
-			//If item is a Child then, all others are Children as well: we don't allow mixed selections of Parent and Children together
+			//If item is a Child then, all others must be Children as well:
+			//We didn't allow mixed selections of Parent and Children together
 			if (!item.isExpandable()) {
 				//It's a Child, so get the Parent
 				if (parent == null) parent = getExpandableOf(item);
@@ -543,10 +503,17 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 					}
 				}
 			} else {
+				//It's a Parent
 				synchronized (mLock) {
 					removedItems.add(new RemovedItem<T>(positionStart, item));
 					//Collapse parent if expanded before removal due to current selection!
-					if (item.isExpanded()) collapse(positionStart);
+					if (item.isExpanded()) {
+						//Collapsing in removeRange, positionStart doesn't match, we fix with [+i]
+						int indexOfKey = mExpandedItems.indexOfKey(positionStart + i);
+						Log.d(TAG, "indexOfKey=" + indexOfKey + " key="+(positionStart+i));
+						if (indexOfKey >= 0) mExpandedItems.removeAt(indexOfKey);
+						collapse(positionStart);
+					}
 					mItems.remove(positionStart);
 				}
 			}
@@ -567,11 +534,11 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	@Override
 	public void removeAllSelectedItems() {
-		this.removeItems(getSelectedItems(), false);
+		this.removeItems(getSelectedPositions(), false);
 	}
 
 	public void removeAllSelectedItems(boolean notifyParentChanged) {
-		this.removeItems(getSelectedItems(), notifyParentChanged);
+		this.removeItems(getSelectedPositions(), notifyParentChanged);
 	}
 
 	/*-------------------------*/
@@ -581,16 +548,16 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	@Override
 	public void restoreDeletedItems() {
 		stopUndoTimer();
-		//TODO: Check if any expandable has been expanded or collapsed meanwhile, above the removed position
 		//Reverse insert (list was reverse ordered on Delete)
 		for (int i = removedItems.size() - 1; i >= 0; i--) {
-			//Restore child
 			RemovedItem removedItem = removedItems.get(i);
 			if (!removedItem.item.isExpandable()) {
+				//Restore child
 				Log.v(TAG, "Restore Child " + removedItem.item + " on position " + removedItem.originalPosition);
 				addSubItem(removedItem.originalPositionInParent, (T) removedItem.item,
 						(T) removedItem.parent, false, removedItem.notifyParentChanged);
-			} else {//Restore parent
+			} else {
+				//Restore parent
 				Log.v(TAG, "Restore Parent " + removedItem.item + " on position " + removedItem.originalPosition);
 				addItem(removedItem.originalPosition, (T) removedItem.item);
 			}
@@ -613,6 +580,100 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		return deletedItems;
 	}
 
+	public List<Integer> getDeletedPositions() {
+		List<Integer> deletedItems = new ArrayList<Integer>();
+		for (RemovedItem removedItem : removedItems) {
+			deletedItems.add(removedItem.originalPosition);
+		}
+		return deletedItems;
+	}
+
+	/*-----------------*/
+	/* PRIVATE METHODS */
+	/*-----------------*/
+
+	private boolean hasSubItems(T item) {
+		return item.getSubItems() != null && item.getSubItems().size() > 0;
+	}
+
+	private boolean hasSubItemsSelected(T item) {
+		if (item.getSubItems() == null) return false;
+
+		for (T subItem : item.getSubItems()) {
+			if (isSelected(getPositionForItem(subItem))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void autoScroll(int position, int subItemsCount) {
+		int firstVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+		int lastVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
+		int itemsToShow = position + subItemsCount - lastVisibleItem;
+		if (DEBUG)
+			Log.v(TAG, "itemsToShow=" + itemsToShow + " firstVisibleItem=" + firstVisibleItem + " lastVisibleItem=" + lastVisibleItem + " RvChildCount=" + mRecyclerView.getChildCount());
+		if (itemsToShow > 0) {
+			int scrollMax = position - firstVisibleItem;
+			int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
+			int scrollBy = Math.min(scrollMax, scrollMin);
+			//Adjust by 1 position for item not completely visible
+			int fix = 0;//(position > lastVisibleItem || itemsToShow >= mRecyclerView.getChildCount() ? 1 : 0);
+			int scrollTo = firstVisibleItem + scrollBy - fix;
+			if (DEBUG)
+				Log.v(TAG, "scrollMin=" + scrollMin + " scrollMax=" + scrollMax + " scrollBy=" + scrollBy + " scrollTo=" + scrollTo + " fix=" + fix);
+			mRecyclerView.smoothScrollToPosition(scrollTo);
+		} else if (position < firstVisibleItem) {
+			mRecyclerView.smoothScrollToPosition(position);
+		}
+	}
+
+	private void adjustSelected(int startPosition, int itemCount) {
+		List<Integer> selectedPositions = getSelectedPositions();
+		boolean adjusted = false;
+		for (Integer position : selectedPositions) {
+			if (position > startPosition) {
+				if (DEBUG)
+					Log.v(TAG, "Adjust Selected position " + position + " to " + (position + itemCount));
+				int index = selectedPositions.indexOf(position);
+				position += itemCount;
+				selectedPositions.set(index, Math.max(position, startPosition));
+				adjusted = true;
+			}
+		}
+		if (DEBUG && adjusted) Log.v(TAG, "AdjustedSelected=" + getSelectedPositions());
+	}
+
+	private void adjustExpanded(int startPosition, int itemCount) {
+		boolean adjusted = false;
+		for (int i = 0; i < mExpandedItems.size(); i++) {
+			int position = mExpandedItems.keyAt(i);
+			if (position >= startPosition) {//= is for insertion at that position
+				if (DEBUG)
+					Log.v(TAG, "Adjust Expanded from position " + position + " to " + (position + itemCount));
+				T item = mExpandedItems.get(position);
+				mExpandedItems.remove(position);
+				position += itemCount;
+				mExpandedItems.put(position, item);
+				adjusted = true;
+			}
+		}
+		if (DEBUG && adjusted) Log.v(TAG, "AdjustedExpanded=" + getExpandedPositions());
+	}
+
+	private void adjustRemoved(int startPosition, int itemCount) {
+		boolean adjusted = false;
+		for (RemovedItem removedItem : removedItems) {
+			if (removedItem.originalPosition > startPosition) {
+				if (DEBUG)
+					Log.v(TAG, "Adjust Removed position " + removedItem.originalPosition + " to " + (removedItem.originalPosition + itemCount));
+				removedItem.originalPosition += itemCount;
+				adjusted = true;
+			}
+		}
+		if (DEBUG && adjusted) Log.v(TAG, "AdjustedRemoved=" + getDeletedPositions());
+	}
+
 	/*----------------*/
 	/* INSTANCE STATE */
 	/*----------------*/
@@ -625,7 +686,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		if (DEBUG) Log.v(TAG, "SaveInstanceState for expanded items");
-		outState.putIntArray(TAG, getExpandedItems());
+		outState.putIntegerArrayList(TAG, (ArrayList<Integer>) getExpandedPositions());
 	}
 
 	/**
@@ -635,20 +696,53 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		if (DEBUG) Log.v(TAG, "RestoreInstanceState for expanded items");
-		//First restore opened collapsible items, as otherwise may not all selections could be restored
-		int[] expandedItems = savedInstanceState.getIntArray(TAG);
+		//First, restore opened collapsible items, as otherwise may not all selections could be restored
+		List<Integer> expandedItems = savedInstanceState.getIntegerArrayList(TAG);
 		if (expandedItems != null) {
 			for (Integer expandedItem : expandedItems) {
 				expand(expandedItem);
 			}
 		}
-		//Restore selection state
+		//Then, restore selection state
 		super.onRestoreInstanceState(savedInstanceState);
 	}
 
 	/*---------------*/
 	/* INNER CLASSES */
 	/*---------------*/
+
+	/**
+	 * Observer Class responsible to recalculate Selection, Expanded, Removed positions.
+	 */
+	private class ExpandableAdapterDataObserver extends RecyclerView.AdapterDataObserver {
+
+		private void adjustPositions(int positionStart, int itemCount) {
+			adjustSelected(positionStart, itemCount);
+			adjustExpanded(positionStart, itemCount);
+		}
+
+		@Override
+		public void onItemRangeChanged(int positionStart, int itemCount) {
+			//nothing
+		}
+
+		@Override
+		public void onItemRangeInserted(int positionStart, int itemCount) {
+			adjustPositions(positionStart, itemCount);
+
+		}
+
+		@Override
+		public void onItemRangeRemoved(int positionStart, int itemCount) {
+			adjustPositions(positionStart, -itemCount);
+		}
+
+		@Override
+		public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+			//Take always the min position
+			//TODO? adjustPositions(Math.min(fromPosition, toPosition), itemCount);
+		}
+	}
 
 	private static class RemovedItem<T extends IExpandableItem<T>> {
 		int originalPosition = -1;
@@ -663,8 +757,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 		public RemovedItem(int originalPosition, T item, int originalPositionInParent, T parent, boolean notifyParentChanged) {
 			this.originalPosition = originalPosition;
-			this.item = item;
 			this.originalPositionInParent = originalPositionInParent;
+			this.item = item;
 			this.parent = parent;
 			this.notifyParentChanged = notifyParentChanged;
 		}
@@ -672,8 +766,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		@Override
 		public String toString() {
 			return "RemovedItem[originalPosition=" + originalPosition +
+					", originalPositionInParent=" + originalPositionInParent +
 					", item=" + item +
-					", originalPositionInParent=" + originalPosition +
 					", parent=" + parent + "]";
 		}
 	}

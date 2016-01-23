@@ -39,8 +39,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	protected List<T> mItems;
 	protected List<T> mDeletedItems;
-	protected SparseArray<T> mRemovedItems;
 	protected List<Integer> mOriginalPositions;
+	protected SparseArray<T> mRemovedItems;//beta test
 	protected String mSearchText;
 	protected Handler mHandler;
 	protected OnUpdateListener mUpdateListener;
@@ -195,21 +195,17 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @see #emptyBin()
 	 */
 	public void removeItem(int position) {
-		if (position < 0) {
-			Log.w(TAG, "Cannot removeItem on negative position");
+		if (position < 0 && position >= mItems.size()) {
+			Log.w(TAG, "Cannot removeItem on position out of OutOfBound!");
 			return;
 		}
-		if (position < mItems.size()) {
-			if (DEBUG) Log.v(TAG, "removeItem notifyItemRemoved on position " + position);
-			synchronized (mLock) {
-				saveDeletedItem(position, mItems.remove(position));
-			}
-			notifyItemRemoved(position);
-			if (mUpdateListener != null && !isAdapterRunning)
-				mUpdateListener.onUpdateEmptyView(mItems.size());
-		} else {
-			Log.w(TAG, "removeItem WARNING! Position OutOfBound! Review the position to remove!");
+		if (DEBUG) Log.v(TAG, "removeItem notifyItemRemoved on position " + position);
+		synchronized (mLock) {
+			saveDeletedItem(position, mItems.remove(position));
 		}
+		notifyItemRemoved(position);
+		if (mUpdateListener != null && !isAdapterRunning)
+			mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
 	/**
@@ -237,7 +233,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 				//Align the selection list when removing the item
 				selectedPositions.remove(0);
 			} else {
-				if (DEBUG) Log.v(TAG, "removeItems current selection " + getSelectedItems());
+				if (DEBUG) Log.v(TAG, "removeItems current selection " + getSelectedPositions());
 				int count = 1;
 				while (selectedPositions.size() > count && selectedPositions.get(count).equals(selectedPositions.get(count - 1) - 1)) {
 					++count;
@@ -276,7 +272,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @see #removeItems(List)
 	 */
 	public void removeAllSelectedItems() {
-		removeItems(getSelectedItems());
+		removeItems(getSelectedPositions());
 	}
 
 	/*--------------*/
@@ -320,9 +316,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		//Reverse insert (list was reverse ordered on Delete)
 		for (int i = mOriginalPositions.size() - 1; i >= 0; i--) {
 			T item = mDeletedItems.get(i);
-			T item2 = mRemovedItems.get(mRemovedItems.indexOfKey(i));
+			T item2 = mRemovedItems.get(mRemovedItems.keyAt(i));
 			if (DEBUG) Log.d(TAG, "Restoring item " + item + " on position " + mOriginalPositions.get(i));
-			if (DEBUG) Log.d(TAG, "Restoring item2 " + item2 + " on position " + mRemovedItems.indexOfKey(i));
+			if (DEBUG) Log.d(TAG, "Restoring item2 " + item2 + " on position " + mRemovedItems.keyAt(i));
 			//Avoid to restore(show) Items not filtered by the current filter
 			if (hasSearchText() && !filterObject(item, getSearchText()))
 				continue;

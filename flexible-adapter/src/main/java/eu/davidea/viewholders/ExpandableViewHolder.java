@@ -1,4 +1,4 @@
-package eu.davidea.viewholder;
+package eu.davidea.viewholders;
 
 import android.view.View;
 

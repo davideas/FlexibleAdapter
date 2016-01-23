@@ -33,8 +33,8 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	public static final int MODE_MULTI = 2;
 
-	//TODO: Evaluate TreeSet instead of ArrayList for selectedItems, TreeSet is a sortedList
-	private ArrayList<Integer> selectedItems;
+	//TODO: Evaluate TreeSet instead of ArrayList for selectedPositions, TreeSet is a sortedList
+	private ArrayList<Integer> selectedPositions;
 	private int mode;
 	protected RecyclerView mRecyclerView;
 	protected FastScroller mFastScroller;
@@ -44,7 +44,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/*--------------*/
 
 	public SelectableAdapter() {
-		selectedItems = new ArrayList<Integer>();
+		selectedPositions = new ArrayList<Integer>();
 		mode = MODE_SINGLE;
 	}
 
@@ -99,7 +99,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @return true if the item is selected, false otherwise.
 	 */
 	public boolean isSelected(int position) {
-		return selectedItems.contains(Integer.valueOf(position));
+		return selectedPositions.contains(Integer.valueOf(position));
 	}
 
 	/**
@@ -134,15 +134,15 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		if (position < 0) return;
 		if (mode == MODE_SINGLE) clearSelection();
 
-		int index = selectedItems.indexOf(position);
+		int index = selectedPositions.indexOf(position);
 		if (index != -1) {
 			if (DEBUG) Log.v(TAG, "toggleSelection removing selection on position " + position);
-			selectedItems.remove(index);
+			selectedPositions.remove(index);
 		} else {
 			if (DEBUG) Log.v(TAG, "toggleSelection adding selection on position " + position);
-			selectedItems.add(position);
+			selectedPositions.add(position);
 		}
-		if (DEBUG) Log.v(TAG, "toggleSelection current selection " + selectedItems);
+		if (DEBUG) Log.v(TAG, "toggleSelection current selection " + selectedPositions);
 	}
 
 	/**
@@ -160,7 +160,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	public void selectAll(int skipViewTypes) {
 		if (DEBUG) Log.v(TAG, "selectAll");
-		selectedItems = new ArrayList<Integer>(getItemCount());
+		selectedPositions = new ArrayList<Integer>(getItemCount());
 		int positionStart = 0, itemCount = 0;
 		for (int i = 0; i < getItemCount(); i++) {
 			Log.v(TAG, "selectAll ViewType=" + getItemViewType(i) + " position=" + i);
@@ -174,7 +174,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 				continue;
 			}
 			itemCount++;
-			selectedItems.add(i);
+			selectedPositions.add(i);
 		}
 		if (DEBUG)
 			Log.v(TAG, "selectAll notifyItemRangeChanged from positionStart=" + positionStart + " itemCount=" + getItemCount());
@@ -188,14 +188,14 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * <b>Note 2:</b> This method use java.util.Iterator to avoid java.util.ConcurrentModificationException.
 	 */
 	public void clearSelection() {
-		Collections.sort(selectedItems, new Comparator<Integer>() {
+		Collections.sort(selectedPositions, new Comparator<Integer>() {
 			@Override
 			public int compare(Integer lhs, Integer rhs) {
 				return lhs - rhs;
 			}
 		});
-		if (DEBUG) Log.v(TAG, "clearSelection current selection " + selectedItems);
-		Iterator<Integer> iterator = selectedItems.iterator();
+		if (DEBUG) Log.v(TAG, "clearSelection current selection " + selectedPositions);
+		Iterator<Integer> iterator = selectedPositions.iterator();
 		int positionStart = 0, itemCount = 0;
 		//The notification is done only on items that are currently selected.
 		while (iterator.hasNext()) {
@@ -205,12 +205,13 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 			if (positionStart + itemCount == position) {
 				itemCount++;
 			} else {
+				//Notify previous range
 				handleSelection(positionStart, itemCount);
-				itemCount = 1;
 				positionStart = position;
+				itemCount = 1;
 			}
 		}
-		//Notify remaining Items
+		//Notify remaining range
 		handleSelection(positionStart, itemCount);
 	}
 
@@ -228,7 +229,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @return Selected items count
 	 */
 	public int getSelectedItemCount() {
-		return selectedItems.size();
+		return selectedPositions.size();
 	}
 
 	/**
@@ -236,8 +237,8 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 *
 	 * @return List of selected items ids
 	 */
-	public List<Integer> getSelectedItems() {
-		return selectedItems;
+	public List<Integer> getSelectedPositions() {
+		return selectedPositions;
 	}
 
 	/*----------------*/
@@ -250,7 +251,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @param outState Current state
 	 */
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putIntegerArrayList(TAG, selectedItems);
+		outState.putIntegerArrayList(TAG, selectedPositions);
 	}
 
 	/**
@@ -259,7 +260,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @param savedInstanceState Previous state
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		selectedItems = savedInstanceState.getIntegerArrayList(TAG);
+		selectedPositions = savedInstanceState.getIntegerArrayList(TAG);
 	}
 
 	/*---------------*/

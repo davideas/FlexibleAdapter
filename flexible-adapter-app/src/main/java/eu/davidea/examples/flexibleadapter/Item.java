@@ -2,8 +2,8 @@ package eu.davidea.examples.flexibleadapter;
 
 import java.io.Serializable;
 
-import eu.davidea.flexibleadapter.item.AbstractExpandableItem;
-import eu.davidea.viewholder.ExpandableViewHolder;
+import eu.davidea.flexibleadapter.items.AbstractExpandableItem;
+import eu.davidea.viewholders.ExpandableViewHolder;
 
 public class Item extends AbstractExpandableItem<Item, ExpandableViewHolder> implements Serializable {
 

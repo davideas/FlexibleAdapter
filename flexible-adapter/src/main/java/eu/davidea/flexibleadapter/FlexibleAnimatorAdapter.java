@@ -36,14 +36,14 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	protected static final String TAG = FlexibleAnimatorAdapter.class.getSimpleName();
 
 	private Interpolator mInterpolator = new LinearInterpolator();
-	private AnimatorAdapterDataObserver mNotifierObserver;
+	private AnimatorAdapterDataObserver mAnimatorNotifierObserver;
 
 	private enum AnimatorEnum {
 		ALPHA, SLIDE_IN_LEFT, SLIDE_IN_RIGHT, SLIDE_IN_BOTTOM, SCALE
 	}
 
 	/**
-	 * The active Animators. Keys are hashcodes of the Views that are animated.
+	 * The active Animators. Keys are hash codes of the Views that are animated.
 	 */
 	@NonNull
 	private final SparseArray<Animator> mAnimators = new SparseArray<>();
@@ -94,8 +94,94 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		super(items, listener);
 
 		//Get notified when an item is changed (should skip animation)
-		mNotifierObserver = new AnimatorAdapterDataObserver();
-		registerAdapterDataObserver(mNotifierObserver);
+		mAnimatorNotifierObserver = new AnimatorAdapterDataObserver();
+		registerAdapterDataObserver(mAnimatorNotifierObserver);
+	}
+
+	/*-----------------------*/
+	/* CONFIGURATION SETTERS */
+	/*-----------------------*/
+
+	/**
+	 * Customize the initial delay for the first item animation.<br/>
+	 * Default is 0ms.
+	 *
+	 * @param initialDelay Any non negative delay
+	 */
+	public void setAnimationInitialDelay(long initialDelay) {
+		mInitialDelay = initialDelay;
+	}
+
+	/**
+	 * Customize the step delay between an animation and the next to be added to the initial delay.<br/>
+	 * The delay is added on top of the previous delay.<br/>
+	 * Default is 100ms.
+	 *
+	 * @param delay Any positive delay
+	 */
+	public void setAnimationDelay(@IntRange(from = 0) long delay) {
+		mStepDelay = delay;
+	}
+
+	/**
+	 * Customize the duration of the animation for ALL items.<br/>
+	 * Default is 300ms.
+	 *
+	 * @param duration any positive time
+	 */
+	public void setAnimationDuration(@IntRange(from = 1) long duration) {
+		mDuration = duration;
+	}
+
+	/**
+	 * Define a custom interpolator for ALL items.<br/>
+	 * Default is {@link LinearInterpolator}.
+	 *
+	 * @param interpolator any valid non null interpolator
+	 */
+	public void setAnimationInterpolator(@NonNull Interpolator interpolator) {
+		mInterpolator = interpolator;
+	}
+
+	/**
+	 * Define an initial start animation adapter position.<br/>
+	 * Default is 0 (1st position).
+	 *
+	 * @param start Non negative minimum position to start animation.
+	 */
+	public void setAnimationStartPosition(@IntRange(from = 0) int start) {
+		mLastAnimatedPosition = start;
+	}
+
+	/**
+	 * Enable/Disable item animation while scrolling and on loading.<br/>
+	 * Disabling scrolling will disable also reverse scrolling!<br/>
+	 * Default enabled.
+	 *
+	 * @param enabled true to enable item animation, false to disable them all.
+	 * @see #setAnimationOnReverseScrolling(boolean)
+	 */
+	public void setAnimationOnScrolling(boolean enabled) {
+		shouldAnimate = enabled;
+	}
+
+	public boolean isAnimationOnScrollingEnabled() {
+		return shouldAnimate;
+	}
+
+	/**
+	 * Enable reverse scrolling animation if AnimationOnScrolling is also enabled!<br/>
+	 * Default disabled (only forward).
+	 *
+	 * @param enabled false to animate items only forward, true to reverse animate
+	 * @see #setAnimationOnScrolling(boolean)
+	 */
+	public void setAnimationOnReverseScrolling(boolean enabled) {
+		isReverseEnabled = enabled;
+	}
+
+	public boolean isAnimationOnReverseScrolling() {
+		return isReverseEnabled;
 	}
 
 	/*--------------*/
@@ -145,12 +231,12 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 //		if (DEBUG)
 //			Log.d(TAG, "shouldAnimate=" + shouldAnimate
 //					+ " isFastScroll=" + isFastScroll
-//					+ " isNotified=" + mNotifierObserver.isPositionNotified()
+//					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
 //					+ " isReverseEnabled=" + isReverseEnabled
 //					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
 //			);
 
-		if (shouldAnimate && !isFastScroll && !mNotifierObserver.isPositionNotified() &&
+		if (shouldAnimate && !isFastScroll && !mAnimatorNotifierObserver.isPositionNotified() &&
 				(isReverseEnabled || (!isReverseEnabled && position > mLastAnimatedPosition)) ) {
 
 			//Cancel animation is necessary when fling
@@ -171,9 +257,8 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			//Execute the animations all together
 			AnimatorSet set = new AnimatorSet();
 			set.playTogether(animators);
-			//Solution 1
-//			set.setStartDelay(calculateAnimationDelay1(position));
-			//Solution 2
+			//TODO: Animate with Solution 1 or 2?
+			//set.setStartDelay(calculateAnimationDelay1(position));
 			set.setStartDelay(calculateAnimationDelay2(position));
 			set.setInterpolator(mInterpolator);
 			set.setDuration(mDuration);
@@ -182,8 +267,8 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			mAnimators.put(itemView.hashCode(), set);
 		}
 
-		if (mNotifierObserver.isPositionNotified())
-			mNotifierObserver.clearNotified();
+		if (mAnimatorNotifierObserver.isPositionNotified())
+			mAnimatorNotifierObserver.clearNotified();
 
 		mLastAnimatedPosition = position;
 	}
@@ -266,89 +351,6 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 				" ChildCount=" + mRecyclerView.getChildCount());
 
 		return delay;
-	}
-
-	/*-----------------------*/
-	/* CONFIGURATION SETTERS */
-	/*-----------------------*/
-
-	/**
-	 * Customize the initial delay for the first item animation.<br/>
-	 * Default is 0ms.
-	 *
-	 * @param initialDelay Any non negative delay
-	 */
-	public void setAnimationInitialDelay(long initialDelay) {
-		mInitialDelay = initialDelay;
-	}
-
-	/**
-	 * Customize the step delay between an animation and the next to be added to the initial delay.<br/>
-	 * The delay is added on top of the previous delay.<br/>
-	 * Default is 100ms.
-	 *
-	 * @param delay Any positive delay
-	 */
-	public void setAnimationDelay(@IntRange(from = 0) long delay) {
-		mStepDelay = delay;
-	}
-
-	/**
-	 * Customize the duration of the animation for ALL items.<br/>
-	 * Default is 300ms.
-	 *
-	 * @param duration any positive time
-	 */
-	public void setAnimationDuration(@IntRange(from = 1) long duration) {
-		mDuration = duration;
-	}
-
-	/**
-	 * Define a custom interpolator for ALL items.<br/>
-	 * Default is {@link LinearInterpolator}.
-	 *
-	 * @param interpolator any valid non null interpolator
-	 */
-	public void setAnimationInterpolator(@NonNull Interpolator interpolator) {
-		mInterpolator = interpolator;
-	}
-
-	/**
-	 * Define an initial start animation adapter position.<br/>
-	 * Default is 0 (1st position).
-	 *
-	 * @param start Non negative minimum position to start animation.
-	 */
-	public void setAnimationStartPosition(@IntRange(from = 0) int start) {
-		mLastAnimatedPosition = start;
-	}
-
-	/**
-	 * Enable reverse scrolling animation.<br/>
-	 * Default disabled (only forward).
-	 *
-	 * @param enabled false to animate items only forward, true to reverse animate
-	 */
-	public void setAnimationOnReverseScrolling(boolean enabled) {
-		isReverseEnabled = enabled;
-	}
-
-	public boolean isAnimationOnReverseScrolling() {
-		return isReverseEnabled;
-	}
-
-	/**
-	 * Enable/Disable item animation while scrolling and on loading.<br/>
-	 * Default enabled.
-	 *
-	 * @param enabled true to enable item animation, false to disable.
-	 */
-	public void setAnimationOnScrolling(boolean enabled) {
-		shouldAnimate = enabled;
-	}
-
-	public boolean isAnimationOnScrollingEnabled() {
-		return shouldAnimate;
 	}
 
 	/*-----------*/
@@ -501,7 +503,8 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 		@Override
 		public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-			markNotified(fromPosition, itemCount);
+			//Take always the min position
+			markNotified(Math.min(fromPosition, toPosition), itemCount);
 		}
 	}
 

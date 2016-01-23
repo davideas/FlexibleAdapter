@@ -1,11 +1,11 @@
-package eu.davidea.flexibleadapter.item;
+package eu.davidea.flexibleadapter.items;
 
 import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.davidea.viewholder.ExpandableViewHolder;
+import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
  * Generic implementation of {@link IExpandableItem} interface with most useful methods to manage
@@ -171,9 +171,9 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 
 	public void restoreDeletedSubItems() {
 		for (int i = 0; i < mRemovedItems.size(); i++) {
-			int indexOfKey = mRemovedItems.indexOfKey(i);
-			if (indexOfKey >= 0)
-				addSubItem(indexOfKey, mRemovedItems.get(indexOfKey));
+			int position = mRemovedItems.keyAt(i);
+			if (position >= 0)
+				addSubItem(position, mRemovedItems.get(position));
 		}
 	}
 

@@ -1,4 +1,4 @@
-package eu.davidea.flexibleadapter.item;
+package eu.davidea.flexibleadapter.items;
 
 /**
  * Generic implementation of {@link IFlexibleItem} interface with most useful methods to manage

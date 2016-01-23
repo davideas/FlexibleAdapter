@@ -1,4 +1,4 @@
-package eu.davidea.flexibleadapter.item;
+package eu.davidea.flexibleadapter.items;
 
 /**
  * Basic Interface to manage Item operations like selection

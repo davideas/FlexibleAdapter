@@ -20,9 +20,9 @@ import java.util.Locale;
 
 import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
 import eu.davidea.utils.Utils;
-import eu.davidea.viewholder.ExpandableViewHolder;
-import eu.davidea.viewholder.FlexibleViewHolder;
-import eu.davidea.viewholder.FlexibleViewHolder.OnListItemClickListener;
+import eu.davidea.viewholders.ExpandableViewHolder;
+import eu.davidea.viewholders.FlexibleViewHolder;
+import eu.davidea.viewholders.FlexibleViewHolder.OnListItemClickListener;
 
 
 public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHolder, Item> {
@@ -61,6 +61,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 
 		//Fill and Filter mItems with your custom list
 		//Note: In case of userLearnSelection, mItems is pre-initialized and after filtered.
+		//TODO: Avoid the call notifyDataSetChanged
 		filterItems(mItems);
 		notifyDataSetChanged();
 

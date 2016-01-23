@@ -1,4 +1,4 @@
-package eu.davidea.flexibleadapter.item;
+package eu.davidea.flexibleadapter.items;
 
 import java.util.List;
 

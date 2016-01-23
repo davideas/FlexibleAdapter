@@ -34,7 +34,7 @@ import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
 import eu.davidea.utils.Utils;
-import eu.davidea.viewholder.FlexibleViewHolder;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener,
@@ -95,9 +95,9 @@ public class MainActivity extends AppCompatActivity implements
 		//Adapter & RecyclerView
 		FlexibleAdapter.enableLogs(true);
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
-		mAdapter.setAnimationOnScrolling(true);
+		mAdapter.setAnimationOnScrolling(false);
 		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAutoCollapseOnExpand(true);
+		mAdapter.setAutoCollapseOnExpand(false);
 		mAdapter.setAutoScrollOnExpand(true);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements
 
 				for (int i = 0; i <= mAdapter.getItemCount() + 1; i++) {
 					Item item = DatabaseService.newExampleItem(i);
-
+					//TODO: Fix position for new item
 					if (!DatabaseService.getInstance().getListById(null).contains(item)) {
 						DatabaseService.getInstance().addItem(i, item);//This is the original list
 						//TODO FOR YOU: Use userLearnedSelection from settings
@@ -468,7 +468,7 @@ public class MainActivity extends AppCompatActivity implements
 			case R.id.action_delete:
 				//Build message before delete, for the Snackbar
 				StringBuilder message = new StringBuilder();
-				for (Integer pos : mAdapter.getSelectedItems()) {
+				for (Integer pos : mAdapter.getSelectedPositions()) {
 					message.append(mAdapter.getItem(pos).getTitle());
 					message.append(", ");
 				}
@@ -487,7 +487,7 @@ public class MainActivity extends AppCompatActivity implements
 				mSnackBar.show();
 
 				//Remove selected items from Adapter list after message is shown
-				mAdapter.removeItems(mAdapter.getSelectedItems(), true);
+				mAdapter.removeItems(mAdapter.getSelectedPositions(), true);
 				mAdapter.startUndoTimer(7000L + 200L, this);//+200: Using SnackBar, user can still click on the action button while bar is dismissing for a fraction of time
 
 				mSwipeHandler.sendEmptyMessage(1);
