@@ -1,5 +1,6 @@
 package eu.davidea.viewholders;
 
+import android.support.annotation.CallSuper;
 import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
@@ -10,7 +11,7 @@ import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
  * Holds callbacks which can be used to trigger expansion events.
  *
  * @author Davide Steduto
- * @since 16/01/2016
+ * @since 16/01/2016 Created
  */
 public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
@@ -80,6 +81,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	/**
 	 * Expand or Collapse based on the current state.
 	 */
+	@CallSuper
 	protected void toggleExpansion() {
 		int position = getAdapterPosition();
 		if (mAdapter.isExpanded(position)) {
@@ -92,6 +94,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	/**
 	 * Triggers expansion of the Item.
 	 */
+	@CallSuper
 	protected void expandView(int position) {
 		mAdapter.expand(position);
 	}
@@ -99,6 +102,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	/**
 	 * Triggers collapse of the Item.
 	 */
+	@CallSuper
 	protected void collapseView(int position) {
 		mAdapter.collapse(position);
 	}

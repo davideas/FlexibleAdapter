@@ -27,7 +27,7 @@ import java.util.List;
  * are animated initially and also when user starts to scroll the list.<br/>
  * Animations can be customized for each items applying different logic based on item position and
  * beyond.
- * <p/>
+ *
  * @author Davide Steduto
  * @since 10/01/2016
  */
@@ -483,6 +483,11 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		}
 
 		private void markNotified(int positionStart, int itemCount) {
+			isNotified = true;
+		}
+
+		@Override
+		public void onChanged() {
 			isNotified = true;
 		}
 

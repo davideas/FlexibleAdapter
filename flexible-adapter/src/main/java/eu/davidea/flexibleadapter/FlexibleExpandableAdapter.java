@@ -91,6 +91,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				super.toggleSelection(position);
 			}
 		}
+		if (getSelectedItemCount() == 0) parentSelected = childSelected = false;
 	}
 
 	@Override
@@ -539,6 +540,42 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	public void removeAllSelectedItems(boolean notifyParentChanged) {
 		this.removeItems(getSelectedPositions(), notifyParentChanged);
+	}
+
+	/*-------------------------*/
+	/* MOVE METHODS OVERRIDDEN */
+	/*-------------------------*/
+
+	@Override
+	public boolean shouldMove(int fromPosition, int toPosition) {
+		boolean move = false;
+		T fromItem = null, toItem = null;
+		if (fromPosition > toPosition) {
+			fromItem = getItem(fromPosition);
+			toItem = getItem(Math.max(0, toPosition - 1));
+		} else {
+			fromItem = getItem(fromPosition);
+			toItem = getItem(toPosition);
+		}
+
+		if (DEBUG) Log.v(TAG, "shouldMove from=" + fromPosition + " to=" + toPosition);
+		if (DEBUG) Log.v(TAG, "shouldMove fromItem=" + fromItem + " toItem=" + toItem);
+
+		if (!fromItem.isExpandable() && toItem.isExpandable() && !toItem.isExpanded()) {
+			expand(getPositionForItem(toItem));
+			move = false;
+		} else if (!fromItem.isExpandable() && !toItem.isExpandable()) {
+			move = true;
+		} else if (fromItem.isExpandable() && !toItem.isExpandable()) {
+			move = false;
+		}
+		if (DEBUG) Log.v(TAG, "shouldMove move=" + move);
+		return move;
+	}
+
+	@Override
+	public boolean onItemMove(int fromPosition, int toPosition) {
+		return super.onItemMove(fromPosition, toPosition);
 	}
 
 	/*-------------------------*/

@@ -25,6 +25,12 @@ import java.lang.reflect.Method;
 
 import eu.davidea.flexibleadapter.R;
 
+/**
+ * Class taken from GitHub, customized and optimized for FlexibleAdapter project.
+ * @since Up to the date 23/01/2016
+ * @see <a href="https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller">
+ *     github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller</a>
+ */
 public class FastScroller extends FrameLayout {
 
 	private static final int BUBBLE_ANIMATION_DURATION = 300;

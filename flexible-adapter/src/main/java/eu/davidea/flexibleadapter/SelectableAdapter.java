@@ -17,12 +17,13 @@ import eu.davidea.fastscroller.FastScroller;
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
  *
  * @author Davide Steduto
+ * @since 03/05/2015 Created
  */
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>
 		implements FastScroller.ScrollerListener {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
-	protected static boolean DEBUG = false;
+	public static boolean DEBUG = false;
 
 	/**
 	 * Default mode for selection
@@ -32,6 +33,10 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * Multi selection will be activated
 	 */
 	public static final int MODE_MULTI = 2;
+	/**
+	 * Mode to use when dragging or swiping
+	 */
+	public static final int MODE_DRAG_SWIPE = 3;
 
 	//TODO: Evaluate TreeSet instead of ArrayList for selectedPositions, TreeSet is a sortedList
 	private ArrayList<Integer> selectedPositions;
@@ -289,7 +294,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor) {
 		if (mRecyclerView == null) {
-			throw new IllegalStateException("RecyclerView cannot be null. Call this method after the adapter is added to the RecyclerView.");
+			throw new IllegalStateException("RecyclerView cannot be null. Call this method after the Adapter is added to the RecyclerView.");
 		}
 		mFastScroller = fastScroller;
 		mFastScroller.setRecyclerView(mRecyclerView);

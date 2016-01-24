@@ -7,6 +7,10 @@ import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 
+/**
+ * @see <a href="http://stackoverflow.com/questions/26875061/scroll-recyclerview-to-show-selected-item-on-top">
+ *     stackoverflow.com/.../scroll-recyclerview-to-show-selected-item-on-top</a>
+ */
 public class SmoothScrollLinearLayoutManager extends LinearLayoutManager {
 	private static final float MILLISECONDS_PER_INCH = 100f;
 

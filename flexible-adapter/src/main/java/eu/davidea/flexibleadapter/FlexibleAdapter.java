@@ -6,6 +6,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.ViewGroup;
@@ -16,6 +17,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
+
 /**
  * This class provides a set of standard methods to handle changes on the data set
  * such as adding, removing, moving an item.
@@ -24,8 +27,10 @@ import java.util.Locale;
  * <strong>T</strong> is your domain object containing the data.
  *
  * @author Davide Steduto
+ * @since 03/05/2015 Created
  */
-public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> extends SelectableAdapter<VH> {
+public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> extends SelectableAdapter<VH>
+		implements ItemTouchHelperCallback.AdapterCallback {
 
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();
 	public static final long UNDO_TIMEOUT = 5000L;
@@ -44,6 +49,11 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	protected String mSearchText;
 	protected Handler mHandler;
 	protected OnUpdateListener mUpdateListener;
+
+	//Drag&Drop and dismiss-on-swipe
+	private ItemTouchHelperCallback mItemTouchHelperCallback;
+	private ItemTouchHelper mItemTouchHelper;
+	private boolean mHandleDragEnabled = true;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -469,6 +479,79 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 		//No match, so don't add to collection
 		return false;
+	}
+
+	/*---------------*/
+	/* TOUCH METHODS */
+	/*---------------*/
+
+	private void initializeItemTouchHelper () {
+		if (mItemTouchHelper == null) {
+			if (mRecyclerView == null) {
+				throw new IllegalStateException("RecyclerView cannot be null. Call this method after the Adapter is added to the RecyclerView.");
+			}
+			mItemTouchHelperCallback = new ItemTouchHelperCallback(this);
+			mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
+			mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+		}
+	}
+
+	public ItemTouchHelper getItemTouchHelper() {
+		return mItemTouchHelper;
+	}
+
+	public void setLongPressDragEnabled(boolean longPressDragEnabled) {
+		initializeItemTouchHelper();
+		mItemTouchHelperCallback.setLongPressDragEnabled(longPressDragEnabled);
+		mHandleDragEnabled = !longPressDragEnabled;
+	}
+
+	public boolean isLongPressDragEnabled() {
+		return mItemTouchHelperCallback.isLongPressDragEnabled();
+	}
+
+	public boolean isHandleDragEnabled() {
+		return mItemTouchHelperCallback.isLongPressDragEnabled();
+	}
+
+	public void setSwipeEnabled(boolean swipeEnabled) {
+		initializeItemTouchHelper();
+		mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
+	}
+
+	public boolean isSwipeEnabled() {
+		return mItemTouchHelperCallback.isItemViewSwipeEnabled();
+	}
+
+	public void moveItem(int fromPosition, int toPosition) {
+		if (DEBUG) Log.v(TAG, "moveItem from=" + fromPosition + " to=" + toPosition);
+		if (DEBUG) Log.v(TAG, "moveItem fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
+		Collections.swap(mItems, fromPosition, toPosition);
+
+		//TODO: toggleSelection??
+		if (!isSelected(fromPosition) && isSelected(toPosition)) {
+			toggleSelection(toPosition);
+		} else if (isSelected(fromPosition) && !isSelected(toPosition)) {
+			toggleSelection(fromPosition);
+		}
+
+		notifyItemMoved(fromPosition, toPosition);
+	}
+
+	@Override
+	public boolean shouldMove(int fromPosition, int toPosition) {
+		return true;
+	}
+
+	@Override
+	public boolean onItemMove(int fromPosition, int toPosition) {
+		moveItem(fromPosition, toPosition);
+		return true;
+	}
+
+	@Override
+	public void onItemSwiped(int position, int direction) {
+
 	}
 
 	/*------------------*/

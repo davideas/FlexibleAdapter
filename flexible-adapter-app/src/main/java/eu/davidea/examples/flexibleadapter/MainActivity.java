@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
+		mAdapter.setLongPressDragEnabled(true);
+		mAdapter.setSwipeEnabled(true);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
 		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
@@ -392,7 +394,9 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onListItemLongClick(int position) {
 		Log.d(TAG, "onListItemLongClick on position " + position);
-		if (mActionMode == null) {
+		if (mAdapter.isLongPressDragEnabled()) {
+			mAdapter.setMode(FlexibleAdapter.MODE_DRAG_SWIPE);
+		} else if (mActionMode == null) {
 			Log.d(TAG, "onListItemLongClick actionMode activated!");
 			mActionMode = startSupportActionMode(this);
 		}
@@ -409,9 +413,9 @@ public class MainActivity extends AppCompatActivity implements
 	 */
 	private void toggleSelection(int position) {
 		mAdapter.toggleSelection(position);
+		if (mActionMode == null) return;
 
 		int count = mAdapter.getSelectedItemCount();
-
 		if (count == 0) {
 			Log.d(TAG, "toggleSelection finish the actionMode");
 			mActionMode.finish();

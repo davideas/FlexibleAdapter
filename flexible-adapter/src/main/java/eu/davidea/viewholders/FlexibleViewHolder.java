@@ -1,28 +1,50 @@
 package eu.davidea.viewholders;
 
+import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 
 /**
  * Helper Class that implements the single Tap and Long Tap.<br/>
  * Must be extended for the own ViewHolder.
  *
  * @author Davide Steduto
- * @since 03/01/2016
+ * @since 03/01/2016 Created<br/>23/01/2016 ItemTouch
  */
 public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
-		implements View.OnClickListener, View.OnLongClickListener {
+		implements View.OnClickListener, View.OnLongClickListener,
+		View.OnTouchListener, ItemTouchHelperCallback.ViewHolderCallback {
+
+	private static final String TAG = FlexibleViewHolder.class.getSimpleName();
 
 	protected final FlexibleAdapter mAdapter;
 	protected final OnListItemClickListener mListItemClickListener;
+	protected final OnListItemTouchListener mListItemTouchListener;
+
+	public FlexibleViewHolder(View view, FlexibleAdapter adapter) {
+		this(view, adapter, null);
+	}
 
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter,
 							  OnListItemClickListener listItemClickListener) {
+		this(view, adapter, listItemClickListener, null);
+	}
+
+	public FlexibleViewHolder(View view, FlexibleAdapter adapter,
+							  OnListItemClickListener listItemClickListener,
+							  OnListItemTouchListener listItemTouchListener) {
 		super(view);
 		this.mAdapter = adapter;
 		this.mListItemClickListener = listItemClickListener;
+		this.mListItemTouchListener = listItemTouchListener;
 		if (this.itemView.isEnabled()) {
 			this.itemView.setOnClickListener(this);
 			this.itemView.setOnLongClickListener(this);
@@ -33,6 +55,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * {@inheritDoc}
 	 */
 	@Override
+	@CallSuper
 	public void onClick(View view) {
 		if (mListItemClickListener != null &&
 				mListItemClickListener.onListItemClick(getAdapterPosition())) {
@@ -44,11 +67,37 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * {@inheritDoc}
 	 */
 	@Override
+	@CallSuper
 	public boolean onLongClick(View view) {
 		if (mListItemClickListener != null) {
 			mListItemClickListener.onListItemLongClick(getAdapterPosition());
 			toggleActivation();
 			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Set the view which will be used to drag the Item ViewHolder.
+	 *
+	 * @param view handle view
+	 * @see #onTouch(View, MotionEvent)
+	 */
+	public final void setDragHandleView(@NonNull View view) {
+		if (view != null) view.setOnTouchListener(this);
+	}
+
+	/**
+	 * <b>Used only by the Handle View!</b><br/>
+	 * {@inheritDoc}
+	 *
+	 * @see #setDragHandleView(View)
+	 */
+	@Override
+	public boolean onTouch(View view, MotionEvent event) {
+		if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN &&
+				mAdapter.isHandleDragEnabled()) {
+			mAdapter.getItemTouchHelper().startDrag(FlexibleViewHolder.this);
 		}
 		return false;
 	}
@@ -68,9 +117,38 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * <i>onBindViewHolder</i> is NOT called on selection and custom animations on objects are NOT interrupted,
 	 * so you can SEE the animation in the Item and have the selection smooth with ripple.
 	 */
+	@CallSuper
 	protected void toggleActivation() {
 		itemView.setActivated(mAdapter.isSelected(getAdapterPosition()));
 	}
+
+	@Override
+	@CallSuper
+	public void onItemTouched(int position, int actionState) {
+		if (FlexibleAdapter.DEBUG)
+			Log.d(TAG, "onItemTouched position=" + position + " actionState=" +
+					(actionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
+		if (mListItemTouchListener != null) {
+			mListItemTouchListener.onListItemTouch(position, actionState);
+		}
+	}
+
+	@Override
+	@CallSuper
+	public void onItemReleased(int position) {
+		if (FlexibleAdapter.DEBUG)
+			Log.d(TAG, "onItemReleased position=" + position);
+		//Log.d("FlexibleViewHolder", "onItemReleased isSelected=" + mAdapter.isSelected(position) + " item=" + mAdapter.getItem(position));
+		//mAdapter.toggleSelection(position);
+		toggleActivation();
+		if (mListItemTouchListener != null) {
+			mListItemTouchListener.onListItemRelease(position);
+		}
+	}
+
+	/*------------------*/
+	/* INNER INTERFACES */
+	/*------------------*/
 
 	public interface OnListItemClickListener {
 		/**
@@ -88,6 +166,20 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		 * @param position Adapter position
 		 */
 		void onListItemLongClick(int position);
+	}
+
+	public interface OnListItemTouchListener {
+		/**
+		 * @param position    the position of the item touched
+		 * @param actionState one of {@link ItemTouchHelper#ACTION_STATE_SWIPE} or
+		 *                    {@link ItemTouchHelper#ACTION_STATE_DRAG}.
+		 */
+		void onListItemTouch(int position, int actionState);
+
+		/**
+		 * @param position Adapter position
+		 */
+		void onListItemRelease(int position);
 	}
 
 }
