@@ -317,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements
 				item.setTitle(R.string.forward_scrolling);
 			}
 		}
+		//TODO: Show difference between MODE_IDLE, MODE_SINGLE
 
 		return super.onOptionsItemSelected(item);
 	}
@@ -342,13 +343,11 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	//TODO: Include setActiveSelection in the library
+	//TODO: Include setActiveSelection in the library?
 	public void setSelection(final int position) {
 		if (mAdapter.getMode() == FlexibleAdapter.MODE_SINGLE) {
 			Log.v(TAG, "setSelection called!");
-
 			setActivatedPosition(position);
-
 			mRecyclerView.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -376,14 +375,13 @@ public class MainActivity extends AppCompatActivity implements
 			toggleSelection(position);
 			return true;
 		} else {
-			//Notify the active callbacks interface (the activity, if the
-			//fragment is attached to one) that an item has been selected.
+			//Notify the active callbacks (ie. the activity, if the fragment is attached to one)
+			// that an item has been selected.
 			if (mAdapter.getItemCount() > 0) {
 				if (position != mActivatedPosition) setActivatedPosition(position);
 				Item item = mAdapter.getItem(position);
-				Log.d(TAG, "onListItemClick on position=" + position + " " + item);
 				if (!item.hasSubItems()) {
-					//TODO FOR YOU: call your custom Callback, for example mCallback.onItemSelected(item.getId());
+					//TODO FOR YOU: call your custom Action, for example mCallback.onItemSelected(item.getId());
 					EditItemDialog.newInstance(item, position).show(getFragmentManager(), EditItemDialog.TAG);
 				}
 			}
@@ -394,13 +392,10 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onListItemLongClick(int position) {
 		Log.d(TAG, "onListItemLongClick on position " + position);
-		if (mAdapter.isLongPressDragEnabled()) {
-			mAdapter.setMode(FlexibleAdapter.MODE_DRAG_SWIPE);
-		} else if (mActionMode == null) {
+		if (mActionMode == null) {
 			Log.d(TAG, "onListItemLongClick actionMode activated!");
 			mActionMode = startSupportActionMode(this);
 		}
-		Toast.makeText(this, "ImageClick or LongClick on " + mAdapter.getItem(position).getTitle(), Toast.LENGTH_SHORT).show();
 		toggleSelection(position);
 	}
 
@@ -506,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onDestroyActionMode(ActionMode mode) {
 		Log.v(TAG, "onDestroyActionMode called!");
-		mAdapter.setMode(ExampleAdapter.MODE_SINGLE);
+		mAdapter.setMode(FlexibleAdapter.MODE_IDLE);
 		mAdapter.clearSelection();
 		mActionMode = null;
 		if (Utils.hasMarshmallow()) {

@@ -26,6 +26,10 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	public static boolean DEBUG = false;
 
 	/**
+	 * Adapter will not keep track of selections
+	 */
+	public static final int MODE_IDLE = 0;
+	/**
 	 * Default mode for selection
 	 */
 	public static final int MODE_SINGLE = 1;
@@ -36,7 +40,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/**
 	 * Mode to use when dragging or swiping
 	 */
-	public static final int MODE_DRAG_SWIPE = 3;
+	//public static final int MODE_DRAG_SWIPE = 4;
 
 	//TODO: Evaluate TreeSet instead of ArrayList for selectedPositions, TreeSet is a sortedList
 	private ArrayList<Integer> selectedPositions;
@@ -50,7 +54,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 
 	public SelectableAdapter() {
 		selectedPositions = new ArrayList<Integer>();
-		mode = MODE_SINGLE;
+		mode = MODE_IDLE;
 	}
 
 	/*----------------*/

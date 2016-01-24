@@ -3,12 +3,15 @@ package eu.davidea.flexibleadapter;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set
@@ -277,7 +281,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Convenience method to remove all Items that are currently selected.<br/>
+	 * Convenience method to remove all Items that are currently selected.
 	 *
 	 * @see #removeItems(List)
 	 */
@@ -327,8 +331,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		for (int i = mOriginalPositions.size() - 1; i >= 0; i--) {
 			T item = mDeletedItems.get(i);
 			T item2 = mRemovedItems.get(mRemovedItems.keyAt(i));
-			if (DEBUG) Log.d(TAG, "Restoring item " + item + " on position " + mOriginalPositions.get(i));
-			if (DEBUG) Log.d(TAG, "Restoring item2 " + item2 + " on position " + mRemovedItems.keyAt(i));
+			if (DEBUG)
+				Log.d(TAG, "Restoring item " + item + " on position " + mOriginalPositions.get(i));
+			if (DEBUG)
+				Log.d(TAG, "Restoring item2 " + item2 + " on position " + mRemovedItems.keyAt(i));
 			//Avoid to restore(show) Items not filtered by the current filter
 			if (hasSearchText() && !filterObject(item, getSearchText()))
 				continue;
@@ -365,19 +371,24 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @param timeout  custom timeout
 	 */
 	public void startUndoTimer(long timeout, final OnDeleteCompleteListener listener) {
-		mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
-			public boolean handleMessage(Message message) {
-				if (listener != null) listener.onDeleteConfirmed();
-				emptyBin();
-				return true;
-			}
-		});
+		if (mHandler != null) {
+			//Make longer the timer for new coming deleted items
+			mHandler.removeCallbacksAndMessages(null);
+		} else {
+			mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+				public boolean handleMessage(Message message) {
+					if (listener != null) listener.onDeleteConfirmed();
+					emptyBin();
+					return true;
+				}
+			});
+		}
 		mHandler.sendMessageDelayed(Message.obtain(mHandler), timeout > 0 ? timeout : UNDO_TIMEOUT);
 	}
 
 	/**
-	 * Stop Undo timer.
-	 * <br/><b>Note:</b> This method is automatically called in case of restoration.
+	 * Stop Undo timer.<br/>
+	 * <b>Note:</b> This method is automatically called in case of restoration.
 	 */
 	protected void stopUndoTimer() {
 		if (mHandler != null) {
@@ -407,8 +418,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Filter the provided list with the search text previously set
 	 * with {@link #setSearchText(String)}.
-	 * <br/><br/>
-	 * <b>Note: </b>
+	 * <p/>
+	 * <b>Note:</b>
 	 * <br/>- This method calls {@link #filterObject(T, String)}.
 	 * <br/>- If search text is empty or null, the provided list is the current list.
 	 * <br/>- Any pending deleted items are always filtered out.
@@ -454,7 +465,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * This method performs filtering on the provided object and returns true, if the object
 	 * should be in the filtered collection, or false if it shouldn't.
-	 * <br/><br/>
+	 * <p/>
 	 * DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
 	 *
 	 * @param myObject   the object to be inspected
@@ -485,7 +496,126 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/* TOUCH METHODS */
 	/*---------------*/
 
-	private void initializeItemTouchHelper () {
+	/**
+	 * Used by {@link FlexibleViewHolder#onTouch(View, MotionEvent)} to start Drag when
+	 * HandleView is touched.
+	 *
+	 * @return the ItemTouchHelper instance already initialized.
+	 */
+	public final ItemTouchHelper getItemTouchHelper() {
+		initializeItemTouchHelper();
+		return mItemTouchHelper;
+	}
+
+	/**
+	 * Enable the Drag on LongPress on the entire ViewHolder.<p>
+	 * Default value is false.
+	 *
+	 * @param longPressDragEnabled true to activate, false otherwise
+	 */
+	public final void setLongPressDragEnabled(boolean longPressDragEnabled) {
+		initializeItemTouchHelper();
+		mItemTouchHelperCallback.setLongPressDragEnabled(longPressDragEnabled);
+	}
+
+	/**
+	 * Returns whether ItemTouchHelper should start a drag and drop operation if an item is
+	 * long pressed.<p>
+	 * Default value returns false.
+	 *
+	 * @return true if ItemTouchHelper should start dragging an item when it is long pressed,
+	 * false otherwise. Default value is false.
+	 */
+	public boolean isLongPressDragEnabled() {
+		return mItemTouchHelperCallback.isLongPressDragEnabled();
+	}
+
+	/**
+	 * Enabled by default.<p>
+	 * It is sufficient to call {@link FlexibleViewHolder#setDragHandleView(View)}.
+	 *
+	 * @return true if LongPressDragEnabled is disabled, false otherwise
+	 */
+	public boolean isHandleDragEnabled() {
+		return true;
+	}
+
+	/**
+	 * Enable the Swipe of the items<p>
+	 * Default value is false.
+	 *
+	 * @param swipeEnabled true to activate, false otherwise
+	 */
+	public final void setSwipeEnabled(boolean swipeEnabled) {
+		initializeItemTouchHelper();
+		mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
+	}
+
+	/**
+	 * Returns whether ItemTouchHelper should start a swipe operation if a pointer is swiped
+	 * over the View.<p>
+	 * Default value returns false.
+	 *
+	 * @return true if ItemTouchHelper should start swiping an item when user swipes a pointer
+	 * over the View, false otherwise. Default value is false.
+	 */
+	public final boolean isSwipeEnabled() {
+		return mItemTouchHelperCallback.isItemViewSwipeEnabled();
+	}
+
+	/**
+	 * Swaps the elements of list list at indices fromPosition and toPosition and notify the change.
+	 * <p/>
+	 * Selection of swiped elements is automatically updated.
+	 *
+	 * @param fromPosition previous position of the item.
+	 * @param toPosition   new position of the item.
+	 */
+	@CallSuper
+	public void moveItem(int fromPosition, int toPosition) {
+		if (DEBUG) Log.v(TAG, "moveItem from=" + fromPosition + " to=" + toPosition);
+		if (DEBUG)
+			Log.v(TAG, "moveItem fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
+		Collections.swap(mItems, fromPosition, toPosition);
+
+		if (!isSelected(fromPosition) && isSelected(toPosition)) {
+			toggleSelection(toPosition);
+			toggleSelection(fromPosition);
+		} else if (isSelected(fromPosition) && !isSelected(toPosition)) {
+			toggleSelection(fromPosition);
+			toggleSelection(toPosition);
+		}
+
+		notifyItemMoved(fromPosition, toPosition);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean shouldMove(int fromPosition, int toPosition) {
+		//Confirm move by default.
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean onItemMove(int fromPosition, int toPosition) {
+		moveItem(fromPosition, toPosition);
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onItemSwiped(int position, int direction) {
+
+	}
+
+	private void initializeItemTouchHelper() {
 		if (mItemTouchHelper == null) {
 			if (mRecyclerView == null) {
 				throw new IllegalStateException("RecyclerView cannot be null. Call this method after the Adapter is added to the RecyclerView.");
@@ -496,78 +626,32 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 	}
 
-	public ItemTouchHelper getItemTouchHelper() {
-		return mItemTouchHelper;
-	}
-
-	public void setLongPressDragEnabled(boolean longPressDragEnabled) {
-		initializeItemTouchHelper();
-		mItemTouchHelperCallback.setLongPressDragEnabled(longPressDragEnabled);
-		mHandleDragEnabled = !longPressDragEnabled;
-	}
-
-	public boolean isLongPressDragEnabled() {
-		return mItemTouchHelperCallback.isLongPressDragEnabled();
-	}
-
-	public boolean isHandleDragEnabled() {
-		return mItemTouchHelperCallback.isLongPressDragEnabled();
-	}
-
-	public void setSwipeEnabled(boolean swipeEnabled) {
-		initializeItemTouchHelper();
-		mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
-	}
-
-	public boolean isSwipeEnabled() {
-		return mItemTouchHelperCallback.isItemViewSwipeEnabled();
-	}
-
-	public void moveItem(int fromPosition, int toPosition) {
-		if (DEBUG) Log.v(TAG, "moveItem from=" + fromPosition + " to=" + toPosition);
-		if (DEBUG) Log.v(TAG, "moveItem fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
-		Collections.swap(mItems, fromPosition, toPosition);
-
-		//TODO: toggleSelection??
-		if (!isSelected(fromPosition) && isSelected(toPosition)) {
-			toggleSelection(toPosition);
-		} else if (isSelected(fromPosition) && !isSelected(toPosition)) {
-			toggleSelection(fromPosition);
-		}
-
-		notifyItemMoved(fromPosition, toPosition);
-	}
-
-	@Override
-	public boolean shouldMove(int fromPosition, int toPosition) {
-		return true;
-	}
-
-	@Override
-	public boolean onItemMove(int fromPosition, int toPosition) {
-		moveItem(fromPosition, toPosition);
-		return true;
-	}
-
-	@Override
-	public void onItemSwiped(int position, int direction) {
-
-	}
-
 	/*------------------*/
 	/* INNER INTERFACES */
 	/*------------------*/
 
+	/**
+	 * @author Davide Steduto
+	 * @since 03/01/2016
+	 */
 	public interface OnUpdateListener {
 		/**
 		 * Called at startup and every time an item is inserted or removed.
+		 *
+		 * @param size the current number of items in the adapter.
 		 */
 		void onUpdateEmptyView(int size);
 	}
 
+	/**
+	 * @author Davide Steduto
+	 * @since 29/11/2015
+	 */
 	public interface OnDeleteCompleteListener {
 
 		/**
+		 * Called when Undo timeout is over and removal must be committed in the user Database.
+		 * <p/>
 		 * Due to Java Generic, it's too complicated and not
 		 * well manageable if we pass the List&lt;T&gt; object.<br/>
 		 * To get deleted items, use {@link #getDeletedItems()} from the

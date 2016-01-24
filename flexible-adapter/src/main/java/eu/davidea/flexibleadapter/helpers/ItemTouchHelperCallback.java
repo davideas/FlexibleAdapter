@@ -20,8 +20,8 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	private AdapterCallback mItemTouchCallback;
 	private boolean mIsLongPressDragEnabled = false;
 	private boolean mIsSwipeEnabled = false;
-	private float mSwipeThreshold = 0.7f;
-	private int mSwipeFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+	private float mSwipeThreshold = 1.0f;
+	private int mSwipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
 
 	/*-------------*/
 	/* CONSTRUCTOR */
@@ -40,11 +40,17 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 		this.mIsLongPressDragEnabled = isLongPressDragEnabled;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isLongPressDragEnabled() {
 		return mIsLongPressDragEnabled;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean canDropOver(RecyclerView recyclerView, RecyclerView.ViewHolder current, RecyclerView.ViewHolder target) {
 		return super.canDropOver(recyclerView, current, target);
@@ -52,10 +58,19 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
 	/* SWIPE */
 
+	/**
+	 * Enable the swipe operation on the ViewHolder.<p>
+	 * Default value is false.
+	 *
+	 * @param isSwipeEnabled true to enable swipe, false to disable
+	 */
 	public void setSwipeEnabled(boolean isSwipeEnabled) {
 		this.mIsSwipeEnabled = isSwipeEnabled;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isItemViewSwipeEnabled() {
 		return mIsSwipeEnabled;
@@ -65,7 +80,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	 * Configures the fraction that the user should move the View to be considered as swiped.
 	 *
 	 * @param threshold A float value that denotes the fraction of the View size.
-	 *                  Default value is .7f
+	 *                  Default value is 1.0f
 	 */
 	public void setSwipeThreshold(@FloatRange(from = 0.0, to = 1.0) float threshold) {
 		this.mSwipeThreshold = threshold;
@@ -89,11 +104,11 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	 * Returns the fraction that the user should move the View to be considered as swiped.
 	 * The fraction is calculated with respect to RecyclerView's bounds.
 	 * <p/>
-	 * Default value is .7f, which means, to swipe a View, user must move the View at least
+	 * Default value is 1.0f, which means, to swipe a View, user must move the View at least
 	 * half of RecyclerView's width or height, depending on the swipe direction.
 	 *
 	 * @param viewHolder The ViewHolder that is being dragged.
-	 * @return A float value that denotes the fraction of the View size. Default value is .7f
+	 * @return A float value that denotes the fraction of the View size. Default value is 1.0f
 	 */
 	@Override
 	public float getSwipeThreshold(RecyclerView.ViewHolder viewHolder) {
@@ -104,10 +119,12 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	/* MAIN METHODS */
 	/*--------------*/
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-		if (mItemTouchCallback.shouldMove(viewHolder.getAdapterPosition(), target.getAdapterPosition()) ||
-				viewHolder.getItemViewType() != target.getItemViewType()) {
+		if (!mItemTouchCallback.shouldMove(viewHolder.getAdapterPosition(), target.getAdapterPosition())) {
 			return false;
 		}
 		// Notify the adapter of the move
@@ -115,12 +132,18 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
 		// Notify the adapter of the swipe dismissal
 		mItemTouchCallback.onItemSwiped(viewHolder.getAdapterPosition(), direction);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
 		// Set movement flags based on the layout manager
@@ -135,6 +158,9 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
 		// We only want the active item to change
@@ -148,6 +174,9 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 		super.onSelectedChanged(viewHolder, actionState);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
 		super.clearView(recyclerView, viewHolder);
@@ -160,12 +189,18 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
 							float dX, float dY, int actionState, boolean isCurrentlyActive) {
 		super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
 								float dX, float dY, int actionState, boolean isCurrentlyActive) {

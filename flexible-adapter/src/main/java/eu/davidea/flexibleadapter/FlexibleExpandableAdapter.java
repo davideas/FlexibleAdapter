@@ -548,29 +548,30 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
-		boolean move = false;
-		T fromItem = null, toItem = null;
-		if (fromPosition > toPosition) {
-			fromItem = getItem(fromPosition);
-			toItem = getItem(Math.max(0, toPosition - 1));
-		} else {
-			fromItem = getItem(fromPosition);
-			toItem = getItem(toPosition);
-		}
-
-		if (DEBUG) Log.v(TAG, "shouldMove from=" + fromPosition + " to=" + toPosition);
-		if (DEBUG) Log.v(TAG, "shouldMove fromItem=" + fromItem + " toItem=" + toItem);
-
-		if (!fromItem.isExpandable() && toItem.isExpandable() && !toItem.isExpanded()) {
-			expand(getPositionForItem(toItem));
-			move = false;
-		} else if (!fromItem.isExpandable() && !toItem.isExpandable()) {
-			move = true;
-		} else if (fromItem.isExpandable() && !toItem.isExpandable()) {
-			move = false;
-		}
-		if (DEBUG) Log.v(TAG, "shouldMove move=" + move);
-		return move;
+		//TODO: Implement logic for views, when expandable items are already expanded or collapsed.
+//		boolean move = false;
+//		T fromItem = null, toItem = null;
+//		if (fromPosition > toPosition) {
+//			fromItem = getItem(fromPosition);
+//			toItem = getItem(Math.max(0, toPosition - 1));
+//		} else {
+//			fromItem = getItem(fromPosition);
+//			toItem = getItem(toPosition);
+//		}
+//
+//		if (DEBUG) Log.v(TAG, "shouldMove from=" + fromPosition + " to=" + toPosition);
+//		if (DEBUG) Log.v(TAG, "shouldMove fromItem=" + fromItem + " toItem=" + toItem);
+//
+//		if (!fromItem.isExpandable() && toItem.isExpandable() && !toItem.isExpanded()) {
+//			expand(getPositionForItem(toItem));
+//			move = false;
+//		} else if (!fromItem.isExpandable() && !toItem.isExpandable()) {
+//			move = true;
+//		} else if (fromItem.isExpandable() && !toItem.isExpandable()) {
+//			move = false;
+//		}
+//		if (DEBUG) Log.v(TAG, "shouldMove move=" + move);
+		return true;
 	}
 
 	@Override

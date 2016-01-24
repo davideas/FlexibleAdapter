@@ -20,7 +20,8 @@ android {
 }
 
 dependencies {
-	//compile 'eu.davidea:flexible-adapter:4.0.1@aar'
+	//compile 'eu.davidea:flexible-adapter:5.0.0-b2@aar'
+	compile 'eu.davidea:flipview:1.1.0'
 	compile project (":flexible-adapter")
 	compile supportDependencies.appcompat
 	compile (supportDependencies.design) {

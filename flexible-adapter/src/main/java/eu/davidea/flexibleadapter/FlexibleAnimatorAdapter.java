@@ -368,7 +368,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 * @param view      ItemView to animate
 	 * @param alphaFrom starting alpha value
 	 */
-	public void addAlphaAnimator(
+	private void addAlphaAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float alphaFrom) {
 		if (animatorsUsed.contains(AnimatorEnum.ALPHA)) return;
 		animators.add(ObjectAnimator.ofFloat(view, "alpha", alphaFrom, 1f));

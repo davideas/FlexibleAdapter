@@ -7,7 +7,7 @@ import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
 
 
 /**
- * ViewHolder for a Expandable Items.<br/>
+ * ViewHolder for a Expandable Items.<p>
  * Holds callbacks which can be used to trigger expansion events.
  *
  * @author Davide Steduto
@@ -17,6 +17,18 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
 	protected final FlexibleExpandableAdapter mAdapter;
 
+	/*--------------*/
+	/* CONSTRUCTORS */
+	/*--------------*/
+
+	public ExpandableViewHolder(View view, FlexibleExpandableAdapter adapter) {
+		this(view, adapter, null);
+	}
+
+	public ExpandableViewHolder(View view, FlexibleExpandableAdapter adapter,
+							  OnListItemClickListener listItemClickListener) {
+		this(view, adapter, listItemClickListener, null);
+	}
 
 	/**
 	 * Default constructor.
@@ -25,18 +37,22 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 * @param adapter Instance of {@link FlexibleExpandableAdapter}
 	 * @param listItemClickListener Instance of {@link OnListItemClickListener}
 	 */
-	public ExpandableViewHolder(View view,
-								FlexibleExpandableAdapter adapter,
-								OnListItemClickListener listItemClickListener) {
+	public ExpandableViewHolder(View view, FlexibleExpandableAdapter adapter,
+								OnListItemClickListener listItemClickListener,
+								OnListItemTouchListener listItemTouchListener) {
 
-		super(view, adapter, listItemClickListener);
+		super(view, adapter, listItemClickListener, listItemTouchListener);
 		mAdapter = adapter;
 	}
+
+	/*--------------*/
+	/* MAIN METHODS */
+	/*--------------*/
 
 	/**
 	 * Allow to set a {@link View.OnClickListener} on the entire ItemView to trigger an expansion
 	 * or collapsing event.
-	 * <br/><br/>
+	 * <p>
 	 * This method returns always true; Extend with "return false" to Not expand or collapse this
 	 * ItemView onClick events.
 	 */
@@ -47,35 +63,12 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	/**
 	 * Allow to collapse child views of this ItemView when {@link View.OnLongClickListener}
 	 * event occurs.
-	 * <br/><br/>
+	 * <p>
 	 * This method returns always true; Extend with "return false" to not collapse this ItemView
 	 * onLongClick events.
 	 */
 	protected boolean isViewCollapsibleOnLongClick() {
 		return true;
-	}
-
-	/**
-	 * {@link View.OnClickListener} to listen for click events on the entire ItemView.
-	 * <br/><br/>
-	 * Only registered if {@link #isViewExpandableOnClick()} is true.
-	 *
-	 * @param view The View that is the trigger for expansion
-	 */
-	@Override
-	public void onClick(View view) {
-		if (isViewExpandableOnClick() && !mAdapter.isSelected(getAdapterPosition())) {
-			toggleExpansion();
-		}
-		super.onClick(view);
-	}
-
-	@Override
-	public boolean onLongClick(View view) {
-		if (isViewCollapsibleOnLongClick() && mAdapter.isExpanded(getAdapterPosition())) {
-			collapseView(getAdapterPosition());
-		}
-		return super.onLongClick(view);
 	}
 
 	/**
@@ -105,6 +98,45 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	@CallSuper
 	protected void collapseView(int position) {
 		mAdapter.collapse(position);
+	}
+
+	/*---------------------------------*/
+	/* CUSTOM LISTENERS IMPLEMENTATION */
+	/*---------------------------------*/
+
+	/**
+	 * {@link View.OnClickListener} to listen for click events on the entire ItemView.
+	 * <p>
+	 * Only registered if {@link #isViewExpandableOnClick()} is true.
+	 *
+	 * @param view The View that is the trigger for expansion
+	 */
+	@Override
+	public void onClick(View view) {
+		if (isViewExpandableOnClick() && !mAdapter.isSelected(getAdapterPosition())) {
+			toggleExpansion();
+		}
+		super.onClick(view);
+	}
+
+	@Override
+	public boolean onLongClick(View view) {
+		if (isViewCollapsibleOnLongClick() && mAdapter.isExpanded(getAdapterPosition())) {
+			collapseView(getAdapterPosition());
+		}
+		return super.onLongClick(view);
+	}
+
+	/**
+	 * {@inheritDoc}<p>
+	 * <b>Note:</b> In the Expandable version, expanded items are forced to collapse.
+	 */
+	@Override
+	public void onItemTouched(int position, int actionState) {
+		if (mAdapter.isExpanded(getAdapterPosition())) {
+			collapseView(getAdapterPosition());
+		}
+		super.onItemTouched(position, actionState);
 	}
 
 }

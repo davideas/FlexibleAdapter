@@ -13,16 +13,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
+import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder.OnListItemClickListener;
+import eu.davidea.viewholders.FlexibleViewHolder.OnListItemTouchListener;
 
 
 public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHolder, Item> {
@@ -34,6 +37,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 
 	private LayoutInflater mInflater;
 	private OnListItemClickListener mClickListener;
+	private OnListItemTouchListener mTouchListener;
 
 	//Selection fields
 	private boolean
@@ -169,32 +173,28 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		//When user scrolls, this line binds the correct selection status
 		pvHolder.itemView.setActivated(isSelected(position));
 
-		//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select and Deselect ALL
+		//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
 		if (mSelectAll || mLastItemInActionMode) {
 			//Reset the flags with delay
-			pvHolder.mImageView.postDelayed(new Runnable() {
+			pvHolder.mFlipView.postDelayed(new Runnable() {
 				@Override
 				public void run() {
 					mSelectAll = mLastItemInActionMode = false;
 				}
 			}, 200L);
 			//Consume the Animation
-			//flip(holder.mImageView, isSelected(position), 200L);
+			pvHolder.mFlipView.flip(isSelected(position), 200L);
 		} else {
 			//Display the current flip status
-			//setFlipped(holder.mImageView, isSelected(position));
+			pvHolder.mFlipView.flipSilently(isSelected(position));
 		}
 
 		//This "if-else" is just an example
 		if (isSelected(position)) {
-			pvHolder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_selected));
 			animateView(holder.itemView, position, true);
 		} else {
-			pvHolder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
 			animateView(holder.itemView, position, false);
 		}
-
-		pvHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 
 		//In case of searchText matches with Title or with an Item's field
 		// this will be highlighted
@@ -229,32 +229,12 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 				//When user scrolls, this line binds the correct selection status
 				cvHolder.itemView.setActivated(isSelected(position));
 
-				//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select and Deselect ALL
-				if (mSelectAll || mLastItemInActionMode) {
-					//Reset the flags with delay
-//					cvHolder.mImageView.postDelayed(new Runnable() {
-//						@Override
-//						public void run() {
-//							mSelectAll = mLastItemInActionMode = false;
-//						}
-//					}, 200L);
-					//Consume the Animation
-					//flip(holder.mImageView, isSelected(position), 200L);
-				} else {
-					//Display the current flip status
-					//setFlipped(holder.mImageView, isSelected(position));
-				}
-
 				//This "if-else" is just an example
 				if (isSelected(position)) {
-//					cvHolder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_selected));
 					animateView(holder.itemView, position, true);
 				} else {
-//					cvHolder.mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
 					animateView(holder.itemView, position, false);
 				}
-
-//				cvHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 
 				//In case of searchText matches with Title or with an Item's field
 				// this will be highlighted
@@ -270,9 +250,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	@Override
 	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
 		List<Animator> animators = new ArrayList<Animator>();
-		//Alpha Animator is needed (it will be added automatically if not here)
-		addAlphaAnimator(animators, itemView, 0);
-
 		//GridLayout
 		if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 
@@ -280,7 +257,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 				addSlideInFromRightAnimator(animators, itemView, 0.5f);
 			else
 				addSlideInFromLeftAnimator(animators, itemView, 0.5f);
-
 		//LinearLayout
 		} else {
 			switch (getItemViewType(position)) {
@@ -296,6 +272,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			}
 		}
 
+		//Alpha Animator is automatically added
 		return animators;
 	}
 
@@ -370,37 +347,47 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	 * This ViewHolder is expandable and collapsible.
 	 */
 	static final class ParentViewHolder extends ExpandableViewHolder {
-		ImageView mImageView;
+		FlipView mFlipView;
 		TextView mTitle;
 		TextView mSubtitle;
+		ImageView mHandleView;
 		Context mContext;
 
-		public ParentViewHolder(View view, ExampleAdapter adapter) {
-			super(view, adapter, adapter.mClickListener);
+		public ParentViewHolder(View view, final ExampleAdapter adapter) {
+			super(view, adapter, adapter.mClickListener, adapter.mTouchListener);
 			this.mContext = adapter.mContext;
 			this.mTitle = (TextView) view.findViewById(R.id.title);
 			this.mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-			this.mImageView = (ImageView) view.findViewById(R.id.image);
-			this.mImageView.setOnClickListener(new View.OnClickListener() {
+			this.mFlipView = (FlipView) view.findViewById(R.id.image);
+			this.mFlipView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					mListItemClickListener.onListItemLongClick(getAdapterPosition());
+					Toast.makeText(mContext, "ImageClick on " + mTitle.getText(), Toast.LENGTH_SHORT).show();
 					toggleActivation();
 				}
 			});
+			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
+			setDragHandleView(mHandleView);
+		}
+
+		@Override
+		public void onClick(View view) {
+			Toast.makeText(mContext, "Click on " + mTitle.getText(), Toast.LENGTH_SHORT).show();
+			super.onClick(view);
+		}
+
+		@Override
+		public boolean onLongClick(View view) {
+			Toast.makeText(mContext, "LongClick on " + mTitle.getText(), Toast.LENGTH_SHORT).show();
+			return super.onLongClick(view);
 		}
 
 		@Override
 		protected void toggleActivation() {
 			super.toggleActivation();
-			//This "if-else" is just an example
-			if (itemView.isActivated()) {
-				mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_selected));
-			} else {
-				mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
-			}
-			//Example of custom Animation inside the ItemView
-			//flip(mImageView, itemView.isActivated());
+			//Here we use a custom Animation inside the ItemView
+			mFlipView.flip(mAdapter.isSelected(getAdapterPosition()));
 		}
 	}
 
@@ -410,7 +397,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	 * you provide access to all the views for a data item in a view holder.
 	 */
 	static final class ChildViewHolder extends FlexibleViewHolder {
-//		ImageView mImageView;
 		TextView mTitle;
 		Context mContext;
 
@@ -418,28 +404,8 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			super(view, adapter, adapter.mClickListener);
 			this.mContext = adapter.mContext;
 			this.mTitle = (TextView) view.findViewById(R.id.title);
-//			this.mImageView = (ImageView) view.findViewById(R.id.image);
-//			this.mImageView.setOnClickListener(new View.OnClickListener() {
-//				@Override
-//				public void onClick(View v) {
-//					mListItemClickListener.onListItemLongClick(getAdapterPosition());
-//					toggleActivation();
-//				}
-//			});
 		}
 
-//		@Override
-//		protected void toggleActivation() {
-//			super.toggleActivation();
-//			//This "if-else" is just an example
-//			if (itemView.isActivated()) {
-//				mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_selected));
-//			} else {
-//				mImageView.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.image_round_normal));
-//			}
-//			//Example of custom Animation inside the ItemView
-//			//flip(mImageView, itemView.isActivated());
-//		}
 	}
 
 	@Override
