@@ -319,6 +319,7 @@ public class MainActivity extends AppCompatActivity implements
 			}
 		}
 		//TODO: Show difference between MODE_IDLE, MODE_SINGLE
+		//TODO: Add toggle for mAdapter.toggleFastScroller();
 
 		return super.onOptionsItemSelected(item);
 	}

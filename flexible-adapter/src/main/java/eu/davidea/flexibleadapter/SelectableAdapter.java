@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,10 +63,10 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/*----------------*/
 
 	/**
-	 * Call this once to enable or disable DEBUG logs.<br/>
+	 * Call this once, to enable or disable DEBUG logs.<br/>
 	 * DEBUG logs are disabled by default.
 	 *
-	 * @param enable true to show DEBUG logs, false to hide them.
+	 * @param enable true to show DEBUG logs in verbose mode, false to hide them.
 	 */
 	public static void enableLogs(boolean enable) {
 		DEBUG = enable;
@@ -74,6 +75,12 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/*--------------*/
 	/* MAIN METHODS */
 	/*--------------*/
+
+	@Override
+	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+		super.onAttachedToRecyclerView(recyclerView);
+		mRecyclerView = recyclerView;
+	}
 
 	/**
 	 * Set the mode of the selection, MODE_SINGLE is the default:
@@ -276,6 +283,26 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/* FAST SCROLLER */
 	/*---------------*/
 
+	/**
+	 * Displays or Hides the FastScroller if previously configured.
+	 *
+	 * @see #setFastScroller(FastScroller)
+	 */
+	public void toggleFastScroller() {
+		if (mFastScroller != null) {
+			if (mFastScroller.getVisibility() != View.VISIBLE)
+				mFastScroller.setVisibility(View.VISIBLE);
+			else mFastScroller.setVisibility(View.GONE);
+		}
+	}
+
+	/**
+	 * @return true if FastScroller is configured and shown, false otherwise
+	 */
+	public boolean isFastScrollerEnabled() {
+		return mFastScroller != null && mFastScroller.getVisibility() == View.VISIBLE;
+	}
+
 	public FastScroller getFastScroller() {
 		return mFastScroller;
 	}
@@ -313,12 +340,6 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	@Override
 	public void onFastScroll(boolean scrolling) {
 		//nothing
-	}
-
-	@Override
-	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-		super.onAttachedToRecyclerView(recyclerView);
-		mRecyclerView = recyclerView;
 	}
 
 }
