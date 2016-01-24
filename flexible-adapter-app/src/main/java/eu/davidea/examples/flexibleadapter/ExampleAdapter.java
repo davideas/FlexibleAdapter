@@ -49,6 +49,10 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		this.mContext = (Context) activity;
 		this.mClickListener = (OnListItemClickListener) activity;
 		if (!isEmpty()) addUserLearnedSelection();
+
+		//We have highlighted text while filtering, so let's enable this feature
+		//to be consistent with the active filter
+		setNotifyChangeOfUnfilteredItems(true);
 	}
 
 	/**
@@ -58,16 +62,12 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	 */
 	@Override
 	public void updateDataSet(String param) {
-		//Refresh the original content
-		mItems = DatabaseService.getInstance().getListById(param);
-
-		if (!super.isEmpty()) addUserLearnedSelection();
-
 		//Fill and Filter mItems with your custom list
-		//Note: In case of userLearnSelection, mItems is pre-initialized and after filtered.
-		//TODO: Avoid the call notifyDataSetChanged
-		filterItems(mItems);
-		notifyDataSetChanged();
+		//Watch out! The original list must a copy
+		filterItems(DatabaseService.getInstance().getListById(param));
+
+		//Add example view
+		if (!super.isEmpty()) addUserLearnedSelection();
 
 		//Update Empty View
 		mUpdateListener.onUpdateEmptyView(mItems.size());
@@ -257,7 +257,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 				addSlideInFromRightAnimator(animators, itemView, 0.5f);
 			else
 				addSlideInFromLeftAnimator(animators, itemView, 0.5f);
-		//LinearLayout
+			//LinearLayout
 		} else {
 			switch (getItemViewType(position)) {
 				case EXAMPLE_VIEW_TYPE:

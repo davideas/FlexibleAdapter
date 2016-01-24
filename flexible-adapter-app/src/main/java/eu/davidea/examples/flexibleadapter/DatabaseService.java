@@ -40,13 +40,13 @@ public class DatabaseService {
 		//All parent items are expandable
 		item.setExpandable(true);
 		//Let's initially expand the first father with subElements
-		item.setInitiallyExpanded(i == 2);
+		//item.setInitiallyExpanded(i == 2);
 
 		//Add subItems every 5 elements
 		//subItems are not expandable by default
 		if (i % 1 == 0) {
 			item.setTitle("Expandable Item " + i);
-			for (int j = 1; j <= 4; j++) {
+			for (int j = 1; j <= 3; j++) {
 				Item subItem = new Item();
 				subItem.setId(i+"s"+j);
 				subItem.setTitle("Sub Item " + j);

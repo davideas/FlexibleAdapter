@@ -26,7 +26,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 /**
  * This class provides a set of standard methods to handle changes on the data set
  * such as adding, removing, moving an item.
- * <p/>
+ * <p>
  * <strong>VH</strong> is your implementation of {@link RecyclerView.ViewHolder}.
  * <strong>T</strong> is your domain object containing the data.
  *
@@ -50,14 +50,17 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	protected List<T> mDeletedItems;
 	protected List<Integer> mOriginalPositions;
 	protected SparseArray<T> mRemovedItems;//beta test
-	protected String mSearchText;
 	protected Handler mHandler;
 	protected OnUpdateListener mUpdateListener;
 
-	//Drag&Drop and dismiss-on-swipe
+	//Filter
+	protected String mSearchText = "";
+	protected String mOldSearchText = "";
+	protected boolean mNotifyChangeOfUnfilteredItems = false;
+
+	//Drag&Drop and Swipe
 	private ItemTouchHelperCallback mItemTouchHelperCallback;
 	private ItemTouchHelper mItemTouchHelper;
-	private boolean mHandleDragEnabled = true;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -322,7 +325,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Restore items just removed.<br/>
+	 * Restore items just removed.<p>
 	 * <b>NOTE:</b> If filter is active, only items that match that filter will be shown(restored).
 	 */
 	public void restoreDeletedItems() {
@@ -416,14 +419,34 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Filter the provided list with the search text previously set
-	 * with {@link #setSearchText(String)}.
-	 * <p/>
+	 * Sometimes it is necessary, while filtering, to rebound the items that remain unfiltered.
+	 * If the items have highlighted text, those items must be refreshed in order to update the
+	 * highlighted text.
+	 * <p>
+	 * This happens systematically when searchText is reduced in length by the user. It doesn't
+	 * reduce performance in other cases, since the notification is triggered only in
+	 * {@link #applyAndAnimateAdditions(List, List)} when new items are not added.
+	 * </p>
+	 *
+	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)} while filtering,
+	 *                     false otherwise
+	 */
+	public final void setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
+		this.mNotifyChangeOfUnfilteredItems = notifyChange;
+	}
+
+	/**
+	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal mechanism,
+	 * items are removed and/or added in order to animate items in the final list.
+	 * <p>
+	 * Filters the provided list with the search text previously set with {@link #setSearchText(String)}.
+	 * <p>
 	 * <b>Note:</b>
 	 * <br/>- This method calls {@link #filterObject(T, String)}.
 	 * <br/>- If search text is empty or null, the provided list is the current list.
 	 * <br/>- Any pending deleted items are always filtered out.
 	 * <br/>- Original positions of deleted items are recalculated.
+	 * <br/>- <b>NEW!</b> Items are animated by {@link #animateTo(List)}.
 	 *
 	 * @param unfilteredItems the list to filter
 	 * @see #filterObject(Object, String)
@@ -432,8 +455,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		// NOTE: In case user has deleted some items and he changes or applies a filter while
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
+		List<T> values = new ArrayList<T>();
 		if (hasSearchText()) {
-			mItems = new ArrayList<T>(); //with filter
 			int newOriginalPosition = -1, oldOriginalPosition = -1;
 			for (T item : unfilteredItems) {
 				if (filterObject(item, getSearchText())) {
@@ -446,26 +469,31 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 						}
 						mOriginalPositions.set(index, newOriginalPosition + mItems.size());
 					} else {
-						mItems.add(item);
+						values.add(item);
 					}
 				}
 			}
 		} else {
-			mItems = unfilteredItems; //with no filter
+			values = unfilteredItems; //with no filter
 			if (mDeletedItems != null && !mDeletedItems.isEmpty()) {
 				mOriginalPositions = new ArrayList<Integer>(mDeletedItems.size());
 				for (T item : mDeletedItems) {
-					mOriginalPositions.add(mItems.indexOf(item));
+					mOriginalPositions.add(values.indexOf(item));
 				}
-				mItems.removeAll(mDeletedItems);
+				values.removeAll(mDeletedItems);
 			}
 		}
+		//Animate search results only in case of new SearchText
+		if (!mOldSearchText.equalsIgnoreCase(mSearchText)) {
+			mOldSearchText = mSearchText;
+			animateTo(values);
+		} else mItems = values;
 	}
 
 	/**
 	 * This method performs filtering on the provided object and returns true, if the object
 	 * should be in the filtered collection, or false if it shouldn't.
-	 * <p/>
+	 * <p>
 	 * DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
 	 *
 	 * @param myObject   the object to be inspected
@@ -490,6 +518,74 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 		//No match, so don't add to collection
 		return false;
+	}
+
+	/**
+	 * Animate from one list to the other
+	 *
+	 * @param models the new list containing the new items
+	 * @return the cleaned up item list. make sure to set your new list to this one
+	 */
+	public List<T> animateTo(List<T> models) {
+		applyAndAnimateRemovals(mItems, models);
+		applyAndAnimateAdditions(mItems, models);
+		applyAndAnimateMovedItems(mItems, models);
+		return mItems;
+	}
+
+	/**
+	 * Find out all removed items and animate them.
+	 */
+	private void applyAndAnimateRemovals(List<T> from, List<T> newItems) {
+		int out = 0;
+		for (int i = from.size() - 1; i >= 0; i--) {
+			final T item = from.get(i);
+			if (!newItems.contains(item)) {
+				if (DEBUG) Log.d(TAG, "animateRemovals remove position=" + i + " item=" + item);
+				from.remove(i);
+				notifyItemRemoved(i);
+				out++;
+			} else {
+				if (DEBUG) Log.d(TAG, "animateRemovals   keep position=" + i + " item=" + item);
+			}
+		}
+		if (DEBUG) Log.d(TAG, "animateRemovals total out=" + out + " in=" + newItems.size());
+	}
+
+	/**
+	 * Find out all added items and animate them.
+	 */
+	private void applyAndAnimateAdditions(List<T> from, List<T> newItems) {
+		int out = 0;
+		for (int i = 0, count = newItems.size(); i < count; i++) {
+			final T item = newItems.get(i);
+			if (!from.contains(item)) {
+				if (DEBUG) Log.d(TAG, "animateAdditions  add position=" + i + " item=" + item);
+				from.add(i, item);
+				notifyItemInserted(i);
+			} else if (mNotifyChangeOfUnfilteredItems) {
+				out++;
+				notifyItemChanged(i);
+				if (DEBUG) Log.d(TAG, "animateAdditions keep position=" + i + " item=" + item);
+			}
+		}
+		if (DEBUG) Log.d(TAG, "animateAdditions total out=" + out + " in=" + newItems.size());
+		//mRecyclerView.smoothScrollToPosition(0);
+	}
+
+	/**
+	 * Find out all moved items and animate them.
+	 */
+	private void applyAndAnimateMovedItems(List<T> from, List<T> newItems) {
+		for (int toPosition = newItems.size() - 1; toPosition >= 0; toPosition--) {
+			final T item = newItems.get(toPosition);
+			final int fromPosition = from.indexOf(item);
+			if (fromPosition >= 0 && fromPosition != toPosition) {
+				if (DEBUG) Log.d(TAG, "animateMovedItems from=" + toPosition + " to=" + toPosition);
+				from.add(toPosition, from.remove(fromPosition));
+				moveItem(fromPosition, toPosition);
+			}
+		}
 	}
 
 	/*---------------*/
@@ -565,7 +661,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	/**
 	 * Swaps the elements of list list at indices fromPosition and toPosition and notify the change.
-	 * <p/>
+	 * <p>
 	 * Selection of swiped elements is automatically updated.
 	 *
 	 * @param fromPosition previous position of the item.
@@ -651,7 +747,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 		/**
 		 * Called when Undo timeout is over and removal must be committed in the user Database.
-		 * <p/>
+		 * <p>
 		 * Due to Java Generic, it's too complicated and not
 		 * well manageable if we pass the List&lt;T&gt; object.<br/>
 		 * To get deleted items, use {@link #getDeletedItems()} from the

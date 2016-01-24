@@ -114,9 +114,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/*--------------*/
 
 	//FIXME: Rewrite Filter logic: Expand Parent if subItem is filtered by searchText?
-	//TODO: Customize items animations on search
 
-	//FIXME: Find a way to not animate items with ItemAnimator!!!
+	//FIXME: Find a way to Not animate items with ItemAnimator!!!
 	//TODO: Customize child items animations (don't use add or remove ItemAnimator)
 
 	public boolean isExpanded(int position) {
@@ -152,7 +151,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * Retrieve the parent of any child.
+	 * Retrieves the parent of any child.
 	 *
 	 * @param child Child item
 	 * @return The Parent of this child item or null if not found
@@ -166,7 +165,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * @return a list with the global positions of all expanded items
+	 * @return a list with all expanded items
 	 */
 	public List<T> getExpandedItems() {
 		int length = mExpandedItems.size();
@@ -177,6 +176,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		return expandedItems;
 	}
 
+	/**
+	 * @return a list with the global positions of all expanded items
+	 */
 	public List<Integer> getExpandedPositions() {
 		int length = mExpandedItems.size();
 		List<Integer> expandedItems = new ArrayList<Integer>(length);
@@ -618,6 +620,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		return deletedItems;
 	}
 
+	/**
+	 * @return a list with the global positions of all deleted items
+	 */
 	public List<Integer> getDeletedPositions() {
 		List<Integer> deletedItems = new ArrayList<Integer>();
 		for (RemovedItem removedItem : removedItems) {

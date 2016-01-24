@@ -19,6 +19,7 @@
 		android:layout_marginStart="@dimen/margin_left"
 		android:clickable="true"
 		app:checked="false"
+		app:enableInitialAnimation="true"
 		app:frontBackgroundColor="@color/colorPrimary_light"
 		app:frontImage="@drawable/ic_touch_app_white_24dp"
 		app:rearBackgroundColor="@color/colorAccent_light"/>

@@ -14,6 +14,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,7 +30,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import eu.davidea.common.SimpleDividerItemDecoration;
-import eu.davidea.examples.anim.SlideInRightAnimator;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements
 		//Adapter & RecyclerView
 		FlexibleAdapter.enableLogs(true);
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
-		mAdapter.setAnimationOnScrolling(false);
+		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
 		mAdapter.setAutoCollapseOnExpand(false);
 		mAdapter.setAutoScrollOnExpand(true);
@@ -105,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.setLongPressDragEnabled(true);
 		mAdapter.setSwipeEnabled(true);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
-		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
+		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
 				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
 
