@@ -238,7 +238,9 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	public interface OnListItemTouchListener {
 		/**
 		 * Called when the {@link ItemTouchHelper} first registers an item as being moved or swiped.
-		 * Implementations should update the item view to indicate its active state.
+		 * Implementations should update the item view to indicate its active state.<p>
+		 * {@link FlexibleViewHolder} class already provides an implementation to handle the
+		 * active state.
 		 *
 		 * @param position    the adapter position of the item touched
 		 * @param actionState one of {@link ItemTouchHelper#ACTION_STATE_SWIPE} or
@@ -248,7 +250,9 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 
 		/**
 		 * Called when the {@link ItemTouchHelper} has completed the move or swipe, and the active
-		 * item state should be cleared.
+		 * item state should be cleared.<p>
+		 * {@link FlexibleViewHolder} class already provides an implementation to disable the
+		 * active state.
 		 *
 		 * @param position the adapter position of the item touched
 		 */

@@ -246,8 +246,8 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 		/**
 		 * Called when an item has been dismissed by a swipe.
 		 * <br/><br/>
-		 * Implementations should call {@link RecyclerView.Adapter#notifyItemRemoved(int)} after
-		 * adjusting the underlying data to reflect this removal.
+		 * Implementations should decide to call or not {@link RecyclerView.Adapter#notifyItemRemoved(int)}
+		 * after adjusting the underlying data to reflect this removal.
 		 *
 		 * @param position  the position of the item dismissed
 		 * @param direction the direction to which the ViewHolder is swiped

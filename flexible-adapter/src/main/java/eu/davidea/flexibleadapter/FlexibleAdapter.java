@@ -207,7 +207,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	/**
 	 * Removes an item from internal list and notify the change.<p>
-	 * The item is retained in a list for an eventual Undo.
+	 * The item is retained for an eventual Undo.
 	 *
 	 * @param position the position of item to remove
 	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
@@ -231,7 +231,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	/**
 	 * Removes a list of items from internal list and notify the change.<p>
-	 * Every item is retained in a list for an eventual Undo.
+	 * Every item is retained for an eventual Undo.
 	 *
 	 * @param selectedPositions list of item positions to remove
 	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
@@ -278,6 +278,13 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
+	/**
+	 * Removes an ordered set items from internal list and notify the change once.<p>
+	 * Items are retained for an eventual Undo.
+	 *
+	 * @param positionStart Previous position of the first item that was removed
+	 * @param itemCount     Number of items removed from the data set
+	 */
 	public void removeRange(int positionStart, int itemCount) {
 		if (DEBUG)
 			Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
@@ -327,6 +334,13 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		return mDeletedItems;
 	}
 
+	/**
+	 * @return a list with the global positions of all deleted items
+	 */
+	public List<Integer> getDeletedPositions() {
+		return mOriginalPositions;
+	}
+
 	public boolean isRestoreInTime() {
 		return mDeletedItems != null && mDeletedItems.size() > 0;
 	}
@@ -362,10 +376,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			if (hasSearchText() && !filterObject(item, getSearchText()))
 				continue;
 			addItem(mOriginalPositions.get(i), item);
+			//Restore selection before emptyBin, if configured
+			if (mRestoreSelection)
+				getSelectedPositions().add(mOriginalPositions.get(i));
 		}
-		//Restore selection before emptyBin if configured
-		if (mRestoreSelection)
-			getSelectedPositions().addAll(mOriginalPositions);
 		emptyBin();
 	}
 
@@ -731,7 +745,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	@Override
 	public void onItemSwiped(int position, int direction) {
-
+		//nothing, user should decide what to do here
 	}
 
 	private void initializeItemTouchHelper() {

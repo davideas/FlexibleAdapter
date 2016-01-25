@@ -48,6 +48,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		super(DatabaseService.getInstance().getListById(listId), activity);
 		this.mContext = (Context) activity;
 		this.mClickListener = (OnListItemClickListener) activity;
+		this.mTouchListener = (OnListItemTouchListener) activity;
 		if (!isEmpty()) addUserLearnedSelection();
 
 		//We have highlighted text while filtering, so let's enable this feature
@@ -299,7 +300,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	}
 
 	/**
-	 * TODO: rewrite Custom filter for the 2 examples Adapters (Expandable and simple Flexible)
+	 * TODO: Rewrite Custom filter for the 2 examples Adapters (Expandable and simple Flexible)
 	 * Custom filter.
 	 *
 	 * @param item   The item to filter
@@ -318,6 +319,14 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 //		valueText = item.getSubtitle();
 //		return valueText != null && valueText.toLowerCase().contains(constraint);
 //	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onItemSwiped(int position, int direction) {
+		removeItem(position, true);
+	}
 
 	/**
 	 * Used for UserLearnsSelection.

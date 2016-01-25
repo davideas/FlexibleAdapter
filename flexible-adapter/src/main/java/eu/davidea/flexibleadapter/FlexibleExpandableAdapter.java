@@ -414,6 +414,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				expand(getPositionForItem(parent));
 			}
 			//Add sub item inside the parent
+			//FIXME: Adding of child should not be done here, verify with notifyItemInserted what happens
 			parent.addSubItem(subPosition, item);
 			//Notify the adapter of the new addition to display it and animate it.
 			//If parent is collapsed there's no need to notify about the change.
@@ -426,26 +427,24 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		}
 	}
 
-	@Override
-	public void addItem(int position, T item) {
-		if (!item.isExpandable()) addSubItem(position, item, getExpandableOf(item));
-		else super.addItem(position, item);
-	}
-
 	/**
-	 * Wrapper method of {@link #addItem(int, Object)} for expandable items (parents).
+	 * Wrapper method of {@link #addItem(int, Object)} for expandable items (Parents).
 	 *
 	 * @param position       the position of the item to add
 	 * @param expandableItem item to add, must be an instance of {@link IExpandableItem}
 	 */
 	public void addExpandableItem(int position, @NonNull T expandableItem) {
-		addItem(position, expandableItem);
+		super.addItem(position, expandableItem);
 	}
 
 	/*----------------------------*/
 	/* REMOVAL METHODS OVERRIDDEN */
 	/*----------------------------*/
 
+	/**
+	 * @param position the position to check
+	 * @return true if item was removed for the Adapter but change not yet committed, false otherwise
+	 */
 	public boolean isItemPendingRemove(int position) {
 		for (RemovedItem removedItem : removedItems) {
 			if (removedItem.originalPosition == position) return true;
@@ -454,6 +453,10 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
+	 * Removes an item from internal list and notify the change.<p>
+	 * The item is retained for an eventual Undo.<p>
+	 * The item must be of class {@link IExpandableItem}.
+	 *
 	 * @param position            The position of item to remove
 	 * @param notifyParentChanged true to Notify parent of a removal of a child
 	 */
@@ -466,6 +469,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				int childPosition = parent.getSubItemPosition(item);
 				if (childPosition >= 0) {
 					removedItems.add(new RemovedItem<T>(position, item, childPosition, parent, notifyParentChanged));
+					//FIXME: Removal of child should not be done here, verify all childPositions
 					parent.removeSubItem(childPosition);
 					//Notify the Parent about the change if requested
 					if (notifyParentChanged) notifyItemChanged(getPositionForItem(parent));
@@ -483,11 +487,19 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		}
 	}
 
+	/**
+	 * {@inheritDoc}<p>
+	 * Parent will not be notified about the change, if a child is removed.
+	 */
 	@Override
 	public void removeItem(int position) {
 		this.removeItem(position, false);
 	}
 
+	/**
+	 * {@inheritDoc}<p>
+	 * Parent will not be notified about the change, if a child is removed.
+	 */
 	@Override
 	public void removeItems(List<Integer> selectedPositions) {
 		this.removeItems(selectedPositions, false);
@@ -559,6 +571,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 					if (childPosition >= 0) {
 						synchronized (mLock) {
 							removedItems.add(new RemovedItem<T>(positionStart, item, childPosition, parent, notifyParentChanged));
+							//FIXME: Removal of child should not be done here, verify all childPositions
 							parent.removeSubItem(childPosition);
 							mItems.remove(positionStart);
 						}
@@ -596,10 +609,25 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	@Override
+	public void removeRange(int positionStart, int itemCount) {
+		removeRange(positionStart, itemCount, false);
+	}
+
+	/**
+	 * {@inheritDoc}<p>
+	 * Parent will not be notified about the change, if a child is removed.
+	 */
+	@Override
 	public void removeAllSelectedItems() {
 		this.removeItems(getSelectedPositions(), false);
 	}
 
+	/**
+	 * Convenience method to remove all Items that are currently selected.<p>
+	 * User can choose to notify the Parent about the change, if a child is removed.
+	 *
+	 * @param notifyParentChanged true to Notify Parent of a removal of its child
+	 */
 	public void removeAllSelectedItems(boolean notifyParentChanged) {
 		this.removeItems(getSelectedPositions(), notifyParentChanged);
 	}
@@ -608,6 +636,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/* MOVE METHODS OVERRIDDEN */
 	/*-------------------------*/
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
 		//TODO: Implement logic for views, when expandable items are already expanded or collapsed.
@@ -636,6 +667,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean onItemMove(int fromPosition, int toPosition) {
 		return super.onItemMove(fromPosition, toPosition);
@@ -645,6 +679,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/* UNDO METHODS OVERRIDDEN */
 	/*-------------------------*/
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void restoreDeletedItems() {
 		stopUndoTimer();
@@ -655,27 +692,35 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				//Restore child
 				if (DEBUG)
 					Log.v(TAG, "Restore Child " + removedItem.item + " on position " + removedItem.originalPosition);
+				//TODO: Check if Child is filtered out by the current filter, if yes continue!
 				addSubItem(removedItem.originalPositionInParent, (T) removedItem.item,
 						(T) removedItem.parent, false, removedItem.notifyParentChanged);
 			} else {
 				//Restore parent
 				if (DEBUG)
 					Log.v(TAG, "Restore Parent " + removedItem.item + " on position " + removedItem.originalPosition);
+				//TODO: Check if Parent is filtered out by the current filter, if yes continue!
 				addItem(removedItem.originalPosition, (T) removedItem.item);
 			}
-			//Restore selection before emptyBin if configured
+			//Restore selection before emptyBin, if configured
 			if (mRestoreSelection)
 				getSelectedPositions().add(removedItem.originalPosition);
 		}
 		emptyBin();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public synchronized void emptyBin() {
 		super.emptyBin();
 		removedItems.clear();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<T> getDeletedItems() {
 		List<T> deletedItems = new ArrayList<T>();
@@ -686,8 +731,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * @return a list with the global positions of all deleted items
+	 * {@inheritDoc}
 	 */
+	@Override
 	public List<Integer> getDeletedPositions() {
 		List<Integer> deletedItems = new ArrayList<Integer>();
 		for (RemovedItem removedItem : removedItems) {

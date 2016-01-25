@@ -41,7 +41,8 @@ public class MainActivity extends AppCompatActivity implements
 		SearchView.OnQueryTextListener,
 		FlexibleAdapter.OnUpdateListener,
 		FlexibleAdapter.OnDeleteCompleteListener,
-		FlexibleViewHolder.OnListItemClickListener {
+		FlexibleViewHolder.OnListItemClickListener,
+		FlexibleViewHolder.OnListItemTouchListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -345,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements
 	 */
 	@Override
 	public void onUpdateEmptyView(int size) {
-		Log.d(TAG, "onUpdateEmptyView size="+size);
+		Log.d(TAG, "onUpdateEmptyView size=" + size);
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
 		TextView emptyView = (TextView) findViewById(R.id.empty);
 		emptyView.setText(getString(R.string.no_items));
@@ -382,6 +383,16 @@ public class MainActivity extends AppCompatActivity implements
 		Item item = mAdapter.getItem(position);
 		item.setTitle(newTitle);
 		mAdapter.updateItem(position, item);
+	}
+
+	@Override
+	public void onListItemTouch(int position, int actionState) {
+		//TODO: Do something onListItemTouch
+	}
+
+	@Override
+	public void onListItemRelease(int position) {
+		//TODO: Do something onListItemRelease
 	}
 
 	@Override
