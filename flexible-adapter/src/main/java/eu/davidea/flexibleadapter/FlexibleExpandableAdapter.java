@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.items.IExpandableItem;
+import eu.davidea.flexibleadapter.items.IFlexibleItem;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -109,6 +110,14 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		super.clearSelection();
 	}
 
+	public boolean isAnyParentSelected() {
+		return parentSelected;
+	}
+
+	public boolean isAnyChildSelected() {
+		return childSelected;
+	}
+
 	/*--------------*/
 	/* MAIN METHODS */
 	/*--------------*/
@@ -189,11 +198,12 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * ViewType for Expandable Item is -1.<br/>
-	 * All others ViewTypes are different than -1.
+	 * Returns the ViewType for an Expandable Item and for all others ViewTypes depends
+	 * by the current position.
 	 *
 	 * @param position position for which ViewType is requested
-	 * @return -1 for {@link #EXPANDABLE_VIEW_TYPE}; 0 (default) or any user value for all others ViewType.
+	 * @return -1 for {@link #EXPANDABLE_VIEW_TYPE};
+	 * otherwise 0 (default) or any user value for all others ViewType
 	 */
 	@Override
 	public int getItemViewType(int position) {
@@ -203,21 +213,28 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * Create ViewHolder that are expandable.
+	 * Creates ViewHolder that is expandable. Will return any ViewHolder of class that extends
+	 * {@link ExpandableViewHolder}.
 	 *
 	 * @param parent   The ViewGroup into which the new View will be added after it is bound to
 	 *                 an adapter position.
-	 * @param viewType The view type of the new View.
-	 * @return A new ExpandableViewHolder that holds a View that can be expanded or collapsed.
+	 * @param viewType The view type of the new View. Value {@link #EXPANDABLE_VIEW_TYPE}
+	 *                 = {@value #EXPANDABLE_VIEW_TYPE}
+	 * @return A new {@link ExpandableViewHolder} that holds a View that can be expanded or collapsed
 	 */
 	public abstract EVH onCreateExpandableViewHolder(ViewGroup parent, int viewType);
 
 	/**
-	 * Create ViewHolder that is not expandable or it's a child of an ExpandableViewHolder.
+	 * Creates ViewHolder that generally is not expandable or it's a child of an
+	 * {@link ExpandableViewHolder}. Will return any ViewHolder of class that extends
+	 * {@link FlexibleViewHolder}.<p>
+	 * This is the good place to create and return any custom ViewType that extends
+	 * {@link FlexibleViewHolder}.
 	 *
 	 * @param parent   The ViewGroup into which the new View will be added after it is bound to
 	 *                 an adapter position.
-	 * @param viewType The view type of the new View.
+	 * @param viewType The view type of the new View, must be different of {@link #EXPANDABLE_VIEW_TYPE}
+	 *                 = {@value #EXPANDABLE_VIEW_TYPE}.
 	 * @return A new FlexibleViewHolder that holds a View that can be child of the expanded views.
 	 */
 	public abstract FlexibleViewHolder onCreateFlexibleViewHolder(ViewGroup parent, int viewType);
@@ -231,10 +248,37 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		}
 	}
 
+	/**
+	 * Method to bind only Expandable items that implement {@link IExpandableItem}.
+	 *
+	 * @param holder   the ViewHolder created of type {@link ExpandableViewHolder}
+	 * @param position the adapter position to bind
+
+	 */
 	public abstract void onBindExpandableViewHolder(EVH holder, int position);
 
+	/**
+	 * Method to bind all others no-Expandable items that implement {@link IFlexibleItem}.
+	 *
+	 * @param holder   the ViewHolder created of type {@link FlexibleViewHolder}
+	 * @param position the adapter position to bind
+	 * @see #onBindExpandableViewHolder(ExpandableViewHolder, int)
+	 */
 	public abstract void onBindFlexibleViewHolder(FlexibleViewHolder holder, int position);
 
+	/**
+	 * No more override is allowed here!
+	 * <p>
+	 * Use {@link #onBindExpandableViewHolder(ExpandableViewHolder, int)} for expandable
+	 * ViewHolder.<br/>
+	 * Use {@link #onBindFlexibleViewHolder(FlexibleViewHolder, int)} for normal or child ViewHolder
+	 * instead.
+	 *
+	 * @param holder   the ViewHolder created
+	 * @param position the adapter position to bind
+	 * @see #onBindFlexibleViewHolder(FlexibleViewHolder, int)
+	 * @see #onBindExpandableViewHolder(ExpandableViewHolder, int)
+	 */
 	@Override
 	public final void onBindViewHolder(FlexibleViewHolder holder, int position) {
 		if (getItemViewType(position) == EXPANDABLE_VIEW_TYPE) {
@@ -244,6 +288,13 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		}
 	}
 
+	/**
+	 * Expands an item that is Expandable, not yet expanded, that has subItems and
+	 * no child is selected.
+	 *
+	 * @param position the position of the item to expand
+	 * @return the number of subItems expanded
+	 */
 	public int expand(int position) {
 		if (DEBUG)
 			Log.v(TAG, "Request to Expand on position " + position + " ExpandedItems=" + mExpandedItems);
@@ -267,8 +318,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			mItems.addAll(position + 1, item.getSubItems());
 			item.setExpanded(true);
 
-
 			//Adjust selection and expandable positions, that are grater than the expanded position
+			//TODO: Deeply test adjustPositions
 //			adjustSelected(position, subItemsCount);
 //			adjustExpanded(position, subItemsCount);
 			adjustRemoved(position, subItemsCount);
@@ -296,6 +347,13 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		return subItemsCount;
 	}
 
+	/**
+	 * Collapses an item that is Expandable and already expanded, in conjunction with no subItems
+	 * selected or item is pending removal (used in combination with removeRange).
+	 *
+	 * @param position the position of the item to collapse
+	 * @return the number of subItems collapsed
+	 */
 	public int collapse(int position) {
 		Log.v(TAG, "Request to Collapse on position " + position + " ExpandedItems=" + mExpandedItems);
 		T item = getItem(position);
@@ -456,9 +514,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 //		}
 //		if (itemCount > 0) removeRange(positionStart, itemCount, notifyParentChanged);
 		// Split the list in ranges
-		//TODO: Change logic for ranges (don't empty selectionPositions!)
+		//TODO: Change logic for ranges, make it simpler
 		while (!selectedPositions.isEmpty()) {
-			isAdapterRunning = true;
+			isMultiRemove = true;
 			if (selectedPositions.size() == 1) {
 				removeItem(selectedPositions.get(0), notifyParentChanged);
 				//Align the selection list when removing the item
@@ -481,7 +539,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				}
 			}
 		}
-		isAdapterRunning = false;
+		isMultiRemove = false;
 		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
@@ -605,6 +663,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 					Log.v(TAG, "Restore Parent " + removedItem.item + " on position " + removedItem.originalPosition);
 				addItem(removedItem.originalPosition, (T) removedItem.item);
 			}
+			//Restore selection before emptyBin if configured
+			if (mRestoreSelection)
+				getSelectedPositions().add(removedItem.originalPosition);
 		}
 		emptyBin();
 	}

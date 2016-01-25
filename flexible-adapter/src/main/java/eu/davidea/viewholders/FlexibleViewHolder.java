@@ -17,7 +17,7 @@ import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
  * <br/>- Single tap
  * <br/>- Long tap
  * <br/>- Touch for Drag and Swipe.
- * <p>
+ * <p/>
  * You must extend and implement this class for the own ViewHolder.
  *
  * @author Davide Steduto
@@ -37,15 +37,33 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	/* CONSTRUCTORS */
 	/*--------------*/
 
+	/**
+	 * Default constructor with no ClickListener or TouchListener.<p>
+	 * <b>Note:</b> using this constructor, click events on the entire View will not have any effect.
+	 *
+	 * @param view    The {@link View} being hosted in this ViewHolder
+	 * @param adapter Adapter instance of type {@link FlexibleAdapter}
+	 */
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter) {
 		this(view, adapter, null);
 	}
 
+	/**
+	 * @param view                  The {@link View} being hosted in this ViewHolder
+	 * @param adapter               Adapter instance of type {@link FlexibleAdapter}
+	 * @param listItemClickListener ClickListener instance of type {@link OnListItemClickListener}
+	 */
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter,
 							  OnListItemClickListener listItemClickListener) {
 		this(view, adapter, listItemClickListener, null);
 	}
 
+	/**
+	 * @param view                  The {@link View} being hosted in this ViewHolder
+	 * @param adapter               Adapter instance of type {@link FlexibleAdapter}
+	 * @param listItemClickListener ClickListener instance of type {@link OnListItemClickListener}
+	 * @param listItemTouchListener TouchListener instance of type {@link OnListItemTouchListener}
+	 */
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter,
 							  OnListItemClickListener listItemClickListener,
 							  OnListItemTouchListener listItemTouchListener) {
@@ -121,15 +139,15 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 
 	/**
 	 * Allow to perform object animation in the ItemView and make [in]visible the selection on it.
-	 * <p>
+	 * <p/>
 	 * <b>IMPORTANT NOTE!</b> <i>setActivated</i> changes the selection color of the item
 	 * background if you added<i>android:background="?attr/selectableItemBackground"</i>
 	 * on the item layout AND in the style.xml.
-	 * <p>
+	 * <p/>
 	 * This must be called after the listener consumed the event in order to add the
 	 * item number in the selection list.<br/>
 	 * Adapter must have a reference to its instance to check selection state.
-	 * <p>
+	 * <p/>
 	 * If you do this, it's not necessary to invalidate the row (with notifyItemChanged): In this way
 	 * <i>onBindViewHolder</i> is NOT called on selection and custom animations on objects are NOT interrupted,
 	 * so you can SEE the animation in the Item and have the selection smooth with ripple.
@@ -205,7 +223,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 
 		/**
 		 * Called when long tap occurs.
-		 * <p>
+		 * <p/>
 		 * This method always calls {@link #toggleActivation} after listener event is consumed.
 		 *
 		 * @param position the adapter position of the item touched

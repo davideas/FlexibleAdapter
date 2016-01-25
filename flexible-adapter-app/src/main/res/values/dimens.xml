@@ -7,6 +7,7 @@
 	<dimen name="margin_left">16dp</dimen>
 	<dimen name="margin_right">16dp</dimen>
 	<dimen name="margin_right_small">8dp</dimen>
+	<dimen name="margin_right_handle">22dp</dimen>
 	<dimen name="icon_width">40dp</dimen>
 	<dimen name="icon_height">40dp</dimen>
 	<dimen name="icon_touchable_component_mini">40dp</dimen>

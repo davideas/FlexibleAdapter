@@ -164,7 +164,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		}
 	}
 
-
 	@Override
 	public void onBindExpandableViewHolder(ExpandableViewHolder holder, int position) {
 //		if (DEBUG) Log.d(TAG, "onBindParentViewHolder for position " + position);
@@ -247,7 +246,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		}//end-switch
 	}
 
-
 	@Override
 	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
 		List<Animator> animators = new ArrayList<Animator>();
@@ -301,6 +299,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	}
 
 	/**
+	 * TODO: rewrite Custom filter for the 2 examples Adapters (Expandable and simple Flexible)
 	 * Custom filter.
 	 *
 	 * @param item   The item to filter
@@ -399,6 +398,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	 * you provide access to all the views for a data item in a view holder.
 	 */
 	static final class ChildViewHolder extends FlexibleViewHolder {
+		ImageView mHandleView;
 		TextView mTitle;
 		Context mContext;
 
@@ -406,8 +406,9 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			super(view, adapter, adapter.mClickListener);
 			this.mContext = adapter.mContext;
 			this.mTitle = (TextView) view.findViewById(R.id.title);
+			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
+			setDragHandleView(mHandleView);
 		}
-
 	}
 
 	@Override

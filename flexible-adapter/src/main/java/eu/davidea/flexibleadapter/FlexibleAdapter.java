@@ -44,12 +44,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Any write operation performed on the list items should be synchronized on this lock.
 	 */
 	protected final Object mLock = new Object();
-	protected boolean isAdapterRunning;
-
+	protected boolean isMultiRemove = false;
 	protected List<T> mItems;
+
+	//Undo
 	protected List<T> mDeletedItems;
 	protected List<Integer> mOriginalPositions;
 	protected SparseArray<T> mRemovedItems;//beta test
+	protected boolean mRestoreSelection = false;
 	protected Handler mHandler;
 	protected OnUpdateListener mUpdateListener;
 
@@ -204,11 +206,13 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/*----------------------*/
 
 	/**
+	 * Removes an item from internal list and notify the change.<p>
 	 * The item is retained in a list for an eventual Undo.
 	 *
 	 * @param position the position of item to remove
 	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
 	 * @see #restoreDeletedItems()
+	 * @see #setRestoreSelectionOnUndo(boolean)
 	 * @see #emptyBin()
 	 */
 	public void removeItem(int position) {
@@ -221,16 +225,19 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			saveDeletedItem(position, mItems.remove(position));
 		}
 		notifyItemRemoved(position);
-		if (mUpdateListener != null && !isAdapterRunning)
+		if (mUpdateListener != null && !isMultiRemove)
 			mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
 	/**
+	 * Removes a list of items from internal list and notify the change.<p>
 	 * Every item is retained in a list for an eventual Undo.
 	 *
 	 * @param selectedPositions list of item positions to remove
-	 * @see #startUndoTimer(OnDeleteCompleteListener)
+	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
 	 * @see #restoreDeletedItems()
+	 * @see #setRestoreSelectionOnUndo(boolean)
+	 * @see #emptyBin()
 	 */
 	public void removeItems(List<Integer> selectedPositions) {
 		if (DEBUG) Log.v(TAG, "removeItems reverse Sorting positions");
@@ -244,7 +251,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 		// Split the list in ranges
 		while (!selectedPositions.isEmpty()) {
-			isAdapterRunning = true;
+			isMultiRemove = true;
 			if (selectedPositions.size() == 1) {
 				removeItem(selectedPositions.get(0));
 				//Align the selection list when removing the item
@@ -267,7 +274,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 				}
 			}
 		}
-		isAdapterRunning = false;
+		isMultiRemove = false;
 		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
 	}
 
@@ -325,8 +332,21 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
+	 * Gives the possibility to restore the selection on Undo, when {@link #restoreDeletedItems()}
+	 * is called.<p>
+	 * Default value is false;
+	 *
+	 * @param restoreSelection true to have restored items still selected, false to empty selections.
+	 */
+	public void setRestoreSelectionOnUndo(boolean restoreSelection) {
+		this.mRestoreSelection = restoreSelection;
+	}
+
+	/**
 	 * Restore items just removed.<p>
 	 * <b>NOTE:</b> If filter is active, only items that match that filter will be shown(restored).
+	 *
+	 * @see #setRestoreSelectionOnUndo(boolean)
 	 */
 	public void restoreDeletedItems() {
 		stopUndoTimer();
@@ -343,11 +363,14 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 				continue;
 			addItem(mOriginalPositions.get(i), item);
 		}
+		//Restore selection before emptyBin if configured
+		if (mRestoreSelection)
+			getSelectedPositions().addAll(mOriginalPositions);
 		emptyBin();
 	}
 
 	/**
-	 * Clean memory from items just removed.<br/>
+	 * Clean memory from items just removed.<p>
 	 * <b>Note:</b> This method is automatically called after timer is over and after a restoration.
 	 */
 	public synchronized void emptyBin() {
@@ -361,7 +384,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Convenience method to start Undo timer with default timeout of 5''
 	 *
-	 * @param listener delete listener called after timeout
+	 * @param listener the listener that will be called after timeout to commit the change
 	 */
 	public void startUndoTimer(OnDeleteCompleteListener listener) {
 		startUndoTimer(0, listener);
@@ -370,8 +393,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Start Undo timer with custom timeout
 	 *
-	 * @param listener delete listener called after timeout
 	 * @param timeout  custom timeout
+	 * @param listener the listener that will be called after timeout to commit the change
 	 */
 	public void startUndoTimer(long timeout, final OnDeleteCompleteListener listener) {
 		if (mHandler != null) {
@@ -390,7 +413,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Stop Undo timer.<br/>
+	 * Stop Undo timer.<p>
 	 * <b>Note:</b> This method is automatically called in case of restoration.
 	 */
 	protected void stopUndoTimer() {
@@ -438,9 +461,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal mechanism,
 	 * items are removed and/or added in order to animate items in the final list.
-	 * <p/>
+	 * <p>
 	 * Filters the provided list with the search text previously set with {@link #setSearchText(String)}.
-	 * <p/>
+	 * </p>
 	 * <b>Note:</b>
 	 * <br/>- This method calls {@link #filterObject(T, String)}.
 	 * <br/>- If search text is empty or null, the provided list is the current list.
@@ -491,10 +514,11 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * This method performs filtering on the provided object and returns true, if the object
-	 * should be in the filtered collection, or false if it shouldn't.
+	 * This method performs filtering on the provided object and returns, <b>true</b> if the object
+	 * should be in the filtered collection or <b>false</b> if it shouldn't.
 	 * <p/>
-	 * DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
+	 * THIS IS THE DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
+	 * The item will result filtered if its {@code toString()} contains the searchText.
 	 *
 	 * @param item       the object to be inspected
 	 * @param constraint constraint, that the object has to fulfil

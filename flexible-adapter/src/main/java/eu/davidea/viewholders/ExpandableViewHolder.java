@@ -7,8 +7,10 @@ import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
 
 
 /**
- * ViewHolder for a Expandable Items.<p>
- * Holds callbacks which can be used to trigger expansion events.
+ * ViewHolder for a Expandable Items. Holds callbacks which can be used to trigger expansion events.
+ * <p/>
+ * This class extends {@link FlexibleViewHolder}, which means it will benefit of all implemented
+ * methods the lower class holds.
  *
  * @author Davide Steduto
  * @since 16/01/2016 Created
@@ -21,26 +23,36 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	/* CONSTRUCTORS */
 	/*--------------*/
 
+	/**
+	 * Default constructor with no ClickListener or TouchListener.<p>
+	 * <b>Note:</b> using this constructor, click events on the entire View will not have any effect.
+	 *
+	 * @param view    The {@link View} being hosted in this ViewHolder
+	 * @param adapter Adapter instance of type {@link FlexibleExpandableAdapter}
+	 */
 	public ExpandableViewHolder(View view, FlexibleExpandableAdapter adapter) {
 		this(view, adapter, null);
 	}
 
+	/**
+	 * @param view                  The {@link View} being hosted in this ViewHolder
+	 * @param adapter               Adapter instance of type {@link FlexibleExpandableAdapter}
+	 * @param listItemClickListener ClickListener instance of type {@link OnListItemClickListener}
+	 */
 	public ExpandableViewHolder(View view, FlexibleExpandableAdapter adapter,
-							  OnListItemClickListener listItemClickListener) {
+								OnListItemClickListener listItemClickListener) {
 		this(view, adapter, listItemClickListener, null);
 	}
 
 	/**
-	 * Default constructor.
-	 *
-	 * @param view The {@link View} being hosted in this ViewHolder
-	 * @param adapter Instance of {@link FlexibleExpandableAdapter}
-	 * @param listItemClickListener Instance of {@link OnListItemClickListener}
+	 * @param view                  The {@link View} being hosted in this ViewHolder
+	 * @param adapter               Adapter instance of type {@link FlexibleExpandableAdapter}
+	 * @param listItemClickListener ClickListener instance of type {@link OnListItemClickListener}
+	 * @param listItemTouchListener TouchListener instance of type {@link OnListItemTouchListener}
 	 */
 	public ExpandableViewHolder(View view, FlexibleExpandableAdapter adapter,
 								OnListItemClickListener listItemClickListener,
 								OnListItemTouchListener listItemTouchListener) {
-
 		super(view, adapter, listItemClickListener, listItemTouchListener);
 		mAdapter = adapter;
 	}
@@ -52,7 +64,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	/**
 	 * Allow to set a {@link View.OnClickListener} on the entire ItemView to trigger an expansion
 	 * or collapsing event.
-	 * <p>
+	 * <p/>
 	 * This method returns always true; Extend with "return false" to Not expand or collapse this
 	 * ItemView onClick events.
 	 */
@@ -63,7 +75,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	/**
 	 * Allow to collapse child views of this ItemView when {@link View.OnLongClickListener}
 	 * event occurs.
-	 * <p>
+	 * <p/>
 	 * This method returns always true; Extend with "return false" to not collapse this ItemView
 	 * onLongClick events.
 	 */
@@ -106,7 +118,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
 	/**
 	 * {@link View.OnClickListener} to listen for click events on the entire ItemView.
-	 * <p>
+	 * <p/>
 	 * Only registered if {@link #isViewExpandableOnClick()} is true.
 	 *
 	 * @param view The View that is the trigger for expansion
@@ -126,6 +138,14 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 		}
 		return super.onLongClick(view);
 	}
+
+//	@Override
+//	public boolean onTouch(View view, MotionEvent event) {
+//		//We don't allow Drag of Children if a parent is selected
+//		if (!mAdapter.isExpandable(getAdapterPosition()) && !mAdapter.isAnyParentSelected())
+//			return super.onTouch(view, event);
+//		return false;
+//	}
 
 	/**
 	 * {@inheritDoc}<p>
