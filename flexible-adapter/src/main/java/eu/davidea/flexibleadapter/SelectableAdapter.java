@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -26,6 +27,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
 	public static boolean DEBUG = false;
 
+	//TODO: Change MODE from int to Enum and EnumSet??
 	/**
 	 * Adapter will not keep track of selections
 	 */
@@ -148,17 +150,18 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	public void toggleSelection(int position) {
 		if (position < 0) return;
-		if (mode == MODE_SINGLE) clearSelection();
+		if (mode == MODE_SINGLE)
+			clearSelection();
 
 		int index = selectedPositions.indexOf(position);
 		if (index != -1) {
-			if (DEBUG) Log.v(TAG, "toggleSelection removing selection on position " + position);
 			selectedPositions.remove(index);
 		} else {
-			if (DEBUG) Log.v(TAG, "toggleSelection adding selection on position " + position);
 			selectedPositions.add(position);
 		}
-		if (DEBUG) Log.v(TAG, "toggleSelection current selection " + selectedPositions);
+		if (DEBUG) Log.v(TAG, "toggleSelection " + (index != -1 ? "removed": "added") +
+				" selection on position " + position +
+				" current selection " + selectedPositions);
 	}
 
 	/**
@@ -169,18 +172,19 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Set the selection status for all items which the ViewType is lower than specified param.
+	 * Set the selection status for all items, but skip the ones which the ViewType is NOT
+	 * included than specified param.
 	 * <br/><b>Note:</b> All items are invalidated and rebound!
 	 *
 	 * @param skipViewTypes All ViewTypes for which we don't want selection
 	 */
-	public void selectAll(int skipViewTypes) {
-		if (DEBUG) Log.v(TAG, "selectAll");
+	public void selectAll(Integer... skipViewTypes) {
+		List<Integer> viewTypesToSkip = Arrays.asList(skipViewTypes);
+		if (DEBUG) Log.v(TAG, "selectAll ViewTypes to skip " + viewTypesToSkip);
 		selectedPositions = new ArrayList<Integer>(getItemCount());
 		int positionStart = 0, itemCount = 0;
 		for (int i = 0; i < getItemCount(); i++) {
-			Log.v(TAG, "selectAll ViewType=" + getItemViewType(i) + " position=" + i);
-			if (getItemViewType(i) >= skipViewTypes) {
+			if (viewTypesToSkip.contains(getItemViewType(i))) {
 				//Optimization for ItemRangeChanged
 				if (positionStart + itemCount == i) {
 					handleSelection(positionStart, itemCount);
@@ -194,7 +198,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		}
 		if (DEBUG)
 			Log.v(TAG, "selectAll notifyItemRangeChanged from positionStart=" + positionStart + " itemCount=" + getItemCount());
-		notifyItemRangeChanged(positionStart, getItemCount());
+		handleSelection(positionStart, getItemCount());
 	}
 
 	/**
@@ -210,7 +214,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 				return lhs - rhs;
 			}
 		});
-		if (DEBUG) Log.v(TAG, "clearSelection current selection " + selectedPositions);
+		if (DEBUG) Log.v(TAG, "clearSelection " + selectedPositions);
 		Iterator<Integer> iterator = selectedPositions.iterator();
 		int positionStart = 0, itemCount = 0;
 		//The notification is done only on items that are currently selected.
@@ -221,22 +225,18 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 			if (positionStart + itemCount == position) {
 				itemCount++;
 			} else {
-				//Notify previous range
+				//Notify previous items in range
 				handleSelection(positionStart, itemCount);
 				positionStart = position;
 				itemCount = 1;
 			}
 		}
-		//Notify remaining range
+		//Notify remaining items in range
 		handleSelection(positionStart, itemCount);
 	}
 
 	private void handleSelection(int positionStart, int itemCount) {
-		if (itemCount > 0) {
-			if (DEBUG) Log.v(TAG, "handleSelection notifyItemRangeChanged from positionStart=" +
-					positionStart + " itemCount=" + itemCount);
-			notifyItemRangeChanged(positionStart, itemCount);
-		}
+		if (itemCount > 0) notifyItemRangeChanged(positionStart, itemCount);
 	}
 
 	/**

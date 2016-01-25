@@ -706,19 +706,17 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	@CallSuper
 	public void moveItem(int fromPosition, int toPosition) {
-		if (DEBUG) Log.v(TAG, "moveItem from=" + fromPosition + " to=" + toPosition);
-		if (DEBUG)
+		if (DEBUG) {
+			Log.v(TAG, "moveItem from=" +
+					fromPosition + "[" + (isSelected(fromPosition) ? "selected" : "unselected") + "] to=" +
+					toPosition + "[" + (isSelected(toPosition) ? "selected" : "unselected") + "]");
 			Log.v(TAG, "moveItem fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
-		Collections.swap(mItems, fromPosition, toPosition);
-
-		if (!isSelected(fromPosition) && isSelected(toPosition)) {
-			toggleSelection(toPosition);
-			toggleSelection(fromPosition);
-		} else if (isSelected(fromPosition) && !isSelected(toPosition)) {
-			toggleSelection(fromPosition);
-			toggleSelection(toPosition);
 		}
-
+		Collections.swap(mItems, fromPosition, toPosition);
+		if (isSelected(fromPosition) && !isSelected(toPosition)) {
+			super.toggleSelection(fromPosition);
+			super.toggleSelection(toPosition);
+		}
 		notifyItemMoved(fromPosition, toPosition);
 	}
 

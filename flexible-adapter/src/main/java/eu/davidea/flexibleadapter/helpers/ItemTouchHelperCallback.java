@@ -183,7 +183,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 		//Force full Alpha
 		viewHolder.itemView.setAlpha(ALPHA_FULL);
 		if (viewHolder instanceof ViewHolderCallback) {
-			// Tell the view holder it's time to restore the idle state
+			//Tell the view holder it's time to restore the idle state
 			ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
 			viewHolderCallback.onItemReleased(viewHolder.getAdapterPosition());
 		}

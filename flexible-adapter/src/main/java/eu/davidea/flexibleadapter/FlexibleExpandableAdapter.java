@@ -99,9 +99,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	public void selectAll() {
 		//FIXME: select view type of only 1 type
 		if (getSelectedItemCount() > 0 && getItem(getSelectedPositions().get(0)).isExpandable())
-			super.selectAll(EXPANDABLE_VIEW_TYPE + 1);//Select only Parents
+			super.selectAll(EXPANDABLE_VIEW_TYPE + 1);//Select only Parents, Skip others
 		else
-			super.selectAll(1);//Select others Views 0(default) + 1
+			super.selectAll(0);//Select others Views 0(default) + 1
 	}
 
 	@Override

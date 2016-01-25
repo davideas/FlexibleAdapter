@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.setAnimationOnReverseScrolling(true);
 		mAdapter.setAutoCollapseOnExpand(false);
 		mAdapter.setAutoScrollOnExpand(true);
+		//mAdapter.setRestoreSelectionOnUndo(true);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
@@ -123,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements
 		mFab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				//TODO: add adjustSelection for FlexibleAdapter
 				destroyActionModeIfNeeded();
 
 				for (int i = 0; i <= mAdapter.getItemCount() + 1; i++) {
@@ -391,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onListItemRelease(int position) {
+	public void onListItemRelease(int position, int actionState) {
 		//TODO: Do something onListItemRelease
 	}
 
@@ -417,7 +419,6 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onListItemLongClick(int position) {
-		Log.d(TAG, "onListItemLongClick on position " + position);
 		if (mActionMode == null) {
 			Log.d(TAG, "onListItemLongClick actionMode activated!");
 			mActionMode = startSupportActionMode(this);

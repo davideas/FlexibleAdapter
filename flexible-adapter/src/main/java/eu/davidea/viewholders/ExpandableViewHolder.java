@@ -144,7 +144,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 //		//We don't allow Drag of Children if a parent is selected
 //		if (!mAdapter.isExpandable(getAdapterPosition()) && !mAdapter.isAnyParentSelected())
 //			return super.onTouch(view, event);
-//		return false;
+//		return true;
 //	}
 
 	/**

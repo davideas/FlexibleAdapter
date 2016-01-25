@@ -49,11 +49,14 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		this.mContext = (Context) activity;
 		this.mClickListener = (OnListItemClickListener) activity;
 		this.mTouchListener = (OnListItemTouchListener) activity;
-		if (!isEmpty()) addUserLearnedSelection();
+		addUserLearnedSelection();
 
 		//We have highlighted text while filtering, so let's enable this feature
 		//to be consistent with the active filter
 		setNotifyChangeOfUnfilteredItems(true);
+
+		//Setting for FlipView
+		FlipView.resetLayoutAnimationDelay();
 	}
 
 	/**
@@ -68,14 +71,17 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		filterItems(DatabaseService.getInstance().getListById(param));
 
 		//Add example view
-		if (!super.isEmpty()) addUserLearnedSelection();
+		addUserLearnedSelection();
+
+		//Setting for FlipView
+		FlipView.resetLayoutAnimationDelay(true, 0);
 
 		//Update Empty View
 		mUpdateListener.onUpdateEmptyView(isEmpty() ? 0 : getItemCount());
 	}
 
 	private void addUserLearnedSelection() {
-		if (!DatabaseService.userLearnedSelection && !hasSearchText()) {
+		if (!DatabaseService.userLearnedSelection && !hasSearchText() && !super.isEmpty()) {
 			//Define Example View
 			Item item = new Item();
 			item.setId("0");

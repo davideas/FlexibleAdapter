@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 
 /**
@@ -32,6 +33,11 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	protected final FlexibleAdapter mAdapter;
 	protected final OnListItemClickListener mListItemClickListener;
 	protected final OnListItemTouchListener mListItemTouchListener;
+
+	/* These 2 fields avoid double tactile feedback triggered by Android and allow to Drag an
+	   item maintaining LongClick events for ActionMode, all at the same time */
+	private int mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
+	private boolean mLongClickSkipped = false;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -87,9 +93,13 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	@Override
 	@CallSuper
 	public void onClick(View view) {
-		if (mListItemClickListener != null &&
-				mListItemClickListener.onListItemClick(getAdapterPosition())) {
-			toggleActivation();
+		//Experimented that, if LongClick is not consumed, onClick is fired. We skip the
+		//call to the listener in this case, which is allowed only in ACTION_STATE_IDLE.
+		if (mListItemClickListener != null && mActionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+			if (FlexibleAdapter.DEBUG)
+				Log.v(TAG, "onClick on position " + getAdapterPosition() + " mode=" + mAdapter.getMode());
+			if (mListItemClickListener.onListItemClick(getAdapterPosition()))
+				toggleActivation();
 		}
 	}
 
@@ -100,9 +110,17 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	@CallSuper
 	public boolean onLongClick(View view) {
 		if (mListItemClickListener != null) {
-			mListItemClickListener.onListItemLongClick(getAdapterPosition());
-			toggleActivation();
-			return true;
+			if (FlexibleAdapter.DEBUG)
+				Log.v(TAG, "onLongClick on position " + getAdapterPosition() + " mode=" + mAdapter.getMode());
+			//Call the listener and activate View only in case Drag is disabled
+			//If Drag is enabled, activation will be done in onItemTouched
+			if (!mAdapter.isLongPressDragEnabled()) {
+				mListItemClickListener.onListItemLongClick(getAdapterPosition());
+				toggleActivation();
+				return true;
+			} else {
+				mLongClickSkipped = true;
+			}
 		}
 		return false;
 	}
@@ -115,6 +133,8 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 */
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
+		if (FlexibleAdapter.DEBUG)
+			Log.v(TAG, "onTouch with DragHandleView on position " + getAdapterPosition() + " mode=" + mAdapter.getMode());
 		if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN &&
 				mAdapter.isHandleDragEnabled()) {
 			//Start Drag!
@@ -158,48 +178,60 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * {@inheritDoc}<p>
+	 * Selection and View activation is automatically handled depends the current Selection MODE.
 	 */
 	@Override
 	@CallSuper
 	public void onItemTouched(int position, int actionState) {
+		mActionState = actionState;
 		if (FlexibleAdapter.DEBUG)
-			Log.d(TAG, "onItemTouched position=" + position + " actionState=" +
-					(actionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "1=Swipe" : "2=Drag"));
-		//Make selection visible
+			Log.v(TAG, "onItemTouched position=" + position + " mode=" + mAdapter.getMode() +
+					" actionState=" + (actionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
 		if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && !mAdapter.isSelected(getAdapterPosition())) {
 			//Be sure, if MODE_MULTI is active, to add this item to the selection list (call listener)
-			if (mAdapter.getMode() == FlexibleAdapter.MODE_MULTI && mListItemClickListener != null) {
+			//Also be sure user consumes the long click event
+			if ((mLongClickSkipped || mAdapter.getMode() == SelectableAdapter.MODE_MULTI) &&
+					mListItemClickListener != null) {
+				mLongClickSkipped = false;
 				mListItemClickListener.onListItemLongClick(getAdapterPosition());
 			} else {
 				//If not, be sure current item appears selected
 				mAdapter.toggleSelection(getAdapterPosition());
 			}
-			toggleActivation();
 		}
+		//Activate view and make selection visible if necessary
+		if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && !itemView.isActivated())
+			toggleActivation();
 		if (mListItemTouchListener != null) {
 			mListItemTouchListener.onListItemTouch(position, actionState);
 		}
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * {@inheritDoc}<p>
+	 * Selection and View activation is automatically handled, selection on Release depends
+	 * by current selection mode.
 	 */
 	@Override
 	@CallSuper
 	public void onItemReleased(int position) {
 		if (FlexibleAdapter.DEBUG)
-			Log.d(TAG, "onItemReleased position=" + position + " mode=" + mAdapter.getMode());
+			Log.v(TAG, "onItemReleased position=" + position + " mode=" + mAdapter.getMode() +
+					" actionState=" + (mActionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
 		//Be sure to remove selection if not MODE_MULTI
-		if (mAdapter.getMode() != FlexibleAdapter.MODE_MULTI && mAdapter.isSelected(position)) {
-			mAdapter.toggleSelection(position);
-			toggleActivation();
-		} else if (mAdapter.getMode() != FlexibleAdapter.MODE_MULTI && itemView.isActivated()) {
-			toggleActivation();
+		if (mAdapter.getMode() != FlexibleAdapter.MODE_MULTI) {
+			if (mAdapter.isSelected(position)) {
+				mAdapter.toggleSelection(position);
+				toggleActivation();
+			} else if (itemView.isActivated()) {
+				toggleActivation();
+			}
 		}
 		if (mListItemTouchListener != null) {
-			mListItemTouchListener.onListItemRelease(position);
+			mListItemTouchListener.onListItemRelease(position, mActionState);
 		}
+		mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
 	}
 
 	/*------------------*/
@@ -244,7 +276,9 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		 *
 		 * @param position    the adapter position of the item touched
 		 * @param actionState one of {@link ItemTouchHelper#ACTION_STATE_SWIPE} or
-		 *                    {@link ItemTouchHelper#ACTION_STATE_DRAG}.
+		 *                    {@link ItemTouchHelper#ACTION_STATE_DRAG} or
+		 *                    {@link ItemTouchHelper#ACTION_STATE_IDLE}.
+		 * @see #onItemTouched(int, int)
 		 */
 		void onListItemTouch(int position, int actionState);
 
@@ -254,9 +288,13 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		 * {@link FlexibleViewHolder} class already provides an implementation to disable the
 		 * active state.
 		 *
-		 * @param position the adapter position of the item touched
+		 * @param position    the adapter position of the item touched
+		 * @param actionState one of {@link ItemTouchHelper#ACTION_STATE_SWIPE} or
+		 *                    {@link ItemTouchHelper#ACTION_STATE_DRAG} or
+		 *                    {@link ItemTouchHelper#ACTION_STATE_IDLE}.
+		 * @see #onItemReleased(int)
 		 */
-		void onListItemRelease(int position);
+		void onListItemRelease(int position, int actionState);
 	}
 
 }
