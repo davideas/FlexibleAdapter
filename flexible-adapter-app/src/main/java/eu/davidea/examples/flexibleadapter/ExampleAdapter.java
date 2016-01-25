@@ -70,7 +70,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		if (!super.isEmpty()) addUserLearnedSelection();
 
 		//Update Empty View
-		mUpdateListener.onUpdateEmptyView(mItems.size());
+		mUpdateListener.onUpdateEmptyView(isEmpty() ? 0 : getItemCount());
 	}
 
 	private void addUserLearnedSelection() {
@@ -127,7 +127,8 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 
 	@Override
 	public boolean isEmpty() {
-		return !DatabaseService.userLearnedSelection && mItems.size() == 1 || super.isEmpty();
+		return !DatabaseService.userLearnedSelection && mItems.size() == 1 && !hasSearchText()
+				|| super.isEmpty();
 	}
 
 	@Override
@@ -302,21 +303,22 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	/**
 	 * Custom filter.
 	 *
-	 * @param myObject   The item to filter
+	 * @param item   The item to filter
 	 * @param constraint the current searchText
 	 * @return true if a match exists in the title or in the subtitle, false if no match found.
 	 */
-	@Override
-	protected boolean filterObject(Item myObject, String constraint) {
-		String valueText = myObject.getTitle();
-		//Filter on Title
-		if (valueText != null && valueText.toLowerCase().contains(constraint)) {
-			return true;
-		}
-		//Filter on Subtitle
-		valueText = myObject.getSubtitle();
-		return valueText != null && valueText.toLowerCase().contains(constraint);
-	}
+//	@Override
+//	protected boolean filterObject(Item item, String constraint) {
+//		String valueText = item.getTitle();
+//
+//		//Filter on Title
+//		if (valueText != null && valueText.toLowerCase().contains(constraint)) {
+//			return true;
+//		}
+//		//Filter on Subtitle
+//		valueText = item.getSubtitle();
+//		return valueText != null && valueText.toLowerCase().contains(constraint);
+//	}
 
 	/**
 	 * Used for UserLearnsSelection.

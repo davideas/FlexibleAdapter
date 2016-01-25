@@ -49,8 +49,8 @@ public class Item extends AbstractExpandableItem<Item, ExpandableViewHolder> imp
 	@Override
 	public String toString() {
 		return "Item[" +
-				"id=" + id +
-				", title=" + title +
+//				"id=" + id +
+				"title=" + title +
 				super.toString() + ']';
 	}
 

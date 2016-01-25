@@ -332,10 +332,10 @@ public class MainActivity extends AppCompatActivity implements
 	 */
 	@Override
 	public void onUpdateEmptyView(int size) {
+		Log.d(TAG, "onUpdateEmptyView size="+size);
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
 		TextView emptyView = (TextView) findViewById(R.id.empty);
 		emptyView.setText(getString(R.string.no_items));
-		if (!DatabaseService.userLearnedSelection && size == 1) size = 0;
 		if (size > 0) {
 			fastScroller.setVisibility(View.VISIBLE);
 			emptyView.setVisibility(View.GONE);

@@ -26,6 +26,21 @@ public interface IFlexibleItem<T> {
 	 */
 	void setEnabled(boolean enabled);
 
+	/**
+	 * Return if the Item is hidden.
+	 *
+	 * @return true for hidden item, (default) false for the shown one.
+	 */
+	boolean isHidden();
+
+	/**
+	 * Setter to change hidden behaviour. Useful while filtering this item.
+	 * Default value is false.
+	 *
+	 * @param hidden true if this item should remain hidden, false otherwise
+	 */
+	void setHidden(boolean hidden);
+
 	/*---------------------*/
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/

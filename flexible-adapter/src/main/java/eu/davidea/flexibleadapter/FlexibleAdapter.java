@@ -26,7 +26,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 /**
  * This class provides a set of standard methods to handle changes on the data set
  * such as adding, removing, moving an item.
- * <p>
+ * <p/>
  * <strong>VH</strong> is your implementation of {@link RecyclerView.ViewHolder}.
  * <strong>T</strong> is your domain object containing the data.
  *
@@ -335,9 +335,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			T item = mDeletedItems.get(i);
 			T item2 = mRemovedItems.get(mRemovedItems.keyAt(i));
 			if (DEBUG)
-				Log.d(TAG, "Restoring item " + item + " on position " + mOriginalPositions.get(i));
+				Log.v(TAG, "Restoring item " + item + " on position " + mOriginalPositions.get(i));
 			if (DEBUG)
-				Log.d(TAG, "Restoring item2 " + item2 + " on position " + mRemovedItems.keyAt(i));
+				Log.v(TAG, "Restoring item2 " + item2 + " on position " + mRemovedItems.keyAt(i));
 			//Avoid to restore(show) Items not filtered by the current filter
 			if (hasSearchText() && !filterObject(item, getSearchText()))
 				continue;
@@ -438,9 +438,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal mechanism,
 	 * items are removed and/or added in order to animate items in the final list.
-	 * <p>
+	 * <p/>
 	 * Filters the provided list with the search text previously set with {@link #setSearchText(String)}.
-	 * <p>
+	 * <p/>
 	 * <b>Note:</b>
 	 * <br/>- This method calls {@link #filterObject(T, String)}.
 	 * <br/>- If search text is empty or null, the provided list is the current list.
@@ -451,7 +451,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @param unfilteredItems the list to filter
 	 * @see #filterObject(Object, String)
 	 */
-	protected synchronized void filterItems(@NonNull List<T> unfilteredItems) {
+	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
 		// NOTE: In case user has deleted some items and he changes or applies a filter while
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
@@ -493,15 +493,15 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * This method performs filtering on the provided object and returns true, if the object
 	 * should be in the filtered collection, or false if it shouldn't.
-	 * <p>
+	 * <p/>
 	 * DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
 	 *
-	 * @param myObject   the object to be inspected
+	 * @param item       the object to be inspected
 	 * @param constraint constraint, that the object has to fulfil
 	 * @return true, if the object should be in the filteredResult, false otherwise
 	 */
-	protected boolean filterObject(T myObject, String constraint) {
-		final String valueText = myObject.toString().toLowerCase();
+	protected boolean filterObject(T item, String constraint) {
+		final String valueText = item.toString().toLowerCase();
 
 		//First match against the whole, non-splitted value
 		if (valueText.startsWith(constraint)) {
@@ -536,52 +536,51 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * Find out all removed items and animate them.
 	 */
-	private void applyAndAnimateRemovals(List<T> from, List<T> newItems) {
+	protected void applyAndAnimateRemovals(List<T> from, List<T> newItems) {
 		int out = 0;
 		for (int i = from.size() - 1; i >= 0; i--) {
 			final T item = from.get(i);
 			if (!newItems.contains(item)) {
-				if (DEBUG) Log.d(TAG, "animateRemovals remove position=" + i + " item=" + item);
+				if (DEBUG) Log.v(TAG, "animateRemovals remove position=" + i + " item=" + item);
 				from.remove(i);
 				notifyItemRemoved(i);
 				out++;
 			} else {
-				if (DEBUG) Log.d(TAG, "animateRemovals   keep position=" + i + " item=" + item);
+				if (DEBUG) Log.v(TAG, "animateRemovals   keep position=" + i + " item=" + item);
 			}
 		}
-		if (DEBUG) Log.d(TAG, "animateRemovals total out=" + out + " in=" + newItems.size());
+		if (DEBUG) Log.v(TAG, "animateRemovals total out=" + out + " in=" + newItems.size());
 	}
 
 	/**
 	 * Find out all added items and animate them.
 	 */
-	private void applyAndAnimateAdditions(List<T> from, List<T> newItems) {
+	protected void applyAndAnimateAdditions(List<T> from, List<T> newItems) {
 		int out = 0;
 		for (int i = 0, count = newItems.size(); i < count; i++) {
 			final T item = newItems.get(i);
 			if (!from.contains(item)) {
-				if (DEBUG) Log.d(TAG, "animateAdditions  add position=" + i + " item=" + item);
+				if (DEBUG) Log.v(TAG, "animateAdditions  add position=" + i + " item=" + item);
 				from.add(i, item);
 				notifyItemInserted(i);
 			} else if (mNotifyChangeOfUnfilteredItems) {
 				out++;
 				notifyItemChanged(i);
-				if (DEBUG) Log.d(TAG, "animateAdditions keep position=" + i + " item=" + item);
+				if (DEBUG) Log.v(TAG, "animateAdditions keep position=" + i + " item=" + item);
 			}
 		}
-		if (DEBUG) Log.d(TAG, "animateAdditions total out=" + out + " in=" + newItems.size());
-		//mRecyclerView.smoothScrollToPosition(0);
+		if (DEBUG) Log.v(TAG, "animateAdditions total out=" + out + " in=" + newItems.size());
 	}
 
 	/**
 	 * Find out all moved items and animate them.
 	 */
-	private void applyAndAnimateMovedItems(List<T> from, List<T> newItems) {
+	protected void applyAndAnimateMovedItems(List<T> from, List<T> newItems) {
 		for (int toPosition = newItems.size() - 1; toPosition >= 0; toPosition--) {
 			final T item = newItems.get(toPosition);
 			final int fromPosition = from.indexOf(item);
 			if (fromPosition >= 0 && fromPosition != toPosition) {
-				if (DEBUG) Log.d(TAG, "animateMovedItems from=" + toPosition + " to=" + toPosition);
+				if (DEBUG) Log.v(TAG, "animateMovedItems from=" + toPosition + " to=" + toPosition);
 				from.add(toPosition, from.remove(fromPosition));
 				moveItem(fromPosition, toPosition);
 			}
@@ -661,7 +660,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	/**
 	 * Swaps the elements of list list at indices fromPosition and toPosition and notify the change.
-	 * <p>
+	 * <p/>
 	 * Selection of swiped elements is automatically updated.
 	 *
 	 * @param fromPosition previous position of the item.
@@ -747,7 +746,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 		/**
 		 * Called when Undo timeout is over and removal must be committed in the user Database.
-		 * <p>
+		 * <p/>
 		 * Due to Java Generic, it's too complicated and not
 		 * well manageable if we pass the List&lt;T&gt; object.<br/>
 		 * To get deleted items, use {@link #getDeletedItems()} from the

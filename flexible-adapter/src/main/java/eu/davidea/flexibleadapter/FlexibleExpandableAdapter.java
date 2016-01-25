@@ -245,7 +245,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	public int expand(int position) {
-		Log.v(TAG, "Request to Expand on position " + position + " ExpandedItems=" + mExpandedItems);
+		if (DEBUG)
+			Log.v(TAG, "Request to Expand on position " + position + " ExpandedItems=" + mExpandedItems);
 		final T item = getItem(position);
 		int subItemsCount = 0;
 		if (item.isExpandable() && !item.isExpanded() && hasSubItems(item) && !parentSelected) {
@@ -513,7 +514,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 					if (item.isExpanded()) {
 						//Collapsing in removeRange, positionStart doesn't match, we fix with [+i]
 						int indexOfKey = mExpandedItems.indexOfKey(positionStart + i);
-						Log.d(TAG, "indexOfKey=" + indexOfKey + " key="+(positionStart+i));
+						if (DEBUG)
+							Log.v(TAG, "indexOfKey=" + indexOfKey + " key=" + (positionStart + i));
 						if (indexOfKey >= 0) mExpandedItems.removeAt(indexOfKey);
 						collapse(positionStart);
 					}
@@ -593,12 +595,14 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			RemovedItem removedItem = removedItems.get(i);
 			if (!removedItem.item.isExpandable()) {
 				//Restore child
-				Log.v(TAG, "Restore Child " + removedItem.item + " on position " + removedItem.originalPosition);
+				if (DEBUG)
+					Log.v(TAG, "Restore Child " + removedItem.item + " on position " + removedItem.originalPosition);
 				addSubItem(removedItem.originalPositionInParent, (T) removedItem.item,
 						(T) removedItem.parent, false, removedItem.notifyParentChanged);
 			} else {
 				//Restore parent
-				Log.v(TAG, "Restore Parent " + removedItem.item + " on position " + removedItem.originalPosition);
+				if (DEBUG)
+					Log.v(TAG, "Restore Parent " + removedItem.item + " on position " + removedItem.originalPosition);
 				addItem(removedItem.originalPosition, (T) removedItem.item);
 			}
 		}
@@ -629,6 +633,91 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			deletedItems.add(removedItem.originalPosition);
 		}
 		return deletedItems;
+	}
+
+	/*---------------------------*/
+	/* FILTER METHODS OVERRIDDEN */
+	/*---------------------------*/
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
+		// NOTE: In case user has deleted some items and he changes or applies a filter while
+		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
+		// the new position in the new list and finally skip those items to avoid they are shown!
+		List<T> values = new ArrayList<T>();
+		if (hasSearchText()) {
+			int newOriginalPosition = -1, oldOriginalPosition = -1;
+			for (T item : unfilteredItems) {
+				if (filterObject(item, getSearchText())) {
+					if (mDeletedItems != null && mDeletedItems.contains(item)) {
+						int index = mDeletedItems.indexOf(item);
+						//Calculate new original position: skip counting position if item was deleted in range
+						if (mOriginalPositions.get(index) != oldOriginalPosition) {
+							newOriginalPosition++;
+							oldOriginalPosition = mOriginalPositions.get(index);
+						}
+						mOriginalPositions.set(index, newOriginalPosition + mItems.size());
+					} else {
+						values.add(item);
+						//Add subItems if not hidden by filterObject()
+						if (item.getSubItems() != null) {
+							for (T subItem : item.getSubItems())
+								if (!subItem.isHidden()) values.add(subItem);
+						}
+					}
+				}
+			}
+		} else {
+			values = unfilteredItems; //with no filter
+			if (mDeletedItems != null && !mDeletedItems.isEmpty()) {
+				mOriginalPositions = new ArrayList<Integer>(mDeletedItems.size());
+				for (T item : mDeletedItems) {
+					mOriginalPositions.add(values.indexOf(item));
+				}
+				values.removeAll(mDeletedItems);
+			}
+		}
+		//Animate search results only in case of new SearchText
+		if (!mOldSearchText.equalsIgnoreCase(mSearchText)) {
+			mOldSearchText = mSearchText;
+			animateTo(values);
+		} else mItems = values;
+	}
+
+	/**
+	 * This method performs filtering on the subItems of the provided expandable and returns
+	 * true, if the expandable should be in the filtered collection, or false if it shouldn't.
+	 * <p/>
+	 * DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
+	 *
+	 * @param item       the object with subItems to be inspected
+	 * @param constraint constraint, that the object has to fulfil
+	 * @return true, if the object should be in the filteredResult, false otherwise
+	 */
+	@Override
+	protected boolean filterObject(T item, String constraint) {
+		//Reset expansion flag
+		item.setExpanded(false);
+		boolean filtered = false;
+
+		//Children scan filter
+		if (item.getSubItems() != null) {
+			for (T subItem : item.getSubItems()) {
+				//Reuse super filter for Children
+				subItem.setHidden(!super.filterObject(subItem, constraint));
+				if (!filtered && !subItem.isHidden()) {
+					filtered = true;
+				}
+			}
+			//Expand if filter found text in subItems
+			item.setExpanded(filtered);
+		}
+
+		//Super filter for Parent only if not filtered already
+		return filtered || super.filterObject(item, constraint);
 	}
 
 	/*-----------------*/

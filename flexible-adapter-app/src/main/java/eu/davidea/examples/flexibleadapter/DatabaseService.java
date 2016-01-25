@@ -44,9 +44,9 @@ public class DatabaseService {
 
 		//Add subItems every 5 elements
 		//subItems are not expandable by default
-		if (i % 1 == 0) {
+		if (i % 4 == 0) {
 			item.setTitle("Expandable Item " + i);
-			for (int j = 1; j <= 3; j++) {
+			for (int j = 1; j <= 5; j++) {
 				Item subItem = new Item();
 				subItem.setId(i+"s"+j);
 				subItem.setTitle("Sub Item " + j);

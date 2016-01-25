@@ -12,6 +12,7 @@ public abstract class AbstractFlexibleItem<T extends IFlexibleItem<T>>
 
 	/* Flags for FlexibleExpandableAdapter */
 	boolean mEnabled = true,
+			mHidden = false,
 			mSelectable = true;
 
 	/**
@@ -30,6 +31,16 @@ public abstract class AbstractFlexibleItem<T extends IFlexibleItem<T>>
 
 	public void setEnabled(boolean enabled) {
 		mEnabled = enabled;
+	}
+
+	@Override
+	public boolean isHidden() {
+		return mHidden;
+	}
+
+	@Override
+	public void setHidden(boolean hidden) {
+		mHidden = hidden;
 	}
 
 	/*---------------------*/
