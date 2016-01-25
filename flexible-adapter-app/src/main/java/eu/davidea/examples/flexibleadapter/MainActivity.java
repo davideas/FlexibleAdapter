@@ -303,7 +303,20 @@ public class MainActivity extends AppCompatActivity implements
 				item.setIcon(R.drawable.ic_view_grid_white_24dp);
 				item.setTitle(R.string.grid_layout);
 			} else {
-				mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+				GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+				gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+					@Override
+					public int getSpanSize(int position) {
+						switch (mAdapter.getItemViewType(position)) {
+							case ExampleAdapter.EXAMPLE_VIEW_TYPE:
+							case ExampleAdapter.EXPANDABLE_VIEW_TYPE:
+								return 2;
+							default:
+								return 1;
+						}
+					}
+				});
+				mRecyclerView.setLayoutManager(gridLayoutManager);
 				item.setIcon(R.drawable.ic_view_agenda_white_24dp);
 				item.setTitle(R.string.linear_layout);
 			}

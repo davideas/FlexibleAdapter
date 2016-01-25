@@ -33,7 +33,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 
 	private Context mContext;
-	private static final int EXAMPLE_VIEW_TYPE = 1;
+	public static final int EXAMPLE_VIEW_TYPE = 1;
 
 	private LayoutInflater mInflater;
 	private OnListItemClickListener mClickListener;

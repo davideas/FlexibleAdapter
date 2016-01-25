@@ -30,7 +30,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		extends FlexibleAnimatorAdapter<FlexibleViewHolder, T> {
 
 	private static final String TAG = FlexibleExpandableAdapter.class.getSimpleName();
-	public static int EXPANDABLE_VIEW_TYPE = -1;
+	public static final int EXPANDABLE_VIEW_TYPE = -1;
 
 	private SparseArray<T> mExpandedItems;
 	private List<RemovedItem> removedItems;
