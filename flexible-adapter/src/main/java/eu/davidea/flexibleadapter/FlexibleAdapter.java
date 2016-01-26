@@ -26,9 +26,8 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 /**
  * This class provides a set of standard methods to handle changes on the data set
  * such as adding, removing, moving an item.
- * <p/>
- * <strong>VH</strong> is your implementation of {@link RecyclerView.ViewHolder}.
- * <strong>T</strong> is your domain object containing the data.
+ * <p><strong>VH</strong> is your implementation of {@link RecyclerView.ViewHolder}.
+ * <strong>T</strong> is your domain object containing the data.</p>
  *
  * @author Davide Steduto
  * @since 03/05/2015 Created
@@ -40,36 +39,50 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public static final long UNDO_TIMEOUT = 5000L;
 
 	/**
+	 * The main container for ALL items.
+	 */
+	protected List<T> mItems;
+	
+	/**
+	 * Used to avoid multiple calls to the {@link OnUpdateListener#onUpdateEmptyView(int)}
+	 */
+	protected boolean isMultiRemove = false;
+	
+	/**
 	 * Lock object used to modify the content of {@link #mItems}.
 	 * Any write operation performed on the list items should be synchronized on this lock.
 	 */
 	protected final Object mLock = new Object();
-	protected boolean isMultiRemove = false;
-	protected List<T> mItems;
-
+	
 	//Undo
 	protected List<T> mDeletedItems;
 	protected List<Integer> mOriginalPositions;
 	protected SparseArray<T> mRemovedItems;//beta test
 	protected boolean mRestoreSelection = false;
 	protected Handler mHandler;
-	protected OnUpdateListener mUpdateListener;
 
-	//Filter
+	/* Filter */
 	protected String mSearchText = "";
 	protected String mOldSearchText = "";
 	protected boolean mNotifyChangeOfUnfilteredItems = false;
 
-	//Drag&Drop and Swipe
+	/* Drag&Drop and Swipe helpers */
 	private ItemTouchHelperCallback mItemTouchHelperCallback;
 	private ItemTouchHelper mItemTouchHelper;
+
+	/* Listeners */
+	protected OnUpdateListener mUpdateListener;
+	public OnItemClickListener mItemClickListener;
+	public OnItemLongClickListener mItemLongClickListener;
+	protected OnItemMoveListener mItemMoveListener;
+	protected OnItemSwipeListener mItemSwipeListener;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
 	/*--------------*/
 
 	/**
-	 * Simple Constructor.
+	 * Simple Constructor with NO listeners!
 	 *
 	 * @param items items to display.
 	 */
@@ -78,18 +91,32 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Main Constructor.
+	 * Main Constructor with all managed Listeners for ViewHolder and the Adapter itself.
+	 * <p>The listener must be a single instance of a class, usually Activity or Fragment.</p>
 	 *
-	 * @param items    items to display
-	 * @param listener must be an instance of {@link OnUpdateListener}
+	 * @param items     items to display
+	 * @param listeners can be an instance of:
+	 * 					<br/>{@link OnUpdateListener}
+	 * 					<br/>{@link OnItemClickListener}
+	 * 					<br/>{@link OnItemLongClickListener}
+	 * 					<br/>{@link OnItemMoveListener}
+	 * 					<br/>{@link OnItemSwipeListener}
 	 */
-	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listener) {
+	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listeners) {
 		mItems = items;
 
-		if (listener instanceof OnUpdateListener) {
-			mUpdateListener = (OnUpdateListener) listener;
+		if (listeners instanceof OnUpdateListener) {
+			mUpdateListener = (OnUpdateListener) listeners;
 			mUpdateListener.onUpdateEmptyView(mItems.size());
 		}
+		if (listeners instanceof OnItemClickListener)
+			mItemClickListener = (OnItemClickListener) listeners;
+		if (listeners instanceof OnItemLongClickListener)
+			mItemLongClickListener = (OnItemLongClickListener) listeners;
+		if (listeners instanceof OnItemMoveListener)
+			mItemMoveListener = (OnItemMoveListener) listeners;
+		if (listeners instanceof OnItemSwipeListener)
+			mItemSwipeListener = (OnItemSwipeListener) listeners;
 	}
 
 	/*--------------*/
@@ -104,9 +131,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * This method will refresh the entire DataSet content.<br/>
-	 * The parameter is useful to filter the type of the DataSet.<br/>
-	 * Pass null value in case not used.
+	 * This method will refresh the entire DataSet content.
+	 * <p>The parameter is useful to filter the type of the DataSet.<br/>
+	 * Pass null value in case not used.</p>
 	 *
 	 * @param param A custom parameter to filter the type of the DataSet
 	 */
@@ -206,8 +233,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/*----------------------*/
 
 	/**
-	 * Removes an item from internal list and notify the change.<p>
-	 * The item is retained for an eventual Undo.
+	 * Removes an item from internal list and notify the change.
+	 * <p>The item is retained for an eventual Undo.</p>
 	 *
 	 * @param position the position of item to remove
 	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
@@ -230,8 +257,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Removes a list of items from internal list and notify the change.<p>
-	 * Every item is retained for an eventual Undo.
+	 * Removes a list of items from internal list and notify the change.
+	 * <p>Every item is retained for an eventual Undo.</p>
 	 *
 	 * @param selectedPositions list of item positions to remove
 	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
@@ -279,8 +306,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Removes an ordered set items from internal list and notify the change once.<p>
-	 * Items are retained for an eventual Undo.
+	 * Removes an ordered set items from internal list and notify the change once.
+	 * <p>Items are retained for an eventual Undo.</p>
 	 *
 	 * @param positionStart Previous position of the first item that was removed
 	 * @param itemCount     Number of items removed from the data set
@@ -347,8 +374,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	/**
 	 * Gives the possibility to restore the selection on Undo, when {@link #restoreDeletedItems()}
-	 * is called.<p>
-	 * Default value is false;
+	 * is called.
+	 * <p>Default value is false;</p>
 	 *
 	 * @param restoreSelection true to have restored items still selected, false to empty selections.
 	 */
@@ -357,8 +384,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Restore items just removed.<p>
-	 * <b>NOTE:</b> If filter is active, only items that match that filter will be shown(restored).
+	 * Restore items just removed.
+	 * <p><b>NOTE:</b> If filter is active, only items that match that filter will be shown(restored).</p>
 	 *
 	 * @see #setRestoreSelectionOnUndo(boolean)
 	 */
@@ -384,8 +411,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Clean memory from items just removed.<p>
-	 * <b>Note:</b> This method is automatically called after timer is over and after a restoration.
+	 * Clean memory from items just removed.
+	 * <p><b>Note:</b> This method is automatically called after timer is over and after a
+	 * restoration.</p>
 	 */
 	public synchronized void emptyBin() {
 		if (mDeletedItems != null) {
@@ -427,8 +455,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Stop Undo timer.<p>
-	 * <b>Note:</b> This method is automatically called in case of restoration.
+	 * Stop Undo timer.
+	 * <p><b>Note:</b> This method is automatically called in case of restoration.</p>
 	 */
 	protected void stopUndoTimer() {
 		if (mHandler != null) {
@@ -483,7 +511,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * <br/>- If search text is empty or null, the provided list is the current list.
 	 * <br/>- Any pending deleted items are always filtered out.
 	 * <br/>- Original positions of deleted items are recalculated.
-	 * <br/>- <b>NEW!</b> Items are animated by {@link #animateTo(List)}.
+	 * <br/>- <b>NEW!</b> Items are animated thanks to {@link #animateTo(List)}.
 	 *
 	 * @param unfilteredItems the list to filter
 	 * @see #filterObject(Object, String)
@@ -520,19 +548,24 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 				values.removeAll(mDeletedItems);
 			}
 		}
+
 		//Animate search results only in case of new SearchText
 		if (!mOldSearchText.equalsIgnoreCase(mSearchText)) {
 			mOldSearchText = mSearchText;
 			animateTo(values);
 		} else mItems = values;
+
+		//Call listener to update EmptyView
+		if (mUpdateListener != null) {
+			mUpdateListener.onUpdateEmptyView(getItemCount());
+		}
 	}
 
 	/**
 	 * This method performs filtering on the provided object and returns, <b>true</b> if the object
 	 * should be in the filtered collection or <b>false</b> if it shouldn't.
-	 * <p/>
-	 * THIS IS THE DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
-	 * The item will result filtered if its {@code toString()} contains the searchText.
+	 * <p>THIS IS THE DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
+	 * The item will result filtered if its {@code toString()} contains the searchText.</p>
 	 *
 	 * @param item       the object to be inspected
 	 * @param constraint constraint, that the object has to fulfil
@@ -641,7 +674,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Enable the Drag on LongPress on the entire ViewHolder.<p>
+	 * Enable the Drag on LongPress on the entire ViewHolder.
+	 * <p><b>NOTE:</b> This will skip LongClick on the view in order to handle the LongPress,
+	 * however the LongClick listener will be called if necessary in the new
+	 * {@link FlexibleViewHolder#onActionStateChanged(int, int)}.</p>
 	 * Default value is false.
 	 *
 	 * @param longPressDragEnabled true to activate, false otherwise
@@ -664,8 +700,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Enabled by default.<p>
-	 * It is sufficient to call {@link FlexibleViewHolder#setDragHandleView(View)}.
+	 * Enabled by default.
+	 * <p>It is sufficient to call {@link FlexibleViewHolder#setDragHandleView(View)}.</p>
 	 *
 	 * @return true if LongPressDragEnabled is disabled, false otherwise
 	 */
@@ -674,8 +710,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Enable the Swipe of the items<p>
-	 * Default value is false.
+	 * Enable the Swipe of the items
+	 * <p>Default value is false.</p>
 	 *
 	 * @param swipeEnabled true to activate, false otherwise
 	 */
@@ -686,8 +722,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	/**
 	 * Returns whether ItemTouchHelper should start a swipe operation if a pointer is swiped
-	 * over the View.<p>
-	 * Default value returns false.
+	 * over the View.
+	 * <p>Default value returns false.</p>
 	 *
 	 * @return true if ItemTouchHelper should start swiping an item when user swipes a pointer
 	 * over the View, false otherwise. Default value is false.
@@ -698,8 +734,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	/**
 	 * Swaps the elements of list list at indices fromPosition and toPosition and notify the change.
-	 * <p/>
-	 * Selection of swiped elements is automatically updated.
+	 * <p>Selection of swiped elements is automatically updated.</p>
 	 *
 	 * @param fromPosition previous position of the item.
 	 * @param toPosition   new position of the item.
@@ -713,7 +748,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			Log.v(TAG, "moveItem fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
 		}
 		Collections.swap(mItems, fromPosition, toPosition);
-		if (isSelected(fromPosition) && !isSelected(toPosition)) {
+		if ((isSelected(fromPosition) && !isSelected(toPosition)) ||
+				(!isSelected(fromPosition) && isSelected(toPosition))) {
 			super.toggleSelection(fromPosition);
 			super.toggleSelection(toPosition);
 		}
@@ -725,7 +761,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
-		//Confirm move by default.
+		//Confirm move by default
 		return true;
 	}
 
@@ -733,8 +769,12 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * {@inheritDoc}
 	 */
 	@Override
+	@CallSuper
 	public boolean onItemMove(int fromPosition, int toPosition) {
 		moveItem(fromPosition, toPosition);
+		if (mItemMoveListener != null) {
+			mItemMoveListener.onItemMove(fromPosition, toPosition);
+		}
 		return true;
 	}
 
@@ -742,8 +782,11 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * {@inheritDoc}
 	 */
 	@Override
+	@CallSuper
 	public void onItemSwiped(int position, int direction) {
-		//nothing, user should decide what to do here
+		if (mItemSwipeListener != null) {
+			mItemSwipeListener.onItemSwipe(position, direction);
+		}
 	}
 
 	private void initializeItemTouchHelper() {
@@ -767,7 +810,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	public interface OnUpdateListener {
 		/**
-		 * Called at startup and every time an item is inserted or removed.
+		 * Called at startup and every time an item is inserted, removed or filtered.
 		 *
 		 * @param size the current number of items in the adapter.
 		 */
@@ -779,16 +822,74 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @since 29/11/2015
 	 */
 	public interface OnDeleteCompleteListener {
-
 		/**
 		 * Called when Undo timeout is over and removal must be committed in the user Database.
-		 * <p/>
-		 * Due to Java Generic, it's too complicated and not
+		 * <p>Due to Java Generic, it's too complicated and not
 		 * well manageable if we pass the List&lt;T&gt; object.<br/>
 		 * To get deleted items, use {@link #getDeletedItems()} from the
-		 * implementation of this method.
+		 * implementation of this method.</p>
 		 */
 		void onDeleteConfirmed();
+	}
+
+	/**
+	 * @author Davide Steduto
+	 * @since 03/01/2016
+	 */
+	public interface OnItemClickListener {
+		/**
+		 * Called when single tap occurs.
+		 * <p>Delegate the click event to the listener and check if selection SINGLE or MULTI are
+		 * enabled. If yes, call {@link FlexibleViewHolder#toggleActivation}.</p>
+		 *
+		 * @param position the adapter position of the item touched
+		 * @return true if MULTI selection is enabled, false for SINGLE selection and
+		 * all others cases.
+		 */
+		boolean onItemClick(int position);
+	}
+
+	/**
+	 * @author Davide Steduto
+	 * @since 03/01/2016
+	 */
+	public interface OnItemLongClickListener {
+		/**
+		 * Called when long tap occurs.
+		 * <p>This method always calls {@link FlexibleViewHolder#toggleActivation} after listener
+		 * event is consumed.</p>
+		 *
+		 * @param position the adapter position of the item touched
+		 */
+		void onItemLongClick(int position);
+	}
+
+	/**
+	 * @author Davide Steduto
+	 * @since 26/01/2016
+	 */
+	public interface OnItemMoveListener {
+		/**
+		 * Called when move has been confirmed.
+		 *
+		 * @param position  the position of the item swiped
+		 * @param direction the direction to which the ViewHolder is swiped
+		 */
+		void onItemMove(int position, int direction);
+	}
+
+	/**
+	 * @author Davide Steduto
+	 * @since 26/01/2016
+	 */
+	public interface OnItemSwipeListener {
+		/**
+		 * Called when swiping ended its animation and Item is not visible anymore.
+		 *
+		 * @param position  the position of the item swiped
+		 * @param direction the direction to which the ViewHolder is swiped
+		 */
+		void onItemSwipe(int position, int direction);
 	}
 
 }

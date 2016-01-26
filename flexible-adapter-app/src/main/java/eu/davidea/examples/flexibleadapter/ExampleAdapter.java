@@ -24,8 +24,6 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
-import eu.davidea.viewholders.FlexibleViewHolder.OnListItemClickListener;
-import eu.davidea.viewholders.FlexibleViewHolder.OnListItemTouchListener;
 
 
 public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHolder, Item> {
@@ -36,8 +34,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	public static final int EXAMPLE_VIEW_TYPE = 1;
 
 	private LayoutInflater mInflater;
-	private OnListItemClickListener mClickListener;
-	private OnListItemTouchListener mTouchListener;
 
 	//Selection fields
 	private boolean
@@ -47,16 +43,11 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	public ExampleAdapter(Object activity, String listId) {
 		super(DatabaseService.getInstance().getListById(listId), activity);
 		this.mContext = (Context) activity;
-		this.mClickListener = (OnListItemClickListener) activity;
-		this.mTouchListener = (OnListItemTouchListener) activity;
 		addUserLearnedSelection();
 
 		//We have highlighted text while filtering, so let's enable this feature
 		//to be consistent with the active filter
 		setNotifyChangeOfUnfilteredItems(true);
-
-		//Setting for FlipView
-		FlipView.resetLayoutAnimationDelay();
 	}
 
 	/**
@@ -66,18 +57,13 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	 */
 	@Override
 	public void updateDataSet(String param) {
-		//Fill and Filter mItems with your custom list
+		//Overwrite the list and fully notify the change
 		//Watch out! The original list must a copy
-		filterItems(DatabaseService.getInstance().getListById(param));
-
+		//TODO: We may create calls like removeAll, addAll or refreshList in order to animate changes
+		mItems = DatabaseService.getInstance().getListById(param);
+		notifyDataSetChanged();
 		//Add example view
 		addUserLearnedSelection();
-
-		//Setting for FlipView
-		FlipView.resetLayoutAnimationDelay(true, 0);
-
-		//Update Empty View
-		mUpdateListener.onUpdateEmptyView(isEmpty() ? 0 : getItemCount());
 	}
 
 	private void addUserLearnedSelection() {
@@ -327,14 +313,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 //	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onItemSwiped(int position, int direction) {
-		removeItem(position, true);
-	}
-
-	/**
 	 * Used for UserLearnsSelection.
 	 */
 	static class ExampleViewHolder extends FlexibleViewHolder {
@@ -345,7 +323,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		ImageView mDismissIcon;
 
 		ExampleViewHolder(View view, final ExampleAdapter adapter) {
-			super(view, adapter, null);
+			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 			mImageView = (ImageView) view.findViewById(R.id.image);
@@ -369,8 +347,8 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		ImageView mHandleView;
 		Context mContext;
 
-		public ParentViewHolder(View view, final ExampleAdapter adapter) {
-			super(view, adapter, adapter.mClickListener, adapter.mTouchListener);
+		public ParentViewHolder(View view, ExampleAdapter adapter) {
+			super(view, adapter);
 			this.mContext = adapter.mContext;
 			this.mTitle = (TextView) view.findViewById(R.id.title);
 			this.mSubtitle = (TextView) view.findViewById(R.id.subtitle);
@@ -378,7 +356,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			this.mFlipView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					mListItemClickListener.onListItemLongClick(getAdapterPosition());
+					mAdapter.mItemLongClickListener.onItemLongClick(getAdapterPosition());
 					Toast.makeText(mContext, "ImageClick on " + mTitle.getText(), Toast.LENGTH_SHORT).show();
 					toggleActivation();
 				}
@@ -418,7 +396,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		Context mContext;
 
 		ChildViewHolder(View view, ExampleAdapter adapter) {
-			super(view, adapter, adapter.mClickListener);
+			super(view, adapter);
 			this.mContext = adapter.mContext;
 			this.mTitle = (TextView) view.findViewById(R.id.title);
 			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);

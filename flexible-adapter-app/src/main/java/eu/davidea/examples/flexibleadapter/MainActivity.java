@@ -33,16 +33,14 @@ import eu.davidea.common.SimpleDividerItemDecoration;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
+import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
-import eu.davidea.viewholders.FlexibleViewHolder;
 
 public class MainActivity extends AppCompatActivity implements
-		ActionMode.Callback, EditItemDialog.OnEditItemListener,
-		SearchView.OnQueryTextListener,
-		FlexibleAdapter.OnUpdateListener,
-		FlexibleAdapter.OnDeleteCompleteListener,
-		FlexibleViewHolder.OnListItemClickListener,
-		FlexibleViewHolder.OnListItemTouchListener {
+		ActionMode.Callback, EditItemDialog.OnEditItemListener, SearchView.OnQueryTextListener,
+		FlexibleAdapter.OnUpdateListener, FlexibleAdapter.OnDeleteCompleteListener,
+		FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener,
+		FlexibleAdapter.OnItemMoveListener, FlexibleAdapter.OnItemSwipeListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -93,6 +91,9 @@ public class MainActivity extends AppCompatActivity implements
 		setContentView(R.layout.activity_main);
 		Log.d(TAG, "onCreate");
 
+		//Settings for FlipView
+		FlipView.resetLayoutAnimationDelay();
+
 		//Adapter & RecyclerView
 		FlexibleAdapter.enableLogs(true);
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
@@ -104,20 +105,17 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
-		mAdapter.setLongPressDragEnabled(true);
-		mAdapter.setSwipeEnabled(true);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
+		//TODO: Change ItemDecorator
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
 				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
 
-		//Add FastScroll to the RecyclerView
-
+		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView
 		mAdapter.setFastScroller((FastScroller) findViewById(R.id.fast_scroller), Utils.getColorAccent(this));
-//		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
-//		fastScroller.setRecyclerView(mRecyclerView);
-//		fastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle);
+		mAdapter.setLongPressDragEnabled(true);
+		mAdapter.setSwipeEnabled(true);
 
 		//FAB
 		mFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -146,8 +144,9 @@ public class MainActivity extends AppCompatActivity implements
 			}
 		});
 
-		//Update EmptyView (by default EmptyView is visible)
-//		updateEmptyView();
+		//With FlexibleAdapter v5.0.0 we don't need to call this function anymore
+		//It is automatically called if Activity implements FlexibleAdapter.OnUpdateListener
+		//updateEmptyView();
 
 		//SwipeToRefresh
 		initializeSwipeToRefresh();
@@ -164,6 +163,9 @@ public class MainActivity extends AppCompatActivity implements
 			if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
 				setSelection(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 		}
+
+		//Settings for FlipView
+		FlipView.stopLayoutAnimation();
 	}
 
 	private void initializeSwipeToRefresh() {
@@ -177,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements
 		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
+				//This makes
 				mAdapter.updateDataSet();
 				mSwipeRefreshLayout.setEnabled(false);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 1000L);
@@ -258,8 +261,9 @@ public class MainActivity extends AppCompatActivity implements
 				|| !mAdapter.getSearchText().equalsIgnoreCase(newText)) {
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			mAdapter.setSearchText(newText);
-			//Filter the items and notify the change!
-			mAdapter.updateDataSet();
+			//Fill and Filter mItems with your custom list and automatically animate the changes
+			//Watch out! The original list must a copy
+			mAdapter.filterItems(DatabaseService.getInstance().getListById(""));
 		}
 
 		if (mAdapter.hasSearchText()) {
@@ -336,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements
 		}
 		//TODO: Show difference between MODE_IDLE, MODE_SINGLE
 		//TODO: Add toggle for mAdapter.toggleFastScroller();
+		//TODO: Add dialog configuration settings
 
 		return super.onOptionsItemSelected(item);
 	}
@@ -361,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	//TODO: Include setActiveSelection in the library?
+	//TODO: Include setActivatedPosition in the library?
 	public void setSelection(final int position) {
 		if (mAdapter.getMode() == FlexibleAdapter.MODE_SINGLE) {
 			Log.v(TAG, "setSelection called!");
@@ -388,17 +393,7 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onListItemTouch(int position, int actionState) {
-		//TODO: Do something onListItemTouch
-	}
-
-	@Override
-	public void onListItemRelease(int position, int actionState) {
-		//TODO: Do something onListItemRelease
-	}
-
-	@Override
-	public boolean onListItemClick(int position) {
+	public boolean onItemClick(int position) {
 		if (mActionMode != null && position != INVALID_POSITION) {
 			toggleSelection(position);
 			return true;
@@ -418,18 +413,29 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onListItemLongClick(int position) {
+	public void onItemLongClick(int position) {
 		if (mActionMode == null) {
-			Log.d(TAG, "onListItemLongClick actionMode activated!");
+			Log.d(TAG, "onItemLongClick actionMode activated!");
 			mActionMode = startSupportActionMode(this);
 		}
 		toggleSelection(position);
 	}
 
+	@Override
+	public void onItemMove(int position, int direction) {
+		//TODO: Do something onItemMove
+	}
+
+	@Override
+	public void onItemSwipe(int position, int direction) {
+		//TODO: Create Undo Helper?
+		mAdapter.removeItem(position, true);
+	}
+
 	/**
-	 * Toggle the selection state of an item.<br/><br/>
-	 * If the item was the last one in the selection and is unselected, the selection is stopped.
-	 * Note that the selection must already be started (actionMode must not be null).
+	 * Toggle the selection state of an item.
+	 * <p>If the item was the last one in the selection and is unselected, the selection is stopped.
+	 * Note that the selection must already be started (actionMode must not be null).</p>
 	 *
 	 * @param position Position of the item to toggle the selection state
 	 */
@@ -528,6 +534,8 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onDestroyActionMode(ActionMode mode) {
 		Log.v(TAG, "onDestroyActionMode called!");
+		//With FlexibleAdapter v5.0.0 you should use MODE_IDLE if you don't want
+		//single selection still visible.
 		mAdapter.setMode(FlexibleAdapter.MODE_IDLE);
 		mAdapter.clearSelection();
 		mActionMode = null;

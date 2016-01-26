@@ -253,7 +253,6 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	 *
 	 * @param holder   the ViewHolder created of type {@link ExpandableViewHolder}
 	 * @param position the adapter position to bind
-
 	 */
 	public abstract void onBindExpandableViewHolder(EVH holder, int position);
 
@@ -268,11 +267,10 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	/**
 	 * No more override is allowed here!
-	 * <p>
-	 * Use {@link #onBindExpandableViewHolder(ExpandableViewHolder, int)} for expandable
+	 * <p>Use {@link #onBindExpandableViewHolder(ExpandableViewHolder, int)} for expandable
 	 * ViewHolder.<br/>
 	 * Use {@link #onBindFlexibleViewHolder(FlexibleViewHolder, int)} for normal or child ViewHolder
-	 * instead.
+	 * instead.</p>
 	 *
 	 * @param holder   the ViewHolder created
 	 * @param position the adapter position to bind
@@ -787,18 +785,23 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				values.removeAll(mDeletedItems);
 			}
 		}
+
 		//Animate search results only in case of new SearchText
 		if (!mOldSearchText.equalsIgnoreCase(mSearchText)) {
 			mOldSearchText = mSearchText;
 			animateTo(values);
 		} else mItems = values;
+
+		//Call listener to update EmptyView
+		if (mUpdateListener != null) {
+			mUpdateListener.onUpdateEmptyView(getItemCount());
+		}
 	}
 
 	/**
 	 * This method performs filtering on the subItems of the provided expandable and returns
 	 * true, if the expandable should be in the filtered collection, or false if it shouldn't.
-	 * <p/>
-	 * DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
+	 * <p>DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!</p>
 	 *
 	 * @param item       the object with subItems to be inspected
 	 * @param constraint constraint, that the object has to fulfil

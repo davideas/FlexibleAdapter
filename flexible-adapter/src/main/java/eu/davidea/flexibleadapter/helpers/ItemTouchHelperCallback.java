@@ -6,6 +6,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
+import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.viewholders.FlexibleViewHolder;
+
 /**
  * This class is an implementation of {@link ItemTouchHelper.Callback} that enables drag & drop
  * and swipe-to-dismiss. Drag and Swipe events are started depending by it's configuration.
@@ -88,10 +91,8 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
 	/**
 	 * Configures the directions in which the item can be swiped. Values:
-	 * <p/>
-	 * {@link ItemTouchHelper#START} | {@link ItemTouchHelper#END} |
-	 * {@link ItemTouchHelper#UP} | {@link ItemTouchHelper#DOWN}
-	 * <p/>
+	 * <p>{@link ItemTouchHelper#START} | {@link ItemTouchHelper#END} |
+	 * {@link ItemTouchHelper#UP} | {@link ItemTouchHelper#DOWN}</p>
 	 * Default values are {@link ItemTouchHelper#START} and {@link ItemTouchHelper#END}.
 	 *
 	 * @param swipeFlags flags directions
@@ -103,9 +104,8 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	/**
 	 * Returns the fraction that the user should move the View to be considered as swiped.
 	 * The fraction is calculated with respect to RecyclerView's bounds.
-	 * <p/>
-	 * Default value is 1.0f, which means, to swipe a View, user must move the View at least
-	 * half of RecyclerView's width or height, depending on the swipe direction.
+	 * <p>Default value is 1.0f, which means, to swipe a View, user must move the View at least
+	 * half of RecyclerView's width or height, depending on the swipe direction.</p>
 	 *
 	 * @param viewHolder The ViewHolder that is being dragged.
 	 * @return A float value that denotes the fraction of the View size. Default value is 1.0f
@@ -127,7 +127,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 		if (!mItemTouchCallback.shouldMove(viewHolder.getAdapterPosition(), target.getAdapterPosition())) {
 			return false;
 		}
-		// Notify the adapter of the move
+		//Notify the adapter of the move
 		mItemTouchCallback.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
 		return true;
 	}
@@ -146,7 +146,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	 */
 	@Override
 	public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-		// Set movement flags based on the layout manager
+		//Set movement flags based on the layout manager
 		if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
 			final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 			final int swipeFlags = 0;
@@ -163,12 +163,12 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	 */
 	@Override
 	public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-		// We only want the active item to change
+		//We only want the active item to change
 		if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
 			if (viewHolder instanceof ViewHolderCallback) {
-				// Let the view holder know that this item is being moved or dragged
+				//Let the ViewHolder to know that this item is swiping or dragging
 				ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
-				viewHolderCallback.onItemTouched(viewHolder.getAdapterPosition(), actionState);
+				viewHolderCallback.onActionStateChanged(viewHolder.getAdapterPosition(), actionState);
 			}
 		}
 		super.onSelectedChanged(viewHolder, actionState);
@@ -212,7 +212,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	/*------------------*/
 
 	/**
-	 * Interface for Adapter and/or Activities to listen for a move or swipe dismissal event
+	 * Internal Interface for Adapter to listen for a move or swipe dismissal event
 	 * from a {@link ItemTouchHelperCallback}.
 	 *
 	 * @author Davide Steduto
@@ -231,9 +231,8 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 		/**
 		 * Called when an item has been dragged far enough to trigger a move. <b>This is called
 		 * every time an item is shifted</b>, and <strong>not</strong> at the end of a "drop" event.
-		 * <br/><br/>
-		 * Implementations should call {@link RecyclerView.Adapter#notifyItemMoved(int, int)} after
-		 * adjusting the underlying data to reflect this move.
+		 * <p>Implementations should call {@link RecyclerView.Adapter#notifyItemMoved(int, int)}
+		 * after adjusting the underlying data to reflect this move.</p>
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
@@ -245,9 +244,8 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
 		/**
 		 * Called when an item has been dismissed by a swipe.
-		 * <br/><br/>
-		 * Implementations should decide to call or not {@link RecyclerView.Adapter#notifyItemRemoved(int)}
-		 * after adjusting the underlying data to reflect this removal.
+		 * <p>Implementations should decide to call or not {@link RecyclerView.Adapter#notifyItemRemoved(int)}
+		 * after adjusting the underlying data to reflect this removal.</p>
 		 *
 		 * @param position  the position of the item dismissed
 		 * @param direction the direction to which the ViewHolder is swiped
@@ -258,26 +256,35 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	}
 
 	/**
-	 * Interface for item ViewHolder to notify of relevant callbacks from
-	 * {@link android.support.v7.widget.helper.ItemTouchHelper.Callback}.
+	 * Internal Interface for ViewHolder to notify of relevant callbacks from
+	 * {@link ItemTouchHelper.Callback}.<br/>
+	 * This listener, is to intend as a further way to display How a ViewHolder will display
+	 * the middle and final activation state.
+	 * <p>Generally the final action should be handled by the listeners
+	 * {@link FlexibleAdapter.OnItemMoveListener} and {@link FlexibleAdapter.OnItemSwipeListener}.</p>
 	 *
 	 * @author Davide Steduto
 	 * @since 23/01/2016
 	 */
 	public interface ViewHolderCallback {
 		/**
-		 * Called when the {@link ItemTouchHelper} first registers an item as being moved or swiped.<br/>
-		 * Implementations should update the item view to indicate it's active state.
+		 * Called when the {@link ItemTouchHelper} first registers an item as being moved or swiped.
+		 * <br/>Implementations should update the item view to indicate it's active state.
+		 * <p>{@link FlexibleViewHolder} class already provides an implementation to handle the
+		 * active state.</p>
 		 *
 		 * @param position    the position of the item touched
 		 * @param actionState one of {@link ItemTouchHelper#ACTION_STATE_SWIPE} or
 		 *                    {@link ItemTouchHelper#ACTION_STATE_DRAG}.
+		 * @see FlexibleViewHolder#onActionStateChanged(int, int)
 		 */
-		void onItemTouched(int position, int actionState);
+		void onActionStateChanged(int position, int actionState);
 
 		/**
-		 * Called when the {@link ItemTouchHelper} has completed the move or swipe, and the active item
-		 * state should be cleared.
+		 * Called when the {@link ItemTouchHelper} has completed the move or swipe, and the active
+		 * item state should be cleared.
+		 * <p>{@link FlexibleViewHolder} class already provides an implementation to disable the
+		 * active state.</p>
 		 *
 		 * @param position the position of the item released
 		 */
