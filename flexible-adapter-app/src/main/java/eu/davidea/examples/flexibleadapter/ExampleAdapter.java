@@ -3,6 +3,7 @@ package eu.davidea.examples.flexibleadapter;
 import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.text.Html;
 import android.text.Spannable;
@@ -71,6 +72,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			//Define Example View
 			Item item = new Item();
 			item.setId("0");
+			item.setEnabled(false);
 			item.setExpandable(true);//Mark Expandable also this (same level of others items)
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
@@ -91,16 +93,21 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	}
 
 	@Override
+	public synchronized void filterItems(@NonNull List<Item> unfilteredItems) {
+		super.filterItems(unfilteredItems);
+		addUserLearnedSelection();
+	}
+
+	@Override
 	public void setMode(int mode) {
 		super.setMode(mode);
-		if (mode == MODE_SINGLE) mLastItemInActionMode = true;
+		if (mode == MODE_IDLE) mLastItemInActionMode = true;
 	}
 
 	@Override
 	public void selectAll() {
 		mSelectAll = true;
 		super.selectAll();
-		//super.selectAll(EXAMPLE_VIEW_TYPE);
 	}
 
 	@Override
@@ -182,7 +189,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			pvHolder.mFlipView.flipSilently(isSelected(position));
 		}
 
-		//This "if-else" is just an example
+		//This "if-else" is just an example of what you can do with item animation
 		if (isSelected(position)) {
 			animateView(holder.itemView, position, true);
 		} else {
@@ -222,7 +229,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 				//When user scrolls, this line binds the correct selection status
 				cvHolder.itemView.setActivated(isSelected(position));
 
-				//This "if-else" is just an example
+				//This "if-else" is just an example of what you can do with item animation
 				if (isSelected(position)) {
 					animateView(holder.itemView, position, true);
 				} else {

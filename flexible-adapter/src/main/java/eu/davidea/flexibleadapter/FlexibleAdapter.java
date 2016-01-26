@@ -171,6 +171,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	public abstract void onBindViewHolder(VH holder, final int position);
 
 	@Override
+	@CallSuper
 	public int getItemCount() {
 		return mItems != null ? mItems.size() : 0;
 	}
@@ -225,7 +226,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			position = mItems.size();
 		}
 		notifyItemInserted(position);
-		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
+		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	/*----------------------*/
@@ -253,7 +254,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 		notifyItemRemoved(position);
 		if (mUpdateListener != null && !isMultiRemove)
-			mUpdateListener.onUpdateEmptyView(mItems.size());
+			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	/**
@@ -302,7 +303,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			}
 		}
 		isMultiRemove = false;
-		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
+		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	/**
@@ -373,9 +374,19 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
+	 * Returns the current configuration to restore selections on Undo.
+	 *
+	 * @return true if selection will be restored, false otherwise
+	 */
+	public boolean isRestoreWithSelection() {
+		return mRestoreSelection;
+	}
+
+	/**
 	 * Gives the possibility to restore the selection on Undo, when {@link #restoreDeletedItems()}
 	 * is called.
-	 * <p>Default value is false;</p>
+	 * <p>To use in combination with {@code ActionMode} in order to not disable it.</p>
+	 * Default value is false.
 	 *
 	 * @param restoreSelection true to have restored items still selected, false to empty selections.
 	 */
@@ -772,6 +783,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	@CallSuper
 	public boolean onItemMove(int fromPosition, int toPosition) {
 		moveItem(fromPosition, toPosition);
+		//After the swap, delegate further actions to the user
 		if (mItemMoveListener != null) {
 			mItemMoveListener.onItemMove(fromPosition, toPosition);
 		}
@@ -784,6 +796,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	@Override
 	@CallSuper
 	public void onItemSwiped(int position, int direction) {
+		//Delegate actions to the user
 		if (mItemSwipeListener != null) {
 			mItemSwipeListener.onItemSwipe(position, direction);
 		}
@@ -805,20 +818,18 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/*------------------*/
 
 	/**
-	 * @author Davide Steduto
 	 * @since 03/01/2016
 	 */
 	public interface OnUpdateListener {
 		/**
 		 * Called at startup and every time an item is inserted, removed or filtered.
 		 *
-		 * @param size the current number of items in the adapter.
+		 * @param size the current number of items in the adapter, result of {@link #getItemCount()}
 		 */
 		void onUpdateEmptyView(int size);
 	}
 
 	/**
-	 * @author Davide Steduto
 	 * @since 29/11/2015
 	 */
 	public interface OnDeleteCompleteListener {
@@ -833,53 +844,51 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * @author Davide Steduto
-	 * @since 03/01/2016
+	 * @since 26/01/2016
 	 */
 	public interface OnItemClickListener {
 		/**
 		 * Called when single tap occurs.
-		 * <p>Delegate the click event to the listener and check if selection SINGLE or MULTI are
-		 * enabled. If yes, call {@link FlexibleViewHolder#toggleActivation}.</p>
+		 * <p>Delegation of the click event to the listener and check if selection MODE is
+		 * SINGLE or MULTI is enabled in order to activate the ItemView.</p>
 		 *
-		 * @param position the adapter position of the item touched
-		 * @return true if MULTI selection is enabled, false for SINGLE selection and
-		 * all others cases.
+		 * @param position the adapter position of the item clicked
+		 * @return true the click should activate the ItemView, false for no change.
 		 */
 		boolean onItemClick(int position);
 	}
 
 	/**
-	 * @author Davide Steduto
-	 * @since 03/01/2016
+	 * @since 26/01/2016
 	 */
 	public interface OnItemLongClickListener {
 		/**
 		 * Called when long tap occurs.
 		 * <p>This method always calls {@link FlexibleViewHolder#toggleActivation} after listener
-		 * event is consumed.</p>
+		 * event is consumed in order to activate the ItemView.</p>
 		 *
-		 * @param position the adapter position of the item touched
+		 * @param position the adapter position of the item clicked
 		 */
 		void onItemLongClick(int position);
 	}
 
 	/**
-	 * @author Davide Steduto
 	 * @since 26/01/2016
 	 */
 	public interface OnItemMoveListener {
 		/**
-		 * Called when move has been confirmed.
+		 * Called when an item has been dragged far enough to trigger a move. <b>This is called
+		 * every time an item is shifted</b>, and <strong>not</strong> at the end of a "drop" event.
+		 * <p>The end of the "drop" event is instead handled by
+		 * {@link FlexibleViewHolder#onItemReleased(int)}</p>.
 		 *
-		 * @param position  the position of the item swiped
-		 * @param direction the direction to which the ViewHolder is swiped
+		 * @param fromPosition the start position of the moved item
+		 * @param toPosition   the resolved position of the moved item
 		 */
-		void onItemMove(int position, int direction);
+		void onItemMove(int fromPosition, int toPosition);
 	}
 
 	/**
-	 * @author Davide Steduto
 	 * @since 26/01/2016
 	 */
 	public interface OnItemSwipeListener {

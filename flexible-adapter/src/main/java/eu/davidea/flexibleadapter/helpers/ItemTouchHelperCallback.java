@@ -215,7 +215,6 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	 * Internal Interface for Adapter to listen for a move or swipe dismissal event
 	 * from a {@link ItemTouchHelperCallback}.
 	 *
-	 * @author Davide Steduto
 	 * @since 23/01/2016
 	 */
 	public interface AdapterCallback {
@@ -263,7 +262,6 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 	 * <p>Generally the final action should be handled by the listeners
 	 * {@link FlexibleAdapter.OnItemMoveListener} and {@link FlexibleAdapter.OnItemSwipeListener}.</p>
 	 *
-	 * @author Davide Steduto
 	 * @since 23/01/2016
 	 */
 	public interface ViewHolderCallback {

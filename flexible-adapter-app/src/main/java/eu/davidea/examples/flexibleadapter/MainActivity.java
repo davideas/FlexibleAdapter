@@ -97,23 +97,24 @@ public class MainActivity extends AppCompatActivity implements
 		//Adapter & RecyclerView
 		FlexibleAdapter.enableLogs(true);
 		mAdapter = new ExampleAdapter(this, "example parameter for List1");
+		//Experimenting NEW features
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
 		mAdapter.setAutoCollapseOnExpand(false);
 		mAdapter.setAutoScrollOnExpand(true);
-		//mAdapter.setRestoreSelectionOnUndo(true);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-		//TODO: Change ItemDecorator
+		//TODO: Change ItemDecorator, this doesn't work well
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
 				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView
 		mAdapter.setFastScroller((FastScroller) findViewById(R.id.fast_scroller), Utils.getColorAccent(this));
+		//Experimenting NEW features
 		mAdapter.setLongPressDragEnabled(true);
 		mAdapter.setSwipeEnabled(true);
 
@@ -179,7 +180,6 @@ public class MainActivity extends AppCompatActivity implements
 		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				//This makes
 				mAdapter.updateDataSet();
 				mSwipeRefreshLayout.setEnabled(false);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 1000L);
@@ -269,18 +269,15 @@ public class MainActivity extends AppCompatActivity implements
 		if (mAdapter.hasSearchText()) {
 			//mFab.setVisibility(View.GONE);
 			ViewCompat.animate(mFab)
-					.scaleX(0f)
-					.scaleY(0f)
-					.alpha(0f)
-					.setDuration(100)
+					.scaleX(0f).scaleY(0f)
+					.alpha(0f).setDuration(100)
 					.start();
 		} else {
+
 			//mFab.setVisibility(View.VISIBLE);
 			ViewCompat.animate(mFab)
-					.scaleX(1f)
-					.scaleY(1f)
-					.alpha(1f)
-					.setDuration(100)
+					.scaleX(1f).scaleY(1f)
+					.alpha(1f).setDuration(100)
 					.start();
 		}
 		return true;
@@ -396,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements
 	public boolean onItemClick(int position) {
 		if (mActionMode != null && position != INVALID_POSITION) {
 			toggleSelection(position);
-			return true;
+			return mAdapter.isSelected(position);
 		} else {
 			//Notify the active callbacks (ie. the activity, if the fragment is attached to one)
 			// that an item has been selected.
@@ -422,14 +419,35 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onItemMove(int position, int direction) {
-		//TODO: Do something onItemMove
+	public void onItemMove(int fromPosition, int toPosition) {
+		//FIXME: this doesn't work yet with subItems.....
+		//TODO: Make a better implementation here. For the moment let's commit the change every time, also to the database list
+		int adjustPosition = DatabaseService.userLearnedSelection ? 0 : 1; //Due to my ExampleView we must remove 1 from the position to swap
+		DatabaseService.getInstance().swapItem(
+				fromPosition - adjustPosition,
+				toPosition - adjustPosition);
 	}
 
 	@Override
 	public void onItemSwipe(int position, int direction) {
-		//TODO: Create Undo Helper?
+		//Experimenting NEW feature
+		mAdapter.setRestoreSelectionOnUndo(false);
+
+		//TODO: Create Undo Helper with SnackBar?
+		StringBuilder message = new StringBuilder();
+		message.append(mAdapter.getItem(position).getTitle())
+				.append(" ").append(getString(R.string.action_deleted));
+		//noinspection ResourceType
+		mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)
+				.setAction(R.string.undo, new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						mAdapter.restoreDeletedItems();
+					}
+				});
+		mSnackBar.show();
 		mAdapter.removeItem(position, true);
+		mAdapter.startUndoTimer(7000L + 200L, this);
 	}
 
 	/**
@@ -498,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements
 				setContextTitle(mAdapter.getSelectedItemCount());
 				return true;
 			case R.id.action_delete:
-				//Build message before delete, for the Snackbar
+				//Build message before delete, for the SnackBar
 				StringBuilder message = new StringBuilder();
 				for (Integer pos : mAdapter.getSelectedPositions()) {
 					message.append(mAdapter.getItem(pos).getTitle());
@@ -514,6 +532,10 @@ public class MainActivity extends AppCompatActivity implements
 							public void onClick(View v) {
 								mAdapter.restoreDeletedItems();
 								mSwipeHandler.sendEmptyMessage(0);
+								if (mAdapter.isRestoreWithSelection()) {
+									mActionMode = startSupportActionMode(MainActivity.this);
+									setContextTitle(mAdapter.getSelectedItemCount());
+								}
 							}
 						});
 				mSnackBar.show();
@@ -524,6 +546,9 @@ public class MainActivity extends AppCompatActivity implements
 
 				mSwipeHandler.sendEmptyMessage(1);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 7000L);
+
+				//Experimenting NEW feature
+				mAdapter.setRestoreSelectionOnUndo(true);
 				mActionMode.finish();
 				return true;
 			default:

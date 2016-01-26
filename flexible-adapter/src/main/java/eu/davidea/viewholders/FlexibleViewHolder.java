@@ -150,7 +150,14 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	/*--------------------------------*/
 
 	/**
-	 * {@inheritDoc}
+	 * Here we handle the event of when the ItemTouchHelper first registers an item as being
+	 * moved or swiped.
+	 * <p>In this implementations, View activation is automatically handled in case of Drag:
+	 * The Item will be added to the selection list if not selected yet and mode MULTI is activated.</p>
+	 *
+	 * @param position    the position of the item touched
+	 * @param actionState one of {@link ItemTouchHelper#ACTION_STATE_SWIPE} or
+	 *                    {@link ItemTouchHelper#ACTION_STATE_DRAG}.
 	 */
 	@Override
 	@CallSuper
@@ -161,14 +168,14 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 					" actionState=" + (actionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
 		if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
 			if (!mAdapter.isSelected(getAdapterPosition())) {
-				//Be sure, if MODE_MULTI is active, to add this item to the selection list (call listener)
-				//Also be sure user consumes the long click event
+				//Be sure, if MODE_MULTI is active, add this item to the selection list (call listener!)
+				//Also be sure user consumes the long click event if not done in onLongClick.
 				if (mAdapter.mItemLongClickListener != null &&
 						(mLongClickSkipped || mAdapter.getMode() == SelectableAdapter.MODE_MULTI)) {
 					mLongClickSkipped = false;
 					mAdapter.mItemLongClickListener.onItemLongClick(getAdapterPosition());
 				} else {
-					//If not, be sure current item appears selected
+					//If not, be sure current item appears selected for the Drag transition
 					mAdapter.toggleSelection(getAdapterPosition());
 				}
 			}
@@ -178,9 +185,11 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * <p>In this implementation, View activation is automatically handled by this method.</p>
+	 * Here we handle the event of when the ItemTouchHelper has completed the move or swipe.
+	 * <p>In this implementation, View activation is automatically handled.</p>
 	 * In case of Drag, the state will be cleared depends by current selection mode!
+	 *
+	 * @param position the position of the item released
 	 */
 	@Override
 	@CallSuper

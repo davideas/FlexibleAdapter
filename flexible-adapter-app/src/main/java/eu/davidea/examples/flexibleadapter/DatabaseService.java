@@ -1,6 +1,7 @@
 package eu.davidea.examples.flexibleadapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,6 +68,10 @@ public class DatabaseService {
 		//listId is not used: we have only 1 type of list in this example
 		//Return a copy of the DB: we will perform some tricky code on this list.
 		return new ArrayList<Item>(mItems);
+	}
+
+	public void swapItem(int fromPosition, int toPosition) {
+		Collections.swap(mItems, fromPosition, toPosition);
 	}
 
 	public void removeItem(Item item) {

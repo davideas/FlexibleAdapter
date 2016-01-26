@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -138,8 +139,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * Automatically collapse all previous expanded parents before expand the clicked parent.<br/>
-	 * Default disabled.
+	 * Automatically collapse all previous expanded parents before expand the clicked parent.
+	 * <p>Default value is disabled.</p>
 	 *
 	 * @param collapseOnExpand true to collapse others items, false to just expand the current
 	 */
@@ -149,9 +150,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	/**
 	 * Automatically scroll the clicked expandable item to the first visible position.<br/>
-	 * Default disabled.<br/><br/>
-	 * This works ONLY in combination with {@link SmoothScrollLinearLayoutManager}.
-	 * GridLayout is still not supported.
+	 * Default disabled.
+	 * <p>This works ONLY in combination with {@link SmoothScrollLinearLayoutManager}.
+	 * GridLayout is still NOT supported.</p>
 	 *
 	 * @param scrollOnExpand true to enable automatic scroll, false to disable
 	 */
@@ -284,6 +285,21 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		} else {
 			onBindFlexibleViewHolder(holder, position);
 		}
+	}
+
+	/**
+	 * TODO: Provide a parameter as counting filter
+	 * @return size of the expandable items
+	 */
+	@Override
+	@CallSuper
+	public int getItemCount() {
+		int count = super.getItemCount();
+		for (int i = 0; i < mExpandedItems.size(); i++) {
+			int position = mExpandedItems.keyAt(i);
+			count -= mExpandedItems.get(position).getSubItemsCount();
+		}
+		return count;
 	}
 
 	/**
@@ -550,7 +566,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			}
 		}
 		isMultiRemove = false;
-		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(mItems.size());
+		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	public void removeRange(int positionStart, int itemCount, boolean notifyParentChanged) {
@@ -640,7 +656,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
 		//TODO: Implement logic for views, when expandable items are already expanded or collapsed.
-//		boolean move = false;
+		boolean move = false;
 //		T fromItem = null, toItem = null;
 //		if (fromPosition > toPosition) {
 //			fromItem = getItem(fromPosition);
@@ -794,7 +810,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 		//Call listener to update EmptyView
 		if (mUpdateListener != null) {
-			mUpdateListener.onUpdateEmptyView(getItemCount());
+			mUpdateListener.onUpdateEmptyView(super.getItemCount());
 		}
 	}
 
@@ -874,9 +890,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		List<Integer> selectedPositions = getSelectedPositions();
 		boolean adjusted = false;
 		for (Integer position : selectedPositions) {
-			if (position > startPosition) {
+			if (position >= startPosition) {
 				if (DEBUG)
-					Log.v(TAG, "Adjust Selected position " + position + " to " + (position + itemCount));
+					Log.v(TAG, "Adjust Selected position " + position + " to " + Math.max(position + itemCount, startPosition));
 				int index = selectedPositions.indexOf(position);
 				position += itemCount;
 				selectedPositions.set(index, Math.max(position, startPosition));
@@ -954,13 +970,18 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/*---------------*/
 
 	/**
-	 * Observer Class responsible to recalculate Selection, Expanded, Removed positions.
+	 * Observer Class responsible to recalculate Selection and Expanded positions.
 	 */
 	private class ExpandableAdapterDataObserver extends RecyclerView.AdapterDataObserver {
 
 		private void adjustPositions(int positionStart, int itemCount) {
 			adjustSelected(positionStart, itemCount);
 			adjustExpanded(positionStart, itemCount);
+		}
+
+		@Override
+		public void onChanged() {
+			//TODO: expandInitialItems(); ??
 		}
 
 		@Override
@@ -971,7 +992,6 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		@Override
 		public void onItemRangeInserted(int positionStart, int itemCount) {
 			adjustPositions(positionStart, itemCount);
-
 		}
 
 		@Override
