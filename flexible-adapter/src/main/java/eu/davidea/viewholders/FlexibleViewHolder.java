@@ -21,7 +21,9 @@ import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
  * <p>You must extend and implement this class for the own ViewHolder.</p>
  *
  * @author Davide Steduto
- * @since 03/01/2016 Created<br/>23/01/2016 ItemTouch
+ * @since 03/01/2016 Created
+ *   <br/>23/01/2016 ItemTouch with Drag&Drop, Swipe
+ *   <br/>26/01/2016 Constructor revisited
  */
 public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		implements View.OnClickListener, View.OnLongClickListener,

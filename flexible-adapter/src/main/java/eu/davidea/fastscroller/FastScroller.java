@@ -28,6 +28,7 @@ import eu.davidea.flexibleadapter.R;
 /**
  * Class taken from GitHub, customized and optimized for FlexibleAdapter project.
  * @since Up to the date 23/01/2016
+ *   <br/>23/01/2016 Added onFastScroll in the listener
  * @see <a href="https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller">
  *     github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller</a>
  */

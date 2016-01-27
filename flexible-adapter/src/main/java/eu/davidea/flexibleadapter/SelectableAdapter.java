@@ -17,9 +17,11 @@ import eu.davidea.fastscroller.FastScroller;
 
 /**
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
+ * <p>Also </p>
  *
  * @author Davide Steduto
  * @since 03/05/2015 Created
+ *   <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
  */
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>
 		implements FastScroller.ScrollerListener {
@@ -45,9 +47,9 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	//public static final int MODE_DRAG_SWIPE = 4;
 
-	//TODO: Evaluate TreeSet instead of ArrayList for selectedPositions, TreeSet is a sortedList
-	private ArrayList<Integer> selectedPositions;
-	private int mode;
+	//TODO: Evaluate TreeSet instead of ArrayList for mSelectedPositions, TreeSet is a sortedList
+	private ArrayList<Integer> mSelectedPositions;
+	private int mMode;
 	protected RecyclerView mRecyclerView;
 	protected FastScroller mFastScroller;
 
@@ -56,8 +58,8 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/*--------------*/
 
 	public SelectableAdapter() {
-		selectedPositions = new ArrayList<Integer>();
-		mode = MODE_IDLE;
+		mSelectedPositions = new ArrayList<Integer>();
+		mMode = MODE_IDLE;
 	}
 
 	/*----------------*/
@@ -96,7 +98,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @param mode MODE_SINGLE or MODE_MULTI
 	 */
 	public void setMode(int mode) {
-		this.mode = mode;
+		this.mMode = mode;
 	}
 
 	/**
@@ -107,7 +109,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @see #MODE_MULTI
 	 */
 	public int getMode() {
-		return mode;
+		return mMode;
 	}
 
 	/**
@@ -117,18 +119,18 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @return true if the item is selected, false otherwise.
 	 */
 	public boolean isSelected(int position) {
-		return selectedPositions.contains(Integer.valueOf(position));
+		return mSelectedPositions.contains(Integer.valueOf(position));
 	}
 
 	/**
 	 * Toggle the selection status of the item at a given position.<br/>
 	 * The behaviour depends on the selection mode previously set with {@link #setMode}.
-	 * <br/><br/>
+	 * <p>
 	 * Optionally the item can be invalidated.<br/>
 	 * However it is preferable to set <i>false</i> and to handle the Activated/Selected State of
 	 * the ItemView in the Click events of the ViewHolder after the selection is registered and
 	 * up to date: Very Useful if the item has views with own animation to perform!
-	 * <br/><br/>
+	 * </p>
 	 * <b>Usage:</b>
 	 * <ul>
 	 * <li>If you don't want any item to be selected/activated at all, just don't call this method.</li>
@@ -150,51 +152,43 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 */
 	public void toggleSelection(int position) {
 		if (position < 0) return;
-		if (mode == MODE_SINGLE)
+		if (mMode == MODE_SINGLE)
 			clearSelection();
 
-		int index = selectedPositions.indexOf(position);
+		int index = mSelectedPositions.indexOf(position);
 		if (index != -1) {
-			selectedPositions.remove(index);
+			mSelectedPositions.remove(index);
 		} else {
-			selectedPositions.add(position);
+			mSelectedPositions.add(position);
 		}
 		if (DEBUG) Log.v(TAG, "toggleSelection " + (index != -1 ? "removed": "added") +
 				" selection on position " + position +
-				" current selection " + selectedPositions);
+				" current selection " + mSelectedPositions);
 	}
 
 	/**
-	 * Convenience method when there is no specific view to skip.
-	 */
-	public void selectAll() {
-		selectAll(-1000);
-	}
-
-	/**
-	 * Set the selection status for all items, but skip the ones which the ViewType is NOT
-	 * included than specified param.
+	 * Set the selection status for all items which the ViewTypes are included in the specified array.
 	 * <br/><b>Note:</b> All items are invalidated and rebound!
 	 *
-	 * @param skipViewTypes All ViewTypes for which we don't want selection
+	 * @param viewTypes The ViewTypes for which we want the selection, pass null to select all
 	 */
-	public void selectAll(Integer... skipViewTypes) {
-		List<Integer> viewTypesToSkip = Arrays.asList(skipViewTypes);
-		if (DEBUG) Log.v(TAG, "selectAll ViewTypes to skip " + viewTypesToSkip);
-		selectedPositions = new ArrayList<Integer>(getItemCount());
+	public void selectAll(Integer... viewTypes) {
+		List<Integer> viewTypesToSelect = Arrays.asList(viewTypes);
+		if (DEBUG) Log.v(TAG, "selectAll ViewTypes to include " + viewTypesToSelect);
+		mSelectedPositions = new ArrayList<Integer>(getItemCount());
 		int positionStart = 0, itemCount = 0;
 		for (int i = 0; i < getItemCount(); i++) {
-			if (viewTypesToSkip.contains(getItemViewType(i))) {
+			if (viewTypesToSelect.contains(getItemViewType(i))) {
+				mSelectedPositions.add(i);
+				itemCount++;
+			} else {
 				//Optimization for ItemRangeChanged
 				if (positionStart + itemCount == i) {
 					handleSelection(positionStart, itemCount);
 					itemCount = 0;
 					positionStart = i;
 				}
-				continue;
 			}
-			itemCount++;
-			selectedPositions.add(i);
 		}
 		if (DEBUG)
 			Log.v(TAG, "selectAll notifyItemRangeChanged from positionStart=" + positionStart + " itemCount=" + getItemCount());
@@ -208,14 +202,14 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * <b>Note 2:</b> This method use java.util.Iterator to avoid java.util.ConcurrentModificationException.
 	 */
 	public void clearSelection() {
-		Collections.sort(selectedPositions, new Comparator<Integer>() {
+		Collections.sort(mSelectedPositions, new Comparator<Integer>() {
 			@Override
 			public int compare(Integer lhs, Integer rhs) {
 				return lhs - rhs;
 			}
 		});
-		if (DEBUG) Log.v(TAG, "clearSelection " + selectedPositions);
-		Iterator<Integer> iterator = selectedPositions.iterator();
+		if (DEBUG) Log.v(TAG, "clearSelection " + mSelectedPositions);
+		Iterator<Integer> iterator = mSelectedPositions.iterator();
 		int positionStart = 0, itemCount = 0;
 		//The notification is done only on items that are currently selected.
 		while (iterator.hasNext()) {
@@ -245,7 +239,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @return Selected items count
 	 */
 	public int getSelectedItemCount() {
-		return selectedPositions.size();
+		return mSelectedPositions.size();
 	}
 
 	/**
@@ -254,7 +248,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @return List of selected items ids
 	 */
 	public List<Integer> getSelectedPositions() {
-		return selectedPositions;
+		return mSelectedPositions;
 	}
 
 	/*----------------*/
@@ -267,7 +261,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @param outState Current state
 	 */
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putIntegerArrayList(TAG, selectedPositions);
+		outState.putIntegerArrayList(TAG, mSelectedPositions);
 	}
 
 	/**
@@ -276,7 +270,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * @param savedInstanceState Previous state
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		selectedPositions = savedInstanceState.getIntegerArrayList(TAG);
+		mSelectedPositions = savedInstanceState.getIntegerArrayList(TAG);
 	}
 
 	/*---------------*/

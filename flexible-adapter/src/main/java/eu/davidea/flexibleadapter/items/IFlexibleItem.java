@@ -4,7 +4,7 @@ package eu.davidea.flexibleadapter.items;
  * Basic Interface to manage Item operations like selection
  *
  * @author Davide Steduto
- * @since 19/01/2016
+ * @since 19/01/2016 Created
  */
 public interface IFlexibleItem<T> {
 

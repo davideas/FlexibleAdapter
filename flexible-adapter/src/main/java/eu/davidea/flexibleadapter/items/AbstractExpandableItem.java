@@ -13,7 +13,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * This abstract class expands also {@link AbstractFlexibleItem}.
  *
  * @author Davide Steduto
- * @since 17/01/2016
+ * @since 17/01/2016 Created
  */
 public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH extends ExpandableViewHolder>
 		extends AbstractFlexibleItem<T>

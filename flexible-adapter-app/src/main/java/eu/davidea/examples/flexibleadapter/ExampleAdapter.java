@@ -105,7 +105,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	}
 
 	@Override
-	public void selectAll() {
+	public void selectAll(Integer... viewTypes) {
 		mSelectAll = true;
 		super.selectAll();
 	}

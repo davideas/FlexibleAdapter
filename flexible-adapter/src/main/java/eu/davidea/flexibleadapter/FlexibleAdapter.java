@@ -31,6 +31,9 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  *
  * @author Davide Steduto
  * @since 03/05/2015 Created
+ *   <br/>20/01/2016 New code reorganization
+ *   <br/>24/01/2016 Drag&Drop, Swipe
+ *   <br/>26/01/2016 New interfaces and full refactoring
  */
 public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> extends SelectableAdapter<VH>
 		implements ItemTouchHelperCallback.AdapterCallback {
@@ -151,10 +154,19 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Retrieve the position of the Item in the Adapter
+	 * @return the total number of the items currently displayed by the adapter
+	 */
+	@Override
+	@CallSuper
+	public int getItemCount() {
+		return mItems != null ? mItems.size() : 0;
+	}
+
+	/**
+	 * Retrieve the global position of the Item in the Adapter list.
 	 *
 	 * @param item the item
-	 * @return The position in the Adapter if found, -1 otherwise
+	 * @return the global position in the Adapter if found, -1 otherwise
 	 */
 	public int getPositionForItem(@NonNull T item) {
 		return mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
@@ -164,21 +176,15 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		return mItems != null && mItems.contains(item);
 	}
 
+	public boolean isEmpty() {
+		return this.getItemCount() == 0;
+	}
+
 	@Override
 	public abstract VH onCreateViewHolder(ViewGroup parent, int viewType);
 
 	@Override
 	public abstract void onBindViewHolder(VH holder, final int position);
-
-	@Override
-	@CallSuper
-	public int getItemCount() {
-		return mItems != null ? mItems.size() : 0;
-	}
-
-	public boolean isEmpty() {
-		return getItemCount() == 0;
-	}
 
 	public void updateItem(int position, @NonNull T item) {
 		if (position < 0) {
@@ -805,7 +811,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	private void initializeItemTouchHelper() {
 		if (mItemTouchHelper == null) {
 			if (mRecyclerView == null) {
-				throw new IllegalStateException("RecyclerView cannot be null. Call this method after the Adapter is added to the RecyclerView.");
+				throw new IllegalStateException("RecyclerView cannot be null. Enabling LongPressDrag or Swipe must be done after the Adapter is added to the RecyclerView.");
 			}
 			mItemTouchHelperCallback = new ItemTouchHelperCallback(this);
 			mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);

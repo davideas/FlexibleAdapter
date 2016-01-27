@@ -26,7 +26,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * This adapter provides a set of standard methods to expand and collapse an Item.
  *
  * @author Davide Steduto
- * @since 16/01/2016
+ * @since 16/01/2016 Created
  */
 public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder, T extends IExpandableItem<T>>
 		extends FlexibleAnimatorAdapter<FlexibleViewHolder, T> {
@@ -93,16 +93,15 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				super.toggleSelection(position);
 			}
 		}
+		//Reset flags if necessary, just to be sure
 		if (getSelectedItemCount() == 0) parentSelected = childSelected = false;
 	}
 
-	@Override
-	public void selectAll() {
-		//FIXME: select view type of only 1 type
+	public void selectAllParent(Integer... viewTypes) {
 		if (getSelectedItemCount() > 0 && getItem(getSelectedPositions().get(0)).isExpandable())
-			super.selectAll(EXPANDABLE_VIEW_TYPE + 1);//Select only Parents, Skip others
+			super.selectAll(EXPANDABLE_VIEW_TYPE);//Select only Parents, Skip others
 		else
-			super.selectAll(0);//Select others Views 0(default) + 1
+			super.selectAll(viewTypes);//Select others Views 0(default)
 	}
 
 	@Override
@@ -123,19 +122,19 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/* MAIN METHODS */
 	/*--------------*/
 
-	//FIXME: Rewrite Filter logic: Expand Parent if subItem is filtered by searchText?
-
-	//FIXME: Find a way to Not animate items with ItemAnimator!!!
-	//TODO: Customize child items animations (don't use add or remove ItemAnimator)
-
-	public boolean isExpanded(int position) {
-		T item = getItem(position);
-		return item.isExpandable() && item.isExpanded();
-	}
-
-	public boolean isExpandable(int position) {
-		T item = getItem(position);
-		return item.isExpandable();
+	/**
+	 * TODO: Provide a parameter to count items of a certain type
+	 * @return size of the expandable items
+	 */
+	@Override
+	@CallSuper
+	public int getItemCount() {
+		int count = super.getItemCount();
+		for (int i = 0; i < mExpandedItems.size(); i++) {
+			int position = mExpandedItems.keyAt(i);
+			count -= mExpandedItems.get(position).getSubItemsCount();
+		}
+		return count;
 	}
 
 	/**
@@ -160,16 +159,47 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		mScrollOnExpand = scrollOnExpand;
 	}
 
+	//FIXME: Rewrite Filter logic: Expand Parent if subItem is filtered by searchText?
+
+	//FIXME: Find a way to Not animate items with ItemAnimator!!!
+	//TODO: Customize child items animations (don't use add or remove ItemAnimator)
+
+	public boolean isExpanded(int position) {
+		T item = getItem(position);
+		return item.isExpandable() && item.isExpanded();
+	}
+
+	public boolean isExpandable(int position) {
+		T item = getItem(position);
+		return item.isExpandable();
+	}
+
+	/**
+	 * Retrieves the position of child in its parent.
+	 * <p>Only for a real child.</p>
+	 *
+	 * @param child the child item
+	 * @return the position in the parent or -1 if, child is a parent itself or not found
+	 */
+	public int getRelativePositionOf(T child) {
+		if (!child.isExpandable())//Only for a real child
+			return getExpandableOf(child).getSubItems().indexOf(child);
+		return -1;
+	}
+
 	/**
 	 * Retrieves the parent of any child.
+	 * <p>Only for a real child.</p>
 	 *
-	 * @param child Child item
-	 * @return The Parent of this child item or null if not found
+	 * @param child the child item
+	 * @return the parent of this child item or null if, child is a parent itself or not found
 	 */
 	public T getExpandableOf(T child) {
-		for (T parent : mItems) {
-			if (parent.isExpandable() && parent.contains(child))
-				return parent;
+		if (!child.isExpandable()) {//Only for a real child
+			for (T parent : mItems) {
+				if (parent.isExpandable() && parent.contains(child))
+					return parent;
+			}
 		}
 		return null;
 	}
@@ -288,21 +318,6 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * TODO: Provide a parameter as counting filter
-	 * @return size of the expandable items
-	 */
-	@Override
-	@CallSuper
-	public int getItemCount() {
-		int count = super.getItemCount();
-		for (int i = 0; i < mExpandedItems.size(); i++) {
-			int position = mExpandedItems.keyAt(i);
-			count -= mExpandedItems.get(position).getSubItemsCount();
-		}
-		return count;
-	}
-
-	/**
 	 * Expands an item that is Expandable, not yet expanded, that has subItems and
 	 * no child is selected.
 	 *
@@ -310,20 +325,20 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	 * @return the number of subItems expanded
 	 */
 	public int expand(int position) {
+		return expand(position, false);
+	}
+
+	private int expand(int position, boolean expandAll) {
 		if (DEBUG)
 			Log.v(TAG, "Request to Expand on position " + position + " ExpandedItems=" + mExpandedItems);
 		final T item = getItem(position);
 		int subItemsCount = 0;
 		if (item.isExpandable() && !item.isExpanded() && hasSubItems(item) && !parentSelected) {
-
 			//Collapse others expandable if configured so
-			if (mCollapseOnExpand) {
-				int collapsed = 0;
-				for (int i = 0; i < mExpandedItems.size(); i++) {
-					collapsed += collapse(mExpandedItems.keyAt(i));
-				}
+			//Skipped when expanding all is requested
+			if (mCollapseOnExpand && !expandAll) {
 				//Fetch the new position after collapsing
-				if (collapsed > 0) position = getPositionForItem(item);
+				if (collapseAll() > 0) position = getPositionForItem(item);
 			}
 
 			//Save expanded state
@@ -362,6 +377,18 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
+	 * @return the number of parent successfully expanded
+	 */
+	public int expandAll() {
+		int expanded = 0;
+		//More efficient if we expand from first collapsible position
+		for (int i = 0; i < mItems.size() - 1; i++) {
+			if (expand(i, true) > 0) expanded++;
+		}
+		return expanded;
+	}
+
+	/**
 	 * Collapses an item that is Expandable and already expanded, in conjunction with no subItems
 	 * selected or item is pending removal (used in combination with removeRange).
 	 *
@@ -395,6 +422,18 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 				Log.v(TAG, "Collapsed " + subItemsCount + " subItems on position=" + position + " ExpandedItems=" + mExpandedItems);
 		}
 		return subItemsCount;
+	}
+
+	/**
+	 * @return the number of parent successfully collapsed
+	 */
+	public int collapseAll() {
+		int collapsed = 0;
+		//More efficient if we collapse from last expanded position
+		for (int i = mExpandedItems.size() - 1; i >= 0; i--) {
+			if (collapse(mExpandedItems.keyAt(i)) > 0) collapsed++;
+		}
+		return collapsed;
 	}
 
 	/*---------------------------*/
@@ -979,14 +1018,14 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			adjustExpanded(positionStart, itemCount);
 		}
 
+		/**
+		 * Triggered by {@link #notifyDataSetChanged()}.
+		 */
 		@Override
 		public void onChanged() {
-			//TODO: expandInitialItems(); ??
-		}
-
-		@Override
-		public void onItemRangeChanged(int positionStart, int itemCount) {
-			//nothing
+			getSelectedPositions().clear();
+			mExpandedItems = new SparseArray<T>();
+			removedItems = new ArrayList<RemovedItem>();
 		}
 
 		@Override

@@ -5,7 +5,7 @@ package eu.davidea.flexibleadapter.items;
  * selection and view holder methods.
  *
  * @author Davide Steduto
- * @since 20/01/2016
+ * @since 20/01/2016 Created
  */
 public abstract class AbstractFlexibleItem<T extends IFlexibleItem<T>>
 		implements IFlexibleItem<T> {

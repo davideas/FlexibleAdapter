@@ -459,19 +459,18 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 	/**
 	 * Observer Class responsible to skip animation when items are notified to avoid
-	 * double animation.
+	 * double animation with {@link android.support.v7.widget.RecyclerView.ItemAnimator}.
 	 * Also, some items at the edge, are rebounded by Android and should not be animated.
 	 */
 	private class AnimatorAdapterDataObserver extends RecyclerView.AdapterDataObserver {
+		private boolean isNotified;
 		private Handler mAnimatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 			public boolean handleMessage(Message message) {
-				if (DEBUG) Log.d(TAG, "Clear notified for Animation");
+				if (DEBUG) Log.d(TAG, "Clear notified for binding Animations");
 				isNotified = false;
 				return true;
 			}
 		});
-
-		private boolean isNotified;
 
 		public boolean isPositionNotified() {
 			return isNotified;
@@ -483,11 +482,6 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		}
 
 		private void markNotified(int positionStart, int itemCount) {
-			isNotified = true;
-		}
-
-		@Override
-		public void onChanged() {
 			isNotified = true;
 		}
 
@@ -504,12 +498,6 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		@Override
 		public void onItemRangeRemoved(int positionStart, int itemCount) {
 			markNotified(positionStart, itemCount);
-		}
-
-		@Override
-		public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-			//Take always the min position
-			markNotified(Math.min(fromPosition, toPosition), itemCount);
 		}
 	}
 

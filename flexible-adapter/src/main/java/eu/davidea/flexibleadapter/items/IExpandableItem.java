@@ -8,7 +8,7 @@ import java.util.List;
  * <br/>Implements this interface or use {@link AbstractExpandableItem}.
  *
  * @author Davide Steduto
- * @since 17/01/2016
+ * @since 17/01/2016 Created
  */
 public interface IExpandableItem<T> extends IFlexibleItem<T> {
 
