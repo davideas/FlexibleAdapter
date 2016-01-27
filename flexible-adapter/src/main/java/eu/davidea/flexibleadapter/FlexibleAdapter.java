@@ -94,8 +94,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Main Constructor with all managed Listeners for ViewHolder and the Adapter itself.
-	 * <p>The listener must be a single instance of a class, usually Activity or Fragment.</p>
+	 * Main Constructor with all managed listeners for ViewHolder and the Adapter itself.
+	 * <p>The listener must be a single instance of a class, usually Activity or Fragment, where
+	 * you can implement how to handle the different events.</p>
 	 *
 	 * @param items     items to display
 	 * @param listeners can be an instance of:

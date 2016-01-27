@@ -4,7 +4,7 @@
 
 ###### A pattern for every RecyclerView - Master branch: v4.2 of 2015.12.16 - Dev branch: v5.0.0-b2
 
-####ANNOUNCEMENT: Important changes are foreseen in v4.2.0 and in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
+####ANNOUNCEMENT: Important changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
 #### Main functionalities
 * Base item selection with ripple effect.
@@ -13,8 +13,11 @@
 * Customizable FastScroller, **NEW** now in the library
 * SearchFilter with string selection in Item titles and any subtext.
 * Add and Remove items with custom animations.
-* **NEW!** Initial Item Animations with custom configuration based on adapter position.
-* **NEW!** Expandable Item with selection coherence.
+* **NEW!** Predefined ViewHolders 
+* **NEW!** Adapter Animations with custom configuration based on adapter position.
+* **NEW!** Expandable item with selection coherence.
+* **NEW!** Drag&Drop and Swipe actions with selection coherence.
+* **NEW!** 1 simple constructor for all events.
 
 #### How is made
 The base functionality is taken from different Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
@@ -68,7 +71,7 @@ Use the internal layout and drawables or create custom files, finally add the im
 ### Usage for the Filter
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 First, call _YourAdapterClass.setSearchText()_ in the Activity, then in _YourAdapterClass.updateDataSet()_, call _filterItems()_;
-### Usage for Initial Item Animations
+### Usage for Adapter Animations
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 Implement your custom logic based on position with getAnimators(); Call animateView() at the end of onBindViewHolder();
 ``` java
@@ -85,7 +88,7 @@ public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder
 	@Override
     public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
     	List<Animator> animators = new ArrayList<Animator>();
-    	//Implement your custom logic based on position and isSelected
+    	//Implement your custom logic based on viewType - position - selection
     	//Use predefined animators or create new custom animators, add them to the local list
     }
 }
@@ -94,12 +97,17 @@ public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 
 # Change Log
-###### v5.0.0-b2 - 2016.01.20
-- **Initial Item Animation** with customization based on adapter position - viewType - selection [See #15].
+###### v5.0.0-b2 - 2016.01.27
 - **Expandable items** with selection coherence [See #23].
+- **Drag&Drop and Swipe** actions with selection coherence and ActionMode compatible [See #21].
+- **Adapter Animations** with customization based on adapter position - viewType - selection [See #15].
+- New concept of Item: added **IFlexibleItem** and **IExpandableItem** interfaces to implement around the domain object.
+- Several new functions to handle all new situations.
+- Animations while filtering [See #24].
+- Simplified constructor [See #25].
 - Added FastScroller in the library [See #20].
-- Added support for Grid Layout
-- Adapted example App accordingly
+- Added support for Grid Layout also in the expandable version.
+- Adapted example App accordingly.
 
 ###### v5.0.0-b1 - 2016.01.03
 - Removed _FilterAsyncTask_ and all deprecated functions from _OnUpdateListener_ [See #18].
