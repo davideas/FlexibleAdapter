@@ -276,12 +276,12 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	}
 
 	@Override
-	public String getTextToShowInBubble(int position) {
+	public String onCreateBubbleText(int position) {
 		if (!DatabaseService.userLearnedSelection && position == 0) {//This 'if' is for my example only
 			//TODO FOR YOU: This is the normal line you should use: Usually it's the first letter
 			return getItem(position).getTitle().substring(0, 1).toUpperCase();
 		}
-		return super.getTextToShowInBubble(position);
+		return super.onCreateBubbleText(position);
 	}
 
 	private void setHighlightText(TextView textView, String text, String searchText) {

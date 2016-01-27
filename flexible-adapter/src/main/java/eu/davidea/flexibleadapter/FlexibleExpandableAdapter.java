@@ -124,6 +124,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	/**
 	 * TODO: Provide a parameter to count items of a certain type
+	 *
 	 * @return size of the expandable items
 	 */
 	@Override
@@ -258,9 +259,9 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/**
 	 * Creates ViewHolder that generally is not expandable or it's a child of an
 	 * {@link ExpandableViewHolder}. Will return any ViewHolder of class that extends
-	 * {@link FlexibleViewHolder}.<p>
-	 * This is the good place to create and return any custom ViewType that extends
 	 * {@link FlexibleViewHolder}.
+	 * <p>This is the good place to create and return any custom ViewType that extends
+	 * {@link FlexibleViewHolder}.</p>
 	 *
 	 * @param parent   The ViewGroup into which the new View will be added after it is bound to
 	 *                 an adapter position.
@@ -456,7 +457,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	 * @param parent              expandable item that shall contain the sub item
 	 * @param expandParent        true to first expand the parent (if needed) and after to add the
 	 *                            sub item, false to simply add the sub item to the parent
-	 * @param notifyParentChanged true if the parent View will be rebound and its content updated,
+	 * @param notifyParentChanged true if the parent View must be rebound and its content updated,
 	 *                            false to not notify the parent about the addition
 	 */
 	public void addSubItem(int subPosition, @NonNull T item, @NonNull T parent,
@@ -473,7 +474,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			//If parent is collapsed there's no need to notify about the change.
 			if (parent.isExpanded()) {
 				int parentPosition = getPositionForItem(parent);
-				super.addItem(parentPosition + subPosition + 1, item);
+				super.addItem(parentPosition + 1 + Math.max(0, subPosition), item);
 			}
 			//Notify the parent about the change if requested
 			if (notifyParentChanged) notifyItemChanged(getPositionForItem(parent));
@@ -495,19 +496,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/*----------------------------*/
 
 	/**
-	 * @param position the position to check
-	 * @return true if item was removed for the Adapter but change not yet committed, false otherwise
-	 */
-	public boolean isItemPendingRemove(int position) {
-		for (RemovedItem removedItem : removedItems) {
-			if (removedItem.originalPosition == position) return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Removes an item from internal list and notify the change.<p>
-	 * The item is retained for an eventual Undo.<p>
+	 * Removes an item from the Parent list and notify the change.
+	 * <p>The item is retained for an eventual Undo.</p>
 	 * The item must be of class {@link IExpandableItem}.
 	 *
 	 * @param position            The position of item to remove
@@ -541,8 +531,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * {@inheritDoc}<p>
-	 * Parent will not be notified about the change, if a child is removed.
+	 * {@inheritDoc}
+	 * <p>Parent will not be notified about the change, if a child is removed.</p>
 	 */
 	@Override
 	public void removeItem(int position) {
@@ -550,8 +540,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * {@inheritDoc}<p>
-	 * Parent will not be notified about the change, if a child is removed.
+	 * {@inheritDoc}
+	 * <p>Parent will not be notified about the change, if a child is removed.</p>
 	 */
 	@Override
 	public void removeItems(List<Integer> selectedPositions) {
@@ -667,8 +657,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * {@inheritDoc}<p>
-	 * Parent will not be notified about the change, if a child is removed.
+	 * {@inheritDoc}
+	 * <p>Parent will not be notified about the change, if a child is removed.</p>
 	 */
 	@Override
 	public void removeAllSelectedItems() {
@@ -731,6 +721,17 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/*-------------------------*/
 	/* UNDO METHODS OVERRIDDEN */
 	/*-------------------------*/
+
+	/**
+	 * @param position the position to check
+	 * @return true if item was removed for the Adapter but change not yet committed, false otherwise
+	 */
+	public boolean isItemPendingRemove(int position) {
+		for (RemovedItem removedItem : removedItems) {
+			if (removedItem.originalPosition == position) return true;
+		}
+		return false;
+	}
 
 	/**
 	 * {@inheritDoc}

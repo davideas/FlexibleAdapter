@@ -135,6 +135,7 @@ public final class Utils {
 			int accentAttr = Utils.hasLollipop() ? android.R.attr.colorAccent : R.attr.colorAccent;
 			TypedArray androidAttr = context.getTheme().obtainStyledAttributes(new int[] { accentAttr });
 			colorAccent = androidAttr.getColor(0, 0xFF009688); //Default: material_deep_teal_500
+			androidAttr.recycle();
 		}
 		return colorAccent;
 	}

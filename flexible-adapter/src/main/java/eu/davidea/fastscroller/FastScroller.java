@@ -22,13 +22,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import eu.davidea.flexibleadapter.R;
 
 /**
  * Class taken from GitHub, customized and optimized for FlexibleAdapter project.
  * @since Up to the date 23/01/2016
- *   <br/>23/01/2016 Added onFastScroll in the listener
+ *   <br/>23/01/2016 Added onFastScrollerStateChange in the listener
  * @see <a href="https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller">
  *     github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller</a>
  */
@@ -39,10 +41,13 @@ public class FastScroller extends FrameLayout {
 
 	private TextView bubble;
 	private ImageView handle;
-	private RecyclerView recyclerView;
 	private int height;
 	private boolean isInitialized = false;
-	private ObjectAnimator currentAnimator = null;
+	private ObjectAnimator currentAnimator;
+	private RecyclerView recyclerView;
+	private LinearLayoutManager layoutManager;
+	private BubbleTextCreator bubbleTextCreator;
+	private List<ScrollStateChangeListener> scrollerListeners = new ArrayList<ScrollStateChangeListener>();
 
 	private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
 		@Override
@@ -56,19 +61,17 @@ public class FastScroller extends FrameLayout {
 		}
 	};
 
-
-	public FastScroller(Context context, AttributeSet attrs, int defStyleAttr) {
-		super(context, attrs, defStyleAttr);
-		init();
-	}
-
 	public FastScroller(Context context) {
 		super(context);
 		init();
 	}
 
 	public FastScroller(Context context, AttributeSet attrs) {
-		super(context, attrs);
+		this(context, attrs, 0);
+	}
+
+	public FastScroller(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
 		init();
 	}
 
@@ -76,6 +79,41 @@ public class FastScroller extends FrameLayout {
 		if (isInitialized) return;
 		isInitialized = true;
 		setClipChildren(false);
+	}
+
+	public void setRecyclerView(RecyclerView recyclerView) {
+		this.recyclerView = recyclerView;
+		this.recyclerView.addOnScrollListener(onScrollListener);
+		this.layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+		if (recyclerView.getAdapter() instanceof  BubbleTextCreator)
+			this.bubbleTextCreator = (BubbleTextCreator) recyclerView.getAdapter();
+		if (recyclerView.getAdapter() instanceof ScrollStateChangeListener)
+			addScrollListener((ScrollStateChangeListener) recyclerView.getAdapter());
+
+		this.recyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+			@Override
+			public boolean onPreDraw() {
+				FastScroller.this.recyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
+				if (bubble == null || handle.isSelected()) return true;
+				int verticalScrollOffset = FastScroller.this.recyclerView.computeVerticalScrollOffset();
+				int verticalScrollRange = FastScroller.this.computeVerticalScrollRange();
+				float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
+				setBubbleAndHandlePosition(height * proportion);
+				return true;
+			}
+		});
+	}
+
+	public void addScrollListener(ScrollStateChangeListener scrollerListener) {
+		if (!scrollerListeners.contains(scrollerListener))
+			scrollerListeners.add(scrollerListener);
+	}
+
+	private void notifyScrollStateChange(boolean scrolling) {
+		for (ScrollStateChangeListener scrollerListener : scrollerListeners) {
+			scrollerListener.onFastScrollerStateChange(scrolling);
+		}
 	}
 
 	/**
@@ -160,7 +198,7 @@ public class FastScroller extends FrameLayout {
 				if (event.getX() < handle.getX() - ViewCompat.getPaddingStart(handle)) return false;
 				if (currentAnimator != null) currentAnimator.cancel();
 				handle.setSelected(true);
-				((ScrollerListener) recyclerView.getAdapter()).onFastScroll(true);
+				notifyScrollStateChange(true);
 				showBubble();
 			case MotionEvent.ACTION_MOVE:
 				float y = event.getY();
@@ -170,28 +208,11 @@ public class FastScroller extends FrameLayout {
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
 				handle.setSelected(false);
-				((ScrollerListener) recyclerView.getAdapter()).onFastScroll(false);
+				notifyScrollStateChange(false);
 				hideBubble();
 				return true;
 		}
 		return super.onTouchEvent(event);
-	}
-
-	public void setRecyclerView(RecyclerView recyclerView) {
-		this.recyclerView = recyclerView;
-		this.recyclerView.addOnScrollListener(onScrollListener);
-		this.recyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-			@Override
-			public boolean onPreDraw() {
-				FastScroller.this.recyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-				if (bubble == null || handle.isSelected()) return true;
-				int verticalScrollOffset = FastScroller.this.recyclerView.computeVerticalScrollOffset();
-				int verticalScrollRange = FastScroller.this.computeVerticalScrollRange();
-				float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
-				setBubbleAndHandlePosition(height * proportion);
-				return true;
-			}
-		});
 	}
 
 	@Override
@@ -212,8 +233,8 @@ public class FastScroller extends FrameLayout {
 			else
 				proportion = y / (float) height;
 			int targetPos = getValueInRange(0, itemCount - 1, (int) (proportion * (float) itemCount));
-			String bubbleText = ((ScrollerListener) recyclerView.getAdapter()).getTextToShowInBubble(targetPos);
-			((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(targetPos, 0);
+			String bubbleText = bubbleTextCreator.onCreateBubbleText(targetPos);
+			layoutManager.scrollToPositionWithOffset(targetPos, 0);
 			if (bubble != null)
 				bubble.setText(bubbleText);
 		}
@@ -267,10 +288,12 @@ public class FastScroller extends FrameLayout {
 		currentAnimator.start();
 	}
 
-	public interface ScrollerListener {
-		String getTextToShowInBubble(int pos);
+	public interface BubbleTextCreator {
+		String onCreateBubbleText(int pos);
+	}
 
-		void onFastScroll(boolean scrolling);
+	public interface ScrollStateChangeListener {
+		void onFastScrollerStateChange(boolean scrolling);
 	}
 
 }

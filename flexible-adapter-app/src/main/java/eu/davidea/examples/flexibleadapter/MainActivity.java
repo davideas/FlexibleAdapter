@@ -393,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements
 	public boolean onItemClick(int position) {
 		if (mActionMode != null && position != INVALID_POSITION) {
 			toggleSelection(position);
-			return mAdapter.isSelected(position);
+			return true;
 		} else {
 			//Notify the active callbacks (ie. the activity, if the fragment is attached to one)
 			// that an item has been selected.

@@ -24,9 +24,9 @@ import java.util.List;
 
 /**
  * This Class is responsible to animate items when RecyclerView is firstly loaded. Bounded items
- * are animated initially and also when user starts to scroll the list.<br/>
- * Animations can be customized for each items applying different logic based on item position and
- * beyond.
+ * are animated initially and also when user starts to scroll the list.
+ * <p>Animations can be customized for each items applying different logic based on item position
+ * and beyond.</p>
  *
  * @author Davide Steduto
  * @since 10/01/2016
@@ -76,19 +76,19 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	/*--------------*/
 
 	/**
-	 * Simple Constructor for Animator Adapter.<br/>
+	 * Simple Constructor for Animator Adapter.
 	 *
-	 * @param items        Items to display
+	 * @param items Items to display
 	 */
 	public FlexibleAnimatorAdapter(@NonNull List<T> items) {
 		this(items, null);
 	}
 
 	/**
-	 * Main Constructor for Animator Adapter.<br/>
+	 * Main Constructor for Animator Adapter.
 	 *
-	 * @param items        Items to display
-	 * @param listener     Must be an instance of {@link OnUpdateListener}
+	 * @param items    items to display
+	 * @param listener must be an instance of {@link OnUpdateListener}
 	 */
 	public FlexibleAnimatorAdapter(@NonNull List<T> items, Object listener) {
 		super(items, listener);
@@ -103,19 +103,19 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	/*-----------------------*/
 
 	/**
-	 * Customize the initial delay for the first item animation.<br/>
-	 * Default is 0ms.
+	 * Customize the initial delay for the first item animation.
+	 * <p>Default value is 0ms.</p>
 	 *
-	 * @param initialDelay Any non negative delay
+	 * @param initialDelay any non negative delay
 	 */
 	public void setAnimationInitialDelay(long initialDelay) {
 		mInitialDelay = initialDelay;
 	}
 
 	/**
-	 * Customize the step delay between an animation and the next to be added to the initial delay.<br/>
-	 * The delay is added on top of the previous delay.<br/>
-	 * Default is 100ms.
+	 * Customize the step delay between an animation and the next to be added to the initial delay.
+	 * <p>The delay is added on top of the previous delay.</p>
+	 * Default value is 100ms.
 	 *
 	 * @param delay Any positive delay
 	 */
@@ -124,8 +124,8 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	}
 
 	/**
-	 * Customize the duration of the animation for ALL items.<br/>
-	 * Default is 300ms.
+	 * Customize the duration of the animation for ALL items.
+	 * <p>Default value is 300ms.</p>
 	 *
 	 * @param duration any positive time
 	 */
@@ -134,8 +134,8 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	}
 
 	/**
-	 * Define a custom interpolator for ALL items.<br/>
-	 * Default is {@link LinearInterpolator}.
+	 * Define a custom interpolator for ALL items.
+	 * <p>Default value is {@link LinearInterpolator}.</p>
 	 *
 	 * @param interpolator any valid non null interpolator
 	 */
@@ -144,18 +144,18 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	}
 
 	/**
-	 * Define an initial start animation adapter position.<br/>
-	 * Default is 0 (1st position).
+	 * Define an initial start animation adapter position.
+	 * <p>Default value is 0 (1st position).</p>
 	 *
-	 * @param start Non negative minimum position to start animation.
+	 * @param start non negative minimum position to start animation.
 	 */
 	public void setAnimationStartPosition(@IntRange(from = 0) int start) {
 		mLastAnimatedPosition = start;
 	}
 
 	/**
-	 * Enable/Disable item animation while scrolling and on loading.<br/>
-	 * Disabling scrolling will disable also reverse scrolling!<br/>
+	 * Enable/Disable item animation while scrolling and on loading.
+	 * <p>Disabling scrolling will disable also reverse scrolling!</p>
 	 * Default enabled.
 	 *
 	 * @param enabled true to enable item animation, false to disable them all.
@@ -173,7 +173,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 * Enable reverse scrolling animation if AnimationOnScrolling is also enabled!<br/>
 	 * Default disabled (only forward).
 	 *
-	 * @param enabled false to animate items only forward, true to reverse animate
+	 * @param enabled false to animate items only forward, true to also reverse animate
 	 * @see #setAnimationOnScrolling(boolean)
 	 */
 	public void setAnimationOnReverseScrolling(boolean enabled) {
@@ -184,34 +184,34 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 		return isReverseEnabled;
 	}
 
+	@Override
+	public void onFastScrollerStateChange(boolean scrolling) {
+		super.onFastScrollerStateChange(scrolling);
+		isFastScroll = scrolling;
+	}
+
 	/*--------------*/
 	/* MAIN METHODS */
 	/*--------------*/
 
 	/**
 	 * Build your custom list of {@link Animator} to apply on the ItemView.<br/>
-	 * Write the logic based on the position and/or viewType and/or the item selection.<br/><br/>
-	 * <b>Suggestions: </b>
+	 * Write the logic based on the position and/or viewType and/or the item selection.
+	 * <p><b>Suggestions:</b>
 	 * <br/>- A simple boolean for <i>isSelected</i> is preferable instead of {@link #isSelected(int)}
-	 * <br/>- You can also use {@link #getItemViewType(int)} to apply
-	 * different Animation for each view type.
+	 * <br/>- You can also use {@link #getItemViewType(int)} to apply different Animation for
+	 * each view type.
 	 * <br/>- If you want to apply same animation for all items, create new list at class level
-	 * and initialize it in the constructor, not inside this method!
+	 * and initialize it in the constructor, not inside this method!</p>
 	 *
-	 * @param itemView   The bounded ItemView
-	 * @param position   Position can be used to differentiate the list of Animators
+	 * @param itemView   the bounded ItemView
+	 * @param position   position can be used to differentiate the list of Animators
 	 * @param isSelected boolean to be used to differentiate the list of Animators
 	 * @return The list of animators to animate all together.
 	 * @see #animateView(View, int, boolean)
 	 * @see #getItemViewType(int)
 	 */
 	public abstract List<Animator> getAnimators(View itemView, int position, boolean isSelected);
-
-	@Override
-	public void onFastScroll(boolean scrolling) {
-		super.onFastScroll(scrolling);
-		isFastScroll = scrolling;
-	}
 
 	/**
 	 * Cancels any existing animations for given View. Useful when fling.
@@ -223,7 +223,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	}
 
 	/**
-	 * Animate the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
+	 * Animates the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
 	 */
 	protected final void animateView(final View itemView, int position, boolean isSelected) {
 		//FIXME: first completed visible item on rotation gets high delay
@@ -237,7 +237,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 //			);
 
 		if (shouldAnimate && !isFastScroll && !mAnimatorNotifierObserver.isPositionNotified() &&
-				(isReverseEnabled || (!isReverseEnabled && position > mLastAnimatedPosition)) ) {
+				(isReverseEnabled || (!isReverseEnabled && position > mLastAnimatedPosition))) {
 
 			//Cancel animation is necessary when fling
 			cancelExistingAnimation(itemView);
@@ -359,13 +359,12 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 	/**
 	 * This is the default animator.<br/>
-	 * Alpha animator will be always added automatically if not done yet.
-	 * <br/><br/>
-	 * <b>Note:</b> Only 1 animator of the same compatible type can be added.<br/>
-	 * Incompatible with ALPHA animator.
+	 * Alpha animator will be always automatically added.
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added.<br/>
+	 * Incompatible with ALPHA animator.</p>
 	 *
 	 * @param animators user defined list
-	 * @param view      ItemView to animate
+	 * @param view      itemView to animate
 	 * @param alphaFrom starting alpha value
 	 */
 	private void addAlphaAnimator(
@@ -378,13 +377,12 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	/**
 	 * Item will slide from Left to Right.<br/>
 	 * Ignored if LEFT, RIGHT or BOTTOM animators were already added.
-	 * <br/><br/>
-	 * <b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with LEFT, BOTTOM animators.
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
+	 * Incompatible with LEFT, BOTTOM animators.<br/>
 	 *
 	 * @param animators user defined list
-	 * @param view      ItemView to animate
-	 * @param percent   Any % multiplier (between 0 and 1) of the LayoutManager Width
+	 * @param view      itemView to animate
+	 * @param percent   any % multiplier (between 0 and 1) of the LayoutManager Width
 	 */
 	public void addSlideInFromLeftAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.5, to = 1.0) float percent) {
@@ -398,9 +396,8 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	/**
 	 * Item will slide from Right to Left.<br/>
 	 * Ignored if LEFT, RIGHT or BOTTOM animators were already added.
-	 * <br/><br/>
-	 * <b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with RIGHT, BOTTOM animators.
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
+	 * Incompatible with RIGHT, BOTTOM animators.<br/>
 	 *
 	 * @param animators user defined list
 	 * @param view      ItemView to animate
@@ -418,12 +415,11 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	/**
 	 * Item will slide from Bottom of the screen to its natural position.<br/>
 	 * Ignored if LEFT, RIGHT or BOTTOM animators were already added.
-	 * <br/><br/>
-	 * <b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with LEFT, RIGHT, BOTTOM animators.
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
+	 * Incompatible with LEFT, RIGHT, BOTTOM animators.</p>
 	 *
 	 * @param animators user defined list
-	 * @param view      ItemView to animate
+	 * @param view      itemView to animate
 	 */
 	public void addSlideInFromBottomAnimator(
 			@NonNull List<Animator> animators, @NonNull View view) {
@@ -437,13 +433,12 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	/**
 	 * Item will scale.<br/>
 	 * Ignored if SCALE animator was already added.
-	 * <br/><br/>
-	 * <b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with LEFT, RIGHT, BOTTOM animators.
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
+	 * Incompatible with LEFT, RIGHT, BOTTOM animators.<br/>
 	 *
 	 * @param animators user defined list
-	 * @param view      ItemView to animate
-	 * @param scaleFrom Initial scale value
+	 * @param view      itemView to animate
+	 * @param scaleFrom initial scale value
 	 */
 	public void addScaleInAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float scaleFrom) {
@@ -460,7 +455,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	/**
 	 * Observer Class responsible to skip animation when items are notified to avoid
 	 * double animation with {@link android.support.v7.widget.RecyclerView.ItemAnimator}.
-	 * Also, some items at the edge, are rebounded by Android and should not be animated.
+	 * <p>Also, some items at the edge, are rebounded by Android and should not be animated.</p>
 	 */
 	private class AnimatorAdapterDataObserver extends RecyclerView.AdapterDataObserver {
 		private boolean isNotified;

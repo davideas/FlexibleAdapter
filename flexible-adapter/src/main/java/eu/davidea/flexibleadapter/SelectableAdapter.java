@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.utils.Utils;
 
 /**
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
@@ -21,10 +22,10 @@ import eu.davidea.fastscroller.FastScroller;
  *
  * @author Davide Steduto
  * @since 03/05/2015 Created
- *   <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
+ * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
  */
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>
-		implements FastScroller.ScrollerListener {
+		implements FastScroller.BubbleTextCreator, FastScroller.ScrollStateChangeListener {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
 	public static boolean DEBUG = false;
@@ -161,7 +162,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		} else {
 			mSelectedPositions.add(position);
 		}
-		if (DEBUG) Log.v(TAG, "toggleSelection " + (index != -1 ? "removed": "added") +
+		if (DEBUG) Log.v(TAG, "toggleSelection " + (index != -1 ? "removed" : "added") +
 				" selection on position " + position +
 				" current selection " + mSelectedPositions);
 	}
@@ -278,7 +279,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/*---------------*/
 
 	/**
-	 * Displays or Hides the FastScroller if previously configured.
+	 * Displays or Hides the {@link FastScroller} if previously configured.
 	 *
 	 * @see #setFastScroller(FastScroller)
 	 */
@@ -291,7 +292,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * @return true if FastScroller is configured and shown, false otherwise
+	 * @return true if {@link FastScroller} is configured and shown, false otherwise
 	 */
 	public boolean isFastScrollerEnabled() {
 		return mFastScroller != null && mFastScroller.getVisibility() == View.VISIBLE;
@@ -302,24 +303,25 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Method under development. It will be public when ready.
+	 * Sets up the {@link FastScroller} with automatic fetch of accent color.
+	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
 	 *
-	 * @param fastScroller Instance of {@link FastScroller}
+	 * @param fastScroller instance of {@link FastScroller}
 	 */
-	private void setFastScroller(@NonNull FastScroller fastScroller) {
-		//TODO: Fetch accent color automatically if at least Android is Lollipop
-		setFastScroller(fastScroller, 0);
+	public void setFastScroller(@NonNull FastScroller fastScroller) {
+		setFastScroller(fastScroller, Utils.fetchAccentColor(fastScroller.getContext()));
 	}
 
 	/**
-	 * <b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.
+	 * Sets up the {@link FastScroller}.
+	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
 	 *
-	 * @param fastScroller Instance of {@link FastScroller}
-	 * @param accentColor  The color when the fast scroller is touched
+	 * @param fastScroller instance of {@link FastScroller}
+	 * @param accentColor  the color when the fast scroller is touched
 	 */
 	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor) {
 		if (mRecyclerView == null) {
-			throw new IllegalStateException("RecyclerView cannot be null. Call this method after the Adapter is added to the RecyclerView.");
+			throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter is added to the RecyclerView.");
 		}
 		mFastScroller = fastScroller;
 		mFastScroller.setRecyclerView(mRecyclerView);
@@ -327,12 +329,12 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	@Override
-	public String getTextToShowInBubble(int position) {
+	public String onCreateBubbleText(int position) {
 		return String.valueOf(position + 1);
 	}
 
 	@Override
-	public void onFastScroll(boolean scrolling) {
+	public void onFastScrollerStateChange(boolean scrolling) {
 		//nothing
 	}
 
