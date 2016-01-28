@@ -2,7 +2,7 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Master branch: v4.2 of 2015.12.16 - Dev branch: v5.0.0-b2
+###### A pattern for every RecyclerView - Stable version v4.2 of 2015.12.16 - Beta on dev branch: v5.0.0-b2
 
 ####ANNOUNCEMENT: Important changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -97,7 +97,7 @@ public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 
 # Change Log
-###### v5.0.0-b2 - 2016.01.27
+###### v5.0.0-b2 - 2016.01.30
 - **Expandable items** with selection coherence [See #23].
 - **Drag&Drop and Swipe** actions with selection coherence and ActionMode compatible [See #21].
 - **Adapter Animations** with customization based on adapter position - viewType - selection [See #15].

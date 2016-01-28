@@ -32,6 +32,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 
 	private Context mContext;
+	public static final int CHILD_VIEW_TYPE = 0;
 	public static final int EXAMPLE_VIEW_TYPE = 1;
 
 	private LayoutInflater mInflater;
@@ -107,7 +108,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	@Override
 	public void selectAll(Integer... viewTypes) {
 		mSelectAll = true;
-		super.selectAll();
+		super.selectAll(CHILD_VIEW_TYPE);
 	}
 
 	@Override

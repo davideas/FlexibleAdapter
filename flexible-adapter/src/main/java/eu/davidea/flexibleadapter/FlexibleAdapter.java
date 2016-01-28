@@ -719,9 +719,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	/**
 	 * Enabled by default.
-	 * <p>It is sufficient to call {@link FlexibleViewHolder#setDragHandleView(View)}.</p>
+	 * <p>To use, it is sufficient to set the HandleView by calling
+	 * {@link FlexibleViewHolder#setDragHandleView(View)}.</p>
 	 *
-	 * @return true if LongPressDragEnabled is disabled, false otherwise
+	 * @return true by default
 	 */
 	public boolean isHandleDragEnabled() {
 		return true;

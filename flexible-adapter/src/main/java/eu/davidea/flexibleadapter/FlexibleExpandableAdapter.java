@@ -97,7 +97,11 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		if (getSelectedItemCount() == 0) parentSelected = childSelected = false;
 	}
 
-	public void selectAllParent(Integer... viewTypes) {
+	/**
+	 * @param viewTypes All non expandable ViewTypes for which we want the selection,
+	 *                  pass nothing to select expandable ViewTypes.
+	 */
+	public void selectAll(Integer... viewTypes) {
 		if (getSelectedItemCount() > 0 && getItem(getSelectedPositions().get(0)).isExpandable())
 			super.selectAll(EXPANDABLE_VIEW_TYPE);//Select only Parents, Skip others
 		else
@@ -127,9 +131,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	 *
 	 * @return size of the expandable items
 	 */
-	@Override
 	@CallSuper
-	public int getItemCount() {
+	public int getItemCountOfType() {
 		int count = super.getItemCount();
 		for (int i = 0; i < mExpandedItems.size(); i++) {
 			int position = mExpandedItems.keyAt(i);

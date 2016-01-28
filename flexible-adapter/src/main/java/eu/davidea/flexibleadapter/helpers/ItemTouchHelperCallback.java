@@ -11,7 +11,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * This class is an implementation of {@link ItemTouchHelper.Callback} that enables drag & drop
- * and swipe-to-dismiss. Drag and Swipe events are started depending by it's configuration.
+ * and swipe actions. Drag and Swipe events are started depending by its configuration.
  *
  * @author Davide Steduto
  * @since 23/01/2016

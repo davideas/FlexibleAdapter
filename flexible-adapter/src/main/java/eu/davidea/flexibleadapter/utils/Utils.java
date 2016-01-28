@@ -1,4 +1,4 @@
-package eu.davidea.utils;
+package eu.davidea.flexibleadapter.utils;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -7,8 +7,6 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 
 public final class Utils {
-
-	private static int colorAccent = -1;
 
 	/**
 	 * API 21
@@ -19,16 +17,24 @@ public final class Utils {
 	}
 
 	/**
-	 * Fetch accent color on Lollipop devices and newer.
+	 * Fetch accent color on devices with at least Lollipop.
+	 *
+	 * @param context context
+	 * @param colorAccent value to return if the accentColor cannot be found
 	 */
 	@TargetApi(VERSION_CODES.LOLLIPOP)
-	public static int fetchAccentColor(Context context) {
-		if (hasLollipop() && colorAccent < 0) {
+	public static int fetchAccentColor(Context context, int colorAccent) {
+		if (hasLollipop()) {
 			TypedArray androidAttr = context.getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorAccent});
-			colorAccent = androidAttr.getColor(0, 0xFF009688); //Default: material_deep_teal_500
+			colorAccent = androidAttr.getColor(0, colorAccent);
 			androidAttr.recycle();
 		}
 		return colorAccent;
+	}
+
+	public static int dpToPx(Context context, float dp) {
+		final float scale = context.getResources().getDisplayMetrics().density;
+		return Math.round(dp * scale);
 	}
 
 }

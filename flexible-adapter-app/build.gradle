@@ -10,8 +10,20 @@ android {
 		targetSdkVersion targetSdk
 		versionCode libraryCode
 		versionName libraryVersion + libraryDate
+
+		applicationVariants.all { variant ->
+			variant.outputs.each { output ->
+				def file = output.outputFile
+				def fileName = "flexible-adapter-v" + libraryVersion + "-c" + versionCode + ".apk"
+				output.outputFile = new File(file.parentFile, fileName)
+			}
+		}
 	}
 	buildTypes {
+		debug {
+			versionNameSuffix "-DEBUG"
+			minifyEnabled false
+		}
 		release {
 			minifyEnabled false
 			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

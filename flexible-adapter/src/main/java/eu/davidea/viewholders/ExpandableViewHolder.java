@@ -17,6 +17,7 @@ import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
 public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
 	protected final FlexibleExpandableAdapter mAdapter;
+	private boolean mLongPressEnabled = false;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -116,8 +117,9 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@Override
 	public boolean onLongClick(View view) {
+		int position = getAdapterPosition();
 		if (isViewCollapsibleOnLongClick()) {
-			collapseView(getAdapterPosition());
+			collapseView(position);
 		}
 		return super.onLongClick(view);
 	}
@@ -125,9 +127,10 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 //	@Override
 //	public boolean onTouch(View view, MotionEvent event) {
 //		//We don't allow Drag of Children if a parent is selected
-//		if (!mAdapter.isExpandable(getAdapterPosition()) && !mAdapter.isAnyParentSelected())
+//		boolean expandable = mAdapter.isExpandable(getAdapterPosition());
+//		if (expandable && !mAdapter.isAnyChildSelected() || !expandable && !mAdapter.isAnyParentSelected())
 //			return super.onTouch(view, event);
-//		return true;
+//		return false;
 //	}
 
 	/**

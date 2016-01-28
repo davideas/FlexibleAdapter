@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.utils.Utils;
+import eu.davidea.flexibleadapter.utils.Utils;
 
 /**
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
@@ -164,14 +164,14 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		}
 		if (DEBUG) Log.v(TAG, "toggleSelection " + (index != -1 ? "removed" : "added") +
 				" selection on position " + position +
-				" current selection " + mSelectedPositions);
+				", current selection " + mSelectedPositions);
 	}
 
 	/**
 	 * Set the selection status for all items which the ViewTypes are included in the specified array.
-	 * <br/><b>Note:</b> All items are invalidated and rebound!
+	 * <p><b>Note:</b> All items are invalidated and rebound!</p>
 	 *
-	 * @param viewTypes The ViewTypes for which we want the selection, pass null to select all
+	 * @param viewTypes The ViewTypes for which we want the selection, pass nothing to select all
 	 */
 	public void selectAll(Integer... viewTypes) {
 		List<Integer> viewTypesToSelect = Arrays.asList(viewTypes);
@@ -179,7 +179,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		mSelectedPositions = new ArrayList<Integer>(getItemCount());
 		int positionStart = 0, itemCount = 0;
 		for (int i = 0; i < getItemCount(); i++) {
-			if (viewTypesToSelect.contains(getItemViewType(i))) {
+			if (viewTypesToSelect.size() == 0 || viewTypesToSelect.contains(getItemViewType(i))) {
 				mSelectedPositions.add(i);
 				itemCount++;
 			} else {
@@ -281,7 +281,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/**
 	 * Displays or Hides the {@link FastScroller} if previously configured.
 	 *
-	 * @see #setFastScroller(FastScroller)
+	 * @see #setFastScroller(FastScroller, int)
 	 */
 	public void toggleFastScroller() {
 		if (mFastScroller != null) {
@@ -305,19 +305,11 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/**
 	 * Sets up the {@link FastScroller} with automatic fetch of accent color.
 	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
+	 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
+	 * for previous version, the default value is used.
 	 *
 	 * @param fastScroller instance of {@link FastScroller}
-	 */
-	public void setFastScroller(@NonNull FastScroller fastScroller) {
-		setFastScroller(fastScroller, Utils.fetchAccentColor(fastScroller.getContext()));
-	}
-
-	/**
-	 * Sets up the {@link FastScroller}.
-	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
-	 *
-	 * @param fastScroller instance of {@link FastScroller}
-	 * @param accentColor  the color when the fast scroller is touched
+	 * @param accentColor  the default value color if the accentColor cannot be fetched
 	 */
 	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor) {
 		if (mRecyclerView == null) {
@@ -325,6 +317,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 		}
 		mFastScroller = fastScroller;
 		mFastScroller.setRecyclerView(mRecyclerView);
+		accentColor = Utils.fetchAccentColor(fastScroller.getContext(), accentColor);
 		mFastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle, accentColor);
 	}
 
