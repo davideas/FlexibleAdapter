@@ -145,40 +145,72 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 
 	/**
 	 * Returns the custom object "Item".
+	 * <p>This cannot be overridden since the entire library relies on it.</p>
 	 *
 	 * @param position the position of the item in the list
 	 * @return The custom "Item" object or null if item not found
 	 */
-	public T getItem(int position) {
+	public final T getItem(int position) {
 		if (position < 0 || position >= mItems.size()) return null;
 		return mItems.get(position);
 	}
 
 	/**
+	 * This cannot be overridden since the selection relies on it.
+	 *
 	 * @return the total number of the items currently displayed by the adapter
+	 * @see #getItemCountOfType(int)
+	 * @see #isEmpty()
 	 */
 	@Override
-	@CallSuper
-	public int getItemCount() {
+	public final int getItemCount() {
 		return mItems != null ? mItems.size() : 0;
+	}
+
+	/**
+	 * Provides the number of items currently displayed of a certain type.
+	 *
+	 * @param viewType the viewType to count
+	 * @return size of the expandable items
+	 * @see #getItemCount()
+	 * @see #isEmpty()
+	 */
+	public int getItemCountOfType(int viewType) {
+		int count = 0;
+		for (int i = 0; i < mItems.size(); i++) {
+			if (getItemViewType(i) == viewType) count++;
+		}
+		return count;
+	}
+
+	/**
+	 * You can override this method to define your own concept of "Empty".
+	 * <p>Default behaviour is the result of {@link #getItemCount()}</p>
+	 *
+	 * @return true if the list is empty, false otherwise
+	 * @see #getItemCount()
+	 * @see #getItemCountOfType(int)
+	 */
+	public boolean isEmpty() {
+		return this.getItemCount() == 0;
 	}
 
 	/**
 	 * Retrieve the global position of the Item in the Adapter list.
 	 *
-	 * @param item the item
+	 * @param item the item to find
 	 * @return the global position in the Adapter if found, -1 otherwise
 	 */
-	public int getPositionForItem(@NonNull T item) {
+	public int getGlobalPositionOf(@NonNull T item) {
 		return mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
 	}
 
+	/**
+	 * @param item the item to find
+	 * @return true if the provided item is currently displayed, false otherwise
+	 */
 	public boolean contains(@NonNull T item) {
 		return mItems != null && mItems.contains(item);
-	}
-
-	public boolean isEmpty() {
-		return this.getItemCount() == 0;
 	}
 
 	@Override
@@ -255,10 +287,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 			Log.w(TAG, "Cannot removeItem on position out of OutOfBound!");
 			return;
 		}
-		if (DEBUG) Log.v(TAG, "removeItem notifyItemRemoved on position " + position);
 		synchronized (mLock) {
 			saveDeletedItem(position, mItems.remove(position));
 		}
+		if (DEBUG) Log.v(TAG, "removeItem notifyItemRemoved on position " + position);
 		notifyItemRemoved(position);
 		if (mUpdateListener != null && !isMultiRemove)
 			mUpdateListener.onUpdateEmptyView(getItemCount());

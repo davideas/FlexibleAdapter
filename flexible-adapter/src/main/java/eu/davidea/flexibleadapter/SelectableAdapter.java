@@ -88,7 +88,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Set the mode of the selection, MODE_SINGLE is the default:
+	 * Sets the mode of the selection, MODE_SINGLE is the default:
 	 * <ul>
 	 * <li>{@link #MODE_SINGLE} configures the adapter to react at the single tap over an item
 	 * (previous selection is cleared automatically);
@@ -124,7 +124,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Toggle the selection status of the item at a given position.<br/>
+	 * Toggles the selection status of the item at a given position.<br/>
 	 * The behaviour depends on the selection mode previously set with {@link #setMode}.
 	 * <p>
 	 * Optionally the item can be invalidated.<br/>
@@ -168,7 +168,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Set the selection status for all items which the ViewTypes are included in the specified array.
+	 * Sets the selection status for all items which the ViewTypes are included in the specified array.
 	 * <p><b>Note:</b> All items are invalidated and rebound!</p>
 	 *
 	 * @param viewTypes The ViewTypes for which we want the selection, pass nothing to select all
@@ -197,7 +197,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Clear the selection status for all items one by one and it doesn't stop animations in the items.
+	 * Clears the selection status for all items one by one and it doesn't stop animations in the items.
 	 * <br/><br/>
 	 * <b>Note 1:</b> Items are invalidated and rebound!<br/>
 	 * <b>Note 2:</b> This method use java.util.Iterator to avoid java.util.ConcurrentModificationException.
@@ -235,7 +235,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Count the selected items.
+	 * Counts the selected items.
 	 *
 	 * @return Selected items count
 	 */
@@ -257,7 +257,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	/*----------------*/
 
 	/**
-	 * Save the state of the current selection on the items.
+	 * Saves the state of the current selection on the items.
 	 *
 	 * @param outState Current state
 	 */
@@ -266,7 +266,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	}
 
 	/**
-	 * Restore the previous state of the selection on the items.
+	 * Restores the previous state of the selection on the items.
 	 *
 	 * @param savedInstanceState Previous state
 	 */
