@@ -28,28 +28,28 @@ public interface IExpandableItem<T> extends IFlexibleItem<T> {
 	/* SUB ITEMS METHODS */
 	/*-------------------*/
 
-	T getParent();
+	//T getParent();
 
 	void setParent(T item);
 
 	List<T> getSubItems();
 
-	void setSubItems(List<T> items);
+	//void setSubItems(List<T> items);
 
 	int getSubItemsCount();
 
-	T getSubItem(int position);
+	//T getSubItem(int position);
 
-	int getSubItemPosition(T item);
+	//int getSubItemPosition(T item);
 
-	boolean contains(T item);
+	//boolean contains(T item);
 
-	void addSubItem(T item);
+	//void addSubItem(T item);
 
-	void addSubItem(int position, T item);
+	//void addSubItem(int position, T item);
 
-	boolean removeSubItem(T item);
+	//boolean removeSubItem(T item);
 
-	boolean removeSubItem(int position);
+	//boolean removeSubItem(int position);
 
 }

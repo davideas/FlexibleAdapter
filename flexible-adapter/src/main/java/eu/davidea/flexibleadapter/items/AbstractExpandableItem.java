@@ -83,7 +83,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 	/* SUB ITEMS METHODS */
 	/*-------------------*/
 
-	@Override
+	//@Override
 	public T getParent() {
 		return mParent;
 	}
@@ -102,7 +102,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 		return mSubItems;
 	}
 
-	@Override
+	//@Override
 	public void setSubItems(List<T> items) {
 		for (T item : items) {
 			item.setParent((T) this);
@@ -115,7 +115,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 		return mSubItems != null ? mSubItems.size() : 0;
 	}
 
-	@Override
+	//@Override
 	public T getSubItem(int position) {
 		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
 			return mSubItems.get(position);
@@ -123,12 +123,12 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 		return null;
 	}
 
-	@Override
+	//@Override
 	public int getSubItemPosition(T item) {
 		return mSubItems.indexOf(item);
 	}
 
-	@Override
+	//@Override
 	public void addSubItem(T item) {
 		if (mSubItems == null)
 			mSubItems = new ArrayList<T>();
@@ -136,7 +136,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 		mSubItems.add(item);
 	}
 
-	@Override
+	//@Override
 	public void addSubItem(int position, T item) {
 		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
 			item.setParent((T) this);
@@ -145,12 +145,12 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 			addSubItem(item);
 	}
 
-	@Override
+	//@Override
 	public boolean contains(T item) {
 		return mSubItems != null && mSubItems.contains(item);
 	}
 
-	@Override
+	//@Override
 	public boolean removeSubItem(T item) {
 		int position = mSubItems.indexOf(item);
 		if (mSubItems != null && position >= 0) {
@@ -160,7 +160,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 		return false;
 	}
 
-	@Override
+	//@Override
 	public boolean removeSubItem(int position) {
 		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
 			mRemovedItems.put(position, mSubItems.remove(position));
