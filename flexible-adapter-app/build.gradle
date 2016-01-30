@@ -21,7 +21,7 @@ android {
 	}
 	buildTypes {
 		debug {
-			versionNameSuffix "-DEBUG"
+			versionNameSuffix " build"
 			minifyEnabled false
 		}
 		release {

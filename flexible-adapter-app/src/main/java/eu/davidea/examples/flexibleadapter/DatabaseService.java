@@ -11,7 +11,7 @@ import java.util.List;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 100, SUB_ITEMS = 8;
+	private static final int ITEMS = 200, SUB_ITEMS = 5;
 	public static boolean userLearnedSelection = false;
 
 	private List<Item> mItems = new ArrayList<Item>();

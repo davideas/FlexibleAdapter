@@ -8,7 +8,7 @@ ext {
 	//Library
 	libraryCode = 12
 	libraryVersion = '5.0.0-b2'
-	libraryDate = " of 2016.01.30"
+	libraryDate = " of 2016.01.31"
 	libraryDescription = 'A pattern for every RecyclerView'
 	libraryName = 'FlexibleAdapter'
 
