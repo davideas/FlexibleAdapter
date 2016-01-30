@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.CallSuper;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -21,21 +22,29 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
+import eu.davidea.flexibleadapter.items.IFlexibleItem;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set
- * such as adding, removing, moving an item.
+ * such as filtering, adding, removing, moving, animating an item.
  * <p><strong>VH</strong> is your implementation of {@link RecyclerView.ViewHolder}.
  * <strong>T</strong> is your domain object containing the data.</p>
  *
  * @author Davide Steduto
+ * @see FlexibleExpandableAdapter
+ * @see FlexibleAnimatorAdapter
+ * @see SelectableAdapter
+ * @see IFlexibleItem
+ * @see FlexibleViewHolder
  * @since 03/05/2015 Created
- *   <br/>20/01/2016 New code reorganization
- *   <br/>24/01/2016 Drag&Drop, Swipe
- *   <br/>26/01/2016 New interfaces and full refactoring
+ * <br/>20/01/2016 New code reorganization
+ * <br/>24/01/2016 Drag&Drop, Swipe
+ * <br/>26/01/2016 New interfaces and full refactoring
+ * <br/>30/01/2016 Class now extends {@link FlexibleAnimatorAdapter} that extends {@link SelectableAdapter}
  */
-public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> extends SelectableAdapter<VH>
+//@SuppressWarnings({"unused", "Convert2Diamond"})
+public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> extends FlexibleAnimatorAdapter<VH>
 		implements ItemTouchHelperCallback.AdapterCallback {
 
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();
@@ -45,24 +54,43 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * The main container for ALL items.
 	 */
 	protected List<T> mItems;
-	
+
 	/**
 	 * Used to avoid multiple calls to the {@link OnUpdateListener#onUpdateEmptyView(int)}
 	 */
-	protected boolean isMultiRemove = false;
-	
+	protected boolean isMultiRange = false;
+
 	/**
 	 * Lock object used to modify the content of {@link #mItems}.
 	 * Any write operation performed on the list items should be synchronized on this lock.
 	 */
 	protected final Object mLock = new Object();
-	
+
 	//Undo
+	//TODO: remove List, use SparseArray
 	protected List<T> mDeletedItems;
 	protected List<Integer> mOriginalPositions;
 	protected SparseArray<T> mRemovedItems;//beta test
 	protected boolean mRestoreSelection = false;
-	protected Handler mHandler;
+
+	/**
+	 * Handler for delayed {@link #filterItems(List)} and {@link OnDeleteCompleteListener#onDeleteConfirmed}
+	 */
+	protected Handler mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+		public boolean handleMessage(Message message) {
+			switch (message.what) {
+				case 0: //filterItems
+					filterItems((List<T>) message.obj);
+					return true;
+				case 1: //confirm delete
+					OnDeleteCompleteListener listener = (OnDeleteCompleteListener) message.obj;
+					if (listener != null) listener.onDeleteConfirmed();
+					emptyBin();
+					return true;
+			}
+			return false;
+		}
+	});
 
 	/* Filter */
 	protected String mSearchText = "";
@@ -100,11 +128,11 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 *
 	 * @param items     items to display
 	 * @param listeners can be an instance of:
-	 * 					<br/>{@link OnUpdateListener}
-	 * 					<br/>{@link OnItemClickListener}
-	 * 					<br/>{@link OnItemLongClickListener}
-	 * 					<br/>{@link OnItemMoveListener}
-	 * 					<br/>{@link OnItemSwipeListener}
+	 *                  <br/>{@link OnUpdateListener}
+	 *                  <br/>{@link OnItemClickListener}
+	 *                  <br/>{@link OnItemLongClickListener}
+	 *                  <br/>{@link OnItemMoveListener}
+	 *                  <br/>{@link OnItemSwipeListener}
 	 */
 	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listeners) {
 		mItems = items;
@@ -232,27 +260,16 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * Insert the given Item at last position.
-	 *
-	 * @param item the item to add
-	 */
-	public void addItem(@NonNull T item) {
-		if (DEBUG) Log.v(TAG, "addItem notifyItemInserted on last position");
-		synchronized (mLock) {
-			mItems.add(item);
-		}
-	}
-
-	/**
 	 * Insert the given Item at desired position or Add Item at last position.
 	 *
 	 * @param position position of the item to add
 	 * @param item     the item to add
+	 * @return true if is has been modified by the addition, fasle otherwise
 	 */
-	public void addItem(int position, @NonNull T item) {
+	public boolean addItem(int position, @NonNull T item) {
 		if (position < 0) {
 			Log.w(TAG, "Cannot addItem on negative position");
-			return;
+			return false;
 		}
 		//Insert Item
 		if (position < mItems.size()) {
@@ -261,11 +278,71 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 				mItems.add(position, item);
 			}
 		} else { //Add Item at the last position
-			addItem(item);
+			if (DEBUG) Log.v(TAG, "addItem notifyItemInserted on last position");
+			synchronized (mLock) {
+				mItems.add(item);
+			}
 			position = mItems.size();
 		}
+		//Notify addition
 		notifyItemInserted(position);
-		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(getItemCount());
+		//Call listener to update EmptyView
+		if (mUpdateListener != null && !isMultiRange)
+			mUpdateListener.onUpdateEmptyView(getItemCount());
+
+		return true;
+	}
+
+	/**
+	 * Add a set of items in the internal list at specific position in a list.
+	 *
+	 * @param position position inside the list, -1 to add the set the end of the list
+	 * @param items    the items to add
+	 * @return true if the addition was successful, false otherwise
+	 */
+	public boolean addItems(int position, List<T> items) {
+		if (position < 0) {
+			Log.w(TAG, "Cannot addItems on negative position");
+			return false;
+		}
+		if (items == null || items.isEmpty()) {
+			Log.w(TAG, "No items to add");
+			return false;
+		}
+		if (DEBUG)
+			Log.v(TAG, "addItems position=" + position + " itemCount=" + items.size());
+
+		//Insert Items
+		synchronized (mLock) {
+			addAllItemsIn(mItems, position, items);
+		}
+		//Notify range addition
+		notifyItemRangeInserted(position, items.size());
+		//Call listener to update EmptyView
+		if (mUpdateListener != null && !isMultiRange)
+			mUpdateListener.onUpdateEmptyView(getItemCount());
+		return true;
+	}
+
+
+	/**
+	 * Internal method to add a set of items at specific position in a list.
+	 * <p>If list is null, a new list will be created.</p>
+	 * No effect if the set of items is null or empty.
+	 *
+	 * @param list     which list
+	 * @param position position inside the list, -1 to add the set the end of the list
+	 * @param items    set of items to insert
+	 * @return true if the list has been modified through the insertion, false otherwise
+	 */
+	protected boolean addAllItemsIn(List<T> list, int position, List<T> items) {
+		if (items == null || items.isEmpty()) return false;
+		if (list == null) list = new ArrayList<T>(items.size());
+		if (position >= 0 && position < list.size()) {
+			list.addAll(position, items);
+		} else
+			list.addAll(items);
+		return true;
 	}
 
 	/*----------------------*/
@@ -284,7 +361,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	public void removeItem(int position) {
 		if (position < 0 && position >= mItems.size()) {
-			Log.w(TAG, "Cannot removeItem on position out of OutOfBound!");
+			Log.w(TAG, "Cannot removeItem on position out of OutOfBounds!");
 			return;
 		}
 		synchronized (mLock) {
@@ -292,7 +369,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		}
 		if (DEBUG) Log.v(TAG, "removeItem notifyItemRemoved on position " + position);
 		notifyItemRemoved(position);
-		if (mUpdateListener != null && !isMultiRemove)
+		//Call listener to update EmptyView
+		if (mUpdateListener != null && !isMultiRange)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
@@ -300,7 +378,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * Removes a list of items from internal list and notify the change.
 	 * <p>Every item is retained for an eventual Undo.</p>
 	 *
-	 * @param selectedPositions list of item positions to remove
+	 * @param selectedPositions list with the item positions to remove
 	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
 	 * @see #restoreDeletedItems()
 	 * @see #setRestoreSelectionOnUndo(boolean)
@@ -317,8 +395,8 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		});
 
 		// Split the list in ranges
+		isMultiRange = true;
 		while (!selectedPositions.isEmpty()) {
-			isMultiRemove = true;
 			if (selectedPositions.size() == 1) {
 				removeItem(selectedPositions.get(0));
 				//Align the selection list when removing the item
@@ -341,8 +419,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 				}
 			}
 		}
-		isMultiRemove = false;
-		if (mUpdateListener != null) mUpdateListener.onUpdateEmptyView(getItemCount());
+		isMultiRange = false;
+		//Call listener to update EmptyView
+		if (mUpdateListener != null)
+			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	/**
@@ -395,7 +475,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	}
 
 	/**
-	 * @return The list of deleted items
+	 * @return the list of deleted items
 	 */
 	public List<T> getDeletedItems() {
 		return mDeletedItems;
@@ -489,19 +569,9 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @param listener the listener that will be called after timeout to commit the change
 	 */
 	public void startUndoTimer(long timeout, final OnDeleteCompleteListener listener) {
-		if (mHandler != null) {
-			//Make longer the timer for new coming deleted items
-			mHandler.removeCallbacksAndMessages(null);
-		} else {
-			mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
-				public boolean handleMessage(Message message) {
-					if (listener != null) listener.onDeleteConfirmed();
-					emptyBin();
-					return true;
-				}
-			});
-		}
-		mHandler.sendMessageDelayed(Message.obtain(mHandler), timeout > 0 ? timeout : UNDO_TIMEOUT);
+		//Make longer the timer for new coming deleted items
+		mHandler.removeMessages(1);
+		mHandler.sendMessageDelayed(Message.obtain(mHandler, 1, listener), timeout > 0 ? timeout : UNDO_TIMEOUT);
 	}
 
 	/**
@@ -509,10 +579,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * <p><b>Note:</b> This method is automatically called in case of restoration.</p>
 	 */
 	protected void stopUndoTimer() {
-		if (mHandler != null) {
-			mHandler.removeCallbacksAndMessages(null);
-			mHandler = null;
-		}
+		mHandler.removeCallbacksAndMessages(null);
 	}
 
 	/*----------------*/
@@ -553,6 +620,22 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/**
 	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal mechanism,
 	 * items are removed and/or added in order to animate items in the final list.
+	 * <p>Same as {@link #filterItems(List)}, but with a delay in the execution, useful to grab
+	 * more characters from user before starting the search.</p>
+	 *
+	 * @param unfilteredItems the list to filter
+	 * @param delay           any non negative delay
+	 * @see #filterObject(Object, String)
+	 */
+	public void filterItems(@NonNull List<T> unfilteredItems, @IntRange(from = 0) long delay) {
+		//Make longer the timer for new coming deleted items
+		mHandler.removeMessages(0);
+		mHandler.sendMessageDelayed(Message.obtain(mHandler, 0, unfilteredItems), delay > 0 ? delay : 0);
+	}
+
+	/**
+	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal mechanism,
+	 * items are removed and/or added in order to animate items in the final list.
 	 * <p>
 	 * Filters the provided list with the search text previously set with {@link #setSearchText(String)}.
 	 * </p>
@@ -571,6 +654,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
 		List<T> values = new ArrayList<T>();
+		int initialCount = getItemCount();
 		if (hasSearchText()) {
 			int newOriginalPosition = -1, oldOriginalPosition = -1;
 			for (T item : unfilteredItems) {
@@ -606,7 +690,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 		} else mItems = values;
 
 		//Call listener to update EmptyView
-		if (mUpdateListener != null) {
+		if (mUpdateListener != null && initialCount != getItemCount()) {
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 		}
 	}

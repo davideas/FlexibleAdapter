@@ -23,15 +23,20 @@ import java.util.EnumSet;
 import java.util.List;
 
 /**
- * This Class is responsible to animate items when RecyclerView is firstly loaded. Bounded items
+ * This class is responsible to animate items when RecyclerView is firstly loaded. Bounded items
  * are animated initially and also when user starts to scroll the list.
  * <p>Animations can be customized for each items applying different logic based on item position
  * and beyond.</p>
+ * This class is extended by {@link FlexibleAdapter}.
  *
  * @author Davide Steduto
+ * @see FlexibleExpandableAdapter
+ * @see FlexibleAdapter
+ * @see SelectableAdapter
  * @since 10/01/2016
+ * <br/>30/01/2016 Class now extends {@link SelectableAdapter}
  */
-public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder, T> extends FlexibleAdapter<VH, T> {
+public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder> extends SelectableAdapter<VH> {
 
 	protected static final String TAG = FlexibleAnimatorAdapter.class.getSimpleName();
 
@@ -45,7 +50,6 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	/**
 	 * The active Animators. Keys are hash codes of the Views that are animated.
 	 */
-	@NonNull
 	private final SparseArray<Animator> mAnimators = new SparseArray<>();
 
 	/**
@@ -77,21 +81,9 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 	/**
 	 * Simple Constructor for Animator Adapter.
-	 *
-	 * @param items Items to display
 	 */
-	public FlexibleAnimatorAdapter(@NonNull List<T> items) {
-		this(items, null);
-	}
-
-	/**
-	 * Main Constructor for Animator Adapter.
-	 *
-	 * @param items    items to display
-	 * @param listener must be an instance of {@link OnUpdateListener}
-	 */
-	public FlexibleAnimatorAdapter(@NonNull List<T> items, Object listener) {
-		super(items, listener);
+	public FlexibleAnimatorAdapter() {
+		super();
 
 		//Get notified when an item is changed (should skip animation)
 		mAnimatorNotifierObserver = new AnimatorAdapterDataObserver();
@@ -250,8 +242,8 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			if (!animatorsUsed.contains(AnimatorEnum.ALPHA))
 				addAlphaAnimator(animators, itemView, 0f);
 
-			if (DEBUG)
-				Log.d(TAG, "Start Animation on position " + position + " Animators=" + animatorsUsed);
+//			if (DEBUG)
+//				Log.d(TAG, "Start Animation on position " + position + " Animators=" + animatorsUsed);
 			animatorsUsed.clear();
 
 			//Execute the animations all together
@@ -291,12 +283,12 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 		int visibleItems = lastVisiblePosition - firstVisiblePosition;
 
-		Log.d(TAG, "Position=" + position +
-				" FirstVisible=" + firstVisiblePosition +
-				" LastVisible=" + lastVisiblePosition +
-				" LastAnimated=" + mLastAnimatedPosition +
-				" VisibleItems=" + visibleItems +
-				" ChildCount=" + mRecyclerView.getChildCount());
+//		if (DEBUG) Log.d(TAG, "Position=" + position +
+//				" FirstVisible=" + firstVisiblePosition +
+//				" LastVisible=" + lastVisiblePosition +
+//				" LastAnimated=" + mLastAnimatedPosition +
+//				" VisibleItems=" + visibleItems +
+//				" ChildCount=" + mRecyclerView.getChildCount());
 
 		//Stop stepDelay when screen is filled
 		if (mLastAnimatedPosition > visibleItems || //Normal Forward scrolling
@@ -343,12 +335,12 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 			delay = mInitialDelay + (position * mStepDelay);
 		}
 
-		if (DEBUG) Log.d(TAG, "Delay[" + position + "]=" + delay +
-				" FirstVisible=" + firstVisiblePosition +
-				" LastVisible=" + lastVisiblePosition +
-				" LastAnimated=" + mLastAnimatedPosition +
-				" VisibleItems=" + numberOfItemsOnScreen +
-				" ChildCount=" + mRecyclerView.getChildCount());
+//		if (DEBUG) Log.d(TAG, "Delay[" + position + "]=" + delay +
+//				" FirstVisible=" + firstVisiblePosition +
+//				" LastVisible=" + lastVisiblePosition +
+//				" LastAnimated=" + mLastAnimatedPosition +
+//				" VisibleItems=" + numberOfItemsOnScreen +
+//				" ChildCount=" + mRecyclerView.getChildCount());
 
 		return delay;
 	}
@@ -473,7 +465,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 
 		public void clearNotified() {
 			mAnimatorHandler.removeCallbacksAndMessages(null);
-			mAnimatorHandler.sendMessageDelayed(Message.obtain(mHandler), 200L);
+			mAnimatorHandler.sendMessageDelayed(Message.obtain(mAnimatorHandler), 200L);
 		}
 
 		private void markNotified(int positionStart, int itemCount) {

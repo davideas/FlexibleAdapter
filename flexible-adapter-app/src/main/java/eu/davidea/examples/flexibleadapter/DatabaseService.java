@@ -11,7 +11,7 @@ import java.util.List;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 100;
+	private static final int ITEMS = 100, SUB_ITEMS = 8;
 	public static boolean userLearnedSelection = false;
 
 	private List<Item> mItems = new ArrayList<Item>();
@@ -47,7 +47,7 @@ public class DatabaseService {
 		//subItems are not expandable by default
 		if (i % 3 == 0) {
 			item.setTitle("Expandable Item " + i);
-			for (int j = 1; j <= 5; j++) {
+			for (int j = 1; j <= SUB_ITEMS; j++) {
 				Item subItem = new Item();
 				subItem.setId(i+"s"+j);
 				subItem.setTitle("Sub Item " + j);

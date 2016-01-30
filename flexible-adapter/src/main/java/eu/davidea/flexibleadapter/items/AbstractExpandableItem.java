@@ -153,7 +153,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 	@Override
 	public boolean removeSubItem(T item) {
 		int position = mSubItems.indexOf(item);
-		if (mSubItems != null && position > 0) {
+		if (mSubItems != null && position >= 0) {
 			mRemovedItems.put(position, item);
 			return mSubItems.remove(item);
 		}

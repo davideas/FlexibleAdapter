@@ -47,7 +47,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		this.mContext = (Context) activity;
 		addUserLearnedSelection();
 
-		//We have highlighted text while filtering, so let's enable this feature
+		//NEW! We have highlighted text while filtering, so let's enable this feature
 		//to be consistent with the active filter
 		setNotifyChangeOfUnfilteredItems(true);
 	}
@@ -69,21 +69,17 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	}
 
 	private void addUserLearnedSelection() {
-		if (!DatabaseService.userLearnedSelection && !hasSearchText() && !super.isEmpty()) {
+		Item uls = getItem(0);
+		if (!DatabaseService.userLearnedSelection && !hasSearchText() &&
+				(uls == null || !uls.getId().equals("ULS"))) {
 			//Define Example View
 			Item item = new Item();
-			item.setId("0");
+			item.setId("ULS");
 			item.setEnabled(false);
 			item.setExpandable(true);//Mark Expandable also this (same level of others items)
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
 			super.addItem(0, item);
-		}
-	}
-
-	private void removeUserLearnedSelection() {
-		if (!DatabaseService.userLearnedSelection && isEmpty()) {
-			super.removeItem(0);
 		}
 	}
 
@@ -109,27 +105,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	public void selectAll(Integer... viewTypes) {
 		mSelectAll = true;
 		super.selectAll(CHILD_VIEW_TYPE);
-	}
-
-	@Override
-	public void addItem(int position, Item item) {
-		if (isEmpty()) {
-			addUserLearnedSelection();
-			notifyItemInserted(0);
-		}
-		super.addItem(position, item);
-	}
-
-	@Override
-	public void removeItems(List<Integer> selectedPositions) {
-		super.removeItems(selectedPositions);
-		removeUserLearnedSelection();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return !DatabaseService.userLearnedSelection && mItems.size() == 1 && !hasSearchText()
-				|| super.isEmpty();
 	}
 
 	@Override
@@ -201,11 +176,15 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		// this will be highlighted
 		if (hasSearchText()) {
 			setHighlightText(pvHolder.mTitle, item.getTitle(), mSearchText);
-			setHighlightText(pvHolder.mSubtitle, item.updateSubTitle(), mSearchText);
+			setHighlightText(pvHolder.mSubtitle, updateSubTitle(item), mSearchText);
 		} else {
 			pvHolder.mTitle.setText(item.getTitle());
-			pvHolder.mSubtitle.setText(item.updateSubTitle());
+			pvHolder.mSubtitle.setText(updateSubTitle(item));
 		}
+	}
+
+	private String updateSubTitle(Item item) {
+		return getCurrentChildren(item).size() + " subItems";
 	}
 
 	@Override

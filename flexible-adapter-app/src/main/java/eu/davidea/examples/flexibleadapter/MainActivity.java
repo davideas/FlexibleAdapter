@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements
 			mAdapter.setSearchText(newText);
 			//Fill and Filter mItems with your custom list and automatically animate the changes
 			//Watch out! The original list must a copy
-			mAdapter.filterItems(DatabaseService.getInstance().getListById(""));
+			mAdapter.filterItems(DatabaseService.getInstance().getListById(""), 500L);
 		}
 
 		if (mAdapter.hasSearchText()) {
@@ -482,8 +482,8 @@ public class MainActivity extends AppCompatActivity implements
 	public void onDeleteConfirmed() {
 		for (Item item : mAdapter.getDeletedItems()) {
 			//Remove items from your Database. Example:
-			Log.d(TAG, "Confirm removed " + item.getTitle());
 			DatabaseService.getInstance().removeItem(item);
+			Log.d(TAG, "Confirm removed " + item.getTitle() + (item.getParent() != null ? " parent " + item.getParent() : ""));
 		}
 	}
 
@@ -526,13 +526,15 @@ public class MainActivity extends AppCompatActivity implements
 
 				//SnackBar for Undo
 				//noinspection ResourceType
-				mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)
+				int undoTime= 20000;
+				//noinspection ResourceType
+				mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, undoTime)
 						.setAction(R.string.undo, new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
 								mAdapter.restoreDeletedItems();
 								mSwipeHandler.sendEmptyMessage(0);
-								if (mAdapter.isRestoreWithSelection()) {
+								if (mAdapter.isRestoreWithSelection() && mAdapter.getSelectedItemCount() > 0) {
 									mActionMode = startSupportActionMode(MainActivity.this);
 									setContextTitle(mAdapter.getSelectedItemCount());
 								}
@@ -542,10 +544,10 @@ public class MainActivity extends AppCompatActivity implements
 
 				//Remove selected items from Adapter list after message is shown
 				mAdapter.removeItems(mAdapter.getSelectedPositions(), true);
-				mAdapter.startUndoTimer(7000L + 200L, this);//+200: Using SnackBar, user can still click on the action button while bar is dismissing for a fraction of time
+				mAdapter.startUndoTimer(undoTime + 200L, this);//+200: Using SnackBar, user can still click on the action button while bar is dismissing for a fraction of time
 
 				mSwipeHandler.sendEmptyMessage(1);
-				mSwipeHandler.sendEmptyMessageDelayed(0, 7000L);
+				mSwipeHandler.sendEmptyMessageDelayed(0, undoTime);
 
 				//Experimenting NEW feature
 				mAdapter.setRestoreSelectionOnUndo(true);

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,9 +22,13 @@ import eu.davidea.flexibleadapter.utils.Utils;
  * <p>Also </p>
  *
  * @author Davide Steduto
+ * @see FlexibleExpandableAdapter
+ * @see FlexibleAdapter
+ * @see FlexibleAnimatorAdapter
  * @since 03/05/2015 Created
  * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
  */
+@SuppressWarnings({"unused", "Convert2Diamond", "unchecked"})
 public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>
 		implements FastScroller.BubbleTextCreator, FastScroller.ScrollStateChangeListener {
 
@@ -31,6 +36,14 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	public static boolean DEBUG = false;
 
 	//TODO: Change MODE from int to Enum and EnumSet??
+	public enum Mode {//beta test
+		IDLE, SINGLE, MULTI, DRAG, SWIPE
+	}
+	/**
+	 * Contains type of animators already added
+	 */
+	private EnumSet<Mode> mode = EnumSet.of(Mode.IDLE);
+
 	/**
 	 * Adapter will not keep track of selections
 	 */
