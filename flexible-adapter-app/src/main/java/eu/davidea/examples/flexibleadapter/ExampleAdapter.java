@@ -344,7 +344,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 				@Override
 				public void onClick(View v) {
 					mAdapter.mItemLongClickListener.onItemLongClick(getAdapterPosition());
-					Toast.makeText(mContext, "ImageClick on " + mTitle.getText(), Toast.LENGTH_SHORT).show();
+					Toast.makeText(mContext, "ImageClick on " + mTitle.getText() + " position " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
 					toggleActivation();
 				}
 			});
@@ -354,13 +354,13 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 
 		@Override
 		public void onClick(View view) {
-			Toast.makeText(mContext, "Click on " + mTitle.getText(), Toast.LENGTH_SHORT).show();
+			Toast.makeText(mContext, "Click on " + mTitle.getText() + " position " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
 			super.onClick(view);
 		}
 
 		@Override
 		public boolean onLongClick(View view) {
-			Toast.makeText(mContext, "LongClick on " + mTitle.getText(), Toast.LENGTH_SHORT).show();
+			Toast.makeText(mContext, "LongClick on " + mTitle.getText() + " position " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
 			return super.onLongClick(view);
 		}
 

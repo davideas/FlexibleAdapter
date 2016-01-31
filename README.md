@@ -104,14 +104,14 @@ See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 
 # Change Log
 ###### v5.0.0-beta2 - 2016.01.31 (Everything might change!)
-- **Expandable items** with selection coherence[See #23].
+- **Expandable items** with selection coherence [See #23].
 - **Drag&Drop and Swipe** actions with selection coherence and ActionMode compatible [See #21].
 - **Adapter Animations** with customization based on adapter position - viewType - selection [See #15].
 - New concept of Item: added **IFlexibleItem** and **IExpandableItem** interfaces to implement around the model object.
 - Several new functions that help to handle all new situations.
 - New advanced filtering: Delayed + Animations while filtering [See #24].
 - Simplified constructor [See #25] and new configuration setters.
-- Added FastScroller in the library [See #20] (This will probably change, in favor of [MaterialScrollBar](https://github.com/krimin-killr21/MaterialScrollBar)). 
+- Added FastScroller in the library [See #20] (This will probably change, in favor of [MaterialScrollBar](https://github.com/krimin-killr21/MaterialScrollBar)).
 - Added support for Grid Layout also in the expandable version.
 - Included showcase for the new [FlipView](https://github.com/davideas/FlipView) library.
 - and much more...

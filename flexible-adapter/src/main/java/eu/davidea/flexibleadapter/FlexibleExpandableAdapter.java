@@ -53,7 +53,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			parentSelected = false,
 			scrollOnExpand = false,
 			collapseOnExpand = false,
-			adjustRemoved = true, adjustSelected = true;
+			adjustRemoved = true, adjustSelected = true, filtering = false;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -175,6 +175,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	public boolean isExpanded(int position) {
 		return expandedItems.indexOfKey(position) >= 0;
+//		T item = getItem(position);
+//		return item != null && item.isExpanded();
 	}
 
 	public boolean isExpandable(int position) {
@@ -429,8 +431,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			}
 
 			//Expand!
-			adjustRemoved(position, subItemsCount);
-			adjustRemoved = false;
+//			adjustRemoved(position, subItemsCount);
+//			adjustRemoved = false;
 			notifyItemRangeInserted(position + 1, subItemsCount);
 
 			if (DEBUG)
@@ -804,6 +806,13 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		return false;
 	}
 
+	private boolean isItemPendingRemove(T item) {
+		for (RemovedItem removedItem : removedItems) {
+			if (removedItem.item.equals(item)) return true;
+		}
+		return false;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -905,6 +914,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	public List<T> getDeletedChildren(int parentPosition) {
 		List<T> deletedChild = new ArrayList<T>();
 		for (RemovedItem removedItem : removedItems) {
+			//TODO: Review with isItemPendingRemove(), it looks like, having better result while filtering, to verify.
 			if (removedItem.parentPosition == parentPosition && removedItem.relativePosition >= 0)
 				deletedChild.add((T) removedItem.item);
 		}
@@ -945,21 +955,38 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
 		List<T> values = new ArrayList<T>();
-		int initialCount = getItemCount();
+		//Enable flag: skip adjustPositions!
+		filtering = true;
+		//Reset values
+		int position = 0, initialCount = getItemCount();
+		expandedItems.clear();
 		if (hasSearchText()) {
-			int newOriginalPosition = -1, oldOriginalPosition = -1;
 			for (T item : unfilteredItems) {
-				if (filterObject(item, getSearchText())) {
+				if (filterObject(item, getSearchText()) && !isItemPendingRemove(item)) {
 					values.add(item);
-					//Add subItems if not hidden by filterObject()
-					for (T subItem : getCurrentChildren(item))
-						if (!subItem.isHidden()) values.add(subItem);
+					if (item.isExpanded()) {
+						List<T> subItems = new ArrayList<>();
+						expandedItems.put(position, subItems);
+						//Add subItems if not hidden by filterObject()
+						for (T subItem : item.getSubItems()) {
+							if (!isItemPendingRemove(subItem) && !subItem.isHidden())
+								subItems.add(subItem);
+						}
+						values.addAll(subItems);
+						position += subItems.size();
+					}
+					position++;
 				}
 			}
+			if (DEBUG) Log.v(TAG, "filterItems ExpandedItems=" + getExpandedPositions());
 		} else {
 			values = unfilteredItems; //with no filter
 			if (!removedItems.isEmpty()) {
 				values.removeAll(getDeletedItems());
+			}
+			//Reset flags for all items! //Merging the 2 Adapters this could be done in applyAndAnimateAdditions();
+			for (T item : values) {
+				item.setExpanded(false);
 			}
 		}
 
@@ -968,6 +995,8 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			mOldSearchText = mSearchText;
 			animateTo(values);
 		} else mItems = values;
+		//Reset flag
+		filtering = false;
 
 		//Call listener to update EmptyView
 		if (mUpdateListener != null && initialCount != getItemCount())
@@ -987,20 +1016,18 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	protected boolean filterObject(T item, String constraint) {
 		//Reset expansion flag
 		boolean filtered = false;
+		item.setExpanded(false);
 
 		//Children scan filter
-		if (item.getSubItems() != null) {
-			item.setExpanded(false);
-			for (T subItem : item.getSubItems()) {
-				//Reuse super filter for Children
-				subItem.setHidden(!super.filterObject(subItem, constraint));
-				if (!filtered && !subItem.isHidden()) {
-					filtered = true;
-				}
+		for (T subItem : getCurrentChildren(item)) {
+			//Reuse super filter for Children
+			subItem.setHidden(!super.filterObject(subItem, constraint));
+			if (!filtered && !subItem.isHidden()) {
+				filtered = true;
 			}
-			//Expand if filter found text in subItems
-			item.setExpanded(filtered);
 		}
+		//Expand if filter found text in subItems
+		item.setExpanded(filtered);
 
 		//Super filter for Parent only if not filtered already
 		return filtered || super.filterObject(item, constraint);
@@ -1175,12 +1202,14 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	private class ExpandableAdapterDataObserver extends RecyclerView.AdapterDataObserver {
 
 		private void adjustPositions(int positionStart, int itemCount) {
-			adjustExpanded(positionStart, itemCount);//All the times
-			if (adjustSelected)
-				adjustSelected(positionStart, itemCount);//No if remove range / restore children
-			if (adjustRemoved)
-				adjustRemoved(positionStart, itemCount);//No if remove range / restore parents
-			adjustSelected = adjustRemoved = true;
+			if (!filtering) {
+				adjustExpanded(positionStart, itemCount);//All the times
+				if (adjustSelected)
+					adjustSelected(positionStart, itemCount);//No if remove range / restore children
+				if (adjustRemoved)
+					adjustRemoved(positionStart, itemCount);//No if remove range / restore parents
+				adjustSelected = adjustRemoved = true;
+			}
 		}
 
 		/**
