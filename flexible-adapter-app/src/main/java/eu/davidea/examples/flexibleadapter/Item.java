@@ -3,9 +3,8 @@ package eu.davidea.examples.flexibleadapter;
 import java.io.Serializable;
 
 import eu.davidea.flexibleadapter.items.AbstractExpandableItem;
-import eu.davidea.viewholders.ExpandableViewHolder;
 
-public class Item extends AbstractExpandableItem<Item, ExpandableViewHolder> implements Serializable {
+public class Item extends AbstractExpandableItem<Item> implements Serializable {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 

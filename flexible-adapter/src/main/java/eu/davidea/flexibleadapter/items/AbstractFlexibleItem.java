@@ -10,13 +10,14 @@ package eu.davidea.flexibleadapter.items;
 public abstract class AbstractFlexibleItem<T extends IFlexibleItem<T>>
 		implements IFlexibleItem<T> {
 
-	/* Flags for FlexibleExpandableAdapter */
+	/* Flags for the Adapter */
 	boolean mEnabled = true,
 			mHidden = false,
 			mSelectable = true;
 
 	/**
-	 * You should implement this method to compare items Identifiers.
+	 * You <b>must</b> implement this method to compare items Identifiers.
+	 * <p>Adapter needs this method to distinguish them and pick up correct items.</p>
 	 *
 	 * @param o Instance to compare
 	 * @return true if items are equals, false otherwise.

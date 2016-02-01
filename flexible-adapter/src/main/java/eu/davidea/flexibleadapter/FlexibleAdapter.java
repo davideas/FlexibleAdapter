@@ -230,7 +230,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @return the global position in the Adapter if found, -1 otherwise
 	 */
 	public int getGlobalPositionOf(@NonNull T item) {
-		return mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
+		return item != null && mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
 	}
 
 	/**
@@ -238,7 +238,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * @return true if the provided item is currently displayed, false otherwise
 	 */
 	public boolean contains(@NonNull T item) {
-		return mItems != null && mItems.contains(item);
+		return item != null && mItems != null && mItems.contains(item);
 	}
 
 	@Override

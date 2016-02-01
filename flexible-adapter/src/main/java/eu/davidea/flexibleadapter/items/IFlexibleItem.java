@@ -1,7 +1,8 @@
 package eu.davidea.flexibleadapter.items;
 
 /**
- * Basic Interface to manage Item operations like selection
+ * Basic interface to manage operations like enabling, selecting, hiding, filtering on items.
+ * <p>Implements this interface or use {@link AbstractFlexibleItem}.</p>
  *
  * @author Davide Steduto
  * @since 19/01/2016 Created

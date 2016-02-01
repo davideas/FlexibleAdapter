@@ -1,34 +1,29 @@
 package eu.davidea.flexibleadapter.items;
 
-import android.util.SparseArray;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
  * Generic implementation of {@link IExpandableItem} interface with most useful methods to manage
  * expansion and sub items.<br/>
- * This abstract class expands also {@link AbstractFlexibleItem}.
+ * This abstract class extends also {@link AbstractFlexibleItem}.
  *
  * @author Davide Steduto
  * @since 17/01/2016 Created
  */
-public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH extends ExpandableViewHolder>
+public abstract class AbstractExpandableItem<T extends IExpandableItem<T>>
 		extends AbstractFlexibleItem<T>
 		implements IExpandableItem<T> {
 
 	/** Reference to the Parent Item */
-	T mParent;
+	private T mParent;
 
 	/* Flags for FlexibleExpandableAdapter */
-	boolean mExpanded = false,
-			mExpandable = false;
+	private boolean mExpandable = false, mExpanded = false;
 
 	/** subItems list */
-	List<T> mSubItems;
-	SparseArray<T> mRemovedItems = new SparseArray<T>();
+	private List<T> mSubItems;
+	//SparseArray<T> mRemovedItems = new SparseArray<T>();
 
 
 	/*---------------------*/
@@ -84,7 +79,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 	/*-------------------*/
 
 	//@Override
-	public T getParent() {
+	public final T getParent() {
 		return mParent;
 	}
 
@@ -93,12 +88,12 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 		mParent = item;
 	}
 
-	public boolean hasSubItems() {
+	public final boolean hasSubItems() {
 		return mSubItems!= null && mSubItems.size() > 0;
 	}
 
 	@Override
-	public List<T> getSubItems() {
+	public final List<T> getSubItems() {
 		return mSubItems;
 	}
 
@@ -111,7 +106,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 	}
 
 	@Override
-	public int getSubItemsCount() {
+	public final int getSubItemsCount() {
 		return mSubItems != null ? mSubItems.size() : 0;
 	}
 
@@ -124,8 +119,8 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 	}
 
 	//@Override
-	public int getSubItemPosition(T item) {
-		return mSubItems.indexOf(item);
+	public final int getSubItemPosition(T item) {
+		return mSubItems != null ? mSubItems.indexOf(item) : -1;
 	}
 
 	//@Override
@@ -151,31 +146,31 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>, VH ex
 	}
 
 	//@Override
-	public boolean removeSubItem(T item) {
-		int position = mSubItems.indexOf(item);
-		if (mSubItems != null && position >= 0) {
-			mRemovedItems.put(position, item);
-			return mSubItems.remove(item);
-		}
-		return false;
-	}
+//	public boolean removeSubItem(T item) {
+//		int position = mSubItems.indexOf(item);
+//		if (mSubItems != null && position >= 0) {
+//			mRemovedItems.put(position, item);
+//			return mSubItems.remove(item);
+//		}
+//		return false;
+//	}
 
 	//@Override
-	public boolean removeSubItem(int position) {
-		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
-			mRemovedItems.put(position, mSubItems.remove(position));
-			return true;
-		}
-		return false;
-	}
+//	public boolean removeSubItem(int position) {
+//		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
+//			mRemovedItems.put(position, mSubItems.remove(position));
+//			return true;
+//		}
+//		return false;
+//	}
 
-	public void restoreDeletedSubItems() {
-		for (int i = 0; i < mRemovedItems.size(); i++) {
-			int position = mRemovedItems.keyAt(i);
-			if (position >= 0)
-				addSubItem(position, mRemovedItems.get(position));
-		}
-	}
+//	public void restoreDeletedSubItems() {
+//		for (int i = 0; i < mRemovedItems.size(); i++) {
+//			int position = mRemovedItems.keyAt(i);
+//			if (position >= 0)
+//				addSubItem(position, mRemovedItems.get(position));
+//		}
+//	}
 
 	@Override
 	public String toString() {
