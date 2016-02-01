@@ -262,8 +262,8 @@ public class MainActivity extends AppCompatActivity implements
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			mAdapter.setSearchText(newText);
 			//Fill and Filter mItems with your custom list and automatically animate the changes
-			//Watch out! The original list must a copy
-			mAdapter.filterItems(DatabaseService.getInstance().getListById(""), 500L);
+			//Watch out! The original list must be a copy
+			mAdapter.filterItems(DatabaseService.getInstance().getListById(""), 450L);
 		}
 
 		if (mAdapter.hasSearchText()) {
@@ -342,27 +342,6 @@ public class MainActivity extends AppCompatActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 
-	/**
-	 * Handling RecyclerView when empty.
-	 * <br/><br/>
-	 * <b>Note:</b> The order how the 3 Views (RecyclerView, EmptyView, FastScroller)
-	 * are placed in the Layout is important!
-	 */
-	@Override
-	public void onUpdateEmptyView(int size) {
-		Log.d(TAG, "onUpdateEmptyView size=" + size);
-		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
-		TextView emptyView = (TextView) findViewById(R.id.empty);
-		emptyView.setText(getString(R.string.no_items));
-		if (size > 0) {
-			fastScroller.setVisibility(View.VISIBLE);
-			emptyView.setVisibility(View.GONE);
-		} else {
-			fastScroller.setVisibility(View.GONE);
-			emptyView.setVisibility(View.VISIBLE);
-		}
-	}
-
 	//TODO: Include setActivatedPosition in the library?
 	public void setSelection(final int position) {
 		if (mAdapter.getMode() == FlexibleAdapter.MODE_SINGLE) {
@@ -380,13 +359,6 @@ public class MainActivity extends AppCompatActivity implements
 	private void setActivatedPosition(int position) {
 		Log.d(TAG, "ItemList New mActivatedPosition=" + position);
 		mActivatedPosition = position;
-	}
-
-	@Override
-	public void onTitleModified(int position, String newTitle) {
-		Item item = mAdapter.getItem(position);
-		item.setTitle(newTitle);
-		mAdapter.updateItem(position, item);
 	}
 
 	@Override
@@ -448,6 +420,34 @@ public class MainActivity extends AppCompatActivity implements
 		mSnackBar.show();
 		mAdapter.removeItem(position, true);
 		mAdapter.startUndoTimer(7000L + 200L, this);
+	}
+
+	@Override
+	public void onTitleModified(int position, String newTitle) {
+		Item item = mAdapter.getItem(position);
+		item.setTitle(newTitle);
+		mAdapter.updateItem(position, item);
+	}
+
+	/**
+	 * Handling RecyclerView when empty.
+	 * <br/><br/>
+	 * <b>Note:</b> The order how the 3 Views (RecyclerView, EmptyView, FastScroller)
+	 * are placed in the Layout is important!
+	 */
+	@Override
+	public void onUpdateEmptyView(int size) {
+		Log.d(TAG, "onUpdateEmptyView size=" + size);
+		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
+		TextView emptyView = (TextView) findViewById(R.id.empty);
+		emptyView.setText(getString(R.string.no_items));
+		if (size > 0) {
+			fastScroller.setVisibility(View.VISIBLE);
+			emptyView.setVisibility(View.GONE);
+		} else {
+			fastScroller.setVisibility(View.GONE);
+			emptyView.setVisibility(View.VISIBLE);
+		}
 	}
 
 	/**
