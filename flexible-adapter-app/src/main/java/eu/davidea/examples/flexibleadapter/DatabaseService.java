@@ -11,7 +11,7 @@ import java.util.List;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 200, SUB_ITEMS = 5;
+	private static final int ITEMS = 200, SUB_ITEMS = 3;
 	public static boolean userLearnedSelection = false;
 
 	private List<Item> mItems = new ArrayList<Item>();
@@ -43,11 +43,11 @@ public class DatabaseService {
 		//Let's initially expand the first father with subElements
 		//item.setInitiallyExpanded(i == 2);
 
-		//Add subItems every 5 elements
-		//subItems are not expandable by default
-		if (i % 3 == 0) {
+		//Add subItems every N elements
+		//subItems are not expandable by default, but thy might be
+		if (i % 1 == 0) {
 			item.setTitle("Expandable Item " + i);
-			for (int j = 1; j <= SUB_ITEMS; j++) {
+			for (int j = 5; j <= SUB_ITEMS; j++) {
 				Item subItem = new Item();
 				subItem.setId(i+"s"+j);
 				subItem.setTitle("Sub Item " + j);
