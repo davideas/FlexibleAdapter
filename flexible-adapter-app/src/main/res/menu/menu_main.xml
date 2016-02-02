@@ -20,6 +20,14 @@
 	      android:icon="@drawable/ic_sort_descending_white_24dp"
 	      app:showAsAction="never"/>
 
+	<item android:id="@+id/action_expand_collapse_all"
+	      android:title="@string/expand_all"
+	      app:showAsAction="never"/>
+
+	<item android:id="@+id/action_show_hide_headers"
+	      android:title="@string/show_headers"
+	      app:showAsAction="never"/>
+
 	<item android:id="@+id/action_about"
 	      android:title="@string/action_about"
 	      android:icon="@drawable/ic_info_outline_white_24dp"

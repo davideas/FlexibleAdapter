@@ -24,6 +24,8 @@
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="@dimen/margin_left"
 		android:layout_marginStart="@dimen/margin_left"
+		android:layout_marginRight="@dimen/margin_right"
+		android:layout_marginEnd="@dimen/margin_right"
 		android:layout_toRightOf="@id/row_handle"
 		android:layout_toEndOf="@id/row_handle"
 		android:layout_centerInParent="true"

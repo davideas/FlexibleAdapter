@@ -1,5 +1,7 @@
 package eu.davidea.examples.flexibleadapter;
 
+import android.util.SparseArray;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 200, SUB_ITEMS = 3;
+	private static final int ITEMS = 200, SUB_ITEMS = 3, HEADERS = 20;
 	public static boolean userLearnedSelection = false;
 
 	private List<Item> mItems = new ArrayList<Item>();
@@ -35,7 +37,7 @@ public class DatabaseService {
 
 	public static Item newExampleItem(int i) {
 		Item item = new Item();
-		item.setId(""+(++i));
+		item.setId("I"+(++i));
 		item.setTitle("Item " + i);
 
 		//All parent items are expandable
@@ -47,9 +49,9 @@ public class DatabaseService {
 		//subItems are not expandable by default, but thy might be
 		if (i % 1 == 0) {
 			item.setTitle("Expandable Item " + i);
-			for (int j = 5; j <= SUB_ITEMS; j++) {
+			for (int j = 1; j <= SUB_ITEMS; j++) {
 				Item subItem = new Item();
-				subItem.setId(i+"s"+j);
+				subItem.setId(item.getId()+"s"+j);
 				subItem.setTitle("Sub Item " + j);
 				subItem.setParent(item);
 				item.addSubItem(subItem);
@@ -58,6 +60,19 @@ public class DatabaseService {
 		item.updateSubTitle();
 
 		return item;
+	}
+
+	public static SparseArray<Item> buildHeaders() {
+		SparseArray<Item> headers = new SparseArray<Item>();
+		for (int i = 0; i < (ITEMS/HEADERS); i++) {
+			Item header = new Item();
+			header.setId("H" + i);
+			header.setTitle("Header " + (i+1));
+			header.setSelectable(false);
+			header.setHidden(true);
+			headers.put(1 + i * HEADERS, header);
+		}
+		return headers;
 	}
 
 	/**

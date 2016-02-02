@@ -118,6 +118,9 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.setLongPressDragEnabled(true);
 		mAdapter.setSwipeEnabled(true);
 
+		//Experimental, set some headers!
+		mAdapter.setHeaders(DatabaseService.buildHeaders());
+
 		//FAB
 		mFab = (FloatingActionButton) findViewById(R.id.fab);
 		mFab.setOnClickListener(new View.OnClickListener() {
@@ -334,7 +337,24 @@ public class MainActivity extends AppCompatActivity implements
 				item.setIcon(R.drawable.ic_sort_descending_white_24dp);
 				item.setTitle(R.string.forward_scrolling);
 			}
+		} else if (id == R.id.action_expand_collapse_all) {
+			if (item.getTitle().equals(getString(R.string.expand_all))) {
+				mAdapter.expandAll();
+				item.setTitle(R.string.collapse_all);
+			} else {
+				mAdapter.collapseAll();
+				item.setTitle(R.string.expand_all);
+			}
+		} else if (id == R.id.action_show_hide_headers) {
+			if (item.getTitle().equals(getString(R.string.show_headers))) {
+				mAdapter.showAllHeaders();
+				item.setTitle(R.string.hide_headers);
+			} else {
+				mAdapter.hideAllHeaders();
+				item.setTitle(R.string.show_headers);
+			}
 		}
+
 		//TODO: Show difference between MODE_IDLE, MODE_SINGLE
 		//TODO: Add toggle for mAdapter.toggleFastScroller();
 		//TODO: Add dialog configuration settings

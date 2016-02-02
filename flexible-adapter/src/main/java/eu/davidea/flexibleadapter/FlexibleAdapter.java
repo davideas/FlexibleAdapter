@@ -72,6 +72,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	protected List<Integer> mOriginalPositions;
 	protected SparseArray<T> mRemovedItems;//beta test
 	protected boolean mRestoreSelection = false;
+	private boolean
+			longPressDragEnabled = false,
+			handleDragEnabled = true,
+			swipeEnabled = false;
 
 	/**
 	 * Handler for delayed {@link #filterItems(List)} and {@link OnDeleteCompleteListener#onDeleteConfirmed}
@@ -348,6 +352,23 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	/*----------------------*/
 	/* DELETE ITEMS METHODS */
 	/*----------------------*/
+
+	/**
+	 * Remove an item from internal list if found
+	 *
+	 * @param item the item to remove
+	 */
+	public void removeItem(@NonNull T item) {
+		if (item == null) {
+			Log.w(TAG, "Cannot remove null item!");
+			return;
+		}
+		int position = getGlobalPositionOf(item);
+		if (position >= 0) {
+			mItems.remove(item);
+			notifyItemRemoved(position);
+		}
+	}
 
 	/**
 	 * Removes an item from internal list and notify the change.
@@ -818,6 +839,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	public final void setLongPressDragEnabled(boolean longPressDragEnabled) {
 		initializeItemTouchHelper();
+		this.longPressDragEnabled = longPressDragEnabled;
 		mItemTouchHelperCallback.setLongPressDragEnabled(longPressDragEnabled);
 	}
 
@@ -838,10 +860,20 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 * <p>To use, it is sufficient to set the HandleView by calling
 	 * {@link FlexibleViewHolder#setDragHandleView(View)}.</p>
 	 *
-	 * @return true by default
+	 * @return true if active, false otherwise
 	 */
 	public boolean isHandleDragEnabled() {
-		return true;
+		return handleDragEnabled;
+	}
+
+	/**
+	 * Enable/Disable the drag with handle.
+	 * <p>Default value is true.</p>
+	 *
+	 * @param handleDragEnabled true to activate, false otherwise
+	 */
+	public void setHandleDragEnabled(boolean handleDragEnabled) {
+		this.handleDragEnabled = handleDragEnabled;
 	}
 
 	/**
@@ -852,6 +884,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> ext
 	 */
 	public final void setSwipeEnabled(boolean swipeEnabled) {
 		initializeItemTouchHelper();
+		this.swipeEnabled = swipeEnabled;
 		mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
 	}
 

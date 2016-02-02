@@ -114,6 +114,15 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	}
 
 	@Override
+	public ExpandableViewHolder onCreateHeaderViewHolder(ViewGroup parent, int viewType) {
+		if (mInflater == null) {
+			mInflater = LayoutInflater.from(parent.getContext());
+		}
+		return new HeaderViewHolder(mInflater.inflate(R.layout.recycler_header_row, parent, false),
+				this);
+	}
+
+	@Override
 	public ExpandableViewHolder onCreateExpandableViewHolder(ViewGroup parent, int viewType) {
 		if (mInflater == null) {
 			mInflater = LayoutInflater.from(parent.getContext());
@@ -138,6 +147,13 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 						mInflater.inflate(R.layout.recycler_row, parent, false),
 						this);
 		}
+	}
+
+	@Override
+	public void onBindHeaderViewHolder(ExpandableViewHolder holder, int position) {
+		final Item header = getItem(position);
+		HeaderViewHolder hvHolder = (HeaderViewHolder) holder;
+		hvHolder.mTitle.setText(header.getTitle());
 	}
 
 	@Override
@@ -278,14 +294,14 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		}
 	}
 
-	/**
-	 * TODO: Rewrite Custom filter for the 2 examples Adapters (Expandable and simple Flexible)
-	 * Custom filter.
-	 *
-	 * @param item   The item to filter
-	 * @param constraint the current searchText
-	 * @return true if a match exists in the title or in the subtitle, false if no match found.
-	 */
+//	/**
+//	 * TODO: Rewrite Custom filter for the 2 examples Adapters (Expandable and simple Flexible)
+//	 * Custom filter.
+//	 *
+//	 * @param item   The item to filter
+//	 * @param constraint the current searchText
+//	 * @return true if a match exists in the title or in the subtitle, false if no match found.
+//	 */
 //	@Override
 //	protected boolean filterObject(Item item, String constraint) {
 //		String valueText = item.getTitle();
@@ -298,6 +314,16 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 //		valueText = item.getSubtitle();
 //		return valueText != null && valueText.toLowerCase().contains(constraint);
 //	}
+
+	static class HeaderViewHolder extends ExpandableViewHolder {
+
+		TextView mTitle;
+
+		public HeaderViewHolder(View view, FlexibleExpandableAdapter adapter) {
+			super(view, adapter);
+			mTitle = (TextView) view.findViewById(R.id.title);
+		}
+	}
 
 	/**
 	 * Used for UserLearnsSelection.

@@ -27,12 +27,12 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <p>Also, this adapter extends all the basic functionalities that {@link FlexibleAdapter} owns,
  * in order to customize all the possible behaviors coming from the events of expansion
  * or collapsing.</p>
- *
+ * 
  * <b>NOTE:</b>This Adapter supports Expandable of Expandable, but selection and restoration don't
  * work well in conjunction of multi level expansion. You should not enable functionalities like:
  * ActionMode, Undo, Drag and CollapseOnExpand in that case. Better change approach in favor
  * of a better and simpler design/layout: Allow to open the list of the subItem in a new Activity.
- *
+ * 
  * <p>Instead, this extra level of expansion is useful in situations where those items are not
  * selectable and draggable, and information in it are read only or action buttons.</p>
  *
@@ -72,6 +72,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 	public FlexibleExpandableAdapter(@NonNull List<T> items, Object listener) {
 		super(items, listener);
+		headers = new SparseArray<T>();
 		removedItems = new ArrayList<RemovedItem>();
 		//Expand initial items also after a screen rotation
 		expandInitialItems();
@@ -155,24 +156,47 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/* HEADERS/SECTIONS METHODS */
 	/*--------------------------*/
 
-	/**
-	 * Add a header section to the internal list.
-	 *
-	 * @param headerPosition header position
-	 * @param headerItem item of the header
-	 */
-	public void addHeader(int headerPosition, T headerItem) {
-		if (headerPosition < 0) {
-			Log.w(TAG, "Cannot addHeader on negative position!");
-			return;
-		}
-		if (headerItem == null) {
-			Log.w(TAG, "Cannot addHeader with null item!");
-			return;
-		}
-		headers.put(headerPosition, headerItem);
+	public FlexibleExpandableAdapter setHeaders(SparseArray<T> headers) {
+		return withHeaders(headers);
 	}
 
+	public FlexibleExpandableAdapter withHeaders(SparseArray<T> headers) {
+		if (headers != null) {
+			if (DEBUG) Log.v(TAG, "Settings " + headers.size() + " headers");
+			this.headers = headers;
+		}
+		return this;
+	}
+
+	/**
+	 * Add 1 header/section to the internal list at the user position.
+	 *
+	 * @param headerPosition header position
+	 * @param headerItem     item of the header
+	 * @param show           also immediate show the header to the user
+	 */
+	public FlexibleExpandableAdapter addHeader(int headerPosition, T headerItem, boolean show, boolean sticky) {
+		if (headerItem == null) {
+			Log.w(TAG, "Cannot addHeader with null item! headerPosition=" + headerPosition);
+			return this;
+		}
+		if (headerPosition < 0) {
+			Log.w(TAG, "Cannot addHeader on negative position! headerItem=" + headerItem);
+			return this;
+		}
+		headers.put(headerPosition, headerItem);
+		if (show) {
+			headerItem.setHidden(false);
+			super.addItem(headerPosition, headerItem);
+		}
+		return this;
+	}
+
+	/**
+	 * Retrieves all the header items.
+	 *
+	 * @return list non-null with all the header items.
+	 */
 	public List<T> getHeadersList() {
 		List<T> list = new ArrayList<T>(headers.size());
 		for (int i = 0; i < headers.size(); i++) {
@@ -181,28 +205,68 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		return list;
 	}
 
-	public void showHeaders() {
+	public List<Integer> getHeadersPositions() {
+		List<Integer> list = new ArrayList<Integer>(headers.size());
 		for (int i = 0; i < headers.size(); i++) {
-			if (!contains(headers.valueAt(i)))
-				super.addItem(headers.keyAt(i), headers.valueAt(i));
+			list.add(headers.keyAt(i));
+		}
+		return list;
+	}
+
+	/**
+	 * Shows all headers in the RecyclerView at their position
+	 */
+	public void showAllHeaders() {
+		for (int i = 0; i < headers.size(); i++) {
+			if (DEBUG) Log.v(TAG, "Showing Header " + headers.keyAt(i) + "=" + headers.valueAt(i));
+			if (!contains(headers.valueAt(i))) {
+				T headerItem = headers.valueAt(i);
+				headerItem.setHidden(false);
+				super.addItem(headers.keyAt(i), headerItem);
+			}
 		}
 	}
 
-	public void hideHeaders() {
-		for (int i = headers.size() - 1; i >= 0 ; i--) {
-			remove(headers.valueAt(i));
+	/**
+	 * Hides all headers from the RecyclerView.
+	 */
+	public void hideAllHeaders() {
+		for (int i = headers.size() - 1; i >= 0; i--) {
+			T headerItem = headers.valueAt(i);
+			headerItem.setHidden(true);
+			removeItem(headerItem);
 		}
 	}
 
-	public void remove(T item) {
-		int position = getGlobalPositionOf(item);
-		mItems.remove(item);
-		notifyItemRemoved(position);
+	/**
+	 * Completely remove the header from Adapter.
+	 *
+	 * @param position the known position of the header to remove
+	 */
+	public void deleteHeader(int position) {
+		int index = headers.indexOfKey(position);
+		if (index >= 0) {
+			removeItem(headers.valueAt(index));
+			headers.removeAt(index);
+		}
 	}
 
-	/*--------------*/
-	/* MAIN METHODS */
-	/*--------------*/
+	/**
+	 * Completely remove the header from Adapter.
+	 *
+	 * @param header the header item to remove
+	 */
+	public void deleteHeader(T header) {
+		int index = headers.indexOfValue(header);
+		if (index >= 0) {
+			removeItem(headers.valueAt(index));
+			headers.removeAt(index);
+		}
+	}
+
+	/*---------------------*/
+	/* VIEW HOLDER METHODS */
+	/*---------------------*/
 
 	//FIXME: Find a way to Not animate items with ItemAnimator!!!
 	//TODO: Customize child items animations (don't use add or remove ItemAnimator)
@@ -238,6 +302,137 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		T item = getItem(position);
 		return item != null && item.isExpandable();
 	}
+
+	/**
+	 * Returns the ViewType for an Expandable Item and for all others ViewTypes depends
+	 * by the current position.
+	 *
+	 * @param position position for which ViewType is requested
+	 * @return -1 for {@link #EXPANDABLE_VIEW_TYPE};
+	 * otherwise 0 (default) or any user value for all others ViewType
+	 */
+	@Override
+	public int getItemViewType(int position) {
+		//Header ViewType has priority
+		int index = headers.indexOfKey(position);
+		if (index >= 0) {
+			T header = headers.valueAt(index);
+			if (header != null && !header.isHidden())
+				return SECTION_VIEW_TYPE;
+		}
+		//Then check if expandable
+		T item = getItem(position);
+		if (item != null) {
+			//if (item.isHeader()) return SECTION_VIEW_TYPE;
+			if (item.isExpandable()) return EXPANDABLE_VIEW_TYPE;
+		}
+		//User ViewType
+		return super.getItemViewType(position);
+	}
+
+	/**
+	 * No more override is allowed here!
+	 * <p>Use {@link #onCreateExpandableViewHolder(ViewGroup, int)} to create expandable
+	 * ViewHolder.<br/>
+	 * Use {@link #onCreateFlexibleViewHolder(ViewGroup, int)} to create normal or child
+	 * ViewHolder instead.</p>
+	 *
+	 * @param parent   the ViewGroup into which the new View will be added after it is bound
+	 *                 to an adapter position
+	 * @param viewType the view type of the new View
+	 * @return a new {@link FlexibleViewHolder} that holds a View of the given view type
+	 * @see #onCreateExpandableViewHolder(ViewGroup, int)
+	 * @see #onCreateFlexibleViewHolder(ViewGroup, int)
+	 */
+	@Override
+	public final FlexibleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		if (viewType == SECTION_VIEW_TYPE) {
+			return onCreateHeaderViewHolder(parent, viewType);
+		} else if (viewType == EXPANDABLE_VIEW_TYPE) {
+			return onCreateExpandableViewHolder(parent, viewType);
+		} else {
+			return onCreateFlexibleViewHolder(parent, viewType);
+		}
+	}
+
+	public EVH onCreateHeaderViewHolder(ViewGroup parent, int viewType) {
+		return null;
+	}
+
+	/**
+	 * Creates ViewHolder that is expandable. Will return any ViewHolder of class that extends
+	 * {@link ExpandableViewHolder}.
+	 *
+	 * @param parent   The ViewGroup into which the new View will be added after it is bound to
+	 *                 an adapter position.
+	 * @param viewType The view type of the new View. Value {@link #EXPANDABLE_VIEW_TYPE}
+	 *                 = {@value #EXPANDABLE_VIEW_TYPE}
+	 * @return A new {@link ExpandableViewHolder} that holds a View that can be expanded or collapsed
+	 */
+	public abstract EVH onCreateExpandableViewHolder(ViewGroup parent, int viewType);
+
+	/**
+	 * Creates ViewHolder that generally is not expandable or it's a child of an
+	 * {@link ExpandableViewHolder}. Will return any ViewHolder of class that extends
+	 * {@link FlexibleViewHolder}.
+	 * <p>This is the good place to create and return any custom ViewType that extends
+	 * {@link FlexibleViewHolder}.</p>
+	 *
+	 * @param parent   The ViewGroup into which the new View will be added after it is bound to
+	 *                 an adapter position.
+	 * @param viewType The view type of the new View, must be different of
+	 *                 {@link #EXPANDABLE_VIEW_TYPE} = {@value #EXPANDABLE_VIEW_TYPE}.
+	 * @return A new FlexibleViewHolder that holds a View that can be child of the expanded views.
+	 */
+	public abstract FlexibleViewHolder onCreateFlexibleViewHolder(ViewGroup parent, int viewType);
+
+	/**
+	 * No more override is allowed here!
+	 * <p>Use {@link #onBindExpandableViewHolder(ExpandableViewHolder, int)} to bind expandable
+	 * ViewHolder.<br/>
+	 * Use {@link #onBindFlexibleViewHolder(FlexibleViewHolder, int)} to bind normal or child
+	 * ViewHolder instead.</p>
+	 *
+	 * @param holder   the ViewHolder created
+	 * @param position the adapter position to bind
+	 * @see #onBindFlexibleViewHolder(FlexibleViewHolder, int)
+	 * @see #onBindExpandableViewHolder(ExpandableViewHolder, int)
+	 */
+	@Override
+	public final void onBindViewHolder(FlexibleViewHolder holder, int position) {
+		if (getItemViewType(position) == SECTION_VIEW_TYPE) {
+			onBindHeaderViewHolder((EVH) holder, position);
+		} else if (getItemViewType(position) == EXPANDABLE_VIEW_TYPE) {
+			onBindExpandableViewHolder((EVH) holder, position);
+		} else {
+			onBindFlexibleViewHolder(holder, position);
+		}
+	}
+
+	public void onBindHeaderViewHolder(EVH holder, int position) {
+
+	}
+
+	/**
+	 * Method to bind only Expandable items that implement {@link IExpandableItem}.
+	 *
+	 * @param holder   the ViewHolder created of type {@link ExpandableViewHolder}
+	 * @param position the adapter position to bind
+	 */
+	public abstract void onBindExpandableViewHolder(EVH holder, int position);
+
+	/**
+	 * Method to bind all others no-Expandable items that implement {@link IFlexibleItem}.
+	 *
+	 * @param holder   the ViewHolder created of type {@link FlexibleViewHolder}
+	 * @param position the adapter position to bind
+	 * @see #onBindExpandableViewHolder(ExpandableViewHolder, int)
+	 */
+	public abstract void onBindFlexibleViewHolder(FlexibleViewHolder holder, int position);
+
+	/*--------------*/
+	/* MAIN METHODS */
+	/*--------------*/
 
 	/**
 	 * Retrieves the parent of a child.
@@ -332,112 +527,6 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * Returns the ViewType for an Expandable Item and for all others ViewTypes depends
-	 * by the current position.
-	 *
-	 * @param position position for which ViewType is requested
-	 * @return -1 for {@link #EXPANDABLE_VIEW_TYPE};
-	 * otherwise 0 (default) or any user value for all others ViewType
-	 */
-	@Override
-	public int getItemViewType(int position) {
-		T item = getItem(position);
-		if (item != null) {
-			//if (item.isHeader()) return SECTION_VIEW_TYPE;
-			if (item.isExpandable()) return EXPANDABLE_VIEW_TYPE;
-		}
-		return super.getItemViewType(position);
-	}
-
-	/**
-	 * Creates ViewHolder that is expandable. Will return any ViewHolder of class that extends
-	 * {@link ExpandableViewHolder}.
-	 *
-	 * @param parent   The ViewGroup into which the new View will be added after it is bound to
-	 *                 an adapter position.
-	 * @param viewType The view type of the new View. Value {@link #EXPANDABLE_VIEW_TYPE}
-	 *                 = {@value #EXPANDABLE_VIEW_TYPE}
-	 * @return A new {@link ExpandableViewHolder} that holds a View that can be expanded or collapsed
-	 */
-	public abstract EVH onCreateExpandableViewHolder(ViewGroup parent, int viewType);
-
-	/**
-	 * Creates ViewHolder that generally is not expandable or it's a child of an
-	 * {@link ExpandableViewHolder}. Will return any ViewHolder of class that extends
-	 * {@link FlexibleViewHolder}.
-	 * <p>This is the good place to create and return any custom ViewType that extends
-	 * {@link FlexibleViewHolder}.</p>
-	 *
-	 * @param parent   The ViewGroup into which the new View will be added after it is bound to
-	 *                 an adapter position.
-	 * @param viewType The view type of the new View, must be different of
-	 *                 {@link #EXPANDABLE_VIEW_TYPE} = {@value #EXPANDABLE_VIEW_TYPE}.
-	 * @return A new FlexibleViewHolder that holds a View that can be child of the expanded views.
-	 */
-	public abstract FlexibleViewHolder onCreateFlexibleViewHolder(ViewGroup parent, int viewType);
-
-	/**
-	 * No more override is allowed here!
-	 * <p>Use {@link #onCreateExpandableViewHolder(ViewGroup, int)} to create expandable
-	 * ViewHolder.<br/>
-	 * Use {@link #onCreateFlexibleViewHolder(ViewGroup, int)} to create normal or child
-	 * ViewHolder instead.</p>
-	 *
-	 * @param parent   the ViewGroup into which the new View will be added after it is bound
-	 *                 to an adapter position
-	 * @param viewType the view type of the new View
-	 * @return a new {@link FlexibleViewHolder} that holds a View of the given view type
-	 * @see #onCreateExpandableViewHolder(ViewGroup, int)
-	 * @see #onCreateFlexibleViewHolder(ViewGroup, int)
-	 */
-	@Override
-	public final FlexibleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		if (viewType == EXPANDABLE_VIEW_TYPE) {
-			return onCreateExpandableViewHolder(parent, viewType);
-		} else {
-			return onCreateFlexibleViewHolder(parent, viewType);
-		}
-	}
-
-	/**
-	 * Method to bind only Expandable items that implement {@link IExpandableItem}.
-	 *
-	 * @param holder   the ViewHolder created of type {@link ExpandableViewHolder}
-	 * @param position the adapter position to bind
-	 */
-	public abstract void onBindExpandableViewHolder(EVH holder, int position);
-
-	/**
-	 * Method to bind all others no-Expandable items that implement {@link IFlexibleItem}.
-	 *
-	 * @param holder   the ViewHolder created of type {@link FlexibleViewHolder}
-	 * @param position the adapter position to bind
-	 * @see #onBindExpandableViewHolder(ExpandableViewHolder, int)
-	 */
-	public abstract void onBindFlexibleViewHolder(FlexibleViewHolder holder, int position);
-
-	/**
-	 * No more override is allowed here!
-	 * <p>Use {@link #onBindExpandableViewHolder(ExpandableViewHolder, int)} to bind expandable
-	 * ViewHolder.<br/>
-	 * Use {@link #onBindFlexibleViewHolder(FlexibleViewHolder, int)} to bind normal or child
-	 * ViewHolder instead.</p>
-	 *
-	 * @param holder   the ViewHolder created
-	 * @param position the adapter position to bind
-	 * @see #onBindFlexibleViewHolder(FlexibleViewHolder, int)
-	 * @see #onBindExpandableViewHolder(ExpandableViewHolder, int)
-	 */
-	@Override
-	public final void onBindViewHolder(FlexibleViewHolder holder, int position) {
-		if (getItemViewType(position) == EXPANDABLE_VIEW_TYPE) {
-			onBindExpandableViewHolder((EVH) holder, position);
-		} else {
-			onBindFlexibleViewHolder(holder, position);
-		}
-	}
-
-	/**
 	 * Expands an item that is Expandable, not yet expanded, that has subItems and
 	 * no child is selected.
 	 *
@@ -474,7 +563,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 			item.setExpanded(true);
 
 			//Automatically scroll the current expandable item to show as much children as possible
-			if (scrollOnExpand) {
+			if (scrollOnExpand && !expandAll) {
 				//Must be delayed to give time at RecyclerView to recalculate positions
 				//after an automatic collapse
 				final int pos = position, count = subItemsCount;
@@ -511,7 +600,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	/**
 	 * Collapses an Expandable item that is already expanded, in conjunction with no subItems
 	 * selected or item is pending removal (used in combination with removeRange).
-	 *
+	 * 
 	 * <p>All Expandable subItem, that are expanded, are recursively collapsed.</p>
 	 *
 	 * @param position the position of the item to collapse
@@ -1193,6 +1282,22 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		}
 	}
 
+	private void adjustHeaders(int startPosition, int itemCount) {
+		boolean adjusted = false;
+		for (int i = 0; i < headers.size(); i++) {
+			int position = headers.keyAt(i);
+			if (position > startPosition) {
+				if (DEBUG)
+					Log.v(TAG, "Adjust Header position " + position + " to " + Math.max(position + itemCount, startPosition));
+				T header = headers.get(i);
+				headers.delete(i);
+				headers.put(position + itemCount, header);
+				adjusted = true;
+			}
+		}
+		if (DEBUG && adjusted) Log.v(TAG, "AdjustedHeaders=" + getHeadersPositions());
+	}
+
 	private void adjustSelected(int startPosition, int itemCount) {
 		List<Integer> selectedPositions = getSelectedPositions();
 		boolean adjusted = false;
@@ -1271,6 +1376,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 
 		private void adjustPositions(int positionStart, int itemCount) {
 			if (!filtering) {//Filtering has multiple insert and removal, we skip this process
+				//adjustHeaders(positionStart, itemCount);
 				if (adjustSelected)//Don't, if remove range / restore children
 					adjustSelected(positionStart, itemCount);
 				if (adjustRemoved)//Don't, if remove range / restore parents
@@ -1334,14 +1440,50 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		}
 	}
 
-	private static class Header<T extends IExpandableItem<T>> {
+	public class Header<T extends IExpandableItem<T>> {
 		int headerPosition;
 		int firstPosition;
-		T item;
+		T headerItem;
+		boolean shown;
+		boolean sticky;
 
-		public Header(int headerPosition, T item) {
+		/**
+		 * @param headerPosition header position
+		 * @param firstPosition  the position of the first item which the header/section will represent
+		 * @param headerItem     the header item with all content
+		 * @param shown          display header at the startup
+		 * @param sticky         make header sticky
+		 */
+		public Header(int headerPosition, int firstPosition, T headerItem, boolean shown, boolean sticky) {
 			this.headerPosition = headerPosition;
-			this.item = item;
+			this.firstPosition = firstPosition;
+			this.headerItem = headerItem;
+			this.shown = shown;
+			this.sticky = sticky;
+		}
+
+		public void hide() {
+			addItem(headerPosition, headers.get(headerPosition));
+			headerItem.setHidden(true);
+			shown = false;
+		}
+
+		public void show() {
+			removeItem(headerPosition);
+			headerItem.setHidden(false);
+			shown = true;
+		}
+
+		public boolean isShown() {
+			return shown;
+		}
+
+		public void setSticky(boolean sticky) {
+			this.sticky = sticky;
+		}
+
+		public boolean isSticky() {
+			return sticky;
 		}
 	}
 
