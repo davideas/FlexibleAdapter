@@ -44,7 +44,8 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>30/01/2016 Class now extends {@link FlexibleAnimatorAdapter} that extends {@link SelectableAdapter}
  */
 //@SuppressWarnings({"unused", "Convert2Diamond"})
-public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T> extends FlexibleAnimatorAdapter<VH>
+public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T extends IFlexibleItem>
+		extends FlexibleAnimatorAdapter<VH>
 		implements ItemTouchHelperCallback.AdapterCallback {
 
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();

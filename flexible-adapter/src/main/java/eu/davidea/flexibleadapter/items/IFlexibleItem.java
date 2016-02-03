@@ -7,7 +7,7 @@ package eu.davidea.flexibleadapter.items;
  * @author Davide Steduto
  * @since 19/01/2016 Created
  */
-public interface IFlexibleItem<T> {
+public interface IFlexibleItem {
 
 	/*---------*/
 	/* METHODS */

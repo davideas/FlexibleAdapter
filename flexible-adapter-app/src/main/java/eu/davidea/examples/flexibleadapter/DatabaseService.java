@@ -50,10 +50,9 @@ public class DatabaseService {
 		if (i % 1 == 0) {
 			item.setTitle("Expandable Item " + i);
 			for (int j = 1; j <= SUB_ITEMS; j++) {
-				Item subItem = new Item();
-				subItem.setId(item.getId()+"s"+j);
+				SubItem subItem = new SubItem();
+				subItem.setId(item.getId() + "s" + j);
 				subItem.setTitle("Sub Item " + j);
-				subItem.setParent(item);
 				item.addSubItem(subItem);
 			}
 		}
@@ -67,7 +66,7 @@ public class DatabaseService {
 		for (int i = 0; i < (ITEMS/HEADERS); i++) {
 			Item header = new Item();
 			header.setId("H" + i);
-			header.setTitle("Header " + (i+1));
+			header.setTitle("Header " + (i + 1));
 			header.setSelectable(false);
 			header.setHidden(true);
 			headers.put(1 + i * HEADERS, header);
@@ -90,15 +89,12 @@ public class DatabaseService {
 	}
 
 	public void removeItem(Item item) {
-		//Is a Parent?
-		if (item.isExpandable()) {
-			mItems.remove(item);
-		} else {
-			Item parent = item.getParent();
-			if (parent.contains(item)) {
-				parent.removeSubItem(item);
-				parent.updateSubTitle();
-			}
+		mItems.remove(item);
+	}
+
+	public void removeSubItem(Item parent, SubItem child) {
+		if (parent.contains(child)) {
+			parent.getSubItems().remove(child);
 		}
 	}
 
@@ -109,7 +105,7 @@ public class DatabaseService {
 			mItems.add(item);
 	}
 
-	public void addSubItem(int i, Item parent, Item subItem) {
+	public void addSubItem(int i, Item parent, SubItem subItem) {
 		parent.addSubItem(i, subItem);
 		parent.setSubtitle(parent.getSubItemsCount() + " subItems");
 	}

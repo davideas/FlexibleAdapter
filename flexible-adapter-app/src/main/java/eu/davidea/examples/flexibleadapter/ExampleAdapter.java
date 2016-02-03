@@ -21,13 +21,14 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
+import eu.davidea.flexibleadapter.items.IExpandableItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 
-public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHolder, Item> {
+public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHolder, Item, SubItem> {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 
@@ -69,7 +70,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	}
 
 	private void addUserLearnedSelection() {
-		Item uls = getItem(0);
+		Item uls = (Item) getItem(0);
 		if (!DatabaseService.userLearnedSelection && !hasSearchText() &&
 				(uls == null || !uls.getId().equals("ULS"))) {
 			//Define Example View
@@ -151,15 +152,15 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 
 	@Override
 	public void onBindHeaderViewHolder(ExpandableViewHolder holder, int position) {
-		final Item header = getItem(position);
+		final IExpandableItem header = getItem(position);
 		HeaderViewHolder hvHolder = (HeaderViewHolder) holder;
-		hvHolder.mTitle.setText(header.getTitle());
+		hvHolder.mTitle.setText(((Item) header).getTitle());
 	}
 
 	@Override
 	public void onBindExpandableViewHolder(ExpandableViewHolder holder, int position) {
 //		if (DEBUG) Log.d(TAG, "onBindParentViewHolder for position " + position);
-		final Item item = getItem(position);
+		final Item item = (Item) getItem(position);
 
 		ParentViewHolder pvHolder = (ParentViewHolder) holder;
 		//When user scrolls, this line binds the correct selection status
@@ -206,11 +207,11 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	@Override
 	public void onBindFlexibleViewHolder(FlexibleViewHolder holder, int position) {
 //		if (DEBUG) Log.d(TAG, "onBindChildViewHolder for position " + position);
-		final Item item = getItem(position);
 
 		//NOTE: ViewType Must be checked ALSO here to bind the correct view
 		switch (getItemViewType(position)) {
 			case EXAMPLE_VIEW_TYPE:
+				final Item item = (Item) getItem(position);
 				ExampleViewHolder exHolder = (ExampleViewHolder) holder;
 				exHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 				exHolder.itemView.setActivated(true);
@@ -221,6 +222,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 				return;
 
 			default:
+				final Item subItem = (Item) getItem(position);
 				ChildViewHolder cvHolder = (ChildViewHolder) holder;
 				//When user scrolls, this line binds the correct selection status
 				cvHolder.itemView.setActivated(isSelected(position));
@@ -235,9 +237,9 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 				//In case of searchText matches with Title or with an Item's field
 				// this will be highlighted
 				if (hasSearchText()) {
-					setHighlightText(cvHolder.mTitle, item.getTitle(), mSearchText);
+					setHighlightText(cvHolder.mTitle, subItem.getTitle(), mSearchText);
 				} else {
-					cvHolder.mTitle.setText(item.getTitle());
+					cvHolder.mTitle.setText(subItem.getTitle());
 				}
 		}//end-switch
 	}
@@ -275,7 +277,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	public String onCreateBubbleText(int position) {
 		if (!DatabaseService.userLearnedSelection && position == 0) {//This 'if' is for my example only
 			//TODO FOR YOU: This is the normal line you should use: Usually it's the first letter
-			return getItem(position).getTitle().substring(0, 1).toUpperCase();
+			return ""+position;
 		}
 		return super.onCreateBubbleText(position);
 	}

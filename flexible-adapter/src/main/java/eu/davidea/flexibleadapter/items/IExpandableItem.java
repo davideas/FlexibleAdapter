@@ -11,7 +11,7 @@ import java.util.List;
  * @author Davide Steduto
  * @since 17/01/2016 Created
  */
-public interface IExpandableItem<T> extends IFlexibleItem<T> {
+public interface IExpandableItem<S extends IExpandableItem> extends IFlexibleItem {
 
 	/*--------------------*/
 	/* EXPANDABLE METHODS */
@@ -31,9 +31,9 @@ public interface IExpandableItem<T> extends IFlexibleItem<T> {
 
 	//T getParent();
 
-	void setParent(T item);
+	//void setParent(T item);
 
-	List<T> getSubItems();
+	List<S> getSubItems();
 
 	//void setSubItems(List<T> items);
 

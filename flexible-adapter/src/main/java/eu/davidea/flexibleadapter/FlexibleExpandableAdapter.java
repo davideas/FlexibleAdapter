@@ -47,7 +47,8 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>30/01/2016 New code reorganization
  */
 //@SuppressWarnings({"unused", "Convert2Diamond", "unchecked"})
-public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder, T extends IExpandableItem<T>>
+public abstract class FlexibleExpandableAdapter
+			<EVH extends ExpandableViewHolder, T extends IExpandableItem, S extends IExpandableItem>
 		extends FlexibleAdapter<FlexibleViewHolder, T> {
 
 	private static final String TAG = FlexibleExpandableAdapter.class.getSimpleName();
@@ -446,7 +447,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	public T getExpandableOf(@NonNull T child) {
 		for (T parent : mItems) {
 			if (parent.isExpandable() && parent.isExpanded() && parent.getSubItemsCount() > 0) {
-				for (T subItem : parent.getSubItems()) {
+				for (S subItem : parent.getSubItems()) {
 					//Pick up only no-hidden items
 					if (!subItem.isHidden() && subItem.equals(child))
 						return parent;
@@ -724,7 +725,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 	}
 
 	/**
-	 * Wrapper method of {@link #addItem(int, Object)} for expandable items (Parents).
+	 * Wrapper method of {@link #addItem(int, IFlexibleItem)} for expandable items (Parents).
 	 *
 	 * @param position       the position of the item to add
 	 * @param expandableItem item to add, must be an instance of {@link IExpandableItem}
@@ -1412,7 +1413,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 //		List<T> siblings = new ArrayList<T>();
 //	}
 
-	private static class RemovedItem<T extends IExpandableItem<T>> {
+	private static class RemovedItem<T extends IExpandableItem> {
 		int parentPosition = -1, relativePosition = -1;
 		T item = null;
 		boolean notifyParentChanged = false;
@@ -1440,7 +1441,7 @@ public abstract class FlexibleExpandableAdapter<EVH extends ExpandableViewHolder
 		}
 	}
 
-	public class Header<T extends IExpandableItem<T>> {
+	public class Header<T extends IExpandableItem> {
 		int headerPosition;
 		int firstPosition;
 		T headerItem;

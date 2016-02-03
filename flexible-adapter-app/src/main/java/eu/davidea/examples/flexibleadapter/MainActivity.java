@@ -33,6 +33,8 @@ import eu.davidea.common.SimpleDividerItemDecoration;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
+import eu.davidea.flexibleadapter.items.AbstractExpandableItem;
+import eu.davidea.flexibleadapter.items.IExpandableItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 
@@ -500,10 +502,17 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onDeleteConfirmed() {
-		for (Item item : mAdapter.getDeletedItems()) {
+		for (IExpandableItem adapterItem : mAdapter.getDeletedItems()) {
 			//Remove items from your Database. Example:
-			DatabaseService.getInstance().removeItem(item);
-			Log.d(TAG, "Confirm removed " + item.getTitle() + (item.getParent() != null ? " parent " + item.getParent() : ""));
+			if (adapterItem.isExpandable()) {
+				Item item = (Item) adapterItem;
+				DatabaseService.getInstance().removeItem(item);
+				Log.d(TAG, "Confirm removed " + item.getTitle());
+			} else {
+				SubItem subItem = (SubItem) adapterItem;
+				DatabaseService.getInstance().removeSubItem(mAdapter.getExpandableOf(subItem), subItem);
+				Log.d(TAG, "Confirm removed " + subItem.getTitle() + (subItem.getParent() != null ? " parent " + subItem.getParent() : ""));
+			}
 		}
 	}
 

@@ -11,18 +11,18 @@ import java.util.List;
  * @author Davide Steduto
  * @since 17/01/2016 Created
  */
-public abstract class AbstractExpandableItem<T extends IExpandableItem<T>>
-		extends AbstractFlexibleItem<T>
-		implements IExpandableItem<T> {
+public abstract class AbstractExpandableItem<S extends IExpandableItem>
+		extends AbstractFlexibleItem
+		implements IExpandableItem<S> {
 
 	/** Reference to the Parent Item */
-	private T mParent;
+	//private T mParent;
 
 	/* Flags for FlexibleExpandableAdapter */
 	private boolean mExpandable = false, mExpanded = false;
 
 	/** subItems list */
-	private List<T> mSubItems;
+	private List<S> mSubItems;
 	//SparseArray<T> mRemovedItems = new SparseArray<T>();
 
 
@@ -79,30 +79,30 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>>
 	/*-------------------*/
 
 	//@Override
-	public final T getParent() {
-		return mParent;
-	}
+//	public final T getParent() {
+//		return mParent;
+//	}
 
-	@Override
-	public final void setParent(T item) {
-		mParent = item;
-	}
+	//@Override
+//	public final void setParent(T item) {
+//		mParent = item;
+//	}
 
 	public final boolean hasSubItems() {
 		return mSubItems!= null && mSubItems.size() > 0;
 	}
 
 	@Override
-	public final List<T> getSubItems() {
+	public final List<S> getSubItems() {
 		return mSubItems;
 	}
 
 	//@Override
-	public void setSubItems(List<T> items) {
-		for (T item : items) {
-			item.setParent((T) this);
-		}
-		mSubItems = new ArrayList<>(items);
+	public void setSubItems(List<S> subItem) {
+//		for (T item : items) {
+//			item.setParent((T) this);
+//		}
+		mSubItems = new ArrayList<>(subItem);
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>>
 	}
 
 	//@Override
-	public T getSubItem(int position) {
+	public S getSubItem(int position) {
 		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
 			return mSubItems.get(position);
 		}
@@ -119,49 +119,50 @@ public abstract class AbstractExpandableItem<T extends IExpandableItem<T>>
 	}
 
 	//@Override
-	public final int getSubItemPosition(T item) {
-		return mSubItems != null ? mSubItems.indexOf(item) : -1;
+	public final int getSubItemPosition(S subItem) {
+		return mSubItems != null ? mSubItems.indexOf(subItem) : -1;
 	}
 
 	//@Override
-	public void addSubItem(T item) {
+	public void addSubItem(S subItem) {
 		if (mSubItems == null)
-			mSubItems = new ArrayList<T>();
-		item.setParent((T) this);
-		mSubItems.add(item);
+			mSubItems = new ArrayList<S>();
+//		item.setParent((T) this);
+		mSubItems.add(subItem);
 	}
 
 	//@Override
-	public void addSubItem(int position, T item) {
+	public void addSubItem(int position, S subItem) {
 		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
-			item.setParent((T) this);
-			mSubItems.add(position, item);
+//			subItem.setParent((T) this);
+			mSubItems.add(position, subItem);
 		} else
-			addSubItem(item);
+			addSubItem(subItem);
 	}
 
 	//@Override
-	public boolean contains(T item) {
-		return mSubItems != null && mSubItems.contains(item);
+	public boolean contains(S subItem) {
+		return mSubItems != null && mSubItems.contains(subItem);
 	}
 
 	//@Override
-	public boolean removeSubItem(T item) {
-		int position = mSubItems.indexOf(item);
-		if (mSubItems != null && position >= 0) {
-			return mSubItems.remove(item);
-		}
-		return false;
-	}
+//	public boolean removeSubItem(T item) {
+//		int position = mSubItems.indexOf(item);
+//		if (mSubItems != null && position >= 0) {
+//			mRemovedItems.put(position, item);
+//			return mSubItems.remove(item);
+//		}
+//		return false;
+//	}
 
 	//@Override
-	public boolean removeSubItem(int position) {
-		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
-			mSubItems.remove(position);
-			return true;
-		}
-		return false;
-	}
+//	public boolean removeSubItem(int position) {
+//		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
+//			mRemovedItems.put(position, mSubItems.remove(position));
+//			return true;
+//		}
+//		return false;
+//	}
 
 //	public void restoreDeletedSubItems() {
 //		for (int i = 0; i < mRemovedItems.size(); i++) {

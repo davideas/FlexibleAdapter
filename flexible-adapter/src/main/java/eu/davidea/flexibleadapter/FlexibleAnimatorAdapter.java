@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -203,7 +204,9 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	 * @see #animateView(View, int, boolean)
 	 * @see #getItemViewType(int)
 	 */
-	public abstract List<Animator> getAnimators(View itemView, int position, boolean isSelected);
+	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
+		return new ArrayList<Animator>();
+	}
 
 	/**
 	 * Cancels any existing animations for given View. Useful when fling.

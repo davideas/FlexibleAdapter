@@ -7,8 +7,7 @@ package eu.davidea.flexibleadapter.items;
  * @author Davide Steduto
  * @since 20/01/2016 Created
  */
-public abstract class AbstractFlexibleItem<T extends IFlexibleItem<T>>
-		implements IFlexibleItem<T> {
+public abstract class AbstractFlexibleItem implements IFlexibleItem {
 
 	/* Flags for the Adapter */
 	boolean mEnabled = true,
