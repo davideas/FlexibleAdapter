@@ -42,6 +42,36 @@ public interface IFlexibleItem {
 	 */
 	void setHidden(boolean hidden);
 
+	/*--------------------*/
+	/* SELECTABLE METHODS */
+	/*--------------------*/
+
+	/**
+	 * Return if the item can be selected.<br/>
+	 *
+	 * @return (default) true for a Selectable item, false otherwise
+	 */
+	boolean isSelectable();
+
+	/**
+	 * Setter to change selectable behaviour.
+	 *
+	 * @param selectable false to disable selection on this item
+	 */
+	void setSelectable(boolean selectable);
+
+	/*-------------------*/
+	/* TOUCHABLE METHODS */
+	/*-------------------*/
+
+	boolean isDraggable();
+
+	void setDraggable(boolean draggable);
+
+	boolean isSwipeable();
+
+	void setSwipeable(boolean swipeable);
+
 	/*---------------------*/
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/
@@ -67,23 +97,5 @@ public interface IFlexibleItem {
 //	VH getViewHolder(Inflater inflater, ViewGroup parent);
 
 //	void bindViewHolder(VH holder);
-
-	/*--------------------*/
-	/* SELECTABLE METHODS */
-	/*--------------------*/
-
-	/**
-	 * Return if the item can be selected.<br/>
-	 *
-	 * @return (default) true for a Selectable item, false otherwise
-	 */
-	boolean isSelectable();
-
-	/**
-	 * Setter to change selectable behaviour.
-	 *
-	 * @param selectable false to disable selection on this item
-	 */
-	void setSelectable(boolean selectable);
 
 }

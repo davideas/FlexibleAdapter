@@ -9,10 +9,12 @@ package eu.davidea.flexibleadapter.items;
  */
 public abstract class AbstractFlexibleItem implements IFlexibleItem {
 
-	/* Flags for the Adapter */
+	/* Item flags recognized by the Adapter */
 	boolean mEnabled = true,
 			mHidden = false,
-			mSelectable = true;
+			mSelectable = true,
+			mDraggable = false,
+			mSwipeable = false;
 
 	/**
 	 * You <b>must</b> implement this method to compare items Identifiers.
@@ -29,6 +31,7 @@ public abstract class AbstractFlexibleItem implements IFlexibleItem {
 		return mEnabled;
 	}
 
+	@Override
 	public void setEnabled(boolean enabled) {
 		mEnabled = enabled;
 	}
@@ -41,6 +44,44 @@ public abstract class AbstractFlexibleItem implements IFlexibleItem {
 	@Override
 	public void setHidden(boolean hidden) {
 		mHidden = hidden;
+	}
+
+	/*--------------------*/
+	/* SELECTABLE METHODS */
+	/*--------------------*/
+
+	@Override
+	public boolean isSelectable() {
+		return mSelectable;
+	}
+
+	@Override
+	public void setSelectable(boolean selectable) {
+		this.mSelectable = selectable;
+	}
+
+	/*-------------------*/
+	/* TOUCHABLE METHODS */
+	/*-------------------*/
+
+	@Override
+	public boolean isDraggable() {
+		return mDraggable;
+	}
+
+	@Override
+	public void setDraggable(boolean draggable) {
+		mDraggable = draggable;
+	}
+
+	@Override
+	public boolean isSwipeable() {
+		return mSwipeable;
+	}
+
+	@Override
+	public void setSwipeable(boolean swipeable) {
+		mSwipeable = swipeable;
 	}
 
 	/*---------------------*/
@@ -60,19 +101,5 @@ public abstract class AbstractFlexibleItem implements IFlexibleItem {
 //
 //	@Override
 //	public abstract void bindViewHolder(VH holder);
-
-	/*--------------------*/
-	/* SELECTABLE METHODS */
-	/*--------------------*/
-
-	@Override
-	public boolean isSelectable() {
-		return mSelectable;
-	}
-
-	@Override
-	public void setSelectable(boolean selectable) {
-		this.mSelectable = selectable;
-	}
 
 }

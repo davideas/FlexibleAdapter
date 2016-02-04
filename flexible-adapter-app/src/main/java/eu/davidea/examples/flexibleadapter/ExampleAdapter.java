@@ -20,15 +20,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import eu.davidea.examples.models.Item;
+import eu.davidea.flexibleadapter.FlexibleAdapterMerge;
 import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
-import eu.davidea.flexibleadapter.items.IExpandableItem;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.IFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 
-public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHolder, Item, SubItem> {
+public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, IFlexibleItem> {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 
@@ -69,6 +73,16 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 		addUserLearnedSelection();
 	}
 
+	@Override
+	public ExpandableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		return null;
+	}
+
+	@Override
+	public void onBindViewHolder(ExpandableViewHolder holder, int position) {
+
+	}
+
 	private void addUserLearnedSelection() {
 		Item uls = (Item) getItem(0);
 		if (!DatabaseService.userLearnedSelection && !hasSearchText() &&
@@ -77,7 +91,6 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 			Item item = new Item();
 			item.setId("ULS");
 			item.setEnabled(false);
-			item.setExpandable(true);//Mark Expandable also this (same level of others items)
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
 			super.addItem(0, item);
@@ -91,7 +104,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 	}
 
 	@Override
-	public synchronized void filterItems(@NonNull List<Item> unfilteredItems) {
+	public synchronized void filterItems(@NonNull List<IFlexibleItem> unfilteredItems) {
 		super.filterItems(unfilteredItems);
 		addUserLearnedSelection();
 	}
@@ -152,7 +165,7 @@ public class ExampleAdapter extends FlexibleExpandableAdapter<ExpandableViewHold
 
 	@Override
 	public void onBindHeaderViewHolder(ExpandableViewHolder holder, int position) {
-		final IExpandableItem header = getItem(position);
+		final IExpandable header = getItem(position);
 		HeaderViewHolder hvHolder = (HeaderViewHolder) holder;
 		hvHolder.mTitle.setText(((Item) header).getTitle());
 	}

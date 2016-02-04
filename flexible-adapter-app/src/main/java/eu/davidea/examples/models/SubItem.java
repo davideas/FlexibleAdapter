@@ -1,21 +1,20 @@
-package eu.davidea.examples.flexibleadapter;
+package eu.davidea.examples.models;
 
 import java.io.Serializable;
 
-import eu.davidea.flexibleadapter.items.AbstractExpandableItem;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 
-public class Item extends AbstractExpandableItem<SubItem> implements Serializable {
+public class SubItem extends AbstractFlexibleItem implements Serializable {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 
 	private String id;
 	private String title;
-	private String subtitle;
 
 	@Override
 	public boolean equals(Object inObject) {
-		if (inObject instanceof Item) {
-			Item inItem = (Item) inObject;
+		if (inObject instanceof SubItem) {
+			SubItem inItem = (SubItem) inObject;
 			return this.id.equals(inItem.id);
 		}
 		return false;
@@ -37,25 +36,12 @@ public class Item extends AbstractExpandableItem<SubItem> implements Serializabl
 		this.title = title;
 	}
 
-	public String getSubtitle() {
-		return subtitle;
-	}
-
-	public void setSubtitle(String subtitle) {
-		this.subtitle = subtitle;
-	}
-
 	@Override
 	public String toString() {
 		return "Item[" +
 //				"id=" + id +
 				"title=" + title +
 				super.toString() + ']';
-	}
-
-	public String updateSubTitle() {
-		setSubtitle(getSubItemsCount() + " subItems");
-		return subtitle;
 	}
 
 }

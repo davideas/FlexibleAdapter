@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import eu.davidea.common.SimpleTextWatcher;
+import eu.davidea.examples.models.Item;
 import eu.davidea.utils.Utils;
 
 

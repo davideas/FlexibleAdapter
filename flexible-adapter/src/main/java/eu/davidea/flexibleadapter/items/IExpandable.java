@@ -11,15 +11,11 @@ import java.util.List;
  * @author Davide Steduto
  * @since 17/01/2016 Created
  */
-public interface IExpandableItem<S extends IExpandableItem> extends IFlexibleItem {
+public interface IExpandable<T extends IFlexibleItem> {
 
 	/*--------------------*/
 	/* EXPANDABLE METHODS */
 	/*--------------------*/
-
-	boolean isExpandable();
-
-	void setExpandable(boolean expandable);
 
 	boolean isExpanded();
 
@@ -29,28 +25,8 @@ public interface IExpandableItem<S extends IExpandableItem> extends IFlexibleIte
 	/* SUB ITEMS METHODS */
 	/*-------------------*/
 
-	//T getParent();
-
-	//void setParent(T item);
-
-	List<S> getSubItems();
-
-	//void setSubItems(List<T> items);
+	List<T> getSubItems();
 
 	int getSubItemsCount();
-
-	//T getSubItem(int position);
-
-	//int getSubItemPosition(T item);
-
-	//boolean contains(T item);
-
-	//void addSubItem(T item);
-
-	//void addSubItem(int position, T item);
-
-	//boolean removeSubItem(T item);
-
-	//boolean removeSubItem(int position);
 
 }

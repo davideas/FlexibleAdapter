@@ -30,11 +30,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import eu.davidea.common.SimpleDividerItemDecoration;
+import eu.davidea.examples.models.Item;
+import eu.davidea.examples.models.SubItem;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
-import eu.davidea.flexibleadapter.items.AbstractExpandableItem;
-import eu.davidea.flexibleadapter.items.IExpandableItem;
+import eu.davidea.flexibleadapter.items.IFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 
@@ -502,9 +503,9 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onDeleteConfirmed() {
-		for (IExpandableItem adapterItem : mAdapter.getDeletedItems()) {
+		for (IFlexibleItem adapterItem : mAdapter.getDeletedItems()) {
 			//Remove items from your Database. Example:
-			if (adapterItem.isExpandable()) {
+			if (mAdapter.isExpandable(adapterItem)) {
 				Item item = (Item) adapterItem;
 				DatabaseService.getInstance().removeItem(item);
 				Log.d(TAG, "Confirm removed " + item.getTitle());

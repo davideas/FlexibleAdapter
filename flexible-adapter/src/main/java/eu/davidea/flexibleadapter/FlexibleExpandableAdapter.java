@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import eu.davidea.flexibleadapter.items.IExpandableItem;
+import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -40,7 +40,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @see FlexibleAdapter
  * @see FlexibleAnimatorAdapter
  * @see SelectableAdapter
- * @see IExpandableItem
+ * @see IExpandable
  * @see ExpandableViewHolder
  * @see FlexibleViewHolder
  * @since 16/01/2016 Created
@@ -48,7 +48,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  */
 //@SuppressWarnings({"unused", "Convert2Diamond", "unchecked"})
 public abstract class FlexibleExpandableAdapter
-			<EVH extends ExpandableViewHolder, T extends IExpandableItem, S extends IExpandableItem>
+			<EVH extends ExpandableViewHolder, T extends IExpandable<S>, S extends T>
 		extends FlexibleAdapter<FlexibleViewHolder, T> {
 
 	private static final String TAG = FlexibleExpandableAdapter.class.getSimpleName();
@@ -91,7 +91,7 @@ public abstract class FlexibleExpandableAdapter
 			T item = getItem(position);
 			if (item != null && item.isExpanded() && item.getSubItemsCount() > 0) {
 				if (DEBUG) Log.v(TAG, "Initially expand item on position " + position);
-				List<T> subItems = getCurrentChildren(item);
+				List<S> subItems = getCurrentChildren(item);
 				mItems.addAll(position + 1, subItems);
 				position += subItems.size();
 			}
@@ -415,7 +415,7 @@ public abstract class FlexibleExpandableAdapter
 	}
 
 	/**
-	 * Method to bind only Expandable items that implement {@link IExpandableItem}.
+	 * Method to bind only Expandable items that implement {@link IExpandable}.
 	 *
 	 * @param holder   the ViewHolder created of type {@link ExpandableViewHolder}
 	 * @param position the adapter position to bind
@@ -441,8 +441,8 @@ public abstract class FlexibleExpandableAdapter
 	 *
 	 * @param child the child item
 	 * @return the parent of this child item or null if not found
-	 * @see #getExpandablePositionOf(IExpandableItem)
-	 * @see #getRelativePositionOf(IExpandableItem)
+	 * @see #getExpandablePositionOf(IExpandable)
+	 * @see #getRelativePositionOf(IExpandable)
 	 */
 	public T getExpandableOf(@NonNull T child) {
 		for (T parent : mItems) {
@@ -463,8 +463,8 @@ public abstract class FlexibleExpandableAdapter
 	 *
 	 * @param child the child item
 	 * @return the parent position of this child item or -1 if not found
-	 * @see #getExpandableOf(IExpandableItem)
-	 * @see #getRelativePositionOf(IExpandableItem)
+	 * @see #getExpandableOf(IExpandable)
+	 * @see #getRelativePositionOf(IExpandable)
 	 */
 	public int getExpandablePositionOf(@NonNull T child) {
 		return getGlobalPositionOf(getExpandableOf(child));
@@ -475,9 +475,9 @@ public abstract class FlexibleExpandableAdapter
 	 *
 	 * @param child the child item
 	 * @return the list of the child element, or a new list if item
-	 * @see #getExpandableOf(IExpandableItem)
-	 * @see #getExpandablePositionOf(IExpandableItem)
-	 * @see #getRelativePositionOf(IExpandableItem)
+	 * @see #getExpandableOf(IExpandable)
+	 * @see #getExpandablePositionOf(IExpandable)
+	 * @see #getRelativePositionOf(IExpandable)
 	 * @see #getExpandedItems()
 	 */
 	public List<T> getSiblingsOf(@NonNull T child) {
@@ -490,8 +490,8 @@ public abstract class FlexibleExpandableAdapter
 	 *
 	 * @param child the child item
 	 * @return the position in the parent or -1 if, child is a parent itself or not found
-	 * @see #getExpandableOf(IExpandableItem)
-	 * @see #getExpandablePositionOf(IExpandableItem)
+	 * @see #getExpandableOf(IExpandable)
+	 * @see #getExpandablePositionOf(IExpandable)
 	 */
 	public int getRelativePositionOf(@NonNull T child) {
 		return getSiblingsOf(child).indexOf(child);
@@ -501,7 +501,7 @@ public abstract class FlexibleExpandableAdapter
 	 * Provides a list of all expandable items that are currently expanded.
 	 *
 	 * @return a list with all expanded items
-	 * @see #getSiblingsOf(IExpandableItem)
+	 * @see #getSiblingsOf(IExpandable)
 	 * @see #getExpandedPositions()
 	 */
 	public List<T> getExpandedItems() {
@@ -516,7 +516,7 @@ public abstract class FlexibleExpandableAdapter
 	 * Provides a list of all expandable positions that are currently expanded.
 	 *
 	 * @return a list with the global positions of all expanded items
-	 * @see #getSiblingsOf(IExpandableItem)
+	 * @see #getSiblingsOf(IExpandable)
 	 * @see #getExpandedItems()
 	 */
 	public List<Integer> getExpandedPositions() {
@@ -661,7 +661,7 @@ public abstract class FlexibleExpandableAdapter
 	/*---------------------------*/
 
 	/**
-	 * Convenience method of {@link #addSubItem(int, int, IExpandableItem, boolean, boolean)}.
+	 * Convenience method of {@link #addSubItem(int, int, IExpandable, boolean, boolean)}.
 	 * <br/>In this case parent item will never be notified nor expanded if it is collapsed.
 	 */
 	public boolean addSubItem(int parentPosition, int subPosition, @NonNull T item) {
@@ -728,7 +728,7 @@ public abstract class FlexibleExpandableAdapter
 	 * Wrapper method of {@link #addItem(int, IFlexibleItem)} for expandable items (Parents).
 	 *
 	 * @param position       the position of the item to add
-	 * @param expandableItem item to add, must be an instance of {@link IExpandableItem}
+	 * @param expandableItem item to add, must be an instance of {@link IExpandable}
 	 */
 	public void addExpandableItem(int position, @NonNull T expandableItem) {
 		super.addItem(position, expandableItem);
@@ -756,7 +756,7 @@ public abstract class FlexibleExpandableAdapter
 	 * <br/>- not expandable, it is removed only if the parent is expanded.
 	 * Optionally the parent can be notified about the removal.</p>
 	 * The item is retained for an eventual Undo.
-	 * <p>The item must implement {@link IExpandableItem}.</p>
+	 * <p>The item must implement {@link IExpandable}.</p>
 	 *
 	 * @param position            The position of item to remove
 	 * @param notifyParentChanged true to notify parent of a removal of a child, false if not
@@ -1068,12 +1068,12 @@ public abstract class FlexibleExpandableAdapter
 	 * @return the list of the original children minus the deleted children if some are
 	 * pending removal.
 	 */
-	public List<T> getCurrentChildren(T item) {
+	public List<S> getCurrentChildren(T item) {
 		//Check item and subItems existence
 		if (item == null || !item.isExpandable() || item.getSubItems() == null)
-			return new ArrayList<T>();
+			return new ArrayList<S>();
 		//Take a copy of the subItems list
-		List<T> subItems = new ArrayList<>(item.getSubItems());
+		List<S> subItems = new ArrayList<>(item.getSubItems());
 		//Remove all children pending removal
 		if (removedItems.size() > 0) {
 			subItems.removeAll(getDeletedChildren(getGlobalPositionOf(item)));
@@ -1132,9 +1132,9 @@ public abstract class FlexibleExpandableAdapter
 						values.add(item);
 						newOriginalPosition++;
 						if (item.isExpanded()) {
-							List<T> subItems = new ArrayList<>();
+							List<S> subItems = new ArrayList<S>();
 							//Add subItems if not hidden by filterObject()
-							for (T subItem : item.getSubItems()) {
+							for (S subItem : item.getSubItems()) {
 								if (!subItem.isHidden()) subItems.add(subItem);
 							}
 							values.addAll(subItems);
@@ -1185,7 +1185,7 @@ public abstract class FlexibleExpandableAdapter
 		item.setExpanded(false);
 
 		//Children scan filter
-		for (T subItem : getCurrentChildren(item)) {
+		for (S subItem : getCurrentChildren(item)) {
 			//Reuse super filter for Children
 			subItem.setHidden(!super.filterObject(subItem, constraint));
 			if (!filtered && !subItem.isHidden()) {
@@ -1413,7 +1413,7 @@ public abstract class FlexibleExpandableAdapter
 //		List<T> siblings = new ArrayList<T>();
 //	}
 
-	private static class RemovedItem<T extends IExpandableItem> {
+	private static class RemovedItem<T extends IExpandable> {
 		int parentPosition = -1, relativePosition = -1;
 		T item = null;
 		boolean notifyParentChanged = false;
@@ -1441,7 +1441,7 @@ public abstract class FlexibleExpandableAdapter
 		}
 	}
 
-	public class Header<T extends IExpandableItem> {
+	public class Header<T extends IExpandable> {
 		int headerPosition;
 		int firstPosition;
 		T headerItem;

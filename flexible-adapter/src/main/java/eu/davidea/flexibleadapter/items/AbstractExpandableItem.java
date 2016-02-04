@@ -4,22 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generic implementation of {@link IExpandableItem} interface with most useful methods to manage
+ * Generic implementation of {@link IExpandable} interface with most useful methods to manage
  * expansion and sub items.<br/>
  * This abstract class extends also {@link AbstractFlexibleItem}.
  *
  * @author Davide Steduto
  * @since 17/01/2016 Created
  */
-public abstract class AbstractExpandableItem<S extends IExpandableItem>
+public abstract class AbstractExpandableItem<S extends IFlexibleItem>
 		extends AbstractFlexibleItem
-		implements IExpandableItem<S> {
-
-	/** Reference to the Parent Item */
-	//private T mParent;
+		implements IExpandable {
 
 	/* Flags for FlexibleExpandableAdapter */
-	private boolean mExpandable = false, mExpanded = false;
+	private boolean mExpanded = false;
 
 	/** subItems list */
 	private List<S> mSubItems;
@@ -51,16 +48,6 @@ public abstract class AbstractExpandableItem<S extends IExpandableItem>
 	/*--------------------*/
 
 	@Override
-	public boolean isExpandable() {
-		return mExpandable;
-	}
-
-	@Override
-	public void setExpandable(boolean expandable) {
-		this.mExpandable = expandable;
-	}
-
-	@Override
 	public boolean isExpanded() {
 		return mExpanded;
 	}
@@ -70,23 +57,9 @@ public abstract class AbstractExpandableItem<S extends IExpandableItem>
 		this.mExpanded = expanded;
 	}
 
-	public void setInitiallyExpanded(boolean expanded) {
-		this.mExpanded = expanded;
-	}
-
 	/*-------------------*/
 	/* SUB ITEMS METHODS */
 	/*-------------------*/
-
-	//@Override
-//	public final T getParent() {
-//		return mParent;
-//	}
-
-	//@Override
-//	public final void setParent(T item) {
-//		mParent = item;
-//	}
 
 	public final boolean hasSubItems() {
 		return mSubItems!= null && mSubItems.size() > 0;
@@ -99,9 +72,6 @@ public abstract class AbstractExpandableItem<S extends IExpandableItem>
 
 	//@Override
 	public void setSubItems(List<S> subItem) {
-//		for (T item : items) {
-//			item.setParent((T) this);
-//		}
 		mSubItems = new ArrayList<>(subItem);
 	}
 
@@ -164,18 +134,9 @@ public abstract class AbstractExpandableItem<S extends IExpandableItem>
 //		return false;
 //	}
 
-//	public void restoreDeletedSubItems() {
-//		for (int i = 0; i < mRemovedItems.size(); i++) {
-//			int position = mRemovedItems.keyAt(i);
-//			if (position >= 0)
-//				addSubItem(position, mRemovedItems.get(position));
-//		}
-//	}
-
 	@Override
 	public String toString() {
-		return ", mExpanded=" + mExpanded +
-				", mExpandable=" + mExpandable +
+		return super.toString() + ", mExpanded=" + mExpanded +
 				", mSubItems=" + (mSubItems != null ? mSubItems.size() : "null");
 	}
 
