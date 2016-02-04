@@ -1,15 +1,16 @@
 package eu.davidea.examples.flexibleadapter;
 
 import android.animation.Animator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -20,11 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import eu.davidea.examples.models.ExpandableItem;
 import eu.davidea.examples.models.Item;
-import eu.davidea.flexibleadapter.FlexibleAdapterMerge;
-import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.examples.models.SubItem;
+import eu.davidea.examples.models.ULSItem;
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
@@ -32,25 +33,25 @@ import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 
-public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, IFlexibleItem> {
+public class ExampleAdapter extends FlexibleAdapter<IFlexibleItem> {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 
-	private Context mContext;
 	public static final int CHILD_VIEW_TYPE = 0;
 	public static final int EXAMPLE_VIEW_TYPE = 1;
-
-	private LayoutInflater mInflater;
 
 	//Selection fields
 	private boolean
 			mLastItemInActionMode = false,
 			mSelectAll = false;
 
-	public ExampleAdapter(Object activity, String listId) {
-		super(DatabaseService.getInstance().getListById(listId), activity);
-		this.mContext = (Context) activity;
+	private Context mContext;
+
+
+	public ExampleAdapter(Activity activity) {
+		super(DatabaseService.getInstance().getListById(), activity);
 		addUserLearnedSelection();
+		mContext = activity;
 
 		//NEW! We have highlighted text while filtering, so let's enable this feature
 		//to be consistent with the active filter
@@ -63,24 +64,14 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 	 * @param param A custom parameter to filter the type of the DataSet
 	 */
 	@Override
-	public void updateDataSet(String param) {
+	public void updateDataSet(String... param) {
 		//Overwrite the list and fully notify the change
 		//Watch out! The original list must a copy
 		//TODO: We may create calls like removeAll, addAll or refreshList in order to animate changes
-		mItems = DatabaseService.getInstance().getListById(param);
+		mItems = DatabaseService.getInstance().getListById();
 		notifyDataSetChanged();
 		//Add example view
 		addUserLearnedSelection();
-	}
-
-	@Override
-	public ExpandableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		return null;
-	}
-
-	@Override
-	public void onBindViewHolder(ExpandableViewHolder holder, int position) {
-
 	}
 
 	private void addUserLearnedSelection() {
@@ -88,8 +79,7 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 		if (!DatabaseService.userLearnedSelection && !hasSearchText() &&
 				(uls == null || !uls.getId().equals("ULS"))) {
 			//Define Example View
-			Item item = new Item();
-			item.setId("ULS");
+			ULSItem item = new ULSItem();
 			item.setEnabled(false);
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
@@ -97,11 +87,6 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 		}
 	}
 
-	private void userLearnedSelection() {
-		//TODO FOR YOU: Save the boolean into Settings!
-		DatabaseService.userLearnedSelection = true;
-		super.removeItem(0);
-	}
 
 	@Override
 	public synchronized void filterItems(@NonNull List<IFlexibleItem> unfilteredItems) {
@@ -128,114 +113,94 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 	}
 
 	@Override
-	public ExpandableViewHolder onCreateHeaderViewHolder(ViewGroup parent, int viewType) {
-		if (mInflater == null) {
-			mInflater = LayoutInflater.from(parent.getContext());
-		}
-		return new HeaderViewHolder(mInflater.inflate(R.layout.recycler_header_row, parent, false),
-				this);
-	}
+	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		//METHOD A - NEW! Via Model objects. In this case you don't need to implement this method.
+		//super.onCreateViewHolder(parent, viewType);
 
-	@Override
-	public ExpandableViewHolder onCreateExpandableViewHolder(ViewGroup parent, int viewType) {
-		if (mInflater == null) {
-			mInflater = LayoutInflater.from(parent.getContext());
-		}
-		return new ParentViewHolder(
-				mInflater.inflate(R.layout.recycler_expandable_row, parent, false),
-				this);
-	}
-
-	@Override
-	public FlexibleViewHolder onCreateFlexibleViewHolder(ViewGroup parent, int viewType) {
-		if (mInflater == null) {
-			mInflater = LayoutInflater.from(parent.getContext());
-		}
+		//METHOD B - Normal way as you prefer
 		switch (viewType) {
+			case SECTION_VIEW_TYPE:
+				return new HeaderViewHolder(
+						mInflater.inflate(R.layout.recycler_header_row, parent, false), this);
+			case EXPANDABLE_VIEW_TYPE:
+				return new ExpandableItem.ParentViewHolder(
+						mInflater.inflate(R.layout.recycler_expandable_row, parent, false), this);
 			case EXAMPLE_VIEW_TYPE:
-				return new ExampleViewHolder(
-						mInflater.inflate(R.layout.recycler_uls_row, parent, false),
-						this);
+				return new ULSItem.ExampleViewHolder(
+						mInflater.inflate(R.layout.recycler_uls_row, parent, false), this);
 			default:
-				return new ChildViewHolder(
-						mInflater.inflate(R.layout.recycler_row, parent, false),
-						this);
+				return new SubItem.ChildViewHolder(
+						mInflater.inflate(R.layout.recycler_child_row, parent, false), this);
 		}
 	}
 
 	@Override
-	public void onBindHeaderViewHolder(ExpandableViewHolder holder, int position) {
-		final IExpandable header = getItem(position);
-		HeaderViewHolder hvHolder = (HeaderViewHolder) holder;
-		hvHolder.mTitle.setText(((Item) header).getTitle());
-	}
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+		//METHOD A - NEW! Via Model objects. In this case you don't need to implement this method.
+		//super.onBindViewHolder(holder, position);
 
-	@Override
-	public void onBindExpandableViewHolder(ExpandableViewHolder holder, int position) {
-//		if (DEBUG) Log.d(TAG, "onBindParentViewHolder for position " + position);
-		final Item item = (Item) getItem(position);
-
-		ParentViewHolder pvHolder = (ParentViewHolder) holder;
-		//When user scrolls, this line binds the correct selection status
-		pvHolder.itemView.setActivated(isSelected(position));
-
-		//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
-		if (mSelectAll || mLastItemInActionMode) {
-			//Reset the flags with delay
-			pvHolder.mFlipView.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					mSelectAll = mLastItemInActionMode = false;
-				}
-			}, 200L);
-			//Consume the Animation
-			pvHolder.mFlipView.flip(isSelected(position), 200L);
-		} else {
-			//Display the current flip status
-			pvHolder.mFlipView.flipSilently(isSelected(position));
-		}
-
-		//This "if-else" is just an example of what you can do with item animation
-		if (isSelected(position)) {
-			animateView(holder.itemView, position, true);
-		} else {
-			animateView(holder.itemView, position, false);
-		}
-
-		//In case of searchText matches with Title or with an Item's field
-		// this will be highlighted
-		if (hasSearchText()) {
-			setHighlightText(pvHolder.mTitle, item.getTitle(), mSearchText);
-			setHighlightText(pvHolder.mSubtitle, updateSubTitle(item), mSearchText);
-		} else {
-			pvHolder.mTitle.setText(item.getTitle());
-			pvHolder.mSubtitle.setText(updateSubTitle(item));
-		}
-	}
-
-	private String updateSubTitle(Item item) {
-		return getCurrentChildren(item).size() + " subItems";
-	}
-
-	@Override
-	public void onBindFlexibleViewHolder(FlexibleViewHolder holder, int position) {
-//		if (DEBUG) Log.d(TAG, "onBindChildViewHolder for position " + position);
-
+		//METHOD B - Normal way, inside the Adapter, as you prefer
 		//NOTE: ViewType Must be checked ALSO here to bind the correct view
 		switch (getItemViewType(position)) {
+			case SECTION_VIEW_TYPE:
+				final Item header = (Item) getItem(position);
+				HeaderViewHolder hvHolder = (HeaderViewHolder) holder;
+				hvHolder.mTitle.setText(((Item) header).getTitle());
+				break;
+
+			case EXPANDABLE_VIEW_TYPE:
+				Item item = (Item) getItem(position);
+				ParentViewHolder pvHolder = (ParentViewHolder) holder;
+				//When user scrolls, this line binds the correct selection status
+				pvHolder.itemView.setActivated(isSelected(position));
+
+				//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
+				if (mSelectAll || mLastItemInActionMode) {
+					//Reset the flags with delay
+					pvHolder.mFlipView.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							mSelectAll = mLastItemInActionMode = false;
+						}
+					}, 200L);
+					//Consume the Animation
+					pvHolder.mFlipView.flip(isSelected(position), 200L);
+				} else {
+					//Display the current flip status
+					pvHolder.mFlipView.flipSilently(isSelected(position));
+				}
+
+				//This "if-else" is just an example of what you can do with item animation
+				if (isSelected(position)) {
+					animateView(holder.itemView, position, true);
+				} else {
+					animateView(holder.itemView, position, false);
+				}
+
+				//In case of searchText matches with Title or with an Item's field
+				// this will be highlighted
+				if (hasSearchText()) {
+					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mTitle, item.getTitle(), mSearchText);
+					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mSubtitle, updateSubTitle(item), mSearchText);
+				} else {
+					pvHolder.mTitle.setText(item.getTitle());
+					pvHolder.mSubtitle.setText(updateSubTitle(item));
+				}
+				break;
+
 			case EXAMPLE_VIEW_TYPE:
-				final Item item = (Item) getItem(position);
+				final ULSItem ulsItem = (ULSItem) getItem(position);
 				ExampleViewHolder exHolder = (ExampleViewHolder) holder;
 				exHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 				exHolder.itemView.setActivated(true);
 				exHolder.mTitle.setSelected(true);//For marquee
-				exHolder.mTitle.setText(Html.fromHtml(item.getTitle()));
-				exHolder.mSubtitle.setText(Html.fromHtml(item.getSubtitle()));
+				exHolder.mTitle.setText(Html.fromHtml(ulsItem.getTitle()));
+				exHolder.mSubtitle.setText(Html.fromHtml(ulsItem.getSubtitle()));
 				animateView(holder.itemView, position, false);
-				return;
+				break;
 
 			default:
-				final Item subItem = (Item) getItem(position);
+				final SubItem subItem = (SubItem) getItem(position);
 				ChildViewHolder cvHolder = (ChildViewHolder) holder;
 				//When user scrolls, this line binds the correct selection status
 				cvHolder.itemView.setActivated(isSelected(position));
@@ -250,11 +215,15 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 				//In case of searchText matches with Title or with an Item's field
 				// this will be highlighted
 				if (hasSearchText()) {
-					setHighlightText(cvHolder.mTitle, subItem.getTitle(), mSearchText);
+					setHighlightText(cvHolder.itemView.getContext(), cvHolder.mTitle, subItem.getTitle(), mSearchText);
 				} else {
 					cvHolder.mTitle.setText(subItem.getTitle());
 				}
 		}//end-switch
+	}
+
+	private String updateSubTitle(Item item) {
+		return getCurrentChildren(item).size() + " subItems";
 	}
 
 	@Override
@@ -295,11 +264,11 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 		return super.onCreateBubbleText(position);
 	}
 
-	private void setHighlightText(TextView textView, String text, String searchText) {
+	public static void setHighlightText(Context context, TextView textView, String text, String searchText) {
 		Spannable spanText = Spannable.Factory.getInstance().newSpannable(text);
 		int i = text.toLowerCase(Locale.getDefault()).indexOf(searchText);
 		if (i != -1) {
-			spanText.setSpan(new ForegroundColorSpan(Utils.getColorAccent(mContext)), i,
+			spanText.setSpan(new ForegroundColorSpan(Utils.getColorAccent(context)), i,
 					i + searchText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			spanText.setSpan(new StyleSpan(Typeface.BOLD), i,
 					i + searchText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -330,11 +299,11 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 //		return valueText != null && valueText.toLowerCase().contains(constraint);
 //	}
 
-	static class HeaderViewHolder extends ExpandableViewHolder {
+	static class HeaderViewHolder extends FlexibleViewHolder {
 
 		TextView mTitle;
 
-		public HeaderViewHolder(View view, FlexibleExpandableAdapter adapter) {
+		public HeaderViewHolder(View view, ExampleAdapter adapter) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 		}
@@ -350,7 +319,7 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 		TextView mSubtitle;
 		ImageView mDismissIcon;
 
-		ExampleViewHolder(View view, final ExampleAdapter adapter) {
+		public ExampleViewHolder(View view, final ExampleAdapter adapter) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
@@ -359,7 +328,9 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					adapter.userLearnedSelection();
+					//TODO FOR YOU: Save the boolean into Settings!
+					DatabaseService.userLearnedSelection = true;
+					adapter.removeItem(0);
 				}
 			});
 		}
@@ -369,6 +340,7 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 	 * This ViewHolder is expandable and collapsible.
 	 */
 	static final class ParentViewHolder extends ExpandableViewHolder {
+
 		FlipView mFlipView;
 		TextView mTitle;
 		TextView mSubtitle;
@@ -377,7 +349,7 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 
 		public ParentViewHolder(View view, ExampleAdapter adapter) {
 			super(view, adapter);
-			this.mContext = adapter.mContext;
+			this.mContext = view.getContext();
 			this.mTitle = (TextView) view.findViewById(R.id.title);
 			this.mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 			this.mFlipView = (FlipView) view.findViewById(R.id.image);
@@ -419,13 +391,12 @@ public class ExampleAdapter extends FlexibleAdapterMerge<ExpandableViewHolder, I
 	 * you provide access to all the views for a data item in a view holder.
 	 */
 	static final class ChildViewHolder extends FlexibleViewHolder {
+
 		ImageView mHandleView;
 		TextView mTitle;
-		Context mContext;
 
-		ChildViewHolder(View view, ExampleAdapter adapter) {
+		public ChildViewHolder(View view, ExampleAdapter adapter) {
 			super(view, adapter);
-			this.mContext = adapter.mContext;
 			this.mTitle = (TextView) view.findViewById(R.id.title);
 			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
 			setDragHandleView(mHandleView);

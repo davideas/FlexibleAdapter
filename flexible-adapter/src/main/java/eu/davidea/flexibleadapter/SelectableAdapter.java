@@ -29,7 +29,7 @@ import eu.davidea.flexibleadapter.utils.Utils;
  * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
  */
 @SuppressWarnings({"unused", "Convert2Diamond", "unchecked"})
-public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH>
+public abstract class SelectableAdapter extends RecyclerView.Adapter
 		implements FastScroller.BubbleTextCreator, FastScroller.ScrollStateChangeListener {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
@@ -155,7 +155,7 @@ public abstract class SelectableAdapter<VH extends RecyclerView.ViewHolder> exte
 	 * <li>In <i>onClick</i> event, enable the Activated/Selected State of the ItemView of the
 	 * ViewHolder <u>after</u> the listener consumed the event:
 	 * <i>itemView.setActivated(mAdapter.isSelected(getAdapterPosition()));</i></li>
-	 * <li>In <i>onBindViewHolder</i>, adjust the selection status:
+	 * <li>In <i>bindViewHolder</i>, adjust the selection status:
 	 * <i>holder.itemView.setActivated(isSelected(position));</i></li>
 	 * <li>If <i>invalidate</i> is set true, {@link #notifyItemChanged} is called and
 	 * {@link #onBindViewHolder} will be automatically called afterwards overriding any animation

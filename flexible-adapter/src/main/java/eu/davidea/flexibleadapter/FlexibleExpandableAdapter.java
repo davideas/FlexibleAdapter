@@ -89,7 +89,7 @@ public abstract class FlexibleExpandableAdapter
 		//Set initially expanded
 		for (int position = 0; position < mItems.size(); position++) {
 			T item = getItem(position);
-			if (item != null && item.isExpanded() && item.getSubItemsCount() > 0) {
+			if (item != null && item.isExpanded()) {
 				if (DEBUG) Log.v(TAG, "Initially expand item on position " + position);
 				List<S> subItems = getCurrentChildren(item);
 				mItems.addAll(position + 1, subItems);

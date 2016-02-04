@@ -37,7 +37,7 @@ import java.util.List;
  * @since 10/01/2016
  * <br/>30/01/2016 Class now extends {@link SelectableAdapter}
  */
-public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder> extends SelectableAdapter<VH> {
+public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 
 	protected static final String TAG = FlexibleAnimatorAdapter.class.getSimpleName();
 
@@ -220,7 +220,7 @@ public abstract class FlexibleAnimatorAdapter<VH extends RecyclerView.ViewHolder
 	/**
 	 * Animates the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
 	 */
-	protected final void animateView(final View itemView, int position, boolean isSelected) {
+	public final void animateView(final View itemView, int position, boolean isSelected) {
 		//FIXME: first completed visible item on rotation gets high delay
 
 //		if (DEBUG)

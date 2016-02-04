@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import eu.davidea.common.SimpleDividerItemDecoration;
+import eu.davidea.examples.models.ExpandableItem;
 import eu.davidea.examples.models.Item;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.fastscroller.FastScroller;
@@ -506,13 +507,12 @@ public class MainActivity extends AppCompatActivity implements
 		for (IFlexibleItem adapterItem : mAdapter.getDeletedItems()) {
 			//Remove items from your Database. Example:
 			if (mAdapter.isExpandable(adapterItem)) {
-				Item item = (Item) adapterItem;
-				DatabaseService.getInstance().removeItem(item);
-				Log.d(TAG, "Confirm removed " + item.getTitle());
+				DatabaseService.getInstance().removeItem(adapterItem);
+				Log.d(TAG, "Confirm removed " + adapterItem);
 			} else {
 				SubItem subItem = (SubItem) adapterItem;
 				DatabaseService.getInstance().removeSubItem(mAdapter.getExpandableOf(subItem), subItem);
-				Log.d(TAG, "Confirm removed " + subItem.getTitle() + (subItem.getParent() != null ? " parent " + subItem.getParent() : ""));
+				Log.d(TAG, "Confirm removed " + subItem.getTitle());
 			}
 		}
 	}

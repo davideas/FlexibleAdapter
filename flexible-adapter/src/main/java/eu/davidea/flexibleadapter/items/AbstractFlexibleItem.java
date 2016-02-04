@@ -1,5 +1,12 @@
 package eu.davidea.flexibleadapter.items;
 
+import android.support.annotation.CallSuper;
+import android.support.v7.widget.RecyclerView;
+
+import java.util.List;
+
+import eu.davidea.flexibleadapter.FlexibleAdapter;
+
 /**
  * Generic implementation of {@link IFlexibleItem} interface with most useful methods to manage
  * selection and view holder methods.
@@ -7,14 +14,17 @@ package eu.davidea.flexibleadapter.items;
  * @author Davide Steduto
  * @since 20/01/2016 Created
  */
-public abstract class AbstractFlexibleItem implements IFlexibleItem {
+public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
+		implements IFlexibleItem<VH> {
 
-	/* Item flags recognized by the Adapter */
-	boolean mEnabled = true,
-			mHidden = false,
-			mSelectable = true,
-			mDraggable = false,
-			mSwipeable = false;
+	/* Item flags recognized by the FlexibleAdapter */
+	boolean mEnabled = true, mHidden = false,
+			mSelectable = true, mSelected = false,
+			mDraggable = false, mSwipeable = false;
+
+	/*---------------*/
+	/* BASIC METHODS */
+	/*---------------*/
 
 	/**
 	 * You <b>must</b> implement this method to compare items Identifiers.
@@ -60,6 +70,16 @@ public abstract class AbstractFlexibleItem implements IFlexibleItem {
 		this.mSelectable = selectable;
 	}
 
+	@Override
+	public boolean isSelected() {
+		return mSelected;
+	}
+
+	@Override
+	public void setSelected(boolean selected) {
+		this.mSelected = selected;
+	}
+
 	/*-------------------*/
 	/* TOUCHABLE METHODS */
 	/*-------------------*/
@@ -88,18 +108,12 @@ public abstract class AbstractFlexibleItem implements IFlexibleItem {
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/
 
-//	@Override
-//	@IdRes
-//	public abstract int getItemViewType();
-//
-//	@Override
-//	@LayoutRes
-//	public abstract int getLayoutRes();
-//
-//	@Override
-//	public abstract VH getViewHolder(Inflater inflater, ViewGroup parent);
-//
-//	@Override
-//	public abstract void bindViewHolder(VH holder);
+	@Override
+	@CallSuper
+	public void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads) {
+		//When user scrolls, this line binds the correct selection status
+		holder.itemView.setActivated(adapter.isSelected(position));
+		//TODO: adapter.isSelected(position) or this.isSelected() ??
+	}
 
 }

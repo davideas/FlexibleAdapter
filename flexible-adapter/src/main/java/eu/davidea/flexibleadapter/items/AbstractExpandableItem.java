@@ -1,5 +1,7 @@
 package eu.davidea.flexibleadapter.items;
 
+import android.support.v7.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,37 +13,15 @@ import java.util.List;
  * @author Davide Steduto
  * @since 17/01/2016 Created
  */
-public abstract class AbstractExpandableItem<S extends IFlexibleItem>
-		extends AbstractFlexibleItem
+public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder, S extends IFlexibleItem>
+		extends AbstractFlexibleItem<VH>
 		implements IExpandable {
 
-	/* Flags for FlexibleExpandableAdapter */
+	/* Flags for FlexibleAdapter */
 	private boolean mExpanded = false;
 
-	/** subItems list */
+	/* subItems list */
 	private List<S> mSubItems;
-	//SparseArray<T> mRemovedItems = new SparseArray<T>();
-
-
-	/*---------------------*/
-	/* VIEW HOLDER METHODS */
-	/*---------------------*/
-
-//	@Override
-//	@IdRes
-//	public int getItemViewType() {
-//		return FlexibleExpandableAdapter.EXPANDABLE_VIEW_TYPE;
-//	}
-//
-//	@Override
-//	@LayoutRes
-//	public abstract int getLayoutRes();
-//
-//	@Override
-//	public abstract VH getViewHolder(Inflater inflater, ViewGroup parent);
-//
-//	@Override
-//	public abstract void bindViewHolder(VH holder);
 
 	/*--------------------*/
 	/* EXPANDABLE METHODS */
@@ -70,17 +50,14 @@ public abstract class AbstractExpandableItem<S extends IFlexibleItem>
 		return mSubItems;
 	}
 
-	//@Override
 	public void setSubItems(List<S> subItem) {
 		mSubItems = new ArrayList<>(subItem);
 	}
 
-	@Override
 	public final int getSubItemsCount() {
 		return mSubItems != null ? mSubItems.size() : 0;
 	}
 
-	//@Override
 	public S getSubItem(int position) {
 		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
 			return mSubItems.get(position);
@@ -88,56 +65,37 @@ public abstract class AbstractExpandableItem<S extends IFlexibleItem>
 		return null;
 	}
 
-	//@Override
 	public final int getSubItemPosition(S subItem) {
 		return mSubItems != null ? mSubItems.indexOf(subItem) : -1;
 	}
 
-	//@Override
 	public void addSubItem(S subItem) {
 		if (mSubItems == null)
 			mSubItems = new ArrayList<S>();
-//		item.setParent((T) this);
 		mSubItems.add(subItem);
 	}
 
-	//@Override
 	public void addSubItem(int position, S subItem) {
 		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
-//			subItem.setParent((T) this);
 			mSubItems.add(position, subItem);
 		} else
 			addSubItem(subItem);
 	}
 
-	//@Override
 	public boolean contains(S subItem) {
 		return mSubItems != null && mSubItems.contains(subItem);
 	}
 
-	//@Override
-//	public boolean removeSubItem(T item) {
-//		int position = mSubItems.indexOf(item);
-//		if (mSubItems != null && position >= 0) {
-//			mRemovedItems.put(position, item);
-//			return mSubItems.remove(item);
-//		}
-//		return false;
-//	}
+	public boolean removeSubItem(S item) {
+		return item != null && mSubItems.remove(item);
+	}
 
-	//@Override
-//	public boolean removeSubItem(int position) {
-//		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
-//			mRemovedItems.put(position, mSubItems.remove(position));
-//			return true;
-//		}
-//		return false;
-//	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", mExpanded=" + mExpanded +
-				", mSubItems=" + (mSubItems != null ? mSubItems.size() : "null");
+	public boolean removeSubItem(int position) {
+		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
+			mSubItems.remove(position);
+			return true;
+		}
+		return false;
 	}
 
 }

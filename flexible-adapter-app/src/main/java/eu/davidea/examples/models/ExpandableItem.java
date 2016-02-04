@@ -1,61 +1,55 @@
 package eu.davidea.examples.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import eu.davidea.flexibleadapter.items.AbstractExpandableItem;
+import eu.davidea.examples.flexibleadapter.R;
+import eu.davidea.flexibleadapter.items.IExpandable;
 
-public class ExpandableItem extends AbstractExpandableItem<SubItem> implements Serializable {
+public class ExpandableItem extends Item implements Serializable, IExpandable<SubItem> {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 
-	private String id;
-	private String title;
-	private String subtitle;
+	/* Flags for FlexibleAdapter */
+	private boolean mExpanded = false;
+
+	/* subItems list */
+	private List<SubItem> mSubItems;
 
 	@Override
 	public boolean equals(Object inObject) {
 		if (inObject instanceof ExpandableItem) {
 			ExpandableItem inItem = (ExpandableItem) inObject;
-			return this.id.equals(inItem.id);
+			return this.getId().equals(inItem.getId());
 		}
 		return false;
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getSubtitle() {
-		return subtitle;
-	}
-
-	public void setSubtitle(String subtitle) {
-		this.subtitle = subtitle;
+	@Override
+	public boolean isExpanded() {
+		return mExpanded;
 	}
 
 	@Override
-	public String toString() {
-		return "Item[" +
-//				"id=" + id +
-				"title=" + title +
-				super.toString() + ']';
+	public void setExpanded(boolean expanded) {
+		mExpanded = expanded;
 	}
 
-	public String updateSubTitle() {
-		setSubtitle(getSubItemsCount() + " subItems");
-		return subtitle;
+	@Override
+	public List<SubItem> getSubItems() {
+		return mSubItems;
+	}
+
+	public void addSubItem(SubItem subItem) {
+		if (mSubItems == null)
+			mSubItems = new ArrayList<SubItem>();
+		mSubItems.add(subItem);
+	}
+
+	@Override
+	public int getLayoutRes() {
+		return R.layout.recycler_expandable_row;
 	}
 
 }

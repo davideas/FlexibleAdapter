@@ -1,5 +1,7 @@
 package eu.davidea.flexibleadapter;
 
+import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -7,10 +9,12 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
+import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -44,11 +49,15 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>30/01/2016 Class now extends {@link FlexibleAnimatorAdapter} that extends {@link SelectableAdapter}
  */
 //@SuppressWarnings({"unused", "Convert2Diamond"})
-public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T extends IFlexibleItem>
-		extends FlexibleAnimatorAdapter<VH>
+public abstract class FlexibleAdapter<T extends IFlexibleItem>
+		extends FlexibleAnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
 
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();
+	private static final String EXTRA_PARENT = TAG + "_parentSelected";
+	private static final String EXTRA_CHILD = TAG + "_childSelected";
+	public static final int EXPANDABLE_VIEW_TYPE = -1;
+	public static final int SECTION_VIEW_TYPE = -2;
 	public static final long UNDO_TIMEOUT = 5000L;
 
 	/**
@@ -57,26 +66,15 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 	protected List<T> mItems;
 
 	/**
-	 * Used to avoid multiple calls to the {@link OnUpdateListener#onUpdateEmptyView(int)}
+	 * Header/Section items
 	 */
-	protected boolean isMultiRange = false;
+//	private SparseArray<T> headers;
 
 	/**
 	 * Lock object used to modify the content of {@link #mItems}.
 	 * Any write operation performed on the list items should be synchronized on this lock.
 	 */
 	protected final Object mLock = new Object();
-
-	//Undo
-	//TODO: remove List, use SparseArray
-	protected List<T> mDeletedItems;
-	protected List<Integer> mOriginalPositions;
-	protected SparseArray<T> mRemovedItems;//beta test
-	protected boolean mRestoreSelection = false;
-	private boolean
-			longPressDragEnabled = false,
-			handleDragEnabled = true,
-			swipeEnabled = false;
 
 	/**
 	 * Handler for delayed {@link #filterItems(List)} and {@link OnDeleteCompleteListener#onDeleteConfirmed}
@@ -97,12 +95,27 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 		}
 	});
 
+	/**
+	 * Used to save deleted items and to recover them (Undo).
+	 */
+	protected List<RemovedItem> mRemovedItems;
+	private boolean restoreSelection = false, multiRange = false,
+			adjustRemoved = true, adjustSelected = true;
+
+	/* ViewTypes */
+	protected LayoutInflater mInflater;
+	private ArrayMap<Integer, IFlexibleItem> mTypeInstances = new ArrayMap<Integer, IFlexibleItem>();
+
 	/* Filter */
-	protected String mSearchText = "";
-	protected String mOldSearchText = "";
-	protected boolean mNotifyChangeOfUnfilteredItems = false;
+	protected String mSearchText = "", mOldSearchText = "";
+	protected boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
+
+	/* Expandable flags */
+	private boolean scrollOnExpand = false, collapseOnExpand = false,
+			childSelected = false, parentSelected = false;
 
 	/* Drag&Drop and Swipe helpers */
+	private boolean longPressDragEnabled = false, handleDragEnabled = true, swipeEnabled = false;
 	private ItemTouchHelperCallback mItemTouchHelperCallback;
 	private ItemTouchHelper mItemTouchHelper;
 
@@ -120,7 +133,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 	/**
 	 * Simple Constructor with NO listeners!
 	 *
-	 * @param items items to display.
+	 * @param items   items to display.
 	 */
 	public FlexibleAdapter(@NonNull List<T> items) {
 		this(items, null);
@@ -141,6 +154,10 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 	 */
 	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listeners) {
 		mItems = items;
+		mRemovedItems = new ArrayList<RemovedItem>();
+
+		//Expand initial items also after a screen rotation
+		expandInitialItems();
 
 		if (listeners instanceof OnUpdateListener) {
 			mUpdateListener = (OnUpdateListener) listeners;
@@ -154,6 +171,85 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 			mItemMoveListener = (OnItemMoveListener) listeners;
 		if (listeners instanceof OnItemSwipeListener)
 			mItemSwipeListener = (OnItemSwipeListener) listeners;
+
+		//Get notified when items are inserted or removed (it adjusts selected and removed positions)
+		registerAdapterDataObserver(new ExpandableAdapterDataObserver());
+	}
+
+	/**
+	 * Expands items that are initially configured to be shown as expanded.
+	 * <p>This method is also called after a screen rotation.</p>
+	 */
+	protected void expandInitialItems() {
+		for (int position = 0; position < mItems.size(); position++) {
+			T item = getItem(position);
+			mapViewTypeFrom(item);
+			if (item != null && item instanceof IExpandable) {
+				IExpandable expandable = (IExpandable) item;
+				if (expandable.isExpanded()) {
+					if (DEBUG) Log.v(TAG, "Initially expand item on position " + position);
+					List<T> subItems = getCurrentChildren(item);
+					mItems.addAll(position + 1, subItems);
+					position += subItems.size();
+				}
+			}
+		}
+	}
+
+	/*------------------------------*/
+	/* SELECTION METHODS OVERRIDDEN */
+	/*------------------------------*/
+
+	@Override
+	public void toggleSelection(int position) {
+		T item = getItem(position);
+		//Allow selection only for selectable items
+		if (item != null && item.isSelectable()) {
+			if (item instanceof IExpandable && !childSelected) {
+				//Allow selection of Parent if no Child has been previously selected
+				parentSelected = true;
+				super.toggleSelection(position);
+			} else if (!parentSelected) {
+				//Allow selection of Child if no Parent has been previously selected
+				childSelected = true;
+				super.toggleSelection(position);
+			}
+		}
+
+		//Reset flags if necessary, just to be sure
+		if (getSelectedItemCount() == 0) parentSelected = childSelected = false;
+	}
+
+	/**
+	 * Helper to select only expandable items or specific view types.
+	 * <p>The priority is determined by the 1st item selected by the user:
+	 * <br/>- if expandable, then only expandable items will be automatically selected.
+	 * <br/>- if not expandable, then the items of the ViewType passed will be selected.</p>
+	 *
+	 * @param viewTypes All non expandable ViewTypes for which we want the selection,
+	 *                  pass nothing to select expandable ViewTypes all the times.
+	 */
+	public void selectAll(Integer... viewTypes) {
+		T item = getItem(getSelectedPositions().get(0));
+		if (getSelectedItemCount() > 0 && item != null && item instanceof IExpandable)
+			super.selectAll(EXPANDABLE_VIEW_TYPE);//Select only Parents, Skip others
+		else
+			super.selectAll(viewTypes);//Select others
+	}
+
+	@Override
+	@CallSuper
+	public void clearSelection() {
+		parentSelected = childSelected = false;
+		super.clearSelection();
+	}
+
+	public boolean isAnyParentSelected() {
+		return parentSelected;
+	}
+
+	public boolean isAnyChildSelected() {
+		return childSelected;
 	}
 
 	/*--------------*/
@@ -161,20 +257,13 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 	/*--------------*/
 
 	/**
-	 * Convenience method of {@link #updateDataSet(String)} with {@link null} as param.
-	 */
-	public void updateDataSet() {
-		updateDataSet(null);
-	}
-
-	/**
 	 * This method will refresh the entire DataSet content.
-	 * <p>The parameter is useful to filter the type of the DataSet.<br/>
-	 * Pass null value in case not used.</p>
+	 * <p>The parameters are useful to filter the type of the DataSet.<br/>
+	 * Pass anything in case not used.</p>
 	 *
-	 * @param param A custom parameter to filter the type of the DataSet
+	 * @param param custom parameters to filter the type of the DataSet
 	 */
-	public abstract void updateDataSet(String param);
+	public abstract void updateDataSet(String... param);
 
 	/**
 	 * Returns the custom object "Item".
@@ -246,11 +335,139 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 		return item != null && mItems != null && mItems.contains(item);
 	}
 
+
+	/**
+	 * Returns the ViewType for an Expandable Item and for all others ViewTypes depends
+	 * by the current position.
+	 *
+	 * @param position position for which ViewType is requested
+	 * @return -1 for {@link #EXPANDABLE_VIEW_TYPE};
+	 * otherwise 0 (default) or any user value for all others ViewType
+	 */
 	@Override
-	public abstract VH onCreateViewHolder(ViewGroup parent, int viewType);
+	public int getItemViewType(int position) {
+		//User ViewType
+		T item = getItem(position);
+		if (item != null)
+			return item.getLayoutRes();
+		//Default ViewType
+		return super.getItemViewType(position);
+	}
+
+	/*---------------------*/
+	/* VIEW HOLDER METHODS */
+	/*---------------------*/
+
+	/**
+	 * Internal mapper to remember and add all ViewTypes for the Items.
+	 *
+	 * @param items
+	 */
+	private void mapViewTypesFrom(Iterable<IFlexibleItem> items) {
+		if (items != null) {
+			for (IFlexibleItem item : items) {
+				mapViewTypeFrom(item);
+			}
+		}
+	}
+
+	/**
+	 * Internal mapper to remember and add all types for the RecyclerView.
+	 *
+	 * @param item
+	 */
+	private void mapViewTypeFrom(IFlexibleItem item) {
+		if (item != null && !mTypeInstances.containsKey(item.getLayoutRes())) {
+			mTypeInstances.put(item.getLayoutRes(), item);
+		}
+	}
+
+	/**
+	 * Retrieves the TypeInstance remembered within the FlexibleAdapter for an item.
+	 *
+	 * @param viewType the ViewType of the item
+	 * @return the IFlexibleItem instance, creator of the ViewType
+	 */
+	private IFlexibleItem getViewTypeInstance(int viewType) {
+		return mTypeInstances.get(viewType);
+	}
+
+	/**
+	 * You can override this method to create ViewHolder from inside the Adapter or
+	 * you can let this method to call the implementation of
+	 * {@link IFlexibleItem#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)}
+	 * to create ViewHolder from inside the Item.
+	 *
+	 * @param parent   the ViewGroup into which the new View will be added after it is bound
+	 *                 to an adapter position
+	 * @param viewType the view type of the new View
+	 * @return a new ViewHolder that holds a View of the given view type
+	 */
+	@Override
+	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		if (mInflater == null) {
+			mInflater = LayoutInflater.from(parent.getContext());
+		}
+		return getViewTypeInstance(viewType).createViewHolder(this, mInflater, parent);
+	}
 
 	@Override
-	public abstract void onBindViewHolder(VH holder, final int position);
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+		this.onBindViewHolder(holder, position, Collections.unmodifiableList(new ArrayList<Object>()));
+	}
+
+	@Override
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+		T item = getItem(position);
+		if (item != null)
+			item.bindViewHolder(this, holder, position, payloads);
+	}
+
+	/*--------------------*/
+	/* EXPANDABLE METHODS */
+	/*--------------------*/
+
+	//FIXME: Find a way to Not animate items with ItemAnimator!!!
+	//TODO: Customize child items animations (don't use add or remove ItemAnimator)
+
+	/**
+	 * Automatically collapse all previous expanded parents before expand the clicked parent.
+	 * <p>Default value is disabled.</p>
+	 *
+	 * @param collapseOnExpand true to collapse others items, false to just expand the current
+	 */
+	public void setAutoCollapseOnExpand(boolean collapseOnExpand) {
+		this.collapseOnExpand = collapseOnExpand;
+	}
+
+	/**
+	 * Automatically scroll the clicked expandable item to the first visible position.<br/>
+	 * Default disabled.
+	 * <p>This works ONLY in combination with {@link SmoothScrollLinearLayoutManager}.
+	 * GridLayout is still NOT supported.</p>
+	 *
+	 * @param scrollOnExpand true to enable automatic scroll, false to disable
+	 */
+	public void setAutoScrollOnExpand(boolean scrollOnExpand) {
+		this.scrollOnExpand = scrollOnExpand;
+	}
+
+	public boolean isExpanded(int position) {
+		T item = getItem(position);
+		if (item != null && item instanceof IExpandable) {
+			IExpandable expandable = (IExpandable) item;
+			return expandable.isExpanded();
+		}
+		return false;
+	}
+
+	public boolean isExpandable(T item) {
+		return item != null && item instanceof IExpandable;
+	}
+
+	/*----------------*/
+	/* UPDATE METHODS */
+	/*----------------*/
 
 	public void updateItem(int position, @NonNull T item) {
 		if (position < 0) {
@@ -292,7 +509,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 		//Notify addition
 		notifyItemInserted(position);
 		//Call listener to update EmptyView
-		if (mUpdateListener != null && !isMultiRange)
+		if (mUpdateListener != null && !multiRange)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 
 		return true;
@@ -324,7 +541,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 		//Notify range addition
 		notifyItemRangeInserted(position, items.size());
 		//Call listener to update EmptyView
-		if (mUpdateListener != null && !isMultiRange)
+		if (mUpdateListener != null && !multiRange)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 		return true;
 	}
@@ -392,7 +609,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 		if (DEBUG) Log.v(TAG, "removeItem notifyItemRemoved on position " + position);
 		notifyItemRemoved(position);
 		//Call listener to update EmptyView
-		if (mUpdateListener != null && !isMultiRange)
+		if (mUpdateListener != null && !multiRange)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
@@ -417,7 +634,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 		});
 
 		// Split the list in ranges
-		isMultiRange = true;
+		multiRange = true;
 		while (!selectedPositions.isEmpty()) {
 			if (selectedPositions.size() == 1) {
 				removeItem(selectedPositions.get(0));
@@ -441,7 +658,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 				}
 			}
 		}
-		isMultiRange = false;
+		multiRange = false;
 		//Call listener to update EmptyView
 		if (mUpdateListener != null)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
@@ -520,7 +737,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 	 * @return true if selection will be restored, false otherwise
 	 */
 	public boolean isRestoreWithSelection() {
-		return mRestoreSelection;
+		return restoreSelection;
 	}
 
 	/**
@@ -532,7 +749,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 	 * @param restoreSelection true to have restored items still selected, false to empty selections.
 	 */
 	public void setRestoreSelectionOnUndo(boolean restoreSelection) {
-		this.mRestoreSelection = restoreSelection;
+		this.restoreSelection = restoreSelection;
 	}
 
 	/**
@@ -556,7 +773,7 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 				continue;
 			addItem(mOriginalPositions.get(i), item);
 			//Restore selection before emptyBin, if configured
-			if (mRestoreSelection)
+			if (restoreSelection)
 				getSelectedPositions().add(mOriginalPositions.get(i));
 		}
 		emptyBin();
@@ -971,9 +1188,104 @@ public abstract class FlexibleAdapter<VH extends RecyclerView.ViewHolder, T exte
 		}
 	}
 
-	/*------------------*/
-	/* INNER INTERFACES */
-	/*------------------*/
+	/*----------------*/
+	/* INSTANCE STATE */
+	/*----------------*/
+
+	/**
+	 * Save the state of the current expanded items.
+	 *
+	 * @param outState Current state
+	 */
+	public void onSaveInstanceState(Bundle outState) {
+		//Save selection state
+		super.onSaveInstanceState(outState);
+		if (DEBUG) Log.v(TAG, "SaveInstanceState for expanded items");
+		//Save selection coherence
+		outState.putBoolean(EXTRA_CHILD, childSelected);
+		outState.putBoolean(EXTRA_PARENT, parentSelected);
+	}
+
+	/**
+	 * Restore the previous state of the expanded items.
+	 *
+	 * @param savedInstanceState Previous state
+	 */
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		//Restore selection state
+		super.onRestoreInstanceState(savedInstanceState);
+		//Restore selection coherence
+		parentSelected = savedInstanceState.getBoolean(EXTRA_PARENT);
+		childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
+	}
+
+	/*---------------*/
+	/* INNER CLASSES */
+	/*---------------*/
+
+	/**
+	 * Observer Class responsible to recalculate Selection and Expanded positions.
+	 */
+	private class ExpandableAdapterDataObserver extends RecyclerView.AdapterDataObserver {
+
+		private void adjustPositions(int positionStart, int itemCount) {
+			if (!filtering) {//Filtering has multiple insert and removal, we skip this process
+				//adjustHeaders(positionStart, itemCount);
+				if (adjustSelected)//Don't, if remove range / restore children
+					adjustSelected(positionStart, itemCount);
+				if (adjustRemoved)//Don't, if remove range / restore parents
+					adjustRemoved(positionStart, itemCount);
+				adjustSelected = adjustRemoved = true;
+			}
+		}
+
+		/**
+		 * Triggered by {@link #notifyDataSetChanged()}.
+		 */
+		@Override
+		public void onChanged() {
+			expandInitialItems();
+		}
+
+		@Override
+		public void onItemRangeInserted(int positionStart, int itemCount) {
+			adjustPositions(positionStart, itemCount);
+		}
+
+		@Override
+		public void onItemRangeRemoved(int positionStart, int itemCount) {
+			adjustPositions(positionStart, -itemCount);
+		}
+	}
+
+	private static class RemovedItem<T> {
+		int parentPosition = -1, relativePosition = -1;
+		T item = null;
+		boolean notifyParentChanged = false;
+
+		public RemovedItem(int parentPosition, T item) {
+			this(parentPosition, -1, item, false);
+		}
+
+		public RemovedItem(int parentPosition, int relativePosition, T item, boolean notifyParentChanged) {
+			this.parentPosition = parentPosition;
+			this.relativePosition = relativePosition;
+			this.item = item;
+			this.notifyParentChanged = notifyParentChanged;
+		}
+
+		public void adjustBy(int itemCount) {
+			parentPosition += itemCount;
+		}
+
+		@Override
+		public String toString() {
+			return "RemovedItem[parentPosition=" + parentPosition +
+					", relativePosition=" + relativePosition +
+					", item=" + item + "]";
+		}
+	}
+
 
 	/**
 	 * @since 03/01/2016

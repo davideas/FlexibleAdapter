@@ -27,6 +27,4 @@ public interface IExpandable<T extends IFlexibleItem> {
 
 	List<T> getSubItems();
 
-	int getSubItemsCount();
-
 }

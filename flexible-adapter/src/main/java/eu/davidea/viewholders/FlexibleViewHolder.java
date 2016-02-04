@@ -147,7 +147,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * (to activate the ActionMode) or during a Drag (to show that we enabled the Drag).
 	 * </p>
 	 * If you do this, it's not necessary to invalidate the row (with notifyItemChanged):
-	 * In this way <i>onBindViewHolder</i> is NOT called and inner Views can animate without
+	 * In this way <i>bindViewHolder</i> is NOT called and inner Views can animate without
 	 * interruption, so you can see the animation running still having the selection activated.
 	 */
 	@CallSuper

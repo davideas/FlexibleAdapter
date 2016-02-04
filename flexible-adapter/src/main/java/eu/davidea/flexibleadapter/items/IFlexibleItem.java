@@ -1,5 +1,14 @@
 package eu.davidea.flexibleadapter.items;
 
+import android.support.annotation.LayoutRes;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
+import java.util.List;
+
+import eu.davidea.flexibleadapter.FlexibleAdapter;
+
 /**
  * Basic interface to manage operations like enabling, selecting, hiding, filtering on items.
  * <p>Implements this interface or use {@link AbstractFlexibleItem}.</p>
@@ -7,11 +16,11 @@ package eu.davidea.flexibleadapter.items;
  * @author Davide Steduto
  * @since 19/01/2016 Created
  */
-public interface IFlexibleItem {
+public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
 
-	/*---------*/
-	/* METHODS */
-	/*---------*/
+	/*---------------*/
+	/* BASIC METHODS */
+	/*---------------*/
 
 	/**
 	 * Return if the Item is enabled.
@@ -60,6 +69,10 @@ public interface IFlexibleItem {
 	 */
 	void setSelectable(boolean selectable);
 
+	boolean isSelected();
+
+	void setSelected(boolean selected);
+
 	/*-------------------*/
 	/* TOUCHABLE METHODS */
 	/*-------------------*/
@@ -77,25 +90,36 @@ public interface IFlexibleItem {
 	/*---------------------*/
 
 	/**
-	 * Returns the type of the Item.<br/>
-	 * Should represent an Integer identifier or a resource Id reference {@link android.R.id}.
-	 *
-	 * @return Integer identifier.
-	 */
-//	@IdRes
-//	int getItemViewType();
-
-	/**
 	 * Returns the layout resource Id to bind for the given Item.<br/>
 	 * Should identify a resource Layout reference {@link android.R.layout}.
+	 * <p>Used by FlexibleAdapter to map the ViewType.</p>
 	 *
 	 * @return Layout identifier.
 	 */
-//	@LayoutRes
-//	int getLayoutRes();
+	@LayoutRes
+	int getLayoutRes();
 
-//	VH getViewHolder(Inflater inflater, ViewGroup parent);
+	/**
+	 *
+	 * @param adapter  the Adapter instance extending {@link FlexibleAdapter}
+	 * @param inflater the {@link LayoutInflater} for the itemView
+	 * @param parent   the ViewGroup into which the new View will be added after it is bound
+	 *                 to an adapter position
+	 * @return a new ViewHolder that holds a View of the given view type
+	 */
+	VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent);
 
-//	void bindViewHolder(VH holder);
+	/**
+	 * Binds the data of this item to the given holder.
+	 * <p>How to use Payload, Please refer to
+	 * {@link android.support.v7.widget.RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}</p>
+	 *
+	 * @param adapter  the FlexibleAdapter instance
+	 * @param holder   the ViewHolder instance
+	 * @param position the current position
+	 * @param payloads A non-null list of merged payloads. Can be empty list if requires full
+	 *                 update.
+	 */
+	void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads);
 
 }

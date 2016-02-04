@@ -3,6 +3,7 @@ package eu.davidea.viewholders;
 import android.support.annotation.CallSuper;
 import android.view.View;
 
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
 
 
@@ -16,7 +17,7 @@ import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
  */
 public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
-	protected final FlexibleExpandableAdapter mAdapter;
+	protected final FlexibleAdapter mAdapter;
 	private boolean mLongPressEnabled = false;
 
 	/*--------------*/
@@ -29,9 +30,9 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 * any effect.</p>
 	 *
 	 * @param view    The {@link View} being hosted in this ViewHolder
-	 * @param adapter Adapter instance of type {@link FlexibleExpandableAdapter}
+	 * @param adapter Adapter instance of type {@link FlexibleAdapter}
 	 */
-	public ExpandableViewHolder(View view, FlexibleExpandableAdapter adapter) {
+	public ExpandableViewHolder(View view, FlexibleAdapter adapter) {
 		super(view, adapter);
 		mAdapter = adapter;
 	}

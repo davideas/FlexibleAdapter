@@ -81,10 +81,9 @@ public class DatabaseService {
 	}
 
 	/**
-	 * @param listId The type of the list
 	 * @return Always a copy of the original list.
 	 */
-	public List<IFlexibleItem> getListById(String listId) {
+	public List<IFlexibleItem> getListById() {
 		//listId is not used: we have only 1 type of list in this example
 		//Return a copy of the DB: we will perform some tricky code on this list.
 		return new ArrayList<IFlexibleItem>(mItems);
@@ -94,25 +93,23 @@ public class DatabaseService {
 		Collections.swap(mItems, fromPosition, toPosition);
 	}
 
-	public void removeItem(Item item) {
+	public void removeItem(IFlexibleItem item) {
 		mItems.remove(item);
 	}
 
 	public void removeSubItem(ExpandableItem parent, SubItem child) {
-		if (parent.contains(child)) {
-			parent.getSubItems().remove(child);
-		}
+		parent.removeSubItem(child);
 	}
 
-	public void addItem(int i, Item item) {
-		if (i < mItems.size())
-			mItems.add(i, item);
+	public void addItem(int position, IFlexibleItem item) {
+		if (position < mItems.size())
+			mItems.add(position, item);
 		else
 			mItems.add(item);
 	}
 
-	public void addSubItem(int i, ExpandableItem parent, SubItem subItem) {
-		parent.addSubItem(i, subItem);
+	public void addSubItem(int position, ExpandableItem parent, SubItem subItem) {
+		parent.addSubItem(position, subItem);
 		parent.updateSubTitle();
 	}
 
