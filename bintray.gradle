@@ -25,6 +25,19 @@ artifacts {
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
+def isReleaseBuild() {
+	return VERSION_NAME.contains("SNAPSHOT") == false
+}
+
+def getReleaseRepositoryUrl() {
+	return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
+			: "https://oss.jfrog.org/artifactory/libs-release"
+}
+
+def getSnapshotRepositoryUrl() {
+	return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
+			: "https://oss.jfrog.org/artifactory/libs-snapshot"
+}
 
 bintray {
 	user = properties.getProperty("bintray.user")
@@ -38,7 +51,7 @@ bintray {
 		websiteUrl = siteUrl
 		licenses = allLicenses
 		vcsUrl = gitUrl
-		labels = ['android', 'recyclerview', 'adapter', 'selection', 'actionmode', 'search', 'filter', 'undo', 'ripple', 'itemanimator']
+		labels = ['android', 'recyclerview', 'adapter', 'selection', 'actionmode', 'ripple', 'search', 'itemanimator', 'undo', 'viewholder', 'filter', 'filtering', 'item', 'item animator', 'animator animation', 'expand', 'expandable', 'collapse', 'collapsible', 'section', 'sticky', 'header category', 'drag', 'draggable', 'swipe', 'swipable', 'fastscroll', 'fastscroller']
 		publish = true
 		publicDownloadNumbers = true
 		version {

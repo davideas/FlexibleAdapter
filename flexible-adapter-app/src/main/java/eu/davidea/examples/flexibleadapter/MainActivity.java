@@ -30,13 +30,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import eu.davidea.common.SimpleDividerItemDecoration;
+import eu.davidea.examples.models.AbstractItem;
 import eu.davidea.examples.models.ExpandableItem;
-import eu.davidea.examples.models.Item;
+import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
-import eu.davidea.flexibleadapter.items.IFlexibleItem;
+import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 
@@ -134,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements
 				destroyActionModeIfNeeded();
 
 				for (int i = 0; i <= mAdapter.getItemCount() + 1; i++) {
-					Item item = DatabaseService.newExampleItem(i);
+					SimpleItem item = DatabaseService.newSimpleItem(i);
 					//TODO: Fix position for new item
 					if (!DatabaseService.getInstance().getListById().contains(item)) {
 						DatabaseService.getInstance().addItem(i, item);//This is the original list
@@ -395,10 +396,20 @@ public class MainActivity extends AppCompatActivity implements
 			// that an item has been selected.
 			if (mAdapter.getItemCount() > 0) {
 				if (position != mActivatedPosition) setActivatedPosition(position);
-				IFlexibleItem item = mAdapter.getItem(position);
-				if (!item.hasSubItems()) {
+				AbstractItem abstractItem = mAdapter.getItem(position);
+				assert abstractItem != null;
+				String title = null;
+				if (mAdapter.isExpandable(abstractItem)) {
+					ExpandableItem expandableItem = (ExpandableItem) abstractItem;
+					if (expandableItem.getSubItems() == null || expandableItem.getSubItems().size() == 0) {
+						title = expandableItem.getTitle();
+					}
+				} else {
+					title = abstractItem.getTitle();
+				}
+				if (title != null) {
 					//TODO FOR YOU: call your custom Action, for example mCallback.onItemSelected(item.getId());
-					EditItemDialog.newInstance(item, position).show(getFragmentManager(), EditItemDialog.TAG);
+					EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
 				}
 			}
 			return false;
@@ -448,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onTitleModified(int position, String newTitle) {
-		Item item = mAdapter.getItem(position);
+		AbstractItem item = mAdapter.getItem(position);
 		item.setTitle(newTitle);
 		mAdapter.updateItem(position, item);
 	}
@@ -504,14 +515,15 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onDeleteConfirmed() {
-		for (IFlexibleItem adapterItem : mAdapter.getDeletedItems()) {
+		for (AbstractItem adapterItem : mAdapter.getDeletedItems()) {
 			//Remove items from your Database. Example:
 			if (mAdapter.isExpandable(adapterItem)) {
 				DatabaseService.getInstance().removeItem(adapterItem);
 				Log.d(TAG, "Confirm removed " + adapterItem);
 			} else {
 				SubItem subItem = (SubItem) adapterItem;
-				DatabaseService.getInstance().removeSubItem(mAdapter.getExpandableOf(subItem), subItem);
+				IExpandable expandable = mAdapter.getExpandableOf(subItem);
+				DatabaseService.getInstance().removeSubItem((ExpandableItem) expandable, subItem);
 				Log.d(TAG, "Confirm removed " + subItem.getTitle());
 			}
 		}

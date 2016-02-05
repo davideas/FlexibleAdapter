@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import eu.davidea.examples.models.AbstractItem;
 import eu.davidea.examples.models.ExpandableItem;
-import eu.davidea.examples.models.Item;
+import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
 
@@ -21,7 +22,7 @@ public class DatabaseService {
 	private static final int ITEMS = 200, SUB_ITEMS = 3, HEADERS = 20;
 	public static boolean userLearnedSelection = false;
 
-	private List<IFlexibleItem> mItems = new ArrayList<IFlexibleItem>();
+	private List<AbstractItem> mItems = new ArrayList<AbstractItem>();
 
 	public static DatabaseService getInstance() {
 		if (mInstance == null) {
@@ -36,14 +37,14 @@ public class DatabaseService {
 
 	private void init() {
 		for (int i = 0; i < ITEMS; i++) {
-			mItems.add(i % 2 == 0 ? newExpandableItem(i) : newExampleItem(i));
+			mItems.add(i % 2 == 0 ? newExpandableItem(i) : newSimpleItem(i));
 		}
 	}
 
-	public static Item newExampleItem(int i) {
-		Item item = new Item();
+	public static SimpleItem newSimpleItem(int i) {
+		SimpleItem item = new SimpleItem();
 		item.setId("I" + (++i));
-		item.setTitle("Item " + i);
+		item.setTitle("Simple Item " + i);
 		item.setSubtitle("Subtitle " + i);
 		return item;
 	}
@@ -67,10 +68,10 @@ public class DatabaseService {
 		return expandableItem;
 	}
 
-	public static SparseArray<IFlexibleItem> buildHeaders() {
-		SparseArray<IFlexibleItem> headers = new SparseArray<IFlexibleItem>();
+	public static SparseArray<AbstractItem> buildHeaders() {
+		SparseArray<AbstractItem> headers = new SparseArray<AbstractItem>();
 		for (int i = 0; i < (ITEMS/HEADERS); i++) {
-			Item header = new Item();
+			SimpleItem header = new SimpleItem();
 			header.setId("H" + i);
 			header.setTitle("Header " + (i + 1));
 			header.setSelectable(false);
@@ -83,10 +84,10 @@ public class DatabaseService {
 	/**
 	 * @return Always a copy of the original list.
 	 */
-	public List<IFlexibleItem> getListById() {
+	public List<AbstractItem> getListById() {
 		//listId is not used: we have only 1 type of list in this example
 		//Return a copy of the DB: we will perform some tricky code on this list.
-		return new ArrayList<IFlexibleItem>(mItems);
+		return new ArrayList<AbstractItem>(mItems);
 	}
 
 	public void swapItem(int fromPosition, int toPosition) {
@@ -101,7 +102,7 @@ public class DatabaseService {
 		parent.removeSubItem(child);
 	}
 
-	public void addItem(int position, IFlexibleItem item) {
+	public void addItem(int position, AbstractItem item) {
 		if (position < mItems.size())
 			mItems.add(position, item);
 		else

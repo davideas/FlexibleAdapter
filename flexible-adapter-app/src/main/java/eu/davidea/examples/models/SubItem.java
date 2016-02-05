@@ -12,10 +12,9 @@ import java.util.List;
 import eu.davidea.examples.flexibleadapter.ExampleAdapter;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
-public class SubItem extends AbstractFlexibleItem<SubItem.ChildViewHolder> implements Serializable {
+public class SubItem extends AbstractItem<SubItem.ChildViewHolder> implements Serializable {
 
 	private static final long serialVersionUID = 2519281529221244210L;
 
@@ -49,9 +48,9 @@ public class SubItem extends AbstractFlexibleItem<SubItem.ChildViewHolder> imple
 
 	@Override
 	public String toString() {
-		return "Item[" +
+		return "SimpleItem[" +
 				"id=" + id +
-				"title=" + title +
+				", title=" + title +
 				super.toString() + ']';
 	}
 
@@ -67,8 +66,6 @@ public class SubItem extends AbstractFlexibleItem<SubItem.ChildViewHolder> imple
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ChildViewHolder holder, int position, List payloads) {
-		super.bindViewHolder(adapter, holder, position, payloads);
-
 		//This "if-else" is just an example of what you can do with item animation
 		if (adapter.isSelected(position)) {
 			adapter.animateView(holder.itemView, position, true);
@@ -76,7 +73,7 @@ public class SubItem extends AbstractFlexibleItem<SubItem.ChildViewHolder> imple
 			adapter.animateView(holder.itemView, position, false);
 		}
 
-		//In case of searchText matches with Title or with an Item's field
+		//In case of searchText matches with Title or with an SimpleItem's field
 		// this will be highlighted
 		if (adapter.hasSearchText()) {
 			ExampleAdapter.setHighlightText(holder.itemView.getContext(),

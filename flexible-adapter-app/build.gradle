@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-	compileSdkVersion targetSdk
-	buildToolsVersion buildTools
+	compileSdkVersion rootProject.ext.compileSdkVersion
+	buildToolsVersion rootProject.ext.buildToolsVersion
 
 	defaultConfig {
 		applicationId "eu.davidea.examples.flexibleadapter"

@@ -1,6 +1,5 @@
 package eu.davidea.examples.models;
 
-import android.app.ExpandableListActivity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,60 +14,21 @@ import java.util.List;
 import eu.davidea.examples.flexibleadapter.ExampleAdapter;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.items.AbstractExpandableItem;
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.viewholders.ExpandableViewHolder;
-import eu.davidea.viewholders.FlexibleViewHolder;
 
-public class Item extends AbstractFlexibleItem<Item.ParentViewHolder>
+public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 		implements Serializable {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 
-	private String id;
-	private String title;
-	private String subtitle;
-
 	@Override
 	public boolean equals(Object inObject) {
-		if (inObject instanceof Item) {
-			Item inItem = (Item) inObject;
-			return this.id.equals(inItem.id);
+		if (inObject instanceof SimpleItem) {
+			SimpleItem inItem = (SimpleItem) inObject;
+			return this.getId().equals(inItem.getId());
 		}
 		return false;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getSubtitle() {
-		return subtitle;
-	}
-
-	public void setSubtitle(String subtitle) {
-		this.subtitle = subtitle;
-	}
-
-	@Override
-	public String toString() {
-		return "Item[" +
-				"id=" + id +
-				"title=" + title +
-				super.toString() + ']';
 	}
 
 	@Override
@@ -82,16 +42,14 @@ public class Item extends AbstractFlexibleItem<Item.ParentViewHolder>
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
-		super.bindViewHolder(adapter, holder, position, payloads);
-
+	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
 		//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
-		if (mSelectAll || mLastItemInActionMode) {
+		if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
 			//Reset the flags with delay
-			holder.mFlipView.postDelayed(new Runnable() {
+			holder.itemView.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					mSelectAll = mLastItemInActionMode = false;
+					adapter.resetActionModeFlags();
 				}
 			}, 200L);
 			//Consume the Animation
@@ -108,16 +66,16 @@ public class Item extends AbstractFlexibleItem<Item.ParentViewHolder>
 			adapter.animateView(holder.itemView, position, false);
 		}
 
-		//In case of searchText matches with Title or with an Item's field
+		//In case of searchText matches with Title or with an SimpleItem's field
 		// this will be highlighted
 		if (adapter.hasSearchText()) {
 			ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-					holder.mTitle, title, adapter.getSearchText());
+					holder.mTitle, getTitle(), adapter.getSearchText());
 			ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-					holder.mSubtitle, subtitle, adapter.getSearchText());
+					holder.mSubtitle, getSubtitle(), adapter.getSearchText());
 		} else {
-			holder.mTitle.setText(title);
-			holder.mSubtitle.setText(subtitle);
+			holder.mTitle.setText(getTitle());
+			holder.mSubtitle.setText(getSubtitle());
 		}
 	}
 

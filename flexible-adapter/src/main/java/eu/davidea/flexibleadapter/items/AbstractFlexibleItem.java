@@ -1,11 +1,6 @@
 package eu.davidea.flexibleadapter.items;
 
-import android.support.annotation.CallSuper;
 import android.support.v7.widget.RecyclerView;
-
-import java.util.List;
-
-import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 /**
  * Generic implementation of {@link IFlexibleItem} interface with most useful methods to manage
@@ -102,18 +97,6 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	@Override
 	public void setSwipeable(boolean swipeable) {
 		mSwipeable = swipeable;
-	}
-
-	/*---------------------*/
-	/* VIEW HOLDER METHODS */
-	/*---------------------*/
-
-	@Override
-	@CallSuper
-	public void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads) {
-		//When user scrolls, this line binds the correct selection status
-		holder.itemView.setActivated(adapter.isSelected(position));
-		//TODO: adapter.isSelected(position) or this.isSelected() ??
 	}
 
 }

@@ -13,17 +13,14 @@ import java.util.List;
 import eu.davidea.examples.flexibleadapter.DatabaseService;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * User Learns Selection
  */
-public class ULSItem extends AbstractFlexibleItem<ULSItem.ExampleViewHolder> implements Serializable {
+public class ULSItem extends AbstractItem<ULSItem.ExampleViewHolder> implements Serializable {
 
 	private static final long serialVersionUID = -5041296095060813327L;
-	private String title;
-	private String subtitle;
 
 	@Override
 	public boolean equals(Object inObject) {
@@ -32,26 +29,6 @@ public class ULSItem extends AbstractFlexibleItem<ULSItem.ExampleViewHolder> imp
 			return this.getId().equals(inItem.getId());
 		}
 		return false;
-	}
-
-	public String getId() {
-		return "ULS";
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getSubtitle() {
-		return subtitle;
-	}
-
-	public void setSubtitle(String subtitle) {
-		this.subtitle = subtitle;
 	}
 
 	@Override
@@ -66,12 +43,11 @@ public class ULSItem extends AbstractFlexibleItem<ULSItem.ExampleViewHolder> imp
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ExampleViewHolder holder, int position, List payloads) {
-		super.bindViewHolder(adapter, holder, position, payloads);
 		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 		holder.itemView.setActivated(true);
 		holder.mTitle.setSelected(true);//For marquee
-		holder.mTitle.setText(Html.fromHtml(title));
-		holder.mSubtitle.setText(Html.fromHtml(subtitle));
+		holder.mTitle.setText(Html.fromHtml(getTitle()));
+		holder.mSubtitle.setText(Html.fromHtml(getSubtitle()));
 		adapter.animateView(holder.itemView, position, false);
 	}
 

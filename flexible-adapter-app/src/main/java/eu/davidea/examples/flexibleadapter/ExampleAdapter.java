@@ -7,7 +7,6 @@ import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -21,37 +20,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import eu.davidea.examples.models.ExpandableItem;
-import eu.davidea.examples.models.Item;
-import eu.davidea.examples.models.SubItem;
+import eu.davidea.examples.models.AbstractItem;
+import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.ULSItem;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.items.IFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 
-public class ExampleAdapter extends FlexibleAdapter<IFlexibleItem> {
+public class ExampleAdapter extends FlexibleAdapter<AbstractItem> {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 
 	public static final int CHILD_VIEW_TYPE = 0;
 	public static final int EXAMPLE_VIEW_TYPE = 1;
 
-	//Selection fields
-	private boolean
-			mLastItemInActionMode = false,
-			mSelectAll = false;
-
 	private Context mContext;
 
 
 	public ExampleAdapter(Activity activity) {
 		super(DatabaseService.getInstance().getListById(), activity);
-		addUserLearnedSelection();
 		mContext = activity;
+		addUserLearnedSelection();
 
 		//NEW! We have highlighted text while filtering, so let's enable this feature
 		//to be consistent with the active filter
@@ -75,7 +67,7 @@ public class ExampleAdapter extends FlexibleAdapter<IFlexibleItem> {
 	}
 
 	private void addUserLearnedSelection() {
-		Item uls = (Item) getItem(0);
+		SimpleItem uls = (SimpleItem) getItem(0);
 		if (!DatabaseService.userLearnedSelection && !hasSearchText() &&
 				(uls == null || !uls.getId().equals("ULS"))) {
 			//Define Example View
@@ -89,7 +81,7 @@ public class ExampleAdapter extends FlexibleAdapter<IFlexibleItem> {
 
 
 	@Override
-	public synchronized void filterItems(@NonNull List<IFlexibleItem> unfilteredItems) {
+	public synchronized void filterItems(@NonNull List<AbstractItem> unfilteredItems) {
 		super.filterItems(unfilteredItems);
 		addUserLearnedSelection();
 	}
@@ -106,123 +98,131 @@ public class ExampleAdapter extends FlexibleAdapter<IFlexibleItem> {
 		super.selectAll(CHILD_VIEW_TYPE);
 	}
 
-	@Override
-	public int getItemViewType(int position) {
-		return (position == 0 && !DatabaseService.userLearnedSelection && !hasSearchText() ?
-				EXAMPLE_VIEW_TYPE : super.getItemViewType(position));
-	}
+//	@Override
+//	public int getItemViewType(int position) {
+//		AbstractItem item = getItem(position);
+//		if (item instanceof SimpleItem) //or ExpandableItem, since it extends SimpleItem!
+//			return EXPANDABLE_VIEW_TYPE;
+//		else if (item instanceof ULSItem) return EXAMPLE_VIEW_TYPE;
+//		else return 0;
+//	}
 
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		//METHOD A - NEW! Via Model objects. In this case you don't need to implement this method.
-		//super.onCreateViewHolder(parent, viewType);
+		return super.onCreateViewHolder(parent, viewType);
 
 		//METHOD B - Normal way as you prefer
-		switch (viewType) {
-			case SECTION_VIEW_TYPE:
-				return new HeaderViewHolder(
-						mInflater.inflate(R.layout.recycler_header_row, parent, false), this);
-			case EXPANDABLE_VIEW_TYPE:
-				return new ExpandableItem.ParentViewHolder(
-						mInflater.inflate(R.layout.recycler_expandable_row, parent, false), this);
-			case EXAMPLE_VIEW_TYPE:
-				return new ULSItem.ExampleViewHolder(
-						mInflater.inflate(R.layout.recycler_uls_row, parent, false), this);
-			default:
-				return new SubItem.ChildViewHolder(
-						mInflater.inflate(R.layout.recycler_child_row, parent, false), this);
-		}
+//		if (mInflater == null) {
+//			mInflater = LayoutInflater.from(parent.getContext());
+//		}
+//		switch (viewType) {
+//			case SECTION_VIEW_TYPE:
+//				return new HeaderViewHolder(
+//						mInflater.inflate(R.layout.recycler_header_row, parent, false), this);
+//			case EXPANDABLE_VIEW_TYPE:
+//				return new ExpandableItem.ParentViewHolder(
+//						mInflater.inflate(R.layout.recycler_expandable_row, parent, false), this);
+//			case EXAMPLE_VIEW_TYPE:
+//				return new ULSItem.ExampleViewHolder(
+//						mInflater.inflate(R.layout.recycler_uls_row, parent, false), this);
+//			default:
+//				return new SubItem.ChildViewHolder(
+//						mInflater.inflate(R.layout.recycler_child_row, parent, false), this);
+//		}
 	}
 
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 		//METHOD A - NEW! Via Model objects. In this case you don't need to implement this method.
-		//super.onBindViewHolder(holder, position);
+		super.onBindViewHolder(holder, position);
 
 		//METHOD B - Normal way, inside the Adapter, as you prefer
 		//NOTE: ViewType Must be checked ALSO here to bind the correct view
-		switch (getItemViewType(position)) {
-			case SECTION_VIEW_TYPE:
-				final Item header = (Item) getItem(position);
-				HeaderViewHolder hvHolder = (HeaderViewHolder) holder;
-				hvHolder.mTitle.setText(((Item) header).getTitle());
-				break;
-
-			case EXPANDABLE_VIEW_TYPE:
-				Item item = (Item) getItem(position);
-				ParentViewHolder pvHolder = (ParentViewHolder) holder;
-				//When user scrolls, this line binds the correct selection status
-				pvHolder.itemView.setActivated(isSelected(position));
-
-				//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
-				if (mSelectAll || mLastItemInActionMode) {
-					//Reset the flags with delay
-					pvHolder.mFlipView.postDelayed(new Runnable() {
-						@Override
-						public void run() {
-							mSelectAll = mLastItemInActionMode = false;
-						}
-					}, 200L);
-					//Consume the Animation
-					pvHolder.mFlipView.flip(isSelected(position), 200L);
-				} else {
-					//Display the current flip status
-					pvHolder.mFlipView.flipSilently(isSelected(position));
-				}
-
-				//This "if-else" is just an example of what you can do with item animation
-				if (isSelected(position)) {
-					animateView(holder.itemView, position, true);
-				} else {
-					animateView(holder.itemView, position, false);
-				}
-
-				//In case of searchText matches with Title or with an Item's field
-				// this will be highlighted
-				if (hasSearchText()) {
-					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mTitle, item.getTitle(), mSearchText);
-					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mSubtitle, updateSubTitle(item), mSearchText);
-				} else {
-					pvHolder.mTitle.setText(item.getTitle());
-					pvHolder.mSubtitle.setText(updateSubTitle(item));
-				}
-				break;
-
-			case EXAMPLE_VIEW_TYPE:
-				final ULSItem ulsItem = (ULSItem) getItem(position);
-				ExampleViewHolder exHolder = (ExampleViewHolder) holder;
-				exHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
-				exHolder.itemView.setActivated(true);
-				exHolder.mTitle.setSelected(true);//For marquee
-				exHolder.mTitle.setText(Html.fromHtml(ulsItem.getTitle()));
-				exHolder.mSubtitle.setText(Html.fromHtml(ulsItem.getSubtitle()));
-				animateView(holder.itemView, position, false);
-				break;
-
-			default:
-				final SubItem subItem = (SubItem) getItem(position);
-				ChildViewHolder cvHolder = (ChildViewHolder) holder;
-				//When user scrolls, this line binds the correct selection status
-				cvHolder.itemView.setActivated(isSelected(position));
-
-				//This "if-else" is just an example of what you can do with item animation
-				if (isSelected(position)) {
-					animateView(holder.itemView, position, true);
-				} else {
-					animateView(holder.itemView, position, false);
-				}
-
-				//In case of searchText matches with Title or with an Item's field
-				// this will be highlighted
-				if (hasSearchText()) {
-					setHighlightText(cvHolder.itemView.getContext(), cvHolder.mTitle, subItem.getTitle(), mSearchText);
-				} else {
-					cvHolder.mTitle.setText(subItem.getTitle());
-				}
-		}//end-switch
+		//When user scrolls, this line binds the correct selection status
+//		holder.itemView.setActivated(isSelected(position));
+//		switch (getItemViewType(position)) {
+//			case SECTION_VIEW_TYPE:
+//				final SimpleItem header = (SimpleItem) getItem(position);
+//				HeaderViewHolder hvHolder = (HeaderViewHolder) holder;
+//				hvHolder.mTitle.setText(((SimpleItem) header).getTitle());
+//				break;
+//
+//			case EXPANDABLE_VIEW_TYPE:
+//				SimpleItem item = (SimpleItem) getItem(position);
+//				ParentViewHolder pvHolder = (ParentViewHolder) holder;
+//				//When user scrolls, this line binds the correct selection status
+//				pvHolder.itemView.setActivated(isSelected(position));
+//
+//				//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
+//				if (mSelectAll || mLastItemInActionMode) {
+//					//Reset the flags with delay
+//					pvHolder.mFlipView.postDelayed(new Runnable() {
+//						@Override
+//						public void run() {
+//							mSelectAll = mLastItemInActionMode = false;
+//						}
+//					}, 200L);
+//					//Consume the Animation
+//					pvHolder.mFlipView.flip(isSelected(position), 200L);
+//				} else {
+//					//Display the current flip status
+//					pvHolder.mFlipView.flipSilently(isSelected(position));
+//				}
+//
+//				//This "if-else" is just an example of what you can do with item animation
+//				if (isSelected(position)) {
+//					animateView(holder.itemView, position, true);
+//				} else {
+//					animateView(holder.itemView, position, false);
+//				}
+//
+//				//In case of searchText matches with Title or with an SimpleItem's field
+//				// this will be highlighted
+//				if (hasSearchText()) {
+//					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mTitle, item.getTitle(), mSearchText);
+//					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mSubtitle, updateSubTitle(item), mSearchText);
+//				} else {
+//					pvHolder.mTitle.setText(item.getTitle());
+//					pvHolder.mSubtitle.setText(updateSubTitle(item));
+//				}
+//				break;
+//
+//			case EXAMPLE_VIEW_TYPE:
+//				final ULSItem ulsItem = (ULSItem) getItem(position);
+//				ExampleViewHolder exHolder = (ExampleViewHolder) holder;
+//				exHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
+//				exHolder.itemView.setActivated(true);
+//				exHolder.mTitle.setSelected(true);//For marquee
+//				exHolder.mTitle.setText(Html.fromHtml(ulsItem.getTitle()));
+//				exHolder.mSubtitle.setText(Html.fromHtml(ulsItem.getSubtitle()));
+//				animateView(holder.itemView, position, false);
+//				break;
+//
+//			default:
+//				final SubItem subItem = (SubItem) getItem(position);
+//				ChildViewHolder cvHolder = (ChildViewHolder) holder;
+//				//When user scrolls, this line binds the correct selection status
+//				cvHolder.itemView.setActivated(isSelected(position));
+//
+//				//This "if-else" is just an example of what you can do with item animation
+//				if (isSelected(position)) {
+//					animateView(holder.itemView, position, true);
+//				} else {
+//					animateView(holder.itemView, position, false);
+//				}
+//
+//				//In case of searchText matches with Title or with an SimpleItem's field
+//				// this will be highlighted
+//				if (hasSearchText()) {
+//					setHighlightText(cvHolder.itemView.getContext(), cvHolder.mTitle, subItem.getTitle(), mSearchText);
+//				} else {
+//					cvHolder.mTitle.setText(subItem.getTitle());
+//				}
+//		}//end-switch
 	}
 
-	private String updateSubTitle(Item item) {
+	private String updateSubTitle(SimpleItem item) {
 		return getCurrentChildren(item).size() + " subItems";
 	}
 
@@ -287,7 +287,7 @@ public class ExampleAdapter extends FlexibleAdapter<IFlexibleItem> {
 //	 * @return true if a match exists in the title or in the subtitle, false if no match found.
 //	 */
 //	@Override
-//	protected boolean filterObject(Item item, String constraint) {
+//	protected boolean filterObject(SimpleItem item, String constraint) {
 //		String valueText = item.getTitle();
 //
 //		//Filter on Title

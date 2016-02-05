@@ -4,7 +4,6 @@ import android.support.annotation.CallSuper;
 import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.FlexibleExpandableAdapter;
 
 
 /**

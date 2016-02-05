@@ -31,7 +31,6 @@ import java.util.List;
  * This class is extended by {@link FlexibleAdapter}.
  *
  * @author Davide Steduto
- * @see FlexibleExpandableAdapter
  * @see FlexibleAdapter
  * @see SelectableAdapter
  * @since 10/01/2016

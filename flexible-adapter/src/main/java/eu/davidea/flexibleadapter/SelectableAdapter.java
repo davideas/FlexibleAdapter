@@ -16,13 +16,13 @@ import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
  * <p>Also </p>
  *
  * @author Davide Steduto
- * @see FlexibleExpandableAdapter
  * @see FlexibleAdapter
  * @see FlexibleAnimatorAdapter
  * @since 03/05/2015 Created
@@ -66,6 +66,18 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	private int mMode;
 	protected RecyclerView mRecyclerView;
 	protected FastScroller mFastScroller;
+
+	/**
+	 * ActionMode selection flag SelectAll.
+	 * <p>Used when user click on selectAll action button in ActionMode.</p>
+	 */
+	protected boolean mSelectAll = false;
+
+	/**
+	 * ActionMode selection flag LastItemInActionMode.
+	 * <p>Used when user returns to {@link #MODE_IDLE} and no selection is active.</p>
+	 */
+	protected boolean mLastItemInActionMode = false;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -113,6 +125,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void setMode(int mode) {
 		this.mMode = mode;
+		mLastItemInActionMode = (mode == MODE_IDLE);
 	}
 
 	/**
@@ -127,6 +140,29 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	/**
+	 * @return true if user clicks on SelectAll on action button in ActionMode.
+	 */
+	public boolean isSelectAll() {
+		return mSelectAll;
+	}
+
+	/**
+	 * @return true if user returns to {@link #MODE_IDLE} and no selection is active, false otherwise
+	 */
+	public boolean isLastItemInActionMode() {
+		return mLastItemInActionMode;
+	}
+
+	/**
+	 * Reset to false the ActionMode flags: {@code SelectAll} and {@code LastItemInActionMode}.
+	 * <p><b>IMPORTANT:</b> To be called with <u>delay</u> in {@code holder.itemView.postDelayed()}.</p>
+	 */
+	public void resetActionModeFlags() {
+		this.mSelectAll = false;
+		this.mLastItemInActionMode = false;
+	}
+
+	/**
 	 * Indicates if the item, at the provided position, is selected.
 	 *
 	 * @param position Position of the item to check.
@@ -138,13 +174,11 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	/**
 	 * Toggles the selection status of the item at a given position.<br/>
-	 * The behaviour depends on the selection mode previously set with {@link #setMode}.
-	 * <p>
-	 * Optionally the item can be invalidated.<br/>
-	 * However it is preferable to set <i>false</i> and to handle the Activated/Selected State of
-	 * the ItemView in the Click events of the ViewHolder after the selection is registered and
-	 * up to date: Very Useful if the item has views with own animation to perform!
-	 * </p>
+	 * The behaviour depends on the selection mode previously set with {@link #setMode(int)}.
+	 *
+	 * <p>The Activated State of the ItemView is automatically set in
+	 * {@link FlexibleViewHolder#toggleActivation()} called in {@code onClick} event</p>
+	 *
 	 * <b>Usage:</b>
 	 * <ul>
 	 * <li>If you don't want any item to be selected/activated at all, just don't call this method.</li>
@@ -152,14 +186,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * to your layout/view of the Item. It's preferable to set in your layout:
 	 * <i>android:background="?attr/selectableItemBackground"</i>, pointing to a custom Drawable
 	 * in the style.xml (note: prefix <i>?android:attr</i> <u>doesn't</u> work).</li>
-	 * <li>In <i>onClick</i> event, enable the Activated/Selected State of the ItemView of the
-	 * ViewHolder <u>after</u> the listener consumed the event:
-	 * <i>itemView.setActivated(mAdapter.isSelected(getAdapterPosition()));</i></li>
 	 * <li>In <i>bindViewHolder</i>, adjust the selection status:
 	 * <i>holder.itemView.setActivated(isSelected(position));</i></li>
-	 * <li>If <i>invalidate</i> is set true, {@link #notifyItemChanged} is called and
-	 * {@link #onBindViewHolder} will be automatically called afterwards overriding any animation
-	 * inside the ItemView!</li>
 	 * </ul>
 	 *
 	 * @param position Position of the item to toggle the selection status for.
@@ -187,6 +215,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @param viewTypes The ViewTypes for which we want the selection, pass nothing to select all
 	 */
 	public void selectAll(Integer... viewTypes) {
+		mSelectAll = true;
 		List<Integer> viewTypesToSelect = Arrays.asList(viewTypes);
 		if (DEBUG) Log.v(TAG, "selectAll ViewTypes to include " + viewTypesToSelect);
 		mSelectedPositions = new ArrayList<Integer>(getItemCount());

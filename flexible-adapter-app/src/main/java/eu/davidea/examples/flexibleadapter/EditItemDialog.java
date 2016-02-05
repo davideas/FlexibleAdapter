@@ -16,34 +16,33 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import eu.davidea.common.SimpleTextWatcher;
-import eu.davidea.examples.models.Item;
 import eu.davidea.utils.Utils;
 
 
 public class EditItemDialog extends DialogFragment {
 
 	public static final String TAG = EditItemDialog.class.getSimpleName();
-	public static final String ARG_ITEM = "item";
+	public static final String ARG_TITLE = "title";
 	public static final String ARG_ITEM_POSITION = "position";
 
 	public interface OnEditItemListener {
 		void onTitleModified(int position, String newTitle);
 	}
 
-	private Item mItem;
+	private String mTitle;
 	private int mPosition;
 
 	public EditItemDialog() {
 	}
 
-	public static EditItemDialog newInstance(Item item, int position) {
-		return newInstance(item, position, null);
+	public static EditItemDialog newInstance(String title, int position) {
+		return newInstance(title, position, null);
 	}
 
-	public static EditItemDialog newInstance(Item item, int position, Fragment fragment) {
+	public static EditItemDialog newInstance(String title, int position, Fragment fragment) {
 		EditItemDialog dialog = new EditItemDialog();
 		Bundle args = new Bundle();
-		args.putSerializable(ARG_ITEM, item);
+		args.putString(ARG_TITLE, title);
 		args.putInt(ARG_ITEM_POSITION, position);
 		dialog.setArguments(args);
 		dialog.setArguments(args);
@@ -61,7 +60,7 @@ public class EditItemDialog extends DialogFragment {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putSerializable(ARG_ITEM, mItem);
+		outState.putString(ARG_TITLE, mTitle);
 		super.onSaveInstanceState(outState);
 	}
 
@@ -82,7 +81,7 @@ public class EditItemDialog extends DialogFragment {
 			bundle = savedInstanceState;
 		}
 
-		mItem = (Item) bundle.getSerializable(ARG_ITEM);
+		mTitle = bundle.getString(ARG_TITLE);
 		mPosition = bundle.getInt(ARG_ITEM_POSITION);
 
 		//Inflate custom view
@@ -119,8 +118,8 @@ public class EditItemDialog extends DialogFragment {
 			}
 		});
 
-		if (mItem != null) {
-			editText.setText(mItem.getTitle());
+		if (mTitle != null) {
+			editText.setText(mTitle);
 			editText.selectAll();
 		}
 		editText.requestFocus();
@@ -161,7 +160,7 @@ public class EditItemDialog extends DialogFragment {
 			buttonOK.setEnabled(false);
 			return;
 		}
-		if (mItem != null && !mItem.getTitle().equalsIgnoreCase(editText.getText().toString().trim())) {
+		if (mTitle != null && !mTitle.equalsIgnoreCase(editText.getText().toString().trim())) {
 			buttonOK.setEnabled(true);
 		} else {
 			editText.setError(getActivity().getString(R.string.err_no_edit));

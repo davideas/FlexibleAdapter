@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -33,20 +34,29 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 /**
  * This class provides a set of standard methods to handle changes on the data set
  * such as filtering, adding, removing, moving, animating an item.
- * <p><strong>VH</strong> is your implementation of {@link RecyclerView.ViewHolder}.
- * <strong>T</strong> is your domain object containing the data.</p>
+ * <p><strong>T</strong> is your Model object containing the data implementing
+ * {@link IFlexibleItem}.</p>
+ *
+ * With 5.0.0, the adapter now supports a set of standard methods to expand and collapse an
+ * expandable Item.
+ * <p><b>NOTE:</b>This Adapter supports Expandable of Expandable, but selection and restoration don't
+ * work well in conjunction of multi level expansion. You should not enable functionalities like:
+ * ActionMode, Undo, Drag and CollapseOnExpand in that case. Better change approach in favor
+ * of a better and clearer design/layout: Open the list of the subItem in a new Activity...
+ *
+ * <br/>Instead, this extra level of expansion is useful in situations where those items are not
+ * selectable nor draggable, and information in them are read only mode or action buttons.</p>
  *
  * @author Davide Steduto
- * @see FlexibleExpandableAdapter
  * @see FlexibleAnimatorAdapter
  * @see SelectableAdapter
  * @see IFlexibleItem
  * @see FlexibleViewHolder
  * @since 03/05/2015 Created
- * <br/>20/01/2016 New code reorganization
+ * <br/>16/01/2016 Adding Expandable feature
  * <br/>24/01/2016 Drag&Drop, Swipe
- * <br/>26/01/2016 New interfaces and full refactoring
  * <br/>30/01/2016 Class now extends {@link FlexibleAnimatorAdapter} that extends {@link SelectableAdapter}
+ * <br/>02/02/2016 New code reorganization, new item interfaces and full refactoring
  */
 //@SuppressWarnings({"unused", "Convert2Diamond"})
 public abstract class FlexibleAdapter<T extends IFlexibleItem>
@@ -184,7 +194,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		for (int position = 0; position < mItems.size(); position++) {
 			T item = getItem(position);
 			mapViewTypeFrom(item);
-			if (item != null && item instanceof IExpandable) {
+			if (item != null && isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
 				if (expandable.isExpanded()) {
 					if (DEBUG) Log.v(TAG, "Initially expand item on position " + position);
@@ -205,7 +215,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		T item = getItem(position);
 		//Allow selection only for selectable items
 		if (item != null && item.isSelectable()) {
-			if (item instanceof IExpandable && !childSelected) {
+			if (isExpandable(item) && !childSelected) {
 				//Allow selection of Parent if no Child has been previously selected
 				parentSelected = true;
 				super.toggleSelection(position);
@@ -231,7 +241,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public void selectAll(Integer... viewTypes) {
 		T item = getItem(getSelectedPositions().get(0));
-		if (getSelectedItemCount() > 0 && item != null && item instanceof IExpandable)
+		if (getSelectedItemCount() > 0 && isExpandable(item))
 			super.selectAll(EXPANDABLE_VIEW_TYPE);//Select only Parents, Skip others
 		else
 			super.selectAll(viewTypes);//Select others
@@ -367,6 +377,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			Log.w(TAG, "Cannot addHeader on negative position! headerItem=" + headerItem);
 			return this;
 		}
+		mapViewTypeFrom(headerItem);
 		headers.put(headerPosition, headerItem);
 		if (show) {
 			headerItem.setHidden(false);
@@ -464,9 +475,8 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	@Override
 	public int getItemViewType(int position) {
 		T item = getItem(position);
-		if (item != null)
-			return item.getLayoutRes();//User ViewType
-		return super.getItemViewType(position);//Default ViewType
+		assert item != null;
+		return item.getLayoutRes();//User ViewType
 	}
 
 	/**
@@ -516,6 +526,9 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+		//When user scrolls, this line binds the correct selection status
+		holder.itemView.setActivated(isSelected(position));
+
 		T item = getItem(position);
 		if (item != null)
 			item.bindViewHolder(this, holder, position, payloads);
@@ -552,7 +565,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 	public boolean isExpanded(@IntRange(from = 0) int position) {
 		T item = getItem(position);
-		if (item != null && item instanceof IExpandable) {
+		if (isExpandable(item)) {
 			IExpandable expandable = (IExpandable) item;
 			return expandable.isExpanded();
 		}
@@ -574,7 +587,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public IExpandable getExpandableOf(@NonNull T child) {
 		for (T parent : mItems) {
-			if (parent instanceof IExpandable) {
+			if (isExpandable(parent)) {
 				IExpandable expandable = (IExpandable) parent;
 				if (expandable.isExpanded() && expandable.getSubItems() != null) {
 					List<T> list = expandable.getSubItems();
@@ -639,7 +652,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	public List<T> getExpandedItems() {
 		List<T> expandedItems = new ArrayList<T>();
 		for (T item : mItems) {
-			if (item instanceof IExpandable && ((IExpandable) item).isExpanded())
+			if (isExpandable(item) && ((IExpandable) item).isExpanded())
 				expandedItems.add(item);
 		}
 		return expandedItems;
@@ -656,7 +669,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		List<Integer> expandedPositions = new ArrayList<Integer>();
 		for (int i = 0; i < mItems.size() - 1; i++) {
 			T item = mItems.get(i);
-			if (item instanceof IExpandable && ((IExpandable) item).isExpanded())
+			if (isExpandable(item) && ((IExpandable) item).isExpanded())
 				expandedPositions.add(i);
 		}
 		return expandedPositions;
@@ -675,7 +688,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 	private int expand(int position, boolean expandAll) {
 		T item = getItem(position);
-		if (item == null || !(item instanceof IExpandable)) return 0;
+		if (item == null || !isExpandable(item)) return 0;
 
 		IExpandable expandable = (IExpandable) item;
 		if (DEBUG) Log.v(TAG, "Request to Expand on position " + position +
@@ -700,6 +713,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			subItemsCount = subItems.size();
 			//Save expanded state
 			expandable.setExpanded(true);
+			mapViewTypesFrom((List<IFlexibleItem>) subItems);
 
 			//Automatically scroll the current expandable item to show as much children as possible
 			if (scrollOnExpand && !expandAll) {
@@ -747,7 +761,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public int collapse(@IntRange(from = 0) int position) {
 		T item = getItem(position);
-		if (item == null || !(item instanceof IExpandable)) return 0;
+		if (item == null || !isExpandable(item)) return 0;
 
 		IExpandable expandable = (IExpandable) item;
 		if (DEBUG)
@@ -778,7 +792,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	private int recursiveCollapse(List<T> subItems) {
 		int collapsed = 0;
 		for (T subItem : subItems) {
-			if (subItem instanceof IExpandable && ((IExpandable) subItem).isExpanded()) {
+			if (isExpandable(subItem) && ((IExpandable) subItem).isExpanded()) {
 				if (DEBUG) Log.v(TAG, "Recursive collapsing on expandable subItem " + subItem);
 				collapsed += collapse(getGlobalPositionOf(subItem));
 			}
@@ -842,6 +856,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			position = mItems.size();
 		}
 		//Notify addition
+		mapViewTypeFrom(item);
 		notifyItemInserted(position);
 		//Call listener to update EmptyView
 		if (mUpdateListener != null && !multiRange)
@@ -875,6 +890,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		} else
 			mItems.addAll(items);
 		//Notify range addition
+		mapViewTypesFrom((List<IFlexibleItem>)items);
 		notifyItemRangeInserted(position, items.size());
 		//Call listener to update EmptyView
 		if (mUpdateListener != null && !multiRange)
@@ -910,7 +926,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 							  @NonNull T item, boolean expandParent, boolean notifyParentChanged) {
 		T parent = getItem(parentPosition);
 		boolean added = false;
-		if (parent != null && parent instanceof IExpandable) {
+		if (parent != null && isExpandable(parent)) {
 			IExpandable expandable = (IExpandable) parent;
 			//Expand parent if requested and not already expanded
 			if (expandParent && !expandable.isExpanded()) {
@@ -922,6 +938,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 				addItem(parentPosition + 1 + Math.max(0, subPosition), item);
 				added = true;
 			}
+			mapViewTypeFrom(item);
 			//Notify the parent about the change if requested
 			if (notifyParentChanged) notifyItemChanged(parentPosition);
 		}
@@ -988,7 +1005,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 		//Differentiate: Expandable & NonExpandable with No parent / NonExpandable with a parent
 		IExpandable parent = getExpandableOf(item);
-		if (item instanceof IExpandable || parent == null) {
+		if (isExpandable(item) || parent == null) {
 			//It's a Parent or Simple Item
 			if (DEBUG) {
 				if (parent == null) Log.v(TAG, "removeItem Item:" + mRemovedItems);
@@ -1083,7 +1100,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			T item = getItem(position);
 			assert item != null;
 			IExpandable parent = getExpandableOf(item);
-			if (item instanceof IExpandable || parent == null) {
+			if (isExpandable(item) || parent == null) {
 				createRemovedItem(position, item);
 			} else {
 				parentPosition = createRemovedSubItem(parent, item, notifyParentChanged);
@@ -1308,7 +1325,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public List<T> getCurrentChildren(T item) {
 		//Check item and subItems existence
-		if (item == null || !(item instanceof IExpandable))
+		if (item == null || !isExpandable(item))
 			return new ArrayList<T>();
 
 		IExpandable expandable = (IExpandable) item;
@@ -1433,7 +1450,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 					} else {
 						values.add(item);
 						newOriginalPosition++;
-						if (item instanceof IExpandable) {
+						if (isExpandable(item)) {
 							IExpandable expandable = (IExpandable) item;
 							if (expandable.isExpanded()) {
 								List<T> filteredSubItems = new ArrayList<T>();
@@ -1489,7 +1506,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	private boolean filterExpandableObject(T item, String constraint) {
 		//Reset expansion flag
 		boolean filtered = false;
-		if (item instanceof IExpandable) {
+		if (isExpandable(item)) {
 			IExpandable expandable = (IExpandable) item;
 			expandable.setExpanded(false);
 			//Children scan filter
@@ -1812,7 +1829,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	private void resetFilterFlags(List<T> items) {
 		//Reset flags for all items!
 		for (T item : items) {
-			if (item instanceof IExpandable) {
+			if (isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
 				expandable.setExpanded(false);
 				List<T> subItems = expandable.getSubItems();
@@ -1841,7 +1858,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	private void createRemovedItem(int position, T item) {
 		//Collapse Parent before removal if it is expanded!
-		if (item instanceof IExpandable && ((IExpandable) item).isExpanded())
+		if (isExpandable(item) && ((IExpandable) item).isExpanded())
 			collapse(position);
 		item.setHidden(true);
 		mRemovedItems.add(new RemovedItem<T>(position, item));
@@ -2050,34 +2067,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		void onItemSwipe(int position, int direction);
 	}
 
-	private static class RemovedItem<T extends IFlexibleItem> {
-		int parentPosition = -1, relativePosition = -1;
-		T item = null;
-		boolean notifyParentChanged = false;
-
-		public RemovedItem(int parentPosition, T item) {
-			this(parentPosition, -1, item, false);
-		}
-
-		public RemovedItem(int parentPosition, int relativePosition, T item, boolean notifyParentChanged) {
-			this.parentPosition = parentPosition;
-			this.relativePosition = relativePosition;
-			this.item = item;
-			this.notifyParentChanged = notifyParentChanged;
-		}
-
-		public void adjustBy(int itemCount) {
-			parentPosition += itemCount;
-		}
-
-		@Override
-		public String toString() {
-			return "RemovedItem[parentPosition=" + parentPosition +
-					", relativePosition=" + relativePosition +
-					", item=" + item + "]";
-		}
-	}
-
 	/**
 	 * Observer Class responsible to recalculate Selection and Expanded positions.
 	 */
@@ -2110,6 +2099,81 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		@Override
 		public void onItemRangeRemoved(int positionStart, int itemCount) {
 			adjustPositions(positionStart, -itemCount);
+		}
+	}
+
+	private static class RemovedItem<T extends IFlexibleItem> {
+		int parentPosition = -1, relativePosition = -1;
+		T item = null;
+		boolean notifyParentChanged = false;
+
+		public RemovedItem(int parentPosition, T item) {
+			this(parentPosition, -1, item, false);
+		}
+
+		public RemovedItem(int parentPosition, int relativePosition, T item, boolean notifyParentChanged) {
+			this.parentPosition = parentPosition;
+			this.relativePosition = relativePosition;
+			this.item = item;
+			this.notifyParentChanged = notifyParentChanged;
+		}
+
+		public void adjustBy(int itemCount) {
+			parentPosition += itemCount;
+		}
+
+		@Override
+		public String toString() {
+			return "RemovedItem[parentPosition=" + parentPosition +
+					", relativePosition=" + relativePosition +
+					", item=" + item + "]";
+		}
+	}
+
+	public abstract class AbstractHeader<T extends IFlexibleItem> extends AbstractFlexibleItem {
+		int headerPosition;
+		int firstPosition;
+		T headerItem;
+		boolean shown;
+		boolean sticky;
+
+		/**
+		 * @param headerPosition header position
+		 * @param firstPosition  the position of the first item which the header/section will represent
+		 * @param headerItem     the header item with all content
+		 * @param shown          display header at the startup
+		 * @param sticky         make header sticky
+		 */
+		public AbstractHeader(int headerPosition, int firstPosition, T headerItem, boolean shown, boolean sticky) {
+			this.headerPosition = headerPosition;
+			this.firstPosition = firstPosition;
+			this.headerItem = headerItem;
+			this.shown = shown;
+			this.sticky = sticky;
+		}
+
+		public void hide() {
+			addItem(headerPosition, headers.get(headerPosition));
+			headerItem.setHidden(true);
+			shown = false;
+		}
+
+		public void show() {
+			removeItem(headerPosition);
+			headerItem.setHidden(false);
+			shown = true;
+		}
+
+		public boolean isShown() {
+			return shown;
+		}
+
+		public void setSticky(boolean sticky) {
+			this.sticky = sticky;
+		}
+
+		public boolean isSticky() {
+			return sticky;
 		}
 	}
 
