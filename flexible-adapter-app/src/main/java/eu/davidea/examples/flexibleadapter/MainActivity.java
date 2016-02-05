@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements
 
 		//Adapter & RecyclerView
 		FlexibleAdapter.enableLogs(true);
-		mAdapter = new ExampleAdapter(this, "example parameter for List1");
+		mAdapter = new ExampleAdapter(this);
 		//Experimenting NEW features
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements
 				for (int i = 0; i <= mAdapter.getItemCount() + 1; i++) {
 					Item item = DatabaseService.newExampleItem(i);
 					//TODO: Fix position for new item
-					if (!DatabaseService.getInstance().getListById(null).contains(item)) {
+					if (!DatabaseService.getInstance().getListById().contains(item)) {
 						DatabaseService.getInstance().addItem(i, item);//This is the original list
 						//TODO FOR YOU: Use userLearnedSelection from settings
 						if (!DatabaseService.userLearnedSelection) {
@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements
 			mAdapter.setSearchText(newText);
 			//Fill and Filter mItems with your custom list and automatically animate the changes
 			//Watch out! The original list must be a copy
-			mAdapter.filterItems(DatabaseService.getInstance().getListById(""), 450L);
+			mAdapter.filterItems(DatabaseService.getInstance().getListById(), 450L);
 		}
 
 		if (mAdapter.hasSearchText()) {
@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements
 			// that an item has been selected.
 			if (mAdapter.getItemCount() > 0) {
 				if (position != mActivatedPosition) setActivatedPosition(position);
-				Item item = mAdapter.getItem(position);
+				IFlexibleItem item = mAdapter.getItem(position);
 				if (!item.hasSubItems()) {
 					//TODO FOR YOU: call your custom Action, for example mCallback.onItemSelected(item.getId());
 					EditItemDialog.newInstance(item, position).show(getFragmentManager(), EditItemDialog.TAG);

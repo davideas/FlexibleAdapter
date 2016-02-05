@@ -111,13 +111,13 @@ public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
 
 	/**
 	 * Binds the data of this item to the given holder.
-	 * <p>How to use Payload, Please refer to
+	 * <p>How to use Payload, please refer to
 	 * {@link android.support.v7.widget.RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}</p>
 	 *
 	 * @param adapter  the FlexibleAdapter instance
 	 * @param holder   the ViewHolder instance
 	 * @param position the current position
-	 * @param payloads A non-null list of merged payloads. Can be empty list if requires full
+	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full
 	 *                 update.
 	 */
 	void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads);

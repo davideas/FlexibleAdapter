@@ -31,7 +31,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <b>NOTE:</b>This Adapter supports Expandable of Expandable, but selection and restoration don't
  * work well in conjunction of multi level expansion. You should not enable functionalities like:
  * ActionMode, Undo, Drag and CollapseOnExpand in that case. Better change approach in favor
- * of a better and simpler design/layout: Allow to open the list of the subItem in a new Activity.
+ * of a better and simpler design/layout: Open the list of the subItem in a new Activity.
  * 
  * <p>Instead, this extra level of expansion is useful in situations where those items are not
  * selectable and draggable, and information in it are read only or action buttons.</p>
@@ -1134,7 +1134,7 @@ public abstract class FlexibleExpandableAdapter
 						if (item.isExpanded()) {
 							List<S> subItems = new ArrayList<S>();
 							//Add subItems if not hidden by filterObject()
-							for (S subItem : item.getSubItems()) {
+							for (T subItem : item.getSubItems()) {
 								if (!subItem.isHidden()) subItems.add(subItem);
 							}
 							values.addAll(subItems);

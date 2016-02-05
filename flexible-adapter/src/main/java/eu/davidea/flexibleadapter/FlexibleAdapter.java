@@ -1,6 +1,5 @@
 package eu.davidea.flexibleadapter;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,6 +9,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -68,7 +68,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * Header/Section items
 	 */
-//	private SparseArray<T> headers;
+	private SparseArray<T> headers;
 
 	/**
 	 * Lock object used to modify the content of {@link #mItems}.
@@ -133,7 +133,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * Simple Constructor with NO listeners!
 	 *
-	 * @param items   items to display.
+	 * @param items items to display.
 	 */
 	public FlexibleAdapter(@NonNull List<T> items) {
 		this(items, null);
@@ -153,7 +153,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 *                  <br/>{@link OnItemSwipeListener}
 	 */
 	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listeners) {
-		mItems = items;
+		mItems = Collections.synchronizedList(items);
 		mRemovedItems = new ArrayList<RemovedItem>();
 
 		//Expand initial items also after a screen rotation
@@ -201,7 +201,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/*------------------------------*/
 
 	@Override
-	public void toggleSelection(int position) {
+	public void toggleSelection(@IntRange(from = 0) int position) {
 		T item = getItem(position);
 		//Allow selection only for selectable items
 		if (item != null && item.isSelectable()) {
@@ -272,7 +272,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * @param position the position of the item in the list
 	 * @return The custom "Item" object or null if item not found
 	 */
-	public final T getItem(int position) {
+	public final T getItem(@IntRange(from = 0) int position) {
 		if (position < 0 || position >= mItems.size()) return null;
 		return mItems.get(position);
 	}
@@ -335,23 +335,116 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		return item != null && mItems != null && mItems.contains(item);
 	}
 
+	/*--------------------------*/
+	/* HEADERS/SECTIONS METHODS */
+	/*--------------------------*/
+
+	public FlexibleAdapter setHeaders(SparseArray<T> headers) {
+		return withHeaders(headers);
+	}
+
+	public FlexibleAdapter withHeaders(SparseArray<T> headers) {
+		if (headers != null) {
+			if (DEBUG) Log.v(TAG, "Settings " + headers.size() + " headers");
+			this.headers = headers;
+		}
+		return this;
+	}
 
 	/**
-	 * Returns the ViewType for an Expandable Item and for all others ViewTypes depends
-	 * by the current position.
+	 * Add 1 header/section to the internal list at the user position.
 	 *
-	 * @param position position for which ViewType is requested
-	 * @return -1 for {@link #EXPANDABLE_VIEW_TYPE};
-	 * otherwise 0 (default) or any user value for all others ViewType
+	 * @param headerPosition header position
+	 * @param headerItem     item of the header
+	 * @param show           also immediate show the header to the user
 	 */
-	@Override
-	public int getItemViewType(int position) {
-		//User ViewType
-		T item = getItem(position);
-		if (item != null)
-			return item.getLayoutRes();
-		//Default ViewType
-		return super.getItemViewType(position);
+	public FlexibleAdapter addHeader(int headerPosition, T headerItem, boolean show, boolean sticky) {
+		if (headerItem == null) {
+			Log.w(TAG, "Cannot addHeader with null item! headerPosition=" + headerPosition);
+			return this;
+		}
+		if (headerPosition < 0) {
+			Log.w(TAG, "Cannot addHeader on negative position! headerItem=" + headerItem);
+			return this;
+		}
+		headers.put(headerPosition, headerItem);
+		if (show) {
+			headerItem.setHidden(false);
+			addItem(headerPosition, headerItem);
+		}
+		return this;
+	}
+
+	/**
+	 * Retrieves all the header items.
+	 *
+	 * @return list non-null with all the header items.
+	 */
+	public List<T> getHeadersList() {
+		List<T> list = new ArrayList<T>(headers.size());
+		for (int i = 0; i < headers.size(); i++) {
+			list.add(headers.valueAt(i));
+		}
+		return list;
+	}
+
+	public List<Integer> getHeadersPositions() {
+		List<Integer> list = new ArrayList<Integer>(headers.size());
+		for (int i = 0; i < headers.size(); i++) {
+			list.add(headers.keyAt(i));
+		}
+		return list;
+	}
+
+	/**
+	 * Shows all headers in the RecyclerView at their position
+	 */
+	public void showAllHeaders() {
+		for (int i = 0; i < headers.size(); i++) {
+			if (DEBUG) Log.v(TAG, "Showing Header " + headers.keyAt(i) + "=" + headers.valueAt(i));
+			if (!contains(headers.valueAt(i))) {
+				T headerItem = headers.valueAt(i);
+				headerItem.setHidden(false);
+				addItem(headers.keyAt(i), headerItem);
+			}
+		}
+	}
+
+	/**
+	 * Hides all headers from the RecyclerView.
+	 */
+	public void hideAllHeaders() {
+		for (int i = headers.size() - 1; i >= 0; i--) {
+			T headerItem = headers.valueAt(i);
+			headerItem.setHidden(true);
+			removeItem(headerItem);
+		}
+	}
+
+	/**
+	 * Completely remove the header from Adapter.
+	 *
+	 * @param position the known position of the header to remove
+	 */
+	public void deleteHeader(int position) {
+		int index = headers.indexOfKey(position);
+		if (index >= 0) {
+			removeItem(headers.valueAt(index));
+			headers.removeAt(index);
+		}
+	}
+
+	/**
+	 * Completely remove the header from Adapter.
+	 *
+	 * @param header the header item to remove
+	 */
+	public void deleteHeader(T header) {
+		int index = headers.indexOfValue(header);
+		if (index >= 0) {
+			removeItem(headers.valueAt(index));
+			headers.removeAt(index);
+		}
 	}
 
 	/*---------------------*/
@@ -359,37 +452,21 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/*---------------------*/
 
 	/**
-	 * Internal mapper to remember and add all ViewTypes for the Items.
+	 * Returns the ViewType for all Items depends by the current position.
+	 * <p>You can override this method to return specific values or you can let this method
+	 * to call the implementation of {@link IFlexibleItem#getLayoutRes()} where ViewTypes are
+	 * automatically mapped.</p>
 	 *
-	 * @param items
+	 * @param position position for which ViewType is requested
+	 * @return if Item is found, any integer value from user layout resource id defined in
+	 * {@code IFlexibleItem#getLayoutRes()}, otherwise 0 (default)
 	 */
-	private void mapViewTypesFrom(Iterable<IFlexibleItem> items) {
-		if (items != null) {
-			for (IFlexibleItem item : items) {
-				mapViewTypeFrom(item);
-			}
-		}
-	}
-
-	/**
-	 * Internal mapper to remember and add all types for the RecyclerView.
-	 *
-	 * @param item
-	 */
-	private void mapViewTypeFrom(IFlexibleItem item) {
-		if (item != null && !mTypeInstances.containsKey(item.getLayoutRes())) {
-			mTypeInstances.put(item.getLayoutRes(), item);
-		}
-	}
-
-	/**
-	 * Retrieves the TypeInstance remembered within the FlexibleAdapter for an item.
-	 *
-	 * @param viewType the ViewType of the item
-	 * @return the IFlexibleItem instance, creator of the ViewType
-	 */
-	private IFlexibleItem getViewTypeInstance(int viewType) {
-		return mTypeInstances.get(viewType);
+	@Override
+	public int getItemViewType(int position) {
+		T item = getItem(position);
+		if (item != null)
+			return item.getLayoutRes();//User ViewType
+		return super.getItemViewType(position);//Default ViewType
 	}
 
 	/**
@@ -402,6 +479,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 *                 to an adapter position
 	 * @param viewType the view type of the new View
 	 * @return a new ViewHolder that holds a View of the given view type
+	 * @see IFlexibleItem#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)
 	 */
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -411,11 +489,31 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		return getViewTypeInstance(viewType).createViewHolder(this, mInflater, parent);
 	}
 
+	/**
+	 * You can override this method to bind the items into the corresponding ViewHolder from
+	 * inside the Adapter or you can let this method to call the implementation of
+	 * {@link IFlexibleItem#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
+	 * to bind the item inside itself.
+	 *
+	 * @param holder   the ViewHolder created
+	 * @param position the adapter position to bind
+	 * @see IFlexibleItem#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)
+	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 		this.onBindViewHolder(holder, position, Collections.unmodifiableList(new ArrayList<Object>()));
 	}
 
+	/**
+	 * Same concept of {@link #onBindViewHolder(RecyclerView.ViewHolder, int)}, but with Payload.
+	 * <p>How to use Payload, please refer to
+	 * {@link android.support.v7.widget.RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}</p>
+	 *
+	 * @param holder   the ViewHolder instance
+	 * @param position the current position
+	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full
+	 *                 update.
+	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
 		T item = getItem(position);
@@ -452,7 +550,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		this.scrollOnExpand = scrollOnExpand;
 	}
 
-	public boolean isExpanded(int position) {
+	public boolean isExpanded(@IntRange(from = 0) int position) {
 		T item = getItem(position);
 		if (item != null && item instanceof IExpandable) {
 			IExpandable expandable = (IExpandable) item;
@@ -465,21 +563,258 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		return item != null && item instanceof IExpandable;
 	}
 
+	/**
+	 * Retrieves the parent of a child.
+	 * <p>Only for a real child of an expanded parent.</p>
+	 *
+	 * @param child the child item
+	 * @return the parent of this child item or null if not found
+	 * @see #getExpandablePositionOf(IFlexibleItem)
+	 * @see #getRelativePositionOf(IFlexibleItem)
+	 */
+	public IExpandable getExpandableOf(@NonNull T child) {
+		for (T parent : mItems) {
+			if (parent instanceof IExpandable) {
+				IExpandable expandable = (IExpandable) parent;
+				if (expandable.isExpanded() && expandable.getSubItems() != null) {
+					List<T> list = expandable.getSubItems();
+					for (T subItem : list) {
+						//Pick up only no-hidden items
+						if (!subItem.isHidden() && subItem.equals(child))
+							return expandable;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Retrieves the parent position of a child.
+	 * <p>Only for a real child of an expanded parent.</p>
+	 *
+	 * @param child the child item
+	 * @return the parent position of this child item or -1 if not found
+	 * @see #getExpandableOf(IFlexibleItem)
+	 * @see #getRelativePositionOf(IFlexibleItem)
+	 */
+	public int getExpandablePositionOf(@NonNull T child) {
+		return getGlobalPositionOf((T) getExpandableOf(child));
+	}
+
+	/**
+	 * Provides the list where the child currently lays.
+	 *
+	 * @param child the child item
+	 * @return the list of the child element, or a new list if item
+	 * @see #getExpandableOf(IFlexibleItem)
+	 * @see #getExpandablePositionOf(IFlexibleItem)
+	 * @see #getRelativePositionOf(IFlexibleItem)
+	 * @see #getExpandedItems()
+	 */
+	public List<T> getSiblingsOf(@NonNull T child) {
+		return getExpandableList(getExpandableOf(child));
+	}
+
+	/**
+	 * Retrieves the position of a child in the list where it lays.
+	 * <p>Only for a real child of an expanded parent.</p>
+	 *
+	 * @param child the child item
+	 * @return the position in the parent or -1 if, child is a parent itself or not found
+	 * @see #getExpandableOf(IFlexibleItem)
+	 * @see #getExpandablePositionOf(IFlexibleItem)
+	 */
+	public int getRelativePositionOf(@NonNull T child) {
+		return getSiblingsOf(child).indexOf(child);
+	}
+
+	/**
+	 * Provides a list of all expandable items that are currently expanded.
+	 *
+	 * @return a list with all expanded items
+	 * @see #getSiblingsOf(IFlexibleItem)
+	 * @see #getExpandedPositions()
+	 */
+	public List<T> getExpandedItems() {
+		List<T> expandedItems = new ArrayList<T>();
+		for (T item : mItems) {
+			if (item instanceof IExpandable && ((IExpandable) item).isExpanded())
+				expandedItems.add(item);
+		}
+		return expandedItems;
+	}
+
+	/**
+	 * Provides a list of all expandable positions that are currently expanded.
+	 *
+	 * @return a list with the global positions of all expanded items
+	 * @see #getSiblingsOf(IFlexibleItem)
+	 * @see #getExpandedItems()
+	 */
+	public List<Integer> getExpandedPositions() {
+		List<Integer> expandedPositions = new ArrayList<Integer>();
+		for (int i = 0; i < mItems.size() - 1; i++) {
+			T item = mItems.get(i);
+			if (item instanceof IExpandable && ((IExpandable) item).isExpanded())
+				expandedPositions.add(i);
+		}
+		return expandedPositions;
+	}
+
+	/**
+	 * Expands an item that is Expandable, not yet expanded, that has subItems and
+	 * no child is selected.
+	 *
+	 * @param position the position of the item to expand
+	 * @return the number of subItems expanded
+	 */
+	public int expand(@IntRange(from = 0) int position) {
+		return expand(position, false);
+	}
+
+	private int expand(int position, boolean expandAll) {
+		T item = getItem(position);
+		if (item == null || !(item instanceof IExpandable)) return 0;
+
+		IExpandable expandable = (IExpandable) item;
+		if (DEBUG) Log.v(TAG, "Request to Expand on position " + position +
+				" expanded " + expandable.isExpanded() + " ExpandedItems=" + getExpandedPositions());
+
+		int subItemsCount = 0;
+		if (!expandable.isExpanded() && !parentSelected &&
+				expandable.getSubItems() != null && expandable.getSubItems().size() > 0) {
+
+			//Collapse others expandable if configured so
+			//Skipped when expanding all is requested
+			if (collapseOnExpand && !expandAll) {
+				//Fetch again the new position after collapsing all!!
+				if (collapseAll() > 0) position = getGlobalPositionOf(item);
+			}
+
+			//Every time an expansion is requested, subItems must be taken from the original Object!
+			//without the subItems that are going to be removed
+			//Save a copy child items list
+			List<T> subItems = getExpandableList(expandable);
+			mItems.addAll(position + 1, subItems);
+			subItemsCount = subItems.size();
+			//Save expanded state
+			expandable.setExpanded(true);
+
+			//Automatically scroll the current expandable item to show as much children as possible
+			if (scrollOnExpand && !expandAll) {
+				//Must be delayed to give time at RecyclerView to recalculate positions
+				//after an automatic collapse
+				final int pos = position, count = subItemsCount;
+				Handler animatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+					public boolean handleMessage(Message message) {
+						autoScroll(pos, count);
+						return true;
+					}
+				});
+				animatorHandler.sendMessageDelayed(Message.obtain(mHandler), 150L);
+			}
+
+			//Expand!
+			notifyItemRangeInserted(position + 1, subItemsCount);
+
+			if (DEBUG)
+				Log.v(TAG, "Expanded " + subItemsCount + " subItems on position=" + position + " ExpandedItems=" + getExpandedPositions());
+		}
+		return subItemsCount;
+	}
+
+	/**
+	 * @return the number of parent successfully expanded
+	 */
+	public int expandAll() {
+		int expanded = 0;
+		//More efficient if we expand from First expandable position
+		for (int i = 0; i < mItems.size() - 1; i++) {
+			if (expand(i, true) > 0) expanded++;
+		}
+		return expanded;
+	}
+
+	/**
+	 * Collapses an Expandable item that is already expanded, in conjunction with no subItems
+	 * selected or item is pending removal (used in combination with removeRange).
+	 * <p/>
+	 * <p>All Expandable subItem, that are expanded, are recursively collapsed.</p>
+	 *
+	 * @param position the position of the item to collapse
+	 * @return the number of subItems collapsed
+	 */
+	public int collapse(@IntRange(from = 0) int position) {
+		T item = getItem(position);
+		if (item == null || !(item instanceof IExpandable)) return 0;
+
+		IExpandable expandable = (IExpandable) item;
+		if (DEBUG)
+			Log.v(TAG, "Request to Collapse on position " + position + " ExpandedItems=" + getExpandedPositions());
+
+		int subItemsCount = 0, recursiveCount = 0;
+		if (expandable.isExpanded() &&
+				(!hasSubItemsSelected(expandable) || isExpandablePendingRemove(position))) {
+
+			//Take the current subList
+			List<T> subItems = getExpandableList(expandable);
+			//Recursive collapse of all sub expandable
+			recursiveCount = recursiveCollapse(subItems);
+			mItems.removeAll(subItems);
+			subItemsCount = subItems.size();
+			//Save expanded state
+			expandable.setExpanded(false);
+
+			//Collapse!
+			notifyItemRangeRemoved(position + 1, subItemsCount);
+
+			if (DEBUG)
+				Log.v(TAG, "Collapsed " + subItemsCount + " subItems on position=" + position + " ExpandedItems=" + getExpandedPositions());
+		}
+		return subItemsCount + recursiveCount;
+	}
+
+	private int recursiveCollapse(List<T> subItems) {
+		int collapsed = 0;
+		for (T subItem : subItems) {
+			if (subItem instanceof IExpandable && ((IExpandable) subItem).isExpanded()) {
+				if (DEBUG) Log.v(TAG, "Recursive collapsing on expandable subItem " + subItem);
+				collapsed += collapse(getGlobalPositionOf(subItem));
+			}
+		}
+		return collapsed;
+	}
+
+	/**
+	 * @return the number of parent successfully collapsed
+	 */
+	public int collapseAll() {
+		int collapsed = 0;
+		//More efficient if we collapse from Last expanded position
+		for (int i = mItems.size() - 1; i >= 0; i--) {
+			if (collapse(i) > 0) collapsed++;
+		}
+		return collapsed;
+	}
+
 	/*----------------*/
 	/* UPDATE METHODS */
 	/*----------------*/
 
-	public void updateItem(int position, @NonNull T item) {
+	public void updateItem(@IntRange(from = 0) int position, @NonNull T item) {
 		if (position < 0) {
 			Log.w(TAG, "Cannot updateItem on negative position");
 			return;
 		}
-		synchronized (mLock) {
-			mItems.set(position, item);
-		}
+		mItems.set(position, item);
 		if (DEBUG) Log.v(TAG, "updateItem notifyItemChanged on position " + position);
 		notifyItemChanged(position);
 	}
+
+	/*----------------*/
+	/* ADDING METHODS */
+	/*----------------*/
 
 	/**
 	 * Insert the given Item at desired position or Add Item at last position.
@@ -488,22 +823,22 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * @param item     the item to add
 	 * @return true if is has been modified by the addition, fasle otherwise
 	 */
-	public boolean addItem(int position, @NonNull T item) {
+	public boolean addItem(@IntRange(from = 0) int position, @NonNull T item) {
 		if (position < 0) {
-			Log.w(TAG, "Cannot addItem on negative position");
+			Log.w(TAG, "Cannot addItem on negative position!");
+			return false;
+		}
+		if (item == null) {
+			Log.w(TAG, "No items to add!");
 			return false;
 		}
 		//Insert Item
 		if (position < mItems.size()) {
 			if (DEBUG) Log.v(TAG, "addItem notifyItemInserted on position " + position);
-			synchronized (mLock) {
-				mItems.add(position, item);
-			}
+			mItems.add(position, item);
 		} else { //Add Item at the last position
 			if (DEBUG) Log.v(TAG, "addItem notifyItemInserted on last position");
-			synchronized (mLock) {
-				mItems.add(item);
-			}
+			mItems.add(item);
 			position = mItems.size();
 		}
 		//Notify addition
@@ -522,22 +857,23 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * @param items    the items to add
 	 * @return true if the addition was successful, false otherwise
 	 */
-	public boolean addItems(int position, List<T> items) {
+	public boolean addItems(@IntRange(from = 0) int position, @NonNull List<T> items) {
 		if (position < 0) {
-			Log.w(TAG, "Cannot addItems on negative position");
+			Log.w(TAG, "Cannot addItems on negative position!");
 			return false;
 		}
 		if (items == null || items.isEmpty()) {
-			Log.w(TAG, "No items to add");
+			Log.w(TAG, "No items to add!");
 			return false;
 		}
 		if (DEBUG)
 			Log.v(TAG, "addItems position=" + position + " itemCount=" + items.size());
 
 		//Insert Items
-		synchronized (mLock) {
-			addAllItemsIn(mItems, position, items);
-		}
+		if (position < mItems.size()) {
+			mItems.addAll(position, items);
+		} else
+			mItems.addAll(items);
 		//Notify range addition
 		notifyItemRangeInserted(position, items.size());
 		//Call listener to update EmptyView
@@ -546,46 +882,70 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		return true;
 	}
 
+	/**
+	 * Convenience method of {@link #addSubItem(int, int, IFlexibleItem, boolean, boolean)}.
+	 * <br/>In this case parent item will never be notified nor expanded if it is collapsed.
+	 */
+	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
+							  @IntRange(from = 0) int subPosition, @NonNull T item) {
+		return this.addSubItem(parentPosition, subPosition, item, false, false);
+	}
 
 	/**
-	 * Internal method to add a set of items at specific position in a list.
-	 * <p>If list is null, a new list will be created.</p>
-	 * No effect if the set of items is null or empty.
+	 * Add an item inside the list of an expandable item (parent).
+	 * <p><b>In order to add a subItem</b>, the following conditions must be satisfied:
+	 * <br/>- The subItem is not expandable
+	 * <br/>- The item resulting from the parent position is actually an Expandable.</p>
 	 *
-	 * @param list     which list
-	 * @param position position inside the list, -1 to add the set the end of the list
-	 * @param items    set of items to insert
-	 * @return true if the list has been modified through the insertion, false otherwise
+	 * @param parentPosition      position of the expandable item that shall contain the subItem
+	 * @param subPosition         the position of the subItem in the expandable list
+	 * @param item                the subItem to add in the expandable list
+	 * @param expandParent        true to initially expand the parent (if needed) and after to add
+	 *                            the subItem, false to simply add the sub item to the parent
+	 * @param notifyParentChanged true if the parent View must be rebound and its content updated,
+	 *                            false to not notify the parent about the addition
 	 */
-	protected boolean addAllItemsIn(List<T> list, int position, List<T> items) {
-		if (items == null || items.isEmpty()) return false;
-		if (list == null) list = new ArrayList<T>(items.size());
-		if (position >= 0 && position < list.size()) {
-			list.addAll(position, items);
-		} else
-			list.addAll(items);
-		return true;
+	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
+							  @IntRange(from = 0) int subPosition,
+							  @NonNull T item, boolean expandParent, boolean notifyParentChanged) {
+		T parent = getItem(parentPosition);
+		boolean added = false;
+		if (parent != null && parent instanceof IExpandable) {
+			IExpandable expandable = (IExpandable) parent;
+			//Expand parent if requested and not already expanded
+			if (expandParent && !expandable.isExpanded()) {
+				expand(parentPosition);
+			}
+			//Notify the adapter of the new addition to display it and animate it.
+			//If parent is collapsed there's no need to notify about the change.
+			if (expandable.isExpanded()) {
+				addItem(parentPosition + 1 + Math.max(0, subPosition), item);
+				added = true;
+			}
+			//Notify the parent about the change if requested
+			if (notifyParentChanged) notifyItemChanged(parentPosition);
+		}
+		return added;
 	}
+
+	//TODO: implement addSubItems
 
 	/*----------------------*/
 	/* DELETE ITEMS METHODS */
 	/*----------------------*/
 
 	/**
-	 * Remove an item from internal list if found
+	 * Removes an item from internal list if found.
 	 *
 	 * @param item the item to remove
+	 * @see #removeItem(int)
 	 */
 	public void removeItem(@NonNull T item) {
 		if (item == null) {
 			Log.w(TAG, "Cannot remove null item!");
 			return;
 		}
-		int position = getGlobalPositionOf(item);
-		if (position >= 0) {
-			mItems.remove(item);
-			notifyItemRemoved(position);
-		}
+		this.removeItem(getGlobalPositionOf(item));
 	}
 
 	/**
@@ -593,143 +953,186 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * <p>The item is retained for an eventual Undo.</p>
 	 *
 	 * @param position the position of item to remove
+	 * @see #removeItem(int, boolean)
 	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
 	 * @see #restoreDeletedItems()
 	 * @see #setRestoreSelectionOnUndo(boolean)
 	 * @see #emptyBin()
 	 */
-	public void removeItem(int position) {
+	public void removeItem(@IntRange(from = 0) int position) {
+		this.removeItem(position, false);
+	}
+
+	/**
+	 * Removes an item from the internal list and notify the change.
+	 * <p>If the item, resulting from the passed position is:</p>
+	 * - <u>not expandable</u> with <u>no</u> parent, it is removed as usual.<br/>
+	 * - <u>not expandable</u> with a parent, it is removed only if the parent is expanded.
+	 * Optionally the parent can be notified about the removal.<br/>
+	 * - <u>expandable</u> implementing {@link IExpandable}, it is removed as usual, but
+	 * it will be collapsed if expanded.
+	 * <p>The item is retained for an eventual Undo.</p>
+	 *
+	 * @param position            The position of item to remove
+	 * @param notifyParentChanged true to notify parent of a removal of a child, false if not
+	 *                            necessary.
+	 * @see #removeItem(int)
+	 */
+	public void removeItem(@IntRange(from = 0) int position, boolean notifyParentChanged) {
 		if (position < 0 && position >= mItems.size()) {
 			Log.w(TAG, "Cannot removeItem on position out of OutOfBounds!");
 			return;
 		}
-		synchronized (mLock) {
-			saveDeletedItem(position, mItems.remove(position));
+		T item = getItem(position);
+		assert item != null;
+
+		//Differentiate: Expandable & NonExpandable with No parent / NonExpandable with a parent
+		IExpandable parent = getExpandableOf(item);
+		if (item instanceof IExpandable || parent == null) {
+			//It's a Parent or Simple Item
+			if (DEBUG) {
+				if (parent == null) Log.v(TAG, "removeItem Item:" + mRemovedItems);
+				else Log.v(TAG, "removeItem Expandable:" + mRemovedItems);
+			}
+			//Collapse Parent before removal if it is expanded!
+			createRemovedItem(position, item);
+		} else {
+			//It's a Child
+			if (DEBUG) Log.v(TAG, "removeItem NonExpandable:" + mRemovedItems);
+			int parentPosition = createRemovedSubItem(parent, item, notifyParentChanged);
+			//Notify the Parent about the change if requested
+			if (notifyParentChanged) notifyItemChanged(parentPosition);
 		}
-		if (DEBUG) Log.v(TAG, "removeItem notifyItemRemoved on position " + position);
+		//Remove and notify removals
+		mItems.remove(position);
 		notifyItemRemoved(position);
+
 		//Call listener to update EmptyView
 		if (mUpdateListener != null && !multiRange)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * <p>Parent will not be notified about the change, if a child is removed.</p>
+	 */
+	public void removeItems(List<Integer> selectedPositions) {
+		this.removeItems(selectedPositions, false);
+	}
+
+	/**
 	 * Removes a list of items from internal list and notify the change.
 	 * <p>Every item is retained for an eventual Undo.</p>
 	 *
-	 * @param selectedPositions list with the item positions to remove
-	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
-	 * @see #restoreDeletedItems()
-	 * @see #setRestoreSelectionOnUndo(boolean)
-	 * @see #emptyBin()
+	 * @param selectedPositions   list with item positions to remove
+	 * @param notifyParentChanged true to notify parent of a removal of a child, false if not
 	 */
-	public void removeItems(List<Integer> selectedPositions) {
-		if (DEBUG) Log.v(TAG, "removeItems reverse Sorting positions");
-		// Reverse-sort the list
+	public void removeItems(List<Integer> selectedPositions, boolean notifyParentChanged) {
+		if (DEBUG)
+			Log.v(TAG, "removeItems selectedPositions=" + selectedPositions + " notifyParentChanged=" + notifyParentChanged);
+		//Check if list is empty
+		if (selectedPositions == null || selectedPositions.isEmpty()) return;
+		//Reverse-sort the list, start from last position for efficiency
 		Collections.sort(selectedPositions, new Comparator<Integer>() {
 			@Override
 			public int compare(Integer lhs, Integer rhs) {
 				return rhs - lhs;
 			}
 		});
-
-		// Split the list in ranges
+		if (DEBUG)
+			Log.v(TAG, "removeItems after reverse sort selectedPositions=" + selectedPositions);
+		//Split the list in ranges
+		int positionStart = 0, itemCount = 0;
+		int lastPosition = selectedPositions.get(0);
 		multiRange = true;
-		while (!selectedPositions.isEmpty()) {
-			if (selectedPositions.size() == 1) {
-				removeItem(selectedPositions.get(0));
-				//Align the selection list when removing the item
-				selectedPositions.remove(0);
+		for (Integer position : selectedPositions) {//10 9 8 //5 4 //1
+			if (lastPosition - itemCount == position) {//10-0==10  10-1==9  10-2==8  10-3==5 NO  //5-1=4  5-2==1 NO
+				itemCount++;             // 1  2  3  //2
+				positionStart = position;//10  9  8  //4
 			} else {
-				if (DEBUG) Log.v(TAG, "removeItems current selection " + getSelectedPositions());
-				int count = 1;
-				while (selectedPositions.size() > count && selectedPositions.get(count).equals(selectedPositions.get(count - 1) - 1)) {
-					++count;
-				}
+				//Remove range
+				if (itemCount > 0)
+					removeRange(positionStart, itemCount, notifyParentChanged);//8,3  //4,2
+				positionStart = lastPosition = position;//5  //1
+				itemCount = 1;
+			}
+			//Request to collapse after the notification of remove range
+			collapse(position);
+		}
+		//Remove last range
+		multiRange = false;
+		if (itemCount > 0) {
+			removeRange(positionStart, itemCount, notifyParentChanged);//1,1
+		}
+	}
 
-				if (count == 1) {
-					removeItem(selectedPositions.get(0));
-				} else {
-					removeRange(selectedPositions.get(count - 1), count);
-				}
+	public void removeRange(int positionStart, int itemCount) {
+		this.removeRange(positionStart, itemCount, false);
+	}
 
-				for (int i = 0; i < count; ++i) {
-					selectedPositions.remove(0);
-				}
+	public void removeRange(int positionStart, int itemCount, boolean notifyParentChanged) {
+		int initialCount = getItemCount();
+		if (DEBUG)
+			Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
+		if (positionStart < 0 || (positionStart + itemCount) > initialCount) {
+			Log.w(TAG, "Cannot removeRange with positionStart out of OutOfBounds!");
+			return;
+		}
+		int parentPosition = -1;
+		for (int position = positionStart + itemCount - 1; position >= positionStart; position--) {
+			T item = getItem(position);
+			assert item != null;
+			IExpandable parent = getExpandableOf(item);
+			if (item instanceof IExpandable || parent == null) {
+				createRemovedItem(position, item);
+			} else {
+				parentPosition = createRemovedSubItem(parent, item, notifyParentChanged);
+			}
+			//Remove item from internal list
+			synchronized (mLock) {
+				mItems.remove(position);
 			}
 		}
-		multiRange = false;
-		//Call listener to update EmptyView
-		if (mUpdateListener != null)
+		//Notify removals
+		if (parentPosition >= 0) {
+			adjustSelected = false;
+			//Notify the Children removal only if Parent is expanded
+			notifyItemRangeRemoved(positionStart, itemCount);
+			//Notify the Parent about the change if requested
+			if (notifyParentChanged) notifyItemChanged(parentPosition);
+		} else {
+			adjustRemoved = false;
+			//Notify range removal
+			notifyItemRangeRemoved(positionStart, itemCount);
+		}
+		//Update empty view
+		if (mUpdateListener != null && !multiRange && initialCount != getItemCount())
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	/**
-	 * Removes an ordered set items from internal list and notify the change once.
-	 * <p>Items are retained for an eventual Undo.</p>
-	 *
-	 * @param positionStart Previous position of the first item that was removed
-	 * @param itemCount     Number of items removed from the data set
-	 */
-	public void removeRange(int positionStart, int itemCount) {
-		if (DEBUG)
-			Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
-		for (int i = 0; i < itemCount; ++i) {
-			synchronized (mLock) {
-				saveDeletedItem(positionStart, mItems.remove(positionStart));
-			}
-		}
-		if (DEBUG) Log.v(TAG, "removeRange notifyItemRangeRemoved");
-		notifyItemRangeRemoved(positionStart, itemCount);
-	}
-
-	/**
 	 * Convenience method to remove all Items that are currently selected.
+	 * <p>Parent will not be notified about the change, if a child is removed.</p>
 	 *
 	 * @see #removeItems(List)
 	 */
 	public void removeAllSelectedItems() {
-		removeItems(getSelectedPositions());
+		this.removeItems(getSelectedPositions());
+	}
+
+	/**
+	 * Convenience method to remove all Items that are currently selected.<p>
+	 * Optionally the Parent can be notified about the change, if a child is removed.
+	 *
+	 * @param notifyParentChanged true to Notify Parent of a removal of its child
+	 */
+	public void removeAllSelectedItems(boolean notifyParentChanged) {
+		this.removeItems(getSelectedPositions(), notifyParentChanged);
 	}
 
 	/*--------------*/
 	/* UNDO METHODS */
 	/*--------------*/
-
-	/**
-	 * Save temporary Items for an eventual Undo.
-	 *
-	 * @param position the position of the item to retain.
-	 */
-	public void saveDeletedItem(int position, @NonNull T item) {
-		if (mDeletedItems == null) {
-			mDeletedItems = new ArrayList<T>();
-			mOriginalPositions = new ArrayList<Integer>();
-			mRemovedItems = new SparseArray<T>();
-		}
-		if (DEBUG) Log.v(TAG, "Recycled " + item + " on position=" + position);
-		mDeletedItems.add(item);
-		mOriginalPositions.add(position);
-		mRemovedItems.put(position, item);
-	}
-
-	/**
-	 * @return the list of deleted items
-	 */
-	public List<T> getDeletedItems() {
-		return mDeletedItems;
-	}
-
-	/**
-	 * @return a list with the global positions of all deleted items
-	 */
-	public List<Integer> getDeletedPositions() {
-		return mOriginalPositions;
-	}
-
-	public boolean isRestoreInTime() {
-		return mDeletedItems != null && mDeletedItems.size() > 0;
-	}
 
 	/**
 	 * Returns the current configuration to restore selections on Undo.
@@ -758,24 +1161,59 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @see #setRestoreSelectionOnUndo(boolean)
 	 */
+	@SuppressWarnings("ResourceType")
 	public void restoreDeletedItems() {
 		stopUndoTimer();
-		//Reverse insert (list was reverse ordered on Delete)
-		for (int i = mOriginalPositions.size() - 1; i >= 0; i--) {
-			T item = mDeletedItems.get(i);
-			T item2 = mRemovedItems.get(mRemovedItems.keyAt(i));
-			if (DEBUG)
-				Log.v(TAG, "Restoring item " + item + " on position " + mOriginalPositions.get(i));
-			if (DEBUG)
-				Log.v(TAG, "Restoring item2 " + item2 + " on position " + mRemovedItems.keyAt(i));
-			//Avoid to restore(show) Items not filtered by the current filter
-			if (hasSearchText() && !filterObject(item, getSearchText()))
-				continue;
-			addItem(mOriginalPositions.get(i), item);
-			//Restore selection before emptyBin, if configured
-			if (restoreSelection)
-				getSelectedPositions().add(mOriginalPositions.get(i));
+		//Be sure list is reverse insert (list was reverse ordered on Delete)
+		Collections.sort(mRemovedItems, new Comparator<RemovedItem>() {
+			@Override
+			public int compare(RemovedItem lhs, RemovedItem rhs) {
+				return rhs.parentPosition - lhs.parentPosition;
+			}
+		});
+		multiRange = true;
+		int initialCount = getItemCount();
+		//Selection coherence: start from a clear situation, clear selection if restoreSelection is active
+		if (restoreSelection) clearSelection();
+		for (int i = mRemovedItems.size() - 1; i >= 0; i--) {
+			RemovedItem removedItem = mRemovedItems.get(i);
+			boolean added;
+			if (removedItem.relativePosition > 0) {
+				//Restore child, if not deleted
+				if (DEBUG) Log.v(TAG, "Restore Child " + removedItem);
+				if (hasSearchText() && !filterObject((T) removedItem.item, getSearchText()))
+					continue;
+				added = addSubItem(removedItem.parentPosition, removedItem.relativePosition,
+						(T) removedItem.item, false, removedItem.notifyParentChanged);
+			} else {
+				//Restore parent or simple item, if not deleted
+				adjustRemoved = false;
+				if (DEBUG) Log.v(TAG, "Restore Parent " + removedItem);
+				if (hasSearchText() && !filterExpandableObject((T) removedItem.item, getSearchText()))
+					continue;
+				added = addItem(removedItem.parentPosition, (T) removedItem.item);
+			}
+			//Item is again visible
+			removedItem.item.setHidden(false);
+			//Restore selection if requested, before emptyBin.
+			if (restoreSelection && added) {
+				if (removedItem.item instanceof IExpandable) {
+					parentSelected = true;
+					getSelectedPositions().add(removedItem.parentPosition);
+				} else {
+					childSelected = true;
+					getSelectedPositions().add(removedItem.parentPosition + 1 + removedItem.relativePosition);
+				}
+			}
 		}
+		if (DEBUG && restoreSelection)
+			Log.v(TAG, "Selected positions after restore " + getSelectedPositions());
+
+		//Call listener to update EmptyView
+		multiRange = false;
+		if (mUpdateListener != null && initialCount != getItemCount())
+			mUpdateListener.onUpdateEmptyView(getItemCount());
+
 		emptyBin();
 	}
 
@@ -785,11 +1223,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * restoration.</p>
 	 */
 	public synchronized void emptyBin() {
-		if (mDeletedItems != null) {
-			mDeletedItems.clear();
-			mOriginalPositions.clear();
-			mRemovedItems.clear();
-		}
+		mRemovedItems.clear();
 	}
 
 	/**
@@ -819,6 +1253,97 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	protected void stopUndoTimer() {
 		mHandler.removeCallbacksAndMessages(null);
+	}
+
+	public boolean isRestoreInTime() {
+		return mRemovedItems != null && mRemovedItems.size() > 0;
+	}
+
+	/**
+	 * @return the list of deleted items
+	 */
+	public List<T> getDeletedItems() {
+		List<T> deletedItems = new ArrayList<T>();
+		for (RemovedItem removedItem : mRemovedItems) {
+			deletedItems.add((T) removedItem.item);
+		}
+		return deletedItems;
+	}
+
+	/**
+	 * @return a list with the global positions of all deleted items
+	 */
+	public List<Integer> getDeletedPositions() {
+		List<Integer> deletedItems = new ArrayList<Integer>();
+		for (RemovedItem removedItem : mRemovedItems) {
+			if (!deletedItems.contains(removedItem.parentPosition))
+				deletedItems.add(removedItem.parentPosition);
+		}
+		return deletedItems;
+	}
+
+	/**
+	 * Retrieves only the deleted children of the specified parent.
+	 *
+	 * @param parentPosition the parent position
+	 * @return the list of deleted children
+	 */
+	public List<T> getDeletedChildren(int parentPosition) {
+		List<T> deletedChild = new ArrayList<T>();
+		for (RemovedItem removedItem : mRemovedItems) {
+			//TODO: Review with isItemPendingRemove(), it looks like, having better result while filtering, to verify.
+			if (removedItem.parentPosition == parentPosition && removedItem.relativePosition >= 0)
+				deletedChild.add((T) removedItem.item);
+		}
+		return deletedChild;
+	}
+
+	/**
+	 * Retrieves all the original children of the specified parent, filtering out all the
+	 * deleted children if any.
+	 *
+	 * @param item the parent item
+	 * @return the list of the original children minus the deleted children if some are
+	 * pending removal.
+	 */
+	public List<T> getCurrentChildren(T item) {
+		//Check item and subItems existence
+		if (item == null || !(item instanceof IExpandable))
+			return new ArrayList<T>();
+
+		IExpandable expandable = (IExpandable) item;
+		if (expandable.getSubItems() == null)
+			return new ArrayList<T>();
+
+		//Take a copy of the subItems list
+		List<T> subItems = new ArrayList<T>(expandable.getSubItems());
+		//Remove all children pending removal
+		if (mRemovedItems.size() > 0) {
+			subItems.removeAll(getDeletedChildren(getGlobalPositionOf(item)));
+		}
+		return subItems;
+	}
+
+	/**
+	 * @param parentPosition the expandable position to check
+	 * @return true if the item or some children are going to be removed, false otherwise
+	 */
+	private boolean isExpandablePendingRemove(int parentPosition) {
+		for (RemovedItem removedItem : mRemovedItems) {
+			if (removedItem.parentPosition == parentPosition) return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @param item the item to compare
+	 * @return the removed item if found, null otherwise
+	 */
+	private RemovedItem getPendingRemovedItem(T item) {
+		for (RemovedItem removedItem : mRemovedItems) {
+			if (removedItem.item.equals(item)) return removedItem;
+		}
+		return null;
 	}
 
 	/*----------------*/
@@ -864,7 +1389,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param unfilteredItems the list to filter
 	 * @param delay           any non negative delay
-	 * @see #filterObject(Object, String)
+	 * @see #filterObject(IFlexibleItem, String)
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems, @IntRange(from = 0) long delay) {
 		//Make longer the timer for new coming deleted items
@@ -886,40 +1411,54 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * <br/>- <b>NEW!</b> Items are animated thanks to {@link #animateTo(List)}.
 	 *
 	 * @param unfilteredItems the list to filter
-	 * @see #filterObject(Object, String)
+	 * @see #filterObject(IFlexibleItem, String)
 	 */
 	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
 		// NOTE: In case user has deleted some items and he changes or applies a filter while
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
 		List<T> values = new ArrayList<T>();
+		//Enable flag: skip adjustPositions!
+		filtering = true;
+		//Reset values
 		int initialCount = getItemCount();
 		if (hasSearchText()) {
-			int newOriginalPosition = -1, oldOriginalPosition = -1;
+			int newOriginalPosition = -1;
 			for (T item : unfilteredItems) {
 				if (filterObject(item, getSearchText())) {
-					if (mDeletedItems != null && mDeletedItems.contains(item)) {
-						int index = mDeletedItems.indexOf(item);
-						//Calculate new original position: skip counting position if item was deleted in range
-						if (mOriginalPositions.get(index) != oldOriginalPosition) {
-							newOriginalPosition++;
-							oldOriginalPosition = mOriginalPositions.get(index);
-						}
-						mOriginalPositions.set(index, newOriginalPosition + mItems.size());
+					RemovedItem removedItem = getPendingRemovedItem(item);
+					if (removedItem != null) {
+						//If found calculate new progressive position while filtering
+						removedItem.parentPosition = ++newOriginalPosition;
 					} else {
 						values.add(item);
+						newOriginalPosition++;
+						if (item instanceof IExpandable) {
+							IExpandable expandable = (IExpandable) item;
+							if (expandable.isExpanded()) {
+								List<T> filteredSubItems = new ArrayList<T>();
+								//Add subItems if not hidden by filterObject()
+								List<T> subItems = expandable.getSubItems();
+								for (T subItem : subItems) {
+									if (!subItem.isHidden()) filteredSubItems.add(subItem);
+								}
+								values.addAll(filteredSubItems);
+								newOriginalPosition += filteredSubItems.size();
+							}
+						}
 					}
 				}
 			}
 		} else {
 			values = unfilteredItems; //with no filter
-			if (mDeletedItems != null && !mDeletedItems.isEmpty()) {
-				mOriginalPositions = new ArrayList<Integer>(mDeletedItems.size());
-				for (T item : mDeletedItems) {
-					mOriginalPositions.add(values.indexOf(item));
+			if (!mRemovedItems.isEmpty()) {
+				for (RemovedItem removedItem : mRemovedItems) {
+					//Retrieve the original position from the original list
+					removedItem.parentPosition = values.indexOf(removedItem.item);
 				}
-				values.removeAll(mDeletedItems);
+				values.removeAll(getDeletedItems());
 			}
+			resetFilterFlags(values);
 		}
 
 		//Animate search results only in case of new SearchText
@@ -928,10 +1467,44 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			animateTo(values);
 		} else mItems = values;
 
+		//Reset filtering flag
+		filtering = false;
+
 		//Call listener to update EmptyView
-		if (mUpdateListener != null && initialCount != getItemCount()) {
+		if (mUpdateListener != null && initialCount != getItemCount())
 			mUpdateListener.onUpdateEmptyView(getItemCount());
+	}
+
+	/**
+	 * This method is a wrapper filter for expandable items.<br/>
+	 * It performs filtering on the subItems returns true, if the any child should be in the
+	 * filtered collection.
+	 * <p>If the provided item is not an expandable it will be filtered as usual by
+	 * {@link #filterObject(IFlexibleItem, String)}.</p>
+	 *
+	 * @param item       the object with subItems to be inspected
+	 * @param constraint constraint, that the object has to fulfil
+	 * @return true, if the object should be in the filteredResult, false otherwise
+	 */
+	private boolean filterExpandableObject(T item, String constraint) {
+		//Reset expansion flag
+		boolean filtered = false;
+		if (item instanceof IExpandable) {
+			IExpandable expandable = (IExpandable) item;
+			expandable.setExpanded(false);
+			//Children scan filter
+			for (T subItem : getCurrentChildren(item)) {
+				//Reuse normal filter for Children
+				subItem.setHidden(!filterObject(subItem, constraint));
+				if (!filtered && !subItem.isHidden()) {
+					filtered = true;
+				}
+			}
+			//Expand if filter found text in subItems
+			expandable.setExpanded(filtered);
 		}
+		//Normal filter for Parent only if not filtered already
+		return filtered || filterObject(item, constraint);
 	}
 
 	/**
@@ -965,7 +1538,8 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Animate from one list to the other
+	 * Animate from one list to the other.
+	 * <p>Used by the filter.</p>
 	 *
 	 * @param models the new list containing the new items
 	 * @return the cleaned up item list. make sure to set your new list to this one
@@ -973,7 +1547,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	public List<T> animateTo(List<T> models) {
 		applyAndAnimateRemovals(mItems, models);
 		applyAndAnimateAdditions(mItems, models);
-		applyAndAnimateMovedItems(mItems, models);
 		return mItems;
 	}
 
@@ -1016,21 +1589,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		if (DEBUG) Log.v(TAG, "animateAdditions total out=" + out + " in=" + newItems.size());
 	}
 
-	/**
-	 * Find out all moved items and animate them.
-	 */
-	protected void applyAndAnimateMovedItems(List<T> from, List<T> newItems) {
-		for (int toPosition = newItems.size() - 1; toPosition >= 0; toPosition--) {
-			final T item = newItems.get(toPosition);
-			final int fromPosition = from.indexOf(item);
-			if (fromPosition >= 0 && fromPosition != toPosition) {
-				if (DEBUG) Log.v(TAG, "animateMovedItems from=" + toPosition + " to=" + toPosition);
-				from.add(toPosition, from.remove(fromPosition));
-				moveItem(fromPosition, toPosition);
-			}
-		}
-	}
-
 	/*---------------*/
 	/* TOUCH METHODS */
 	/*---------------*/
@@ -1047,6 +1605,18 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
+	 * Returns whether ItemTouchHelper should start a drag and drop operation if an item is
+	 * long pressed.<p>
+	 * Default value returns false.
+	 *
+	 * @return true if ItemTouchHelper should start dragging an item when it is long pressed,
+	 * false otherwise. Default value is false.
+	 */
+	public boolean isLongPressDragEnabled() {
+		return mItemTouchHelperCallback.isLongPressDragEnabled();
+	}
+
+	/**
 	 * Enable the Drag on LongPress on the entire ViewHolder.
 	 * <p><b>NOTE:</b> This will skip LongClick on the view in order to handle the LongPress,
 	 * however the LongClick listener will be called if necessary in the new
@@ -1059,18 +1629,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		initializeItemTouchHelper();
 		this.longPressDragEnabled = longPressDragEnabled;
 		mItemTouchHelperCallback.setLongPressDragEnabled(longPressDragEnabled);
-	}
-
-	/**
-	 * Returns whether ItemTouchHelper should start a drag and drop operation if an item is
-	 * long pressed.<p>
-	 * Default value returns false.
-	 *
-	 * @return true if ItemTouchHelper should start dragging an item when it is long pressed,
-	 * false otherwise. Default value is false.
-	 */
-	public boolean isLongPressDragEnabled() {
-		return mItemTouchHelperCallback.isLongPressDragEnabled();
 	}
 
 	/**
@@ -1095,18 +1653,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Enable the Swipe of the items
-	 * <p>Default value is false.</p>
-	 *
-	 * @param swipeEnabled true to activate, false otherwise
-	 */
-	public final void setSwipeEnabled(boolean swipeEnabled) {
-		initializeItemTouchHelper();
-		this.swipeEnabled = swipeEnabled;
-		mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
-	}
-
-	/**
 	 * Returns whether ItemTouchHelper should start a swipe operation if a pointer is swiped
 	 * over the View.
 	 * <p>Default value returns false.</p>
@@ -1116,6 +1662,18 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public final boolean isSwipeEnabled() {
 		return mItemTouchHelperCallback.isItemViewSwipeEnabled();
+	}
+
+	/**
+	 * Enable the Swipe of the items
+	 * <p>Default value is false.</p>
+	 *
+	 * @param swipeEnabled true to activate, false otherwise
+	 */
+	public final void setSwipeEnabled(boolean swipeEnabled) {
+		initializeItemTouchHelper();
+		this.swipeEnabled = swipeEnabled;
+		mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
 	}
 
 	/**
@@ -1147,7 +1705,29 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
-		//Confirm move by default
+		//TODO: Implement logic for views, when expandable items are already expanded or collapsed.
+//		boolean move = false;
+//		T fromItem = null, toItem = null;
+//		if (fromPosition > toPosition) {
+//			fromItem = getItem(fromPosition);
+//			toItem = getItem(Math.max(0, toPosition - 1));
+//		} else {
+//			fromItem = getItem(fromPosition);
+//			toItem = getItem(toPosition);
+//		}
+//
+//		if (DEBUG) Log.v(TAG, "shouldMove from=" + fromPosition + " to=" + toPosition);
+//		if (DEBUG) Log.v(TAG, "shouldMove fromItem=" + fromItem + " toItem=" + toItem);
+//
+//		if (!fromItem.isExpandable() && toItem.isExpandable() && !toItem.isExpanded()) {
+//			expand(getGlobalPositionOf(toItem));
+//			move = false;
+//		} else if (!fromItem.isExpandable() && !toItem.isExpandable()) {
+//			move = true;
+//		} else if (fromItem.isExpandable() && !toItem.isExpandable()) {
+//			move = false;
+//		}
+//		if (DEBUG) Log.v(TAG, "shouldMove move=" + move);
 		return true;
 	}
 
@@ -1188,6 +1768,169 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		}
 	}
 
+	/*-----------------*/
+	/* PRIVATE METHODS */
+	/*-----------------*/
+
+	/**
+	 * Internal mapper to remember and add all ViewTypes for the Items.
+	 *
+	 * @param items list of items to map
+	 */
+	private void mapViewTypesFrom(Iterable<IFlexibleItem> items) {
+		if (items != null) {
+			for (IFlexibleItem item : items) {
+				mapViewTypeFrom(item);
+			}
+		}
+	}
+
+	/**
+	 * Internal mapper to remember and add all types for the RecyclerView.
+	 *
+	 * @param item the item to map
+	 */
+	private void mapViewTypeFrom(IFlexibleItem item) {
+		if (item != null && !mTypeInstances.containsKey(item.getLayoutRes())) {
+			mTypeInstances.put(item.getLayoutRes(), item);
+		}
+	}
+
+	/**
+	 * Retrieves the TypeInstance remembered within the FlexibleAdapter for an item.
+	 *
+	 * @param viewType the ViewType of the item
+	 * @return the IFlexibleItem instance, creator of the ViewType
+	 */
+	private IFlexibleItem getViewTypeInstance(int viewType) {
+		return mTypeInstances.get(viewType);
+	}
+
+	/**
+	 * Clears flags after searchText is cleared
+	 */
+	private void resetFilterFlags(List<T> items) {
+		//Reset flags for all items!
+		for (T item : items) {
+			if (item instanceof IExpandable) {
+				IExpandable expandable = (IExpandable) item;
+				expandable.setExpanded(false);
+				List<T> subItems = expandable.getSubItems();
+				for (T subItem : subItems) {
+					subItem.setHidden(false);
+				}
+			}
+		}
+	}
+
+	private int createRemovedSubItem(IExpandable parent, T item, boolean notifyParentChanged) {
+		int parentPosition = getGlobalPositionOf((T) parent);
+		List<T> siblings = getExpandableList(parent);
+		int childPosition = siblings.indexOf(item);
+		item.setHidden(true);
+		mRemovedItems.add(new RemovedItem<T>(parentPosition, childPosition, item, notifyParentChanged));
+		if (DEBUG)
+			Log.v(TAG, "Recycled Child " + mRemovedItems.get(mRemovedItems.size() - 1) + " with Parent position=" + parentPosition);
+		return parentPosition;
+	}
+
+	/**
+	 * Save temporary Items for an eventual Undo.
+	 *
+	 * @param position the position of the item to retain.
+	 */
+	private void createRemovedItem(int position, T item) {
+		//Collapse Parent before removal if it is expanded!
+		if (item instanceof IExpandable && ((IExpandable) item).isExpanded())
+			collapse(position);
+		item.setHidden(true);
+		mRemovedItems.add(new RemovedItem<T>(position, item));
+		if (DEBUG)
+			Log.v(TAG, "Recycled Parent " + mRemovedItems.get(mRemovedItems.size() - 1) + " on position=" + position);
+	}
+
+	/**
+	 * Retrieves the list of subItems which are not hidden.
+	 *
+	 * @param parent the parent item
+	 * @return the list of the subItems not hidden
+	 */
+	private List<T> getExpandableList(IExpandable parent) {
+		List<T> subItems = new ArrayList<T>();
+		if (parent != null && parent.getSubItems() != null) {
+			List<T> allSubItems = parent.getSubItems();
+			for (T subItem : allSubItems) {
+				//Pick up only no hidden items
+				if (!subItem.isHidden()) subItems.add(subItem);
+			}
+		}
+		return subItems;
+	}
+
+	private boolean hasSubItemsSelected(IExpandable item) {
+		for (T subItem : getExpandableList(item)) {
+			if (isSelected(getGlobalPositionOf(subItem))) return true;
+		}
+		return false;
+	}
+
+	private void autoScroll(int position, int subItemsCount) {
+		int firstVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+		int lastVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
+		int itemsToShow = position + subItemsCount - lastVisibleItem;
+		if (DEBUG)
+			Log.v(TAG, "itemsToShow=" + itemsToShow + " firstVisibleItem=" + firstVisibleItem + " lastVisibleItem=" + lastVisibleItem + " RvChildCount=" + mRecyclerView.getChildCount());
+		if (itemsToShow > 0) {
+			int scrollMax = position - firstVisibleItem;
+			int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
+			int scrollBy = Math.min(scrollMax, scrollMin);
+			//Adjust by 1 position for item not completely visible
+			int fix = 0;//(position > lastVisibleItem || itemsToShow >= mRecyclerView.getChildCount() ? 1 : 0);
+			int scrollTo = firstVisibleItem + scrollBy - fix;
+			if (DEBUG)
+				Log.v(TAG, "scrollMin=" + scrollMin + " scrollMax=" + scrollMax + " scrollBy=" + scrollBy + " scrollTo=" + scrollTo + " fix=" + fix);
+			mRecyclerView.smoothScrollToPosition(scrollTo);
+		} else if (position < firstVisibleItem) {
+			mRecyclerView.smoothScrollToPosition(position);
+		}
+	}
+
+	private void adjustSelected(int startPosition, int itemCount) {
+		List<Integer> selectedPositions = getSelectedPositions();
+		boolean adjusted = false;
+		for (Integer position : selectedPositions) {
+			if (position >= startPosition) {
+				if (DEBUG)
+					Log.v(TAG, "Adjust Selected position " + position + " to " + Math.max(position + itemCount, startPosition));
+				selectedPositions.set(
+						selectedPositions.indexOf(position),
+						Math.max(position + itemCount, startPosition));
+				adjusted = true;
+			}
+		}
+		if (DEBUG && adjusted) Log.v(TAG, "AdjustedSelected=" + getSelectedPositions());
+	}
+
+	private void adjustRemoved(int startPosition, int itemCount) {
+		boolean adjusted = false;
+		int skipped = 0;
+		//Reverse scan for potential expand/collapse while pending removal
+		for (int i = mRemovedItems.size() - 1; i >= 0; i--) {
+			RemovedItem removedItem = mRemovedItems.get(i);
+			if (removedItem.parentPosition >= startPosition + skipped) {
+				if (DEBUG) Log.v(TAG, "Adjust Removed startPosition " + (startPosition + skipped) +
+						" / parentPosition " + removedItem.parentPosition +
+						" to " + Math.max(removedItem.parentPosition + itemCount, startPosition) + (removedItem.relativePosition >= 0 ? " for childPosition " + removedItem.relativePosition : ""));
+				removedItem.parentPosition = Math.max(removedItem.parentPosition + itemCount, startPosition);
+				adjusted = true;
+			} else if (removedItem.item instanceof IExpandable) {
+				//Parent position to adjust must be below the number of the previous delete position
+				skipped++;
+			}
+		}
+		if (DEBUG && adjusted) Log.v(TAG, "AdjustedRemoved=" + getDeletedPositions());
+	}
+
 	/*----------------*/
 	/* INSTANCE STATE */
 	/*----------------*/
@@ -1222,70 +1965,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/*---------------*/
 	/* INNER CLASSES */
 	/*---------------*/
-
-	/**
-	 * Observer Class responsible to recalculate Selection and Expanded positions.
-	 */
-	private class ExpandableAdapterDataObserver extends RecyclerView.AdapterDataObserver {
-
-		private void adjustPositions(int positionStart, int itemCount) {
-			if (!filtering) {//Filtering has multiple insert and removal, we skip this process
-				//adjustHeaders(positionStart, itemCount);
-				if (adjustSelected)//Don't, if remove range / restore children
-					adjustSelected(positionStart, itemCount);
-				if (adjustRemoved)//Don't, if remove range / restore parents
-					adjustRemoved(positionStart, itemCount);
-				adjustSelected = adjustRemoved = true;
-			}
-		}
-
-		/**
-		 * Triggered by {@link #notifyDataSetChanged()}.
-		 */
-		@Override
-		public void onChanged() {
-			expandInitialItems();
-		}
-
-		@Override
-		public void onItemRangeInserted(int positionStart, int itemCount) {
-			adjustPositions(positionStart, itemCount);
-		}
-
-		@Override
-		public void onItemRangeRemoved(int positionStart, int itemCount) {
-			adjustPositions(positionStart, -itemCount);
-		}
-	}
-
-	private static class RemovedItem<T> {
-		int parentPosition = -1, relativePosition = -1;
-		T item = null;
-		boolean notifyParentChanged = false;
-
-		public RemovedItem(int parentPosition, T item) {
-			this(parentPosition, -1, item, false);
-		}
-
-		public RemovedItem(int parentPosition, int relativePosition, T item, boolean notifyParentChanged) {
-			this.parentPosition = parentPosition;
-			this.relativePosition = relativePosition;
-			this.item = item;
-			this.notifyParentChanged = notifyParentChanged;
-		}
-
-		public void adjustBy(int itemCount) {
-			parentPosition += itemCount;
-		}
-
-		@Override
-		public String toString() {
-			return "RemovedItem[parentPosition=" + parentPosition +
-					", relativePosition=" + relativePosition +
-					", item=" + item + "]";
-		}
-	}
-
 
 	/**
 	 * @since 03/01/2016
@@ -1369,6 +2048,69 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		 * @param direction the direction to which the ViewHolder is swiped
 		 */
 		void onItemSwipe(int position, int direction);
+	}
+
+	private static class RemovedItem<T extends IFlexibleItem> {
+		int parentPosition = -1, relativePosition = -1;
+		T item = null;
+		boolean notifyParentChanged = false;
+
+		public RemovedItem(int parentPosition, T item) {
+			this(parentPosition, -1, item, false);
+		}
+
+		public RemovedItem(int parentPosition, int relativePosition, T item, boolean notifyParentChanged) {
+			this.parentPosition = parentPosition;
+			this.relativePosition = relativePosition;
+			this.item = item;
+			this.notifyParentChanged = notifyParentChanged;
+		}
+
+		public void adjustBy(int itemCount) {
+			parentPosition += itemCount;
+		}
+
+		@Override
+		public String toString() {
+			return "RemovedItem[parentPosition=" + parentPosition +
+					", relativePosition=" + relativePosition +
+					", item=" + item + "]";
+		}
+	}
+
+	/**
+	 * Observer Class responsible to recalculate Selection and Expanded positions.
+	 */
+	private class ExpandableAdapterDataObserver extends RecyclerView.AdapterDataObserver {
+
+		private void adjustPositions(int positionStart, int itemCount) {
+			if (!filtering) {//Filtering has multiple insert and removal, we skip this process
+				//adjustHeaders(positionStart, itemCount);
+				if (adjustSelected)//Don't, if remove range / restore children
+					adjustSelected(positionStart, itemCount);
+				if (adjustRemoved)//Don't, if remove range / restore parents
+					adjustRemoved(positionStart, itemCount);
+				adjustSelected = adjustRemoved = true;
+			}
+		}
+
+		/**
+		 * Triggered by {@link #notifyDataSetChanged()}.
+		 */
+		@Override
+		public void onChanged() {
+			expandInitialItems();
+		}
+
+		@Override
+		public void onItemRangeInserted(int positionStart, int itemCount) {
+			adjustPositions(positionStart, itemCount);
+		}
+
+		@Override
+		public void onItemRangeRemoved(int positionStart, int itemCount) {
+			adjustPositions(positionStart, -itemCount);
+		}
 	}
 
 }
