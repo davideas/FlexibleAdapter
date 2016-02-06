@@ -854,27 +854,29 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/*----------------*/
 
 	/**
-	 * Insert the given Item at desired position or Add Item at last position with a delay.
+	 * Inserts the given Item at desired position or Add Item at last position with a delay
+	 * and autoscroll to the position.
 	 * <p>Useful at startup, when there's an item to add after Adapter Animations is completed.</p>
 	 *
 	 * @param position position of the item to add
 	 * @param item     the item to add
 	 * @delay delay    a non negative delay
-	 * @return true if is has been modified by the addition, fasle otherwise
+	 * @return true if it has been modified by the addition, false otherwise
 	 */
 	public void addItemWithDelay(@IntRange(from = 0) final int position, @NonNull final T item,
 								 @IntRange(from = 0) long delay) {
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				addItem(position, item);
-				mRecyclerView.scrollToPosition(position);
+				if (addItem(position, item))
+					mRecyclerView.scrollToPosition(
+							Math.min(Math.max(0, position), mItems.size() - 1));
 			}
 		}, delay);
 	}
 
 	/**
-	 * Insert the given Item at desired position or Add Item at last position.
+	 * Inserts the given Item at desired position or Add Item at last position.
 	 *
 	 * @param position position of the item to add
 	 * @param item     the item to add
@@ -909,7 +911,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Add a set of items in the internal list at specific position in a list.
+	 * Adds a set of items in the internal list at specific position in a list.
 	 *
 	 * @param position position inside the list, -1 to add the set the end of the list
 	 * @param items    the items to add
@@ -988,7 +990,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		return added;
 	}
 
-	//TODO: implement addSubItems
+	//TODO: Implement addSubItems
 
 	/*----------------------*/
 	/* DELETE ITEMS METHODS */
@@ -1748,6 +1750,11 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			super.toggleSelection(toPosition);
 		}
 		notifyItemMoved(fromPosition, toPosition);
+
+		//TODO: If a section (being dragged or being swapped) change first item in that section
+		//TODO: If item in a section has being dragged, should swap section as well ??
+
+		//TODO: Allow child to be moved into another parent, update the 2 parents, optionally: 1) collapse the new parent 2) expand it 3) leave as it is
 	}
 
 	/**
