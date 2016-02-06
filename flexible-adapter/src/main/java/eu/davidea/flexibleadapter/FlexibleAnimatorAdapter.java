@@ -222,13 +222,13 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 	public final void animateView(final View itemView, int position, boolean isSelected) {
 		//FIXME: first completed visible item on rotation gets high delay
 
-//		if (DEBUG)
-//			Log.d(TAG, "shouldAnimate=" + shouldAnimate
-//					+ " isFastScroll=" + isFastScroll
-//					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
-//					+ " isReverseEnabled=" + isReverseEnabled
-//					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
-//			);
+		if (DEBUG)
+			Log.d(TAG, "shouldAnimate=" + shouldAnimate
+					+ " isFastScroll=" + isFastScroll
+					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
+					+ " isReverseEnabled=" + isReverseEnabled
+					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
+			);
 
 		if (shouldAnimate && !isFastScroll && !mAnimatorNotifierObserver.isPositionNotified() &&
 				(isReverseEnabled || (!isReverseEnabled && position > mLastAnimatedPosition))) {
@@ -244,8 +244,8 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 			if (!animatorsUsed.contains(AnimatorEnum.ALPHA))
 				addAlphaAnimator(animators, itemView, 0f);
 
-//			if (DEBUG)
-//				Log.d(TAG, "Start Animation on position " + position + " Animators=" + animatorsUsed);
+			if (DEBUG)
+				Log.d(TAG, "Start Animation on position " + position + " Animators=" + animatorsUsed);
 			animatorsUsed.clear();
 
 			//Execute the animations all together
@@ -337,12 +337,12 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 			delay = mInitialDelay + (position * mStepDelay);
 		}
 
-//		if (DEBUG) Log.d(TAG, "Delay[" + position + "]=" + delay +
-//				" FirstVisible=" + firstVisiblePosition +
-//				" LastVisible=" + lastVisiblePosition +
-//				" LastAnimated=" + mLastAnimatedPosition +
-//				" VisibleItems=" + numberOfItemsOnScreen +
-//				" ChildCount=" + mRecyclerView.getChildCount());
+		if (DEBUG) Log.d(TAG, "Delay[" + position + "]=" + delay +
+				" FirstVisible=" + firstVisiblePosition +
+				" LastVisible=" + lastVisiblePosition +
+				" LastAnimated=" + mLastAnimatedPosition +
+				" VisibleItems=" + numberOfItemsOnScreen +
+				" ChildCount=" + mRecyclerView.getChildCount());
 
 		return delay;
 	}

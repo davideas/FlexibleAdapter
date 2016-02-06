@@ -71,7 +71,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * The main container for ALL items.
 	 */
-	protected List<T> mItems;
+	private List<T> mItems;
 
 	/**
 	 * Header/Section items
@@ -86,6 +86,9 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 	/**
 	 * Handler for delayed {@link #filterItems(List)} and {@link OnDeleteCompleteListener#onDeleteConfirmed}
+	 * <p>"What" already used:
+	 * <br/>0 = filterItems delay
+	 * <br/>1 = deleteConfirmed when Undo timeout is over</p>
 	 */
 	protected Handler mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
@@ -267,12 +270,13 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 	/**
 	 * This method will refresh the entire DataSet content.
-	 * <p>The parameters are useful to filter the type of the DataSet.<br/>
-	 * Pass anything in case not used.</p>
 	 *
-	 * @param param custom parameters to filter the type of the DataSet
+	 * @param items the new data set
 	 */
-	public abstract void updateDataSet(String... param);
+	public void updateDataSet(List<T> items) {
+		mItems = items;
+		notifyDataSetChanged();
+	}
 
 	/**
 	 * Returns the custom object "Item".
@@ -850,6 +854,26 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/*----------------*/
 
 	/**
+	 * Insert the given Item at desired position or Add Item at last position with a delay.
+	 * <p>Useful at startup, when there's an item to add after Adapter Animations is completed.</p>
+	 *
+	 * @param position position of the item to add
+	 * @param item     the item to add
+	 * @delay delay    a non negative delay
+	 * @return true if is has been modified by the addition, fasle otherwise
+	 */
+	public void addItemWithDelay(@IntRange(from = 0) final int position, @NonNull final T item,
+								 @IntRange(from = 0) long delay) {
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				addItem(position, item);
+				mRecyclerView.scrollToPosition(position);
+			}
+		}, delay);
+	}
+
+	/**
 	 * Insert the given Item at desired position or Add Item at last position.
 	 *
 	 * @param position position of the item to add
@@ -1027,6 +1051,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		}
 		//Remove and notify removals
 		mItems.remove(position);
+		getSelectedPositions().remove(new Integer(position));
 		notifyItemRemoved(position);
 
 		//Call listener to update EmptyView
@@ -2040,7 +2065,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		/**
 		 * Called when long tap occurs.
 		 * <p>This method always calls
-		 * {@link eu.davidea.flexibleadapter.FlexibleAdapter.FlexibleViewHolder#toggleActivation}
+		 * {@link eu.davidea.viewholders.FlexibleViewHolder#toggleActivation}
 		 * after listener event is consumed in order to activate the ItemView.</p>
 		 * For Expandable Views it will collapse the View if configured so.
 		 *
@@ -2057,7 +2082,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		 * Called when an item has been dragged far enough to trigger a move. <b>This is called
 		 * every time an item is shifted</b>, and <strong>not</strong> at the end of a "drop" event.
 		 * <p>The end of the "drop" event is instead handled by
-		 * {@link eu.davidea.flexibleadapter.FlexibleAdapter.FlexibleViewHolder#onItemReleased(int)}</p>.
+		 * {@link eu.davidea.viewholders.FlexibleViewHolder#onItemReleased(int)}</p>.
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
@@ -2101,11 +2126,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		public void onChanged() {
 			expandInitialItems();
 		}
-
-//		@Override
-//		public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
-//			//Must be empty to avoid fallback to onItemRangeChanged(positionStart, itemCount)
-//		}
 
 		@Override
 		public void onItemRangeInserted(int positionStart, int itemCount) {

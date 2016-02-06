@@ -17,7 +17,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
 	protected final FlexibleAdapter mAdapter;
-	private boolean mLongPressEnabled = false;
+//	private boolean mLongPressEnabled = false;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -41,27 +41,31 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	/*--------------*/
 
 	/**
-	 * Allow to expand or collapse child views of this ItemView when {@link View.OnClickListener}
+	 * Allows to expand or collapse child views of this ItemView when {@link View.OnClickListener}
 	 * event occurs on the entire view.
 	 * <p>This method returns always true; Extend with "return false" to Not expand or collapse
 	 * this ItemView onClick events.</p>
+	 *
+	 * @return always true, if not overridden
 	 */
 	protected boolean isViewExpandableOnClick() {
 		return true;
 	}
 
 	/**
-	 * Allow to collapse child views of this ItemView when {@link View.OnLongClickListener}
+	 * Allows to collapse child views of this ItemView when {@link View.OnLongClickListener}
 	 * event occurs on the entire view.
 	 * <p>This method returns always true; Extend with "return false" to Not collapse this
 	 * ItemView onLongClick events.</p>
+	 *
+	 * @return always true, if not overridden
 	 */
 	protected boolean isViewCollapsibleOnLongClick() {
 		return true;
 	}
 
 	/**
-	 * Expand or Collapse based on the current state.
+	 * Expands or Collapses based on the current state.
 	 */
 	@CallSuper
 	protected void toggleExpansion() {

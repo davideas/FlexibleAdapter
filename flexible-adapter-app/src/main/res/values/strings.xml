@@ -49,9 +49,12 @@ limitations under the License.
 	<string name="grid_layout">Grid Layout</string>
 	<string name="reverse_scrolling">Reverse scrolling</string>
 	<string name="forward_scrolling">Forward scrolling</string>
+	<string name="auto_collapse">Auto collapse</string>
+	<string name="keep_expanded">Keep expanded</string>
 	<string name="expand_all">Expand All</string>
 	<string name="collapse_all">Collapse All</string>
 	<string name="show_headers">Show Headers</string>
 	<string name="hide_headers">Hide Headers</string>
+
 
 </resources>

@@ -20,6 +20,10 @@
 	      android:icon="@drawable/ic_sort_descending_white_24dp"
 	      app:showAsAction="never"/>
 
+	<item android:id="@+id/action_auto_collapse"
+	      android:title="@string/auto_collapse"
+	      app:showAsAction="never"/>
+
 	<item android:id="@+id/action_expand_collapse_all"
 	      android:title="@string/expand_all"
 	      app:showAsAction="never"/>

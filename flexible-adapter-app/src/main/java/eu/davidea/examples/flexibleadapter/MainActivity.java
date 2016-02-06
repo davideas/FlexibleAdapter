@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements
 		Log.d(TAG, "onCreate");
 
 		//Settings for FlipView
-		FlipView.resetLayoutAnimationDelay();
+		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Adapter & RecyclerView
 		FlexibleAdapter.enableLogs(true);
@@ -110,10 +110,11 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
-		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
+		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 				@Override
 				public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
+					//NOTE: This allows to receive Payload objects on notifyItemChanged launched by the Adapter!!
 					return true;
 				}
 			});
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements
 			@Override
 			public void onClick(View v) {
 				//TODO: add adjustSelection for FlexibleAdapter
-				destroyActionModeIfNeeded();
+				destroyActionModeIfCan();
 
 				for (int i = 0; i <= mAdapter.getItemCount() + 1; i++) {
 					SimpleItem item = DatabaseService.newSimpleItem(i);
@@ -193,10 +194,10 @@ public class MainActivity extends AppCompatActivity implements
 		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				mAdapter.updateDataSet();
+				mAdapter.updateDataSet(DatabaseService.getInstance().getListById());
 				mSwipeRefreshLayout.setEnabled(false);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 1000L);
-				destroyActionModeIfNeeded();
+				destroyActionModeIfCan();
 			}
 		});
 	}
@@ -350,6 +351,14 @@ public class MainActivity extends AppCompatActivity implements
 				item.setIcon(R.drawable.ic_sort_descending_white_24dp);
 				item.setTitle(R.string.forward_scrolling);
 			}
+		} else if (id == R.id.action_auto_collapse) {
+			if (item.getTitle().equals(getString(R.string.auto_collapse))) {
+				mAdapter.setAutoCollapseOnExpand(true);
+				item.setTitle(R.string.keep_expanded);
+			} else {
+				mAdapter.setAutoCollapseOnExpand(false);
+				item.setTitle(R.string.auto_collapse);
+			}
 		} else if (id == R.id.action_expand_collapse_all) {
 			if (item.getTitle().equals(getString(R.string.expand_all))) {
 				mAdapter.expandAll();
@@ -439,8 +448,8 @@ public class MainActivity extends AppCompatActivity implements
 		//TODO: Make a better implementation here. For the moment let's commit the change every time, also to the database list
 		int adjustPosition = DatabaseService.userLearnedSelection ? 0 : 1; //Due to my ExampleView we must remove 1 from the position to swap
 		DatabaseService.getInstance().swapItem(
-				fromPosition - adjustPosition,
-				toPosition - adjustPosition);
+				Math.max(0, fromPosition - adjustPosition),
+				Math.max(0, toPosition - adjustPosition));
 	}
 
 	@Override
@@ -463,6 +472,11 @@ public class MainActivity extends AppCompatActivity implements
 		mSnackBar.show();
 		mAdapter.removeItem(position, true);
 		mAdapter.startUndoTimer(7000L + 200L, this);
+		//Handle ActionMode title
+		if (mAdapter.getSelectedItemCount() == 0)
+			destroyActionModeIfCan();
+		else
+			setContextTitle(mAdapter.getSelectedItemCount());
 	}
 
 	@Override
@@ -629,7 +643,7 @@ public class MainActivity extends AppCompatActivity implements
 	 *
 	 * @return true if ActionMode was active (in case it is also terminated), false otherwise
 	 */
-	public boolean destroyActionModeIfNeeded() {
+	public boolean destroyActionModeIfCan() {
 		if (mActionMode != null) {
 			mActionMode.finish();
 			return true;
@@ -640,7 +654,7 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onBackPressed() {
 		//If ActionMode is active, back key closes it
-		if (destroyActionModeIfNeeded()) return;
+		if (destroyActionModeIfCan()) return;
 
 		//Close the App
 		DatabaseService.onDestroy();

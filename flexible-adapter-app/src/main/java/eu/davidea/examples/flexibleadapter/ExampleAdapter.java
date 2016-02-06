@@ -23,10 +23,10 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.utils.Utils;
 
 /**
- * NOTE: Customized AbstractExampleItem is for example purpose only. I wanted to have in common
+ * NOTE: AbstractExampleItem is for example purpose only. I wanted to have in common
  * some Fields and Layout.
- * You, having different Layout for every item, would use IFlexibleItem or AbstractFlexibleItem
- * as base item to provide to the this Adapter.
+ * You, having different Layout for each item type, would use IFlexibleItem or AbstractFlexibleItem
+ * as base item to extend this Adapter.
  */
 public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 
@@ -48,32 +48,25 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 		setNotifyChangeOfUnfilteredItems(true);
 	}
 
-	/**
-	 * Param, in this example, is not used.
-	 *
-	 * @param param A custom parameter to filter the type of the DataSet
-	 */
 	@Override
-	public void updateDataSet(String... param) {
+	public void updateDataSet(List<AbstractExampleItem> items) {
+		super.updateDataSet(items);
 		//Overwrite the list and fully notify the change
 		//Watch out! The original list must a copy
 		//TODO: We may create calls like removeAll, addAll or refreshList in order to animate changes
-		mItems = DatabaseService.getInstance().getListById();
-		notifyDataSetChanged();
+
 		//Add example view
 		addUserLearnedSelection();
 	}
 
 	private void addUserLearnedSelection() {
-		SimpleItem uls = (SimpleItem) getItem(0);
-		if (!DatabaseService.userLearnedSelection && !hasSearchText() &&
-				(uls == null || !uls.getId().equals("ULS"))) {
+		if (!DatabaseService.userLearnedSelection && !hasSearchText() && !(getItem(0) instanceof ULSItem)) {
 			//Define Example View
-			ULSItem item = new ULSItem("ULS");
+			final ULSItem item = new ULSItem("ULS");
 			item.setEnabled(false);
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			super.addItem(0, item);
+			addItemWithDelay(0, item, 1500L);
 		}
 	}
 
@@ -292,12 +285,5 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 //		valueText = item.getSubtitle();
 //		return valueText != null && valueText.toLowerCase().contains(constraint);
 //	}
-
-
-
-	@Override
-	public String toString() {
-		return mItems.toString();
-	}
 
 }
