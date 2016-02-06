@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import eu.davidea.examples.models.AbstractItem;
+import eu.davidea.examples.models.AbstractExampleItem;
 import eu.davidea.examples.models.ExpandableItem;
+import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
@@ -22,7 +23,7 @@ public class DatabaseService {
 	private static final int ITEMS = 200, SUB_ITEMS = 3, HEADERS = 20;
 	public static boolean userLearnedSelection = false;
 
-	private List<AbstractItem> mItems = new ArrayList<AbstractItem>();
+	private List<AbstractExampleItem> mItems = new ArrayList<AbstractExampleItem>();
 
 	public static DatabaseService getInstance() {
 		if (mInstance == null) {
@@ -42,8 +43,7 @@ public class DatabaseService {
 	}
 
 	public static SimpleItem newSimpleItem(int i) {
-		SimpleItem item = new SimpleItem();
-		item.setId("I" + (++i));
+		SimpleItem item = new SimpleItem("I" + (++i));
 		item.setTitle("Simple Item " + i);
 		item.setSubtitle("Subtitle " + i);
 		return item;
@@ -51,28 +51,24 @@ public class DatabaseService {
 
 	public static ExpandableItem newExpandableItem(int i) {
 		//All Items are expandable because they implements IExpandable
-		ExpandableItem expandableItem = new ExpandableItem();
-		expandableItem.setId("E" + (++i));
+		ExpandableItem expandableItem = new ExpandableItem("E" + (++i));
 		//Let's initially expand the first father with subElements
 //		expandableItem.setInitiallyExpanded(i == 2);
 		expandableItem.setTitle("Expandable Item " + i);
 		//Add subItems every N elements
 		//SubItems are not expandable by default, but thy might be if extends/implements IExpandable
 		for (int j = 1; j <= SUB_ITEMS; j++) {
-			SubItem subItem = new SubItem();
-			subItem.setId(expandableItem.getId() + "S" + j);
+			SubItem subItem = new SubItem(expandableItem.getId() + "S" + j);
 			subItem.setTitle("Sub Item " + j);
 			expandableItem.addSubItem(subItem);
 		}
-		expandableItem.updateSubTitle();
 		return expandableItem;
 	}
 
-	public static SparseArray<AbstractItem> buildHeaders() {
-		SparseArray<AbstractItem> headers = new SparseArray<AbstractItem>();
+	public static SparseArray<AbstractExampleItem> buildHeaders() {
+		SparseArray<AbstractExampleItem> headers = new SparseArray<AbstractExampleItem>();
 		for (int i = 0; i < (ITEMS/HEADERS); i++) {
-			SimpleItem header = new SimpleItem();
-			header.setId("H" + i);
+			HeaderItem header = new HeaderItem("H" + i);
 			header.setTitle("Header " + (i + 1));
 			header.setSelectable(false);
 			header.setHidden(true);
@@ -84,10 +80,10 @@ public class DatabaseService {
 	/**
 	 * @return Always a copy of the original list.
 	 */
-	public List<AbstractItem> getListById() {
+	public List<AbstractExampleItem> getListById() {
 		//listId is not used: we have only 1 type of list in this example
 		//Return a copy of the DB: we will perform some tricky code on this list.
-		return new ArrayList<AbstractItem>(mItems);
+		return new ArrayList<AbstractExampleItem>(mItems);
 	}
 
 	public void swapItem(int fromPosition, int toPosition) {
@@ -102,7 +98,7 @@ public class DatabaseService {
 		parent.removeSubItem(child);
 	}
 
-	public void addItem(int position, AbstractItem item) {
+	public void addItem(int position, AbstractExampleItem item) {
 		if (position < mItems.size())
 			mItems.add(position, item);
 		else
@@ -111,7 +107,6 @@ public class DatabaseService {
 
 	public void addSubItem(int position, ExpandableItem parent, SubItem subItem) {
 		parent.addSubItem(position, subItem);
-		parent.updateSubTitle();
 	}
 
 	public static void onDestroy() {

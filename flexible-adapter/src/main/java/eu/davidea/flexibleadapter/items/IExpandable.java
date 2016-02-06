@@ -5,8 +5,7 @@ import java.util.List;
 /**
  * Interface to manage expanding operations on items with
  * {@link eu.davidea.flexibleadapter.FlexibleAdapter}.
- * <br/>Most of these methods are called in the Adapter.
- * <p>Implements this interface or use {@link AbstractExpandableItem}.</p>
+  * <p>Implements this interface or use {@link AbstractExpandableItem}.</p>
  *
  * @author Davide Steduto
  * @since 17/01/2016 Created

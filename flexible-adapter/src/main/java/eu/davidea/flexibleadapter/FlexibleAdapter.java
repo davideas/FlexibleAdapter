@@ -29,21 +29,18 @@ import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
-import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set
- * such as filtering, adding, removing, moving, animating an item.
- * <p><strong>T</strong> is your Model object containing the data implementing
- * {@link IFlexibleItem}.</p>
- *
+ * such as filtering, adding, removing, moving and animating an item.
+ * <p><strong>T</strong> is your Model object containing the data, it must implement
+ * {@link IFlexibleItem} interface.</p>
  * With 5.0.0, the adapter now supports a set of standard methods to expand and collapse an
  * expandable Item.
  * <p><b>NOTE:</b>This Adapter supports Expandable of Expandable, but selection and restoration don't
  * work well in conjunction of multi level expansion. You should not enable functionalities like:
  * ActionMode, Undo, Drag and CollapseOnExpand in that case. Better change approach in favor
  * of a better and clearer design/layout: Open the list of the subItem in a new Activity...
- *
  * <br/>Instead, this extra level of expansion is useful in situations where those items are not
  * selectable nor draggable, and information in them are read only mode or action buttons.</p>
  *
@@ -52,6 +49,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @see SelectableAdapter
  * @see IFlexibleItem
  * @see FlexibleViewHolder
+ * @see ExpandableViewHolder
  * @since 03/05/2015 Created
  * <br/>16/01/2016 Adding Expandable feature
  * <br/>24/01/2016 Drag&Drop, Swipe
@@ -114,7 +112,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 	/* ViewTypes */
 	protected LayoutInflater mInflater;
-	private ArrayMap<Integer, IFlexibleItem> mTypeInstances = new ArrayMap<Integer, IFlexibleItem>();
+	private ArrayMap<Integer, T> mTypeInstances = new ArrayMap<Integer, T>();
 
 	/* Filter */
 	protected String mSearchText = "", mOldSearchText = "";
@@ -215,11 +213,12 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		T item = getItem(position);
 		//Allow selection only for selectable items
 		if (item != null && item.isSelectable()) {
-			if (isExpandable(item) && !childSelected) {
+			boolean hasParent = getExpandableOf(item) != null;
+			if ((isExpandable(item) || !hasParent) && !childSelected) {
 				//Allow selection of Parent if no Child has been previously selected
 				parentSelected = true;
 				super.toggleSelection(position);
-			} else if (!parentSelected) {
+			} else if (!parentSelected && hasParent) {
 				//Allow selection of Child if no Parent has been previously selected
 				childSelected = true;
 				super.toggleSelection(position);
@@ -411,7 +410,8 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * Shows all headers in the RecyclerView at their position
 	 */
 	public void showAllHeaders() {
-		for (int i = 0; i < headers.size(); i++) {
+		multiRange = true;
+		for (int i = headers.size() - 1; i >= 0; i--) {
 			if (DEBUG) Log.v(TAG, "Showing Header " + headers.keyAt(i) + "=" + headers.valueAt(i));
 			if (!contains(headers.valueAt(i))) {
 				T headerItem = headers.valueAt(i);
@@ -419,16 +419,32 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 				addItem(headers.keyAt(i), headerItem);
 			}
 		}
+		multiRange = false;
 	}
 
 	/**
 	 * Hides all headers from the RecyclerView.
 	 */
 	public void hideAllHeaders() {
+		multiRange = true;
 		for (int i = headers.size() - 1; i >= 0; i--) {
-			T headerItem = headers.valueAt(i);
-			headerItem.setHidden(true);
-			removeItem(headerItem);
+			hideHeader(headers.valueAt(i));
+		}
+		multiRange = false;
+	}
+
+	/**
+	 * Internally hide an header from the list.
+	 *
+	 * @param header the header
+	 */
+	public void hideHeader(@NonNull T header) {
+		header.setHidden(true);
+		int position = getGlobalPositionOf(header);
+		if (DEBUG) Log.d(TAG, "Hiding header " + position + "=" + header);
+		if (position >= 0) {
+			mItems.remove(position);
+			notifyItemRemoved(position);
 		}
 	}
 
@@ -440,7 +456,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	public void deleteHeader(int position) {
 		int index = headers.indexOfKey(position);
 		if (index >= 0) {
-			removeItem(headers.valueAt(index));
+			hideHeader(headers.valueAt(index));
 			headers.removeAt(index);
 		}
 	}
@@ -453,7 +469,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	public void deleteHeader(T header) {
 		int index = headers.indexOfValue(header);
 		if (index >= 0) {
-			removeItem(headers.valueAt(index));
+			hideHeader(headers.valueAt(index));
 			headers.removeAt(index);
 		}
 	}
@@ -587,6 +603,9 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public IExpandable getExpandableOf(@NonNull T child) {
 		for (T parent : mItems) {
+			//Parent can only be positioned before the child
+			if (parent == child) return null;
+			//Still not encountered the same item (child), check if it's his parent
 			if (isExpandable(parent)) {
 				IExpandable expandable = (IExpandable) parent;
 				if (expandable.isExpanded() && expandable.getSubItems() != null) {
@@ -713,7 +732,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			subItemsCount = subItems.size();
 			//Save expanded state
 			expandable.setExpanded(true);
-			mapViewTypesFrom((List<IFlexibleItem>) subItems);
+			mapViewTypesFrom(subItems);
 
 			//Automatically scroll the current expandable item to show as much children as possible
 			if (scrollOnExpand && !expandAll) {
@@ -890,7 +909,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		} else
 			mItems.addAll(items);
 		//Notify range addition
-		mapViewTypesFrom((List<IFlexibleItem>)items);
+		mapViewTypesFrom(items);
 		notifyItemRangeInserted(position, items.size());
 		//Call listener to update EmptyView
 		if (mUpdateListener != null && !multiRange)
@@ -940,7 +959,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			}
 			mapViewTypeFrom(item);
 			//Notify the parent about the change if requested
-			if (notifyParentChanged) notifyItemChanged(parentPosition);
+			if (notifyParentChanged) notifyItemChanged(parentPosition, expandable);
 		}
 		return added;
 	}
@@ -950,20 +969,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/*----------------------*/
 	/* DELETE ITEMS METHODS */
 	/*----------------------*/
-
-	/**
-	 * Removes an item from internal list if found.
-	 *
-	 * @param item the item to remove
-	 * @see #removeItem(int)
-	 */
-	public void removeItem(@NonNull T item) {
-		if (item == null) {
-			Log.w(TAG, "Cannot remove null item!");
-			return;
-		}
-		this.removeItem(getGlobalPositionOf(item));
-	}
 
 	/**
 	 * Removes an item from internal list and notify the change.
@@ -1018,7 +1023,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			if (DEBUG) Log.v(TAG, "removeItem NonExpandable:" + mRemovedItems);
 			int parentPosition = createRemovedSubItem(parent, item, notifyParentChanged);
 			//Notify the Parent about the change if requested
-			if (notifyParentChanged) notifyItemChanged(parentPosition);
+			if (notifyParentChanged) notifyItemChanged(parentPosition, parent);
 		}
 		//Remove and notify removals
 		mItems.remove(position);
@@ -1096,10 +1101,12 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			return;
 		}
 		int parentPosition = -1;
+		IExpandable parent = null;
 		for (int position = positionStart + itemCount - 1; position >= positionStart; position--) {
 			T item = getItem(position);
 			assert item != null;
-			IExpandable parent = getExpandableOf(item);
+			//When removing a range of children, parent is always the same :-)
+			if (parent == null) parent = getExpandableOf(item);
 			if (isExpandable(item) || parent == null) {
 				createRemovedItem(position, item);
 			} else {
@@ -1116,7 +1123,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			//Notify the Children removal only if Parent is expanded
 			notifyItemRangeRemoved(positionStart, itemCount);
 			//Notify the Parent about the change if requested
-			if (notifyParentChanged) notifyItemChanged(parentPosition);
+			if (notifyParentChanged) notifyItemChanged(parentPosition, parent);
 		} else {
 			adjustRemoved = false;
 			//Notify range removal
@@ -1195,7 +1202,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		for (int i = mRemovedItems.size() - 1; i >= 0; i--) {
 			RemovedItem removedItem = mRemovedItems.get(i);
 			boolean added;
-			if (removedItem.relativePosition > 0) {
+			if (removedItem.relativePosition >= 0) {
 				//Restore child, if not deleted
 				if (DEBUG) Log.v(TAG, "Restore Child " + removedItem);
 				if (hasSearchText() && !filterObject((T) removedItem.item, getSearchText()))
@@ -1214,7 +1221,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			removedItem.item.setHidden(false);
 			//Restore selection if requested, before emptyBin.
 			if (restoreSelection && added) {
-				if (removedItem.item instanceof IExpandable) {
+				if (removedItem.item instanceof IExpandable || getExpandableOf((T) removedItem.item) == null) {
 					parentSelected = true;
 					getSelectedPositions().add(removedItem.parentPosition);
 				} else {
@@ -1320,7 +1327,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * deleted children if any.
 	 *
 	 * @param item the parent item
-	 * @return the list of the original children minus the deleted children if some are
+	 * @return a non null list of the original children minus the deleted children if some are
 	 * pending removal.
 	 */
 	public List<T> getCurrentChildren(T item) {
@@ -1442,7 +1449,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		if (hasSearchText()) {
 			int newOriginalPosition = -1;
 			for (T item : unfilteredItems) {
-				if (filterObject(item, getSearchText())) {
+				if (filterExpandableObject(item, getSearchText())) {
 					RemovedItem removedItem = getPendingRemovedItem(item);
 					if (removedItem != null) {
 						//If found calculate new progressive position while filtering
@@ -1459,6 +1466,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 								for (T subItem : subItems) {
 									if (!subItem.isHidden()) filteredSubItems.add(subItem);
 								}
+								mapViewTypesFrom(filteredSubItems);
 								values.addAll(filteredSubItems);
 								newOriginalPosition += filteredSubItems.size();
 							}
@@ -1520,7 +1528,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			//Expand if filter found text in subItems
 			expandable.setExpanded(filtered);
 		}
-		//Normal filter for Parent only if not filtered already
+		//if not filtered already, fallback to Normal filter
 		return filtered || filterObject(item, constraint);
 	}
 
@@ -1794,9 +1802,9 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param items list of items to map
 	 */
-	private void mapViewTypesFrom(Iterable<IFlexibleItem> items) {
+	private void mapViewTypesFrom(Iterable<T> items) {
 		if (items != null) {
-			for (IFlexibleItem item : items) {
+			for (T item : items) {
 				mapViewTypeFrom(item);
 			}
 		}
@@ -1807,7 +1815,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param item the item to map
 	 */
-	private void mapViewTypeFrom(IFlexibleItem item) {
+	private void mapViewTypeFrom(T item) {
 		if (item != null && !mTypeInstances.containsKey(item.getLayoutRes())) {
 			mTypeInstances.put(item.getLayoutRes(), item);
 		}
@@ -1819,7 +1827,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * @param viewType the ViewType of the item
 	 * @return the IFlexibleItem instance, creator of the ViewType
 	 */
-	private IFlexibleItem getViewTypeInstance(int viewType) {
+	private T getViewTypeInstance(int viewType) {
 		return mTypeInstances.get(viewType);
 	}
 
@@ -1877,7 +1885,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		if (parent != null && parent.getSubItems() != null) {
 			List<T> allSubItems = parent.getSubItems();
 			for (T subItem : allSubItems) {
-				//Pick up only no hidden items
+				//Pick up only no hidden items (doesn't get into account the filtered items)
 				if (!subItem.isHidden()) subItems.add(subItem);
 			}
 		}
@@ -2015,11 +2023,12 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	public interface OnItemClickListener {
 		/**
 		 * Called when single tap occurs.
-		 * <p>Delegation of the click event to the listener and check if selection MODE is
+		 * <p>Delegates the click event to the listener and checks if selection MODE if
 		 * SINGLE or MULTI is enabled in order to activate the ItemView.</p>
+		 * For Expandable Views it will toggle the Expansion if configured so.
 		 *
 		 * @param position the adapter position of the item clicked
-		 * @return true the click should activate the ItemView, false for no change.
+		 * @return true if the click should activate the ItemView, false for no change.
 		 */
 		boolean onItemClick(int position);
 	}
@@ -2030,8 +2039,10 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	public interface OnItemLongClickListener {
 		/**
 		 * Called when long tap occurs.
-		 * <p>This method always calls {@link FlexibleViewHolder#toggleActivation} after listener
-		 * event is consumed in order to activate the ItemView.</p>
+		 * <p>This method always calls
+		 * {@link eu.davidea.flexibleadapter.FlexibleAdapter.FlexibleViewHolder#toggleActivation}
+		 * after listener event is consumed in order to activate the ItemView.</p>
+		 * For Expandable Views it will collapse the View if configured so.
 		 *
 		 * @param position the adapter position of the item clicked
 		 */
@@ -2046,7 +2057,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		 * Called when an item has been dragged far enough to trigger a move. <b>This is called
 		 * every time an item is shifted</b>, and <strong>not</strong> at the end of a "drop" event.
 		 * <p>The end of the "drop" event is instead handled by
-		 * {@link FlexibleViewHolder#onItemReleased(int)}</p>.
+		 * {@link eu.davidea.flexibleadapter.FlexibleAdapter.FlexibleViewHolder#onItemReleased(int)}</p>.
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
@@ -2090,6 +2101,11 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		public void onChanged() {
 			expandInitialItems();
 		}
+
+//		@Override
+//		public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
+//			//Must be empty to avoid fallback to onItemRangeChanged(positionStart, itemCount)
+//		}
 
 		@Override
 		public void onItemRangeInserted(int positionStart, int itemCount) {

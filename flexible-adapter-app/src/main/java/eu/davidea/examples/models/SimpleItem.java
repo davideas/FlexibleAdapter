@@ -1,6 +1,7 @@
 package eu.davidea.examples.models;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,18 +18,13 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
-public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
+public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 		implements Serializable {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 
-	@Override
-	public boolean equals(Object inObject) {
-		if (inObject instanceof SimpleItem) {
-			SimpleItem inItem = (SimpleItem) inObject;
-			return this.getId().equals(inItem.getId());
-		}
-		return false;
+	public SimpleItem(String id) {
+		super(id);
 	}
 
 	@Override
@@ -43,39 +39,57 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 
 	@Override
 	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
-		//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
-		if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
-			//Reset the flags with delay
-			holder.itemView.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					adapter.resetActionModeFlags();
+		if (payloads.size() > 0){
+			Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
+			List<AbstractExampleItem> list = (List<AbstractExampleItem>) payloads;
+			for (AbstractExampleItem item : list) {
+				if (this instanceof ExpandableItem)
+					setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
+				if (adapter.hasSearchText()) {
+					ExampleAdapter.setHighlightText(holder.itemView.getContext(),
+							holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+				} else {
+					holder.mSubtitle.setText(getSubtitle());
 				}
-			}, 200L);
-			//Consume the Animation
-			holder.mFlipView.flip(adapter.isSelected(position), 200L);
-		} else {
-			//Display the current flip status
-			holder.mFlipView.flipSilently(adapter.isSelected(position));
-		}
+			}
 
-		//This "if-else" is just an example of what you can do with item animation
-		if (adapter.isSelected(position)) {
-			adapter.animateView(holder.itemView, position, true);
 		} else {
-			adapter.animateView(holder.itemView, position, false);
-		}
+			//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
+			if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
+				//Reset the flags with delay
+				holder.itemView.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						adapter.resetActionModeFlags();
+					}
+				}, 200L);
+				//Consume the Animation
+				holder.mFlipView.flip(adapter.isSelected(position), 200L);
+			} else {
+				//Display the current flip status
+				holder.mFlipView.flipSilently(adapter.isSelected(position));
+			}
 
-		//In case of searchText matches with Title or with an SimpleItem's field
-		// this will be highlighted
-		if (adapter.hasSearchText()) {
-			ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-					holder.mTitle, getTitle(), adapter.getSearchText());
-			ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-					holder.mSubtitle, getSubtitle(), adapter.getSearchText());
-		} else {
-			holder.mTitle.setText(getTitle());
-			holder.mSubtitle.setText(getSubtitle());
+			//This "if-else" is just an example of what you can do with item animation
+			if (adapter.isSelected(position)) {
+				adapter.animateView(holder.itemView, position, true);
+			} else {
+				adapter.animateView(holder.itemView, position, false);
+			}
+
+			//In case of searchText matches with Title or with an SimpleItem's field
+			// this will be highlighted
+			if (this instanceof ExpandableItem)
+				setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
+			if (adapter.hasSearchText()) {
+				ExampleAdapter.setHighlightText(holder.itemView.getContext(),
+						holder.mTitle, getTitle(), adapter.getSearchText());
+				ExampleAdapter.setHighlightText(holder.itemView.getContext(),
+						holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+			} else {
+				holder.mTitle.setText(getTitle());
+				holder.mSubtitle.setText(getSubtitle());
+			}
 		}
 	}
 
@@ -84,11 +98,11 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 	 */
 	public static final class ParentViewHolder extends ExpandableViewHolder {
 
-		FlipView mFlipView;
-		TextView mTitle;
-		TextView mSubtitle;
-		ImageView mHandleView;
-		Context mContext;
+		public FlipView mFlipView;
+		public TextView mTitle;
+		public TextView mSubtitle;
+		public ImageView mHandleView;
+		public Context mContext;
 
 		public ParentViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);

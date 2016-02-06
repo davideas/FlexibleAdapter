@@ -30,7 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import eu.davidea.common.SimpleDividerItemDecoration;
-import eu.davidea.examples.models.AbstractItem;
+import eu.davidea.examples.models.AbstractExampleItem;
 import eu.davidea.examples.models.ExpandableItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
@@ -111,7 +111,12 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of views will not change as the data changes
-		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
+				@Override
+				public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
+					return true;
+				}
+			});
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		//TODO: Change ItemDecorator, this doesn't work well
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
@@ -319,9 +324,12 @@ public class MainActivity extends AppCompatActivity implements
 				gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 					@Override
 					public int getSpanSize(int position) {
+						//NOTE: If you use simple integer to identify the ViewType,
+						//here, you should use them and not Layout integers
 						switch (mAdapter.getItemViewType(position)) {
-							case ExampleAdapter.EXAMPLE_VIEW_TYPE:
-							case ExampleAdapter.EXPANDABLE_VIEW_TYPE:
+							case R.layout.recycler_uls_row:
+							case R.layout.recycler_header_row:
+							case R.layout.recycler_expandable_row:
 								return 2;
 							default:
 								return 1;
@@ -396,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements
 			// that an item has been selected.
 			if (mAdapter.getItemCount() > 0) {
 				if (position != mActivatedPosition) setActivatedPosition(position);
-				AbstractItem abstractItem = mAdapter.getItem(position);
+				AbstractExampleItem abstractItem = mAdapter.getItem(position);
 				assert abstractItem != null;
 				String title = null;
 				if (mAdapter.isExpandable(abstractItem)) {
@@ -459,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onTitleModified(int position, String newTitle) {
-		AbstractItem item = mAdapter.getItem(position);
+		AbstractExampleItem item = mAdapter.getItem(position);
 		item.setTitle(newTitle);
 		mAdapter.updateItem(position, item);
 	}
@@ -515,7 +523,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onDeleteConfirmed() {
-		for (AbstractItem adapterItem : mAdapter.getDeletedItems()) {
+		for (AbstractExampleItem adapterItem : mAdapter.getDeletedItems()) {
 			//Remove items from your Database. Example:
 			if (mAdapter.isExpandable(adapterItem)) {
 				DatabaseService.getInstance().removeItem(adapterItem);

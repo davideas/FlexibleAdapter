@@ -90,16 +90,23 @@ public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
 	/*---------------------*/
 
 	/**
-	 * Returns the layout resource Id to bind for the given Item.<br/>
-	 * Should identify a resource Layout reference {@link android.R.layout}.
-	 * <p>Used by FlexibleAdapter to map the ViewType.</p>
+	 * Returns the layout resource Id to auto-map a specific ViewType on this Item.
+	 * <p><b>NOTE:</b> Should identify a resource Layout reference {@link android.R.layout} used
+	 * by FlexibleAdapter to auto-map the ViewTypes.</p>
+	 * <b>HELP:</b> To know how to implement auto-map for ViewTypes please refer to the
+	 * <a href="https://github.com/davideas/FlexibleAdapter/wiki">FlexibleAdapter WikiPage</a>
+	 * on GitHub.
 	 *
-	 * @return Layout identifier.
+	 * @return Layout identifier
 	 */
 	@LayoutRes
 	int getLayoutRes();
 
 	/**
+	 * Delegates the creation of the ViewHolder to the user, if auto-map has been implemented.
+	 * <p><b>HELP:</b> To know how to implement auto-map for ViewTypes please refer to the
+	 * <a href="https://github.com/davideas/FlexibleAdapter/wiki">FlexibleAdapter WikiPage</a>
+	 * on GitHub.</p>
 	 *
 	 * @param adapter  the Adapter instance extending {@link FlexibleAdapter}
 	 * @param inflater the {@link LayoutInflater} for the itemView
@@ -110,9 +117,12 @@ public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
 	VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent);
 
 	/**
-	 * Binds the data of this item to the given holder.
-	 * <p>How to use Payload, please refer to
-	 * {@link android.support.v7.widget.RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}</p>
+	 * Binds the data of this item to the given Layout, if auto-map has been implemented.
+	 * <p><b>HELP:</b> To know how to implement auto-map for ViewTypes please refer to the
+	 * <a href="https://github.com/davideas/FlexibleAdapter/wiki">FlexibleAdapter WikiPage</a>
+	 * on GitHub.</p>
+	 * How to use Payload, please refer to
+	 * {@link android.support.v7.widget.RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}.
 	 *
 	 * @param adapter  the FlexibleAdapter instance
 	 * @param holder   the ViewHolder instance

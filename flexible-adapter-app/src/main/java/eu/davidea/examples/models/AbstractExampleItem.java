@@ -6,10 +6,7 @@ import java.io.Serializable;
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 
-/**
- * Customized item for example purpose.
- */
-public abstract class AbstractItem<VH extends RecyclerView.ViewHolder>
+public abstract class AbstractExampleItem<VH extends RecyclerView.ViewHolder>
 		extends AbstractFlexibleItem<VH>
 		implements Serializable {
 
@@ -19,10 +16,14 @@ public abstract class AbstractItem<VH extends RecyclerView.ViewHolder>
 	private String title;
 	private String subtitle;
 
+	public AbstractExampleItem(String id) {
+		this.id = id;
+	}
+
 	@Override
 	public boolean equals(Object inObject) {
-		if (inObject instanceof AbstractItem) {
-			AbstractItem inItem = (AbstractItem) inObject;
+		if (inObject instanceof AbstractExampleItem) {
+			AbstractExampleItem inItem = (AbstractExampleItem) inObject;
 			return this.id.equals(inItem.id);
 		}
 		return false;
@@ -54,10 +55,9 @@ public abstract class AbstractItem<VH extends RecyclerView.ViewHolder>
 
 	@Override
 	public String toString() {
-		return "SimpleItem[" +
+		return "[" +
 				"id=" + id +
-				", title=" + title +
-				super.toString() + ']';
+				", title=" + title + "]";
 	}
 
 }

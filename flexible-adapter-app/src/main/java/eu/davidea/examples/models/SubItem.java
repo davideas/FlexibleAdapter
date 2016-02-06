@@ -14,44 +14,19 @@ import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
-public class SubItem extends AbstractItem<SubItem.ChildViewHolder> implements Serializable {
+public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder> implements Serializable {
 
 	private static final long serialVersionUID = 2519281529221244210L;
 
-	private String id;
-	private String title;
-
-	@Override
-	public boolean equals(Object inObject) {
-		if (inObject instanceof SubItem) {
-			SubItem inItem = (SubItem) inObject;
-			return this.id.equals(inItem.id);
-		}
-		return false;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
+	public SubItem(String id) {
+		super(id);
 	}
 
 	@Override
 	public String toString() {
-		return "SimpleItem[" +
-				"id=" + id +
-				", title=" + title +
-				super.toString() + ']';
+		return "SubItem[" +
+				"id=" + getId() +
+				", title=" + getTitle() + ']';
 	}
 
 	@Override
@@ -77,9 +52,9 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder> implements Se
 		// this will be highlighted
 		if (adapter.hasSearchText()) {
 			ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-					holder.mTitle, title, adapter.getSearchText());
+					holder.mTitle, getTitle(), adapter.getSearchText());
 		} else {
-			holder.mTitle.setText(title);
+			holder.mTitle.setText(getTitle());
 		}
 	}
 
@@ -89,8 +64,9 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder> implements Se
 	 * you provide access to all the views for a data item in a view holder.
 	 */
 	public static final class ChildViewHolder extends FlexibleViewHolder {
-		ImageView mHandleView;
-		TextView mTitle;
+
+		public ImageView mHandleView;
+		public TextView mTitle;
 
 		public ChildViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);

@@ -1,6 +1,12 @@
 package eu.davidea.flexibleadapter.items;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
+import java.util.List;
+
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 /**
  * Generic implementation of {@link IFlexibleItem} interface with most useful methods to manage
@@ -97,6 +103,27 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	@Override
 	public void setSwipeable(boolean swipeable) {
 		mSwipeable = swipeable;
+	}
+
+	/*---------------------*/
+	/* VIEW HOLDER METHODS */
+	/*---------------------*/
+
+	private static final String MAPPING_ILLEGAL_STATE = "If you want FlexibleAdapter creates and binds ViewHolder for you, you must override and implement ";
+
+	@Override
+	public int getLayoutRes() {
+		throw new IllegalStateException(MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".getLayoutRes() method.");
+	}
+
+	@Override
+	public VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		throw new IllegalStateException(MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".createViewHolder() method.");
+	}
+
+	@Override
+	public void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads) {
+		throw new IllegalStateException(MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".bindViewHolder() method.");
 	}
 
 }

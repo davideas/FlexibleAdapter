@@ -18,17 +18,12 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 /**
  * User Learns Selection
  */
-public class ULSItem extends AbstractItem<ULSItem.ExampleViewHolder> implements Serializable {
+public class ULSItem extends AbstractExampleItem<ULSItem.ExampleViewHolder> implements Serializable {
 
 	private static final long serialVersionUID = -5041296095060813327L;
 
-	@Override
-	public boolean equals(Object inObject) {
-		if (inObject instanceof ULSItem) {
-			ULSItem inItem = (ULSItem) inObject;
-			return this.getId().equals(inItem.getId());
-		}
-		return false;
+	public ULSItem(String id) {
+		super(id);
 	}
 
 	@Override
@@ -56,12 +51,12 @@ public class ULSItem extends AbstractItem<ULSItem.ExampleViewHolder> implements 
 	 */
 	public static class ExampleViewHolder extends FlexibleViewHolder {
 
-		ImageView mImageView;
-		TextView mTitle;
-		TextView mSubtitle;
-		ImageView mDismissIcon;
+		public ImageView mImageView;
+		public TextView mTitle;
+		public TextView mSubtitle;
+		public ImageView mDismissIcon;
 
-		public ExampleViewHolder(View view, final FlexibleAdapter adapter) {
+		public ExampleViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
@@ -72,7 +67,7 @@ public class ULSItem extends AbstractItem<ULSItem.ExampleViewHolder> implements 
 				public void onClick(View v) {
 					//TODO FOR YOU: Save the boolean into Settings!
 					DatabaseService.userLearnedSelection = true;
-					adapter.removeItem(0);
+					mAdapter.removeItem(0);
 				}
 			});
 		}

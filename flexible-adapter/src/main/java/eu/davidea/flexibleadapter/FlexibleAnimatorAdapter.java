@@ -24,8 +24,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 /**
- * This class is responsible to animate items when RecyclerView is firstly loaded. Bounded items
- * are animated initially and also when user starts to scroll the list.
+ * This class is responsible to animate items. Bounded items are animated initially and also
+ * when user starts to scroll the list.
  * <p>Animations can be customized for each items applying different logic based on item position
  * and beyond.</p>
  * This class is extended by {@link FlexibleAdapter}.

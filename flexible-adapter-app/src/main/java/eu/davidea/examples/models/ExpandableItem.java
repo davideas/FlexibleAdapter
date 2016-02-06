@@ -17,13 +17,9 @@ public class ExpandableItem extends SimpleItem implements Serializable, IExpanda
 	/* subItems list */
 	private List<SubItem> mSubItems;
 
-	@Override
-	public boolean equals(Object inObject) {
-		if (inObject instanceof ExpandableItem) {
-			ExpandableItem inItem = (ExpandableItem) inObject;
-			return this.getId().equals(inItem.getId());
-		}
-		return false;
+
+	public ExpandableItem(String id) {
+		super(id);
 	}
 
 	@Override
@@ -75,9 +71,8 @@ public class ExpandableItem extends SimpleItem implements Serializable, IExpanda
 		return R.layout.recycler_expandable_row;
 	}
 
-	public String updateSubTitle() {
-		setSubtitle(mSubItems.size() + " subItems");
-		return getSubtitle();
+	@Override
+	public String toString() {
+		return super.toString() + mSubItems;
 	}
-
 }
