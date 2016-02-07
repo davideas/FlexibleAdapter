@@ -1,13 +1,18 @@
 package eu.davidea.examples.models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.items.IExpandable;
 
-public class ExpandableItem extends SimpleItem implements Serializable, IExpandable<SubItem> {
+/**
+ * If you don't have fields in common (my example: SimpleItem) better to extend directly from
+ * {@link eu.davidea.flexibleadapter.items.AbstractExpandableItem} to benefit of the already
+ * implemented methods around subItems list.
+ */
+public class ExpandableItem extends SimpleItem
+		implements IExpandable<SimpleItem.ParentViewHolder, SubItem> {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 

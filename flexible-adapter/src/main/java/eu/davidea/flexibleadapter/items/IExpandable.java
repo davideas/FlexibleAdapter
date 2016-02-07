@@ -1,5 +1,7 @@
 package eu.davidea.flexibleadapter.items;
 
+import android.support.v7.widget.RecyclerView;
+
 import java.util.List;
 
 /**
@@ -10,7 +12,8 @@ import java.util.List;
  * @author Davide Steduto
  * @since 17/01/2016 Created
  */
-public interface IExpandable<T extends IFlexibleItem> {
+public interface IExpandable<VH extends RecyclerView.ViewHolder, S extends IFlexibleItem>
+		extends IFlexibleItem<VH> {
 
 	/*--------------------*/
 	/* EXPANDABLE METHODS */
@@ -24,6 +27,6 @@ public interface IExpandable<T extends IFlexibleItem> {
 	/* SUB ITEMS METHODS */
 	/*-------------------*/
 
-	List<T> getSubItems();
+	List<S> getSubItems();
 
 }

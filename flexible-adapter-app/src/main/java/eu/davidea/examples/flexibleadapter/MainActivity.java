@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.setSwipeEnabled(true);
 
 		//Experimental, set some headers!
-		mAdapter.setHeaders(DatabaseService.buildHeaders());
+		mAdapter.setHeaders(DatabaseService.getInstance().buildHeaders());
 
 		//FAB
 		mFab = (FloatingActionButton) findViewById(R.id.fab);

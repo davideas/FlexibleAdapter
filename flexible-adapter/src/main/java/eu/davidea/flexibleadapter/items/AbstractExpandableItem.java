@@ -15,7 +15,7 @@ import java.util.List;
  */
 public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder, S extends IFlexibleItem>
 		extends AbstractFlexibleItem<VH>
-		implements IExpandable {
+		implements IExpandable<VH, S> {
 
 	/* Flags for FlexibleAdapter */
 	private boolean mExpanded = false;
@@ -41,13 +41,13 @@ public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder,
 	/* SUB ITEMS METHODS */
 	/*-------------------*/
 
-	public final boolean hasSubItems() {
-		return mSubItems!= null && mSubItems.size() > 0;
-	}
-
 	@Override
 	public final List<S> getSubItems() {
 		return mSubItems;
+	}
+
+	public final boolean hasSubItems() {
+		return mSubItems!= null && mSubItems.size() > 0;
 	}
 
 	public void setSubItems(List<S> subItem) {

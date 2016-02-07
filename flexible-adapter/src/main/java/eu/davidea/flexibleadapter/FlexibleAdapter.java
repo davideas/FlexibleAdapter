@@ -13,7 +13,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,9 +26,9 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
+import eu.davidea.flexibleadapter.items.ISectionable;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set
@@ -77,13 +76,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * Header/Section items
 	 */
-	private SparseArray<T> headers;
-
-	/**
-	 * Lock object used to modify the content of {@link #mItems}.
-	 * Any write operation performed on the list items should be synchronized on this lock.
-	 */
-	protected final Object mLock = new Object();
+	private List<ISectionable> mHeaders;
 
 	/**
 	 * Handler for delayed {@link #filterItems(List)} and {@link OnDeleteCompleteListener#onDeleteConfirmed}
@@ -156,6 +149,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * Main Constructor with all managed listeners for ViewHolder and the Adapter itself.
 	 * <p>The listener must be a single instance of a class, usually Activity or Fragment, where
 	 * you can implement how to handle the different events.</p>
+	 * Any write operation performed on the items list is synchronized.
 	 *
 	 * @param items     items to display
 	 * @param listeners can be an instance of:
@@ -292,6 +286,11 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		return mItems.get(position);
 	}
 
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
 	/**
 	 * This cannot be overridden since the selection relies on it.
 	 *
@@ -358,39 +357,37 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/* HEADERS/SECTIONS METHODS */
 	/*--------------------------*/
 
-	public FlexibleAdapter setHeaders(SparseArray<T> headers) {
-		return withHeaders(headers);
+	//TODO: Boolean for saved instance state and notifyDataSetChanged
+	//TODO: On item removed / inserted / moved switch header linkage
+
+	public FlexibleAdapter setHeaders(List<ISectionable> mHeaders) {
+		return withHeaders(mHeaders);
 	}
 
-	public FlexibleAdapter withHeaders(SparseArray<T> headers) {
+	public FlexibleAdapter withHeaders(List<ISectionable> headers) {
 		if (headers != null) {
-			if (DEBUG) Log.v(TAG, "Settings " + headers.size() + " headers");
-			this.headers = headers;
+			if (DEBUG) Log.v(TAG, "Settings " + headers.size() + " mHeaders");
+			this.mHeaders = headers;
 		}
 		return this;
 	}
 
 	/**
-	 * Add 1 header/section to the internal list at the user position.
+	 * Add 1 header/section to the internal list at the linked position.
 	 *
-	 * @param headerPosition header position
 	 * @param headerItem     item of the header
 	 * @param show           also immediate show the header to the user
 	 */
-	public FlexibleAdapter addHeader(int headerPosition, T headerItem, boolean show, boolean sticky) {
+	public FlexibleAdapter addHeader(@NonNull ISectionable headerItem) {
 		if (headerItem == null) {
-			Log.w(TAG, "Cannot addHeader with null item! headerPosition=" + headerPosition);
+			Log.e(TAG, "Cannot add null Header!");
 			return this;
 		}
-		if (headerPosition < 0) {
-			Log.w(TAG, "Cannot addHeader on negative position! headerItem=" + headerItem);
-			return this;
-		}
-		mapViewTypeFrom(headerItem);
-		headers.put(headerPosition, headerItem);
-		if (show) {
-			headerItem.setHidden(false);
-			addItem(headerPosition, headerItem);
+		mHeaders.add(headerItem);
+		if (!headerItem.isHidden()) {
+			showHeader(headerItem);
+		} else {
+			mapViewTypeFrom((T) headerItem);
 		}
 		return this;
 	}
@@ -400,34 +397,26 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @return list non-null with all the header items.
 	 */
-	public List<T> getHeadersList() {
-		List<T> list = new ArrayList<T>(headers.size());
-		for (int i = 0; i < headers.size(); i++) {
-			list.add(headers.valueAt(i));
-		}
-		return list;
+	public List<ISectionable> getHeadersList() {
+		return mHeaders;
 	}
 
-	public List<Integer> getHeadersPositions() {
-		List<Integer> list = new ArrayList<Integer>(headers.size());
-		for (int i = 0; i < headers.size(); i++) {
-			list.add(headers.keyAt(i));
+	public List<Integer> getHeadersActualPositions() {
+		List<Integer> list = new ArrayList<Integer>(mHeaders.size());
+		for (int i = 0; i < mItems.size(); i++) {
+			if (mItems.get(i) instanceof ISectionable)
+				list.add(i);
 		}
 		return list;
 	}
 
 	/**
-	 * Shows all headers in the RecyclerView at their position
+	 * Shows all headers in the RecyclerView at their attached position
 	 */
 	public void showAllHeaders() {
 		multiRange = true;
-		for (int i = headers.size() - 1; i >= 0; i--) {
-			if (DEBUG) Log.v(TAG, "Showing Header " + headers.keyAt(i) + "=" + headers.valueAt(i));
-			if (!contains(headers.valueAt(i))) {
-				T headerItem = headers.valueAt(i);
-				headerItem.setHidden(false);
-				addItem(headers.keyAt(i), headerItem);
-			}
+		for (int i = mHeaders.size() - 1; i >= 0; i--) {
+			showHeader(mHeaders.get(i));
 		}
 		multiRange = false;
 	}
@@ -437,22 +426,38 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public void hideAllHeaders() {
 		multiRange = true;
-		for (int i = headers.size() - 1; i >= 0; i--) {
-			hideHeader(headers.valueAt(i));
+		for (int i = mHeaders.size() - 1; i >= 0; i--) {
+			hideHeader(mHeaders.get(i));
 		}
 		multiRange = false;
 	}
 
 	/**
-	 * Internally hide an header from the list.
+	 * Hides an header from the internal list.
 	 *
 	 * @param header the header
 	 */
-	public void hideHeader(@NonNull T header) {
-		header.setHidden(true);
-		int position = getGlobalPositionOf(header);
-		if (DEBUG) Log.d(TAG, "Hiding header " + position + "=" + header);
+	private void showHeader(@NonNull ISectionable header) {
+		int position = getGlobalPositionOf((T) header.getAttachedItem());
+		if (position < 0) {
+			Log.e(TAG, "Cannot add Header. Cannot find item to which attach the Header! headerItem=" + header);
+			return;
+		}
+		if (DEBUG) Log.v(TAG, "Showing header " + position + "=" + header);
+		header.setHidden(false);
+		addItem(position, (T) header);
+	}
+
+	/**
+	 * Hides an header from the internal list.
+	 *
+	 * @param header the header
+	 */
+	private void hideHeader(@NonNull ISectionable header) {
+		int position = getGlobalPositionOf((T) header);
+		if (DEBUG) Log.v(TAG, "Hiding header actual position " + position + "=" + header);
 		if (position >= 0) {
+			header.setHidden(true);
 			mItems.remove(position);
 			notifyItemRemoved(position);
 		}
@@ -461,26 +466,14 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * Completely remove the header from Adapter.
 	 *
-	 * @param position the known position of the header to remove
-	 */
-	public void deleteHeader(int position) {
-		int index = headers.indexOfKey(position);
-		if (index >= 0) {
-			hideHeader(headers.valueAt(index));
-			headers.removeAt(index);
-		}
-	}
-
-	/**
-	 * Completely remove the header from Adapter.
-	 *
 	 * @param header the header item to remove
 	 */
-	public void deleteHeader(T header) {
-		int index = headers.indexOfValue(header);
+	public void deleteHeader(ISectionable header) {
+		int index = mHeaders.indexOf(header);
+		if (DEBUG) Log.v(TAG, "Deleting header " + header);
 		if (index >= 0) {
-			hideHeader(headers.valueAt(index));
-			headers.removeAt(index);
+			hideHeader(mHeaders.get(index));
+			mHeaders.remove(index);
 		}
 	}
 
@@ -847,8 +840,8 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/*----------------*/
 
 	public void updateItem(@IntRange(from = 0) int position, @NonNull T item) {
-		if (position < 0) {
-			Log.w(TAG, "Cannot updateItem on negative position");
+		if (position < 0 && position >= mItems.size()) {
+			Log.e(TAG, "Cannot updateItem on position out of OutOfBounds!");
 			return;
 		}
 		mItems.set(position, item);
@@ -891,11 +884,11 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public boolean addItem(@IntRange(from = 0) int position, @NonNull T item) {
 		if (position < 0) {
-			Log.w(TAG, "Cannot addItem on negative position!");
+			Log.e(TAG, "Cannot addItem on negative position!");
 			return false;
 		}
 		if (item == null) {
-			Log.w(TAG, "No items to add!");
+			Log.e(TAG, "No items to add!");
 			return false;
 		}
 		//Insert Item
@@ -926,11 +919,11 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public boolean addItems(@IntRange(from = 0) int position, @NonNull List<T> items) {
 		if (position < 0) {
-			Log.w(TAG, "Cannot addItems on negative position!");
+			Log.e(TAG, "Cannot addItems on negative position!");
 			return false;
 		}
 		if (items == null || items.isEmpty()) {
-			Log.w(TAG, "No items to add!");
+			Log.e(TAG, "No items to add!");
 			return false;
 		}
 		if (DEBUG)
@@ -1035,7 +1028,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public void removeItem(@IntRange(from = 0) int position, boolean notifyParentChanged) {
 		if (position < 0 && position >= mItems.size()) {
-			Log.w(TAG, "Cannot removeItem on position out of OutOfBounds!");
+			Log.e(TAG, "Cannot removeItem on position out of OutOfBounds!");
 			return;
 		}
 		T item = getItem(position);
@@ -1045,16 +1038,16 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		IExpandable parent = getExpandableOf(item);
 		if (isExpandable(item) || parent == null) {
 			//It's a Parent or Simple Item
-			if (DEBUG) {
-				if (parent == null) Log.v(TAG, "removeItem Item:" + mRemovedItems);
-				else Log.v(TAG, "removeItem Expandable:" + mRemovedItems);
-			}
 			//Collapse Parent before removal if it is expanded!
 			createRemovedItem(position, item);
+			if (DEBUG) {
+				if (parent == null) Log.v(TAG, "removeItem Item:" + item);
+				else Log.v(TAG, "removeItem ExpandableItem:" + item);
+			}
 		} else {
 			//It's a Child
-			if (DEBUG) Log.v(TAG, "removeItem NonExpandable:" + mRemovedItems);
 			int parentPosition = createRemovedSubItem(parent, item, notifyParentChanged);
+			if (DEBUG) Log.v(TAG, "removeItem NonExpandableItem:" + item);
 			//Notify the Parent about the change if requested
 			if (notifyParentChanged) notifyItemChanged(parentPosition, parent);
 		}
@@ -1131,7 +1124,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		if (DEBUG)
 			Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
 		if (positionStart < 0 || (positionStart + itemCount) > initialCount) {
-			Log.w(TAG, "Cannot removeRange with positionStart out of OutOfBounds!");
+			Log.e(TAG, "Cannot removeRange with positionStart out of OutOfBounds!");
 			return;
 		}
 		int parentPosition = -1;
@@ -1147,9 +1140,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 				parentPosition = createRemovedSubItem(parent, item, notifyParentChanged);
 			}
 			//Remove item from internal list
-			synchronized (mLock) {
-				mItems.remove(position);
-			}
+			mItems.remove(position);
 		}
 		//Notify removals
 		if (parentPosition >= 0) {
@@ -1233,6 +1224,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		int initialCount = getItemCount();
 		//Selection coherence: start from a clear situation, clear selection if restoreSelection is active
 		if (restoreSelection) clearSelection();
+		//FIXME: Restore has some bugs when item are deleted one by one with Swipe action
 		for (int i = mRemovedItems.size() - 1; i >= 0; i--) {
 			RemovedItem removedItem = mRemovedItems.get(i);
 			boolean added;
@@ -2138,7 +2130,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 		private void adjustPositions(int positionStart, int itemCount) {
 			if (!filtering) {//Filtering has multiple insert and removal, we skip this process
-				//adjustHeaders(positionStart, itemCount);
 				if (adjustSelected)//Don't, if remove range / restore children
 					adjustSelected(positionStart, itemCount);
 				if (adjustRemoved)//Don't, if remove range / restore parents
@@ -2194,53 +2185,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			return "RemovedItem[parentPosition=" + parentPosition +
 					", relativePosition=" + relativePosition +
 					", item=" + item + "]";
-		}
-	}
-
-	public abstract class AbstractHeader<T extends IFlexibleItem> extends AbstractFlexibleItem {
-		int headerPosition;
-		int firstPosition;
-		T headerItem;
-		boolean shown;
-		boolean sticky;
-
-		/**
-		 * @param headerPosition header position
-		 * @param firstPosition  the position of the first item which the header/section will represent
-		 * @param headerItem     the header item with all content
-		 * @param shown          display header at the startup
-		 * @param sticky         make header sticky
-		 */
-		public AbstractHeader(int headerPosition, int firstPosition, T headerItem, boolean shown, boolean sticky) {
-			this.headerPosition = headerPosition;
-			this.firstPosition = firstPosition;
-			this.headerItem = headerItem;
-			this.shown = shown;
-			this.sticky = sticky;
-		}
-
-		public void hide() {
-			addItem(headerPosition, headers.get(headerPosition));
-			headerItem.setHidden(true);
-			shown = false;
-		}
-
-		public void show() {
-			removeItem(headerPosition);
-			headerItem.setHidden(false);
-			shown = true;
-		}
-
-		public boolean isShown() {
-			return shown;
-		}
-
-		public void setSticky(boolean sticky) {
-			this.sticky = sticky;
-		}
-
-		public boolean isSticky() {
-			return sticky;
 		}
 	}
 

@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.Serializable;
 import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.ExampleAdapter;
@@ -18,8 +17,12 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
-public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
-		implements Serializable {
+/**
+ * If you don't have many fields in common better to extend directly from
+ * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
+ * implemented methods (getter and setters).
+ */
+public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder> {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 

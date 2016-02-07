@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,13 +36,13 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	public static boolean DEBUG = false;
 
 	//TODO: Change MODE from int to Enum and EnumSet??
-	public enum Mode {//beta test
-		IDLE, SINGLE, MULTI, DRAG, SWIPE
-	}
+//	public enum Mode {//beta test
+//		IDLE, SINGLE, MULTI, DRAG, SWIPE
+//	}
 	/**
 	 * Contains type of animators already added
 	 */
-	private EnumSet<Mode> mode = EnumSet.of(Mode.IDLE);
+//	private EnumSet<Mode> mode = EnumSet.of(Mode.IDLE);
 
 	/**
 	 * Adapter will not keep track of selections

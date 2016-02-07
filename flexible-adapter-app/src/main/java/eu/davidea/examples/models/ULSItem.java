@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.Serializable;
 import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.DatabaseService;
@@ -16,9 +15,12 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * User Learns Selection
+ * Item dedicated only for User Learns Selection view (located always at position 0 in the Adapter).
+ * <p>If you don't have many fields in common better to extend directly from
+ * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
+ * implemented methods (getter and setters).</p>
  */
-public class ULSItem extends AbstractExampleItem<ULSItem.ExampleViewHolder> implements Serializable {
+public class ULSItem extends AbstractExampleItem<ULSItem.ExampleViewHolder> {
 
 	private static final long serialVersionUID = -5041296095060813327L;
 

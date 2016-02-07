@@ -1,7 +1,5 @@
 package eu.davidea.examples.flexibleadapter;
 
-import android.util.SparseArray;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +10,7 @@ import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
+import eu.davidea.flexibleadapter.items.ISectionable;
 
 /**
  * Created by Davide Steduto on 23/11/2015.
@@ -20,7 +19,7 @@ import eu.davidea.flexibleadapter.items.IFlexibleItem;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 200, SUB_ITEMS = 3, HEADERS = 20;
+	private static final int ITEMS = 200, SUB_ITEMS = 3, HEADERS = 7;
 
 	//TODO FOR YOU: Use userLearnedSelection from settings
 	public static boolean userLearnedSelection = false;
@@ -65,14 +64,14 @@ public class DatabaseService {
 		return expandableItem;
 	}
 
-	public static SparseArray<AbstractExampleItem> buildHeaders() {
-		SparseArray<AbstractExampleItem> headers = new SparseArray<AbstractExampleItem>();
+	public List<ISectionable> buildHeaders() {
+		List<ISectionable> headers = new ArrayList<ISectionable>();
 		for (int i = 0; i < (ITEMS/HEADERS); i++) {
-			HeaderItem header = new HeaderItem("H" + i);
+			HeaderItem header = new HeaderItem("H" + i, mItems.get(i * HEADERS), false, false);
 			header.setTitle("Header " + (i + 1));
-			header.setSelectable(false);
+			header.setSubtitle("Attached to " + mItems.get(i * HEADERS).getTitle());
 			header.setHidden(true);
-			headers.put(1 + i * HEADERS, header);
+			headers.add(header);
 		}
 		return headers;
 	}

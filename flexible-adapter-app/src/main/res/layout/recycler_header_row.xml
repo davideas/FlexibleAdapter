@@ -27,6 +27,16 @@
 			android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse"
 			tools:text="Header"/>
 
+		<TextView
+			android:id="@+id/subtitle"
+			android:layout_marginTop="2dp"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:ellipsize="end"
+			android:maxLines="1"
+			android:textAppearance="@style/TextAppearance.AppCompat.Small.Inverse"
+			tools:text="Subtitle"/>
+
 	</LinearLayout>
 
 </RelativeLayout>
