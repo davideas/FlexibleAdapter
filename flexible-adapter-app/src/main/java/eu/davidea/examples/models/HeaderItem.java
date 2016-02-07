@@ -1,5 +1,6 @@
 package eu.davidea.examples.models;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,8 +77,15 @@ public class HeaderItem extends AbstractExampleItem<HeaderItem.HeaderViewHolder>
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
-		holder.mTitle.setText(getTitle());
-		holder.mSubtitle.setText(getSubtitle());
+		if (payloads.size() > 0) {
+			Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
+			List<AbstractExampleItem> list = (List<AbstractExampleItem>) payloads;
+				for (AbstractExampleItem item : list)
+					holder.mSubtitle.setText(getSubtitle());
+		} else {
+			holder.mTitle.setText(getTitle());
+			holder.mSubtitle.setText(getSubtitle());
+		}
 	}
 
 	public static class HeaderViewHolder extends FlexibleViewHolder {

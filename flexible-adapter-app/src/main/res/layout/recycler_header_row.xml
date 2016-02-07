@@ -24,7 +24,7 @@
 			android:layout_height="wrap_content"
 			android:ellipsize="end"
 			android:maxLines="1"
-			android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse"
+			android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse"
 			tools:text="Header"/>
 
 		<TextView
@@ -34,7 +34,8 @@
 			android:layout_height="wrap_content"
 			android:ellipsize="end"
 			android:maxLines="1"
-			android:textAppearance="@style/TextAppearance.AppCompat.Small.Inverse"
+			android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+			android:textColor="@color/material_text_color_white_text"
 			tools:text="Subtitle"/>
 
 	</LinearLayout>

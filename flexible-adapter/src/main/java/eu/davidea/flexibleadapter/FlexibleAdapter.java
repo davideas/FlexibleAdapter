@@ -359,6 +359,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 	//TODO: Boolean for saved instance state and notifyDataSetChanged
 	//TODO: On item removed / inserted / moved switch header linkage
+	//TODO: On restore item after the position of an header switch header linkage
 
 	public FlexibleAdapter setHeaders(List<ISectionable> mHeaders) {
 		return withHeaders(mHeaders);
@@ -839,14 +840,14 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/* UPDATE METHODS */
 	/*----------------*/
 
-	public void updateItem(@IntRange(from = 0) int position, @NonNull T item) {
+	public void updateItem(@IntRange(from = 0) int position, @NonNull T item, Object payload) {
 		if (position < 0 && position >= mItems.size()) {
 			Log.e(TAG, "Cannot updateItem on position out of OutOfBounds!");
 			return;
 		}
 		mItems.set(position, item);
 		if (DEBUG) Log.v(TAG, "updateItem notifyItemChanged on position " + position);
-		notifyItemChanged(position);
+		notifyItemChanged(position, payload);
 	}
 
 	/*----------------*/
@@ -985,6 +986,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			}
 			mapViewTypeFrom(item);
 			//Notify the parent about the change if requested
+			//FIXME: Change Payload from Item to User Object and configure Adapter: use Payload object instead of boolean
 			if (notifyParentChanged) notifyItemChanged(parentPosition, expandable);
 		}
 		return added;
@@ -1049,6 +1051,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			int parentPosition = createRemovedSubItem(parent, item, notifyParentChanged);
 			if (DEBUG) Log.v(TAG, "removeItem NonExpandableItem:" + item);
 			//Notify the Parent about the change if requested
+			//FIXME: Change Payload from Item to User Object and configure Adapter: use Payload object instead of boolean
 			if (notifyParentChanged) notifyItemChanged(parentPosition, parent);
 		}
 		//Remove and notify removals
@@ -1148,6 +1151,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			//Notify the Children removal only if Parent is expanded
 			notifyItemRangeRemoved(positionStart, itemCount);
 			//Notify the Parent about the change if requested
+			//FIXME: Change Payload from Item to User Object and configure Adapter: use Payload object instead of boolean
 			if (notifyParentChanged) notifyItemChanged(parentPosition, parent);
 		} else {
 			adjustRemoved = false;
