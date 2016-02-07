@@ -111,6 +111,16 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 
 	private static final String MAPPING_ILLEGAL_STATE = "If you want FlexibleAdapter creates and binds ViewHolder for you, you must override and implement ";
 
+	/**
+	 * Wrapper of {@link #getLayoutRes()}.
+	 * <p>It DOESN'T belongs to the {@link IFlexibleItem} interface!!</p>
+	 *
+	 * @return the layout resourceId as viewType
+	 */
+	public int getViewType() {
+		return getLayoutRes();
+	}
+
 	@Override
 	public int getLayoutRes() {
 		throw new IllegalStateException(MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".getLayoutRes() method.");

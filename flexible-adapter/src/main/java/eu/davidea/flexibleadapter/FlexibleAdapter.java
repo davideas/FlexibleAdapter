@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -116,6 +117,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/* ViewTypes */
 	protected LayoutInflater mInflater;
 	private ArrayMap<Integer, T> mTypeInstances = new ArrayMap<Integer, T>();
+	private boolean autoMap = false;
 
 	/* Filter */
 	protected String mSearchText = "", mOldSearchText = "";
@@ -294,7 +296,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * This cannot be overridden since the selection relies on it.
 	 *
 	 * @return the total number of the items currently displayed by the adapter
-	 * @see #getItemCountOfType(int)
+	 * @see #getItemCountOfTypes(Integer...)
 	 * @see #isEmpty()
 	 */
 	@Override
@@ -303,17 +305,21 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Provides the number of items currently displayed of a certain type.
+	 * Provides the number of items currently displayed of one or more certain types.
 	 *
-	 * @param viewType the viewType to count
-	 * @return size of the expandable items
+	 * @param viewTypes the viewTypes to count
+	 * @return number of the viewTypes counted
 	 * @see #getItemCount()
 	 * @see #isEmpty()
 	 */
-	public int getItemCountOfType(int viewType) {
+	public int getItemCountOfTypes(Integer... viewTypes) {
+		List<Integer> viewTypeList = Arrays.asList(viewTypes);
 		int count = 0;
 		for (int i = 0; i < mItems.size(); i++) {
-			if (getItemViewType(i) == viewType) count++;
+			//Privilege faster counting if autoMap is active
+			if ((autoMap && viewTypeList.contains(mItems.get(i).getLayoutRes())) ||
+					viewTypeList.contains(getItemViewType(i)))
+				count++;
 		}
 		return count;
 	}
@@ -485,7 +491,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * Returns the ViewType for all Items depends by the current position.
 	 * <p>You can override this method to return specific values or you can let this method
-	 * to call the implementation of {@link IFlexibleItem#getLayoutRes()} where ViewTypes are
+	 * to call the implementation of {@link IFlexibleItem#getLayoutRes()} so ViewTypes are
 	 * automatically mapped.</p>
 	 *
 	 * @param position position for which ViewType is requested
@@ -494,6 +500,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	@Override
 	public int getItemViewType(int position) {
+		autoMap = true;
 		T item = getItem(position);
 		assert item != null;
 		return item.getLayoutRes();//User ViewType
@@ -860,8 +867,8 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param position position of the item to add
 	 * @param item     the item to add
-	 * @delay delay    a non negative delay
 	 * @return true if it has been modified by the addition, false otherwise
+	 * @delay delay    a non negative delay
 	 */
 	public void addItemWithDelay(@IntRange(from = 0) final int position, @NonNull final T item,
 								 @IntRange(from = 0) long delay) {
@@ -1331,6 +1338,20 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 				deletedItems.add(removedItem.parentPosition);
 		}
 		return deletedItems;
+	}
+
+	/**
+	 * Retrieves the expandable of the deleted child.
+	 *
+	 * @param child the deleted child
+	 * @return the expandable(parent) of this child, or null if no parent found.
+	 */
+	public IExpandable getExpandableOfDeletedChild(T child) {
+		for (RemovedItem removedItem : mRemovedItems) {
+			if (removedItem.item.equals(child))
+				return removedItem.expandable;
+		}
+		return null;
 	}
 
 	/**
@@ -1885,7 +1906,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		List<T> siblings = getExpandableList(parent);
 		int childPosition = siblings.indexOf(item);
 		item.setHidden(true);
-		mRemovedItems.add(new RemovedItem<T>(parentPosition, childPosition, item, notifyParentChanged));
+		mRemovedItems.add(new RemovedItem<T>(parentPosition, childPosition, parent, item, notifyParentChanged));
 		if (DEBUG)
 			Log.v(TAG, "Recycled Child " + mRemovedItems.get(mRemovedItems.size() - 1) + " with Parent position=" + parentPosition);
 		return parentPosition;
@@ -2147,16 +2168,19 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 	private static class RemovedItem<T extends IFlexibleItem> {
 		int parentPosition = -1, relativePosition = -1;
+		IExpandable expandable = null;
 		T item = null;
 		boolean notifyParentChanged = false;
 
 		public RemovedItem(int parentPosition, T item) {
-			this(parentPosition, -1, item, false);
+			this(parentPosition, -1, null, item, false);
 		}
 
-		public RemovedItem(int parentPosition, int relativePosition, T item, boolean notifyParentChanged) {
+		public RemovedItem(int parentPosition, int relativePosition,
+						   IExpandable expandable, T item, boolean notifyParentChanged) {
 			this.parentPosition = parentPosition;
 			this.relativePosition = relativePosition;
+			this.expandable = expandable;//parent
 			this.item = item;
 			this.notifyParentChanged = notifyParentChanged;
 		}

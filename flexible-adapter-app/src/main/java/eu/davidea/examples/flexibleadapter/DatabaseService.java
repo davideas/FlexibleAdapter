@@ -21,9 +21,13 @@ public class DatabaseService {
 
 	private static DatabaseService mInstance;
 	private static final int ITEMS = 200, SUB_ITEMS = 3, HEADERS = 20;
+
+	//TODO FOR YOU: Use userLearnedSelection from settings
 	public static boolean userLearnedSelection = false;
 
+	//Database original items
 	private List<AbstractExampleItem> mItems = new ArrayList<AbstractExampleItem>();
+
 
 	public static DatabaseService getInstance() {
 		if (mInstance == null) {
@@ -33,12 +37,8 @@ public class DatabaseService {
 	}
 
 	DatabaseService() {
-		init();
-	}
-
-	private void init() {
 		for (int i = 0; i < ITEMS; i++) {
-			mItems.add(i % 2 == 0 ? newExpandableItem(i) : newSimpleItem(i));
+			mItems.add(i % 3 == 0 ? newExpandableItem(i) : newSimpleItem(i));
 		}
 	}
 

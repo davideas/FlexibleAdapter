@@ -98,6 +98,7 @@ public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
 	 * on GitHub.
 	 *
 	 * @return Layout identifier
+	 * @throws IllegalStateException if called but not implemented
 	 */
 	@LayoutRes
 	int getLayoutRes();
@@ -112,7 +113,8 @@ public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
 	 * @param inflater the {@link LayoutInflater} for the itemView
 	 * @param parent   the ViewGroup into which the new View will be added after it is bound
 	 *                 to an adapter position
-	 * @return a new ViewHolder that holds a View of the given view type
+	 * @return a new ViewHolder that holds a View of the given view typeù
+	 * @throws IllegalStateException if called but not implemented
 	 */
 	VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent);
 
@@ -129,6 +131,7 @@ public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
 	 * @param position the current position
 	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full
 	 *                 update.
+	 * @throws IllegalStateException if called but not implemented
 	 */
 	void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads);
 

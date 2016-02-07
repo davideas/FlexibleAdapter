@@ -137,22 +137,26 @@ public class MainActivity extends AppCompatActivity implements
 		mFab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//TODO: add adjustSelection for FlexibleAdapter
 				destroyActionModeIfCan();
 
-				for (int i = 0; i <= mAdapter.getItemCount() + 1; i++) {
-					SimpleItem item = DatabaseService.newSimpleItem(i);
-					//TODO: Fix position for new item
+				for (int position = 0; position <= mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1; position++) {
+					//Every 3 positions I want to create an expandable
+					AbstractExampleItem item = (position % 3 == 0 ?
+							DatabaseService.newExpandableItem(position) :
+							DatabaseService.newSimpleItem(position));
+					//Add only if we don't have it
 					if (!DatabaseService.getInstance().getListById().contains(item)) {
-						DatabaseService.getInstance().addItem(i, item);//This is the original list
-						//TODO FOR YOU: Use userLearnedSelection from settings
-						if (!DatabaseService.userLearnedSelection) {
-							i++;//Fixing exampleAdapter for new position :-)
-						}
-						mAdapter.addItem(i, item);//Adapter's list is a copy, to animate the item you must call addItem on the new position
-
+						DatabaseService.getInstance().addItem(position, item);//This is the original list
+						//For my example, the adapter position must be adjusted according to
+						//all child and headers currently visible
+						int adapterPos = position + mAdapter.getItemCountOfTypes(
+								R.layout.recycler_uls_row,
+								R.layout.recycler_child_row,
+								R.layout.recycler_header_row);
+						//Adapter's list is a copy, to animate the item you must call addItem on the new position
+						mAdapter.addItem(adapterPos, item);
 						Toast.makeText(MainActivity.this, "Added New " + item.getTitle(), Toast.LENGTH_SHORT).show();
-						mRecyclerView.smoothScrollToPosition(i);
+						mRecyclerView.smoothScrollToPosition(position);
 						break;
 					}
 				}
@@ -538,15 +542,34 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onDeleteConfirmed() {
 		for (AbstractExampleItem adapterItem : mAdapter.getDeletedItems()) {
-			//Remove items from your Database. Example:
-			if (mAdapter.isExpandable(adapterItem)) {
-				DatabaseService.getInstance().removeItem(adapterItem);
-				Log.d(TAG, "Confirm removed " + adapterItem);
-			} else {
-				SubItem subItem = (SubItem) adapterItem;
-				IExpandable expandable = mAdapter.getExpandableOf(subItem);
-				DatabaseService.getInstance().removeSubItem((ExpandableItem) expandable, subItem);
-				Log.d(TAG, "Confirm removed " + subItem.getTitle());
+			//Removing items from Database. Example:
+			try {
+				//NEW! You can take advantage of AutoMap and differentiate logic by viewType using "switch" statement
+				switch (adapterItem.getLayoutRes()) {
+					case R.layout.recycler_child_row:
+						SubItem subItem = (SubItem) adapterItem;
+						ExpandableItem expandable = (ExpandableItem) mAdapter.getExpandableOfDeletedChild(subItem);
+						DatabaseService.getInstance().removeSubItem(expandable, subItem);
+						Log.d(TAG, "Confirm removed " + subItem.getTitle());
+						break;
+					case R.layout.recycler_expandable_row:
+						DatabaseService.getInstance().removeItem(adapterItem);
+						Log.d(TAG, "Confirm removed " + adapterItem);
+						break;
+				}
+			} catch (IllegalStateException e) {
+				//AutoMap is disabled, fallback to if-else with "instanceof" statement
+				if (adapterItem instanceof SubItem) {
+					//SubItem
+					SubItem subItem = (SubItem) adapterItem;
+					IExpandable expandable = mAdapter.getExpandableOf(subItem);
+					DatabaseService.getInstance().removeSubItem((ExpandableItem) expandable, subItem);
+					Log.d(TAG, "Confirm removed " + subItem.getTitle());
+				} else if (adapterItem instanceof SimpleItem) {
+					//SimpleItem or ExpandableItem(extends SimpleItem)
+					DatabaseService.getInstance().removeItem(adapterItem);
+					Log.d(TAG, "Confirm removed " + adapterItem);
+				}
 			}
 		}
 	}
