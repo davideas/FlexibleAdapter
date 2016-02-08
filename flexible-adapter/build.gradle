@@ -23,4 +23,5 @@ dependencies {
 }
 
 apply from: '../install.gradle'
-apply from: '../bintray.gradle'
+apply from: '../bintray-push.gradle'
+//apply from: '../artifactory-push.gradle'

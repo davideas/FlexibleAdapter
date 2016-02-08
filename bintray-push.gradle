@@ -2,6 +2,10 @@ apply plugin: 'com.jfrog.bintray'
 
 version = libraryVersion
 
+task clean(type: Delete) {
+	delete rootProject.buildDir
+}
+
 task sourcesJar(type: Jar) {
 	from android.sourceSets.main.java.srcDirs
 	classifier = 'sources'
@@ -16,6 +20,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 	classifier = 'javadoc'
 	from javadoc.destinationDir
 }
+
 artifacts {
 	archives javadocJar
 	archives sourcesJar
@@ -24,20 +29,6 @@ artifacts {
 // Bintray
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-def isReleaseBuild() {
-	return VERSION_NAME.contains("SNAPSHOT") == false
-}
-
-def getReleaseRepositoryUrl() {
-	return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-			: "https://oss.jfrog.org/artifactory/libs-release"
-}
-
-def getSnapshotRepositoryUrl() {
-	return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-			: "https://oss.jfrog.org/artifactory/libs-snapshot"
-}
 
 bintray {
 	user = properties.getProperty("bintray.user")

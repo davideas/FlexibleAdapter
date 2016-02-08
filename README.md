@@ -2,7 +2,7 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Stable version v4.2 of 2015.12.16 - NEW! dev branch in beta 2: v5.0.0-b2 (usable library!)
+###### A pattern for every RecyclerView - Stable version v4.2 of 2015.12.16 - NEW! dev branch in beta 2: v5.0.0-b3 (usable library!)
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -18,10 +18,12 @@ This library is configurable and it guides the developers (thanks to quality com
 * Customizable FastScroller, **NEW** now in the library.
 * SearchFilter with string selection in Item titles and any subtext.
 * Add and Remove items with custom animations.
-* **NEW!** Expandable item with selection coherence.
+* **NEW!** Expandable items with selection coherence.
 * **NEW!** Predefined ViewHolders.
 * **NEW!** Adapter Animations with custom configuration based on adapter position and beyond.
 * **NEW!** Drag&Drop and Swipe actions with selection coherence.
+* **NEW!** Headers/Sections.
+* **NEW!** Auto mapping ViewTypes with Item interfaces.
 * **NEW!** 1 simple constructor for all events.
 
 #### How is made
@@ -33,8 +35,6 @@ The base functionality is taken from different Blogs (see at the bottom of the p
 
 I've put the Set click listeners at the creation and not in the Binding method, because onBindViewHolder is called at each invalidate (each notify..() methods).
 
-Finally note that, this adapter handles the basic clicks: _single_ and _long clicks_. If you need a double tap you need to implement the android.view.GestureDetector.
-
 # Screenshots
 ![Main screen](/screenshots/main_screen.png) ![Multi Selection](/screenshots/multi_selection.png)
 ![Search screen](/screenshots/search.png) ![Undo Screen](/screenshots/undo.png)
@@ -44,7 +44,7 @@ Using JCenter
 ```
 dependencies {
 	//compile 'eu.davidea:flexible-adapter:4.2.0'
-	compile 'eu.davidea:flexible-adapter:5.0.0-b2'
+	compile 'eu.davidea:flexible-adapter:5.0.0-b3'
 }
 ```
 Using bintray.com
@@ -54,7 +54,7 @@ repositories {
 }
 dependencies {
 	//compile 'eu.davidea:flexible-adapter:4.2.0@aar'
-	compile 'eu.davidea:flexible-adapter:5.0.0-b2@aar'
+	compile 'eu.davidea:flexible-adapter:5.0.0-b3@aar'
 }
 ```
 
@@ -81,7 +81,7 @@ First, call _YourAdapterClass.setSearchText()_ in the Activity, then in _YourAda
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 Implement your custom logic based on position with getAnimators(); Call animateView() at the end of onBindViewHolder();
 ``` java
-public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder, Item> {
+public class YourAdapterClass extends FlexibleAdapter<FlexibleViewHolder, IFlexibleItem> {
 	...
 	@Override
     public void onBindViewHolder(FlexibleViewHolder holder, final int position) {
@@ -103,11 +103,28 @@ public class YourAdapterClass extends FlexibleAnimatorAdapter<FlexibleViewHolder
 See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 
 # Change Log
-###### v5.0.0-beta2 - 2016.01.31 (Everything might change!)
+###### v5.0.0-b3 - 2016.02.08
+- **Header/Section** with new **ISectionable** item [See #31] (still need to add features on this).
+- **Redesigned** the Item interfaces to simplify development and re-usability.
+- **Merged** the _FlexibleExpandableAdapter_ into _FlexibleAdapter_.
+- mItems is now private and fully synchronized, the new method updateDataSet allows to update full content and notifyChange.
+- **Auto-mapping** of the ViewType (using Layout resourceId) when using implementation of _IFlexibleItem_ interface.
+- Possibility to disjoint Creation and Binding of the View Holder in the Model items OR (user choice) to create and bind the view inside the Adapter (as usual).
+- 3 new configurations for _FlexibleViewHolder_ in combination with onTouch, selection and ActionMode state.
+- Customizable _view elevation_ on item activation [See #38].
+- Better implementation of Expandable items.
+- Added possibility to have Expandables inside another Expandable. Limits are described.
+- Added support for **Payload** when notifyItemChanged is called (still need to work on this).
+- New method _addItemWithDelay()_.
+- Use of Log.error instead of Log.warn.
+- New options menu for example App for the showcase.
+
+# Change Log
+###### v5.0.0-b2 - 2016.01.31
 - **Expandable items** with selection coherence [See #23].
 - **Drag&Drop and Swipe** actions with selection coherence and ActionMode compatible [See #21].
 - **Adapter Animations** with customization based on adapter position - viewType - selection [See #15].
-- New concept of Item: added **IFlexibleItem** and **IExpandableItem** interfaces to implement around the model object.
+- New concept of Item: added **IFlexibleItem** and **IExpandable** interfaces to implement around the model object.
 - Several new functions that help to handle all new situations.
 - New advanced filtering: Delayed + Animations while filtering [See #24].
 - Simplified constructor [See #25] and new configuration setters.
