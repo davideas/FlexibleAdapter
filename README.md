@@ -119,7 +119,6 @@ See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 - Use of Log.error instead of Log.warn.
 - New options menu for example App for the showcase.
 
-# Change Log
 ###### v5.0.0-b2 - 2016.01.31
 - **Expandable items** with selection coherence [See #23].
 - **Drag&Drop and Swipe** actions with selection coherence and ActionMode compatible [See #21].
@@ -134,28 +133,11 @@ See [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) for full details!
 - and much more...
 - Adapted example App accordingly (but a new example App is foreseen, in order to show all the power this library has).
 
-###### v5.0.0-b1 - 2016.01.03
-- Removed _FilterAsyncTask_ and all deprecated functions from _OnUpdateListener_ [See #18].
-- _OnUpdateListener_ now contains only the new _onUpdateEmptyView()_ [See #17].
-- Added **FlexibleViewHolder** [See #14].
-- Added _enableLogs()_ to see internal logs at runtime.
-- Adapted example App accordingly.
-
-###### v4.2.0 - 2015.12.12
-- Added _isEmpty()_.
-- Added new constructor to initialize list items [See #12].
-- Moved _onDeletedConfirmed()_ in a new listener to pass as parameter to the method _startUndoTimer()_ [See #10].
-- Deprecated _OnUpdateListener_ and some relative functions.
-- **Note:** _updateDataSetAsync()_ has been **deprecated** and will be removed soon from next major version. Use _updateDataSet()_
-  instead. **FilterAsyncTask** will not be used anymore to load data at startup: there's no advantage to use an Asynchronous loading,
-  usually the list is already loaded Asynchronously somewhere else.
-- Removed _static_ declaration from the following methods: _hasSearchText(); getSearchText(); setSearchText(String searchText)_.
-- Adapted example App accordingly.
-
 ###### Old releases
 See [releases](https://github.com/davideas/FlexibleAdapter/releases) for old versions.
 
-v4.1.0 - 2015.11.29 |
+v5.0.0-b1 - 2016.01.03 |
+v4.2.0 - 2015.12.12 | v4.1.0 - 2015.11.29 |
 v4.0.1 - 2015.11.01 | v4.0 - 2015.10.18 |
 v3.1 - 2015.08.18 | v3.0 - 2015.07.29 |
 v2.2 - 2015.07.20 | v2.1 - 2015.07.03 |
