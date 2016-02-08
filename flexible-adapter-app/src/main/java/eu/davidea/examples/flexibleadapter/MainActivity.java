@@ -487,7 +487,7 @@ public class MainActivity extends AppCompatActivity implements
 	public void onTitleModified(int position, String newTitle) {
 		AbstractExampleItem item = mAdapter.getItem(position);
 		item.setTitle(newTitle);
-		mAdapter.updateItem(position, item);
+		mAdapter.updateItem(position, item, null);
 	}
 
 	/**
