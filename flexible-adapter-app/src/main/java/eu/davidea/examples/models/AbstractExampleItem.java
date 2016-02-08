@@ -7,9 +7,8 @@ import java.io.Serializable;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 
 /**
- * If you don't have many fields in common better to extend directly from
- * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
- * implemented methods (getter and setters).
+ * This class will benefit of the already implemented methods (getter and setters) in
+ * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem}.
  */
 public abstract class AbstractExampleItem<VH extends RecyclerView.ViewHolder>
 		extends AbstractFlexibleItem<VH>
