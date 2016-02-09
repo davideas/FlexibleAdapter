@@ -557,6 +557,7 @@ public class MainActivity extends AppCompatActivity implements
 						Log.d(TAG, "Confirm removed " + adapterItem);
 						break;
 				}
+
 			} catch (IllegalStateException e) {
 				//AutoMap is disabled, fallback to if-else with "instanceof" statement
 				if (adapterItem instanceof SubItem) {
@@ -630,8 +631,10 @@ public class MainActivity extends AppCompatActivity implements
 				mSnackBar.show();
 
 				//Remove selected items from Adapter list after message is shown
+				//MY Payload is a Boolean(true), you can pass what ever you want!
 				mAdapter.removeItems(mAdapter.getSelectedPositions(), true);
-				mAdapter.startUndoTimer(undoTime + 200L, this);//+200: Using SnackBar, user can still click on the action button while bar is dismissing for a fraction of time
+				//+200: Using SnackBar, user can still click on the action button while bar is dismissing for a fraction of time
+				mAdapter.startUndoTimer(undoTime + 200L, this);
 
 				mSwipeHandler.sendEmptyMessage(1);
 				mSwipeHandler.sendEmptyMessageDelayed(0, undoTime);

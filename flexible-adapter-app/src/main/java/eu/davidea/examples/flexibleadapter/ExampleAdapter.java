@@ -6,9 +6,12 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -17,7 +20,10 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.davidea.examples.models.AbstractExampleItem;
+import eu.davidea.examples.models.ExpandableItem;
+import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
+import eu.davidea.examples.models.SubItem;
 import eu.davidea.examples.models.ULSItem;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.utils.Utils;
@@ -123,91 +129,105 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 	 * METHOD A - NEW! Via Model objects. In this case you don't need to implement this method!
 	 * METHOD B - You override and implement this method as you prefer.
 	 */
-//	@Override
-//	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-//		//NOTE: ViewType Must be checked ALSO here to bind the correct view
-//		//When user scrolls, this line binds the correct selection status
-//		holder.itemView.setActivated(isSelected(position));
-//		switch (getItemViewType(position)) {
-//			case SECTION_VIEW_TYPE:
-//				final SimpleItem header = (SimpleItem) getItem(position);
-//				HeaderItem.HeaderViewHolder hvHolder = (HeaderItem.HeaderViewHolder) holder;
-//				hvHolder.mTitle.setText(((SimpleItem) header).getTitle());
-//				break;
-//
-//			case EXPANDABLE_VIEW_TYPE:
-//				ExpandableItem item = (ExpandableItem) getItem(position);
-//				ExpandableItem.ParentViewHolder pvHolder = (ExpandableItem.ParentViewHolder) holder;
-//				//When user scrolls, this line binds the correct selection status
-//				pvHolder.itemView.setActivated(isSelected(position));
-//
-//				//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
-//				if (mSelectAll || mLastItemInActionMode) {
-//					//Reset the flags with delay
-//					pvHolder.mFlipView.postDelayed(new Runnable() {
-//						@Override
-//						public void run() {
-//							mSelectAll = mLastItemInActionMode = false;
-//						}
-//					}, 200L);
-//					//Consume the Animation
-//					pvHolder.mFlipView.flip(isSelected(position), 200L);
-//				} else {
-//					//Display the current flip status
-//					pvHolder.mFlipView.flipSilently(isSelected(position));
-//				}
-//
-//				//This "if-else" is just an example of what you can do with item animation
-//				if (isSelected(position)) {
-//					animateView(holder.itemView, position, true);
-//				} else {
-//					animateView(holder.itemView, position, false);
-//				}
-//
-//				//In case of searchText matches with Title or with an SimpleItem's field
-//				// this will be highlighted
-//				if (hasSearchText()) {
-//					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mTitle, item.getTitle(), mSearchText);
-//					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mSubtitle, updateSubTitle(item), mSearchText);
-//				} else {
-//					pvHolder.mTitle.setText(item.getTitle());
-//					pvHolder.mSubtitle.setText(updateSubTitle(item));
-//				}
-//				break;
-//
-//			case EXAMPLE_VIEW_TYPE:
-//				final ULSItem ulsItem = (ULSItem) getItem(position);
-//				ULSItem.ExampleViewHolder exHolder = (ULSItem.ExampleViewHolder) holder;
-//				exHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
-//				exHolder.itemView.setActivated(true);
-//				exHolder.mTitle.setSelected(true);//For marquee
-//				exHolder.mTitle.setText(Html.fromHtml(ulsItem.getTitle()));
-//				exHolder.mSubtitle.setText(Html.fromHtml(ulsItem.getSubtitle()));
-//				animateView(holder.itemView, position, false);
-//				break;
-//
-//			default:
-//				final SubItem subItem = (SubItem) getItem(position);
-//				SubItem.ChildViewHolder cvHolder = (SubItem.ChildViewHolder) holder;
-//				//When user scrolls, this line binds the correct selection status
-//				cvHolder.itemView.setActivated(isSelected(position));
-//
-//				//This "if-else" is just an example of what you can do with item animation
-//				if (isSelected(position)) {
-//					animateView(holder.itemView, position, true);
-//				} else {
-//					animateView(holder.itemView, position, false);
-//				}
-//
-//				//In case of searchText matches with Title or with an SimpleItem's field
-//				// this will be highlighted
-//				if (hasSearchText()) {
-//					setHighlightText(cvHolder.itemView.getContext(), cvHolder.mTitle, subItem.getTitle(), mSearchText);
-//				} else {
-//					cvHolder.mTitle.setText(subItem.getTitle());
-//				}
-//		}//end-switch
-//	}
+	@Override
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+		//NOTE: ViewType Must be checked ALSO here to bind the correct view
+		//When user scrolls, this line binds the correct selection status
+		holder.itemView.setActivated(isSelected(position));
+		switch (getItemViewType(position)) {
+			case SECTION_VIEW_TYPE:
+				final SimpleItem header = (SimpleItem) getItem(position);
+				HeaderItem.HeaderViewHolder hvHolder = (HeaderItem.HeaderViewHolder) holder;
+				hvHolder.mTitle.setText(((SimpleItem) header).getTitle());
+				break;
+
+			case EXPANDABLE_VIEW_TYPE:
+				ExpandableItem item = (ExpandableItem) getItem(position);
+				ExpandableItem.ParentViewHolder pvHolder = (ExpandableItem.ParentViewHolder) holder;
+				assert item != null;
+
+				if (payloads.size() > 0) {
+					Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
+					item.setSubtitle(getCurrentChildren(item).size() + " subItems");
+					if (hasSearchText()) {
+						ExampleAdapter.setHighlightText(holder.itemView.getContext(),
+								pvHolder.mSubtitle, item.getSubtitle(), getSearchText());
+					} else {
+						pvHolder.mSubtitle.setText(item.getSubtitle());
+					}
+					break;//We stop the process here, we only want to update the subtitle
+				}
+
+				//When user scrolls, this line binds the correct selection status
+				pvHolder.itemView.setActivated(isSelected(position));
+
+				//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
+				if (mSelectAll || mLastItemInActionMode) {
+					//Reset the flags with delay
+					pvHolder.mFlipView.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							mSelectAll = mLastItemInActionMode = false;
+						}
+					}, 200L);
+					//Consume the Animation
+					pvHolder.mFlipView.flip(isSelected(position), 200L);
+				} else {
+					//Display the current flip status
+					pvHolder.mFlipView.flipSilently(isSelected(position));
+				}
+
+				//This "if-else" is just an example of what you can do with item animation
+				if (isSelected(position)) {
+					animateView(holder.itemView, position, true);
+				} else {
+					animateView(holder.itemView, position, false);
+				}
+
+				//In case of searchText matches with Title or with an SimpleItem's field
+				// this will be highlighted
+				if (hasSearchText()) {
+					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mTitle, item.getTitle(), mSearchText);
+					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mSubtitle, updateSubTitle(item), mSearchText);
+				} else {
+					pvHolder.mTitle.setText(item.getTitle());
+					pvHolder.mSubtitle.setText(updateSubTitle(item));
+				}
+				break;
+
+			case EXAMPLE_VIEW_TYPE:
+				final ULSItem ulsItem = (ULSItem) getItem(position);
+				ULSItem.ExampleViewHolder exHolder = (ULSItem.ExampleViewHolder) holder;
+				exHolder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
+				exHolder.itemView.setActivated(true);
+				exHolder.mTitle.setSelected(true);//For marquee
+				exHolder.mTitle.setText(Html.fromHtml(ulsItem.getTitle()));
+				exHolder.mSubtitle.setText(Html.fromHtml(ulsItem.getSubtitle()));
+				animateView(holder.itemView, position, false);
+				break;
+
+			default:
+				final SubItem subItem = (SubItem) getItem(position);
+				SubItem.ChildViewHolder cvHolder = (SubItem.ChildViewHolder) holder;
+				//When user scrolls, this line binds the correct selection status
+				cvHolder.itemView.setActivated(isSelected(position));
+
+				//This "if-else" is just an example of what you can do with item animation
+				if (isSelected(position)) {
+					animateView(holder.itemView, position, true);
+				} else {
+					animateView(holder.itemView, position, false);
+				}
+
+				//In case of searchText matches with Title or with an SimpleItem's field
+				// this will be highlighted
+				if (hasSearchText()) {
+					setHighlightText(cvHolder.itemView.getContext(), cvHolder.mTitle, subItem.getTitle(), mSearchText);
+				} else {
+					cvHolder.mTitle.setText(subItem.getTitle());
+				}
+		}//end-switch
+	}
 
 	private String updateSubTitle(SimpleItem item) {
 		return getCurrentChildren(item).size() + " subItems";

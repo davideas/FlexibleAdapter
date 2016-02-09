@@ -79,9 +79,7 @@ public class HeaderItem extends AbstractExampleItem<HeaderItem.HeaderViewHolder>
 	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
 			Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
-			List<AbstractExampleItem> list = (List<AbstractExampleItem>) payloads;
-				for (AbstractExampleItem item : list)
-					holder.mSubtitle.setText(getSubtitle());
+			holder.mSubtitle.setText(getSubtitle());
 		} else {
 			holder.mTitle.setText(getTitle());
 			holder.mSubtitle.setText(getSubtitle());

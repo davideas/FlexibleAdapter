@@ -53,7 +53,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @see FlexibleViewHolder
  * @see ExpandableViewHolder
  * @since 03/05/2015 Created
- * <br/>16/01/2016 Adding Expandable feature
+ * <br/>16/01/2016 Expandable feature
  * <br/>24/01/2016 Drag&Drop, Swipe
  * <br/>30/01/2016 Class now extends {@link FlexibleAnimatorAdapter} that extends {@link SelectableAdapter}
  * <br/>02/02/2016 New code reorganization, new item interfaces and full refactoring
@@ -378,7 +378,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * Add 1 header/section to the internal list at the linked position.
 	 *
-	 * @param headerItem     item of the header
+	 * @param headerItem item of the header
 	 */
 	public FlexibleAdapter addHeader(@NonNull ISectionable headerItem) {
 		if (headerItem == null) {
@@ -951,26 +951,28 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
 							  @IntRange(from = 0) int subPosition, @NonNull T item) {
-		return this.addSubItem(parentPosition, subPosition, item, false, false);
+		return this.addSubItem(parentPosition, subPosition, item, false, null);
 	}
 
 	/**
 	 * Add an item inside the list of an expandable item (parent).
-	 * <p><b>In order to add a subItem</b>, the following conditions must be satisfied:
-	 * <br/>- The subItem is not expandable
+	 * <p><b>In order to add a subItem</b>, the following condition must be satisfied:
 	 * <br/>- The item resulting from the parent position is actually an Expandable.</p>
+	 * Optionally you can pass any payload to notify the parent about the change and optimize the
+	 * view binding.
 	 *
-	 * @param parentPosition      position of the expandable item that shall contain the subItem
-	 * @param subPosition         the position of the subItem in the expandable list
-	 * @param item                the subItem to add in the expandable list
-	 * @param expandParent        true to initially expand the parent (if needed) and after to add
-	 *                            the subItem, false to simply add the sub item to the parent
-	 * @param notifyParentChanged true if the parent View must be rebound and its content updated,
-	 *                            false to not notify the parent about the addition
+	 * @param parentPosition position of the expandable item that shall contain the subItem
+	 * @param subPosition    the position of the subItem in the expandable list
+	 * @param item           the subItem to add in the expandable list
+	 * @param expandParent   true to initially expand the parent (if needed) and after to add
+	 *                       the subItem, false to simply add the sub item to the parent
+	 * @param payload        any non-null user object to notify the parent (the payload will be
+	 *                       therefore passed to the bind method of the parent ViewHolder),
+	 *                       pass null to <u>not</u> notify the parent
 	 */
 	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
 							  @IntRange(from = 0) int subPosition,
-							  @NonNull T item, boolean expandParent, boolean notifyParentChanged) {
+							  @NonNull T item, boolean expandParent, Object payload) {
 		T parent = getItem(parentPosition);
 		boolean added = false;
 		if (parent != null && isExpandable(parent)) {
@@ -982,13 +984,11 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			//Notify the adapter of the new addition to display it and animate it.
 			//If parent is collapsed there's no need to notify about the change.
 			if (expandable.isExpanded()) {
-				addItem(parentPosition + 1 + Math.max(0, subPosition), item);
-				added = true;
+				added = addItem(parentPosition + 1 + Math.max(0, subPosition), item);
 			}
 			mapViewTypeFrom(item);
 			//Notify the parent about the change if requested
-			//FIXME: Change Payload from Item to User Object and configure Adapter: use Payload object instead of boolean
-			if (notifyParentChanged) notifyItemChanged(parentPosition, expandable);
+			if (payload != null) notifyItemChanged(parentPosition, payload);
 		}
 		return added;
 	}
@@ -1011,7 +1011,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * @see #emptyBin()
 	 */
 	public void removeItem(@IntRange(from = 0) int position) {
-		this.removeItem(position, false);
+		this.removeItem(position, null);
 	}
 
 	/**
@@ -1019,17 +1019,18 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * <p>If the item, resulting from the passed position is:</p>
 	 * - <u>not expandable</u> with <u>no</u> parent, it is removed as usual.<br/>
 	 * - <u>not expandable</u> with a parent, it is removed only if the parent is expanded.
-	 * Optionally the parent can be notified about the removal.<br/>
+	 * Optionally the parent can be notified about the removal if a payload is passed.<br/>
 	 * - <u>expandable</u> implementing {@link IExpandable}, it is removed as usual, but
 	 * it will be collapsed if expanded.
 	 * <p>The item is retained for an eventual Undo.</p>
 	 *
-	 * @param position            The position of item to remove
-	 * @param notifyParentChanged true to notify parent of a removal of a child, false if not
-	 *                            necessary.
+	 * @param position The position of item to remove
+	 * @param payload  any non-null user object to notify the parent (the payload will be
+	 *                 therefore passed to the bind method of the parent ViewHolder),
+	 *                 pass null to <u>not</u> notify the parent
 	 * @see #removeItem(int)
 	 */
-	public void removeItem(@IntRange(from = 0) int position, boolean notifyParentChanged) {
+	public void removeItem(@IntRange(from = 0) int position, Object payload) {
 		if (position < 0 && position >= mItems.size()) {
 			Log.e(TAG, "Cannot removeItem on position out of OutOfBounds!");
 			return;
@@ -1049,11 +1050,10 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			}
 		} else {
 			//It's a Child
-			int parentPosition = createRemovedSubItem(parent, item, notifyParentChanged);
+			int parentPosition = createRemovedSubItem(parent, item, payload);
 			if (DEBUG) Log.v(TAG, "removeItem NonExpandableItem:" + item);
 			//Notify the Parent about the change if requested
-			//FIXME: Change Payload from Item to User Object and configure Adapter: use Payload object instead of boolean
-			if (notifyParentChanged) notifyItemChanged(parentPosition, parent);
+			if (payload != null) notifyItemChanged(parentPosition, payload);
 		}
 		//Remove and notify removals
 		mItems.remove(position);
@@ -1066,22 +1066,27 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Parent will not be notified about the change, if a child is removed.
+	 * Same as {@link #removeItem(int, Object)}, but in this case the parent will not be
+	 * notified about the change, if a child is removed.
 	 */
 	public void removeItems(List<Integer> selectedPositions) {
-		this.removeItems(selectedPositions, false);
+		this.removeItems(selectedPositions, null);
 	}
 
 	/**
 	 * Removes a list of items from internal list and notify the change.
 	 * <p>Every item is retained for an eventual Undo.</p>
+	 * Optionally you can pass any payload to notify the parent about the change and optimize the
+	 * view binding.
 	 *
-	 * @param selectedPositions   list with item positions to remove
-	 * @param notifyParentChanged true to notify parent of a removal of a child, false if not
+	 * @param selectedPositions list with item positions to remove
+	 * @param payload           any non-null user object to notify the parent (the payload will be
+	 *                          therefore passed to the bind method of the parent ViewHolder),
+	 *                          pass null to <u>not</u> notify the parent
 	 */
-	public void removeItems(List<Integer> selectedPositions, boolean notifyParentChanged) {
+	public void removeItems(List<Integer> selectedPositions, Object payload) {
 		if (DEBUG)
-			Log.v(TAG, "removeItems selectedPositions=" + selectedPositions + " notifyParentChanged=" + notifyParentChanged);
+			Log.v(TAG, "removeItems selectedPositions=" + selectedPositions + " payload=" + payload);
 		//Check if list is empty
 		if (selectedPositions == null || selectedPositions.isEmpty()) return;
 		//Reverse-sort the list, start from last position for efficiency
@@ -1104,7 +1109,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			} else {
 				//Remove range
 				if (itemCount > 0)
-					removeRange(positionStart, itemCount, notifyParentChanged);//8,3  //4,2
+					removeRange(positionStart, itemCount, payload);//8,3  //4,2
 				positionStart = lastPosition = position;//5  //1
 				itemCount = 1;
 			}
@@ -1114,15 +1119,30 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		//Remove last range
 		multiRange = false;
 		if (itemCount > 0) {
-			removeRange(positionStart, itemCount, notifyParentChanged);//1,1
+			removeRange(positionStart, itemCount, payload);//1,1
 		}
 	}
 
+	/**
+	 * Same as {@link #removeRange(int, int, Object)}, but in this case the parent will not be
+	 * notified about the change, if children are removed.
+	 */
 	public void removeRange(int positionStart, int itemCount) {
-		this.removeRange(positionStart, itemCount, false);
+		this.removeRange(positionStart, itemCount, null);
 	}
 
-	public void removeRange(int positionStart, int itemCount, boolean notifyParentChanged) {
+	/**
+	 * Removes a list of consecutive items from internal list and notify the change.
+	 * <p>Optionally you can pass any payload to notify the parent about the change and optimize
+	 * the view binding.</p>
+	 *
+	 * @param positionStart the start position of the first item
+	 * @param itemCount     how many items should be removed
+	 * @param payload       any non-null user object to notify the parent (the payload will be
+	 *                      therefore passed to the bind method of the parent ViewHolder),
+	 *                      pass null to <u>not</u> notify the parent
+	 */
+	public void removeRange(int positionStart, int itemCount, Object payload) {
 		int initialCount = getItemCount();
 		if (DEBUG)
 			Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
@@ -1140,7 +1160,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			if (isExpandable(item) || parent == null) {
 				createRemovedItem(position, item);
 			} else {
-				parentPosition = createRemovedSubItem(parent, item, notifyParentChanged);
+				parentPosition = createRemovedSubItem(parent, item, payload);
 			}
 			//Remove item from internal list
 			mItems.remove(position);
@@ -1151,8 +1171,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 			//Notify the Children removal only if Parent is expanded
 			notifyItemRangeRemoved(positionStart, itemCount);
 			//Notify the Parent about the change if requested
-			//FIXME: Change Payload from Item to User Object and configure Adapter: use Payload object instead of boolean
-			if (notifyParentChanged) notifyItemChanged(parentPosition, parent);
+			if (payload != null) notifyItemChanged(parentPosition, payload);
 		} else {
 			adjustRemoved = false;
 			//Notify range removal
@@ -1167,7 +1186,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * Convenience method to remove all Items that are currently selected.
 	 * <p>Parent will not be notified about the change, if a child is removed.</p>
 	 *
-	 * @see #removeItems(List)
+	 * @see #removeAllSelectedItems(Object)
 	 */
 	public void removeAllSelectedItems() {
 		this.removeItems(getSelectedPositions());
@@ -1175,12 +1194,15 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 	/**
 	 * Convenience method to remove all Items that are currently selected.<p>
-	 * Optionally the Parent can be notified about the change, if a child is removed.
+	 * Optionally the Parent can be notified about the change, if a child is removed, by passing
+	 * any payload.
 	 *
-	 * @param notifyParentChanged true to Notify Parent of a removal of its child
+	 * @param payload any non-null user object to notify the parent (the payload will be
+	 *                therefore passed to the bind method of the parent ViewHolder),
+	 *                pass null to <u>not</u> notify the parent
 	 */
-	public void removeAllSelectedItems(boolean notifyParentChanged) {
-		this.removeItems(getSelectedPositions(), notifyParentChanged);
+	public void removeAllSelectedItems(Object payload) {
+		this.removeItems(getSelectedPositions(), payload);
 	}
 
 	/*--------------*/
@@ -1238,7 +1260,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 				if (hasSearchText() && !filterObject((T) removedItem.item, getSearchText()))
 					continue;
 				added = addSubItem(removedItem.parentPosition, removedItem.relativePosition,
-						(T) removedItem.item, false, removedItem.notifyParentChanged);
+						(T) removedItem.item, false, removedItem.payload);
 			} else {
 				//Restore parent or simple item, if not deleted
 				adjustRemoved = false;
@@ -1897,12 +1919,12 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		}
 	}
 
-	private int createRemovedSubItem(IExpandable parent, T item, boolean notifyParentChanged) {
+	private int createRemovedSubItem(IExpandable parent, T item, Object payload) {
 		int parentPosition = getGlobalPositionOf((T) parent);
 		List<T> siblings = getExpandableList(parent);
 		int childPosition = siblings.indexOf(item);
 		item.setHidden(true);
-		mRemovedItems.add(new RemovedItem<T>(parentPosition, childPosition, parent, item, notifyParentChanged));
+		mRemovedItems.add(new RemovedItem<T>(parentPosition, childPosition, parent, item, payload));
 		if (DEBUG)
 			Log.v(TAG, "Recycled Child " + mRemovedItems.get(mRemovedItems.size() - 1) + " with Parent position=" + parentPosition);
 		return parentPosition;
@@ -2163,25 +2185,33 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 	private static class RemovedItem<T extends IFlexibleItem> {
 		int parentPosition = -1, relativePosition = -1;
+		ISectionable sectionable = null;
 		IExpandable expandable = null;
 		T item = null;
-		boolean notifyParentChanged = false;
+		Object payload = false;
 
 		public RemovedItem(int parentPosition, T item) {
 			this(parentPosition, -1, null, item, false);
 		}
 
-		public RemovedItem(int parentPosition, int relativePosition,
-						   IExpandable expandable, T item, boolean notifyParentChanged) {
+		public RemovedItem(int parentPosition, int relativePosition, IExpandable expandable, T item, Object payload) {
 			this.parentPosition = parentPosition;
 			this.relativePosition = relativePosition;
 			this.expandable = expandable;//parent
 			this.item = item;
-			this.notifyParentChanged = notifyParentChanged;
+			this.payload = payload;
 		}
 
 		public void adjustBy(int itemCount) {
 			parentPosition += itemCount;
+		}
+
+		public ISectionable getSectionable() {
+			return sectionable;
+		}
+
+		public void setSectionable(ISectionable sectionable) {
+			this.sectionable = sectionable;
 		}
 
 		@Override

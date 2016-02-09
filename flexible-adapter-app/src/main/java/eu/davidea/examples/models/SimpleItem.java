@@ -44,17 +44,14 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0){
 			Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
-			List<AbstractExampleItem> list = (List<AbstractExampleItem>) payloads;
-			for (AbstractExampleItem item : list) {
-				if (this instanceof ExpandableItem)
-					setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
-				if (adapter.hasSearchText()) {
-					ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-							holder.mSubtitle, getSubtitle(), adapter.getSearchText());
-				} else {
-					holder.mSubtitle.setText(getSubtitle());
-				}
+			setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
+			if (adapter.hasSearchText()) {
+				ExampleAdapter.setHighlightText(holder.itemView.getContext(),
+						holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+			} else {
+				holder.mSubtitle.setText(getSubtitle());
 			}
+			//We stop the process here, we only want to update the subtitle
 
 		} else {
 			//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
