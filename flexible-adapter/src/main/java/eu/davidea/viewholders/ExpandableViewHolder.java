@@ -2,6 +2,8 @@ package eu.davidea.viewholders;
 
 import android.support.annotation.CallSuper;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 
@@ -41,7 +43,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	/*--------------*/
 
 	/**
-	 * Allows to expand or collapse child views of this ItemView when {@link View.OnClickListener}
+	 * Allows to expand or collapse child views of this ItemView when {@link OnClickListener}
 	 * event occurs on the entire view.
 	 * <p>This method returns always true; Extend with "return false" to Not expand or collapse
 	 * this ItemView onClick events.</p>
@@ -53,7 +55,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	}
 
 	/**
-	 * Allows to collapse child views of this ItemView when {@link View.OnLongClickListener}
+	 * Allows to collapse child views of this ItemView when {@link OnLongClickListener}
 	 * event occurs on the entire view.
 	 * <p>This method returns always true; Extend with "return false" to Not collapse this
 	 * ItemView onLongClick events.</p>

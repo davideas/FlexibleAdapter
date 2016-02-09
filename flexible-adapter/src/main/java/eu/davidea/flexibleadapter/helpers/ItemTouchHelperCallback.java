@@ -4,19 +4,22 @@ import android.graphics.Canvas;
 import android.support.annotation.FloatRange;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.support.v7.widget.helper.ItemTouchHelper.Callback;
 
-import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemMoveListener;
+import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemSwipeListener;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * This class is an implementation of {@link ItemTouchHelper.Callback} that enables drag & drop
+ * This class is an implementation of {@link Callback} that enables drag & drop
  * and swipe actions. Drag and Swipe events are started depending by its configuration.
  *
  * @author Davide Steduto
  * @since 23/01/2016
  */
-public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
+public class ItemTouchHelperCallback extends Callback {
 
 	private static final float ALPHA_FULL = 1.0f;
 
@@ -230,37 +233,33 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 		/**
 		 * Called when an item has been dragged far enough to trigger a move. <b>This is called
 		 * every time an item is shifted</b>, and <strong>not</strong> at the end of a "drop" event.
-		 * <p>Implementations should call {@link RecyclerView.Adapter#notifyItemMoved(int, int)}
+		 * <p>Implementations should call {@link Adapter#notifyItemMoved(int, int)}
 		 * after adjusting the underlying data to reflect this move.</p>
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
 		 * @return true if the item was moved to the new adapter position
-		 * @see RecyclerView#getAdapterPositionFor(RecyclerView.ViewHolder)
-		 * @see RecyclerView.ViewHolder#getAdapterPosition()
 		 */
 		boolean onItemMove(int fromPosition, int toPosition);
 
 		/**
 		 * Called when an item has been dismissed by a swipe.
-		 * <p>Implementations should decide to call or not {@link RecyclerView.Adapter#notifyItemRemoved(int)}
+		 * <p>Implementations should decide to call or not {@link Adapter#notifyItemRemoved(int)}
 		 * after adjusting the underlying data to reflect this removal.</p>
 		 *
 		 * @param position  the position of the item dismissed
 		 * @param direction the direction to which the ViewHolder is swiped
-		 * @see RecyclerView#getAdapterPositionFor(RecyclerView.ViewHolder)
-		 * @see RecyclerView.ViewHolder#getAdapterPosition()
 		 */
 		void onItemSwiped(int position, int direction);
 	}
 
 	/**
 	 * Internal Interface for ViewHolder to notify of relevant callbacks from
-	 * {@link ItemTouchHelper.Callback}.<br/>
+	 * {@link Callback}.<br/>
 	 * This listener, is to intend as a further way to display How a ViewHolder will display
 	 * the middle and final activation state.
 	 * <p>Generally the final action should be handled by the listeners
-	 * {@link FlexibleAdapter.OnItemMoveListener} and {@link FlexibleAdapter.OnItemSwipeListener}.</p>
+	 * {@link OnItemMoveListener} and {@link OnItemSwipeListener}.</p>
 	 *
 	 * @since 23/01/2016
 	 */

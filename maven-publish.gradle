@@ -17,6 +17,13 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+def hasProxy() { return hasProperty('systemProp.http.proxyUser')}
+def getProxyType() { return "http" }
+def getProxyHost() { return getProperties().get("systemProp.http.proxyHost") }
+def getProxyPort() { return Integer.parseInt((String) getProperties().get("systemProp.http.proxyPort")) }
+def getProxyUser() { return getProperties().get("systemProp.http.proxyUser") }
+def getProxyPassword() { return getProperties().get("systemProp.http.proxyPassword") }
+
 def isReleaseBuild() {
 	return libraryVersion.contains("SNAPSHOT") == false
 }
@@ -30,11 +37,11 @@ def getSnapshotRepositoryUrl() {
 }
 
 def getRepositoryUsername() {
-	return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+	return getProperties().get('nexus.username')
 }
 
 def getRepositoryPassword() {
-	return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+	return getProperties().get('nexus.password')
 }
 
 afterEvaluate { project ->
@@ -47,10 +54,19 @@ afterEvaluate { project ->
 				pom.artifactId = artifact
 				pom.version = libraryVersion
 
+				if (hasProxy()) {
+					println("PROXY! host: " + getProxyHost() + ", port: " + getProxyPort() + ", type: " + getProxyType() + ", userName: " + getProxyUser() + ", password: " + getProxyPassword())
+				}
 				repository(url: getReleaseRepositoryUrl()) {
+					if (hasProxy()) {
+						proxy(host: getProxyHost(), port: getProxyPort(), type: getProxyType(), userName: getProxyUser(), password: getProxyPassword())
+					}
 					authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
 				}
 				snapshotRepository(url: getSnapshotRepositoryUrl()) {
+					if (hasProxy()) {
+						proxy(host: getProxyHost(), port: getProxyPort(), type: getProxyType(), userName: getProxyUser(), password: getProxyPassword())
+					}
 					authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
 				}
 

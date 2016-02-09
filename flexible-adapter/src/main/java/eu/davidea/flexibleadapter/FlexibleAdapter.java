@@ -29,6 +29,8 @@ import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
 import eu.davidea.flexibleadapter.items.ISectionable;
+import eu.davidea.viewholders.ExpandableViewHolder;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set
@@ -329,7 +331,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @return true if the list is empty, false otherwise
 	 * @see #getItemCount()
-	 * @see #getItemCountOfType(int)
+	 * @see #getItemCountOfTypes(Integer...)
 	 */
 	public boolean isEmpty() {
 		return this.getItemCount() == 0;
@@ -377,7 +379,6 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * Add 1 header/section to the internal list at the linked position.
 	 *
 	 * @param headerItem     item of the header
-	 * @param show           also immediate show the header to the user
 	 */
 	public FlexibleAdapter addHeader(@NonNull ISectionable headerItem) {
 		if (headerItem == null) {
@@ -813,6 +814,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		return subItemsCount + recursiveCount;
 	}
 
+	@SuppressWarnings("Range")
 	private int recursiveCollapse(List<T> subItems) {
 		int collapsed = 0;
 		for (T subItem : subItems) {
@@ -861,8 +863,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param position position of the item to add
 	 * @param item     the item to add
-	 * @return true if it has been modified by the addition, false otherwise
-	 * @delay delay    a non negative delay
+	 * @param delay    a non negative delay
 	 */
 	public void addItemWithDelay(@IntRange(from = 0) final int position, @NonNull final T item,
 								 @IntRange(from = 0) long delay) {
@@ -1065,8 +1066,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * <p>Parent will not be notified about the change, if a child is removed.</p>
+	 * Parent will not be notified about the change, if a child is removed.
 	 */
 	public void removeItems(List<Integer> selectedPositions) {
 		this.removeItems(selectedPositions, false);
@@ -1472,7 +1472,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * Filters the provided list with the search text previously set with {@link #setSearchText(String)}.
 	 * </p>
 	 * <b>Note:</b>
-	 * <br/>- This method calls {@link #filterObject(T, String)}.
+	 * <br/>- This method calls {@link #filterObject(IFlexibleItem, String)}.
 	 * <br/>- If search text is empty or null, the provided list is the current list.
 	 * <br/>- Any pending deleted items are always filtered out.
 	 * <br/>- Original positions of deleted items are recalculated.
@@ -1663,8 +1663,8 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	/*---------------*/
 
 	/**
-	 * Used by {@link FlexibleViewHolder#onTouch(View, MotionEvent)} to start Drag when
-	 * HandleView is touched.
+	 * Used by {@link FlexibleViewHolder#onTouch(View, MotionEvent)}
+	 * to start Drag when HandleView is touched.
 	 *
 	 * @return the ItemTouchHelper instance already initialized.
 	 */
@@ -2089,7 +2089,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		/**
 		 * Called when long tap occurs.
 		 * <p>This method always calls
-		 * {@link eu.davidea.viewholders.FlexibleViewHolder#toggleActivation}
+		 * {@link FlexibleViewHolder#toggleActivation}
 		 * after listener event is consumed in order to activate the ItemView.</p>
 		 * For Expandable Views it will collapse the View if configured so.
 		 *
@@ -2106,7 +2106,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 		 * Called when an item has been dragged far enough to trigger a move. <b>This is called
 		 * every time an item is shifted</b>, and <strong>not</strong> at the end of a "drop" event.
 		 * <p>The end of the "drop" event is instead handled by
-		 * {@link eu.davidea.viewholders.FlexibleViewHolder#onItemReleased(int)}</p>.
+		 * {@link FlexibleViewHolder#onItemReleased(int)}</p>.
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
