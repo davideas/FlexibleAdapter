@@ -7,10 +7,11 @@ ext {
 
 	//Library
 	libraryCode = 13
-	libraryVersion = '5.0.0-b3'
+	libraryVersion = '5.0.0-SNAPSHOT'
 	libraryDate = " of 2016.02.08"
 	libraryDescription = '1 Adapter for SelectionMode, ViewHolders, Filter, FastScroller, Animations, Undo, Headers, Expandable, Draggable, Swipeable :-)'
 	libraryName = 'FlexibleAdapter'
+	packageExt = 'aar'
 
 	//Library Repository
 	bintrayRepo = 'maven'
@@ -40,19 +41,19 @@ ext {
 	licenseName = 'The Apache Software License, Version 2.0'
 	licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
 	allLicenses = ["Apache-2.0"]
+	licenseDist = 'repo'
 }
 
 buildscript {
 	repositories {
 		jcenter()
-		maven {url = 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
+		maven {url = "https://oss.sonatype.org/content/repositories/snapshots/" }
 	}
 
 	dependencies {
 		classpath 'com.android.tools.build:gradle:1.5.0'
 		classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
-		classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"
 		// NOTE: Do not place your application dependencies here; they belong
 		// in the individual module build.gradle files
 	}
@@ -62,22 +63,6 @@ allprojects {
 	repositories {
 		jcenter()
 		maven {url = "http://dl.bintray.com/davideas/maven" }
-		maven {url = "http://oss.jfrog.org/oss-snapshot-local"}
-		maven {url = "http://oss.jfrog.org/oss-release-local"}
+		maven {url = "https://oss.sonatype.org/content/repositories/snapshots/" }
 	}
 }
-
-//Properties properties = new Properties()
-//properties.load(project.rootProject.file('local.properties').newDataInputStream())
-//
-//def isReleaseBuild() {
-//	return libraryVersion.contains("SNAPSHOT") == false
-//}
-//
-//def getRepositoryUsername() {
-//	return properties.getProperty("bintray.user")
-//}
-//
-//def getRepositoryPassword() {
-//	return properties.getProperty("bintray.apikey")
-//}

@@ -22,6 +22,6 @@ dependencies {
 	compile supportDependencies.recyclerview
 }
 
-apply from: '../install.gradle'
-apply from: '../bintray-push.gradle'
-//apply from: '../artifactory-push.gradle'
+//apply from: '../install.gradle'
+//apply from: '../bintray-push.gradle'
+apply from: '../maven-push.gradle'

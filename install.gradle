@@ -6,8 +6,9 @@ install {
 	repositories.mavenInstaller {
 		// This generates POM.xml with proper parameters
 		pom {
+			//noinspection GroovyAssignabilityCheck
 			project {
-				packaging 'aar'
+				packaging packageExt
 				groupId publishedGroupId
 				artifactId artifact
 
