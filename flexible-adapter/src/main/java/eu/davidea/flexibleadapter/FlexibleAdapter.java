@@ -149,17 +149,18 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 
 	/**
 	 * Main Constructor with all managed listeners for ViewHolder and the Adapter itself.
-	 * <p>The listener must be a single instance of a class, usually Activity or Fragment, where
-	 * you can implement how to handle the different events.</p>
-	 * Any write operation performed on the items list is synchronized.
+	 * <p>The listener must be a single instance of a class, usually <i>Activity</i> or <i>Fragment</i>,
+	 * where you can implement how to handle the different events.</p>
+	 * Any write operation performed on the items list is <u>synchronized</u>.
+	 * <p><b>PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: <i>new ArrayList&lt;T&gt;(originalList);</i></p>
 	 *
 	 * @param items     items to display
 	 * @param listeners can be an instance of:
-	 *                  <br/>{@link OnUpdateListener}
-	 *                  <br/>{@link OnItemClickListener}
-	 *                  <br/>{@link OnItemLongClickListener}
-	 *                  <br/>{@link OnItemMoveListener}
-	 *                  <br/>{@link OnItemSwipeListener}
+	 *                  <br/>- {@link OnUpdateListener}
+	 *                  <br/>- {@link OnItemClickListener}
+	 *                  <br/>- {@link OnItemLongClickListener}
+	 *                  <br/>- {@link OnItemMoveListener}
+	 *                  <br/>- {@link OnItemSwipeListener}
 	 */
 	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listeners) {
 		mItems = Collections.synchronizedList(items);
@@ -946,7 +947,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Convenience method of {@link #addSubItem(int, int, IFlexibleItem, boolean, boolean)}.
+	 * Convenience method of {@link #addSubItem(int, int, IFlexibleItem, boolean, Object)}.
 	 * <br/>In this case parent item will never be notified nor expanded if it is collapsed.
 	 */
 	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
@@ -1004,7 +1005,7 @@ public abstract class FlexibleAdapter<T extends IFlexibleItem>
 	 * <p>The item is retained for an eventual Undo.</p>
 	 *
 	 * @param position the position of item to remove
-	 * @see #removeItem(int, boolean)
+	 * @see #removeItem(int, Object)
 	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
 	 * @see #restoreDeletedItems()
 	 * @see #setRestoreSelectionOnUndo(boolean)
