@@ -8,9 +8,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import eu.davidea.examples.flexibleadapter.ExampleAdapter;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -55,8 +55,8 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder> {
 		//In case of searchText matches with Title or with an SimpleItem's field
 		// this will be highlighted
 		if (adapter.hasSearchText()) {
-			ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-					holder.mTitle, getTitle(), adapter.getSearchText());
+			Utils.setHighlightText(holder.itemView.getContext(), holder.mTitle,
+					getTitle(), adapter.getSearchText(), R.color.colorAccent_light);
 		} else {
 			holder.mTitle.setText(getTitle());
 		}

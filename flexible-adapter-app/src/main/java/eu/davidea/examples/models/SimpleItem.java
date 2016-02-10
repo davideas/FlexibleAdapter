@@ -11,9 +11,9 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import eu.davidea.examples.flexibleadapter.ExampleAdapter;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
@@ -46,8 +46,8 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 			Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
 			setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
 			if (adapter.hasSearchText()) {
-				ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-						holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+				Utils.setHighlightText(holder.itemView.getContext(), holder.mSubtitle,
+						getSubtitle(), adapter.getSearchText(), R.color.colorAccent_light);
 			} else {
 				holder.mSubtitle.setText(getSubtitle());
 			}
@@ -82,10 +82,10 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 			if (this instanceof ExpandableItem)
 				setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
 			if (adapter.hasSearchText()) {
-				ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-						holder.mTitle, getTitle(), adapter.getSearchText());
-				ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-						holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+				Utils.setHighlightText(holder.itemView.getContext(), holder.mTitle,
+						getTitle(), adapter.getSearchText(), R.color.colorAccent_light);
+				Utils.setHighlightText(holder.itemView.getContext(), holder.mSubtitle,
+						getSubtitle(), adapter.getSearchText(), R.color.colorAccent_light);
 			} else {
 				holder.mTitle.setText(getTitle());
 				holder.mSubtitle.setText(getSubtitle());

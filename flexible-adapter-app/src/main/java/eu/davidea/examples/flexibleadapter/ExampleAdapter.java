@@ -3,24 +3,17 @@ package eu.davidea.examples.flexibleadapter;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
-import android.text.Spannable;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
 import android.view.View;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import eu.davidea.examples.models.AbstractExampleItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.ULSItem;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.utils.Utils;
 
 /**
  * NOTE: AbstractExampleItem is for example purpose only. I wanted to have in common
@@ -66,7 +59,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 			item.setEnabled(false);
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			addItemWithDelay(0, item, 1500L);
+			addItemWithDelay(0, item, 1800L);
 		}
 	}
 
@@ -144,8 +137,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 //					Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
 //					item.setSubtitle(getCurrentChildren(item).size() + " subItems");
 //					if (hasSearchText()) {
-//						ExampleAdapter.setHighlightText(holder.itemView.getContext(),
-//								pvHolder.mSubtitle, item.getSubtitle(), getSearchText());
+//						Utils.setHighlightText(holder.itemView.getContext(), pvHolder.mSubtitle,
+//								item.getSubtitle(), getSearchText(), R.color.colorAccent_light);
 //					} else {
 //						pvHolder.mSubtitle.setText(item.getSubtitle());
 //					}
@@ -181,8 +174,10 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 //				//In case of searchText matches with Title or with an SimpleItem's field
 //				// this will be highlighted
 //				if (hasSearchText()) {
-//					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mTitle, item.getTitle(), mSearchText);
-//					setHighlightText(pvHolder.itemView.getContext(), pvHolder.mSubtitle, updateSubTitle(item), mSearchText);
+//					Utils.setHighlightText(pvHolder.itemView.getContext(), pvHolder.mTitle,
+//							item.getTitle(), getSearchText(), R.color.colorAccent_light);
+//					Utils.setHighlightText(pvHolder.itemView.getContext(), pvHolder.mSubtitle,
+//							updateSubTitle(item), getSearchText(), R.color.colorAccent_light);
 //				} else {
 //					pvHolder.mTitle.setText(item.getTitle());
 //					pvHolder.mSubtitle.setText(updateSubTitle(item));
@@ -201,8 +196,10 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 //				break;
 //
 //			default:
-//				final SubItem subItem = (SubItem) getItem(position);
+//				SubItem subItem = (SubItem) getItem(position);
 //				SubItem.ChildViewHolder cvHolder = (SubItem.ChildViewHolder) holder;
+//				assert subItem != null;
+//
 //				//When user scrolls, this line binds the correct selection status
 //				cvHolder.itemView.setActivated(isSelected(position));
 //
@@ -216,7 +213,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 //				//In case of searchText matches with Title or with an SimpleItem's field
 //				// this will be highlighted
 //				if (hasSearchText()) {
-//					setHighlightText(cvHolder.itemView.getContext(), cvHolder.mTitle, subItem.getTitle(), mSearchText);
+//					Utils.setHighlightText(cvHolder.itemView.getContext(), cvHolder.mTitle,
+//							subItem.getTitle(), getSearchText(), R.color.colorAccent_light);
 //				} else {
 //					cvHolder.mTitle.setText(subItem.getTitle());
 //				}
@@ -263,20 +261,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 			return ""+position;
 		}
 		return super.onCreateBubbleText(position);
-	}
-
-	public static void setHighlightText(Context context, TextView textView, String text, String searchText) {
-		Spannable spanText = Spannable.Factory.getInstance().newSpannable(text);
-		int i = text.toLowerCase(Locale.getDefault()).indexOf(searchText);
-		if (i != -1) {
-			spanText.setSpan(new ForegroundColorSpan(Utils.getColorAccent(context)), i,
-					i + searchText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-			spanText.setSpan(new StyleSpan(Typeface.BOLD), i,
-					i + searchText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-			textView.setText(spanText, TextView.BufferType.SPANNABLE);
-		} else {
-			textView.setText(text, TextView.BufferType.NORMAL);
-		}
 	}
 
 //	/**
