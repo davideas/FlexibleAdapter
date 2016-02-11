@@ -477,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements
 				});
 		mSnackBar.show();
 		mAdapter.removeItem(position, true);
-		mAdapter.startUndoTimer(7000L + 200L, this);
+		mAdapter.startUndoTimer(5000L + 200L, this);
 		//Handle ActionMode title
 		if (mAdapter.getSelectedItemCount() == 0)
 			destroyActionModeIfCan();

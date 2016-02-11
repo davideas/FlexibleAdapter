@@ -69,7 +69,9 @@ public class ULSItem extends AbstractExampleItem<ULSItem.ExampleViewHolder> {
 				public void onClick(View v) {
 					//TODO FOR YOU: Save the boolean into Settings!
 					DatabaseService.userLearnedSelection = true;
+					mAdapter.setPermanentDelete(true);
 					mAdapter.removeItem(0);
+					mAdapter.setPermanentDelete(false);
 				}
 			});
 		}
