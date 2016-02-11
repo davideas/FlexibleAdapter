@@ -16,7 +16,7 @@ This library is configurable and it guides the developers (thanks to quality com
 * SINGLE & MULTI selection mode. (Re
 * Restore deleted items (undo delete), **NEW** works with Expandable items too!
 * Customizable FastScroller, **NEW** now in the library.
-* SearchFilter with string selection in Item titles and any subtext, **NEW** now items are moved and animated. Works with sub items too!
+* SearchFilter with Spannable text, **NEW** now items are animated. Works with sub items too!
 * Add and Remove items with custom animations.
 * **NEW!** Predefined ViewHolders.
 * **NEW!** Expandable items with <u>selection coherence</u>.
@@ -32,7 +32,6 @@ Some simple functionalities have been implemented thanks to the some Blogs (see 
 * At lower level there is `SelectableAdapter` class. It provides selection functionalities and it's able to _maintain the state_ after the rotation: you just need to call the onSave/onRestore methods from the Activity!
 * At middle level, the `FlexibleAnimatorAdapter` class has been added to give some animation at startup and when user scrolls.
 * At front level, the core class `FlexibleAdapter`. It holds and handles the main list, performs actions on all different types of item paying attention at the adding and removal of the items, as well as the new concept of "selection coherence".
-* Then you need to extend over again this class. Here you can add and implement methods as you wish for your own ViewHolders and your Domain/Model class (data holder).
 * Item interfaces and predefined ViewHolders complete the whole library giving more actions to the items and configuration options to the developers and the end user.
 
 # Screenshots
@@ -52,9 +51,11 @@ dependencies {
 	//Using bintray.com
 	compile 'eu.davidea:flexible-adapter:4.2.0@aar'
 	compile 'eu.davidea:flexible-adapter:5.0.0-b3@aar'
+	
 	//Using JCenter
 	compile 'eu.davidea:flexible-adapter:4.2.0'
 	compile 'eu.davidea:flexible-adapter:5.0.0-b3'
+	
 	//Using MavenSnapshots repository for continuous updates from my development
 	compile 'eu.davidea:flexible-adapter:5.0.0-SNAPSHOT'
 }
@@ -73,7 +74,7 @@ Not all pages are filled, working in progress :-)
 
 # Change Log
 ###### v5.0.0-b3 - 2016.02.08
-- **Header/Section** with new **ISectionable** item [See #31] (still need to add features on this).
+- **Header/Section** with new **ISectionable** item [See #31]. Still need to add features on this.
 - **Redesigned** the Item interfaces to simplify development and re-usability.
 - **Merged** the _FlexibleExpandableAdapter_ into _FlexibleAdapter_.
 - mItems is now private and fully synchronized, the new method updateDataSet allows to update full content and notifyChange.
@@ -122,7 +123,7 @@ https://www.grokkingandroid.com/statelistdrawables-for-recyclerview-selection/
 # Imported libraries
 
 [LollipopContactsRecyclerViewFastScroller](https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller)<br/>
-Improved and adapted to work in conjuction with `FlexibleAnimatorAdapter`.
+Improved and adapted to work in conjunction with `FlexibleAnimatorAdapter`.
 
 # License
 
