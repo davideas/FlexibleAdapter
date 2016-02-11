@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.examples.models.AbstractExampleItem;
-import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.ULSItem;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.items.IExpandable;
 
 /**
  * NOTE: AbstractExampleItem is for example purpose only. I wanted to have in common
@@ -34,7 +34,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 	public ExampleAdapter(Activity activity) {
 		super(DatabaseService.getInstance().getListById(), activity);
 		mContext = activity;
-		addUserLearnedSelection();
 
 		//NEW! We have highlighted text while filtering, so let's enable this feature
 		//to be consistent with the active filter
@@ -49,24 +48,24 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 		//TODO: We may create calls like removeAll, addAll or refreshList in order to animate changes
 
 		//Add example view
-		addUserLearnedSelection();
+		addUserLearnedSelection(true);
 	}
 
-	private void addUserLearnedSelection() {
+	public void addUserLearnedSelection(boolean scrollToPosition) {
 		if (!DatabaseService.userLearnedSelection && !hasSearchText() && !(getItem(0) instanceof ULSItem)) {
 			//Define Example View
 			final ULSItem item = new ULSItem("ULS");
 			item.setEnabled(false);
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			addItemWithDelay(0, item, 1800L);
+			addItemWithDelay(0, item, 1700L, scrollToPosition);
 		}
 	}
 
 	@Override
 	public synchronized void filterItems(@NonNull List<AbstractExampleItem> unfilteredItems) {
 		super.filterItems(unfilteredItems);
-		addUserLearnedSelection();
+		addUserLearnedSelection(false);
 	}
 
 	@Override
@@ -221,7 +220,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 //		}//end-switch
 //	}
 
-	private String updateSubTitle(SimpleItem item) {
+	private String updateSubTitle(IExpandable item) {
 		return getCurrentChildren(item).size() + " subItems";
 	}
 

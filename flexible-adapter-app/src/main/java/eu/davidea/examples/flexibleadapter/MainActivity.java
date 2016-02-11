@@ -114,12 +114,12 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 				@Override
 				public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-					//NOTE: This allows to receive Payload objects on notifyItemChanged launched by the Adapter!!
+					//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!
 					return true;
 				}
 			});
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-		//TODO: Change ItemDecorator, this doesn't work well
+		//FIXME: Change ItemDecorator, this doesn't work well
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
 				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
 
@@ -128,8 +128,10 @@ public class MainActivity extends AppCompatActivity implements
 		//Experimenting NEW features
 		mAdapter.setLongPressDragEnabled(true);
 		mAdapter.setSwipeEnabled(true);
-
+		//Add sample item on the top
+		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		//Experimental, set some headers!
+		//mAdapter.setDisplayHeadersAtStartUp(true);
 		mAdapter.setHeaders(DatabaseService.getInstance().buildHeaders());
 
 		//FAB
@@ -372,7 +374,7 @@ public class MainActivity extends AppCompatActivity implements
 				item.setTitle(R.string.expand_all);
 			}
 		} else if (id == R.id.action_show_hide_headers) {
-			if (item.getTitle().equals(getString(R.string.show_headers))) {
+			if (!mAdapter.areHeadersShown()) {
 				mAdapter.showAllHeaders();
 				item.setTitle(R.string.hide_headers);
 			} else {

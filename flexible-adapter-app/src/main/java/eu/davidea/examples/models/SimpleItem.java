@@ -13,6 +13,7 @@ import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.viewholders.ExpandableViewHolder;
@@ -42,9 +43,9 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 
 	@Override
 	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
-		if (payloads.size() > 0){
+		if (adapter.isExpandable(this) && payloads.size() > 0){
 			Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
-			setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
+			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems");
 			if (adapter.hasSearchText()) {
 				Utils.setHighlightText(holder.itemView.getContext(), holder.mSubtitle,
 						getSubtitle(), adapter.getSearchText(), R.color.colorAccent_light);
@@ -79,8 +80,8 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 
 			//In case of searchText matches with Title or with an SimpleItem's field
 			// this will be highlighted
-			if (this instanceof ExpandableItem)
-				setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
+			if (adapter.isExpandable(this))
+				setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems");
 			if (adapter.hasSearchText()) {
 				Utils.setHighlightText(holder.itemView.getContext(), holder.mTitle,
 						getTitle(), adapter.getSearchText(), R.color.colorAccent_light);
