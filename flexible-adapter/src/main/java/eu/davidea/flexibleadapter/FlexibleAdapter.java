@@ -698,6 +698,10 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		return item != null && item instanceof IExpandable;
 	}
 
+	public boolean hasSubItems(IExpandable expandable) {
+		return expandable.getSubItems() != null && expandable.getSubItems().size() > 0;
+	}
+
 	/**
 	 * Retrieves the parent of a child.
 	 * <p>Only for a real child of an expanded parent.</p>
@@ -711,7 +715,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		for (T parent : mItems) {
 			if (isExpandable(parent)) {
 				IExpandable expandable = (IExpandable) parent;
-				if (expandable.isExpanded() && expandable.getSubItems() != null) {
+				if (expandable.isExpanded() && hasSubItems(expandable)) {
 					List<T> list = expandable.getSubItems();
 					for (T subItem : list) {
 						//Pick up only no-hidden items
@@ -817,8 +821,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 				" expanded " + expandable.isExpanded() + " ExpandedItems=" + getExpandedPositions());
 
 		int subItemsCount = 0;
-		if (!expandable.isExpanded() && !parentSelected &&
-				expandable.getSubItems() != null && expandable.getSubItems().size() > 0) {
+		if (!expandable.isExpanded() && !parentSelected && hasSubItems(expandable)) {
 
 			//Collapse others expandable if configured so
 			//Skipped when expanding all is requested
@@ -892,7 +895,8 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 
 		int subItemsCount = 0, recursiveCount = 0;
 		if (expandable.isExpanded() &&
-				(!hasSubItemsSelected(expandable) || getPendingRemovedItem(item) == null)) {
+				(!hasSubItemsSelected(expandable) || getPendingRemovedItem(item) != null)) {
+			//FIXME: it doesn't block the collapse anymore if any child is selected
 
 			//Take the current subList
 			List<T> subItems = getExpandableList(expandable);
@@ -1085,7 +1089,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @return
 	 */
 	public int addAllSubItemsFrom(@IntRange(from = 0) int parentPosition,
-									  @NonNull IExpandable expandable, boolean expandParent, Object payload) {
+								  @NonNull IExpandable expandable, boolean expandParent, Object payload) {
 		List<T> subItems = getCurrentChildren(expandable);
 		addSubItems(parentPosition, 0, expandable, subItems, expandParent, payload);
 		return subItems.size();
@@ -1113,9 +1117,9 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	private boolean addSubItems(@IntRange(from = 0) int parentPosition,
-							   @IntRange(from = 0) int subPosition,
-							   @NonNull IExpandable expandable,
-							   @NonNull List<T> items, boolean expandParent, Object payload) {
+								@IntRange(from = 0) int subPosition,
+								@NonNull IExpandable expandable,
+								@NonNull List<T> items, boolean expandParent, Object payload) {
 		boolean added = false;
 		//Expand parent if requested and not already expanded
 		if (expandParent && !expandable.isExpanded()) {
@@ -1538,10 +1542,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public List<T> getCurrentChildren(IExpandable expandable) {
 		//Check item and subItems existence
-		if (expandable == null)
-			return new ArrayList<T>();
-
-		if (expandable.getSubItems() == null)
+		if (expandable == null || !hasSubItems(expandable))
 			return new ArrayList<T>();
 
 		//Take a copy of the subItems list
@@ -1551,17 +1552,6 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			subItems.removeAll(getDeletedChildren((T) expandable));
 		}
 		return subItems;
-	}
-
-	/**
-	 * @param item the item to compare
-	 * @return the removed item if found, null otherwise
-	 */
-	private RestoreInfo getPendingRemovedItem(T item) {
-		for (RestoreInfo restoreInfo : mRestoreList) {
-			if (restoreInfo.item.equals(item)) return restoreInfo;
-		}
-		return null;
 	}
 
 	/*----------------*/
@@ -2052,22 +2042,37 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		}
 	}
 
-	private int createRestoreSubItemInfo(IExpandable parent, T item, Object payload) {
-		int parentPosition = getGlobalPositionOf((T) parent);
-		List<T> siblings = getExpandableList(parent);
+	/**
+	 * @param item the item to compare
+	 * @return the removed item if found, null otherwise
+	 */
+	private RestoreInfo getPendingRemovedItem(T item) {
+		for (RestoreInfo restoreInfo : mRestoreList) {
+			if (restoreInfo.item.equals(item)) return restoreInfo;
+		}
+		return null;
+	}
+
+	/**
+	 * @param expandable
+	 * @param item       the deleted item
+	 * @param payload    any payload object
+	 * @return
+	 */
+	private int createRestoreSubItemInfo(IExpandable expandable, T item, Object payload) {
+		int parentPosition = getGlobalPositionOf((T) expandable);
+		List<T> siblings = getExpandableList(expandable);
 		int childPosition = siblings.indexOf(item);
 		item.setHidden(true);
-		mRestoreList.add(new RestoreInfo((T) parent, item, childPosition, payload));
+		mRestoreList.add(new RestoreInfo((T) expandable, item, childPosition, payload));
 		if (DEBUG)
 			Log.v(TAG, "Recycled Child " + mRestoreList.get(mRestoreList.size() - 1) + " with Parent position=" + parentPosition);
 		return parentPosition;
 	}
 
 	/**
-	 * Save all relatives info of a deleted item, for an eventual Undo.
-	 *
 	 * @param position the position of the item to retain.
-	 * @param item the deleted item
+	 * @param item     the deleted item
 	 */
 	private void createRestoreItemInfo(int position, T item) {
 		//Collapse Parent before removal if it is expanded!
@@ -2088,15 +2093,13 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Retrieves the list of subItems which are not hidden.
-	 *
-	 * @param parent the parent item
+	 * @param expandable the parent item
 	 * @return the list of the subItems not hidden
 	 */
-	private List<T> getExpandableList(IExpandable parent) {
+	private List<T> getExpandableList(IExpandable expandable) {
 		List<T> subItems = new ArrayList<T>();
-		if (parent != null && parent.getSubItems() != null) {
-			List<T> allSubItems = parent.getSubItems();
+		if (expandable != null && hasSubItems(expandable)) {
+			List<T> allSubItems = expandable.getSubItems();
 			for (T subItem : allSubItems) {
 				//Pick up only no hidden items (doesn't get into account the filtered items)
 				if (!subItem.isHidden()) subItems.add(subItem);
@@ -2105,8 +2108,14 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		return subItems;
 	}
 
-	private boolean hasSubItemsSelected(IExpandable item) {
-		for (T subItem : getExpandableList(item)) {
+	/**
+	 * Allows or disallows the request to collapse the Expandable item.
+	 *
+	 * @param expandable the expandable item to check
+	 * @return true if at least 1 subItem is currently selected, false if no subItems are selected
+	 */
+	private boolean hasSubItemsSelected(IExpandable expandable) {
+		for (T subItem : getExpandableList(expandable)) {
 			if (isSelected(getGlobalPositionOf(subItem))) return true;
 		}
 		return false;
@@ -2122,11 +2131,9 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			int scrollMax = position - firstVisibleItem;
 			int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
 			int scrollBy = Math.min(scrollMax, scrollMin);
-			//Adjust by 1 position for item not completely visible
-			int fix = 0;//(position > lastVisibleItem || itemsToShow >= mRecyclerView.getChildCount() ? 1 : 0);
-			int scrollTo = firstVisibleItem + scrollBy - fix;
+			int scrollTo = firstVisibleItem + scrollBy;
 			if (DEBUG)
-				Log.v(TAG, "scrollMin=" + scrollMin + " scrollMax=" + scrollMax + " scrollBy=" + scrollBy + " scrollTo=" + scrollTo + " fix=" + fix);
+				Log.v(TAG, "scrollMin=" + scrollMin + " scrollMax=" + scrollMax + " scrollBy=" + scrollBy + " scrollTo=" + scrollTo);
 			mRecyclerView.smoothScrollToPosition(scrollTo);
 		} else if (position < firstVisibleItem) {
 			mRecyclerView.smoothScrollToPosition(position);
@@ -2311,13 +2318,13 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	private class RestoreInfo {
-		/* Positions */
+		// Positions
 		int refPosition = -1, relativePosition = -1;
-		/* The item to which the deleted item is refererring to */
+		// The item to which the deleted item is referring to
 		T refItem = null, filterRefItem = null;
-		/* The deleted item */
+		// The deleted item
 		T item = null;
-		/* Payload for the refItem */
+		// Payload for the refItem
 		Object payload = false;
 
 		public RestoreInfo(T refItem, T item) {
@@ -2332,8 +2339,8 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		}
 
 		/**
-		 * @return the reference position which this deleted item is refererring to.
-		 *         It is the parent position if this is a sub item
+		 * @return the reference position which this deleted item is referring to.
+		 * It is the parent position if this is a sub item
 		 */
 		public int getRefPosition() {
 			if (refPosition < 0) {
