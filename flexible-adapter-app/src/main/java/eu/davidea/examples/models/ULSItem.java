@@ -29,6 +29,16 @@ public class ULSItem extends AbstractExampleItem<ULSItem.ExampleViewHolder> {
 	}
 
 	@Override
+	public boolean isEnabled() {
+		return false;
+	}
+
+	@Override
+	public boolean isSelectable() {
+		return false;
+	}
+
+	@Override
 	public int getLayoutRes() {
 		return R.layout.recycler_uls_row;
 	}

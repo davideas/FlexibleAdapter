@@ -172,7 +172,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		return mSelectedPositions.contains(Integer.valueOf(position));
 	}
 
-	protected abstract boolean isSelectable(int position);
+	public abstract boolean isSelectable(int position);
 
 	/**
 	 * Toggles the selection status of the item at a given position.<br/>

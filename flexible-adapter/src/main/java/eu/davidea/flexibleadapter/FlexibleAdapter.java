@@ -213,8 +213,13 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/* SELECTION METHODS OVERRIDDEN */
 	/*------------------------------*/
 
+	public boolean isEnabled(int position) {
+		//noinspection ConstantConditions
+		return getItem(position).isEnabled();
+	}
+
 	@Override
-	protected boolean isSelectable(int position) {
+	public boolean isSelectable(int position) {
 		//noinspection ConstantConditions
 		return getItem(position).isSelectable();
 	}
@@ -1420,29 +1425,24 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			if (restoreInfo.relativePosition >= 0) {
 				//Restore child, if not deleted
 				if (DEBUG) Log.v(TAG, "Restore Child " + restoreInfo);
+				//Restore header linkage
+				restoreInfo.restoreHeader();
+				//Skip subItem addition if filter is active
 				if (hasSearchText() && !filterObject(restoreInfo.item, getSearchText()))
 					continue;
+				//Add subItem
 				added = addSubItem(restoreInfo.getRefPosition(), restoreInfo.relativePosition,
 						restoreInfo.item, false, restoreInfo.payload);
-				//Restore header linkage
-				//TODO: Move restore inside the RestoreInfo
-				if (restoreInfo.header != null) {
-					restoreInfo.header.setAttachedItem(restoreInfo.item);
-					if (!restoreInfo.header.isHidden())
-						notifyItemChanged(getGlobalPositionOf(restoreInfo.item), restoreInfo.payload);
-				}
 			} else {
 				//Restore parent or simple item, if not deleted
 				if (DEBUG) Log.v(TAG, "Restore Parent " + restoreInfo);
+				//Restore header linkage
+				restoreInfo.restoreHeader();
+				//Skip item addition if filter is active
 				if (hasSearchText() && !filterExpandableObject(restoreInfo.item, getSearchText()))
 					continue;
+				//Add item
 				added = addItem(restoreInfo.getRestorePosition(), restoreInfo.item);
-				//TODO: Move restore inside the RestoreInfo
-				if (restoreInfo.header != null) {
-					restoreInfo.header.setAttachedItem(restoreInfo.item);
-					if (!restoreInfo.header.isHidden())
-						notifyItemChanged(getGlobalPositionOf((T) restoreInfo.header), restoreInfo.payload);
-				}
 			}
 			//Item is again visible
 			restoreInfo.item.setHidden(false);
@@ -2396,6 +2396,14 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 				refPosition += getExpandableList((IExpandable) item).size();
 			}
 			return refPosition + 1;
+		}
+
+		public void restoreHeader() {
+			if (header != null) {
+				header.setAttachedItem(item);
+				if (!header.isHidden())
+					notifyItemChanged(getGlobalPositionOf(item), payload);
+			}
 		}
 
 		public void clearFilterRef() {

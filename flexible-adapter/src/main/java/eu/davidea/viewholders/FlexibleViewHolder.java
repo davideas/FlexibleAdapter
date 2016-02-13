@@ -68,10 +68,11 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	@Override
 	@CallSuper
 	public void onClick(View view) {
+		int position = getAdapterPosition();
+		if (!mAdapter.isEnabled(position)) return;
 		//Experimented that, if LongClick is not consumed, onClick is fired. We skip the
 		//call to the listener in this case, which is allowed only in ACTION_STATE_IDLE.
 		if (mAdapter.mItemClickListener != null && mActionState == ItemTouchHelper.ACTION_STATE_IDLE) {
-			int position = getAdapterPosition();
 			if (FlexibleAdapter.DEBUG)
 				Log.v(TAG, "onClick on position " + position + " mode=" + mAdapter.getMode());
 			//Get the permission to activate the View from user
@@ -91,12 +92,14 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	@Override
 	@CallSuper
 	public boolean onLongClick(View view) {
+		int position = getAdapterPosition();
+		if (!mAdapter.isEnabled(position)) return false;
 		if (FlexibleAdapter.DEBUG)
-			Log.v(TAG, "onLongClick on position " + getAdapterPosition() + " mode=" + mAdapter.getMode());
+			Log.v(TAG, "onLongClick on position " + position + " mode=" + mAdapter.getMode());
 		//If DragLongPress is enabled, then LongClick must be skipped and the listener will
 		// be called in onActionStateChanged in Drag mode.
 		if (mAdapter.mItemLongClickListener != null && !mAdapter.isLongPressDragEnabled()) {
-			mAdapter.mItemLongClickListener.onItemLongClick(getAdapterPosition());
+			mAdapter.mItemLongClickListener.onItemLongClick(position);
 			toggleActivation();
 			return true;
 		}
@@ -112,8 +115,10 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 */
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
+		int position = getAdapterPosition();
+		if (!mAdapter.isEnabled(position)) return false;
 		if (FlexibleAdapter.DEBUG)
-			Log.v(TAG, "onTouch with DragHandleView on position " + getAdapterPosition() + " mode=" + mAdapter.getMode());
+			Log.v(TAG, "onTouch with DragHandleView on position " + position + " mode=" + mAdapter.getMode());
 		if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN &&
 				mAdapter.isHandleDragEnabled()) {
 			//Start Drag!

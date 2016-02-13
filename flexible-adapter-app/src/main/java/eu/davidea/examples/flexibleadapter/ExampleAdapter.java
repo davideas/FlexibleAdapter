@@ -55,8 +55,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 		if (!DatabaseService.userLearnedSelection && !hasSearchText() && !(getItem(0) instanceof ULSItem)) {
 			//Define Example View
 			final ULSItem item = new ULSItem("ULS");
-			item.setEnabled(false);//TODO: check for set enabled, now not implemented yet
-			item.setSelectable(false);
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
 			addItemWithDelay(0, item, 1700L, scrollToPosition);
