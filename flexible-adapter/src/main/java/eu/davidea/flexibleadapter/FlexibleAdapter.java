@@ -186,7 +186,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		if (listeners instanceof OnItemSwipeListener)
 			mItemSwipeListener = (OnItemSwipeListener) listeners;
 
-		//Get notified when items are inserted or removed (it adjusts selected and removed positions)
+		//Get notified when items are inserted or removed (it adjusts selected positions)
 		registerAdapterDataObserver(new ExpandableAdapterDataObserver());
 	}
 
@@ -214,6 +214,12 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/*------------------------------*/
 
 	@Override
+	protected boolean isSelectable(int position) {
+		//noinspection ConstantConditions
+		return getItem(position).isSelectable();
+	}
+
+	@Override
 	public void toggleSelection(@IntRange(from = 0) int position) {
 		T item = getItem(position);
 		//Allow selection only for selectable items
@@ -235,20 +241,26 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Helper to select only expandable items or specific view types.
-	 * <p>The priority is determined by the 1st item selected by the user:
-	 * <br/>- if expandable, then only expandable items will be automatically selected.
-	 * <br/>- if not expandable, then the items of the ViewType passed will be selected.</p>
+	 * Helper to automatically select all the items of the viewType equal to the viewType of
+	 * the first selected item.
+	 * <p>Examples:
+	 * <br/>- if user initially selects an expandable of type A, then only expandable items of
+	 * type A will be selected.
+	 * <br/>- if user initially selects a non expandable of type B, then only items of Type B
+	 * will be selected.
+	 * <br/>- The developer can override this behaviour by passing a list of viewTypes for which
+	 * he wants to force the selection.</p>
 	 *
-	 * @param viewTypes All non expandable ViewTypes for which we want the selection,
-	 *                  pass nothing to select expandable ViewTypes all the times.
+	 * @param viewTypes All the desired viewTypes to be selected, pass nothing to automatically
+	 *                  select all the viewTypes of the first item user selected
 	 */
+	@Override
 	public void selectAll(Integer... viewTypes) {
-		T item = getItem(getSelectedPositions().get(0));
-		if (getSelectedItemCount() > 0 && isExpandable(item))
-			super.selectAll(EXPANDABLE_VIEW_TYPE);//Select only Parents, Skip others
-		else
-			super.selectAll(viewTypes);//Select others
+		if (getSelectedItemCount() > 0 && viewTypes.length == 0) {
+			super.selectAll(getItemViewType(getSelectedPositions().get(0)));//Priority on the first item
+		} else {
+			super.selectAll(viewTypes);//Force the selection for the viewTypes passed
+		}
 	}
 
 	@Override
@@ -278,6 +290,10 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	public void updateDataSet(List<T> items) {
 		mItems = items;
 		notifyDataSetChanged();
+		if (mHeaders != null && headersShown) {
+			for (ISectionable header : mHeaders) header.setHidden(true);
+			showAllHeaders();
+		}
 	}
 
 	/**
@@ -436,6 +452,8 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			Log.e(TAG, "Cannot add null Header!");
 			return this;
 		}
+		//Initialize the list
+		if (mHeaders == null) mHeaders = new ArrayList<ISectionable>();
 		//TODO: Before adding the header, check the attached item:
 		// - is not already linked to another header!
 		// - is not pending removal
@@ -475,13 +493,17 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @see #hideAllHeaders()
 	 */
 	public void showAllHeaders() {
+		if (mHeaders == null) {
+			Log.w(TAG, "Header list is empty, nothing to show!");
+			return;
+		}
 		multiRange = true;
 		for (int i = mHeaders.size() - 1; i >= 0; i--) {
 			//Headers must be added from last position: an header can be
 			// attached to another one, if all items are removed
 			showHeader(mHeaders.get(i));
 		}
-		headersShown = true;
+		if (mHeaders.size() > 0) headersShown = true;
 		multiRange = false;
 	}
 
@@ -492,12 +514,41 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @see #showAllHeaders()
 	 */
 	public void hideAllHeaders() {
+		if (mHeaders == null) {
+			Log.w(TAG, "Header list is empty, nothing to hide!");
+			return;
+		}
 		multiRange = true;
 		for (int i = mHeaders.size() - 1; i >= 0; i--) {
 			hideHeader(mHeaders.get(i));
 		}
 		headersShown = false;
 		multiRange = false;
+	}
+
+	/**
+	 * Hides and completely remove the header from Adapter.
+	 *
+	 * @param header the header item to remove
+	 */
+	public void deleteHeader(@NonNull ISectionable header) {
+		if (mHeaders == null) {
+			Log.w(TAG, "Header list is empty, nothing to delete!");
+			return;
+		}
+		int index = mHeaders.indexOf(header);
+		if (index >= 0) {
+			if (DEBUG) Log.v(TAG, "Deleting header " + header);
+			int position = getGlobalPositionOf((T) header);
+			if (position >= 0) {
+				//TODO: Restore of an header and restore previous reference of the attached item
+				//TODO: Modify the reference of the attached item with the next item
+				removeItem(position);
+			}
+			mHeaders.remove(index);
+		} else {
+			if (DEBUG) Log.w(TAG, "Header not found " + header);
+		}
 	}
 
 	/**
@@ -539,24 +590,25 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Hides and completely remove the header from Adapter.
+	 * Attach the new item to the header.
 	 *
-	 * @param header the header item to remove
+	 * @param deletedItem the deleted item
+	 * @param newPosition the position of the new item to be attached to the header
+	 * @param payload     any non-null user object to notify the parent (the payload will be
+	 *                    therefore passed to the bind method of the parent ViewHolder),
+	 *                    pass null to <u>not</u> notify the parent
+	 * @return the modified header if found, null otherwise
 	 */
-	public void deleteHeader(@NonNull ISectionable header) {
-		int index = mHeaders.indexOf(header);
-		if (index >= 0) {
-			if (DEBUG) Log.v(TAG, "Deleting header " + header);
-			int position = getGlobalPositionOf((T) header);
-			if (position >= 0) {
-				//TODO: Restore of an header and restore previous reference of the attached item
-				//TODO: Modify the reference of the attached item with the next item
-				removeItem(position);
+	private ISectionable attachHeaderTo(T deletedItem, int newPosition, Object payload) {
+		for (ISectionable header : mHeaders) {
+			if (header.getAttachedItem().equals(deletedItem)) {
+				header.setAttachedItem(getItem(newPosition));
+				if (!header.isHidden())
+					notifyItemChanged(getGlobalPositionOf((T) header), payload);
+				return header;
 			}
-			mHeaders.remove(index);
-		} else {
-			if (DEBUG) Log.w(TAG, "Header not found " + header);
 		}
+		return null;
 	}
 
 	/*---------------------*/
@@ -879,7 +931,6 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * Collapses an Expandable item that is already expanded, in conjunction with no subItems
 	 * selected or item is pending removal (used in combination with removeRange).
-	 * <p/>
 	 * <p>All Expandable subItem, that are expanded, are recursively collapsed.</p>
 	 *
 	 * @param position the position of the item to collapse
@@ -896,7 +947,6 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		int subItemsCount = 0, recursiveCount = 0;
 		if (expandable.isExpanded() &&
 				(!hasSubItemsSelected(expandable) || getPendingRemovedItem(item) != null)) {
-			//FIXME: it doesn't block the collapse anymore if any child is selected
 
 			//Take the current subList
 			List<T> subItems = getExpandableList(expandable);
@@ -960,7 +1010,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 
 	/**
 	 * Inserts the given Item at desired position or Add Item at last position with a delay
-	 * and autoscroll to the position.
+	 * and auto-scroll to the position.
 	 * <p>Useful at startup, when there's an item to add after Adapter Animations is completed.</p>
 	 *
 	 * @param position         position of the item to add
@@ -987,22 +1037,17 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param position position of the item to add
 	 * @param item     the item to add
-	 * @return true if is has been modified by the addition, fasle otherwise
+	 * @return true if is has been modified by the addition, false otherwise
 	 */
 	public boolean addItem(@IntRange(from = 0) int position, @NonNull T item) {
 		if (item == null) {
 			Log.e(TAG, "No items to add!");
 			return false;
 		}
-		if (position < mItems.size()) {
-			mItems.add(position, item);
-		} else
-			mItems.add(item);
-		//Map all the view types if not done yet
-		mapViewTypeFrom(item);
-		//Notify range addition
-		notifyItemInserted(position);
-		return true;
+		if (DEBUG) Log.v(TAG, "addItem delegates addition to addItems!");
+		List<T> items = new ArrayList<T>(1);
+		items.add(item);
+		return addItems(position, items);
 	}
 
 	/**
@@ -1073,7 +1118,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			return false;
 		}
 		//Build a new list with 1 item to chain the methods of addSubItems
-		List<T> subItems = new ArrayList<T>();
+		List<T> subItems = new ArrayList<T>(1);
 		subItems.add(item);
 		//Reuse the method for subItems
 		return addSubItems(parentPosition, subPosition, subItems, expandParent, payload);
@@ -1179,43 +1224,12 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @see #removeItem(int)
 	 */
 	public void removeItem(@IntRange(from = 0) int position, Object payload) {
-		if (position < 0 && position >= mItems.size()) {
-			Log.e(TAG, "Cannot removeItem on position out of OutOfBounds!");
-			return;
-		}
-		T item = getItem(position);
-		assert item != null;
-
-		//Differentiate: Expandable & NonExpandable with No parent from NonExpandable with a parent
-		if (!permanentDelete) {
-			IExpandable parent = getExpandableOf(item);
-			if (isExpandable(item) || parent == null) {
-				//It's a Parent or a Header or a Simple Item
-				createRestoreItemInfo(position, item);
-				if (DEBUG) {
-					if (parent == null) Log.v(TAG, "removeItem Item:" + item);
-					else Log.v(TAG, "removeItem ExpandableItem:" + item);
-				}
-			} else {
-				//It's a Child
-				int parentPosition = createRestoreSubItemInfo(parent, item, payload);
-				if (DEBUG) Log.v(TAG, "removeItem NonExpandableItem:" + item);
-				//Notify the Parent about the change if requested
-				if (payload != null) notifyItemChanged(parentPosition, payload);
-			}
-		}
-		//Remove and notify removals
-		mItems.remove(position);
-		getSelectedPositions().remove(new Integer(position));
-		notifyItemRemoved(position);
-
-		//Call listener to update EmptyView
-		if (mUpdateListener != null && !multiRange)
-			mUpdateListener.onUpdateEmptyView(getItemCount());
+		if (DEBUG) Log.v(TAG, "removeItem delegates removal to removeRange");
+		removeRange(position, 1, payload);
 	}
 
 	/**
-	 * Same as {@link #removeItem(int, Object)}, but in this case the parent will not be
+	 * Same as {@link #removeItems(List, Object)}, but in this case the parent will not be
 	 * notified about the change, if a child is removed.
 	 */
 	public void removeItems(List<Integer> selectedPositions) {
@@ -1299,6 +1313,9 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			Log.e(TAG, "Cannot removeRange with positionStart out of OutOfBounds!");
 			return;
 		}
+		//Handle header linkage
+		ISectionable header = attachHeaderTo(getItem(positionStart), positionStart + itemCount, payload);
+
 		int parentPosition = -1;
 		IExpandable parent = null;
 		for (int position = positionStart + itemCount - 1; position >= positionStart; position--) {
@@ -1307,15 +1324,17 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 				assert item != null;
 				//When removing a range of children, parent is always the same :-)
 				if (parent == null) parent = getExpandableOf(item);
+				//Differentiate: (Expandable & NonExpandable with No parent) from (NonExpandable with a parent)
 				if (isExpandable(item) || parent == null) {
-					createRestoreItemInfo(position, item);
+					createRestoreItemInfo(position, item, header, payload);
 				} else {
-					parentPosition = createRestoreSubItemInfo(parent, item, payload);
+					parentPosition = createRestoreSubItemInfo(parent, item, header, payload);
 				}
 			}
 			//Remove item from internal list
 			mItems.remove(position);
 		}
+
 		//Notify removals
 		if (parentPosition >= 0) {
 			adjustSelected = false;
@@ -1355,9 +1374,9 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		this.removeItems(getSelectedPositions(), payload);
 	}
 
-	/*--------------*/
-	/* UNDO METHODS */
-	/*--------------*/
+	/*----------------------*/
+	/* UNDO/RESTORE METHODS */
+	/*----------------------*/
 
 	/**
 	 * Returns the current configuration to restore selections on Undo.
@@ -1405,12 +1424,25 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 					continue;
 				added = addSubItem(restoreInfo.getRefPosition(), restoreInfo.relativePosition,
 						restoreInfo.item, false, restoreInfo.payload);
+				//Restore header linkage
+				//TODO: Move restore inside the RestoreInfo
+				if (restoreInfo.header != null) {
+					restoreInfo.header.setAttachedItem(restoreInfo.item);
+					if (!restoreInfo.header.isHidden())
+						notifyItemChanged(getGlobalPositionOf(restoreInfo.item), restoreInfo.payload);
+				}
 			} else {
 				//Restore parent or simple item, if not deleted
 				if (DEBUG) Log.v(TAG, "Restore Parent " + restoreInfo);
 				if (hasSearchText() && !filterExpandableObject(restoreInfo.item, getSearchText()))
 					continue;
 				added = addItem(restoreInfo.getRestorePosition(), restoreInfo.item);
+				//TODO: Move restore inside the RestoreInfo
+				if (restoreInfo.header != null) {
+					restoreInfo.header.setAttachedItem(restoreInfo.item);
+					if (!restoreInfo.header.isHidden())
+						notifyItemChanged(getGlobalPositionOf((T) restoreInfo.header), restoreInfo.payload);
+				}
 			}
 			//Item is again visible
 			restoreInfo.item.setHidden(false);
@@ -2054,17 +2086,18 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * @param expandable
+	 * @param expandable the expandable, parent of this sub item
 	 * @param item       the deleted item
+	 * @param header     the header item
 	 * @param payload    any payload object
-	 * @return
+	 * @return the parent position
 	 */
-	private int createRestoreSubItemInfo(IExpandable expandable, T item, Object payload) {
+	private int createRestoreSubItemInfo(IExpandable expandable, T item, ISectionable header, Object payload) {
 		int parentPosition = getGlobalPositionOf((T) expandable);
 		List<T> siblings = getExpandableList(expandable);
 		int childPosition = siblings.indexOf(item);
 		item.setHidden(true);
-		mRestoreList.add(new RestoreInfo((T) expandable, item, childPosition, payload));
+		mRestoreList.add(new RestoreInfo((T) expandable, item, childPosition, header, payload));
 		if (DEBUG)
 			Log.v(TAG, "Recycled Child " + mRestoreList.get(mRestoreList.size() - 1) + " with Parent position=" + parentPosition);
 		return parentPosition;
@@ -2072,9 +2105,10 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 
 	/**
 	 * @param position the position of the item to retain.
+	 * @param header   the header item
 	 * @param item     the deleted item
 	 */
-	private void createRestoreItemInfo(int position, T item) {
+	private void createRestoreItemInfo(int position, T item, ISectionable header, Object payload) {
 		//Collapse Parent before removal if it is expanded!
 		if (isExpanded(item))
 			collapse(position);
@@ -2087,7 +2121,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			IExpandable expandable = getExpandableOf(refItem);
 			if (expandable != null) refItem = (T) expandable;
 		}
-		mRestoreList.add(new RestoreInfo(refItem, item));
+		mRestoreList.add(new RestoreInfo(refItem, item, header, payload));
 		if (DEBUG)
 			Log.v(TAG, "Recycled Parent " + mRestoreList.get(mRestoreList.size() - 1) + " on position=" + position);
 	}
@@ -2324,17 +2358,20 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		T refItem = null, filterRefItem = null;
 		// The deleted item
 		T item = null;
+		//Any header to which this item was attached
+		ISectionable header = null;
 		// Payload for the refItem
 		Object payload = false;
 
-		public RestoreInfo(T refItem, T item) {
-			this(refItem, item, -1, null);
+		public RestoreInfo(T refItem, T item, ISectionable header, Object payload) {
+			this(refItem, item, -1, header, payload);
 		}
 
-		public RestoreInfo(T refItem, T item, int relativePosition, Object payload) {
+		public RestoreInfo(T refItem, T item, int relativePosition, ISectionable header, Object payload) {
 			this.refItem = refItem;//This can be an Expandable or an Header
 			this.item = item;
 			this.relativePosition = relativePosition;
+			this.header = header;
 			this.payload = payload;
 		}
 

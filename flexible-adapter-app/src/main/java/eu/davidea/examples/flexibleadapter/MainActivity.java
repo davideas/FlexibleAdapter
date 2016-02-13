@@ -536,9 +536,11 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private void setContextTitle(int count) {
-		mActionMode.setTitle(String.valueOf(count) + " " + (count == 1 ?
-				getString(R.string.action_selected_one) :
-				getString(R.string.action_selected_many)));
+		if (mActionMode != null) {
+			mActionMode.setTitle(String.valueOf(count) + " " + (count == 1 ?
+					getString(R.string.action_selected_one) :
+					getString(R.string.action_selected_many)));
+		}
 	}
 
 	@Override

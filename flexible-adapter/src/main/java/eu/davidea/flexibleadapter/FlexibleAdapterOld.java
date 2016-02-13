@@ -214,6 +214,12 @@ public class FlexibleAdapterOld<T extends IFlexibleItem>
 	/*------------------------------*/
 
 	@Override
+	public boolean isSelectable(int position) {
+		//noinspection ConstantConditions
+		return getItem(position).isSelectable();
+	}
+
+	@Override
 	public void toggleSelection(@IntRange(from = 0) int position) {
 		T item = getItem(position);
 		//Allow selection only for selectable items

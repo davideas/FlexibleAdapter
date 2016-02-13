@@ -53,6 +53,7 @@ public class DatabaseService {
 		ExpandableItem expandableItem = new ExpandableItem("E" + (++i));
 		//Let's initially expand the first father with subElements
 //		expandableItem.setInitiallyExpanded(i == 2);
+//		expandableItem.setSelectable(false);
 		expandableItem.setTitle("Expandable Item " + i);
 		//Add subItems every N elements
 		//SubItems are not expandable by default, but thy might be if extends/implements IExpandable
@@ -69,7 +70,6 @@ public class DatabaseService {
 		for (int i = 0; i < (ITEMS/HEADERS); i++) {
 			HeaderItem header = new HeaderItem("H" + i, mItems.get(i * HEADERS), false, false);
 			header.setTitle("Header " + (i + 1));
-			header.setSubtitle("Attached to " + mItems.get(i * HEADERS).getTitle());
 			header.setHidden(true);
 			headers.add(header);
 		}

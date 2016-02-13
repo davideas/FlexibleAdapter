@@ -172,6 +172,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		return mSelectedPositions.contains(Integer.valueOf(position));
 	}
 
+	protected abstract boolean isSelectable(int position);
+
 	/**
 	 * Toggles the selection status of the item at a given position.<br/>
 	 * The behaviour depends on the selection mode previously set with {@link #setMode(int)}.
@@ -221,7 +223,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		mSelectedPositions = new ArrayList<Integer>(getItemCount());
 		int positionStart = 0, itemCount = 0;
 		for (int i = 0; i < getItemCount(); i++) {
-			if (viewTypesToSelect.size() == 0 || viewTypesToSelect.contains(getItemViewType(i))) {
+			if (isSelectable(i) &&
+					(viewTypesToSelect.size() == 0 || viewTypesToSelect.contains(getItemViewType(i)))) {
 				mSelectedPositions.add(i);
 				itemCount++;
 			} else {

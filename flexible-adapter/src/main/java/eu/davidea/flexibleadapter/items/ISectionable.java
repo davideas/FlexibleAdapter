@@ -15,4 +15,6 @@ public interface ISectionable<VH extends RecyclerView.ViewHolder, T extends IFle
 
 	T getAttachedItem();
 
+	void setAttachedItem(T attachedItem);
+
 }

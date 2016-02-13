@@ -57,6 +57,17 @@ public class HeaderItem extends AbstractExampleItem<HeaderItem.HeaderViewHolder>
 	}
 
 	@Override
+	public void setAttachedItem(IFlexibleItem attachedItem) {
+		this.attachedItem = attachedItem;
+	}
+
+	@Override
+	public String getSubtitle() {
+		return "Attached to " + (attachedItem == null ? "none" :
+				((AbstractExampleItem) attachedItem).getTitle());
+	}
+
+	@Override
 	public boolean equals(Object inObject) {
 		if (inObject instanceof HeaderItem) {
 			HeaderItem inItem = (HeaderItem) inObject;
