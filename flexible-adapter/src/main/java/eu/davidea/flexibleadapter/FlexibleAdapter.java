@@ -479,6 +479,17 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		return mHeaders;
 	}
 
+	public ISectionable getHeaderOf(T item) {
+		if (mHeaders != null) {
+			for (ISectionable header : mHeaders) {
+				if (header.getAttachedItem() != null && header.getAttachedItem().equals(item)) {
+					return header;
+				}
+			}
+		}
+		return null;
+	}
+
 	public List<Integer> getHeadersActualPositions() {
 		List<Integer> list = new ArrayList<Integer>(mHeaders.size());
 		for (int i = 0; i < mItems.size(); i++) {
@@ -919,6 +930,13 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 
 			//Expand!
 			notifyItemRangeInserted(position + 1, subItemsCount);
+			//Show also the headers of the subItems
+			if (mHeaders != null && headersShown) {
+				for (T subItem : subItems) {
+					ISectionable header = getHeaderOf(subItem);
+					if (header != null) showHeader(header);
+				}
+			}
 
 			if (DEBUG)
 				Log.v(TAG, "Expanded " + subItemsCount + " subItems on position=" + position + " ExpandedItems=" + getExpandedPositions());
@@ -969,6 +987,13 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 
 			//Collapse!
 			notifyItemRangeRemoved(position + 1, subItemsCount);
+			//Hide also the headers of the subItems
+			if (mHeaders != null && headersShown) {
+				for (T subItem : subItems) {
+					ISectionable header = getHeaderOf(subItem);
+					if (header != null) hideHeader(header);
+				}
+			}
 
 			if (DEBUG)
 				Log.v(TAG, "Collapsed " + subItemsCount + " subItems on position=" + position + " ExpandedItems=" + getExpandedPositions());
@@ -1969,32 +1994,42 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 					//An Header is being dragged down
 					oldPosition = fromPosition;
 					newPosition = toPosition + 1;
+					//Update header linkage swap
+					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 				} else if (fromItem instanceof ISectionable) {
 					//An Header is being swapped up
 					oldPosition = toPosition + 1;
 					newPosition = toPosition;
+					//Update header linkage swap
+					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 				} else {
 					//An Header receives the fromItem
 					oldPosition = toPosition;
 					newPosition = fromPosition;
+					//Update header linkage swap
+					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 				}
 			} else {
 				if (toItem instanceof ISectionable) {
 					//An Header is being dragged up
 					oldPosition = fromPosition + 1;
 					newPosition = fromPosition;
+					//Update header linkage swap
+					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 				} else if (fromItem instanceof ISectionable) {
 					//An Header is being swapped down
 					oldPosition = toPosition;
 					newPosition = fromPosition + 1;
+					//Update header linkage swap
+					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 				} else {
 					//An Header receives the toItem
 					oldPosition = fromPosition;
 					newPosition = toPosition;
+					//Update header linkage swap
+					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 				}
 			}
-			//Update header linkage swap
-			updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 		}
 		//TODO: If item in a section has being dragged, should swap section as well ??
 

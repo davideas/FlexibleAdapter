@@ -38,6 +38,7 @@ import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 
@@ -450,12 +451,16 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemMove(int fromPosition, int toPosition) {
+		AbstractExampleItem fromItem = mAdapter.getItem(fromPosition);
+		AbstractExampleItem toItem = mAdapter.getItem(toPosition);
+		//Don't swap if an Header is involved!!!
+		if (fromItem instanceof ISectionable || toItem instanceof ISectionable) {
+			return;
+		}
 		//FIXME: this doesn't work yet with subItems.....
-		//TODO: Make a better implementation here. For the moment let's commit the change every time, also to the database list
-		int adjustPosition = DatabaseService.userLearnedSelection ? 0 : 1; //Due to my ExampleView we must remove 1 from the position to swap
 		DatabaseService.getInstance().swapItem(
-				Math.max(0, fromPosition - adjustPosition),
-				Math.max(0, toPosition - adjustPosition));
+				DatabaseService.getInstance().getListById().indexOf(fromItem),
+				DatabaseService.getInstance().getListById().indexOf(toItem));
 	}
 
 	@Override
