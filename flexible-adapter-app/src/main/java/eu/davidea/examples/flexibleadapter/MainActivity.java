@@ -460,12 +460,15 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemSwipe(int position, int direction) {
+		AbstractExampleItem item = mAdapter.getItem(position);
+		assert item != null;
 		//Experimenting NEW feature
-		mAdapter.setRestoreSelectionOnUndo(false);
+		if (item.isSelectable())
+			mAdapter.setRestoreSelectionOnUndo(false);
 
 		//TODO: Create Undo Helper with SnackBar?
 		StringBuilder message = new StringBuilder();
-		message.append(mAdapter.getItem(position).getTitle())
+		message.append(item.getTitle())
 				.append(" ").append(getString(R.string.action_deleted));
 		//noinspection ResourceType
 		mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)

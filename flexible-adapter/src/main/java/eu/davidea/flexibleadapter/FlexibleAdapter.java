@@ -295,10 +295,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	public void updateDataSet(List<T> items) {
 		mItems = items;
 		notifyDataSetChanged();
-		if (mHeaders != null && headersShown) {
-			for (ISectionable header : mHeaders) header.setHidden(true);
-			showAllHeaders();
-		}
+		showAllHeadersAfterRefresh();
 	}
 
 	/**
@@ -556,6 +553,13 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		}
 	}
 
+	private void showAllHeadersAfterRefresh() {
+		if (mHeaders != null && headersShown) {
+			for (ISectionable header : mHeaders) header.setHidden(true);
+			showAllHeaders();
+		}
+	}
+
 	/**
 	 * Internal method to show/add an header in the internal list.
 	 *
@@ -606,7 +610,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	private ISectionable attachHeaderTo(T deletedItem, int newPosition, Object payload) {
 		for (ISectionable header : mHeaders) {
-			if (header.getAttachedItem().equals(deletedItem)) {
+			if (header.getAttachedItem() != null && header.getAttachedItem().equals(deletedItem)) {
 				header.setAttachedItem(getItem(newPosition));
 				if (!header.isHidden())
 					notifyItemChanged(getGlobalPositionOf((T) header), payload);
@@ -701,10 +705,11 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
 		//When user scrolls, this line binds the correct selection status
 		holder.itemView.setActivated(isSelected(position));
-
 		T item = getItem(position);
-		if (item != null)
+		if (item != null) {
+			holder.itemView.setEnabled(item.isEnabled());
 			item.bindViewHolder(this, holder, position, payloads);
+		}
 	}
 
 	/*--------------------*/
@@ -712,7 +717,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/*--------------------*/
 
 	//FIXME: Expanded children: find a way to Not animate items from custom ItemAnimator!!!
-	// (ItemAnimators should work in conjuction with AnimatorViewHolder???)
+	// (ItemAnimators should work in conjunction with AnimatorViewHolder???)
 	//TODO: Customize children animations (don't use animateAdd or animateRemove from custom ItemAnimator)
 	//TODO: Check if multiple types of sub items are already supported (in theory yes)
 	//TODO: Add new feature (Load More)
@@ -871,7 +876,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 
 	private int expand(int position, boolean expandAll) {
 		T item = getItem(position);
-		if (item == null || !isExpandable(item)) return 0;
+		if (item == null || !item.isEnabled() || !isExpandable(item)) return 0;
 
 		IExpandable expandable = (IExpandable) item;
 		if (DEBUG) Log.v(TAG, "Request to Expand on position " + position +
@@ -943,7 +948,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public int collapse(@IntRange(from = 0) int position) {
 		T item = getItem(position);
-		if (item == null || !isExpandable(item)) return 0;
+		if (item == null || !item.isEnabled() || !isExpandable(item)) return 0;
 
 		IExpandable expandable = (IExpandable) item;
 		if (DEBUG)
@@ -1189,14 +1194,6 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/* DELETE ITEMS METHODS */
 	/*----------------------*/
 
-	public boolean isPermanentDelete() {
-		return permanentDelete;
-	}
-
-	public void setPermanentDelete(boolean permanentDelete) {
-		this.permanentDelete = permanentDelete;
-	}
-
 	/**
 	 * Removes an item from internal list and notify the change.
 	 * <p>The item is retained for an eventual Undo.</p>
@@ -1275,6 +1272,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 				itemCount++;             // 1  2  3  //2
 				positionStart = position;//10  9  8  //4
 			} else {
+				adjustSelected = false;
 				//Remove range
 				if (itemCount > 0)
 					removeRange(positionStart, itemCount, payload);//8,3  //4,2
@@ -1284,8 +1282,10 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			//Request to collapse after the notification of remove range
 			collapse(position);
 		}
-		//Remove last range
 		multiRange = false;
+		//Clear also the selection
+		clearSelection();
+		//Remove last range
 		if (itemCount > 0) {
 			removeRange(positionStart, itemCount, payload);//1,1
 		}
@@ -1323,21 +1323,24 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 
 		int parentPosition = -1;
 		IExpandable parent = null;
-		for (int position = positionStart + itemCount - 1; position >= positionStart; position--) {
+		//for (int position = positionStart + itemCount - 1; position >= positionStart; position--) {
+		for (int position = positionStart; position < positionStart + itemCount; position++) {
 			if (!permanentDelete) {
-				T item = getItem(position);
+				T item = getItem(positionStart);
 				assert item != null;
 				//When removing a range of children, parent is always the same :-)
 				if (parent == null) parent = getExpandableOf(item);
 				//Differentiate: (Expandable & NonExpandable with No parent) from (NonExpandable with a parent)
 				if (isExpandable(item) || parent == null) {
-					createRestoreItemInfo(position, item, header, payload);
+					createRestoreItemInfo(positionStart, item,
+							(position == positionStart ? header : null), payload);
 				} else {
-					parentPosition = createRestoreSubItemInfo(parent, item, header, payload);
+					parentPosition = createRestoreSubItemInfo(parent, item,
+							(position == positionStart ? header : null), payload);
 				}
 			}
 			//Remove item from internal list
-			mItems.remove(position);
+			mItems.remove(positionStart);
 		}
 
 		//Notify removals
@@ -1382,6 +1385,14 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/*----------------------*/
 	/* UNDO/RESTORE METHODS */
 	/*----------------------*/
+
+	public boolean isPermanentDelete() {
+		return permanentDelete;
+	}
+
+	public void setPermanentDelete(boolean permanentDelete) {
+		this.permanentDelete = permanentDelete;
+	}
 
 	/**
 	 * Returns the current configuration to restore selections on Undo.
@@ -1447,7 +1458,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			//Item is again visible
 			restoreInfo.item.setHidden(false);
 			//Restore selection if requested, before emptyBin.
-			if (restoreSelection && added) {
+			if (restoreSelection && restoreInfo.item.isSelectable() && added) {
 				if (restoreInfo.item instanceof IExpandable || getExpandableOf(restoreInfo.item) == null) {
 					parentSelected = true;
 					getSelectedPositions().add(restoreInfo.getRestorePosition());
@@ -1708,6 +1719,10 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			mOldSearchText = mSearchText;
 			animateTo(values);
 		} else mItems = values;
+		//Restore headers if necessary
+		if (mSearchText.isEmpty()) {
+			showAllHeadersAfterRefresh();
+		}
 
 		//Reset filtering flag
 		filtering = false;
@@ -2402,7 +2417,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			if (header != null) {
 				header.setAttachedItem(item);
 				if (!header.isHidden())
-					notifyItemChanged(getGlobalPositionOf(item), payload);
+					notifyItemChanged(getGlobalPositionOf((T) header), payload);
 			}
 		}
 

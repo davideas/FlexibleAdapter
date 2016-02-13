@@ -148,11 +148,9 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * <i>android:background="?attr/selectableItemBackground"</i> on the item layout AND
 	 * in the style.xml.<br/>
 	 * Adapter must have a reference to its instance to check selection state.</p>
-	 * <p>
-	 * This must be called every time we want the activation state visible on the ItemView,
+	 * <p>This must be called every time we want the activation state visible on the ItemView,
 	 * for instance, after a Click (to add the item to the selection list) or after a LongClick
-	 * (to activate the ActionMode) or during a Drag (to show that we enabled the Drag).
-	 * </p>
+	 * (to activate the ActionMode) or during a Drag (to show that we enabled the Drag).</p>
 	 * If you do this, it's not necessary to invalidate the row (with notifyItemChanged):
 	 * In this way <i>bindViewHolder</i> is NOT called and inner Views can animate without
 	 * interruption, so you can see the animation running still having the selection activated.
