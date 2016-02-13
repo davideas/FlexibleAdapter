@@ -59,9 +59,8 @@ public abstract class AbstractExampleItem<VH extends RecyclerView.ViewHolder>
 
 	@Override
 	public String toString() {
-		return "[" +
-				"id=" + id +
-				", title=" + title + "]";
+		return "[id=" + id +
+				", title=" + title;
 	}
 
 }

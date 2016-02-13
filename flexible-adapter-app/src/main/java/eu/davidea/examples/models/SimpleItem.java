@@ -143,4 +143,8 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 		}
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + "]";
+	}
 }

@@ -601,16 +601,16 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * Attach the new item to the header.
 	 *
-	 * @param deletedItem the deleted item
+	 * @param oldItem     the previous attached item
 	 * @param newPosition the position of the new item to be attached to the header
 	 * @param payload     any non-null user object to notify the parent (the payload will be
 	 *                    therefore passed to the bind method of the parent ViewHolder),
 	 *                    pass null to <u>not</u> notify the parent
 	 * @return the modified header if found, null otherwise
 	 */
-	private ISectionable attachHeaderTo(T deletedItem, int newPosition, Object payload) {
+	private ISectionable updateHeaderLinkage(T oldItem, int newPosition, Object payload) {
 		for (ISectionable header : mHeaders) {
-			if (header.getAttachedItem() != null && header.getAttachedItem().equals(deletedItem)) {
+			if (header.getAttachedItem() != null && header.getAttachedItem().equals(oldItem)) {
 				header.setAttachedItem(getItem(newPosition));
 				if (!header.isHidden())
 					notifyItemChanged(getGlobalPositionOf((T) header), payload);
@@ -1319,7 +1319,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			return;
 		}
 		//Handle header linkage
-		ISectionable header = attachHeaderTo(getItem(positionStart), positionStart + itemCount, payload);
+		ISectionable header = updateHeaderLinkage(getItem(positionStart), positionStart + itemCount, payload);
 
 		int parentPosition = -1;
 		IExpandable parent = null;
@@ -1951,6 +1951,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 					toPosition + "[" + (isSelected(toPosition) ? "selected" : "unselected") + "]");
 			Log.v(TAG, "moveItem fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
 		}
+		//Perform item swap
 		Collections.swap(mItems, fromPosition, toPosition);
 		if ((isSelected(fromPosition) && !isSelected(toPosition)) ||
 				(!isSelected(fromPosition) && isSelected(toPosition))) {
@@ -1958,8 +1959,43 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			super.toggleSelection(toPosition);
 		}
 		notifyItemMoved(fromPosition, toPosition);
-
-		//TODO: If a section (being dragged or being swapped) change first item in that section
+		//Header swap linkage
+		if (mHeaders != null && headersShown) {
+			T fromItem = getItem(fromPosition);
+			T toItem = getItem(toPosition);
+			int newPosition, oldPosition;
+			if (fromPosition < toPosition) {
+				if (toItem instanceof ISectionable) {
+					//An Header is being dragged down
+					oldPosition = fromPosition;
+					newPosition = toPosition + 1;
+				} else if (fromItem instanceof ISectionable) {
+					//An Header is being swapped up
+					oldPosition = toPosition + 1;
+					newPosition = toPosition;
+				} else {
+					//An Header receives the fromItem
+					oldPosition = toPosition;
+					newPosition = fromPosition;
+				}
+			} else {
+				if (toItem instanceof ISectionable) {
+					//An Header is being dragged up
+					oldPosition = fromPosition + 1;
+					newPosition = fromPosition;
+				} else if (fromItem instanceof ISectionable) {
+					//An Header is being swapped down
+					oldPosition = toPosition;
+					newPosition = fromPosition + 1;
+				} else {
+					//An Header receives the toItem
+					oldPosition = fromPosition;
+					newPosition = toPosition;
+				}
+			}
+			//Update header linkage swap
+			updateHeaderLinkage(getItem(oldPosition), newPosition, true);
+		}
 		//TODO: If item in a section has being dragged, should swap section as well ??
 
 		//TODO: Allow child to be moved into another parent, update the 2 parents, optionally: 1) collapse the new parent 2) expand it 3) leave as it is

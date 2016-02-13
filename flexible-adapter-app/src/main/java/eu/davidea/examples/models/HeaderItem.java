@@ -109,4 +109,10 @@ public class HeaderItem extends AbstractExampleItem<HeaderItem.HeaderViewHolder>
 		}
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() +
+				", sticky=" + sticky +
+				", attachedTo=" + attachedItem + "]";
+	}
 }

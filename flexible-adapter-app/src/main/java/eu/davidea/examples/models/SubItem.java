@@ -27,13 +27,6 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder> {
 	}
 
 	@Override
-	public String toString() {
-		return "SubItem[" +
-				"id=" + getId() +
-				", title=" + getTitle() + ']';
-	}
-
-	@Override
 	public int getLayoutRes() {
 		return R.layout.recycler_child_row;
 	}
@@ -78,6 +71,12 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder> {
 			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
 			setDragHandleView(mHandleView);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "SubItem[id=" + getId() +
+				", title=" + getTitle() + "]";
 	}
 
 }

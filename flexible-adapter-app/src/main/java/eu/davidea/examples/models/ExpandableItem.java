@@ -78,6 +78,6 @@ public class ExpandableItem extends SimpleItem
 
 	@Override
 	public String toString() {
-		return super.toString() + mSubItems;
+		return super.toString() + mSubItems + "]";
 	}
 }
