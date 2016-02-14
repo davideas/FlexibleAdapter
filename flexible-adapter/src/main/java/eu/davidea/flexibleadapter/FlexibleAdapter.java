@@ -1989,46 +1989,63 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			T fromItem = getItem(fromPosition);
 			T toItem = getItem(toPosition);
 			int newPosition, oldPosition;
-			if (fromPosition < toPosition) {
-				if (toItem instanceof ISectionable) {
-					//An Header is being dragged down
-					oldPosition = fromPosition;
-					newPosition = toPosition + 1;
-					//Update header linkage swap
-					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
-				} else if (fromItem instanceof ISectionable) {
-					//An Header is being swapped up
-					oldPosition = toPosition + 1;
-					newPosition = toPosition;
-					//Update header linkage swap
-					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
-				} else {
+			if (toItem instanceof ISectionable && fromItem instanceof ISectionable) {
+				//Two Headers are swapped each others, custom update linkage swap
+				ISectionable fromHeader = (ISectionable) fromItem;
+				ISectionable toHeader = (ISectionable) toItem;
+				if (fromPosition < toPosition) {
 					//An Header receives the fromItem
 					oldPosition = toPosition;
 					newPosition = fromPosition;
 					//Update header linkage swap
 					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
-				}
-			} else {
-				if (toItem instanceof ISectionable) {
-					//An Header is being dragged up
-					oldPosition = fromPosition + 1;
-					newPosition = fromPosition;
-					//Update header linkage swap
-					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
-				} else if (fromItem instanceof ISectionable) {
-					//An Header is being swapped down
-					oldPosition = toPosition;
-					newPosition = fromPosition + 1;
-					//Update header linkage swap
-					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
+					//Swap the 2 headers
+					toHeader.setAttachedItem(fromHeader.getAttachedItem());
+					fromHeader.setAttachedItem(toHeader);
 				} else {
 					//An Header receives the toItem
 					oldPosition = fromPosition;
 					newPosition = toPosition;
 					//Update header linkage swap
 					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
+					//Swap the 2 headers
+					fromHeader.setAttachedItem(toHeader.getAttachedItem());
+					toHeader.setAttachedItem(fromHeader);
 				}
+				notifyItemChanged(fromPosition, true);
+				notifyItemChanged(toPosition, true);
+			} else if (fromPosition < toPosition) {
+				if (toItem instanceof ISectionable) {
+					//An Header is being dragged down
+					oldPosition = fromPosition;
+					newPosition = toPosition + 1;
+				} else if (fromItem instanceof ISectionable) {
+					//An Header is being swapped up
+					oldPosition = toPosition + 1;
+					newPosition = toPosition;
+				} else {
+					//An Header receives the fromItem
+					oldPosition = toPosition;
+					newPosition = fromPosition;
+				}
+				//Update header linkage swap
+				updateHeaderLinkage(getItem(oldPosition), newPosition, true);
+			} else {
+				if (toItem instanceof ISectionable) {
+					//An Header is being dragged up
+					oldPosition = fromPosition + 1;
+					newPosition = fromPosition;
+				} else if (fromItem instanceof ISectionable) {
+					//An Header is being swapped down
+					oldPosition = toPosition;
+					newPosition = fromPosition + 1;
+				} else {
+					//An Header receives the toItem
+					oldPosition = fromPosition;
+					newPosition = toPosition;
+				}
+				//Update header linkage swap
+				updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 			}
 		}
 		//TODO: If item in a section has being dragged, should swap section as well ??

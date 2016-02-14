@@ -19,7 +19,7 @@ import eu.davidea.flexibleadapter.items.ISectionable;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 1000, SUB_ITEMS = 3, HEADERS = 7;
+	private static final int ITEMS = 200, SUB_ITEMS = 3, HEADERS = 7;
 
 	//TODO FOR YOU: Use userLearnedSelection from settings
 	public static boolean userLearnedSelection = false;
