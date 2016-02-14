@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		//Experimental, set some headers!
 		//mAdapter.setDisplayHeadersAtStartUp(true);
-		mAdapter.setHeaders(DatabaseService.getInstance().buildHeaders());
+		//OLD! mAdapter.setHeaders(DatabaseService.getInstance().buildHeaders());
 
 		//FAB
 		mFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -145,8 +145,8 @@ public class MainActivity extends AppCompatActivity implements
 				for (int position = 0; position <= mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1; position++) {
 					//Every 3 positions I want to create an expandable
 					AbstractExampleItem item = (position % 3 == 0 ?
-							DatabaseService.newExpandableItem(position) :
-							DatabaseService.newSimpleItem(position));
+							DatabaseService.newExpandableItem(position, false) :
+							DatabaseService.newSimpleItem(position, false));
 					//Add only if we don't have it
 					if (!DatabaseService.getInstance().getListById().contains(item)) {
 						DatabaseService.getInstance().addItem(position, item);//This is the original list

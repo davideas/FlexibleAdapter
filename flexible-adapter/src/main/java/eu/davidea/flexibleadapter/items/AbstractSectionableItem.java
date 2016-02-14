@@ -1,5 +1,6 @@
 package eu.davidea.flexibleadapter.items;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
 /**
@@ -15,54 +16,50 @@ public abstract class AbstractSectionableItem<VH extends RecyclerView.ViewHolder
 			implements ISectionable<VH, T> {
 
 	/**
-	 * TODO: Header position
+	 * The header of this item
 	 */
-	int headerPosition;
+	T header;
+
 	/**
-	 * TODO: The position of the first item which the header/section will represent
+	 * If the header should be sticky on the top until next header comes and takes its place
 	 */
-	int firstPosition;
-	/**
-	 * The item to which this header is attached
-	 */
-	T attachedItem;
-	/**
-	 * If this header should be sticky on the top until next header comes and takes its place
-	 */
-	boolean sticky;
+	boolean headerSticky;
 
 	/**
 	 * Basic Constructor for Header items.
 	 * <p>By default header cannot be selectable.</p>
 	 *
-	 * @param attachedItem   the item to which this header is attached
-	 * @param shown          display header at the startup
-	 * @param sticky         make header sticky
+	 * @param header       the item to which this header is attached
+	 * @param showHeader   display header at the startup
+	 * @param headerSticky make header sticky
 	 */
-	public AbstractSectionableItem(T attachedItem, boolean shown, boolean sticky) {
-		this.attachedItem = attachedItem;
-		this.sticky = sticky;
-		setHidden(!shown);
+	public AbstractSectionableItem(@NonNull T header, boolean showHeader, boolean headerSticky) {
+		this.header = header;
+		this.headerSticky = headerSticky;
+		if (header != null) {
+			header.setHidden(!showHeader);
+			header.setSelectable(false);
+		}
 	}
 
 	@Override
-	public final boolean isSelectable() {
-		return false;
+	public void setHeaderSticky(boolean headerSticky) {
+		this.headerSticky = headerSticky;
 	}
 
 	@Override
-	public void setSticky(boolean sticky) {
-		this.sticky = sticky;
+	public boolean isHeaderSticky() {
+		return headerSticky;
 	}
 
 	@Override
-	public boolean isSticky() {
-		return sticky;
+	public T getHeader() {
+		return header;
 	}
 
 	@Override
-	public T getAttachedItem() {
-		return attachedItem;
+	public void setHeader(T header) {
+		this.header = header;
 	}
 
 }

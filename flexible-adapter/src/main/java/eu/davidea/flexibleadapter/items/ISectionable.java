@@ -9,12 +9,12 @@ import android.support.v7.widget.RecyclerView;
 public interface ISectionable<VH extends RecyclerView.ViewHolder, T extends IFlexibleItem>
 		extends IFlexibleItem<VH> {
 
-	boolean isSticky();
+	boolean isHeaderSticky();
 
-	void setSticky(boolean sticky);
+	void setHeaderSticky(boolean sticky);
 
-	T getAttachedItem();
+	T getHeader();
 
-	void setAttachedItem(T attachedItem);
+	void setHeader(T header);
 
 }

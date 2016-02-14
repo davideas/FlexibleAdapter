@@ -23,12 +23,16 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder> {
+public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder, AbstractExampleItem> {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 
 	public SimpleItem(String id) {
 		super(id);
+	}
+
+	public SimpleItem(String id, AbstractExampleItem header, boolean showHeader, boolean headerSticky) {
+		super(id, header, showHeader, headerSticky);
 	}
 
 	@Override

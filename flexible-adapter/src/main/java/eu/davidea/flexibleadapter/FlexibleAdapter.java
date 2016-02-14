@@ -406,76 +406,18 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Sets the new headers list.
-	 * <p>The headers will be automatically displayed if all headers are currently shown,
-	 * otherwise they will be kept hidden.</p>
-	 *
-	 * @param headers a non null and not empty list of {@link ISectionable} header objects
-	 * @return this adapter so the call can be chained
-	 * @see #setDisplayHeadersAtStartUp(boolean)
-	 */
-	public FlexibleAdapter withHeaders(@NonNull List<ISectionable> headers) {
-		setHeaders(headers);
-		return this;
-	}
-
-	/**
-	 * Sets the new headers list.
-	 * <p>The headers will be automatically displayed if all headers are currently shown,
-	 * otherwise they will be kept hidden.</p>
-	 *
-	 * @param headers a non null and not empty list of {@link ISectionable} header objects
-	 * @see #setDisplayHeadersAtStartUp(boolean)
-	 */
-	public void setHeaders(@NonNull List<ISectionable> headers) {
-		if (headers != null) {
-			//TODO: Preliminary check if all attached items are free to be attached (no duplicated items allowed)
-			//Save the current status to know if headers will be already displayed
-			boolean alreadyShown = headersShown;
-			//Hide all previous headers if they exists
-			if (mHeaders != null) hideAllHeaders();
-			mHeaders = headers;
-			if (DEBUG) Log.v(TAG, "Imported " + headers.size() + " headers");
-			if (alreadyShown) showAllHeaders();
-		}
-	}
-
-	/**
-	 * Adds 1 header/section to the internal list at its linked position.
+	 * Adds or overwrites the header for the passed Sectionable item.
 	 * <p>The header will be automatically displayed if all headers are currently shown,
 	 * otherwise it will be kept hidden.</p>
 	 *
-	 * @param headerItem item of the header
+	 * @param sectionable the item that holds the header
+	 * @param header      the header item
 	 * @return this adapter so the call can be chained
-	 * @see #areHeadersShown()
 	 */
-	public FlexibleAdapter addHeader(@NonNull ISectionable headerItem) {
-		if (headerItem == null) {
-			Log.e(TAG, "Cannot add null Header!");
-			return this;
-		}
-		//Before adding the header, check the attached item
-		ISectionable existentHeader = getHeaderOf((T) headerItem.getAttachedItem());
-		if (existentHeader != null) {
-			Log.e(TAG, "Cannot add Header " + headerItem +
-					". Attached item already has an header " + existentHeader);
-			return this;
-		}
-		if (getPendingRemovedItem((T) headerItem.getAttachedItem()) != null) {
-			Log.e(TAG, "Cannot add Header " + headerItem +
-					". Attached item is going to be removed soon");
-			return this;
-		}
-		//Initialize the list if necessary and add the new header to it
-		if (mHeaders == null)
-			mHeaders = new ArrayList<ISectionable>();
-		mHeaders.add(headerItem);
-		//Show new header if all others are shown
+	public FlexibleAdapter setHeaderTo(@NonNull ISectionable sectionable, @NonNull T header) {
+		sectionable.setHeader(header);
 		if (headersShown) {
-			showHeader(headerItem);
-		} else {
-			headerItem.setHidden(true);
-			mapViewTypeFrom((T) headerItem);
+			showHeader(getGlobalPositionOf((T) sectionable), (T) sectionable);
 		}
 		return this;
 	}
@@ -485,48 +427,55 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @return list non-null with all the header items.
 	 */
-	public List<ISectionable> getHeaderItems() {
-		return mHeaders;
+	public List<T> getHeaderItems() {
+		List<T> headers = new ArrayList<T>();
+		for (T item : mItems) {
+			T header = getHeaderOf(item);
+			if (header != null)
+				headers.add(header);
+		}
+		return headers;
 	}
 
-	public ISectionable getHeaderOf(T item) {
-		if (mHeaders != null) {
-			for (ISectionable header : mHeaders) {
-				if (header.getAttachedItem() != null && header.getAttachedItem().equals(item)) {
-					return header;
-				}
+	public boolean isHeader(@NonNull T item) {
+		return getSectionableOf(item) != null;
+	}
+
+	public boolean hasHeader(@NonNull T item) {
+		return item != null && item instanceof ISectionable
+				&& ((ISectionable) item).getHeader() != null;
+	}
+
+	public T getHeaderOf(@NonNull T item) {
+		if (item instanceof ISectionable) {
+			return (T) ((ISectionable) item).getHeader();
+		}
+		return null;
+	}
+
+	public ISectionable getSectionableOf(@NonNull T header) {
+		for (T listItem : mItems) {
+			if (listItem instanceof ISectionable) {
+				ISectionable sectionable = (ISectionable) listItem;
+				if (sectionable.getHeader() != null && sectionable.getHeader().equals(header))
+					return sectionable;
 			}
 		}
 		return null;
 	}
 
-	public List<Integer> getHeadersActualPositions() {
-		List<Integer> list = new ArrayList<Integer>(mHeaders.size());
-		for (int i = 0; i < mItems.size(); i++) {
-			if (mItems.get(i) instanceof ISectionable)
-				list.add(i);
-		}
-		return list;
-	}
-
 	/**
-	 * Shows all headers in the RecyclerView at their attached position.
+	 * Shows all headers in the RecyclerView at their linked position.
 	 * <p>Headers can be shown or hidden all together.</p>
 	 *
 	 * @see #hideAllHeaders()
 	 */
 	public void showAllHeaders() {
-		if (mHeaders == null) {
-			Log.w(TAG, "Header list is empty, nothing to show!");
-			return;
-		}
 		multiRange = true;
-		for (int i = mHeaders.size() - 1; i >= 0; i--) {
-			//Headers must be added from last position: an header can be
-			// attached to another one, if all items are removed
-			showHeader(mHeaders.get(i));
+		for (int position = 0; position < mItems.size(); position++) {
+			showHeader(position, mItems.get(position));
 		}
-		if (mHeaders.size() > 0) headersShown = true;
+		headersShown = true;
 		multiRange = false;
 	}
 
@@ -537,44 +486,36 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @see #showAllHeaders()
 	 */
 	public void hideAllHeaders() {
-		if (mHeaders == null) {
-			Log.w(TAG, "Header list is empty, nothing to hide!");
-			return;
-		}
 		multiRange = true;
-		for (int i = mHeaders.size() - 1; i >= 0; i--) {
-			hideHeader(mHeaders.get(i));
+		for (int position = mItems.size() - 1; position >= 0; position--) {
+			hideHeader(mItems.get(position));
 		}
 		headersShown = false;
 		multiRange = false;
 	}
 
 	/**
-	 * Hides and completely remove the header from Adapter.
+	 * Hides and completely removes the header from the Adapter and from the item that holds it.
+	 * <p>No undo is possible.</p>
 	 *
-	 * @param header the header item to remove
+	 * @param item the item that holds the header
 	 */
-	public void deleteHeader(@NonNull ISectionable header) {
-		if (mHeaders == null) {
-			Log.w(TAG, "Header list is empty, nothing to delete!");
-			return;
-		}
-		int index = mHeaders.indexOf(header);
-		if (index >= 0) {
-			if (DEBUG) Log.v(TAG, "Deleting header " + header);
-			int position = getGlobalPositionOf((T) header);
-			if (position >= 0) {
-				removeItem(position);
-			}
-			mHeaders.remove(index);
-		} else {
-			if (DEBUG) Log.w(TAG, "Header not found " + header);
+	public void deleteHeaderFrom(@NonNull T item) {
+		if (item instanceof ISectionable) {
+			ISectionable sectionable = (ISectionable) item;
+			if (DEBUG) Log.v(TAG, "Deleting header " + sectionable.getHeader());
+			hideHeader(item);
+			sectionable.setHeader(null);
 		}
 	}
 
 	private void showAllHeadersAfterRefresh() {
-		if (mHeaders != null && headersShown) {
-			for (ISectionable header : mHeaders) header.setHidden(true);
+		if (headersShown) {
+			for (T item : mItems) {
+				T header = getHeaderOf(item);
+				if (header != null)
+					header.setHidden(true);
+			}
 			showAllHeaders();
 		}
 	}
@@ -582,17 +523,17 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * Internal method to show/add an header in the internal list.
 	 *
-	 * @param header the header
+	 * @param position the position where the header will be displayed
+	 * @param item     the item that holds the header
 	 */
-	private void showHeader(@NonNull ISectionable header) {
-		int position = getGlobalPositionOf((T) header.getAttachedItem());
-		if (position < 0) {
-			Log.e(TAG, "Cannot add Header. Cannot find item to which attach the Header! headerItem=" + header);
-			return;
-		}
-		if (header.isHidden() && getPendingRemovedItem((T) header) == null) {
+	private void showHeader(int position, @NonNull T item) {
+		//Check header existence
+		if (!hasHeader(item) || getPendingRemovedItem(item) != null) return;
+		//Take the header
+		T header = getHeaderOf(item);
+		if (header.isHidden()) {
 			if (DEBUG) Log.v(TAG, "Showing header at position " + position + "=" + header);
-			addItem(position, (T) header);
+			addItem(position, header);
 			header.setHidden(false);
 		} else {
 			if (DEBUG) Log.w(TAG, "Header already shown at position " + position + "=" + header);
@@ -600,43 +541,25 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Internal method to hides/remove an header from the internal list.
+	 * Internal method to hide/remove an header from the internal list.
 	 *
-	 * @param header the header
+	 * @param item the item that holds the header
 	 */
-	private void hideHeader(@NonNull ISectionable header) {
-		int position = getGlobalPositionOf((T) header);
-		if (position >= 0) {
+	private void hideHeader(@NonNull T item) {
+		//Check header existence
+		if (!hasHeader(item)) return;
+		//Take the header
+		T header = getHeaderOf(item);
+		if (!header.isHidden()) {
+			int position = getGlobalPositionOf(header);
 			if (DEBUG) Log.v(TAG, "Hiding header at position " + position + "=" + header);
 			header.setHidden(true);
 			//Remove and notify removals, don't create RestoreInfo object by calling removeItem()
 			mItems.remove(position);
 			notifyItemRemoved(position);
 		} else {
-			if (DEBUG) Log.w(TAG, "Header already hidden at position " + position + "=" + header);
+			if (DEBUG) Log.w(TAG, "Header already hidden at position " + getGlobalPositionOf(header) + "=" + header);
 		}
-	}
-
-	/**
-	 * Attach the new item to the header.
-	 *
-	 * @param oldItem     the previous attached item
-	 * @param newPosition the position of the new item to be attached to the header
-	 * @param payload     any non-null user object to notify the parent (the payload will be
-	 *                    therefore passed to the bind method of the parent ViewHolder),
-	 *                    pass null to <u>not</u> notify the parent
-	 * @return the modified header if found, null otherwise
-	 */
-	private ISectionable updateHeaderLinkage(T oldItem, int newPosition, Object payload) {
-		for (ISectionable header : mHeaders) {
-			if (header.getAttachedItem() != null && header.getAttachedItem().equals(oldItem)) {
-				header.setAttachedItem(getItem(newPosition));
-				if (!header.isHidden())
-					notifyItemChanged(getGlobalPositionOf((T) header), payload);
-				return header;
-			}
-		}
-		return null;
 	}
 
 	/*---------------------*/
@@ -939,10 +862,10 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			//Expand!
 			notifyItemRangeInserted(position + 1, subItemsCount);
 			//Show also the headers of the subItems
-			if (mHeaders != null && headersShown) {
+			if (headersShown) {
+				int count = 0;
 				for (T subItem : subItems) {
-					ISectionable header = getHeaderOf(subItem);
-					if (header != null) showHeader(header);
+					showHeader(position + (++count), subItem);
 				}
 			}
 
@@ -998,8 +921,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			//Hide also the headers of the subItems
 			if (mHeaders != null && headersShown) {
 				for (T subItem : subItems) {
-					ISectionable header = getHeaderOf(subItem);
-					if (header != null) hideHeader(header);
+					hideHeader(subItem);
 				}
 			}
 
@@ -1351,12 +1273,9 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			Log.e(TAG, "Cannot removeRange with positionStart out of OutOfBounds!");
 			return;
 		}
-		//Handle header linkage
-		ISectionable header = updateHeaderLinkage(getItem(positionStart), positionStart + itemCount, payload);
 
 		int parentPosition = -1;
 		IExpandable parent = null;
-		//for (int position = positionStart + itemCount - 1; position >= positionStart; position--) {
 		for (int position = positionStart; position < positionStart + itemCount; position++) {
 			if (!permanentDelete) {
 				T item = getItem(positionStart);
@@ -1365,13 +1284,14 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 				if (parent == null) parent = getExpandableOf(item);
 				//Differentiate: (Expandable & NonExpandable with No parent) from (NonExpandable with a parent)
 				if (isExpandable(item) || parent == null) {
-					createRestoreItemInfo(positionStart, item,
-							(position == positionStart ? header : null), payload);
+					createRestoreItemInfo(positionStart, item, payload);
 				} else {
-					parentPosition = createRestoreSubItemInfo(parent, item,
-							(position == positionStart ? header : null), payload);
+					parentPosition = createRestoreSubItemInfo(parent, item, payload);
 				}
 			}
+			//Handle header linkage
+//			T header = getHeaderOf(item);
+//			if (header != null)
 			//Remove item from internal list
 			mItems.remove(positionStart);
 		}
@@ -1461,7 +1381,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		multiRange = true;
 		int initialCount = getItemCount();
 		//Selection coherence: start from a clear situation, clear selection if restoreSelection is active
-		if (restoreSelection) clearSelection();
+		clearSelection();
 		adjustSelected = false;
 		//Start from latest item deleted, since others could rely on it
 		for (int i = mRestoreList.size() - 1; i >= 0; i--) {
@@ -2009,19 +1929,19 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 					oldPosition = toPosition;
 					newPosition = fromPosition;
 					//Update header linkage swap
-					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
+					//updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 					//Swap the 2 headers attached item
-					toHeader.setAttachedItem(fromHeader.getAttachedItem());
-					fromHeader.setAttachedItem(toHeader);
+					toHeader.setHeader(fromHeader.getHeader());
+					fromHeader.setHeader(toHeader);
 				} else {
 					//An Header receives the toItem
 					oldPosition = fromPosition;
 					newPosition = toPosition;
 					//Update header linkage swap
-					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
+					//updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 					//Swap the 2 headers attached item
-					fromHeader.setAttachedItem(toHeader.getAttachedItem());
-					toHeader.setAttachedItem(fromHeader);
+					fromHeader.setHeader(toHeader.getHeader());
+					toHeader.setHeader(fromHeader);
 				}
 				notifyItemChanged(fromPosition, true);
 				notifyItemChanged(toPosition, true);
@@ -2040,7 +1960,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 					newPosition = fromPosition;
 				}
 				//Update header linkage swap
-				updateHeaderLinkage(getItem(oldPosition), newPosition, true);
+				//updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 			} else {
 				if (toItem instanceof ISectionable) {
 					//An Header is being dragged up
@@ -2056,7 +1976,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 					newPosition = toPosition;
 				}
 				//Update header linkage swap
-				updateHeaderLinkage(getItem(oldPosition), newPosition, true);
+				//updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 			}
 		}
 		//TODO: If item with a section has being dragged, should section follow the item as well ??
@@ -2182,16 +2102,15 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * @param expandable the expandable, parent of this sub item
 	 * @param item       the deleted item
-	 * @param header     the header item
 	 * @param payload    any payload object
 	 * @return the parent position
 	 */
-	private int createRestoreSubItemInfo(IExpandable expandable, T item, ISectionable header, Object payload) {
+	private int createRestoreSubItemInfo(IExpandable expandable, T item, Object payload) {
 		int parentPosition = getGlobalPositionOf((T) expandable);
 		List<T> siblings = getExpandableList(expandable);
 		int childPosition = siblings.indexOf(item);
 		item.setHidden(true);
-		mRestoreList.add(new RestoreInfo((T) expandable, item, childPosition, header, payload));
+		mRestoreList.add(new RestoreInfo((T) expandable, item, childPosition, payload));
 		if (DEBUG)
 			Log.v(TAG, "Recycled Child " + mRestoreList.get(mRestoreList.size() - 1) + " with Parent position=" + parentPosition);
 		return parentPosition;
@@ -2199,10 +2118,9 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 
 	/**
 	 * @param position the position of the item to retain.
-	 * @param header   the header item
 	 * @param item     the deleted item
 	 */
-	private void createRestoreItemInfo(int position, T item, ISectionable header, Object payload) {
+	private void createRestoreItemInfo(int position, T item, Object payload) {
 		//Collapse Parent before removal if it is expanded!
 		if (isExpanded(item))
 			collapse(position);
@@ -2215,7 +2133,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			IExpandable expandable = getExpandableOf(refItem);
 			if (expandable != null) refItem = (T) expandable;
 		}
-		mRestoreList.add(new RestoreInfo(refItem, item, header, payload));
+		mRestoreList.add(new RestoreInfo(refItem, item, payload));
 		if (DEBUG)
 			Log.v(TAG, "Recycled Parent " + mRestoreList.get(mRestoreList.size() - 1) + " on position=" + position);
 	}
@@ -2433,7 +2351,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 
 		private void adjustPositions(int positionStart, int itemCount) {
 			if (!filtering) {//Filtering has multiple insert and removal, we skip this process
-				if (adjustSelected)//Don't, if remove range / restore children
+				if (adjustSelected)//Don't, if remove range / restore
 					adjustSelected(positionStart, itemCount);
 				adjustSelected = true;
 			}
@@ -2465,20 +2383,17 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		T refItem = null, filterRefItem = null;
 		// The deleted item
 		T item = null;
-		//Any header to which this item was attached
-		ISectionable header = null;
 		// Payload for the refItem
 		Object payload = false;
 
-		public RestoreInfo(T refItem, T item, ISectionable header, Object payload) {
-			this(refItem, item, -1, header, payload);
+		public RestoreInfo(T refItem, T item, Object payload) {
+			this(refItem, item, -1, payload);
 		}
 
-		public RestoreInfo(T refItem, T item, int relativePosition, ISectionable header, Object payload) {
+		public RestoreInfo(T refItem, T item, int relativePosition, Object payload) {
 			this.refItem = refItem;//This can be an Expandable or an Header
 			this.item = item;
 			this.relativePosition = relativePosition;
-			this.header = header;
 			this.payload = payload;
 		}
 
@@ -2506,10 +2421,12 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		}
 
 		public void restoreHeader() {
-			if (header != null) {
-				header.setAttachedItem(item);
-				if (!header.isHidden())
-					notifyItemChanged(getGlobalPositionOf((T) header), payload);
+			if (item instanceof ISectionable) {
+				ISectionable sectionable = (ISectionable) item;
+				T header = (T) sectionable.getHeader();
+				if (header != null && !header.isHidden()) {
+					notifyItemChanged(getGlobalPositionOf(header), payload);
+				}
 			}
 		}
 

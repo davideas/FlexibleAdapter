@@ -27,6 +27,10 @@ public class ExpandableItem extends SimpleItem
 		super(id);
 	}
 
+	public ExpandableItem(String id, AbstractExampleItem header, boolean showHeader, boolean headerSticky) {
+		super(id, header, showHeader, headerSticky);
+	}
+
 	@Override
 	public boolean isExpanded() {
 		return mExpanded;
@@ -80,4 +84,5 @@ public class ExpandableItem extends SimpleItem
 	public String toString() {
 		return super.toString() + mSubItems + "]";
 	}
+
 }

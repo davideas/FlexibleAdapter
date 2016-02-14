@@ -10,7 +10,6 @@ import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
-import eu.davidea.flexibleadapter.items.ISectionable;
 
 /**
  * Created by Davide Steduto on 23/11/2015.
@@ -37,25 +36,44 @@ public class DatabaseService {
 
 	DatabaseService() {
 		for (int i = 0; i < ITEMS; i++) {
-			mItems.add(i % 3 == 0 ? newExpandableItem(i) : newSimpleItem(i));
+			mItems.add(i % 3 == 0 ?
+					newExpandableItem(i + 1, i % HEADERS == 0) :
+					newSimpleItem(i + 1, i % HEADERS == 0));
 		}
 	}
 
-	public static SimpleItem newSimpleItem(int i) {
-		SimpleItem item = new SimpleItem("I" + (++i));
+	public static HeaderItem newHeader(int i) {
+		HeaderItem header = new HeaderItem("H" + (1 + i / HEADERS));
+		header.setTitle("Header " + (1 + i / HEADERS));
+		return header;
+	}
+
+	public static SimpleItem newSimpleItem(int i, boolean withHeader) {
+		SimpleItem item;
+		if (withHeader) {
+			item = new SimpleItem("I" + i, newHeader(i), false, false);
+			item.getHeader().setSubtitle("Attached to Simple Item " + i);
+		} else {
+			item = new SimpleItem("I" + i);
+		}
 		item.setTitle("Simple Item " + i);
 		item.setSubtitle("Subtitle " + i);
 		return item;
 	}
 
-	public static ExpandableItem newExpandableItem(int i) {
-		//All Items are expandable because they implements IExpandable
-		ExpandableItem expandableItem = new ExpandableItem("E" + (++i));
-		//Let's initially expand the first father with subElements
-//		expandableItem.setInitiallyExpanded(i == 2);
+	public static ExpandableItem newExpandableItem(int i, boolean withHeader) {
+		//Items are expandable because they implements IExpandable
+		ExpandableItem expandableItem;
+		if (withHeader) {
+			expandableItem = new ExpandableItem("E" + i, newHeader(i), false, false);
+			expandableItem.getHeader().setSubtitle("Attached to Expandable Item " + i);
+		} else {
+			expandableItem = new ExpandableItem("E" + i);
+		}
+		//Let's initially expand the first parent item with subElements
+//		expandableItem.setInitiallyExpanded(i == 3);
 //		expandableItem.setSelectable(false);
 		expandableItem.setTitle("Expandable Item " + i);
-		//Add subItems every N elements
 		//SubItems are not expandable by default, but thy might be if extends/implements IExpandable
 		for (int j = 1; j <= SUB_ITEMS; j++) {
 			SubItem subItem = new SubItem(expandableItem.getId() + "S" + j);
@@ -65,16 +83,28 @@ public class DatabaseService {
 		return expandableItem;
 	}
 
-	public List<ISectionable> buildHeaders() {
-		List<ISectionable> headers = new ArrayList<ISectionable>();
-		for (int i = 0; i < (ITEMS/HEADERS); i++) {
-			HeaderItem header = new HeaderItem("H" + i, mItems.get(i * HEADERS), false, false);
+	/* Or you can add headers later with this kind of method */
+	public void buildHeaders() {
+		for (int i = 0; i < (ITEMS / HEADERS); i++) {
+			HeaderItem header = new HeaderItem("H" + i);
 			header.setTitle("Header " + (i + 1));
+			header.setSubtitle("Attached to " + mItems.get(i * HEADERS));
 			header.setHidden(true);
-			headers.add(header);
+			//noinspection unchecked
+			mItems.get(i * HEADERS).setHeader(header);
 		}
-		return headers;
 	}
+
+//	public List<ISectionable> buildHeaders() {
+//		List<ISectionable> headers = new ArrayList<ISectionable>();
+//		for (int i = 0; i < (ITEMS/HEADERS); i++) {
+//			HeaderItem header = new HeaderItem("H" + i, mItems.get(i * HEADERS), false, false);
+//			header.setTitle("Header " + (i + 1));
+//			header.setHidden(true);
+//			headers.add(header);
+//		}
+//		return headers;
+//	}
 
 	/**
 	 * @return Always a copy of the original list.

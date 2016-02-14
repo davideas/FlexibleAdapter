@@ -18,7 +18,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder> {
+public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder, AbstractExampleItem> {
 
 	private static final long serialVersionUID = 2519281529221244210L;
 
