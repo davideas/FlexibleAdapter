@@ -449,6 +449,11 @@ public class MainActivity extends AppCompatActivity implements
 		toggleSelection(position);
 	}
 
+//	@Override
+//	public boolean shouldMoveItem(int fromPosition, int toPosition) {
+//		return true;
+//	}
+
 	@Override
 	public void onItemMove(int fromPosition, int toPosition) {
 		AbstractExampleItem fromItem = mAdapter.getItem(fromPosition);
@@ -458,9 +463,9 @@ public class MainActivity extends AppCompatActivity implements
 			return;
 		}
 		//FIXME: this doesn't work yet with subItems.....
-		DatabaseService.getInstance().swapItem(
-				DatabaseService.getInstance().getListById().indexOf(fromItem),
-				DatabaseService.getInstance().getListById().indexOf(toItem));
+//		DatabaseService.getInstance().swapItem(
+//				DatabaseService.getInstance().getListById().indexOf(fromItem),
+//				DatabaseService.getInstance().getListById().indexOf(toItem));
 	}
 
 	@Override

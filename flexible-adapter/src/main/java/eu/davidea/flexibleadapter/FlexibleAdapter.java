@@ -454,13 +454,23 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			Log.e(TAG, "Cannot add null Header!");
 			return this;
 		}
-		//Initialize the list
-		if (mHeaders == null) mHeaders = new ArrayList<ISectionable>();
-		//TODO: Before adding the header, check the attached item:
-		// - is not already linked to another header!
-		// - is not pending removal
-		//TODO: Check if child item already supports the header item (in theory yes)
+		//Before adding the header, check the attached item
+		ISectionable existentHeader = getHeaderOf((T) headerItem.getAttachedItem());
+		if (existentHeader != null) {
+			Log.e(TAG, "Cannot add Header " + headerItem +
+					". Attached item already has an header " + existentHeader);
+			return this;
+		}
+		if (getPendingRemovedItem((T) headerItem.getAttachedItem()) != null) {
+			Log.e(TAG, "Cannot add Header " + headerItem +
+					". Attached item is going to be removed soon");
+			return this;
+		}
+		//Initialize the list if necessary and add the new header to it
+		if (mHeaders == null)
+			mHeaders = new ArrayList<ISectionable>();
 		mHeaders.add(headerItem);
+		//Show new header if all others are shown
 		if (headersShown) {
 			showHeader(headerItem);
 		} else {
@@ -554,8 +564,6 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			if (DEBUG) Log.v(TAG, "Deleting header " + header);
 			int position = getGlobalPositionOf((T) header);
 			if (position >= 0) {
-				//TODO: Restore of an header and restore previous reference of the attached item
-				//TODO: Modify the reference of the attached item with the next item
 				removeItem(position);
 			}
 			mHeaders.remove(index);
@@ -1988,6 +1996,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		notifyItemMoved(fromPosition, toPosition);
 		//Header swap linkage
 		if (mHeaders != null && headersShown) {
+			//TODO: Improve the logic for swapping with headers
 			T fromItem = getItem(fromPosition);
 			T toItem = getItem(toPosition);
 			int newPosition, oldPosition;
@@ -2001,7 +2010,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 					newPosition = fromPosition;
 					//Update header linkage swap
 					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
-					//Swap the 2 headers
+					//Swap the 2 headers attached item
 					toHeader.setAttachedItem(fromHeader.getAttachedItem());
 					fromHeader.setAttachedItem(toHeader);
 				} else {
@@ -2010,7 +2019,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 					newPosition = toPosition;
 					//Update header linkage swap
 					updateHeaderLinkage(getItem(oldPosition), newPosition, true);
-					//Swap the 2 headers
+					//Swap the 2 headers attached item
 					fromHeader.setAttachedItem(toHeader.getAttachedItem());
 					toHeader.setAttachedItem(fromHeader);
 				}
@@ -2050,7 +2059,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 				updateHeaderLinkage(getItem(oldPosition), newPosition, true);
 			}
 		}
-		//TODO: If item in a section has being dragged, should swap section as well ??
+		//TODO: If item with a section has being dragged, should section follow the item as well ??
 
 		//TODO: Allow child to be moved into another parent, update the 2 parents, optionally: 1) collapse the new parent 2) expand it 3) leave as it is
 	}
@@ -2060,29 +2069,9 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
-		//TODO: Implement logic for views, when expandable items are already expanded or collapsed.
-//		boolean move = false;
-//		T fromItem = null, toItem = null;
-//		if (fromPosition > toPosition) {
-//			fromItem = getItem(fromPosition);
-//			toItem = getItem(Math.max(0, toPosition - 1));
-//		} else {
-//			fromItem = getItem(fromPosition);
-//			toItem = getItem(toPosition);
+//		if (mItemMoveListener != null) {
+//			return mItemMoveListener.shouldMoveItem(fromPosition, toPosition);
 //		}
-//
-//		if (DEBUG) Log.v(TAG, "shouldMove from=" + fromPosition + " to=" + toPosition);
-//		if (DEBUG) Log.v(TAG, "shouldMove fromItem=" + fromItem + " toItem=" + toItem);
-//
-//		if (!fromItem.isExpandable() && toItem.isExpandable() && !toItem.isExpanded()) {
-//			expand(getGlobalPositionOf(toItem));
-//			move = false;
-//		} else if (!fromItem.isExpandable() && !toItem.isExpandable()) {
-//			move = true;
-//		} else if (fromItem.isExpandable() && !toItem.isExpandable()) {
-//			move = false;
-//		}
-//		if (DEBUG) Log.v(TAG, "shouldMove move=" + move);
 		return true;
 	}
 
@@ -2400,6 +2389,18 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 */
 	public interface OnItemMoveListener {
 		/**
+		 * Called when the item would like to be swapped.
+		 * <p>Delegate this permission to the developer.</p>
+		 *
+		 * @param fromPosition the potential start position of the dragged item
+		 * @param toPosition   the potential resolved position of the swapped item
+		 * @return return true if the items can swap ({@code onItemMove()} will be called),
+		 * false otherwise (nothing happens)
+		 * @see #onItemMove(int, int)
+		 */
+//		boolean shouldMoveItem(int fromPosition, int toPosition);
+
+		/**
 		 * Called when an item has been dragged far enough to trigger a move. <b>This is called
 		 * every time an item is shifted</b>, and <strong>not</strong> at the end of a "drop" event.
 		 * <p>The end of the "drop" event is instead handled by
@@ -2407,6 +2408,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
+		 * @see #shouldMoveItem(int, int)
 		 */
 		void onItemMove(int fromPosition, int toPosition);
 	}
