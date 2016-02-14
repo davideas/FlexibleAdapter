@@ -1454,10 +1454,10 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		int initialCount = getItemCount();
 		//Selection coherence: start from a clear situation, clear selection if restoreSelection is active
 		if (restoreSelection) clearSelection();
+		adjustSelected = false;
 		//Start from latest item deleted, since others could rely on it
 		for (int i = mRestoreList.size() - 1; i >= 0; i--) {
 			RestoreInfo restoreInfo = mRestoreList.get(i);
-			boolean added;
 			if (restoreInfo.relativePosition >= 0) {
 				//Restore child, if not deleted
 				if (DEBUG) Log.v(TAG, "Restore Child " + restoreInfo);
@@ -1467,7 +1467,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 				if (hasSearchText() && !filterObject(restoreInfo.item, getSearchText()))
 					continue;
 				//Add subItem
-				added = addSubItem(restoreInfo.getRefPosition(), restoreInfo.relativePosition,
+				addSubItem(restoreInfo.getRefPosition(), restoreInfo.relativePosition,
 						restoreInfo.item, false, restoreInfo.payload);
 			} else {
 				//Restore parent or simple item, if not deleted
@@ -1478,23 +1478,25 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 				if (hasSearchText() && !filterExpandableObject(restoreInfo.item, getSearchText()))
 					continue;
 				//Add item
-				added = addItem(restoreInfo.getRestorePosition(), restoreInfo.item);
+				addItem(restoreInfo.getRestorePosition(), restoreInfo.item);
 			}
 			//Item is again visible
 			restoreInfo.item.setHidden(false);
-			//Restore selection if requested, before emptyBin.
-			if (restoreSelection && restoreInfo.item.isSelectable() && added) {
-				if (restoreInfo.item instanceof IExpandable || getExpandableOf(restoreInfo.item) == null) {
-					parentSelected = true;
-					getSelectedPositions().add(restoreInfo.getRestorePosition());
-				} else {
-					childSelected = true;
-					getSelectedPositions().add(restoreInfo.getRefPosition() + 1 + restoreInfo.relativePosition);
+		}
+		//Restore selection if requested, before emptyBin.
+		if (restoreSelection) {
+			if (isExpandable(mRestoreList.get(0).item) || getExpandableOf(mRestoreList.get(0).item) == null) {
+				parentSelected = true;
+			} else {
+				childSelected = true;
+			}
+			for (RestoreInfo restoreInfo : mRestoreList) {
+				if (restoreInfo.item.isSelectable()) {
+					getSelectedPositions().add(getGlobalPositionOf(restoreInfo.item));
 				}
 			}
+			if (DEBUG) Log.v(TAG, "Selected positions after restore " + getSelectedPositions());
 		}
-		if (DEBUG && restoreSelection)
-			Log.v(TAG, "Selected positions after restore " + getSelectedPositions());
 
 		//Call listener to update EmptyView
 		multiRange = false;
