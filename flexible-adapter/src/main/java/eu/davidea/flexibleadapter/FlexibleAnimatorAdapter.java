@@ -223,7 +223,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 		//FIXME: first completed visible item on rotation gets high delay
 
 //		if (DEBUG)
-//			Log.d(TAG, "shouldAnimate=" + shouldAnimate
+//			Log.v(TAG, "shouldAnimate=" + shouldAnimate
 //					+ " isFastScroll=" + isFastScroll
 //					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
 //					+ " isReverseEnabled=" + isReverseEnabled
@@ -245,7 +245,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 				addAlphaAnimator(animators, itemView, 0f);
 
 			if (DEBUG)
-				Log.d(TAG, "Start Animation on position " + position + " Animators=" + animatorsUsed);
+				Log.v(TAG, "Start Animation on position " + position + " Animators=" + animatorsUsed);
 			animatorsUsed.clear();
 
 			//Execute the animations all together
@@ -285,7 +285,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 
 		int visibleItems = lastVisiblePosition - firstVisiblePosition;
 
-//		if (DEBUG) Log.d(TAG, "Position=" + position +
+//		if (DEBUG) Log.v(TAG, "Position=" + position +
 //				" FirstVisible=" + firstVisiblePosition +
 //				" LastVisible=" + lastVisiblePosition +
 //				" LastAnimated=" + mLastAnimatedPosition +
@@ -295,7 +295,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 		//Stop stepDelay when screen is filled
 		if (mLastAnimatedPosition > visibleItems || //Normal Forward scrolling
 				(firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews)) { //Reverse scrolling
-			if (DEBUG) Log.d(TAG, "Reset AnimationDelay on position " + position);
+			if (DEBUG) Log.v(TAG, "Reset AnimationDelay on position " + position);
 			mInitialDelay = 0L;
 		}
 
@@ -337,7 +337,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 			delay = mInitialDelay + (position * mStepDelay);
 		}
 
-//		if (DEBUG) Log.d(TAG, "Delay[" + position + "]=" + delay +
+//		if (DEBUG) Log.v(TAG, "Delay[" + position + "]=" + delay +
 //				" FirstVisible=" + firstVisiblePosition +
 //				" LastVisible=" + lastVisiblePosition +
 //				" LastAnimated=" + mLastAnimatedPosition +
@@ -455,7 +455,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 		private boolean isNotified;
 		private Handler mAnimatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 			public boolean handleMessage(Message message) {
-				if (DEBUG) Log.d(TAG, "Clear notified for binding Animations");
+				if (DEBUG) Log.v(TAG, "Clear notified for binding Animations");
 				isNotified = false;
 				return true;
 			}
