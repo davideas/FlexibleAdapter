@@ -950,7 +950,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	public int expandAll() {
 		int expanded = 0;
 		//More efficient if we expand from First expandable position
-		for (int i = 0; i < mItems.size() - 1; i++) {
+		for (int i = 0; i < mItems.size(); i++) {
 			if (expand(i, true) > 0) expanded++;
 		}
 		return expanded;
