@@ -14,25 +14,63 @@ import java.util.List;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
- * If you don't have many fields in common better to extend directly from
+ * You should extend directly from
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder, AbstractExampleItem> {
+public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
+		implements ISectionable<SimpleItem.ParentViewHolder, HeaderItem> {
 
 	private static final long serialVersionUID = -6882745111884490060L;
+	/**
+	 * The header of this item
+	 */
+	HeaderItem header;
+
+	/**
+	 * If the header should be sticky on the top until next header comes and takes its place
+	 */
+	boolean headerSticky;
 
 	public SimpleItem(String id) {
 		super(id);
 	}
 
-	public SimpleItem(String id, AbstractExampleItem header, boolean showHeader, boolean headerSticky) {
-		super(id, header, showHeader, headerSticky);
+	public SimpleItem(String id, HeaderItem header, boolean showHeader, boolean headerSticky) {
+		super(id);
+		//THe following statements are copied by AbstractSectionableItem (part of library)
+		this.header = header;
+		this.headerSticky = headerSticky;
+		if (header != null) {
+			header.setHidden(!showHeader);
+			header.setSelectable(false);
+		}
+	}
+
+	@Override
+	public void setHeaderSticky(boolean headerSticky) {
+		this.headerSticky = headerSticky;
+	}
+
+	@Override
+	public boolean isHeaderSticky() {
+		return headerSticky;
+	}
+
+	@Override
+	public HeaderItem getHeader() {
+		return header;
+	}
+
+	@Override
+	public void setHeader(HeaderItem header) {
+		this.header = header;
 	}
 
 	@Override

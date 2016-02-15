@@ -10,19 +10,24 @@ import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * If you don't have many fields in common better to extend directly from
- * {@link eu.davidea.flexibleadapter.items.AbstractSectionableItem} to benefit of the already
- * implemented methods relative to the header.
+ * This is a simple item with custom layout for headers.
+ * <p>A Section should not contain others Sections!</p>
+ * Headers are not Sectionable!
  */
-public class HeaderItem extends AbstractExampleItem<HeaderItem.HeaderViewHolder, AbstractExampleItem> {
+public class HeaderItem extends AbstractFlexibleItem<HeaderItem.HeaderViewHolder> {
 
 	private static final long serialVersionUID = -7408637077727563374L;
 
+	private String id;
+	private String title;
+	private String subtitle;
+
 	public HeaderItem(String id) {
-		super(id);
+		this.id = id;
 	}
 
 	@Override
@@ -32,6 +37,30 @@ public class HeaderItem extends AbstractExampleItem<HeaderItem.HeaderViewHolder,
 			return this.getId().equals(inItem.getId());
 		}
 		return false;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getSubtitle() {
+		return subtitle;
+	}
+
+	public void setSubtitle(String subtitle) {
+		this.subtitle = subtitle;
 	}
 
 	@Override

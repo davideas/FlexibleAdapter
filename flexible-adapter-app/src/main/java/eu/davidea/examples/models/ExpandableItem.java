@@ -27,7 +27,7 @@ public class ExpandableItem extends SimpleItem
 		super(id);
 	}
 
-	public ExpandableItem(String id, AbstractExampleItem header, boolean showHeader, boolean headerSticky) {
+	public ExpandableItem(String id, HeaderItem header, boolean showHeader, boolean headerSticky) {
 		super(id, header, showHeader, headerSticky);
 	}
 

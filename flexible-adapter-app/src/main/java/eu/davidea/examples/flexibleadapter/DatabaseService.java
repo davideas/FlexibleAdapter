@@ -9,7 +9,9 @@ import eu.davidea.examples.models.ExpandableItem;
 import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexibleItem;
+import eu.davidea.flexibleadapter.items.ISectionable;
 
 /**
  * Created by Davide Steduto on 23/11/2015.
@@ -18,13 +20,13 @@ import eu.davidea.flexibleadapter.items.IFlexibleItem;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 1000, SUB_ITEMS = 3, HEADERS = 7;
+	private static final int ITEMS = 100, SUB_ITEMS = 3, HEADERS = 7;
 
 	//TODO FOR YOU: Use userLearnedSelection from settings
 	public static boolean userLearnedSelection = false;
 
 	//Database original items
-	private List<AbstractExampleItem> mItems = new ArrayList<AbstractExampleItem>();
+	private List<AbstractFlexibleItem> mItems = new ArrayList<AbstractFlexibleItem>();
 
 
 	public static DatabaseService getInstance() {
@@ -51,8 +53,9 @@ public class DatabaseService {
 	public static SimpleItem newSimpleItem(int i, boolean withHeader) {
 		SimpleItem item;
 		if (withHeader) {
-			item = new SimpleItem("I" + i, newHeader(i), false, false);
-			item.getHeader().setSubtitle("Attached to Simple Item " + i);
+			HeaderItem header = newHeader(i);
+			header.setSubtitle("Attached to Simple Item " + i);
+			item = new SimpleItem("I" + i, header, false, false);
 		} else {
 			item = new SimpleItem("I" + i);
 		}
@@ -65,11 +68,13 @@ public class DatabaseService {
 		//Items are expandable because they implements IExpandable
 		ExpandableItem expandableItem;
 		if (withHeader) {
-			expandableItem = new ExpandableItem("E" + i, newHeader(i), false, false);
-			expandableItem.getHeader().setSubtitle("Attached to Expandable Item " + i);
+			HeaderItem header = newHeader(i);
+			header.setSubtitle("Attached to Expandable Item " + i);
+			expandableItem = new ExpandableItem("E" + i, header, false, false);
 		} else {
 			expandableItem = new ExpandableItem("E" + i);
 		}
+		//Experimenting NEW features
 		//Let's initially expand the first parent item with subElements
 //		expandableItem.setInitiallyExpanded(i == 3);
 //		expandableItem.setSelectable(false);
@@ -83,36 +88,32 @@ public class DatabaseService {
 		return expandableItem;
 	}
 
-	/* Or you can add headers later with this kind of method */
+	/*
+	 * Or you can add headers later with this kind of method
+	 * BUT, DO NOT CREATE SECTIONABLE OF SECTIONABLE!
+	 */
 	public void buildHeaders() {
 		for (int i = 0; i < (ITEMS / HEADERS); i++) {
 			HeaderItem header = new HeaderItem("H" + i);
 			header.setTitle("Header " + (i + 1));
 			header.setSubtitle("Attached to " + mItems.get(i * HEADERS));
 			header.setHidden(true);
-			//noinspection unchecked
-			mItems.get(i * HEADERS).setHeader(header);
+			IFlexibleItem item = mItems.get(i * HEADERS);
+			if (item instanceof ISectionable) {
+				ISectionable sectionable = (ISectionable) item;
+				//noinspection unchecked
+				sectionable.setHeader(header);
+			}
 		}
 	}
-
-//	public List<ISectionable> buildHeaders() {
-//		List<ISectionable> headers = new ArrayList<ISectionable>();
-//		for (int i = 0; i < (ITEMS/HEADERS); i++) {
-//			HeaderItem header = new HeaderItem("H" + i, mItems.get(i * HEADERS), false, false);
-//			header.setTitle("Header " + (i + 1));
-//			header.setHidden(true);
-//			headers.add(header);
-//		}
-//		return headers;
-//	}
 
 	/**
 	 * @return Always a copy of the original list.
 	 */
-	public List<AbstractExampleItem> getListById() {
+	public List<AbstractFlexibleItem> getListById() {
 		//listId is not used: we have only 1 type of list in this example
 		//Return a copy of the DB: we will perform some tricky code on this list.
-		return new ArrayList<AbstractExampleItem>(mItems);
+		return new ArrayList<AbstractFlexibleItem>(mItems);
 	}
 
 	public void swapItem(int fromPosition, int toPosition) {

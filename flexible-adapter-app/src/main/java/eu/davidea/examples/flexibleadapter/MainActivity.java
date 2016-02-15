@@ -32,11 +32,13 @@ import android.widget.Toast;
 import eu.davidea.common.SimpleDividerItemDecoration;
 import eu.davidea.examples.models.AbstractExampleItem;
 import eu.davidea.examples.models.ExpandableItem;
+import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flipview.FlipView;
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.setAnimationOnReverseScrolling(true);
 		mAdapter.setAutoCollapseOnExpand(false);
 		mAdapter.setAutoScrollOnExpand(true);
+		mAdapter.setRemoveOrphanHeaders(false);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements
 				}
 			});
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-		//FIXME: Change ItemDecorator, this doesn't work well
+		//FIXME: Change ItemDecorator, this doesn't work well!!!
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
 				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
 
@@ -129,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements
 		//Experimenting NEW features
 		mAdapter.setLongPressDragEnabled(true);
 		mAdapter.setSwipeEnabled(true);
-		//Add sample item on the top
+		//Add sample item on the top (not part of library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		//Experimental, set some headers!
 		//mAdapter.setDisplayHeadersAtStartUp(true);
@@ -420,18 +423,10 @@ public class MainActivity extends AppCompatActivity implements
 			// that an item has been selected.
 			if (mAdapter.getItemCount() > 0) {
 				if (position != mActivatedPosition) setActivatedPosition(position);
-				AbstractExampleItem abstractItem = mAdapter.getItem(position);
+				AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
 				assert abstractItem != null;
-				String title = null;
-				if (mAdapter.isExpandable(abstractItem)) {
-					ExpandableItem expandableItem = (ExpandableItem) abstractItem;
-					if (expandableItem.getSubItems() == null || expandableItem.getSubItems().size() == 0) {
-						title = expandableItem.getTitle();
-					}
-				} else {
-					title = abstractItem.getTitle();
-				}
-				if (title != null) {
+				String title = extractTitleFrom(abstractItem);
+				if (!title.isEmpty()) {
 					//TODO FOR YOU: call your custom Action, for example mCallback.onItemSelected(item.getId());
 					EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
 				}
@@ -456,8 +451,8 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemMove(int fromPosition, int toPosition) {
-		AbstractExampleItem fromItem = mAdapter.getItem(fromPosition);
-		AbstractExampleItem toItem = mAdapter.getItem(toPosition);
+		AbstractFlexibleItem fromItem = mAdapter.getItem(fromPosition);
+		AbstractFlexibleItem toItem = mAdapter.getItem(toPosition);
 		//Don't swap if an Header is involved!!!
 		if (fromItem instanceof ISectionable || toItem instanceof ISectionable) {
 			return;
@@ -470,15 +465,15 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemSwipe(int position, int direction) {
-		AbstractExampleItem item = mAdapter.getItem(position);
-		assert item != null;
+		AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
+		assert abstractItem != null;
 		//Experimenting NEW feature
-		if (item.isSelectable())
+		if (abstractItem.isSelectable())
 			mAdapter.setRestoreSelectionOnUndo(false);
 
 		//TODO: Create Undo Helper with SnackBar?
 		StringBuilder message = new StringBuilder();
-		message.append(item.getTitle())
+		message.append(extractTitleFrom(abstractItem))
 				.append(" ").append(getString(R.string.action_deleted));
 		//noinspection ResourceType
 		mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)
@@ -500,9 +495,16 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onTitleModified(int position, String newTitle) {
-		AbstractExampleItem item = mAdapter.getItem(position);
-		item.setTitle(newTitle);
-		mAdapter.updateItem(position, item, null);
+		AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
+		assert abstractItem != null;
+		if (abstractItem instanceof AbstractExampleItem) {
+			AbstractExampleItem exampleItem = (AbstractExampleItem) abstractItem;
+			exampleItem.setTitle(newTitle);
+		} else if (abstractItem instanceof HeaderItem) {
+			HeaderItem headerItem = (HeaderItem) abstractItem;
+			headerItem.setTitle(newTitle);
+		}
+		mAdapter.updateItem(position, abstractItem, null);
 	}
 
 	/**
@@ -558,7 +560,8 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onDeleteConfirmed() {
-		for (AbstractExampleItem adapterItem : mAdapter.getDeletedItems()) {
+		mSwipeHandler.sendEmptyMessage(0);
+		for (AbstractFlexibleItem adapterItem : mAdapter.getDeletedItems()) {
 			//Removing items from Database. Example:
 			try {
 				//NEW! You can take advantage of AutoMap and differentiate logic by viewType using "switch" statement
@@ -624,7 +627,7 @@ public class MainActivity extends AppCompatActivity implements
 				//Build message before delete, for the SnackBar
 				StringBuilder message = new StringBuilder();
 				for (Integer pos : mAdapter.getSelectedPositions()) {
-					message.append(mAdapter.getItem(pos).getTitle());
+					message.append(extractTitleFrom(mAdapter.getItem(pos)));
 					message.append(", ");
 				}
 				message.append(" ").append(getString(R.string.action_deleted));
@@ -702,6 +705,25 @@ public class MainActivity extends AppCompatActivity implements
 		//Close the App
 		DatabaseService.onDestroy();
 		super.onBackPressed();
+	}
+
+	private String extractTitleFrom(AbstractFlexibleItem abstractItem) {
+		if (abstractItem instanceof ExpandableItem) {
+			ExpandableItem expandableItem = (ExpandableItem) abstractItem;
+			if (expandableItem.getSubItems() == null || expandableItem.getSubItems().size() == 0) {
+				return expandableItem.getTitle();
+			}
+
+		} else if (abstractItem instanceof AbstractExampleItem) {
+			AbstractExampleItem exampleItem = (AbstractExampleItem) abstractItem;
+			return exampleItem.getTitle();
+
+		} else if (abstractItem instanceof HeaderItem) {
+			HeaderItem headerItem = (HeaderItem) abstractItem;
+			return headerItem.getTitle();
+		}
+		//We already covered all situations with instanceof
+		return "";
 	}
 
 }

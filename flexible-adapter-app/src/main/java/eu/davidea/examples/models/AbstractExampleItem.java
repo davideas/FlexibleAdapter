@@ -4,15 +4,14 @@ import android.support.v7.widget.RecyclerView;
 
 import java.io.Serializable;
 
-import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
-import eu.davidea.flexibleadapter.items.IFlexibleItem;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 
 /**
  * This class will benefit of the already implemented methods (getter and setters) in
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem}.
  */
-public abstract class AbstractExampleItem<VH extends RecyclerView.ViewHolder, T extends IFlexibleItem>
-		extends AbstractSectionableItem<VH, T>
+public abstract class AbstractExampleItem<VH extends RecyclerView.ViewHolder>
+		extends AbstractFlexibleItem<VH>
 		implements Serializable {
 
 	private static final long serialVersionUID = -6882745111884490060L;
@@ -22,11 +21,6 @@ public abstract class AbstractExampleItem<VH extends RecyclerView.ViewHolder, T 
 	private String subtitle;
 
 	public AbstractExampleItem(String id) {
-		this(id, null, false, false);
-	}
-
-	public AbstractExampleItem(String id, T header, boolean showHeader, boolean headerSticky) {
-		super(header, showHeader, headerSticky);
 		this.id = id;
 	}
 

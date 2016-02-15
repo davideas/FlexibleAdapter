@@ -10,9 +10,9 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.davidea.examples.models.AbstractExampleItem;
 import eu.davidea.examples.models.ULSItem;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 
 /**
@@ -21,7 +21,7 @@ import eu.davidea.flexibleadapter.items.IExpandable;
  * You, having different Layout for each item type, would use IFlexibleItem or AbstractFlexibleItem
  * as base item to extend this Adapter.
  */
-public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
+public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 
@@ -41,7 +41,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 	}
 
 	@Override
-	public void updateDataSet(List<AbstractExampleItem> items) {
+	public void updateDataSet(List<AbstractFlexibleItem> items) {
 		super.updateDataSet(items);
 		//Overwrite the list and fully notify the change
 		//Watch out! The original list must a copy
@@ -62,7 +62,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractExampleItem> {
 	}
 
 	@Override
-	public synchronized void filterItems(@NonNull List<AbstractExampleItem> unfilteredItems) {
+	public synchronized void filterItems(@NonNull List<AbstractFlexibleItem> unfilteredItems) {
 		super.filterItems(unfilteredItems);
 		addUserLearnedSelection(false);
 	}
