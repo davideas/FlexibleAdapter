@@ -369,7 +369,6 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @return the global position in the Adapter if found, -1 otherwise
 	 */
 	public int getGlobalPositionOf(@NonNull IFlexibleItem item) {
-		//TODO: Accept an IFlexibleItem and remove all the cast
 		return item != null && mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
 	}
 
@@ -386,9 +385,6 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/*--------------------------*/
 	/* HEADERS/SECTIONS METHODS */
 	/*--------------------------*/
-
-	//TODO: On item removed / inserted / moved switch header linkage
-	//TODO: On restore item after the position of a header switch header linkage
 
 	/**
 	 * @return true if all headers are currently displayed, false otherwise
