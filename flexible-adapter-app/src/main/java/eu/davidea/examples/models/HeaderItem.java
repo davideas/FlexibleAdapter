@@ -10,7 +10,7 @@ import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.items.AbstractHeaderItem;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -18,7 +18,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <p>A Section should not contain others Sections!</p>
  * Headers are not Sectionable!
  */
-public class HeaderItem extends AbstractFlexibleItem<HeaderItem.HeaderViewHolder> {
+public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> {
 
 	private static final long serialVersionUID = -7408637077727563374L;
 
@@ -27,6 +27,7 @@ public class HeaderItem extends AbstractFlexibleItem<HeaderItem.HeaderViewHolder
 	private String subtitle;
 
 	public HeaderItem(String id) {
+		super();
 		this.id = id;
 	}
 
@@ -96,6 +97,13 @@ public class HeaderItem extends AbstractFlexibleItem<HeaderItem.HeaderViewHolder
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "HeaderItem[id=" + id +
+				", title=" + title +
+				", sticky=" + isSticky() + "]";
 	}
 
 }

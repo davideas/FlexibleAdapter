@@ -10,6 +10,8 @@ import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.items.IFlexibleItem;
+import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -18,12 +20,29 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder> {
+public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
+		implements ISectionable<SubItem.ChildViewHolder, HeaderItem> {
 
 	private static final long serialVersionUID = 2519281529221244210L;
 
+	/**
+	 * The header of this item
+	 */
+	HeaderItem header;
+
 	public SubItem(String id) {
 		super(id);
+	}
+
+	@Override
+	public HeaderItem getHeader() {
+		return header;
+	}
+
+	@Override
+	public IFlexibleItem setHeader(HeaderItem header) {
+		this.header = header;
+		return this;
 	}
 
 	@Override
@@ -75,8 +94,7 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder> {
 
 	@Override
 	public String toString() {
-		return "SubItem[id=" + getId() +
-				", title=" + getTitle() + "]";
+		return "SubItem[" + super.toString() + "]";
 	}
 
 }

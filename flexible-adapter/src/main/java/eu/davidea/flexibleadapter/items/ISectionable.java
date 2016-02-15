@@ -6,15 +6,11 @@ import android.support.v7.widget.RecyclerView;
  * @author Davide Steduto
  * @since 07/02/2016
  */
-public interface ISectionable<VH extends RecyclerView.ViewHolder, T extends IFlexibleItem>
+public interface ISectionable<VH extends RecyclerView.ViewHolder, T extends IHeader>
 		extends IFlexibleItem<VH> {
-
-	boolean isHeaderSticky();
-
-	void setHeaderSticky(boolean sticky);
 
 	T getHeader();
 
-	void setHeader(T header);
+	IFlexibleItem setHeader(T header);
 
 }

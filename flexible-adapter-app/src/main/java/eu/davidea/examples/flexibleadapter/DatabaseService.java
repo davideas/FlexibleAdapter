@@ -47,6 +47,7 @@ public class DatabaseService {
 	public static HeaderItem newHeader(int i) {
 		HeaderItem header = new HeaderItem("H" + (1 + i / HEADERS));
 		header.setTitle("Header " + (1 + i / HEADERS));
+		//header is hidden by default!
 		return header;
 	}
 
@@ -55,7 +56,7 @@ public class DatabaseService {
 		if (withHeader) {
 			HeaderItem header = newHeader(i);
 			header.setSubtitle("Attached to Simple Item " + i);
-			item = new SimpleItem("I" + i, header, false, false);
+			item = new SimpleItem("I" + i, header);
 		} else {
 			item = new SimpleItem("I" + i);
 		}
@@ -70,13 +71,13 @@ public class DatabaseService {
 		if (withHeader) {
 			HeaderItem header = newHeader(i);
 			header.setSubtitle("Attached to Expandable Item " + i);
-			expandableItem = new ExpandableItem("E" + i, header, false, false);
+			expandableItem = new ExpandableItem("E" + i, header);
 		} else {
 			expandableItem = new ExpandableItem("E" + i);
 		}
 		//Experimenting NEW features
 		//Let's initially expand the first parent item with subElements
-//		expandableItem.setInitiallyExpanded(i == 3);
+//		expandableItem.setExpanded(i == 3);
 //		expandableItem.setSelectable(false);
 		expandableItem.setTitle("Expandable Item " + i);
 		//SubItems are not expandable by default, but thy might be if extends/implements IExpandable

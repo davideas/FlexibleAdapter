@@ -33,34 +33,13 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 	 */
 	HeaderItem header;
 
-	/**
-	 * If the header should be sticky on the top until next header comes and takes its place
-	 */
-	boolean headerSticky;
-
 	public SimpleItem(String id) {
 		super(id);
 	}
 
-	public SimpleItem(String id, HeaderItem header, boolean showHeader, boolean headerSticky) {
+	public SimpleItem(String id, HeaderItem header) {
 		super(id);
-		//THe following statements are copied by AbstractSectionableItem (part of library)
 		this.header = header;
-		this.headerSticky = headerSticky;
-		if (header != null) {
-			header.setHidden(!showHeader);
-			header.setSelectable(false);
-		}
-	}
-
-	@Override
-	public void setHeaderSticky(boolean headerSticky) {
-		this.headerSticky = headerSticky;
-	}
-
-	@Override
-	public boolean isHeaderSticky() {
-		return headerSticky;
 	}
 
 	@Override
@@ -69,8 +48,9 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 	}
 
 	@Override
-	public void setHeader(HeaderItem header) {
+	public SimpleItem setHeader(HeaderItem header) {
 		this.header = header;
+		return this;
 	}
 
 	@Override
@@ -187,6 +167,8 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 
 	@Override
 	public String toString() {
-		return super.toString() + "]";
+		return this instanceof ExpandableItem ? super.toString() :
+				"SimpleItem[" + super.toString() + "]";
 	}
+
 }

@@ -50,8 +50,9 @@ public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder,
 		return mSubItems!= null && mSubItems.size() > 0;
 	}
 
-	public void setSubItems(List<S> subItem) {
+	public IFlexibleItem setSubItems(List<S> subItem) {
 		mSubItems = new ArrayList<>(subItem);
+		return this;
 	}
 
 	public final int getSubItemsCount() {

@@ -134,9 +134,8 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.setSwipeEnabled(true);
 		//Add sample item on the top (not part of library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
-		//Experimental, set some headers!
-		//mAdapter.setDisplayHeadersAtStartUp(true);
-		//OLD! mAdapter.setHeaders(DatabaseService.getInstance().buildHeaders());
+		//Experimental, show Headers at startUp!
+		mAdapter.showAllHeaders();
 
 		//FAB
 		mFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -453,7 +452,7 @@ public class MainActivity extends AppCompatActivity implements
 	public void onItemMove(int fromPosition, int toPosition) {
 		AbstractFlexibleItem fromItem = mAdapter.getItem(fromPosition);
 		AbstractFlexibleItem toItem = mAdapter.getItem(toPosition);
-		//Don't swap if an Header is involved!!!
+		//Don't swap if a Header is involved!!!
 		if (fromItem instanceof ISectionable || toItem instanceof ISectionable) {
 			return;
 		}

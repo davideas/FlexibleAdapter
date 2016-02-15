@@ -89,6 +89,6 @@ public class ULSItem extends AbstractExampleItem<ULSItem.ExampleViewHolder> {
 
 	@Override
 	public String toString() {
-		return super.toString() + "]";
+		return "ULSItem[" + super.toString() + "]";
 	}
 }

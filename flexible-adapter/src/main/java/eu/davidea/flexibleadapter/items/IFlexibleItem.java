@@ -23,7 +23,7 @@ public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
 	/*---------------*/
 
 	/**
-	 * Return if the Item is enabled.
+	 * Returns if the Item is enabled.
 	 *
 	 * @return (default) true for enabled item, false for disabled one.
 	 */
@@ -37,7 +37,7 @@ public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
 	void setEnabled(boolean enabled);
 
 	/**
-	 * Return if the Item is hidden.
+	 * Returns if the Item is hidden.
 	 *
 	 * @return true for hidden item, (default) false for the shown one.
 	 */
@@ -56,7 +56,7 @@ public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
 	/*--------------------*/
 
 	/**
-	 * Return if the item can be selected.<br/>
+	 * Returns if the item can be selected.<br/>
 	 *
 	 * @return (default) true for a Selectable item, false otherwise
 	 */
