@@ -368,7 +368,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @param item the item to find
 	 * @return the global position in the Adapter if found, -1 otherwise
 	 */
-	public int getGlobalPositionOf(@NonNull T item) {
+	public int getGlobalPositionOf(@NonNull IFlexibleItem item) {
 		//TODO: Accept an IFlexibleItem and remove all the cast
 		return item != null && mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
 	}
@@ -508,7 +508,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @return the Sectionable of the passed header if found, null otherwise
 	 */
 	public ISectionable getSectionableOf(@NonNull IHeader header) {
-		int headerPosition = getGlobalPositionOf((T) header);
+		int headerPosition = getGlobalPositionOf(header);
 		if (DEBUG) Log.v(TAG, "getSectionableOf - Item to evaluate " + headerPosition + "=" + header);
 		for (int position = headerPosition - 1; position <= headerPosition + 2; position++) {
 			IHeader realHeader = getHeaderOf(getItem(position));//This will also return null in case of OutOfBounds!
@@ -596,7 +596,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		//Check header existence
 		if (header == null) return false;
 		if (!header.isHidden()) {
-			int position = getGlobalPositionOf((T) header);
+			int position = getGlobalPositionOf(header);
 			if (position < 0) return false;
 			if (DEBUG) Log.v(TAG, "Hiding header at position " + position + "=" + header);
 			header.setHidden(true);
@@ -606,7 +606,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			return true;
 		} else {
 			if (DEBUG)
-				Log.w(TAG, "Header already hidden at position " + getGlobalPositionOf((T) header) + "=" + header);
+				Log.w(TAG, "Header already hidden at position " + getGlobalPositionOf(header) + "=" + header);
 			return false;
 		}
 	}
@@ -629,7 +629,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			sectionable.setHeader(header);
 			linked = true;
 		}
-		notifyItemChanged(getGlobalPositionOf((T) header), payload);
+		notifyItemChanged(getGlobalPositionOf(header), payload);
 		return linked;
 	}
 
@@ -649,7 +649,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			if (DEBUG) Log.v(TAG, "Unlink header " + header + " from " + sectionable);
 			sectionable.setHeader(null);
 			if (!header.isHidden()) {
-				notifyItemChanged(getGlobalPositionOf((T) header), payload);
+				notifyItemChanged(getGlobalPositionOf(header), payload);
 			}
 			return header;
 		}
@@ -846,7 +846,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @see #getRelativePositionOf(IFlexibleItem)
 	 */
 	public int getExpandablePositionOf(@NonNull T child) {
-		return getGlobalPositionOf((T) getExpandableOf(child));
+		return getGlobalPositionOf(getExpandableOf(child));
 	}
 
 	/**
@@ -1426,7 +1426,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		for (IHeader orphanHeader : orphanHeaders) {
 			if (DEBUG) Log.d(TAG, "Removing orphan header " + orphanHeader);
 			//noinspection Range
-			removeItem(getGlobalPositionOf((T) orphanHeader), payload);
+			removeItem(getGlobalPositionOf(orphanHeader), payload);
 		}
 
 		//Update empty view
@@ -1641,7 +1641,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @param expandable the parent item
 	 * @return the list of deleted children
 	 */
-	public List<T> getDeletedChildren(T expandable) {
+	public List<T> getDeletedChildren(IExpandable expandable) {
 		List<T> deletedChild = new ArrayList<T>();
 		for (RestoreInfo restoreInfo : mRestoreList) {
 			if (restoreInfo.refItem != null && restoreInfo.refItem.equals(expandable) && restoreInfo.relativePosition >= 0)
@@ -1667,7 +1667,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		List<T> subItems = new ArrayList<T>(expandable.getSubItems());
 		//Remove all children pending removal
 		if (mRestoreList.size() > 0) {
-			subItems.removeAll(getDeletedChildren((T) expandable));
+			subItems.removeAll(getDeletedChildren(expandable));
 		}
 		return subItems;
 	}
@@ -2037,58 +2037,41 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		if (DEBUG) {
 			Log.v(TAG, "moveItem afterSwap fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
 		}
-		//Header swap linkage
 		//TODO: Allow child to be moved into another parent, update the 2 parents, optionally: 1) collapse the new parent 2) expand it 3) leave as it is
 		//TODO: If item with a section has being dragged, should section follow the item as well ??
+		//Header swap linkage
 		if (headersShown) {
 			//Situation AFTER items have been swapped, items are inverted!
 			T fromItem = getItem(toPosition);
 			T toItem = getItem(fromPosition);
-
 			int oldPosition, newPosition;
 			if (toItem instanceof IHeader) {
-				if (fromPosition < toPosition) {
-					//A Header is being swapped up
-					oldPosition = toPosition + 1;
-					newPosition = toPosition;
-				} else {
-					//A Header is being swapped down
-					oldPosition = toPosition;
-					newPosition = fromPosition + 1;
-				}
+				//A Header is being swapped up
+				//Else a Header is being swapped down
+				oldPosition = fromPosition < toPosition ? toPosition + 1 : toPosition;
+				newPosition = fromPosition < toPosition ? toPosition : fromPosition + 1;
+				//Update header linkage swap
 				unlinkHeaderFrom(getItem(oldPosition), null);
 				linkHeaderTo(getItem(newPosition), (IHeader) toItem, true);
 			} else if (fromItem instanceof IHeader) {
-				if (fromPosition < toPosition) {
-					//A Header is being dragged down
-					oldPosition = fromPosition;
-					newPosition = toPosition + 1;
-				} else {
-					//A Header is being dragged up
-					oldPosition = fromPosition + 1;
-					newPosition = fromPosition;
-				}
+				//A Header is being dragged down
+				//Else a Header is being dragged up
+				oldPosition = fromPosition < toPosition ? fromPosition : fromPosition + 1;
+				newPosition = fromPosition < toPosition ? toPosition + 1 : fromPosition;
+				//Update header linkage swap
 				unlinkHeaderFrom(getItem(oldPosition), null);
 				linkHeaderTo(getItem(newPosition), (IHeader) fromItem, true);
 			} else {
-				if (fromPosition < toPosition) {
-					//A Header receives the toItem
-					oldPosition = toPosition;
-					newPosition = fromPosition;
-				} else {
-					//A Header receives the fromItem
-					oldPosition = fromPosition;
-					newPosition = toPosition;
-				}
+				//A Header receives the toItem
+				//Else a Header receives the fromItem
+				oldPosition = fromPosition < toPosition ? toPosition : fromPosition;
+				newPosition = fromPosition < toPosition ? fromPosition : toPosition;
 				//Update header linkage swap
 				IHeader header = unlinkHeaderFrom(getItem(oldPosition), null);
 				if (header != null)
 					linkHeaderTo(getItem(newPosition), header, true);
 			}
 		}
-		//TODO: If item with a section has being dragged, should section follow the item as well ??
-
-		//TODO: Allow child to be moved into another parent, update the 2 parents, optionally: 1) collapse the new parent 2) expand it 3) leave as it is
 	}
 
 	/**
@@ -2213,7 +2196,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @return the parent position
 	 */
 	private int createRestoreSubItemInfo(IExpandable expandable, T item, Object payload) {
-		int parentPosition = getGlobalPositionOf((T) expandable);
+		int parentPosition = getGlobalPositionOf(expandable);
 		List<T> siblings = getExpandableList(expandable);
 		int childPosition = siblings.indexOf(item);
 		item.setHidden(true);
