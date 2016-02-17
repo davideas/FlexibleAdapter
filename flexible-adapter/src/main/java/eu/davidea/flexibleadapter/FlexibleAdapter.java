@@ -610,6 +610,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Internal method to link the header to the new item.
 	 * <p>Used by the Adapter during the Remove/Restore/Move operations.</p>
+	 * The new item looses the previous header if was
 	 *
 	 * @param item    the item that holds the header
 	 * @param header  the header item
@@ -621,7 +622,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		boolean linked = false;
 		if (item != null && item instanceof ISectionable) {
 			ISectionable sectionable = (ISectionable) item;
-			unlinkHeaderFrom((T) sectionable, payload);
+			//TODO: linkHeaderTo: Save orphan header?
+			IHeader orphanHeader = unlinkHeaderFrom((T) sectionable, payload);
 			if (DEBUG) Log.v(TAG, "Link header " + header + " to " + sectionable);
 			sectionable.setHeader(header);
 			linked = true;
@@ -1381,7 +1383,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		List<IHeader> orphanHeaders = new ArrayList<IHeader>();
 		if (header != null) {
 			T newItem = getItem(positionStart + itemCount);
-			if (!linkHeaderTo(newItem, header, payload) && removeOrphanHeaders) {
+			//Header becomes orphan if newItem has already an header, or linkage didn't succeed
+			if (hasHeader(newItem) || !linkHeaderTo(newItem, header, payload)) {
 				//We cannot delete headers during remove range, otherwise positions
 				// becomes wrongs. Headers will be deleted at the end of this process.
 				orphanHeaders.add(header);
@@ -1422,8 +1425,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Remove orphan headers
 		for (IHeader orphanHeader : orphanHeaders) {
 			if (DEBUG) Log.d(TAG, "Removing orphan header " + orphanHeader);
-			//noinspection Range
-			removeItem(getGlobalPositionOf(orphanHeader), payload);
+			int headerPosition = getGlobalPositionOf(orphanHeader);
+			if (headerPosition >= 0)
+				removeItem(headerPosition, payload);
 		}
 
 		//Update empty view
