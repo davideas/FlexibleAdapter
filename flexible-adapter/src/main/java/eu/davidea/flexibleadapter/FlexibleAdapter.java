@@ -621,6 +621,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 		boolean linked = false;
 		if (item != null && item instanceof ISectionable) {
 			ISectionable sectionable = (ISectionable) item;
+			unlinkHeaderFrom((T) sectionable, payload);
 			if (DEBUG) Log.v(TAG, "Link header " + header + " to " + sectionable);
 			sectionable.setHeader(header);
 			linked = true;
@@ -965,7 +966,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			if (headersShown) {
 				int count = 0;
 				for (T subItem : subItems) {
-					showHeaderOf(position + (++count), subItem);
+					if (showHeaderOf(position + (++count), subItem)) count++;
 				}
 			}
 
@@ -2014,6 +2015,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @param fromPosition previous position of the item.
 	 * @param toPosition   new position of the item.
 	 */
+	@SuppressWarnings("Range")
 	@CallSuper
 	public void moveItem(int fromPosition, int toPosition) {
 		if (DEBUG) {
@@ -2041,21 +2043,38 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 			T fromItem = getItem(toPosition);
 			T toItem = getItem(fromPosition);
 			int oldPosition, newPosition;
-			if (toItem instanceof IHeader) {
+			if (toItem instanceof IHeader && fromItem instanceof IHeader) {
+				if (fromPosition < toPosition) {
+					//Dragging down fromHeader
+					oldPosition = toPosition + 1;
+					newPosition = fromPosition + 2;
+					unlinkHeaderFrom(getItem(oldPosition), true);
+					linkHeaderTo(getItem(oldPosition), (IHeader) fromItem, true);
+				} else {
+					//Dragging up fromHeader
+					oldPosition = fromPosition + 1;
+					newPosition = toPosition + 2;
+					unlinkHeaderFrom(getItem(oldPosition), true);
+					linkHeaderTo(getItem(oldPosition), (IHeader) toItem, true);
+				}
+			} else if (toItem instanceof IHeader) {
 				//A Header is being swapped up
 				//Else a Header is being swapped down
 				oldPosition = fromPosition < toPosition ? toPosition + 1 : toPosition;
 				newPosition = fromPosition < toPosition ? toPosition : fromPosition + 1;
 				//Update header linkage swap
-				unlinkHeaderFrom(getItem(oldPosition), null);
+				unlinkHeaderFrom(getItem(oldPosition), true);
+				if (DEBUG) Log.d(TAG, "NewPosition " + getItem(newPosition));
 				linkHeaderTo(getItem(newPosition), (IHeader) toItem, true);
+				if (getItem(fromPosition - 2) instanceof IHeader)
+					linkHeaderTo(getItem(fromPosition - 1), (IHeader) getItem(fromPosition - 2), true);
 			} else if (fromItem instanceof IHeader) {
 				//A Header is being dragged down
 				//Else a Header is being dragged up
 				oldPosition = fromPosition < toPosition ? fromPosition : fromPosition + 1;
 				newPosition = fromPosition < toPosition ? toPosition + 1 : fromPosition;
 				//Update header linkage swap
-				unlinkHeaderFrom(getItem(oldPosition), null);
+				unlinkHeaderFrom(getItem(oldPosition), true);
 				linkHeaderTo(getItem(newPosition), (IHeader) fromItem, true);
 			} else {
 				//A Header receives the toItem
@@ -2063,7 +2082,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 				oldPosition = fromPosition < toPosition ? toPosition : fromPosition;
 				newPosition = fromPosition < toPosition ? fromPosition : toPosition;
 				//Update header linkage swap
-				IHeader header = unlinkHeaderFrom(getItem(oldPosition), null);
+				IHeader header = unlinkHeaderFrom(getItem(oldPosition), true);
 				if (header != null)
 					linkHeaderTo(getItem(newPosition), header, true);
 			}
