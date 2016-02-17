@@ -27,7 +27,7 @@ import java.util.Locale;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IExpandable;
-import eu.davidea.flexibleadapter.items.IFlexibleItem;
+import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.viewholders.ExpandableViewHolder;
@@ -37,7 +37,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * This class provides a set of standard methods to handle changes on the data set such as
  * filtering, adding, removing, moving and animating an item.
  * <p><b>T</b> is your Model object containing the data, with version 5.0.0 it must implement
- * {@link IFlexibleItem} interface.</p>
+ * {@link IFlexible} interface.</p>
  * With version 5.0.0, this Adapter supports a set of standard methods for Headers/Sections to
  * expand and collapse an Expandable item, to Drag&Drop and Swipe any item.
  * <p><b>NOTE:</b>This Adapter supports Expandable of Expandable, but selection and restoration
@@ -50,7 +50,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @author Davide Steduto
  * @see FlexibleAnimatorAdapter
  * @see SelectableAdapter
- * @see IFlexibleItem
+ * @see IFlexible
  * @see FlexibleViewHolder
  * @see ExpandableViewHolder
  * @since 03/05/2015 Created
@@ -62,7 +62,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
  */
 //@SuppressWarnings({"unused", "Convert2Diamond"})
-public class FlexibleAdapter<T extends IFlexibleItem>
+public class FlexibleAdapter<T extends IFlexible>
 		extends FlexibleAnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
 
@@ -368,7 +368,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @param item the item to find
 	 * @return the global position in the Adapter if found, -1 otherwise
 	 */
-	public int getGlobalPositionOf(@NonNull IFlexibleItem item) {
+	public int getGlobalPositionOf(@NonNull IFlexible item) {
 		return item != null && mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
 	}
 
@@ -670,13 +670,13 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * Returns the ViewType for all Items depends by the current position.
 	 * <p>You can override this method to return specific values or you can let this method
-	 * to call the implementation of {@link IFlexibleItem#getLayoutRes()} so ViewTypes are
+	 * to call the implementation of {@link IFlexible#getLayoutRes()} so ViewTypes are
 	 * automatically mapped.</p>
 	 *
 	 * @param position position for which ViewType is requested
 	 * @return if Item is found, any integer value from user layout resource if defined in
-	 * {@code IFlexibleItem#getLayoutRes()}
-	 * @throws IllegalStateException if {@link IFlexibleItem#getLayoutRes()} is not implemented
+	 * {@code IFlexible#getLayoutRes()}
+	 * @throws IllegalStateException if {@link IFlexible#getLayoutRes()} is not implemented
 	 *                               and if this method is not overridden.
 	 */
 	@Override
@@ -690,17 +690,17 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * You can override this method to create ViewHolder from inside the Adapter or
 	 * you can let this method to call the implementation of
-	 * {@link IFlexibleItem#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)}
+	 * {@link IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)}
 	 * to create ViewHolder from inside the Item.
 	 *
 	 * @param parent   the ViewGroup into which the new View will be added after it is bound
 	 *                 to an adapter position
 	 * @param viewType the view type of the new View
 	 * @return a new ViewHolder that holds a View of the given view type
-	 * @throws IllegalStateException if {@link IFlexibleItem#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)}
+	 * @throws IllegalStateException if {@link IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)}
 	 *                               is not implemented and if this method is not overridden. Also
 	 *                               it is thrown if ViewType instance has not been correcly mapped.
-	 * @see IFlexibleItem#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)
+	 * @see IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)
 	 */
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -719,14 +719,14 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	/**
 	 * You can override this method to bind the items into the corresponding ViewHolder from
 	 * inside the Adapter or you can let this method to call the implementation of
-	 * {@link IFlexibleItem#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
+	 * {@link IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
 	 * to bind the item inside itself.
 	 *
 	 * @param holder   the ViewHolder created
 	 * @param position the adapter position to bind
-	 * @throws IllegalStateException if {@link IFlexibleItem#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
+	 * @throws IllegalStateException if {@link IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
 	 *                               is not implemented and if this method is not overridden.
-	 * @see IFlexibleItem#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)
+	 * @see IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)
 	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -741,7 +741,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * @param holder   the ViewHolder instance
 	 * @param position the current position
 	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full update.
-	 * @throws IllegalStateException if {@link IFlexibleItem#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
+	 * @throws IllegalStateException if {@link IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
 	 *                               is not implemented and if this method is not overridden.
 	 */
 	@Override
@@ -813,8 +813,8 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param child the child item
 	 * @return the parent of this child item or null if not found
-	 * @see #getExpandablePositionOf(IFlexibleItem)
-	 * @see #getRelativePositionOf(IFlexibleItem)
+	 * @see #getExpandablePositionOf(IFlexible)
+	 * @see #getRelativePositionOf(IFlexible)
 	 */
 	public IExpandable getExpandableOf(@NonNull T child) {
 		for (T parent : mItems) {
@@ -839,8 +839,8 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param child the child item
 	 * @return the parent position of this child item or -1 if not found
-	 * @see #getExpandableOf(IFlexibleItem)
-	 * @see #getRelativePositionOf(IFlexibleItem)
+	 * @see #getExpandableOf(IFlexible)
+	 * @see #getRelativePositionOf(IFlexible)
 	 */
 	public int getExpandablePositionOf(@NonNull T child) {
 		return getGlobalPositionOf(getExpandableOf(child));
@@ -851,9 +851,9 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param child the child item
 	 * @return the list of the child element, or a new list if item
-	 * @see #getExpandableOf(IFlexibleItem)
-	 * @see #getExpandablePositionOf(IFlexibleItem)
-	 * @see #getRelativePositionOf(IFlexibleItem)
+	 * @see #getExpandableOf(IFlexible)
+	 * @see #getExpandablePositionOf(IFlexible)
+	 * @see #getRelativePositionOf(IFlexible)
 	 * @see #getExpandedItems()
 	 */
 	public List<T> getSiblingsOf(@NonNull T child) {
@@ -866,8 +866,8 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param child the child item
 	 * @return the position in the parent or -1 if, child is a parent itself or not found
-	 * @see #getExpandableOf(IFlexibleItem)
-	 * @see #getExpandablePositionOf(IFlexibleItem)
+	 * @see #getExpandableOf(IFlexible)
+	 * @see #getExpandablePositionOf(IFlexible)
 	 */
 	public int getRelativePositionOf(@NonNull T child) {
 		return getSiblingsOf(child).indexOf(child);
@@ -877,7 +877,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * Provides a list of all expandable items that are currently expanded.
 	 *
 	 * @return a list with all expanded items
-	 * @see #getSiblingsOf(IFlexibleItem)
+	 * @see #getSiblingsOf(IFlexible)
 	 * @see #getExpandedPositions()
 	 */
 	public List<T> getExpandedItems() {
@@ -893,7 +893,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * Provides a list of all expandable positions that are currently expanded.
 	 *
 	 * @return a list with the global positions of all expanded items
-	 * @see #getSiblingsOf(IFlexibleItem)
+	 * @see #getSiblingsOf(IFlexible)
 	 * @see #getExpandedItems()
 	 */
 	public List<Integer> getExpandedPositions() {
@@ -1152,7 +1152,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	}
 
 	/**
-	 * Convenience method of {@link #addSubItem(int, int, IFlexibleItem, boolean, Object)}.
+	 * Convenience method of {@link #addSubItem(int, int, IFlexible, boolean, Object)}.
 	 * <br/>In this case parent item will never be notified nor expanded if it is collapsed.
 	 */
 	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
@@ -1710,7 +1710,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 *
 	 * @param unfilteredItems the list to filter
 	 * @param delay           any non negative delay
-	 * @see #filterObject(IFlexibleItem, String)
+	 * @see #filterObject(IFlexible, String)
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems, @IntRange(from = 0) long delay) {
 		//Make longer the timer for new coming deleted items
@@ -1725,14 +1725,14 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * Filters the provided list with the search text previously set with {@link #setSearchText(String)}.
 	 * </p>
 	 * <b>Note:</b>
-	 * <br/>- This method calls {@link #filterObject(IFlexibleItem, String)}.
+	 * <br/>- This method calls {@link #filterObject(IFlexible, String)}.
 	 * <br/>- If search text is empty or null, the provided list is the current list.
 	 * <br/>- Any pending deleted items are always filtered out.
 	 * <br/>- Original positions of deleted items are recalculated.
 	 * <br/>- <b>NEW!</b> Items are animated thanks to {@link #animateTo(List)}.
 	 *
 	 * @param unfilteredItems the list to filter
-	 * @see #filterObject(IFlexibleItem, String)
+	 * @see #filterObject(IFlexible, String)
 	 */
 	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
 		// NOTE: In case user has deleted some items and he changes or applies a filter while
@@ -1809,7 +1809,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * It performs filtering on the subItems returns true, if the any child should be in the
 	 * filtered collection.
 	 * <p>If the provided item is not an expandable it will be filtered as usual by
-	 * {@link #filterObject(IFlexibleItem, String)}.</p>
+	 * {@link #filterObject(IFlexible, String)}.</p>
 	 *
 	 * @param item       the object with subItems to be inspected
 	 * @param constraint constraint, that the object has to fulfil
@@ -2170,7 +2170,7 @@ public class FlexibleAdapter<T extends IFlexibleItem>
 	 * Retrieves the TypeInstance remembered within the FlexibleAdapter for an item.
 	 *
 	 * @param viewType the ViewType of the item
-	 * @return the IFlexibleItem instance, creator of the ViewType
+	 * @return the IFlexible instance, creator of the ViewType
 	 */
 	private T getViewTypeInstance(int viewType) {
 		return mTypeInstances.get(viewType);

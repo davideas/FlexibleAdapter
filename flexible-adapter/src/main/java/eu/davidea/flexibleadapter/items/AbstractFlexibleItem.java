@@ -9,14 +9,14 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 /**
- * Generic implementation of {@link IFlexibleItem} interface with most useful methods to manage
+ * Generic implementation of {@link IFlexible} interface with most useful methods to manage
  * selection and view holder methods.
  *
  * @author Davide Steduto
  * @since 20/01/2016 Created
  */
 public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
-		implements IFlexibleItem<VH> {
+		implements IFlexible<VH> {
 
 	/* Item flags recognized by the FlexibleAdapter */
 	boolean mEnabled = true, mHidden = false,
@@ -113,7 +113,7 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 
 //	/**
 //	 * Wrapper of {#getLayoutRes()}.
-//	 * <p>It DOESN'T belongs to the {@link IFlexibleItem} interface!!</p>
+//	 * <p>It DOESN'T belongs to the {@link IFlexible} interface!!</p>
 //	 *
 //	 * @return the layout resourceId as viewType
 //	 */

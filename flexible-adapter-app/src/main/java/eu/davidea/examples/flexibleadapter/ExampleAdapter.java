@@ -18,7 +18,7 @@ import eu.davidea.flexibleadapter.items.IExpandable;
 /**
  * NOTE: AbstractExampleItem is for example purpose only. I wanted to have in common
  * some Fields and Layout.
- * You, having different Layout for each item type, would use IFlexibleItem or AbstractFlexibleItem
+ * You, having different Layout for each item type, would use IFlexible or AbstractFlexibleItem
  * as base item to extend this Adapter.
  */
 public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {

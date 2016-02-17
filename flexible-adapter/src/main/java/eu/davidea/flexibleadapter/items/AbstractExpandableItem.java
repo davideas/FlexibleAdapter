@@ -13,7 +13,7 @@ import java.util.List;
  * @author Davide Steduto
  * @since 17/01/2016 Created
  */
-public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder, S extends IFlexibleItem>
+public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder, S extends IFlexible>
 		extends AbstractFlexibleItem<VH>
 		implements IExpandable<VH, S> {
 
@@ -50,7 +50,7 @@ public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder,
 		return mSubItems!= null && mSubItems.size() > 0;
 	}
 
-	public IFlexibleItem setSubItems(List<S> subItem) {
+	public IFlexible setSubItems(List<S> subItem) {
 		mSubItems = new ArrayList<>(subItem);
 		return this;
 	}

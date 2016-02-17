@@ -10,7 +10,7 @@ import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.items.IFlexibleItem;
+import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -40,7 +40,7 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
 	}
 
 	@Override
-	public IFlexibleItem setHeader(HeaderItem header) {
+	public IFlexible setHeader(HeaderItem header) {
 		this.header = header;
 		return this;
 	}

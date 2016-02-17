@@ -27,7 +27,7 @@ public abstract class AbstractHeaderItem<VH extends RecyclerView.ViewHolder>
 	}
 
 	@Override
-	public IFlexibleItem setSticky(boolean sticky) {
+	public IFlexible setSticky(boolean sticky) {
 		this.sticky = sticky;
 		return this;
 	}

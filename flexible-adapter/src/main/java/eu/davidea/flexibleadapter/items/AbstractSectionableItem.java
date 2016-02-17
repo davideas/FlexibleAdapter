@@ -23,7 +23,7 @@ public abstract class AbstractSectionableItem<VH extends RecyclerView.ViewHolder
 	}
 
 	@Override
-	public IFlexibleItem setHeader(T header) {
+	public IFlexible setHeader(T header) {
 		this.header = header;
 		return this;
 	}

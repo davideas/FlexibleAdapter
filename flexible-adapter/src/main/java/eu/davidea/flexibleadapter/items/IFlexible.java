@@ -16,7 +16,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @author Davide Steduto
  * @since 19/01/2016 Created
  */
-public interface IFlexibleItem<VH extends RecyclerView.ViewHolder> {
+public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 
 	/*---------------*/
 	/* BASIC METHODS */

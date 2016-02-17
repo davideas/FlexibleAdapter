@@ -7,10 +7,10 @@ import android.support.v7.widget.RecyclerView;
  * @since 07/02/2016
  */
 public interface ISectionable<VH extends RecyclerView.ViewHolder, T extends IHeader>
-		extends IFlexibleItem<VH> {
+		extends IFlexible<VH> {
 
 	T getHeader();
 
-	IFlexibleItem setHeader(T header);
+	IFlexible setHeader(T header);
 
 }

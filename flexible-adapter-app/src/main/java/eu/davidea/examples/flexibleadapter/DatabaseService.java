@@ -10,7 +10,7 @@ import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.flexibleadapter.items.IFlexibleItem;
+import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.ISectionable;
 
 /**
@@ -99,7 +99,7 @@ public class DatabaseService {
 			header.setTitle("Header " + (i + 1));
 			header.setSubtitle("Attached to " + mItems.get(i * HEADERS));
 			header.setHidden(true);
-			IFlexibleItem item = mItems.get(i * HEADERS);
+			IFlexible item = mItems.get(i * HEADERS);
 			if (item instanceof ISectionable) {
 				ISectionable sectionable = (ISectionable) item;
 				//noinspection unchecked
@@ -121,7 +121,7 @@ public class DatabaseService {
 		Collections.swap(mItems, fromPosition, toPosition);
 	}
 
-	public void removeItem(IFlexibleItem item) {
+	public void removeItem(IFlexible item) {
 		mItems.remove(item);
 	}
 

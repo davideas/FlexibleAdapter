@@ -12,8 +12,8 @@ import java.util.List;
  * @author Davide Steduto
  * @since 17/01/2016 Created
  */
-public interface IExpandable<VH extends RecyclerView.ViewHolder, S extends IFlexibleItem>
-		extends IFlexibleItem<VH> {
+public interface IExpandable<VH extends RecyclerView.ViewHolder, S extends IFlexible>
+		extends IFlexible<VH> {
 
 	/*--------------------*/
 	/* EXPANDABLE METHODS */
