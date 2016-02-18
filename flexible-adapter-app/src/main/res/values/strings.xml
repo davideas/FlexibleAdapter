@@ -5,7 +5,7 @@
 	<string name="action_select_all">Select All</string>
 	<string name="action_selected_one">selected</string>
 	<string name="action_selected_many">selected</string>
-	<string name="action_deleted">deleted</string>
+	<string name="action_deleted">Deleted</string>
 
 	<!-- User Learns Selection -->
 	<string name="uls_title"><![CDATA[<i>Click on Image (or LongClick on Item) to select that Item</i>]]></string>

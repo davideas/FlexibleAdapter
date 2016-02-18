@@ -62,7 +62,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>08/02/2016 Headers/Sections feature
  * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
  */
-//@SuppressWarnings({"unused", "Convert2Diamond"})
+@SuppressWarnings({"//unused", "Convert2Diamond", "ConstantConditions", "unchecked"})
 public class FlexibleAdapter<T extends IFlexible>
 		extends FlexibleAnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
@@ -83,7 +83,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Header/Section items
 	 */
-//	private List<IHeader> mHeaders;
+	private List<IHeader> mOrphanHeaders;
 	private boolean headersShown = false;
 
 	/**
@@ -171,6 +171,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listeners) {
 		mItems = Collections.synchronizedList(items);
 		mRestoreList = new ArrayList<RestoreInfo>();
+		mOrphanHeaders = new ArrayList<IHeader>();
 
 		//Expand initial items and show headers at startup if not hidden
 		//This works also after a screen rotation
@@ -237,6 +238,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				//Allow selection of Parent if no Child has been previously selected
 				parentSelected = true;
 				super.toggleSelection(position);
+				//TODO: Set selected for items
 			} else if (!parentSelected && hasParent) {
 				//Allow selection of Child if no Parent has been previously selected
 				childSelected = true;
@@ -408,21 +410,34 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * @return true if orphan headers will be removed when unlinked, false if are kept unlinked
+	 * @see #setRemoveOrphanHeaders(boolean)
 	 */
 	public boolean isRemoveOrphanHeaders() {
 		return removeOrphanHeaders;
 	}
 
 	/**
-	 * Sets if the unlinked orphan headers will be deleted as well during the removal process.
+	 * Sets if the orphan headers will be deleted as well during the removal process.
 	 * <p>Default value is false.</p>
 	 *
-	 * @param removeOrphanHeaders
+	 * @param removeOrphanHeaders true to remove the header during the remove items
 	 * @return this adapter so the call can be chained
+	 * @see #getOrphanHeaders()
 	 */
 	public FlexibleAdapter setRemoveOrphanHeaders(boolean removeOrphanHeaders) {
 		this.removeOrphanHeaders = removeOrphanHeaders;
 		return this;
+	}
+
+	/**
+	 * Provides the list of the headers remained unlinked "orphan headers",
+	 * Orphan headers can appear from the user events (remove/move items).
+	 *
+	 * @return the list of the orphan headers collected until this moment
+	 * @see #setRemoveOrphanHeaders(boolean)
+	 */
+	public List<IHeader> getOrphanHeaders() {
+		return mOrphanHeaders;
 	}
 
 	/**
@@ -507,15 +522,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	public ISectionable getSectionableOf(@NonNull IHeader header) {
 		int headerPosition = getGlobalPositionOf(header);
 		if (DEBUG)
-			Log.v(TAG, "getSectionableOf - Item to evaluate " + headerPosition + "=" + header);
+//			Log.v(TAG, "getSectionableOf - Item to evaluate " + headerPosition + "=" + header);
 		for (int position = headerPosition - 1; position <= headerPosition + 2; position++) {
 			IHeader realHeader = getHeaderOf(getItem(position));//This will also return null in case of OutOfBounds!
 			if (realHeader != null && realHeader.equals(header)) {
-				if (DEBUG) Log.v(TAG, "getSectionableOf - Found Sectionable=" + getItem(position));
+//				if (DEBUG) Log.v(TAG, "getSectionableOf - Found Sectionable=" + getItem(position));
 				return (ISectionable) getItem(position);
 			}
 		}
-		if (DEBUG) Log.v(TAG, "getSectionableOf - Sectionable NotFound");
+//		if (DEBUG) Log.v(TAG, "getSectionableOf - Sectionable NotFound");
 		return null;
 	}
 
@@ -527,6 +542,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void showAllHeaders() {
 		multiRange = true;
+		//Show linked headers only
 		for (int position = 0; position < mItems.size(); position++) {
 			if (showHeaderOf(position, mItems.get(position)))
 				position++;//It's the same element, skip it.
@@ -543,6 +559,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void hideAllHeaders() {
 		multiRange = true;
+		//Hide orphan headers first
+		for (IHeader header : getOrphanHeaders()) {
+			hideHeader(getGlobalPositionOf(header), header);
+		}
+		//Hide linked headers
 		for (int position = mItems.size() - 1; position >= 0; position--) {
 			if (hideHeaderOf(mItems.get(position)))
 				position--;//It's the same element, skip it.
@@ -594,19 +615,24 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Check header existence
 		if (header == null) return false;
 		if (!header.isHidden()) {
-			int position = getGlobalPositionOf(header);
-			if (position < 0) return false;
+			return hideHeader(getGlobalPositionOf(header), header);
+		} else {
+			if (DEBUG)
+				Log.w(TAG, "Header already hidden at position " + getGlobalPositionOf(header) + "=" + header);
+			return false;
+		}
+	}
+
+	private boolean hideHeader(int position, IHeader header) {
+		if (position >= 0) {
 			if (DEBUG) Log.v(TAG, "Hiding header at position " + position + "=" + header);
 			header.setHidden(true);
 			//Remove and notify removals
 			mItems.remove(position);
 			notifyItemRemoved(position);
 			return true;
-		} else {
-			if (DEBUG)
-				Log.w(TAG, "Header already hidden at position " + getGlobalPositionOf(header) + "=" + header);
-			return false;
 		}
+		return false;
 	}
 
 	/**
@@ -620,15 +646,19 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                therefore passed to the bind method of the header ViewHolder),
 	 *                pass null to <u>not</u> notify the parent
 	 */
-	private boolean linkHeaderTo(@NonNull T item, @NonNull IHeader header, Object payload) {
+	private boolean linkHeaderTo(@NonNull T item, @NonNull IHeader header, @Nullable Object payload) {
 		boolean linked = false;
 		if (item != null && item instanceof ISectionable) {
 			ISectionable sectionable = (ISectionable) item;
-			//TODO: linkHeaderTo: Save orphan header?
-			IHeader orphanHeader = unlinkHeaderFrom((T) sectionable, payload);
+			unlinkHeaderFrom((T) sectionable, payload);
 			if (DEBUG) Log.v(TAG, "Link header " + header + " to " + sectionable);
 			sectionable.setHeader(header);
 			linked = true;
+			if (mOrphanHeaders.remove(header) && DEBUG)
+				Log.d(TAG, "Header removed from the orphan list [" + mOrphanHeaders.size() + "]");
+		} else {
+			mOrphanHeaders.add(header);
+			if (DEBUG) Log.d(TAG, "Header added to the orphan list [" + mOrphanHeaders.size() + "]");
 		}
 		notifyItemChanged(getGlobalPositionOf(header), payload);
 		return linked;
@@ -643,7 +673,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                therefore passed to the bind method of the header ViewHolder),
 	 *                pass null to <u>not</u> notify the parent
 	 */
-	private IHeader unlinkHeaderFrom(@NonNull T item, Object payload) {
+	private IHeader unlinkHeaderFrom(@NonNull T item, @Nullable Object payload) {
 		if (hasHeader(item)) {
 			ISectionable sectionable = (ISectionable) item;
 			IHeader header = sectionable.getHeader();
@@ -657,7 +687,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		return null;
 	}
 
-	private void restoreHeaderLinkage(T newItem, Object payload) {
+	private void restoreHeaderLinkage(T newItem, @Nullable Object payload) {
 		IHeader header = getHeaderOf(newItem);
 		if (header != null) {
 			//First unlink header from current sectionable, otherwise it could not be found
@@ -795,7 +825,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		return isExpanded(getItem(position));
 	}
 
-	public boolean isExpanded(T item) {
+	public boolean isExpanded(@NonNull T item) {
 		if (isExpandable(item)) {
 			IExpandable expandable = (IExpandable) item;
 			return expandable.isExpanded();
@@ -803,12 +833,13 @@ public class FlexibleAdapter<T extends IFlexible>
 		return false;
 	}
 
-	public boolean isExpandable(T item) {
+	public boolean isExpandable(@NonNull T item) {
 		return item != null && item instanceof IExpandable;
 	}
 
-	public boolean hasSubItems(IExpandable expandable) {
-		return expandable.getSubItems() != null && expandable.getSubItems().size() > 0;
+	public boolean hasSubItems(@NonNull IExpandable expandable) {
+		return expandable != null && expandable.getSubItems() != null &&
+				expandable.getSubItems().size() > 0;
 	}
 
 	/**
@@ -1064,7 +1095,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* UPDATE METHODS */
 	/*----------------*/
 
-	public void updateItem(@IntRange(from = 0) int position, @NonNull T item, Object payload) {
+	public void updateItem(@IntRange(from = 0) int position, @NonNull T item,
+						   @Nullable Object payload) {
 		if (position < 0 && position >= mItems.size()) {
 			Log.e(TAG, "Cannot updateItem on position out of OutOfBounds!");
 			return;
@@ -1088,6 +1120,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param delay            a non negative delay
 	 * @param scrollToPosition true if RecyclerView should scroll after item has been added,
 	 *                         false otherwise
+	 * @see #addItem(int, IFlexible)
+	 * @see #addItems(int, List)
+	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
 	 */
 	public void addItemWithDelay(@IntRange(from = 0) final int position, @NonNull final T item,
 								 @IntRange(from = 0) long delay, final boolean scrollToPosition) {
@@ -1107,7 +1142,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position position of the item to add
 	 * @param item     the item to add
-	 * @return true if is has been modified by the addition, false otherwise
+	 * @return true if the internal list was successfully modified, false otherwise
+	 * @see #addItemWithDelay(int, IFlexible, long, boolean)
+	 * @see #addItems(int, List)
+	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
 	 */
 	public boolean addItem(@IntRange(from = 0) int position, @NonNull T item) {
 		if (item == null) {
@@ -1126,7 +1164,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position position inside the list, -1 to add the set the end of the list
 	 * @param items    the items to add
-	 * @return true if the addition was successful, false otherwise
+	 * @return true if the internal list was successfully modified, false otherwise
+	 * @see #addItem(int, IFlexible)
+	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
 	 */
 	public boolean addItems(@IntRange(from = 0) int position, @NonNull List<T> items) {
 		if (position < 0) {
@@ -1145,10 +1185,12 @@ public class FlexibleAdapter<T extends IFlexible>
 			mItems.addAll(position, items);
 		} else
 			mItems.addAll(items);
+
 		//Map all the view types if not done yet
 		mapViewTypesFrom(items);
 		//Notify range addition
 		notifyItemRangeInserted(position, items.size());
+
 		//Call listener to update EmptyView
 		if (mUpdateListener != null && !multiRange)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
@@ -1158,6 +1200,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Convenience method of {@link #addSubItem(int, int, IFlexible, boolean, Object)}.
 	 * <br/>In this case parent item will never be notified nor expanded if it is collapsed.
+	 *
+	 * @return true if the internal list was successfully modified, false otherwise
+	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
 	 */
 	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
 							  @IntRange(from = 0) int subPosition, @NonNull T item) {
@@ -1165,24 +1210,24 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Add an item inside the list of an expandable item (parent).
-	 * <p><b>In order to add a subItem</b>, the following condition must be satisfied:
-	 * <br/>- The item resulting from the parent position is actually an Expandable.</p>
-	 * Optionally you can pass any payload to notify the parent about the change and optimize the
-	 * view binding.
+	 * Convenience method of {@link #addSubItems(int, int, IExpandable, List, boolean, Object).
+	 * <br/>Optionally you can pass any payload to notify the parent about the change and optimize
+	 * the view binding.
 	 *
 	 * @param parentPosition position of the expandable item that shall contain the subItem
 	 * @param subPosition    the position of the subItem in the expandable list
 	 * @param item           the subItem to add in the expandable list
 	 * @param expandParent   true to initially expand the parent (if needed) and after to add
-	 *                       the subItem, false to simply add the sub item to the parent
+	 *                       the subItem, false to simply add the subItem to the parent
 	 * @param payload        any non-null user object to notify the parent (the payload will be
 	 *                       therefore passed to the bind method of the parent ViewHolder),
 	 *                       pass null to <u>not</u> notify the parent
+	 * @return true if the internal list was successfully modified, false otherwise
+	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
 	 */
 	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
 							  @IntRange(from = 0) int subPosition,
-							  @NonNull T item, boolean expandParent, Object payload) {
+							  @NonNull T item, boolean expandParent, @Nullable Object payload) {
 		if (item == null) {
 			Log.e(TAG, "No items to add!");
 			return false;
@@ -1195,33 +1240,50 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * TODO: javadoc
+	 * Adds all current subItems of the passed parent to the internal list.
+	 * <p><b>In order to add the subItems</b>, the following condition must be satisfied:
+	 * <br/>- The item resulting from the parent position is actually an {@link IExpandable}.</p>
+	 * Optionally the parent can be expanded and subItems displayed.
+	 * <br/>Optionally you can pass any payload to notify the parent about the change and optimize
+	 * the view binding.
 	 *
-	 * @param parentPosition
-	 * @param expandable
-	 * @param expandParent
-	 * @param payload
-	 * @return
+	 * @param parentPosition position of the expandable item that shall contain the subItem
+	 * @param parent         the expandable item which shall contain the new subItem
+	 * @param expandParent   true to initially expand the parent (if needed) and after to add
+	 *                       the subItem, false to simply add the subItem to the parent
+	 * @param payload        any non-null user object to notify the parent (the payload will be
+	 *                       therefore passed to the bind method of the parent ViewHolder),
+	 *                       pass null to <u>not</u> notify the parent
+	 * @return true if the internal list was successfully modified, false otherwise
+	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
 	 */
 	public int addAllSubItemsFrom(@IntRange(from = 0) int parentPosition,
-								  @NonNull IExpandable expandable, boolean expandParent, Object payload) {
-		List<T> subItems = getCurrentChildren(expandable);
-		addSubItems(parentPosition, 0, expandable, subItems, expandParent, payload);
+								  @NonNull IExpandable parent, boolean expandParent,
+								  @Nullable Object payload) {
+		List<T> subItems = getCurrentChildren(parent);
+		addSubItems(parentPosition, 0, parent, subItems, expandParent, payload);
 		return subItems.size();
 	}
 
 	/**
-	 * TODO: javadoc
+	 * Convenience method of {@link #addSubItems(int, int, IExpandable, List, boolean, Object).
+	 * <br/>Optionally you can pass any payload to notify the parent about the change and optimize
+	 * the view binding.
 	 *
-	 * @param parentPosition
-	 * @param subPosition
-	 * @param items
-	 * @param expandParent
-	 * @param payload
+	 * @param parentPosition position of the expandable item that shall contain the subItems
+	 * @param subPosition    the start position in the parent where the new items shall be inserted
+	 * @param items          the list of the subItems to add
+	 * @param expandParent   true to initially expand the parent (if needed) and after to add
+	 *                       the subItems, false to simply add the subItems to the parent
+	 * @param payload        any non-null user object to notify the parent (the payload will be
+	 *                       therefore passed to the bind method of the parent ViewHolder),
+	 *                       pass null to <u>not</u> notify the parent
+	 * @return true if the internal list was successfully modified, false otherwise
+	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
 	 */
 	public boolean addSubItems(@IntRange(from = 0) int parentPosition,
 							   @IntRange(from = 0) int subPosition,
-							   @NonNull List<T> items, boolean expandParent, Object payload) {
+							   @NonNull List<T> items, boolean expandParent, @Nullable Object payload) {
 		T parent = getItem(parentPosition);
 		if (isExpandable(parent)) {
 			IExpandable expandable = (IExpandable) parent;
@@ -1231,23 +1293,43 @@ public class FlexibleAdapter<T extends IFlexible>
 		return false;
 	}
 
+	/**
+	 * Adds new subItems on the specified parent item, to the internal list.
+	 * <p><b>In order to add subItems</b>, the following condition must be satisfied:
+	 * <br/>- The item resulting from the parent position is actually an {@link IExpandable}.</p>
+	 * Optionally the parent can be expanded and subItems displayed.
+	 * <br/>Optionally you can pass any payload to notify the parent about the change and optimize
+	 * the view binding.
+	 *
+	 * @param parentPosition position of the expandable item that shall contain the subItems
+	 * @param subPosition    the start position in the parent where the new items shall be inserted
+	 * @param parent         the expandable item which shall contain the new subItem
+	 * @param items          the list of the subItems to add
+	 * @param expandParent   true to initially expand the parent (if needed) and after to add
+	 *                       the subItems, false to simply add the subItems to the parent
+	 * @param payload        any non-null user object to notify the parent (the payload will be
+	 *                       therefore passed to the bind method of the parent ViewHolder),
+	 *                       pass null to <u>not</u> notify the parent
+	 * @return true if the internal list was successfully modified, false otherwise
+	 * @see #addItems(int, List)
+	 */
 	private boolean addSubItems(@IntRange(from = 0) int parentPosition,
 								@IntRange(from = 0) int subPosition,
-								@NonNull IExpandable expandable,
-								@NonNull List<T> items, boolean expandParent, Object payload) {
+								@NonNull IExpandable parent,
+								@NonNull List<T> items, boolean expandParent, @Nullable Object payload) {
 		boolean added = false;
 		//Expand parent if requested and not already expanded
-		if (expandParent && !expandable.isExpanded()) {
+		if (expandParent && !parent.isExpanded()) {
 			expand(parentPosition);
 		}
 		//Notify the adapter of the new addition to display it and animate it.
 		//If parent is collapsed there's no need to notify about the change.
-		if (expandable.isExpanded()) {
+		if (parent.isExpanded()) {
 			added = addItems(parentPosition + 1 + Math.max(0, subPosition), items);
 		}
 		//Notify the parent about the change if requested
 		if (payload != null) notifyItemChanged(parentPosition, payload);
-		return added;//FIXME? should be return always true??
+		return added;
 	}
 
 	/*----------------------*/
@@ -1257,13 +1339,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Removes an item from internal list and notify the change.
 	 * <p>The item is retained for an eventual Undo.</p>
+	 * This method delegates the removal to removeRange.
 	 *
 	 * @param position the position of item to remove
-	 * @see #removeItem(int, Object)
-	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
-	 * @see #restoreDeletedItems()
-	 * @see #setRestoreSelectionOnUndo(boolean)
-	 * @see #emptyBin()
+	 * @see #removeRange(int, int, Object)
 	 */
 	public void removeItem(@IntRange(from = 0) int position) {
 		this.removeItem(position, null);
@@ -1271,21 +1350,16 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Removes an item from the internal list and notify the change.
-	 * <p>If the item, resulting from the passed position is:</p>
-	 * - <u>not expandable</u> with <u>no</u> parent, it is removed as usual.<br/>
-	 * - <u>not expandable</u> with a parent, it is removed only if the parent is expanded.
-	 * Optionally the parent can be notified about the removal if a payload is passed.<br/>
-	 * - <u>expandable</u> implementing {@link IExpandable}, it is removed as usual, but
-	 * it will be collapsed if expanded.
 	 * <p>The item is retained for an eventual Undo.</p>
+	 * This method delegates the removal to removeRange.
 	 *
 	 * @param position The position of item to remove
 	 * @param payload  any non-null user object to notify the parent (the payload will be
 	 *                 therefore passed to the bind method of the parent ViewHolder),
 	 *                 pass null to <u>not</u> notify the parent
-	 * @see #removeItem(int)
+	 * @see #removeRange(int, int, Object)
 	 */
-	public void removeItem(@IntRange(from = 0) int position, Object payload) {
+	public void removeItem(@IntRange(from = 0) int position, @Nullable Object payload) {
 		if (DEBUG) Log.v(TAG, "removeItem delegates removal to removeRange");
 		removeRange(position, 1, payload);
 		clearSelection();
@@ -1294,8 +1368,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Same as {@link #removeItems(List, Object)}, but in this case the parent will not be
 	 * notified about the change, if a child is removed.
+	 * <p>This method delegates the removal to removeRange.</p>
+	 *
+	 * @see #removeRange(int, int, Object)
 	 */
-	public void removeItems(List<Integer> selectedPositions) {
+	public void removeItems(@NonNull List<Integer> selectedPositions) {
 		this.removeItems(selectedPositions, null);
 	}
 
@@ -1304,13 +1381,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Every item is retained for an eventual Undo.</p>
 	 * Optionally you can pass any payload to notify the parent about the change and optimize the
 	 * view binding.
+	 * <p>This method delegates the removal to removeRange.</p>
 	 *
 	 * @param selectedPositions list with item positions to remove
 	 * @param payload           any non-null user object to notify the parent (the payload will be
 	 *                          therefore passed to the bind method of the parent ViewHolder),
 	 *                          pass null to <u>not</u> notify the parent
+	 * @see #removeRange(int, int, Object)
 	 */
-	public void removeItems(List<Integer> selectedPositions, Object payload) {
+	public void removeItems(@NonNull List<Integer> selectedPositions, @Nullable Object payload) {
 		if (DEBUG)
 			Log.v(TAG, "removeItems selectedPositions=" + selectedPositions + " payload=" + payload);
 		//Check if list is empty
@@ -1356,22 +1435,38 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Same as {@link #removeRange(int, int, Object)}, but in this case the parent will not be
 	 * notified about the change, if children are removed.
 	 */
-	public void removeRange(int positionStart, int itemCount) {
+	public void removeRange(@IntRange(from = 0) int positionStart,
+							@IntRange(from = 0) int itemCount) {
 		this.removeRange(positionStart, itemCount, null);
 	}
 
 	/**
 	 * Removes a list of consecutive items from internal list and notify the change.
-	 * <p>Optionally you can pass any payload to notify the parent about the change and optimize
-	 * the view binding.</p>
-	 *
+	 * <p>If the item, resulting from the passed position:</p>
+	 * - is <u>not expandable</u> with <u>no</u> parent, it is removed as usual.<br/>
+	 * - is <u>not expandable</u> with a parent, it is removed only if the parent is expanded.<br/>
+	 * - is <u>expandable</u> implementing {@link IExpandable}, it is removed as usual, but
+	 * it will be collapsed if expanded.<br/>
+	 * - has a {@link IHeader} item, the header will be automatically linked to the first item
+	 * after the range or can remain orphan. 
+	 * <p>Optionally you can pass any payload to notify the <u>parent</u> or the <u>header</u>
+	 * about the change and optimize the view binding.</p>
+	 * 
 	 * @param positionStart the start position of the first item
 	 * @param itemCount     how many items should be removed
 	 * @param payload       any non-null user object to notify the parent (the payload will be
 	 *                      therefore passed to the bind method of the parent ViewHolder),
 	 *                      pass null to <u>not</u> notify the parent
+	 * @see #removeItem(int, Object)
+	 * @see #removeItems(List, Object)
+	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
+	 * @see #restoreDeletedItems()
+	 * @see #setRestoreSelectionOnUndo(boolean)
+	 * @see #setRemoveOrphanHeaders(boolean)
+	 * @see #emptyBin()
 	 */
-	public void removeRange(int positionStart, int itemCount, Object payload) {
+	public void removeRange(@IntRange(from = 0) int positionStart,
+							@IntRange(from = 0) int itemCount, @Nullable Object payload) {
 		int initialCount = getItemCount();
 		if (DEBUG)
 			Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
@@ -1382,14 +1477,18 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		//Handle header linkage
 		IHeader header = getHeaderOf(getItem(positionStart));
-		List<IHeader> orphanHeaders = new ArrayList<IHeader>();
 		if (header != null) {
 			T newItem = getItem(positionStart + itemCount);
-			//Header becomes orphan if newItem has already an header, or linkage didn't succeed
-			if (hasHeader(newItem) || !linkHeaderTo(newItem, header, payload)) {
+			//Header becomes orphan, also if newItem has already an header!
+			if (hasHeader(newItem)) {
 				//We cannot delete headers during remove range, otherwise positions
 				// becomes wrongs. Headers will be deleted at the end of this process.
-				orphanHeaders.add(header);
+				mOrphanHeaders.add(header);
+				if (DEBUG) Log.d(TAG, "Header added to the orphan list [" + mOrphanHeaders.size() + "]");
+			} else {
+				//Link the new header to the newItem, and eventually
+				// collect the orphan header if linkage didn't succeed
+				linkHeaderTo(newItem, header, payload);
 			}
 		}
 
@@ -1425,11 +1524,17 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 
 		//Remove orphan headers
-		for (IHeader orphanHeader : orphanHeaders) {
-			if (DEBUG) Log.d(TAG, "Removing orphan header " + orphanHeader);
-			int headerPosition = getGlobalPositionOf(orphanHeader);
-			if (headerPosition >= 0)
-				removeItem(headerPosition, payload);
+		if (removeOrphanHeaders) {
+			for (IHeader orphanHeader : mOrphanHeaders) {
+				int headerPosition = getGlobalPositionOf(orphanHeader);
+				if (headerPosition >= 0) {
+					if (DEBUG) Log.d(TAG, "Removing orphan header " + orphanHeader);
+					createRestoreItemInfo(headerPosition, (T) orphanHeader, payload);
+					mItems.remove(headerPosition);
+					notifyItemRemoved(headerPosition);
+				}
+			}
+			mOrphanHeaders.clear();
 		}
 
 		//Update empty view
@@ -1456,7 +1561,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                therefore passed to the bind method of the parent ViewHolder),
 	 *                pass null to <u>not</u> notify the parent
 	 */
-	public void removeAllSelectedItems(Object payload) {
+	public void removeAllSelectedItems(@Nullable Object payload) {
 		this.removeItems(getSelectedPositions(), payload);
 	}
 
@@ -1582,7 +1687,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param timeout  custom timeout
 	 * @param listener the listener that will be called after timeout to commit the change
 	 */
-	public void startUndoTimer(long timeout, final OnDeleteCompleteListener listener) {
+	public void startUndoTimer(long timeout, OnDeleteCompleteListener listener) {
 		//Make longer the timer for new coming deleted items
 		mHandler.removeMessages(1);
 		mHandler.sendMessageDelayed(Message.obtain(mHandler, 1, listener), timeout > 0 ? timeout : UNDO_TIMEOUT);
@@ -1661,7 +1766,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return a non null list of the original children minus the deleted children if some are
 	 * pending removal.
 	 */
-	public List<T> getCurrentChildren(IExpandable expandable) {
+	public List<T> getCurrentChildren(@NonNull IExpandable expandable) {
 		//Check item and subItems existence
 		if (expandable == null || !hasSubItems(expandable))
 			return new ArrayList<T>();
@@ -2210,7 +2315,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param payload    any payload object
 	 * @return the parent position
 	 */
-	private int createRestoreSubItemInfo(IExpandable expandable, T item, Object payload) {
+	private int createRestoreSubItemInfo(IExpandable expandable, T item, @Nullable Object payload) {
 		int parentPosition = getGlobalPositionOf(expandable);
 		List<T> siblings = getExpandableList(expandable);
 		int childPosition = siblings.indexOf(item);
@@ -2225,7 +2330,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position the position of the item to retain.
 	 * @param item     the deleted item
 	 */
-	private void createRestoreItemInfo(int position, T item, Object payload) {
+	private void createRestoreItemInfo(int position, T item, @Nullable Object payload) {
 		//Collapse Parent before removal if it is expanded!
 		if (isExpanded(item))
 			collapse(position);

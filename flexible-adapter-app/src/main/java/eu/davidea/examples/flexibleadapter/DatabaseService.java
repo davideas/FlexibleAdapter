@@ -3,6 +3,7 @@ package eu.davidea.examples.flexibleadapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.davidea.examples.models.AbstractExampleItem;
 import eu.davidea.examples.models.ExpandableItem;
@@ -20,7 +21,8 @@ import eu.davidea.flexibleadapter.items.ISectionable;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 30, SUB_ITEMS = 3, HEADERS = 30;
+	private static final int ITEMS = 60, SUB_ITEMS = 3, HEADERS = 30;
+	private static AtomicInteger atomicInteger = new AtomicInteger(0);
 
 	//TODO FOR YOU: Use userLearnedSelection from settings
 	public static boolean userLearnedSelection = false;
@@ -39,22 +41,23 @@ public class DatabaseService {
 	DatabaseService() {
 		for (int i = 0; i < ITEMS; i++) {
 			mItems.add(i % 3 == 0 ?
-					newExpandableItem(i + 1, i % ITEMS/HEADERS == 0) :
-					newSimpleItem(i + 1, i % ITEMS/HEADERS == 0));
+					newExpandableItem(i + 1, i % (ITEMS/HEADERS) == 0) :
+					newSimpleItem(i + 1, i % (ITEMS/HEADERS) == 0));
 		}
 	}
 
-	public static HeaderItem newHeader(int i) {
-		HeaderItem header = new HeaderItem("H" + i);
-		header.setTitle("Header " + i);
-		//header is hidden by default!
+	public static HeaderItem newHeader() {
+		int id = atomicInteger.incrementAndGet();
+		HeaderItem header = new HeaderItem("H" + id);
+		header.setTitle("Header " + id);
+		//header is hidden and un-selectable by default!
 		return header;
 	}
 
 	public static SimpleItem newSimpleItem(int i, boolean withHeader) {
 		SimpleItem item;
 		if (withHeader) {
-			HeaderItem header = newHeader(i);
+			HeaderItem header = newHeader();
 			header.setSubtitle("Attached to Simple Item " + i);
 			item = new SimpleItem("I" + i, header);
 		} else {
@@ -69,7 +72,7 @@ public class DatabaseService {
 		//Items are expandable because they implements IExpandable
 		ExpandableItem expandableItem;
 		if (withHeader) {
-			HeaderItem header = newHeader(i);
+			HeaderItem header = newHeader();
 			header.setSubtitle("Attached to Expandable Item " + i);
 			expandableItem = new ExpandableItem("E" + i, header);
 		} else {

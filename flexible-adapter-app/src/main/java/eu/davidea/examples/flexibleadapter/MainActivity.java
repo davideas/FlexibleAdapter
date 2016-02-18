@@ -40,6 +40,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
@@ -116,12 +117,12 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
-				@Override
-				public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-					//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!
-					return true;
-				}
-			});
+			@Override
+			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
+				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!
+				return true;
+			}
+		});
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		//FIXME: Change ItemDecorator, this doesn't work well!!!
 		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
@@ -484,6 +485,7 @@ public class MainActivity extends AppCompatActivity implements
 				});
 		mSnackBar.show();
 		mAdapter.removeItem(position, true);
+		logOrphanHeaders();
 		mAdapter.startUndoTimer(5000L + 200L, this);
 		//Handle ActionMode title
 		if (mAdapter.getSelectedItemCount() == 0)
@@ -625,15 +627,16 @@ public class MainActivity extends AppCompatActivity implements
 			case R.id.action_delete:
 				//Build message before delete, for the SnackBar
 				StringBuilder message = new StringBuilder();
+				message.append(getString(R.string.action_deleted)).append(" ");
 				for (Integer pos : mAdapter.getSelectedPositions()) {
 					message.append(extractTitleFrom(mAdapter.getItem(pos)));
-					message.append(", ");
+					if (mAdapter.getSelectedItemCount() > 1)
+						message.append(", ");
 				}
-				message.append(" ").append(getString(R.string.action_deleted));
 
 				//SnackBar for Undo
 				//noinspection ResourceType
-				int undoTime= 20000;
+				int undoTime = 20000;
 				//noinspection ResourceType
 				mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, undoTime)
 						.setAction(R.string.undo, new View.OnClickListener() {
@@ -652,6 +655,7 @@ public class MainActivity extends AppCompatActivity implements
 				//Remove selected items from Adapter list after message is shown
 				//MY Payload is a Boolean(true), you can pass what ever you want!
 				mAdapter.removeItems(mAdapter.getSelectedPositions(), true);
+				logOrphanHeaders();
 				//+200: Using SnackBar, user can still click on the action button while bar is dismissing for a fraction of time
 				mAdapter.startUndoTimer(undoTime + 200L, this);
 
@@ -706,17 +710,25 @@ public class MainActivity extends AppCompatActivity implements
 		super.onBackPressed();
 	}
 
+	private void logOrphanHeaders() {
+		//If removeOrphanHeader is set false, once hidden the Orphan Headers are not shown
+		// anymore, but you can recover them using getOrphanHeaders()
+		for (IHeader header : mAdapter.getOrphanHeaders()) {
+			Log.w(TAG, "Logging orphan header " + header);
+		}
+	}
+
 	private String extractTitleFrom(AbstractFlexibleItem abstractItem) {
-		if (abstractItem instanceof ExpandableItem) {
-			ExpandableItem expandableItem = (ExpandableItem) abstractItem;
-			if (expandableItem.getSubItems() == null || expandableItem.getSubItems().size() == 0) {
-				return expandableItem.getTitle();
+		if (abstractItem instanceof AbstractExampleItem) {
+			SimpleItem simpleItem = (SimpleItem) abstractItem;
+			String title = simpleItem.getTitle();
+			if (simpleItem instanceof ExpandableItem) {
+				ExpandableItem expandableItem = (ExpandableItem) abstractItem;
+				if (expandableItem.getSubItems() != null) {
+					title += "(+" + expandableItem.getSubItems().size() + ")";
+				}
 			}
-
-		} else if (abstractItem instanceof AbstractExampleItem) {
-			AbstractExampleItem exampleItem = (AbstractExampleItem) abstractItem;
-			return exampleItem.getTitle();
-
+			return title;
 		} else if (abstractItem instanceof HeaderItem) {
 			HeaderItem headerItem = (HeaderItem) abstractItem;
 			return headerItem.getTitle();

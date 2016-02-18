@@ -29,7 +29,7 @@
 	      app:showAsAction="never"/>
 
 	<item android:id="@+id/action_show_hide_headers"
-	      android:title="@string/show_headers"
+	      android:title="@string/hide_headers"
 	      app:showAsAction="never"/>
 
 	<item android:id="@+id/action_about"
