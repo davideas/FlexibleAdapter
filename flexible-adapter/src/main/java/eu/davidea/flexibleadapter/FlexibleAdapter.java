@@ -2019,7 +2019,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param fromPosition previous position of the item.
 	 * @param toPosition   new position of the item.
 	 */
-	@SuppressWarnings("Range")
+	@SuppressWarnings({"Range", "ConstantConditions"})
 	@CallSuper
 	public void moveItem(int fromPosition, int toPosition) {
 		if (DEBUG) {
@@ -2051,13 +2051,11 @@ public class FlexibleAdapter<T extends IFlexible>
 				if (fromPosition < toPosition) {
 					//Dragging down fromHeader
 					oldPosition = toPosition + 1;
-					newPosition = fromPosition + 2;
 					unlinkHeaderFrom(getItem(oldPosition), true);
 					linkHeaderTo(getItem(oldPosition), (IHeader) fromItem, true);
 				} else {
 					//Dragging up fromHeader
 					oldPosition = fromPosition + 1;
-					newPosition = toPosition + 2;
 					unlinkHeaderFrom(getItem(oldPosition), true);
 					linkHeaderTo(getItem(oldPosition), (IHeader) toItem, true);
 				}
