@@ -14,6 +14,7 @@ import java.util.List;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.flipview.FlipView;
@@ -25,7 +26,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * implemented methods (getter and setters).
  */
 public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
-		implements ISectionable<SimpleItem.ParentViewHolder, HeaderItem> {
+		implements ISectionable<SimpleItem.ParentViewHolder, HeaderItem>, IFilterable {
 
 	private static final long serialVersionUID = -6882745111884490060L;
 	/**
@@ -114,6 +115,12 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 				holder.mSubtitle.setText(getSubtitle());
 			}
 		}
+	}
+
+	@Override
+	public boolean filter(String constraint) {
+		return getTitle() != null && getTitle().toLowerCase().trim().contains(constraint) ||
+				getSubtitle() != null && getSubtitle().toLowerCase().trim().contains(constraint);
 	}
 
 	/**

@@ -27,6 +27,7 @@ import java.util.Locale;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
@@ -505,7 +506,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public ISectionable getSectionableOf(@NonNull IHeader header) {
 		int headerPosition = getGlobalPositionOf(header);
-		if (DEBUG) Log.v(TAG, "getSectionableOf - Item to evaluate " + headerPosition + "=" + header);
+		if (DEBUG)
+			Log.v(TAG, "getSectionableOf - Item to evaluate " + headerPosition + "=" + header);
 		for (int position = headerPosition - 1; position <= headerPosition + 2; position++) {
 			IHeader realHeader = getHeaderOf(getItem(position));//This will also return null in case of OutOfBounds!
 			if (realHeader != null && realHeader.equals(header)) {
@@ -1725,18 +1727,19 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal mechanism,
 	 * items are removed and/or added in order to animate items in the final list.
-	 * <p>
-	 * Filters the provided list with the search text previously set with {@link #setSearchText(String)}.
-	 * </p>
+	 * <p>This method filters the provided list with the search text previously set with
+	 * {@link #setSearchText(String)}.</p>
 	 * <b>Note:</b>
 	 * <br/>- This method calls {@link #filterObject(IFlexible, String)}.
 	 * <br/>- If search text is empty or null, the provided list is the current list.
-	 * <br/>- Any pending deleted items are always filtered out.
-	 * <br/>- Original positions of deleted items are recalculated.
+	 * <br/>- Any pending deleted items are always filtered out, but if restored, they will be
+	 * displayed according to the current filter and in the correct positions.
+	 * <br/>- <b>NEW!</b> Expandable items are picked up and displayed if at least a child is
+	 * collected by the current filter.
 	 * <br/>- <b>NEW!</b> Items are animated thanks to {@link #animateTo(List)}.
 	 *
 	 * @param unfilteredItems the list to filter
-	 * @see #filterObject(IFlexible, String)
+	 * @see #filterObject(T, String)
 	 */
 	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
 		// NOTE: In case user has deleted some items and he changes or applies a filter while
@@ -1810,10 +1813,10 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * This method is a wrapper filter for expandable items.<br/>
-	 * It performs filtering on the subItems returns true, if the any child should be in the
+	 * It performs filtering on the subItems returning true, if the any child should be in the
 	 * filtered collection.
 	 * <p>If the provided item is not an expandable it will be filtered as usual by
-	 * {@link #filterObject(IFlexible, String)}.</p>
+	 * {@link #filterObject(T, String)}.</p>
 	 *
 	 * @param item       the object with subItems to be inspected
 	 * @param constraint constraint, that the object has to fulfil
@@ -1841,32 +1844,27 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * This method performs filtering on the provided object and returns, <b>true</b> if the object
-	 * should be in the filtered collection or <b>false</b> if it shouldn't.
-	 * <p>THIS IS THE DEFAULT IMPLEMENTATION, OVERRIDE TO HAVE OWN FILTER!
-	 * The item will result filtered if its {@code toString()} contains the searchText.</p>
+	 * This method checks if the provided object is a type of {@link IFilterable} interface,
+	 * if yes, performs the filter on the implemented method {@link IFilterable#filter(String)}.
+	 * <p><b>NOTE:</b>
+	 * <br/>- The item will be collected if the implemented method returns true.
+	 * <br/>- {@code IExpandable} items are automatically picked up and displayed if at least a
+	 * child is collected by the current filter: however, you also need to implement
+	 * {@code IFilterable} interface on the {@code IExpandable} item and on the child type. What
+	 * you DON'T NEED to implement is the scan for the children: this is already done :-)
+	 * <br/>- If you don't want to implement the {@code IFilterable} interface on the items, then
+	 * you can override this method to have another filter logic!
 	 *
 	 * @param item       the object to be inspected
 	 * @param constraint constraint, that the object has to fulfil
-	 * @return true, if the object should be in the filteredResult, false otherwise
+	 * @return true, if the object returns true as well, and so if it should be in the
+	 * filteredResult, false otherwise
 	 */
 	protected boolean filterObject(T item, String constraint) {
-		final String valueText = item.toString().toLowerCase();
-
-		//First match against the whole, non-splitted value
-		if (valueText.startsWith(constraint)) {
-			return true;
-		} else {
-			final String[] words = valueText.split(" ");
-
-			//Start at index 0, in case valueText starts with space(s)
-			for (String word : words) {
-				if (word.startsWith(constraint)) {
-					return true;
-				}
-			}
+		if (item instanceof IFilterable) {
+			IFilterable filterable = (IFilterable) item;
+			return filterable.filter(constraint);
 		}
-		//No match, so don't add to collection
 		return false;
 	}
 

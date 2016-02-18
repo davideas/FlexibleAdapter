@@ -10,6 +10,7 @@ import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
@@ -21,7 +22,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * implemented methods (getter and setters).
  */
 public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
-		implements ISectionable<SubItem.ChildViewHolder, HeaderItem> {
+		implements ISectionable<SubItem.ChildViewHolder, HeaderItem>, IFilterable {
 
 	private static final long serialVersionUID = 2519281529221244210L;
 
@@ -72,6 +73,11 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
 		} else {
 			holder.mTitle.setText(getTitle());
 		}
+	}
+
+	@Override
+	public boolean filter(String constraint) {
+		return getTitle() != null && getTitle().toLowerCase().trim().contains(constraint);
 	}
 
 	/**
