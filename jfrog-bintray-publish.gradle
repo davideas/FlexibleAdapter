@@ -38,7 +38,7 @@ bintray {
 		websiteUrl = siteUrl
 		licenses = allLicenses
 		vcsUrl = gitUrl
-		labels = ['android', 'recyclerview', 'adapter', 'selection', 'actionmode', 'ripple', 'search', 'itemanimator', 'undo', 'viewholder', 'filter', 'filtering', 'item', 'item animator', 'animator animation', 'expand', 'expandable', 'collapse', 'collapsible', 'section', 'sticky', 'header category', 'drag', 'draggable', 'swipe', 'swipable', 'fastscroll', 'fastscroller']
+		labels = ['android', 'recyclerview', 'adapter', 'selection', 'actionmode', 'ripple', 'search', 'itemanimator', 'undo', 'viewholder', 'filter', 'filtering', 'item', 'item animator', 'animator animation', 'expand', 'expandable', 'collapse', 'collapsible', 'section', 'sticky', 'header category', 'drag', 'draggable', 'swipe', 'swipeable', 'fastscroll', 'fastscroller']
 		publish = true
 		publicDownloadNumbers = true
 		//noinspection GroovyAssignabilityCheck

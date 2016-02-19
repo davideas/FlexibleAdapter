@@ -521,8 +521,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public ISectionable getSectionableOf(@NonNull IHeader header) {
 		int headerPosition = getGlobalPositionOf(header);
-		if (DEBUG)
-//			Log.v(TAG, "getSectionableOf - Item to evaluate " + headerPosition + "=" + header);
+//		if (DEBUG) Log.v(TAG, "getSectionableOf - Item to evaluate " + headerPosition + "=" + header);
 		for (int position = headerPosition - 1; position <= headerPosition + 2; position++) {
 			IHeader realHeader = getHeaderOf(getItem(position));//This will also return null in case of OutOfBounds!
 			if (realHeader != null && realHeader.equals(header)) {
@@ -654,11 +653,9 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (DEBUG) Log.v(TAG, "Link header " + header + " to " + sectionable);
 			sectionable.setHeader(header);
 			linked = true;
-			if (mOrphanHeaders.remove(header) && DEBUG)
-				Log.d(TAG, "Header removed from the orphan list [" + mOrphanHeaders.size() + "]");
+			removeFromOrphanList(header);
 		} else {
-			mOrphanHeaders.add(header);
-			if (DEBUG) Log.d(TAG, "Header added to the orphan list [" + mOrphanHeaders.size() + "]");
+			addToOrphanList(header);
 		}
 		notifyItemChanged(getGlobalPositionOf(header), payload);
 		return linked;
@@ -682,6 +679,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (!header.isHidden()) {
 				notifyItemChanged(getGlobalPositionOf(header), payload);
 			}
+			addToOrphanList(header);
 			return header;
 		}
 		return null;
@@ -695,6 +693,20 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Then link the header to the new sectionable
 			linkHeaderTo(newItem, header, payload);
 		}
+	}
+
+	private void addToOrphanList(IHeader header) {
+		//Check if the header is not already added (Happens after un-linkage and un-success linkage)
+		if (!mOrphanHeaders.contains(header)) {
+			mOrphanHeaders.add(header);
+			if (DEBUG)
+				Log.d(TAG, "Added to orphan list [" + mOrphanHeaders.size() + "] Header " + header);
+		}
+	}
+
+	private void removeFromOrphanList(IHeader header) {
+		if (mOrphanHeaders.remove(header) && DEBUG)
+			Log.d(TAG, "Removed from orphan list [" + mOrphanHeaders.size() + "] Header " + header);
 	}
 
 	/*---------------------*/
@@ -1177,15 +1189,14 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.e(TAG, "No items to add!");
 			return false;
 		}
-		if (DEBUG)
-			Log.v(TAG, "addItems on position=" + position + " itemCount=" + items.size());
+		if (DEBUG) Log.v(TAG, "addItems on position=" + position + " itemCount=" + items.size());
 
 		//Insert Items
 		if (position < mItems.size()) {
 			mItems.addAll(position, items);
-		} else
+		} else {
 			mItems.addAll(items);
-
+		}
 		//Map all the view types if not done yet
 		mapViewTypesFrom(items);
 		//Notify range addition
@@ -1448,10 +1459,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * - is <u>expandable</u> implementing {@link IExpandable}, it is removed as usual, but
 	 * it will be collapsed if expanded.<br/>
 	 * - has a {@link IHeader} item, the header will be automatically linked to the first item
-	 * after the range or can remain orphan. 
+	 * after the range or can remain orphan.
 	 * <p>Optionally you can pass any payload to notify the <u>parent</u> or the <u>header</u>
 	 * about the change and optimize the view binding.</p>
-	 * 
+	 *
 	 * @param positionStart the start position of the first item
 	 * @param itemCount     how many items should be removed
 	 * @param payload       any non-null user object to notify the parent (the payload will be
@@ -1483,8 +1494,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (hasHeader(newItem)) {
 				//We cannot delete headers during remove range, otherwise positions
 				// becomes wrongs. Headers will be deleted at the end of this process.
-				mOrphanHeaders.add(header);
-				if (DEBUG) Log.d(TAG, "Header added to the orphan list [" + mOrphanHeaders.size() + "]");
+				addToOrphanList(header);
 			} else {
 				//Link the new header to the newItem, and eventually
 				// collect the orphan header if linkage didn't succeed
@@ -2167,18 +2177,20 @@ public class FlexibleAdapter<T extends IFlexible>
 				//Else a Header is being swapped down
 				oldPosition = fromPosition < toPosition ? toPosition + 1 : toPosition;
 				newPosition = fromPosition < toPosition ? toPosition : fromPosition + 1;
-				//Update header linkage swap
-				unlinkHeaderFrom(getItem(oldPosition), true);
+				//Swap header linkage
 				if (DEBUG) Log.d(TAG, "NewPosition " + getItem(newPosition));
+				unlinkHeaderFrom(getItem(oldPosition), true);
 				linkHeaderTo(getItem(newPosition), (IHeader) toItem, true);
-				if (getItem(fromPosition - 2) instanceof IHeader)
+				if (getItem(fromPosition - 2) instanceof IHeader) {
+					//Another Header receives the toItem
 					linkHeaderTo(getItem(fromPosition - 1), (IHeader) getItem(fromPosition - 2), true);
+				}
 			} else if (fromItem instanceof IHeader) {
 				//A Header is being dragged down
 				//Else a Header is being dragged up
 				oldPosition = fromPosition < toPosition ? fromPosition : fromPosition + 1;
 				newPosition = fromPosition < toPosition ? toPosition + 1 : fromPosition;
-				//Update header linkage swap
+				//Swap header linkage
 				unlinkHeaderFrom(getItem(oldPosition), true);
 				linkHeaderTo(getItem(newPosition), (IHeader) fromItem, true);
 			} else {
@@ -2186,7 +2198,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				//Else a Header receives the fromItem
 				oldPosition = fromPosition < toPosition ? toPosition : fromPosition;
 				newPosition = fromPosition < toPosition ? fromPosition : toPosition;
-				//Update header linkage swap
+				//Swap header linkage
 				IHeader header = unlinkHeaderFrom(getItem(oldPosition), true);
 				if (header != null)
 					linkHeaderTo(getItem(newPosition), header, true);

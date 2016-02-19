@@ -425,9 +425,9 @@ public class MainActivity extends AppCompatActivity implements
 				if (position != mActivatedPosition) setActivatedPosition(position);
 				AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
 				assert abstractItem != null;
-				String title = extractTitleFrom(abstractItem);
-				if (!title.isEmpty()) {
+				if (!(abstractItem instanceof ExpandableItem) && !(abstractItem instanceof IHeader)) {
 					//TODO FOR YOU: call your custom Action, for example mCallback.onItemSelected(item.getId());
+					String title = extractTitleFrom(abstractItem);
 					EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
 				}
 			}
@@ -457,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements
 		if (fromItem instanceof ISectionable || toItem instanceof ISectionable) {
 			return;
 		}
-		//FIXME: this doesn't work yet with subItems.....
+		//FIXME: this doesn't work with all types of items (of course)..... we need to implement some custom logic
 //		DatabaseService.getInstance().swapItem(
 //				DatabaseService.getInstance().getListById().indexOf(fromItem),
 //				DatabaseService.getInstance().getListById().indexOf(toItem));
