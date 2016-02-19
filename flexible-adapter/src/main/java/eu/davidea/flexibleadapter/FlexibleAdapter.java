@@ -696,7 +696,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	private void addToOrphanList(IHeader header) {
-		//Check if the header is not already added (Happens after un-linkage and un-success linkage)
+		//Check if the header is not already added (happens after un-linkage with un-success linkage)
 		if (!mOrphanHeaders.contains(header)) {
 			mOrphanHeaders.add(header);
 			if (DEBUG)

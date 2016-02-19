@@ -94,13 +94,6 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 				holder.mFlipView.flipSilently(adapter.isSelected(position));
 			}
 
-			//This "if-else" is just an example of what you can do with item animation
-			if (adapter.isSelected(position)) {
-				adapter.animateView(holder.itemView, position, true);
-			} else {
-				adapter.animateView(holder.itemView, position, false);
-			}
-
 			//In case of searchText matches with Title or with an SimpleItem's field
 			// this will be highlighted
 			if (adapter.isExpandable(this))
@@ -113,6 +106,13 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 			} else {
 				holder.mTitle.setText(getTitle());
 				holder.mSubtitle.setText(getSubtitle());
+			}
+
+			//This "if-else" is just an example of what you can do with item animation
+			if (adapter.isSelected(position)) {
+				adapter.animateView(holder.itemView, position, true);
+			} else {
+				adapter.animateView(holder.itemView, position, false);
 			}
 		}
 	}
