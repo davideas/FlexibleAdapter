@@ -3,7 +3,6 @@ package eu.davidea.examples.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.items.IExpandable;
 
 /**
@@ -75,10 +74,10 @@ public class ExpandableItem extends SimpleItem
 			addSubItem(subItem);
 	}
 
-	@Override
-	public int getLayoutRes() {
-		return R.layout.recycler_expandable_row;
-	}
+//	@Override
+//	public int getLayoutRes() {
+//		return R.layout.recycler_expandable_row;
+//	}
 
 	@Override
 	public String toString() {

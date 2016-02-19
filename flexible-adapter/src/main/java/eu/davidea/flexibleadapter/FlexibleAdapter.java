@@ -756,8 +756,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		T item = getViewTypeInstance(viewType);
 		if (item == null) {
 			//If everything has been set properly, this should never happen ;-)
-			Log.wtf(TAG, "ViewType instance has not been correcly mapped for viewType " + viewType);
-			throw new IllegalStateException("ViewType instance has not been correcly mapped for viewType " + viewType);
+			Log.wtf(TAG, "ViewType instance has not been correctly mapped for viewType " + viewType);
+			throw new IllegalStateException("ViewType instance has not been correctly mapped for viewType " + viewType);
 		}
 		return item.createViewHolder(this, mInflater, parent);
 	}
@@ -792,6 +792,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+		if (!autoMap) {
+			super.onBindViewHolder(holder, position, payloads);
+			return;
+		}
 		//When user scrolls, this line binds the correct selection status
 		holder.itemView.setActivated(isSelected(position));
 		T item = getItem(position);

@@ -21,7 +21,7 @@ import eu.davidea.flexibleadapter.items.ISectionable;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 60, SUB_ITEMS = 3, HEADERS = 30;
+	private static final int ITEMS = 90, SUB_ITEMS = 3, HEADERS = 30;
 	private static AtomicInteger atomicInteger = new AtomicInteger(0);
 
 	//TODO FOR YOU: Use userLearnedSelection from settings
@@ -46,10 +46,10 @@ public class DatabaseService {
 		}
 	}
 
-	public static HeaderItem newHeader() {
-		int id = atomicInteger.incrementAndGet();
-		HeaderItem header = new HeaderItem("H" + id);
-		header.setTitle("Header " + id);
+	public static HeaderItem newHeader(int i) {
+		i = i * HEADERS/ITEMS + 1;
+		HeaderItem header = new HeaderItem("H" + i);
+		header.setTitle("Header " + i);
 		//header is hidden and un-selectable by default!
 		return header;
 	}
@@ -57,7 +57,7 @@ public class DatabaseService {
 	public static SimpleItem newSimpleItem(int i, boolean withHeader) {
 		SimpleItem item;
 		if (withHeader) {
-			HeaderItem header = newHeader();
+			HeaderItem header = newHeader(i);
 			header.setSubtitle("Attached to Simple Item " + i);
 			item = new SimpleItem("I" + i, header);
 		} else {
@@ -72,7 +72,7 @@ public class DatabaseService {
 		//Items are expandable because they implements IExpandable
 		ExpandableItem expandableItem;
 		if (withHeader) {
-			HeaderItem header = newHeader();
+			HeaderItem header = newHeader(i);
 			header.setSubtitle("Attached to Expandable Item " + i);
 			expandableItem = new ExpandableItem("E" + i, header);
 		} else {

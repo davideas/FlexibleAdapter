@@ -122,11 +122,6 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 //	}
 
 	@Override
-	public int getLayoutRes() {
-		throw new IllegalStateException(MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".getLayoutRes() method.");
-	}
-
-	@Override
 	public VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
 		throw new IllegalStateException(MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".createViewHolder() method.");
 	}

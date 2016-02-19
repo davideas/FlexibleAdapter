@@ -13,7 +13,6 @@ import java.util.List;
 import eu.davidea.examples.models.ULSItem;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.flexibleadapter.items.IExpandable;
 
 /**
  * NOTE: AbstractExampleItem is for example purpose only. I wanted to have in common
@@ -78,9 +77,10 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 */
 //	@Override
 //	public int getItemViewType(int position) {
-//		AbstractExampleItem item = getItem(position);
+//		IFlexible item = getItem(position);
 //		if (item instanceof SimpleItem) //or ExpandableItem, since it extends SimpleItem!
 //			return EXPANDABLE_VIEW_TYPE;
+//		else if (item instanceof IHeader) return SECTION_VIEW_TYPE;
 //		else if (item instanceof ULSItem) return EXAMPLE_VIEW_TYPE;
 //		else return 0;
 //	}
@@ -115,33 +115,35 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 * METHOD B - You override and implement this method as you prefer.
 	 */
 //	@Override
-//	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+//	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 //		//NOTE: ViewType Must be checked ALSO here to bind the correct view
 //		//When user scrolls, this line binds the correct selection status
 //		holder.itemView.setActivated(isSelected(position));
 //		switch (getItemViewType(position)) {
 //			case SECTION_VIEW_TYPE:
-//				final SimpleItem header = (SimpleItem) getItem(position);
+//				final HeaderItem header = (HeaderItem) getItem(position);
+//				assert header != null;
 //				HeaderItem.HeaderViewHolder hvHolder = (HeaderItem.HeaderViewHolder) holder;
-//				hvHolder.mTitle.setText(((SimpleItem) header).getTitle());
+//				hvHolder.mTitle.setText(header.getTitle());
+//				hvHolder.mSubtitle.setText(header.getSubtitle());
 //				break;
 //
 //			case EXPANDABLE_VIEW_TYPE:
-//				ExpandableItem item = (ExpandableItem) getItem(position);
+//				SimpleItem item = (SimpleItem) getItem(position);
 //				ExpandableItem.ParentViewHolder pvHolder = (ExpandableItem.ParentViewHolder) holder;
 //				assert item != null;
 //
-//				if (payloads.size() > 0) {
-//					Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
-//					item.setSubtitle(getCurrentChildren(item).size() + " subItems");
-//					if (hasSearchText()) {
-//						Utils.setHighlightText(holder.itemView.getContext(), pvHolder.mSubtitle,
-//								item.getSubtitle(), getSearchText(), R.color.colorAccent_light);
-//					} else {
-//						pvHolder.mSubtitle.setText(item.getSubtitle());
-//					}
-//					break;//We stop the process here, we only want to update the subtitle
-//				}
+////				if (payloads.size() > 0) {
+////					Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
+////					item.setSubtitle(getCurrentChildren(item).size() + " subItems");
+////					if (hasSearchText()) {
+////						Utils.setHighlightText(holder.itemView.getContext(), pvHolder.mSubtitle,
+////								item.getSubtitle(), getSearchText(), R.color.colorAccent_light);
+////					} else {
+////						pvHolder.mSubtitle.setText(item.getSubtitle());
+////					}
+////					break;//We stop the process here, we only want to update the subtitle
+////				}
 //
 //				//When user scrolls, this line binds the correct selection status
 //				pvHolder.itemView.setActivated(isSelected(position));
@@ -218,10 +220,13 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //				}
 //		}//end-switch
 //	}
-
-	private String updateSubTitle(IExpandable item) {
-		return getCurrentChildren(item).size() + " subItems";
-	}
+//
+//	private String updateSubTitle(SimpleItem item) {
+//		if (item instanceof IExpandable)
+//			return getCurrentChildren((IExpandable)item).size() + " subItems";
+//		else
+//			return item.getSubtitle();
+//	}
 
 	@Override
 	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
