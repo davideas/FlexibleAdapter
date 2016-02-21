@@ -26,9 +26,21 @@ artifacts {
 	archives sourcesJar
 }
 
+def getRepositoryUsername() {
+	return getProperties().get('bintray.user')
+}
+
+def getRepositoryPassphrase() {
+	return getProperties().get('bintray.gpg.password')
+}
+
+def getApiKey() {
+	return getProperties().get("bintray.apikey")
+}
+
 bintray {
-	user = getProperties().get("bintray.user")
-	key = getProperties().get("bintray.apikey")
+	user = getRepositoryUsername()
+	key = getApiKey()
 
 	configurations = ['archives']
 	pkg {
@@ -48,7 +60,7 @@ bintray {
 			vcsTag = libraryVersion
 			gpg {
 				sign = true //Determines whether to GPG sign the files. The default is false
-				passphrase = getProperties().get("bintray.gpg.password")
+				passphrase = getRepositoryPassphrase()
 				//Optional. The passphrase for GPG signing'
 			}
 		}
@@ -64,13 +76,13 @@ artifactory {
 			// The Artifactory repository key to publish to
 			repoKey = 'libs-release-local'
 
-			username = getProperties().get("bintray.user")
-			password = getProperties().get("bintray.apikey")
+			username = getProperties().get('bintray.user')
+			password = getProperties().get('bintray.gpg.password')
 		}
 		//noinspection GroovyAssignabilityCheck
 		defaults {
 			// Tell the Artifactory Plugin which artifacts should be published to Artifactory.
-			publications('aar')
+			//publications('aar')
 			publishArtifacts = true
 
 			// Properties to be attached to the published artifacts.

@@ -2,7 +2,7 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Stable version v4.2 of 2015.12.16 - NEW! dev branch in beta: v5.0.0-b3 (usable library!)
+###### A pattern for every RecyclerView - Stable version v4.2 of 2015.12.16 - NEW! dev branch in beta: v5.0.0-b4 (usable library!)
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -13,16 +13,16 @@ This library is configurable and it guides the developers (thanks to quality com
 
 #### Main functionalities (New features might still change)
 * Simple item selection with ripple effect.
-* SINGLE & MULTI selection mode. (Re
+* SINGLE & MULTI selection mode.
 * Restore deleted items (undo delete), **NEW** works with Expandable items too!
-* Customizable FastScroller, **NEW** now in the library.
+* Customizable ItemDecoration and FastScroller, **NEW** now in the library.
 * SearchFilter with Spannable text, **NEW** now items are animated. Works with sub items too!
 * Add and Remove items with custom animations.
 * **NEW!** Predefined ViewHolders.
 * **NEW!** Expandable items with <u>selection coherence</u>.
 * **NEW!** Adapter Animations with custom configuration based on adapter position and beyond.
 * **NEW!** Drag&Drop and Swipe actions with <u>selection coherence</u>.
-* **NEW!** Headers/Sections [with automatic re-linkage].
+* **NEW!** Headers/Sections with automatic re-linkage and with sticky behaviour!
 * **NEW!** Auto mapping ViewTypes with Item interfaces.
 * **NEW!** 1 simple constructor for all events.
 
@@ -50,11 +50,11 @@ repositories {
 dependencies {
 	//Using bintray.com
 	compile 'eu.davidea:flexible-adapter:4.2.0@aar'
-	compile 'eu.davidea:flexible-adapter:5.0.0-b3@aar'
+	compile 'eu.davidea:flexible-adapter:5.0.0-b4@aar'
 	
 	//Using JCenter
 	compile 'eu.davidea:flexible-adapter:4.2.0'
-	compile 'eu.davidea:flexible-adapter:5.0.0-b3'
+	compile 'eu.davidea:flexible-adapter:5.0.0-b4'
 	
 	//Using MavenSnapshots repository for continuous updates from my development
 	compile 'eu.davidea:flexible-adapter:5.0.0-SNAPSHOT'
@@ -66,13 +66,24 @@ Feel free to contribute and ask!<br/>
 Active discussion [Test FlexibleAdapter v5.0.0](https://github.com/davideas/FlexibleAdapter/issues/39).
 
 # Wiki!
-I strong suggest to read the [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages.
+I strong suggest to read the **NEW** [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages.
 
 Wiki pages have been completely reviewed to support all the coming functionalities from 5.0.0.
 
 Not all pages are filled, working in progress :-)
 
 # Change Log
+###### v5.0.0-b4 - 2016.02.21
+- Added **Sticky Header** functionality [See #32].
+- _IHeader_ interface has been added to identify the fact the item is a Header item, as consequence, _ISectionable_ interface now has to be assigned to the items(!!) in order for them to hold the reference to the _IHeader_ item.
+- Headers work in combination with restore items, in all situations, they can be dragged, swapped and receive the new swapped item. Support for **Orphan Headers** has been added.
+- **New clean way to filter items**. Added _IFilterable_ item interface: Items can now implement _filter()_ method in order to be collected for the filtered list. 
+- Brand new logic, how a removed item saves restoration info, now it never misses a restore. 
+- Added a good _DividerItemDecorator_ into library [See #33].
+- Added support for _isSelectable()_, _isEnabled()_.
+- Added methods _addSubItems()_ and _addAllSubItemsFrom()_.
+- Code optimization, nice to mention: removed unnecessary 8 casts; better use of Payload when _notifyItemChanged_ is triggered; Much faster restoration with big numbers (~1000)
+
 ###### v5.0.0-b3 - 2016.02.08
 - **Header/Section** with new **ISectionable** item [See #31]. Still need to add features on this.
 - **Redesigned** the Item interfaces to simplify development and re-usability.
@@ -88,25 +99,12 @@ Not all pages are filled, working in progress :-)
 - New method _addItemWithDelay()_.
 - Use of Log.error instead of Log.warn.
 - New options menu for example App for the showcase.
-
-###### v5.0.0-b2 - 2016.01.31
-- **Expandable items** with selection coherence [See #23].
-- **Drag&Drop and Swipe** actions with selection coherence and ActionMode compatible [See #21].
-- **Adapter Animations** with customization based on adapter position - viewType - selection [See #15].
-- New concept of Item: added **IFlexibleItem** and **IExpandable** interfaces to implement around the model object.
-- Several new functions that help to handle all new situations.
-- New advanced filtering: Delayed + Animations while filtering [See #24].
-- Simplified constructor [See #25] and new configuration setters.
-- Added FastScroller in the library [See #20] (This will probably change, in favor of [MaterialScrollBar](https://github.com/krimin-killr21/MaterialScrollBar)).
-- Added support for Grid Layout also in the expandable version.
-- Included showcase for the new [FlipView](https://github.com/davideas/FlipView) library.
-- and much more...
-- Adapted example App accordingly (but a new example App is foreseen, in order to show all the power this library has).
+- FlexibleAdapter is not anymore abstract.
 
 ###### Old releases
 See [releases](https://github.com/davideas/FlexibleAdapter/releases) for old versions.
 
-v5.0.0-b1 - 2016.01.03 |
+v5.0.0-b2 - 2016.01.31 | v5.0.0-b1 - 2016.01.03 |
 v4.2.0 - 2015.12.12 | v4.1.0 - 2015.11.29 |
 v4.0.1 - 2015.11.01 | v4.0 - 2015.10.18 |
 v3.1 - 2015.08.18 | v3.0 - 2015.07.29 |
