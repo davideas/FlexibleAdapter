@@ -395,10 +395,10 @@ public class MainActivity extends AppCompatActivity implements
 			}
 		} else if (id == R.id.action_sticky_headers) {
 			if (mAdapter.areHeadersSticky()) {
-				mAdapter.disableHeadersSticky();
+				mAdapter.disableStickyHeaders();
 				item.setTitle(R.string.sticky_headers);
 			} else {
-				mAdapter.enableHeadersSticky(3);
+				mAdapter.enableStickyHeaders(3);
 				item.setTitle(R.string.scroll_headers);
 			}
 		}

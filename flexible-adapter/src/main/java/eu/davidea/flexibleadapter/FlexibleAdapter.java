@@ -527,19 +527,19 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                         how many headers are normally displayed in the RecyclerView. It
 	 *                         depends by the specific use case.
 	 */
-	public void enableHeadersSticky(int maxCachedHeaders) {
-		setHeadersSticky(true, maxCachedHeaders);
+	public void enableStickyHeaders(int maxCachedHeaders) {
+		setStickyHeaders(true, maxCachedHeaders);
 	}
 
 	/**
 	 * Disables the sticky header functionality. Clears the cache and removes the
 	 * {@link StickyHeaderDecoration} from the RecyclerView.
 	 */
-	public void disableHeadersSticky() {
-		setHeadersSticky(false, -1);
+	public void disableStickyHeaders() {
+		setStickyHeaders(false, -1);
 	}
 
-	private void setHeadersSticky(boolean headersSticky, int maxCachedHeaders) {
+	private void setStickyHeaders(boolean headersSticky, int maxCachedHeaders) {
 		//Add or Remove the sticky headers decoration
 		if (headersShown && headersSticky) {
 			this.headersSticky = headersSticky;
