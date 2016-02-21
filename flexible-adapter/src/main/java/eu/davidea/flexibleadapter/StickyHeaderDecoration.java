@@ -18,7 +18,6 @@ package eu.davidea.flexibleadapter;
 
 import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -57,10 +56,10 @@ class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 		final IHeader key = mAdapter.getHeaderStickyOn(position);
 
 		if (key != null && mHeaderCache.containsKey(key)) {
-			Log.v("getHeader", "Returning existing Header " + key);
+//			Log.v("getHeader", "Returning existing Header " + key);
 			return mHeaderCache.get(key);
 		} else if (key == null) {
-			Log.v("getHeader", "No Header");
+//			Log.v("getHeader", "No Header");
 			return null;
 		} else {
 			int headerPosition = mAdapter.getGlobalPositionOf(key);
@@ -86,7 +85,7 @@ class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 			if (mHeaderCache.keySet().size() == maxCachedHeaders)
 				clearHeadersCache();
 			mHeaderCache.put(key, header);
-			Log.v("getHeader", "Returning new Header " + key + " headerCache>>>" + mHeaderCache.keySet());
+//			Log.v("getHeader", "Returning new Header " + key + " headerCache>>>" + mHeaderCache.keySet());
 			return header;
 		}
 	}
@@ -107,7 +106,7 @@ class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 		//A header is found?
 		if (headerView != null) {
 			int top = getHeaderTop(recyclerView, child, adapterPos);
-			Log.v("onDrawOver", "adapterPos=" + adapterPos + " top=" + top);
+//			Log.v("onDrawOver", "adapterPos=" + adapterPos + " top=" + top);
 			//Draw header!
 			int left = child.getLeft();
 			canvas.save();

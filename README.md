@@ -66,7 +66,7 @@ Feel free to contribute and ask!<br/>
 Active discussion [Test FlexibleAdapter v5.0.0](https://github.com/davideas/FlexibleAdapter/issues/39).
 
 # Wiki!
-I strong suggest to read the **NEW** [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages.
+I strong suggest to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**.
 
 Wiki pages have been completely reviewed to support all the coming functionalities from 5.0.0.
 
@@ -95,7 +95,7 @@ Not all pages are filled, working in progress :-)
 - Customizable _view elevation_ on item activation [See #38].
 - Better implementation of Expandable items.
 - Added possibility to have Expandables inside another Expandable. Limits are described in the javadoc description of FlexibleAdapter.
-- Added support for **Payload** when notifyItemChanged is called (still need to work on this).
+- Added support for **Payload** when notifyItemChanged is called.
 - New method _addItemWithDelay()_.
 - Use of Log.error instead of Log.warn.
 - New options menu for example App for the showcase.
