@@ -21,7 +21,7 @@ import eu.davidea.flexibleadapter.items.ISectionable;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 90, SUB_ITEMS = 3, HEADERS = 30;
+	private static final int ITEMS = 2000, SUB_ITEMS = 3, HEADERS = 400;
 	private static AtomicInteger atomicInteger = new AtomicInteger(0);
 
 	//TODO FOR YOU: Use userLearnedSelection from settings

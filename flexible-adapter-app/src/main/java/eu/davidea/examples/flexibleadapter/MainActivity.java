@@ -621,7 +621,7 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.setMode(ExampleAdapter.MODE_MULTI);
 		if (Utils.hasMarshmallow()) {
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorAccentDark_light, this.getTheme()));
-		} else {
+		} else if (Utils.hasLollipop()) {
 			//noinspection deprecation
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorAccentDark_light));
 		}
@@ -697,7 +697,7 @@ public class MainActivity extends AppCompatActivity implements
 		mActionMode = null;
 		if (Utils.hasMarshmallow()) {
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark_light, this.getTheme()));
-		} else {
+		} else if (Utils.hasLollipop()) {
 			//noinspection deprecation
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark_light));
 		}
