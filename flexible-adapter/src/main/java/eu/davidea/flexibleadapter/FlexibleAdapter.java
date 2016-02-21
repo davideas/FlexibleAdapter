@@ -542,10 +542,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	private void setStickyHeaders(boolean headersSticky, int maxCachedHeaders) {
 		//Add or Remove the sticky headers decoration
 		if (headersShown && headersSticky) {
-			this.headersSticky = headersSticky;
+			this.headersSticky = true;
 			stickyHeaderDecoration = new StickyHeaderDecoration(this, maxCachedHeaders);
 			mRecyclerView.addItemDecoration(stickyHeaderDecoration);
 		} else if (stickyHeaderDecoration != null){
+			this.headersSticky = false;
 			stickyHeaderDecoration.clearHeadersCache();
 			mRecyclerView.removeItemDecoration(stickyHeaderDecoration);
 			stickyHeaderDecoration = null;
