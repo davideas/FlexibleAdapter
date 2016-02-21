@@ -1,5 +1,6 @@
 package eu.davidea.flexibleadapter;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -8,7 +9,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFilterable;
@@ -55,12 +57,13 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @see FlexibleViewHolder
  * @see ExpandableViewHolder
  * @since 03/05/2015 Created
- * <br/>16/01/2016 Expandable feature
- * <br/>24/01/2016 Drag&Drop, Swipe features
+ * <br/>16/01/2016 Expandable items
+ * <br/>24/01/2016 Drag&Drop, Swipe
  * <br/>30/01/2016 Class now extends {@link FlexibleAnimatorAdapter} that extends {@link SelectableAdapter}
  * <br/>02/02/2016 New code reorganization, new item interfaces and full refactoring
- * <br/>08/02/2016 Headers/Sections feature
+ * <br/>08/02/2016 Headers/Sections
  * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
+ * <br/>20/02/2016 Sticky headers
  */
 @SuppressWarnings({"//unused", "Convert2Diamond", "ConstantConditions", "unchecked"})
 public class FlexibleAdapter<T extends IFlexible>
@@ -84,7 +87,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Header/Section items
 	 */
 	private List<IHeader> mOrphanHeaders;
-	private boolean headersShown = false;
+	private boolean headersShown = false, headersSticky = false;
 
 	/**
 	 * Handler for delayed {@link #filterItems(List)} and {@link OnDeleteCompleteListener#onDeleteConfirmed}
@@ -112,12 +115,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Used to save deleted items and to recover them (Undo).
 	 */
 	private List<RestoreInfo> mRestoreList;
+	private StickyHeaderDecoration stickyHeaderDecoration;
 	private boolean restoreSelection = false, multiRange = false,
 			removeOrphanHeaders = false, permanentDelete = false, adjustSelected = true;
 
 	/* ViewTypes */
 	protected LayoutInflater mInflater;
-	private ArrayMap<Integer, T> mTypeInstances = new ArrayMap<Integer, T>();
+	@SuppressLint("UseSparseArrays")//We can usually count Type instances on the fingers of a hand..
+	private HashMap<Integer, T> mTypeInstances = new HashMap<Integer, T>();
 	private boolean autoMap = false;
 
 	/* Filter */
@@ -173,7 +178,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		mRestoreList = new ArrayList<RestoreInfo>();
 		mOrphanHeaders = new ArrayList<IHeader>();
 
-		//Expand initial items and show headers at startup if not hidden
+		//Expand initial items
 		//This works also after a screen rotation
 		initializeItems();
 
@@ -195,19 +200,19 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Expands items that are initially configured to be shown as expanded.
+	 * Maps and expands items that are initially configured to be shown as expanded.
 	 * <p>This method is also called after a screen rotation.</p>
 	 */
 	protected void initializeItems() {
 		for (int position = 0; position < mItems.size(); position++) {
 			T item = getItem(position);
-			//Map the parent view type if not done yet
-			mapViewTypeFrom(item);
+			//Map the view type if not done yet
+			//mapViewTypeFrom(item);
 			if (isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
 				if (expandable.isExpanded()) {
 					if (DEBUG) Log.v(TAG, "Initially expand item on position " + position);
-					position += addAllSubItemsFrom(position + 1, expandable, false, null);
+					position += addAllSubItemsFrom(position, expandable, false, null);
 				}
 			}
 		}
@@ -218,13 +223,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*------------------------------*/
 
 	public boolean isEnabled(int position) {
-		//noinspection ConstantConditions
 		return getItem(position).isEnabled();
 	}
 
 	@Override
 	public boolean isSelectable(int position) {
-		//noinspection ConstantConditions
 		return getItem(position).isSelectable();
 	}
 
@@ -486,7 +489,52 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	public boolean isHeader(@NonNull T item) {
-		return item != null & item instanceof IHeader;
+		return item != null && item instanceof IHeader;
+	}
+
+	/**
+	 * Returns if Adapter will display sticky headers on the top.
+	 *
+	 * @return true if headers can be sticky, false if headers are scrolled together with all items
+	 */
+	public boolean areHeadersSticky() {
+		return headersSticky;
+	}
+
+	/**
+	 * Enables the sticky header functionality. Adds {@link StickyHeaderDecoration} to the
+	 * RecyclerView.
+	 * <p>Headers can be sticky only if they are shown. Command is otherwise ignored!</p>
+	 * <b>NOTE:</b> Sticky headers cannot be dragged, swiped, moved nor deleted. They, instead,
+	 * are automatically re-linked if the linked Sectionable item is different.
+	 *
+	 * @param maxCachedHeaders the max view instances to keep in the cache. This number depends by
+	 *                         how many headers are normally displayed in the RecyclerView. It
+	 *                         depends by the specific use case.
+	 */
+	public void enableHeadersSticky(int maxCachedHeaders) {
+		setHeadersSticky(true, maxCachedHeaders);
+	}
+
+	/**
+	 * Disables the sticky header functionality. Clears the cache and removes the
+	 * {@link StickyHeaderDecoration} from the RecyclerView.
+	 */
+	public void disableHeadersSticky() {
+		setHeadersSticky(false, -1);
+	}
+
+	private void setHeadersSticky(boolean headersSticky, int maxCachedHeaders) {
+		//Add or Remove the sticky headers decoration
+		if (headersShown && headersSticky) {
+			this.headersSticky = headersSticky;
+			stickyHeaderDecoration = new StickyHeaderDecoration(this, maxCachedHeaders);
+			mRecyclerView.addItemDecoration(stickyHeaderDecoration);
+		} else if (stickyHeaderDecoration != null){
+			stickyHeaderDecoration.clearHeadersCache();
+			mRecyclerView.removeItemDecoration(stickyHeaderDecoration);
+			stickyHeaderDecoration = null;
+		}
 	}
 
 	/**
@@ -512,22 +560,35 @@ public class FlexibleAdapter<T extends IFlexible>
 		return null;
 	}
 
+	public IHeader getHeaderStickyOn(@IntRange(from = 0) int position) {
+		//Headers are not visible nor sticky
+		if (!headersShown || !headersSticky) return null;
+		//When headers are visible and sticky, get the previous header
+		for (int i = position; i >= 0; i--) {
+			T item = getItem(i);
+			if (isHeader(item)) return (IHeader) item;
+			IHeader header = getHeaderOf(item);
+			if (header != null) return  header;
+		}
+		return null;
+	}
+
 	/**
 	 * Provides the item that holds the passed header.
-	 * <p>The Sectionable is serched starting from Header position -1 to Header position +2.</p>
+	 * <p>The Sectionable is searched starting from Header position -1 to Header position +2.</p>
 	 *
 	 * @param header the header
 	 * @return the Sectionable of the passed header if found, null otherwise
 	 */
 	public ISectionable getSectionableOf(@NonNull IHeader header) {
-		int headerPosition = getGlobalPositionOf(header);
+				int headerPosition = getGlobalPositionOf(header);
 //		if (DEBUG) Log.v(TAG, "getSectionableOf - Item to evaluate " + headerPosition + "=" + header);
-		for (int position = headerPosition - 1; position <= headerPosition + 2; position++) {
-			IHeader realHeader = getHeaderOf(getItem(position));//This will also return null in case of OutOfBounds!
-			if (realHeader != null && realHeader.equals(header)) {
+				for (int position = headerPosition - 1; position <= headerPosition + 2; position++) {
+					IHeader realHeader = getHeaderOf(getItem(position));//This will also return null in case of OutOfBounds!
+					if (realHeader != null && realHeader.equals(header)) {
 //				if (DEBUG) Log.v(TAG, "getSectionableOf - Found Sectionable=" + getItem(position));
-				return (ISectionable) getItem(position);
-			}
+						return (ISectionable) getItem(position);
+					}
 		}
 //		if (DEBUG) Log.v(TAG, "getSectionableOf - Sectionable NotFound");
 		return null;
@@ -685,13 +746,16 @@ public class FlexibleAdapter<T extends IFlexible>
 		return null;
 	}
 
-	private void restoreHeaderLinkage(T newItem, @Nullable Object payload) {
-		IHeader header = getHeaderOf(newItem);
+	private void restoreHeaderLinkage(RestoreInfo restoreInfo) {
+		IHeader header = getHeaderOf(restoreInfo.item);
 		if (header != null) {
 			//First unlink header from current sectionable, otherwise it could not be found
-			unlinkHeaderFrom((T) getSectionableOf(header), payload);
+			unlinkHeaderFrom((T) getSectionableOf(header), restoreInfo.payload);
 			//Then link the header to the new sectionable
-			linkHeaderTo(newItem, header, payload);
+			linkHeaderTo(restoreInfo.item, header, restoreInfo.payload);
+		} else if (isHeader(restoreInfo.item)) {
+			//Restore header into the sectionable
+			linkHeaderTo(getItem(restoreInfo.getRestorePosition()), (IHeader) restoreInfo.item, null);
 		}
 	}
 
@@ -722,15 +786,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position position for which ViewType is requested
 	 * @return if Item is found, any integer value from user layout resource if defined in
 	 * {@code IFlexible#getLayoutRes()}
-	 * @throws IllegalStateException if {@link IFlexible#getLayoutRes()} is not implemented
-	 *                               and if this method is not overridden.
 	 */
 	@Override
 	public int getItemViewType(int position) {
 		T item = getItem(position);
 		assert item != null;
+		//Map the view type if not done yet
+		mapViewTypeFrom(item);
 		autoMap = true;
-		return item.getLayoutRes();//User ViewType or throws IllegalStateException
+		return item.getLayoutRes();
 	}
 
 	/**
@@ -995,7 +1059,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Save expanded state
 			expandable.setExpanded(true);
 			//Map all the view types if not done yet
-			mapViewTypesFrom(subItems);
+			//mapViewTypesFrom(subItems);
 
 			//Automatically scroll the current expandable item to show as much children as possible
 			if (scrollOnExpand && !expandAll) {
@@ -1202,7 +1266,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			mItems.addAll(items);
 		}
 		//Map all the view types if not done yet
-		mapViewTypesFrom(items);
+		//mapViewTypesFrom(items);
 		//Notify range addition
 		notifyItemRangeInserted(position, items.size());
 
@@ -1521,6 +1585,11 @@ public class FlexibleAdapter<T extends IFlexible>
 					parentPosition = createRestoreSubItemInfo(parent, item, payload);
 				}
 			}
+			//If item is a Header, remove linkage from Sectionable if exists
+			if (isHeader(item)) {
+				ISectionable sectionable = getSectionableOf((IHeader) item);
+				if (sectionable != null) sectionable.setHeader(null);
+			}
 			//Remove item from internal list
 			mItems.remove(positionStart);
 		}
@@ -1630,7 +1699,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			adjustSelected = false;
 			RestoreInfo restoreInfo = mRestoreList.get(i);
 			//Restore header linkage
-			restoreHeaderLinkage(restoreInfo.item, restoreInfo.payload);
+			restoreHeaderLinkage(restoreInfo);
 
 			if (restoreInfo.relativePosition >= 0) {
 				//Restore child, if not deleted
@@ -1654,7 +1723,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			restoreInfo.item.setHidden(false);
 		}
 		//Restore selection if requested, before emptyBin
-		if (restoreSelection) {
+		if (restoreSelection && mRestoreList.size() > 0) {
 			if (isExpandable(mRestoreList.get(0).item) || getExpandableOf(mRestoreList.get(0).item) == null) {
 				parentSelected = true;
 			} else {
@@ -1890,7 +1959,7 @@ public class FlexibleAdapter<T extends IFlexible>
 									if (!subItem.isHidden()) filteredSubItems.add(subItem);
 								}
 								//Map the view types if not done yet
-								mapViewTypesFrom(filteredSubItems);
+								//mapViewTypesFrom(filteredSubItems);
 								values.addAll(filteredSubItems);
 								newOriginalPosition += filteredSubItems.size();
 							}
@@ -2584,22 +2653,34 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 		}
 
-		/**
-		 * Triggered by {@link #notifyDataSetChanged()}.
-		 */
+		private void clearHeadersCache() {
+			if (headersSticky) {
+				stickyHeaderDecoration.clearHeadersCache();
+			}
+		}
+
+		/* Triggered by {@link #notifyDataSetChanged()} */
 		@Override
 		public void onChanged() {
 			initializeItems();
+			clearHeadersCache();
 		}
 
 		@Override
 		public void onItemRangeInserted(int positionStart, int itemCount) {
 			adjustPositions(positionStart, itemCount);
+			clearHeadersCache();
 		}
 
 		@Override
 		public void onItemRangeRemoved(int positionStart, int itemCount) {
 			adjustPositions(positionStart, -itemCount);
+			clearHeadersCache();
+		}
+
+		@Override
+		public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+			clearHeadersCache();
 		}
 	}
 

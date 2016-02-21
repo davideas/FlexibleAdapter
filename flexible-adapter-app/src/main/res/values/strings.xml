@@ -55,6 +55,8 @@ limitations under the License.
 	<string name="collapse_all">Collapse All</string>
 	<string name="show_headers">Show Headers</string>
 	<string name="hide_headers">Hide Headers</string>
+	<string name="sticky_headers">Sticky Headers</string>
+	<string name="scroll_headers">Scroll Headers</string>
 
 
 </resources>

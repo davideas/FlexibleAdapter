@@ -48,7 +48,7 @@ public final class Utils {
 		return context.getResources().getDisplayMetrics();
 	}
 
-	public static int dpToPx(Context context, float dp) {
+	public static float dpToPx(Context context, float dp) {
 		final float scale = context.getResources().getDisplayMetrics().density;
 		return Math.round(dp * scale);
 	}

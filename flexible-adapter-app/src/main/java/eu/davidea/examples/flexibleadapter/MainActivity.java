@@ -8,7 +8,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -29,7 +28,7 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import eu.davidea.common.SimpleDividerItemDecoration;
+import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.examples.models.AbstractExampleItem;
 import eu.davidea.examples.models.ExpandableItem;
 import eu.davidea.examples.models.HeaderItem;
@@ -37,7 +36,7 @@ import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.SmoothScrollLinearLayoutManager;
+import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IHeader;
@@ -119,24 +118,21 @@ public class MainActivity extends AppCompatActivity implements
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 			@Override
 			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!
+				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!!
 				return true;
 			}
 		});
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-		//FIXME: Change ItemDecorator, this doesn't work well!!!
-		mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
-				ResourcesCompat.getDrawable(getResources(), R.drawable.divider, null)));
+		mRecyclerView.addItemDecoration(new DividerItemDecoration(this, R.drawable.divider));
 
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView
+		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) findViewById(R.id.fast_scroller), Utils.getColorAccent(this));
 		//Experimenting NEW features
-		mAdapter.setLongPressDragEnabled(true);
-		mAdapter.setSwipeEnabled(true);
+		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
+		mAdapter.setSwipeEnabled(true);//Enable swipe items
+		mAdapter.showAllHeaders();//Show Headers at startUp!
 		//Add sample item on the top (not part of library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
-		//Experimental, show Headers at startUp!
-		mAdapter.showAllHeaders();
 
 		//FAB
 		mFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -157,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements
 						//all child and headers currently visible
 						int adapterPos = position + mAdapter.getItemCountOfTypes(
 								R.layout.recycler_uls_row,
+								R.layout.recycler_expandable_row,
 								R.layout.recycler_child_row,
 								R.layout.recycler_header_row);
 						//Adapter's list is a copy, to animate the item you must call addItem on the new position
@@ -276,6 +273,17 @@ public class MainActivity extends AppCompatActivity implements
 			searchView.setQuery(mAdapter.getSearchText(), false);
 			searchView.setIconified(false);
 		}
+
+		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
+		headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
+		MenuItem headersSticky = menu.findItem(R.id.action_sticky_headers);
+		if (mAdapter.areHeadersShown()) {
+			headersSticky.setVisible(true);
+			headersSticky.setTitle(mAdapter.areHeadersSticky() ? R.string.scroll_headers : R.string.sticky_headers);
+		} else {
+			headersSticky.setVisible(false);
+		}
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -378,12 +386,20 @@ public class MainActivity extends AppCompatActivity implements
 				item.setTitle(R.string.expand_all);
 			}
 		} else if (id == R.id.action_show_hide_headers) {
-			if (!mAdapter.areHeadersShown()) {
-				mAdapter.showAllHeaders();
-				item.setTitle(R.string.hide_headers);
-			} else {
+			if (mAdapter.areHeadersShown()) {
 				mAdapter.hideAllHeaders();
 				item.setTitle(R.string.show_headers);
+			} else {
+				mAdapter.showAllHeaders();
+				item.setTitle(R.string.hide_headers);
+			}
+		} else if (id == R.id.action_sticky_headers) {
+			if (mAdapter.areHeadersSticky()) {
+				mAdapter.disableHeadersSticky();
+				item.setTitle(R.string.sticky_headers);
+			} else {
+				mAdapter.enableHeadersSticky(3);
+				item.setTitle(R.string.scroll_headers);
 			}
 		}
 

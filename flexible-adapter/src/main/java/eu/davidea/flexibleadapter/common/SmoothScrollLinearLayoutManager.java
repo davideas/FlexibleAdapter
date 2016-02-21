@@ -1,4 +1,4 @@
-package eu.davidea.flexibleadapter;
+package eu.davidea.flexibleadapter.common;
 
 import android.content.Context;
 import android.graphics.PointF;

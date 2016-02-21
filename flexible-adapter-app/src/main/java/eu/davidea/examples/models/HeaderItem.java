@@ -102,8 +102,7 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 	@Override
 	public String toString() {
 		return "HeaderItem[id=" + id +
-				", title=" + title +
-				", sticky=" + isSticky() + "]";
+				", title=" + title + "]";
 	}
 
 }
