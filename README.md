@@ -35,13 +35,13 @@ Some simple functionalities have been implemented thanks to the some Blogs (see 
 * Item interfaces and predefined ViewHolders complete the whole library giving more actions to the items and configuration options to the developers and the end user.
 
 # Screenshots
-![Multi Selection](/screenshots/multi_selection.png)
+![GridView & Secondary Functionalities](/screenshots/gridview_secondary_functionalities.png)
 ![Search screen](/screenshots/search.png)
 ![Undo Screen](/screenshots/undo.png)
 ![Adapter Animations](/screenshots/adapter_animations.png)
 ![StickyHeaders & Header Linkage & Restore items](/screenshots/stickyheaders_headerlinkage_restoreitems.png)
 ![StickyHeaders & Expandable items](/screenshots/stickyheaders_expandableitems.png)
-![GridView & Secondary Functionalities](/screenshots/gridview_secondary_functionalities.png)
+![Multi Selection](/screenshots/multi_selection.png)
 
 # Setup
 ```
