@@ -736,9 +736,9 @@ public class MainActivity extends AppCompatActivity implements
 
 	private String extractTitleFrom(AbstractFlexibleItem abstractItem) {
 		if (abstractItem instanceof AbstractExampleItem) {
-			SimpleItem simpleItem = (SimpleItem) abstractItem;
-			String title = simpleItem.getTitle();
-			if (simpleItem instanceof ExpandableItem) {
+			AbstractExampleItem exampleItem = (AbstractExampleItem) abstractItem;
+			String title = exampleItem.getTitle();
+			if (exampleItem instanceof ExpandableItem) {
 				ExpandableItem expandableItem = (ExpandableItem) abstractItem;
 				if (expandableItem.getSubItems() != null) {
 					title += "(+" + expandableItem.getSubItems().size() + ")";
