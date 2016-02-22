@@ -17,6 +17,7 @@
 package eu.davidea.flexibleadapter;
 
 import android.graphics.Canvas;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,10 +30,10 @@ import eu.davidea.flexibleadapter.items.IHeader;
 /**
  * A sticky header decoration for RecyclerView, to use only with {@link FlexibleAdapter}.
  */
-class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
+public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 
 	private FlexibleAdapter mAdapter;
-	private Map<Object, View> mHeaderCache;
+	private Map<IHeader, View> mHeaderCache;
 	private int maxCachedHeaders;
 
 	/**
@@ -40,7 +41,7 @@ class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 	 */
 	public StickyHeaderDecoration(FlexibleAdapter adapter, int maxCachedHeaders) {
 		mAdapter = adapter;
-		mHeaderCache = new HashMap<Object, View>();
+		mHeaderCache = new HashMap<IHeader, View>();
 		this.maxCachedHeaders = maxCachedHeaders;
 	}
 
@@ -81,7 +82,21 @@ class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 			header.layout(0, 0, header.getMeasuredWidth(), header.getMeasuredHeight());
 
 			//TODO: Intercept taps on sticky views
-			//TODO: How many headers can be retained into the cache? Can we automatically remove invisible headers?
+//			recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
+//				@Override
+//				public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+//					// only use the "UP" motion event, discard all others
+//					if (e.getAction() == MotionEvent.ACTION_UP) {
+//						IHeader header = findHeaderViewUnder(e.getX(), e.getY());
+//						if (header != null) {
+//							Log.d("getHeader", "headerView has been touched!!!! " + header);
+//							return true;
+//						}
+//					}
+//					return false;
+//				}
+//			});
+
 			if (mHeaderCache.keySet().size() == maxCachedHeaders)
 				clearHeadersCache();
 			mHeaderCache.put(key, header);
@@ -122,15 +137,18 @@ class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 	 * @param recyclerView the RecyclerView
 	 * @param child        the current child item view
 	 * @param adapterPos   the current Adapter position
-	 * @return the new top (usually 0) of the header view, or the offset if next header pushes the previous offscreen
+	 * @return the new top (usually 0) of the header view, or the offset if next header pushes
+	 * the previous offscreen
 	 */
 	private int getHeaderTop(RecyclerView recyclerView, View child, int adapterPos) {
 		int top = Math.max(0, (int) child.getY());
+
+		//Check item availability
 		IHeader current = mAdapter.getHeaderStickyOn(adapterPos);
-		if (current == null) return top;
+		if (current == null || recyclerView.getChildCount() < 1)
+			return top;
 
 		//Get next(+1) view with header and compute the offscreen push if needed
-		if (recyclerView.getChildCount() < 1) return top;
 		View nextItemView = recyclerView.getChildAt(1);
 		int adapterPosHere = recyclerView.getChildAdapterPosition(nextItemView);
 		IHeader next = mAdapter.getHeaderStickyOn(adapterPosHere);
@@ -153,6 +171,22 @@ class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 	 */
 	public void clearHeadersCache() {
 		mHeaderCache.clear();
+	}
+
+	public IHeader findHeaderViewUnder(float x, float y) {
+		for (Map.Entry<IHeader, View> entry : mHeaderCache.entrySet()) {
+			View child = entry.getValue();
+			final float translationX = ViewCompat.getTranslationX(child);
+			final float translationY = ViewCompat.getTranslationY(child);
+
+			if (x >= child.getLeft() + translationX &&
+					x <= child.getRight() + translationX &&
+					y >= child.getTop() + translationY &&
+					y <= child.getBottom() + translationY) {
+				return entry.getKey();
+			}
+		}
+		return null;
 	}
 
 }
