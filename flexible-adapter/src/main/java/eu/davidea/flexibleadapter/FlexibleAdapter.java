@@ -545,7 +545,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			this.headersSticky = true;
 			stickyHeaderDecoration = new StickyHeaderDecoration(this, maxCachedHeaders);
 			mRecyclerView.addItemDecoration(stickyHeaderDecoration);
-		} else if (stickyHeaderDecoration != null){
+		} else if (stickyHeaderDecoration != null) {
 			this.headersSticky = false;
 			stickyHeaderDecoration.clearHeadersCache();
 			mRecyclerView.removeItemDecoration(stickyHeaderDecoration);
@@ -584,7 +584,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			T item = getItem(i);
 			if (isHeader(item)) return (IHeader) item;
 			IHeader header = getHeaderOf(item);
-			if (header != null) return  header;
+			if (header != null) return header;
 		}
 		return null;
 	}
@@ -597,14 +597,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the Sectionable of the passed header if found, null otherwise
 	 */
 	public ISectionable getSectionableOf(@NonNull IHeader header) {
-				int headerPosition = getGlobalPositionOf(header);
+		int headerPosition = getGlobalPositionOf(header);
 //		if (DEBUG) Log.v(TAG, "getSectionableOf - Item to evaluate " + headerPosition + "=" + header);
-				for (int position = headerPosition - 1; position <= headerPosition + 2; position++) {
-					IHeader realHeader = getHeaderOf(getItem(position));//This will also return null in case of OutOfBounds!
-					if (realHeader != null && realHeader.equals(header)) {
+		for (int position = headerPosition - 1; position <= headerPosition + 2; position++) {
+			IHeader realHeader = getHeaderOf(getItem(position));//This will also return null in case of OutOfBounds!
+			if (realHeader != null && realHeader.equals(header)) {
 //				if (DEBUG) Log.v(TAG, "getSectionableOf - Found Sectionable=" + getItem(position));
-						return (ISectionable) getItem(position);
-					}
+				return (ISectionable) getItem(position);
+			}
 		}
 //		if (DEBUG) Log.v(TAG, "getSectionableOf - Sectionable NotFound");
 		return null;
@@ -2368,7 +2368,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	private void mapViewTypeFrom(T item) {
 		if (item != null && !mTypeInstances.containsKey(item.getLayoutRes())) {
 			mTypeInstances.put(item.getLayoutRes(), item);
-			if (DEBUG) Log.i(TAG, "Mapped viewType " + item.getLayoutRes() + " from " + item);
+			if (DEBUG)
+				Log.i(TAG, "Mapped viewType " + item.getLayoutRes() + " from " + item.getClass().getSimpleName());
 		}
 	}
 

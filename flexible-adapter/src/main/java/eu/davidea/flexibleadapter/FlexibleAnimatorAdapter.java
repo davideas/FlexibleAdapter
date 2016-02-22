@@ -256,8 +256,11 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 
 			//Add Alpha animator if not yet
 			ViewCompat.setAlpha(itemView, 0);
-			if (!animatorsUsed.contains(AnimatorEnum.ALPHA))
+			if (!animatorsUsed.contains(AnimatorEnum.ALPHA)) {
 				addAlphaAnimator(animators, itemView, 0f);
+			}
+//			if (DEBUG)
+//				Log.v(TAG, "Started Animation on position " + position + " animatorsUsed=" + animatorsUsed);
 			//Clear animators since the new item might have different animations
 			animatorsUsed.clear();
 
@@ -271,8 +274,6 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 			set.setDuration(mDuration);
 			set.addListener(new HelperAnimatorListener(itemView.hashCode()));
 			set.start();
-			if (DEBUG)
-				Log.v(TAG, "Started Animation on position " + position + " animatorsUsed=" + animatorsUsed);
 			mAnimators.put(itemView.hashCode(), set);
 		}
 

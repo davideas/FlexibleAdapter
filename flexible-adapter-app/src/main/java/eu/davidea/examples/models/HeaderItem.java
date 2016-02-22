@@ -96,6 +96,12 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
+			mTitle.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Log.d("HeaderTitle", "Registered click on Header TitleTextView! " + mTitle.getText());
+				}
+			});
 		}
 	}
 
