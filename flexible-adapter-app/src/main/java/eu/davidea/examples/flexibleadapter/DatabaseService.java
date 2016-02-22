@@ -21,7 +21,7 @@ import eu.davidea.flexibleadapter.items.ISectionable;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 2000, SUB_ITEMS = 3, HEADERS = 400;
+	private static final int ITEMS = 90, SUB_ITEMS = 3, HEADERS = 30;
 	private static AtomicInteger atomicInteger = new AtomicInteger(0);
 
 	//TODO FOR YOU: Use userLearnedSelection from settings
@@ -39,10 +39,12 @@ public class DatabaseService {
 	}
 
 	DatabaseService() {
+		HeaderItem header = null;
 		for (int i = 0; i < ITEMS; i++) {
+			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i) : header;
 			mItems.add(i % 3 == 0 ?
-					newExpandableItem(i + 1, i % (ITEMS/HEADERS) == 0) :
-					newSimpleItem(i + 1, i % (ITEMS/HEADERS) == 0));
+					newExpandableItem(i + 1, header) :
+					newSimpleItem(i + 1, header));
 		}
 	}
 
@@ -54,10 +56,9 @@ public class DatabaseService {
 		return header;
 	}
 
-	public static SimpleItem newSimpleItem(int i, boolean withHeader) {
+	public static SimpleItem newSimpleItem(int i, HeaderItem header) {
 		SimpleItem item;
-		if (withHeader) {
-			HeaderItem header = newHeader(i);
+		if (header != null) {
 			header.setSubtitle("Attached to Simple Item " + i);
 			item = new SimpleItem("I" + i, header);
 		} else {
@@ -68,11 +69,10 @@ public class DatabaseService {
 		return item;
 	}
 
-	public static ExpandableItem newExpandableItem(int i, boolean withHeader) {
+	public static ExpandableItem newExpandableItem(int i, HeaderItem header) {
 		//Items are expandable because they implements IExpandable
 		ExpandableItem expandableItem;
-		if (withHeader) {
-			HeaderItem header = newHeader(i);
+		if (header != null) {
 			header.setSubtitle("Attached to Expandable Item " + i);
 			expandableItem = new ExpandableItem("E" + i, header);
 		} else {

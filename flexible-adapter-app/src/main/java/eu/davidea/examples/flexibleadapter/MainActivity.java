@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements
 		//Experimenting NEW features
 		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
 		mAdapter.setSwipeEnabled(true);//Enable swipe items
-		mAdapter.showAllHeaders();//Show Headers at startUp!
+		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
 		//Add sample item on the top (not part of library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
@@ -144,8 +144,8 @@ public class MainActivity extends AppCompatActivity implements
 				for (int position = 0; position <= mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1; position++) {
 					//Every 3 positions I want to create an expandable
 					AbstractExampleItem item = (position % 3 == 0 ?
-							DatabaseService.newExpandableItem(position, false) :
-							DatabaseService.newSimpleItem(position, false));
+							DatabaseService.newExpandableItem(position, null) :
+							DatabaseService.newSimpleItem(position, null));
 					//Add only if we don't have it
 					if (!DatabaseService.getInstance().getListById().contains(item)) {
 						DatabaseService.getInstance().addItem(position, item);//This is the original list

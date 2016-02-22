@@ -80,7 +80,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
  * <br/>20/02/2016 Sticky headers
  */
-@SuppressWarnings({"//unused", "Convert2Diamond", "ConstantConditions", "unchecked"})
+@SuppressWarnings({"//unused", "Range", "Convert2Diamond", "ConstantConditions", "unchecked"})
 public class FlexibleAdapter<T extends IFlexible>
 		extends FlexibleAnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
@@ -318,7 +318,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void updateDataSet(List<T> items) {
 		mItems = items;
 		notifyDataSetChanged();
-		showAllHeadersAfterRefresh();
+		showAllHeaders();
 	}
 
 	/**
@@ -421,10 +421,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param displayHeaders true to display them, false to keep them hidden
 	 * @return this adapter so the call can be chained
 	 */
-//	public FlexibleAdapter setDisplayHeadersAtStartUp(boolean displayHeaders) {
-//		headersShown = displayHeaders;
-//		return this;
-//	}
+	public FlexibleAdapter setDisplayHeadersAtStartUp(boolean displayHeaders) {
+		headersShown = displayHeaders;
+		if (displayHeaders) showAllHeaders();
+		return this;
+	}
 
 	/**
 	 * @return true if orphan headers will be removed when unlinked, false if are kept unlinked
@@ -564,6 +565,18 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Checks if the item has a header and that header is the same of the provided one.
+	 *
+	 * @param item   the item supposing having a header
+	 * @param header the header to compare
+	 * @return true if the item has a header and it is the same of the provided one, false otherwise
+	 */
+	public boolean hasSameHeader(@NonNull T item, @NonNull IHeader header) {
+		IHeader current = getHeaderOf(item);
+		return current != null && header != null && current.equals(header);
+	}
+
+	/**
 	 * Provides the header of the passed Sectionable.
 	 *
 	 * @param item the item holding a header
@@ -619,6 +632,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void showAllHeaders() {
 		multiRange = true;
 		//Show linked headers only
+		resetHiddenStatus();
 		for (int position = 0; position < mItems.size(); position++) {
 			if (showHeaderOf(position, mItems.get(position)))
 				position++;//It's the same element, skip it.
@@ -648,14 +662,20 @@ public class FlexibleAdapter<T extends IFlexible>
 		multiRange = false;
 	}
 
-	private void showAllHeadersAfterRefresh() {
+	/**
+	 * Helper method to ensure that all current headers are hidden before they are shown again.
+	 * <p>This method is already called inside {@link #showAllHeaders()}.</p>
+	 * This is necessary when {@link #setDisplayHeadersAtStartUp(boolean)} is set true and also
+	 * if an Activity/Fragment has been closed and then reopened. We need to reset hidden status,
+	 * the process is very fast.
+	 */
+	private void resetHiddenStatus() {
 		if (headersShown) {
 			for (T item : mItems) {
 				IHeader header = getHeaderOf(item);
 				if (header != null)
 					header.setHidden(true);
 			}
-			showAllHeaders();
 		}
 	}
 
@@ -1191,9 +1211,33 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* UPDATE METHODS */
 	/*----------------*/
 
+	/**
+	 * Updates/Rebounds the ItemView corresponding to the current position of that item, with
+	 * the new content provided.
+	 *
+	 * @param item    the item with the new content
+	 * @param payload any non-null user object to notify the current item (the payload will be
+	 *                therefore passed to the bind method of the item ViewHolder to optimize the
+	 *                content to update); pass null to rebind all fields of this item.
+	 */
+	public void updateItem(@NonNull T item, @Nullable Object payload) {
+		updateItem(getGlobalPositionOf(item), item, payload);
+	}
+
+	/**
+	 * Updates/Rebounds the ItemView corresponding to the provided position with the new
+	 * provided content. Use {@link #updateItem(IFlexible, Object)} if the new content should
+	 * be bound on the same position.
+	 *
+	 * @param position the position where the new content should be updated and rebound
+	 * @param item     the item with the new content
+	 * @param payload  any non-null user object to notify the current item (the payload will be
+	 *                 therefore passed to the bind method of the item ViewHolder to optimize the
+	 *                 content to update); pass null to rebind all fields of this item.
+	 */
 	public void updateItem(@IntRange(from = 0) int position, @NonNull T item,
 						   @Nullable Object payload) {
-		if (position < 0 && position >= mItems.size()) {
+		if (position < 0 || position >= mItems.size()) {
 			Log.e(TAG, "Cannot updateItem on position out of OutOfBounds!");
 			return;
 		}
@@ -1574,15 +1618,18 @@ public class FlexibleAdapter<T extends IFlexible>
 		IHeader header = getHeaderOf(getItem(positionStart));
 		if (header != null) {
 			T newItem = getItem(positionStart + itemCount);
-			//Header becomes orphan, also if newItem has already an header!
-			if (hasHeader(newItem)) {
+			//Header becomes orphan, also if newItem has a different header!
+			if (!hasSameHeader(newItem, header)) {
 				//We cannot delete headers during remove range, otherwise positions
 				// becomes wrongs. Headers will be deleted at the end of this process.
 				addToOrphanList(header);
-			} else {
+			} else if (!hasHeader(newItem)) {
 				//Link the new header to the newItem, and eventually
 				// collect the orphan header if linkage didn't succeed
 				linkHeaderTo(newItem, header, payload);
+			} else {
+				//it's the same header so rebound content
+				notifyItemChanged(getGlobalPositionOf(header), payload);
 			}
 		}
 
@@ -2004,7 +2051,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		} else mItems = values;
 		//Restore headers if necessary
 		if (mSearchText.isEmpty()) {
-			showAllHeadersAfterRefresh();
+			showAllHeaders();
 		}
 
 		//Reset filtering flag
@@ -2221,7 +2268,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param fromPosition previous position of the item.
 	 * @param toPosition   new position of the item.
 	 */
-	@SuppressWarnings({"Range", "ConstantConditions"})
 	@CallSuper
 	public void moveItem(int fromPosition, int toPosition) {
 		if (DEBUG) {
@@ -2549,7 +2595,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
 			//Restore headers shown status
 			headersShown = savedInstanceState.getBoolean(EXTRA_HEADERS);
-			showAllHeadersAfterRefresh();
+			showAllHeaders();
 		}
 	}
 
