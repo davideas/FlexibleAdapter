@@ -378,7 +378,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public int getItemCountOfTypesUntil(@IntRange(from = 0) int position, Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
 		int count = 0;
-		for (int i = 0; i < position; i++) {
+		for (int i = 0; i <= position; i++) {
 			//Privilege faster counting if autoMap is active
 			if ((autoMap && viewTypeList.contains(mItems.get(i).getLayoutRes())) ||
 					viewTypeList.contains(getItemViewType(i)))
