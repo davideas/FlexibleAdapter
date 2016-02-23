@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements
 	private ActionMode mActionMode;
 	private Snackbar mSnackBar;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
+	private SearchView mSearchView;
 	private final Handler mSwipeHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
 			switch (message.what) {
@@ -235,14 +236,14 @@ public class MainActivity extends AppCompatActivity implements
 		//Associate searchable configuration with the SearchView
 		Log.d(TAG, "onCreateOptionsMenu setup SearchView!");
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-		final SearchView searchView = (SearchView) MenuItemCompat
+		mSearchView = (SearchView) MenuItemCompat
 				.getActionView(menu.findItem(R.id.action_search));
-		searchView.setInputType(InputType.TYPE_TEXT_VARIATION_FILTER);
-		searchView.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_FULLSCREEN);
-		searchView.setQueryHint(getString(R.string.action_search));
-		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-		searchView.setOnQueryTextListener(this);
-		searchView.setOnSearchClickListener(new View.OnClickListener() {
+		mSearchView.setInputType(InputType.TYPE_TEXT_VARIATION_FILTER);
+		mSearchView.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_FULLSCREEN);
+		mSearchView.setQueryHint(getString(R.string.action_search));
+		mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+		mSearchView.setOnQueryTextListener(this);
+		mSearchView.setOnSearchClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				menu.findItem(R.id.action_list_type).setVisible(false);
@@ -250,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements
 				menu.findItem(R.id.action_about).setVisible(false);
 			}
 		});
-		searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+		mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
 			@Override
 			public boolean onClose() {
 				menu.findItem(R.id.action_list_type).setVisible(true);
@@ -264,14 +265,13 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		Log.v(TAG, "onPrepareOptionsMenu called!");
-		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 		//Has searchText?
 		if (!mAdapter.hasSearchText()) {
 			Log.d(TAG, "onPrepareOptionsMenu Clearing SearchView!");
-			searchView.setIconified(true);// This also clears the text in SearchView widget
+			mSearchView.setIconified(true);// This also clears the text in SearchView widget
 		} else {
-			searchView.setQuery(mAdapter.getSearchText(), false);
-			searchView.setIconified(false);
+			mSearchView.setQuery(mAdapter.getSearchText(), false);
+			mSearchView.setIconified(false);
 		}
 
 		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
@@ -720,7 +720,11 @@ public class MainActivity extends AppCompatActivity implements
 	public void onBackPressed() {
 		//If ActionMode is active, back key closes it
 		if (destroyActionModeIfCan()) return;
-
+		//If SearchView is visible, back key cancels search and iconify it
+		if (mSearchView != null && !mSearchView.isIconified()) {
+			mSearchView.setIconified(true);
+			return;
+		}
 		//Close the App
 		DatabaseService.onDestroy();
 		super.onBackPressed();
