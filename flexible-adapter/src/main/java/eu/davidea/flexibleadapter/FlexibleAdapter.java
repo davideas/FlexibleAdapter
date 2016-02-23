@@ -343,6 +343,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return the total number of the items currently displayed by the adapter
 	 * @see #getItemCountOfTypes(Integer...)
+	 * @see #getItemCountOfTypesUntil(int, Integer...)
 	 * @see #isEmpty()
 	 */
 	@Override
@@ -356,12 +357,28 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param viewTypes the viewTypes to count
 	 * @return number of the viewTypes counted
 	 * @see #getItemCount()
+	 * @see #getItemCountOfTypesUntil(int, Integer...)
 	 * @see #isEmpty()
 	 */
 	public int getItemCountOfTypes(Integer... viewTypes) {
+		return getItemCountOfTypesUntil(getItemCount(), viewTypes);
+	}
+
+	/**
+	 * Provides the number of items currently displayed of one or more certain types until
+	 * the specified position.
+	 * <p>Useful to retrieve the correct position where to insert the new items.</p>
+	 *
+	 * @param position  the position limit to stop counting
+	 * @param viewTypes the viewTypes to count
+	 * @see #getItemCount()
+	 * @see #getItemCountOfTypes(Integer...)
+	 * @see #isEmpty()
+	 */
+	public int getItemCountOfTypesUntil(@IntRange(from = 0) int position, Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
 		int count = 0;
-		for (int i = 0; i < mItems.size(); i++) {
+		for (int i = 0; i < position; i++) {
 			//Privilege faster counting if autoMap is active
 			if ((autoMap && viewTypeList.contains(mItems.get(i).getLayoutRes())) ||
 					viewTypeList.contains(getItemViewType(i)))
@@ -1301,6 +1318,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Inserts a set of items in the internal list at specified position or Adds the items
 	 * at last position.
+	 * <p>When headers are shown, the header of this item will be shown as well.</p>
 	 *
 	 * @param position position inside the list, -1 to add the set the end of the list
 	 * @param items    the items to add
@@ -1329,6 +1347,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		//mapViewTypesFrom(items);
 		//Notify range addition
 		notifyItemRangeInserted(position, items.size());
+
+		//Show the headers of these items if all headers are already visible
+		if (headersShown) {
+			for (T item : items)
+				showHeaderOf(position++, item);
+		}
 
 		//Call listener to update EmptyView
 		if (mUpdateListener != null && !multiRange)
