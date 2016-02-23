@@ -1351,7 +1351,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Show the headers of these items if all headers are already visible
 		if (headersShown) {
 			for (T item : items)
-				showHeaderOf(position++, item);
+				showHeaderOf(position, item);
 		}
 
 		//Call listener to update EmptyView
