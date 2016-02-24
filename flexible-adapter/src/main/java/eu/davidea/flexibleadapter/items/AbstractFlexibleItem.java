@@ -124,7 +124,7 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/
 
-	private static final String MAPPING_ILLEGAL_STATE = "If you want FlexibleAdapter creates and binds ViewHolder for you, you must override and implement ";
+	private static final String MAPPING_ILLEGAL_STATE = "If you want FlexibleAdapter creates and binds ViewHolder for you, you must override and implement the method ";
 
 //	/**
 //	 * Wrapper of {#getLayoutRes()}.
@@ -144,13 +144,13 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	@Override
 	public VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
 		throw new IllegalStateException("onCreateViewHolder(ViewGroup, ViewType) is not implemented. " +
-				MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".createViewHolder() method.");
+				MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".createViewHolder().");
 	}
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads) {
 		throw new IllegalStateException("onBindViewHolder(ViewHolder, Position[, Payloads]) is not implemented. " +
-				MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".bindViewHolder() method.");
+				MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".bindViewHolder().");
 	}
 
 }

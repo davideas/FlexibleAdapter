@@ -102,7 +102,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Header/Section items
 	 */
 	private List<IHeader> mOrphanHeaders;
-	private boolean headersShown = false, headersSticky = false;
+	private boolean headersShown = false, headersSticky = false, recursive = false;
 
 	/**
 	 * Handler for delayed {@link #filterItems(List)} and {@link OnDeleteCompleteListener#onDeleteConfirmed}
@@ -378,7 +378,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public int getItemCountOfTypesUntil(@IntRange(from = 0) int position, Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
 		int count = 0;
-		for (int i = 0; i <= position; i++) {
+		for (int i = 0; i < position; i++) {
 			//Privilege faster counting if autoMap is active
 			if ((autoMap && viewTypeList.contains(mItems.get(i).getLayoutRes())) ||
 					viewTypeList.contains(getItemViewType(i)))
@@ -1318,7 +1318,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Inserts a set of items in the internal list at specified position or Adds the items
 	 * at last position.
-	 * <p>When headers are shown, the header of this item will be shown as well.</p>
+	 * <p><b>NOTE:</b> When all headers are shown, the header (if exists) of this item will be
+	 * shown as well, unless it's already shown, so it will not be shown twice.</p>
 	 *
 	 * @param position position inside the list, -1 to add the set the end of the list
 	 * @param items    the items to add
@@ -1349,13 +1350,14 @@ public class FlexibleAdapter<T extends IFlexible>
 		notifyItemRangeInserted(position, items.size());
 
 		//Show the headers of these items if all headers are already visible
-		if (headersShown) {
+		if (headersShown && !recursive) {
+			recursive = true;
 			for (T item : items)
-				showHeaderOf(position, item);
+				showHeaderOf(getGlobalPositionOf(item), item);//We have to find the correct position!
+			recursive = false;
 		}
-
 		//Call listener to update EmptyView
-		if (mUpdateListener != null && !multiRange)
+		if (!recursive && mUpdateListener != null && !multiRange)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 		return true;
 	}
