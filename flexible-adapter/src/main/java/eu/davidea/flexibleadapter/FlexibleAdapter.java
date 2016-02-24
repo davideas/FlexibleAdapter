@@ -826,6 +826,21 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.d(TAG, "Removed from orphan list [" + mOrphanHeaders.size() + "] Header " + header);
 	}
 
+	private boolean isHeaderShared(IHeader header, int positionStart, int itemCount) {
+		int firstElementWithHeader = getGlobalPositionOf(header) + 1;
+		for (int i = firstElementWithHeader; i < mItems.size(); i++) {
+			T item = getItem(i);
+			//Another header is met, we can stop here
+			if (item instanceof IHeader) break;
+			//Skip the items to delete
+			if (i >= positionStart && i < positionStart + itemCount) continue;
+			//An element with same header is met
+			if (!hasHeader(item) || hasSameHeader(item, header))
+				return true;
+		}
+		return false;
+	}
+
 	/*---------------------*/
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/
@@ -1645,16 +1660,17 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (header != null) {
 			T newItem = getItem(positionStart + itemCount);
 			//Header becomes orphan, also if newItem has a different header!
-			if (!hasSameHeader(newItem, header)) {
+			if (!hasSameHeader(newItem, header) && !isHeaderShared(header, positionStart, itemCount)) {
 				//We cannot delete headers during remove range, otherwise positions
 				// becomes wrongs. Headers will be deleted at the end of this process.
 				addToOrphanList(header);
+				notifyItemChanged(getGlobalPositionOf(header), payload);
 			} else if (!hasHeader(newItem)) {
 				//Link the new header to the newItem, and eventually
 				// collect the orphan header if linkage didn't succeed
 				linkHeaderTo(newItem, header, payload);
 			} else {
-				//it's the same header so rebound content
+				//It's the same header group, so rebound header content
 				notifyItemChanged(getGlobalPositionOf(header), payload);
 			}
 		}
