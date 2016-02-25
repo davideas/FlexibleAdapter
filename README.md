@@ -130,7 +130,7 @@ Improved and adapted to work in conjunction with `FlexibleAnimatorAdapter`.
 
 # License
 
-    Copyright 2016 Davide Steduto
+    Copyright 2015-2016 Davide Steduto
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

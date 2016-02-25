@@ -19,7 +19,7 @@ import android.support.v7.widget.RecyclerView;
 
 /**
  * @author Davide Steduto
- * @since 07/02/2016
+ * @since 07/02/2016 Created
  */
 public interface ISectionable<VH extends RecyclerView.ViewHolder, T extends IHeader>
 		extends IFlexible<VH> {

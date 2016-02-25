@@ -48,7 +48,7 @@ import java.util.List;
  * @author Davide Steduto
  * @see FlexibleAdapter
  * @see SelectableAdapter
- * @since 10/01/2016
+ * @since 10/01/2016 Created
  * <br/>30/01/2016 Class now extends {@link SelectableAdapter}
  */
 public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {

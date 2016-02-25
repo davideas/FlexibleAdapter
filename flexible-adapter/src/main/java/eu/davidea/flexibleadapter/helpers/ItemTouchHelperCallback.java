@@ -32,7 +32,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * and swipe actions. Drag and Swipe events are started depending by its configuration.
  *
  * @author Davide Steduto
- * @since 23/01/2016
+ * @since 23/01/2016 Created
  */
 public class ItemTouchHelperCallback extends Callback {
 
