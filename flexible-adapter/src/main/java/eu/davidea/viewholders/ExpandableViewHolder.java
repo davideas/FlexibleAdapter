@@ -87,11 +87,11 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	@CallSuper
 	protected void toggleExpansion() {
 		int position = getAdapterPosition();
-		if (mAdapter.isExpanded(position)) {
-			collapseView(position);
-		} else if (!mAdapter.isSelected(position)) {
-			expandView(position);
-		}
+//		if (mAdapter.isExpanded(position)) {
+//			collapseView(position);
+//		} else if (!mAdapter.isSelected(position)) {
+//			expandView(position);
+//		}
 	}
 
 	/**
@@ -99,7 +99,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@CallSuper
 	protected void expandView(int position) {
-		mAdapter.expand(position);
+//		mAdapter.expand(position);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@CallSuper
 	protected void collapseView(int position) {
-		mAdapter.collapse(position);
+//		mAdapter.collapse(position);
 	}
 
 	/*---------------------------------*/
@@ -160,9 +160,9 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@Override
 	public void onActionStateChanged(int position, int actionState) {
-		if (mAdapter.isExpanded(getAdapterPosition())) {
-			collapseView(position);
-		}
+//		if (mAdapter.isExpanded(getAdapterPosition())) {
+//			collapseView(position);
+//		}
 		super.onActionStateChanged(position, actionState);
 	}
 

@@ -17,15 +17,13 @@
 package eu.davidea.flexibleadapter;
 
 import android.graphics.Canvas;
-import android.support.v4.view.ViewCompat;
+import android.support.v4.util.LruCache;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import eu.davidea.flexibleadapter.items.IHeader;
 
 /**
  * A sticky header decoration for RecyclerView, to use only with {@link FlexibleAdapter}.
@@ -33,18 +31,29 @@ import eu.davidea.flexibleadapter.items.IHeader;
 public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 
 	private FlexibleAdapter mAdapter;
-	private Map<IHeader, View> mHeaderCache;
-	private int maxCachedHeaders;
+	private LruCache<Integer, View> mHeaderCache;
 
 	/**
 	 * @param adapter the sticky header adapter to use
 	 */
 	public StickyHeaderDecoration(FlexibleAdapter adapter, int maxCachedHeaders) {
 		mAdapter = adapter;
-		mHeaderCache = new HashMap<IHeader, View>();
-		this.maxCachedHeaders = maxCachedHeaders;
+		mHeaderCache = new LruCache<Integer, View>(maxCachedHeaders);
 	}
-
+	
+	public void setMaxCachedHeaders(int maxCachedHeaders) {
+        mHeaderCache.resize(maxCachedHeaders);
+        mHeaderCache.evictAll();
+	}
+	
+	
+	public int getOrientation(RecyclerView recyclerView) {
+	    RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+	    if (layoutManager instanceof LinearLayoutManager) {
+	        return ((LinearLayoutManager) layoutManager).getOrientation();
+	    }
+	    return LinearLayoutManager.HORIZONTAL;
+	  } 
 	/**
 	 * Gets the header view for the associated position. If it doesn't exist yet, it will be
 	 * created, measured, and laid out.
@@ -54,65 +63,65 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 	 * @return Header view or null if the associated position and previous has no header
 	 */
 	private View getHeader(RecyclerView recyclerView, int position) {
-		final IHeader key = mAdapter.getHeaderStickyOn(position);
+	    if (!mAdapter.areHeadersShown()) {
+            return null;
+	    }
+	    final Integer key = mAdapter.getHeaderId(position);
+	    if (key == null) {
+//          Log.v("getHeader", "No Header");
+            return null;
+        } else {
+            
+            View header = mHeaderCache.get(key);
+            if (header == null) {
+                if (position < 0) return null;
 
-		if (key != null && mHeaderCache.containsKey(key)) {
-//			Log.v("getHeader", "Returning existing Header " + key);
-			return mHeaderCache.get(key);
-		} else if (key == null) {
-//			Log.v("getHeader", "No Header");
-			return null;
-		} else {
-			int headerPosition = mAdapter.getGlobalPositionOf(key);
-			if (headerPosition < 0) return null;
+                final RecyclerView.ViewHolder holder = mAdapter.createViewHolder(recyclerView, mAdapter.getItemViewType(position));
+                if (holder == null) {
+                    return null;
+                }
+                header = holder.itemView;
+                if (header.getLayoutParams() == null) {
+                    header.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                  }
+                mAdapter.onBindHeaderViewHolder(holder, position);
+                mHeaderCache.put(key, header);
+            }
+            
+            
+            //TODO: optimize by not measuring everytime
+            // though we need new measurement for all headers when:
+            // - orientation change
+            // - recyclerView size change
+            int widthSpec;
+            int heightSpec;
 
-			final RecyclerView.ViewHolder holder = mAdapter.onCreateViewHolder(recyclerView, mAdapter.getItemViewType(headerPosition));
-			final View header = holder.itemView;
-			mAdapter.onBindViewHolder(holder, headerPosition);
+            if (getOrientation(recyclerView) == LinearLayoutManager.VERTICAL) {
+              widthSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getWidth(), View.MeasureSpec.EXACTLY);
+              heightSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getHeight(), View.MeasureSpec.UNSPECIFIED);
+            } else {
+              widthSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+              heightSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getHeight(), View.MeasureSpec.EXACTLY);
+            }
+            int childWidth = ViewGroup.getChildMeasureSpec(widthSpec,
+                    recyclerView.getPaddingLeft() + recyclerView.getPaddingRight(), header.getLayoutParams().width);
+            int childHeight = ViewGroup.getChildMeasureSpec(heightSpec,
+                    recyclerView.getPaddingTop() + recyclerView.getPaddingBottom(), header.getLayoutParams().height);
 
-			int widthSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getWidth(), View.MeasureSpec.EXACTLY);
-			int heightSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getHeight(), View.MeasureSpec.UNSPECIFIED);
-
-			int childWidth = ViewGroup.getChildMeasureSpec(widthSpec,
-					recyclerView.getPaddingLeft() + recyclerView.getPaddingRight(), header.getLayoutParams().width);
-			int childHeight = ViewGroup.getChildMeasureSpec(heightSpec,
-					recyclerView.getPaddingTop() + recyclerView.getPaddingBottom(), header.getLayoutParams().height);
-
-			header.measure(childWidth, childHeight);
-			header.layout(0, 0, header.getMeasuredWidth(), header.getMeasuredHeight());
-
-			//TODO: Intercept taps on sticky views
-//			recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
-//				@Override
-//				public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-//					// only use the "UP" motion event, discard all others
-//					if (e.getAction() == MotionEvent.ACTION_UP) {
-//						IHeader header = findHeaderViewUnder(e.getX(), e.getY());
-//						if (header != null) {
-//							Log.d("getHeader", "headerView has been touched!!!! " + header);
-//							return true;
-//						}
-//					}
-//					return false;
-//				}
-//			});
-
-			if (mHeaderCache.keySet().size() == maxCachedHeaders)
-				clearHeadersCache();
-			mHeaderCache.put(key, header);
-//			Log.v("getHeader", "Returning new Header " + key + " headerCache>>>" + mHeaderCache.keySet());
-			return header;
-		}
+            header.measure(childWidth, childHeight);
+            header.layout(0, 0, header.getMeasuredWidth(), header.getMeasuredHeight());
+            return header;
+       }
 	}
+	
+	private int currentStickyPos = -1;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void onDrawOver(Canvas canvas, RecyclerView recyclerView, RecyclerView.State state) {
-		//Not needed, handled by FlexibleAdapter (this decorator is removed if no sticky headers!):
-		// if (!mAdapter.areHeadersShown() && !mAdapter.areHeadersSticky()) return;
-
 		//Get or create the headerView for top position (index = 0)
 		if (recyclerView.getChildCount() < 0) return;
 		View child = recyclerView.getChildAt(0);
@@ -121,7 +130,11 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 		//A header is found?
 		if (headerView != null) {
 			int top = getHeaderTop(recyclerView, child, adapterPos);
-//			Log.v("onDrawOver", "adapterPos=" + adapterPos + " top=" + top);
+			if (adapterPos != currentStickyPos && top == 0) {
+			    currentStickyPos = adapterPos;
+			    mAdapter.onStickyHeaderChange(currentStickyPos);
+	            Log.v("onDrawOver", "new StickyHeader=" + currentStickyPos);
+			}
 			//Draw header!
 			int left = child.getLeft();
 			canvas.save();
@@ -144,20 +157,18 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 		int top = Math.max(0, (int) child.getY());
 
 		//Check item availability
-		IHeader current = mAdapter.getHeaderStickyOn(adapterPos);
+		View current = getHeader(recyclerView, adapterPos);
 		if (current == null || recyclerView.getChildCount() < 1)
 			return top;
 
 		//Get next(+1) view with header and compute the offscreen push if needed
 		View nextItemView = recyclerView.getChildAt(1);
 		int adapterPosHere = recyclerView.getChildAdapterPosition(nextItemView);
-		IHeader next = mAdapter.getHeaderStickyOn(adapterPosHere);
+        View next = getHeader(recyclerView, adapterPosHere);
 
 		if (next != null && !next.equals(current)) {
-			View nextHeaderView = getHeader(recyclerView, adapterPosHere);
-			if (nextHeaderView == null) return top;
 
-			int offset = (int) nextItemView.getY() - nextHeaderView.getHeight();
+			int offset = (int) nextItemView.getY() - next.getHeight();
 			if (offset < 0) {
 				return offset;//The new translated top, when pushing up
 			}
@@ -170,23 +181,6 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 	 * rebound on list scroll after this method has been called.
 	 */
 	public void clearHeadersCache() {
-		mHeaderCache.clear();
+		mHeaderCache.evictAll();
 	}
-
-	public IHeader findHeaderViewUnder(float x, float y) {
-		for (Map.Entry<IHeader, View> entry : mHeaderCache.entrySet()) {
-			View child = entry.getValue();
-			final float translationX = ViewCompat.getTranslationX(child);
-			final float translationY = ViewCompat.getTranslationY(child);
-
-			if (x >= child.getLeft() + translationX &&
-					x <= child.getRight() + translationX &&
-					y >= child.getTop() + translationY &&
-					y <= child.getBottom() + translationY) {
-				return entry.getKey();
-			}
-		}
-		return null;
-	}
-
 }

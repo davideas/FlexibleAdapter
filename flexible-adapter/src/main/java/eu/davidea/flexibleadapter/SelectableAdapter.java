@@ -126,6 +126,12 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		super.onAttachedToRecyclerView(recyclerView);
 		mRecyclerView = recyclerView;
 	}
+	
+	   @Override
+	    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+	        super.onDetachedFromRecyclerView(recyclerView);
+	        mRecyclerView = null;
+	    }
 
 	/**
 	 * Sets the mode of the selection, MODE_SINGLE is the default:
