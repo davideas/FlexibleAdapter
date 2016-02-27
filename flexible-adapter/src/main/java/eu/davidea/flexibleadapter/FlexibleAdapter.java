@@ -127,7 +127,8 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	 * Used to save deleted items and to recover them (Undo).
 	 */
 //	private List<RestoreInfo> mRestoreList;
-	private StickyHeaderDecoration stickyHeaderDecoration;
+    private StickyHeaderDecoration stickyHeaderDecoration;
+    private boolean stickyHeaderDecorationAttached = false;
 	private boolean restoreSelection = false, 
 //	        removeOrphanHeaders = false, 
 //	        permanentDelete = false, 
@@ -393,40 +394,44 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 
 	private void setStickyHeaders(boolean headersSticky, int maxCachedHeaders) {
 		//Add or Remove the sticky headers decoration
-		if (headersShown && headersSticky) {
+		if (headersSticky) {
 			this.headersSticky = true;
-			
 			if (stickyHeaderDecoration == null) {
 	            stickyHeaderDecoration = new StickyHeaderDecoration(this, maxCachedHeaders);
 			}
-			if (mRecyclerView != null) {
-	            mRecyclerView.addItemDecoration(stickyHeaderDecoration);
+			if (!stickyHeaderDecorationAttached && headersShown && mRecyclerView != null) {
+			    stickyHeaderDecorationAttached = true;
+			    mRecyclerView.addItemDecoration(stickyHeaderDecoration);
             }
 		} else if (stickyHeaderDecoration != null) {
 			this.headersSticky = false;
 			
 			if (stickyHeaderDecoration != null) {
 	            stickyHeaderDecoration.clearHeadersCache();
+	            if (mRecyclerView != null) {
+	                mRecyclerView.removeItemDecoration(stickyHeaderDecoration);
+	            }
+	            stickyHeaderDecoration = null;
+                stickyHeaderDecorationAttached = false;
             }
-			if (mRecyclerView != null) {
-	            mRecyclerView.removeItemDecoration(stickyHeaderDecoration);
-            }
-			stickyHeaderDecoration = null;
+			
 		}
 	}
 	
 	@Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        if (stickyHeaderDecoration != null) {
+        if (!stickyHeaderDecorationAttached && headersShown && stickyHeaderDecoration != null) {
+            stickyHeaderDecorationAttached = true;
             mRecyclerView.addItemDecoration(stickyHeaderDecoration);
         }
     }
 	
 	@Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
-       if (stickyHeaderDecoration != null) {
-           recyclerView.removeItemDecoration(stickyHeaderDecoration);
+       if (stickyHeaderDecorationAttached && stickyHeaderDecoration != null) {
+           stickyHeaderDecorationAttached = false;
+          recyclerView.removeItemDecoration(stickyHeaderDecoration);
        }
         super.onDetachedFromRecyclerView(recyclerView);
     }
