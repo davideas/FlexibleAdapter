@@ -2546,4 +2546,6 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
         }
     }
 
+    public abstract ViewHolder onCreateHeaderViewHolder(RecyclerView recyclerView,
+            int position);
 }
