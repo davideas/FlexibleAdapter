@@ -11,6 +11,7 @@ install {
 				packaging packageExt
 				groupId publishedGroupId
 				artifactId artifact
+				version libraryVersion
 
 				// Add your description here
 				name libraryName

@@ -628,15 +628,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public ISectionable getSectionableOf(@NonNull IHeader header) {
 		int headerPosition = getGlobalPositionOf(header);
-//		if (DEBUG) Log.v(TAG, "getSectionableOf - Item to evaluate " + headerPosition + "=" + header);
 		for (int position = headerPosition - 1; position <= headerPosition + 2; position++) {
 			IHeader realHeader = getHeaderOf(getItem(position));//This will also return null in case of OutOfBounds!
 			if (realHeader != null && realHeader.equals(header)) {
-//				if (DEBUG) Log.v(TAG, "getSectionableOf - Found Sectionable=" + getItem(position));
 				return (ISectionable) getItem(position);
 			}
 		}
-//		if (DEBUG) Log.v(TAG, "getSectionableOf - Sectionable NotFound");
 		return null;
 	}
 
@@ -687,12 +684,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * the process is very fast.
 	 */
 	private void resetHiddenStatus() {
-		if (headersShown) {
-			for (T item : mItems) {
-				IHeader header = getHeaderOf(item);
-				if (header != null)
-					header.setHidden(true);
-			}
+		for (T item : mItems) {
+			IHeader header = getHeaderOf(item);
+			if (header != null)
+				header.setHidden(true);
 		}
 	}
 
@@ -914,7 +909,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Same concept of {@link #onBindViewHolder(RecyclerView.ViewHolder, int)}, but with Payload.
 	 * <p>How to use Payload, please refer to
-	 * {@link RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}</p>
+	 * {@link RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}.</p>
 	 *
 	 * @param holder   the ViewHolder instance
 	 * @param position the current position
@@ -988,6 +983,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	public boolean hasSubItems(@NonNull IExpandable expandable) {
 		return expandable != null && expandable.getSubItems() != null &&
 				expandable.getSubItems().size() > 0;
+	}
+
+	public IExpandable getExpandableOf(@IntRange(from = 0) int position) {
+		return getExpandableOf(getItem(position));
 	}
 
 	/**
@@ -1390,7 +1389,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Convenience method of {@link #addSubItems(int, int, IExpandable, List, boolean, Object).
+	 * Convenience method of {@link #addSubItems(int, int, IExpandable, List, boolean, Object)}.
 	 * <br/>Optionally you can pass any payload to notify the parent about the change and optimize
 	 * the view binding.
 	 *
@@ -1446,7 +1445,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Convenience method of {@link #addSubItems(int, int, IExpandable, List, boolean, Object).
+	 * Convenience method of {@link #addSubItems(int, int, IExpandable, List, boolean, Object)}.
 	 * <br/>Optionally you can pass any payload to notify the parent about the change and optimize
 	 * the view binding.
 	 *
@@ -1540,6 +1539,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeRange(int, int, Object)
 	 */
 	public void removeItem(@IntRange(from = 0) int position, @Nullable Object payload) {
+		//Request to collapse after the notification of remove range
+		collapse(position);
 		if (DEBUG) Log.v(TAG, "removeItem delegates removal to removeRange");
 		removeRange(position, 1, payload);
 		clearSelection();
@@ -1612,6 +1613,23 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Selectively removes all items of the type provided as parameter.
+	 *
+	 * @param viewTypes the viewTypes to remove
+	 */
+	public void removeItemsOfType(Integer... viewTypes) {
+		List<Integer> viewTypeList = Arrays.asList(viewTypes);
+		List<Integer> itemsToRemove = new ArrayList<Integer>();
+		for (int i = mItems.size() - 1; i >= 0; i--) {
+			//Privilege autoMap if active
+			if ((autoMap && viewTypeList.contains(mItems.get(i).getLayoutRes())) ||
+					viewTypeList.contains(getItemViewType(i)))
+				itemsToRemove.add(i);
+		}
+		this.removeItems(itemsToRemove);
+	}
+
+	/**
 	 * Same as {@link #removeRange(int, int, Object)}, but in this case the parent will not be
 	 * notified about the change, if children are removed.
 	 */
@@ -1659,18 +1677,18 @@ public class FlexibleAdapter<T extends IFlexible>
 		IHeader header = getHeaderOf(getItem(positionStart));
 		if (header != null) {
 			T newItem = getItem(positionStart + itemCount);
-			//Header becomes orphan, also if newItem has a different header!
-			if (!hasSameHeader(newItem, header) && !isHeaderShared(header, positionStart, itemCount)) {
-				//We cannot delete headers during remove range, otherwise positions
-				// becomes wrongs. Headers will be deleted at the end of this process.
-				addToOrphanList(header);
+			if (isHeaderShared(header, positionStart, itemCount)) {
+				//The header still represents a group, so rebound header content
 				notifyItemChanged(getGlobalPositionOf(header), payload);
 			} else if (!hasHeader(newItem)) {
 				//Link the new header to the newItem, and eventually
 				// collect the orphan header if linkage didn't succeed
 				linkHeaderTo(newItem, header, payload);
 			} else {
-				//It's the same header group, so rebound header content
+				//Header becomes orphan, also if newItem has a different header!
+				//We cannot delete headers during remove range, otherwise positions
+				// becomes wrongs. Headers will be deleted at the end of this process.
+				addToOrphanList(header);
 				notifyItemChanged(getGlobalPositionOf(header), payload);
 			}
 		}
@@ -2032,7 +2050,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>- <b>NEW!</b> Items are animated thanks to {@link #animateTo(List)}.
 	 *
 	 * @param unfilteredItems the list to filter
-	 * @see #filterObject(T, String)
+	 * @see #filterObject(IFlexible, String)
 	 */
 	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
 		// NOTE: In case user has deleted some items and he changes or applies a filter while
@@ -2240,7 +2258,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * false otherwise. Default value is false.
 	 */
 	public boolean isLongPressDragEnabled() {
-		return mItemTouchHelperCallback.isLongPressDragEnabled();
+		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.isLongPressDragEnabled();
 	}
 
 	/**
@@ -2288,7 +2306,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * over the View, false otherwise. Default value is false.
 	 */
 	public final boolean isSwipeEnabled() {
-		return mItemTouchHelperCallback.isItemViewSwipeEnabled();
+		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.isItemViewSwipeEnabled();
 	}
 
 	/**
@@ -2637,7 +2655,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
 			//Restore headers shown status
 			headersShown = savedInstanceState.getBoolean(EXTRA_HEADERS);
-			showAllHeaders();
+			if (headersShown) showAllHeaders();
 		}
 	}
 
