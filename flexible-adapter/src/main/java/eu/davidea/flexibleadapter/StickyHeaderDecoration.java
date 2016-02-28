@@ -38,7 +38,7 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
     private HeaderViewHolder mHeader;
 
     /* --- Header state --- */
-    private Long mHeaderId;
+    private Integer mHeaderId;
     // used to not have to call getHeaderId() all the time
     private Integer mHeaderPosition;
     
@@ -66,14 +66,20 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
         });
     }
     
+    private final OnScrollListener scrollListener = new OnScrollListener() {
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+            updateHeader();
+        }
+   };
+    
     public void setParent(RecyclerView parent) {
+        if (mRecyclerView != null) {
+            mRecyclerView.removeOnScrollListener(scrollListener);
+            clearHeader();
+        }
         mRecyclerView = parent;
         if (mRecyclerView != null) {
-            mRecyclerView.addOnScrollListener(new OnScrollListener() {
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy){
-                    updateHeader();
-                }
-           });
+            mRecyclerView.addOnScrollListener(scrollListener);
         }
     }
     
@@ -91,6 +97,8 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
         if (mStickyHolder != null) {
             if (mHeader != null) {
                 ensureHeaderParent();
+            } else {
+                updateHeader();
             }
         } else {
             clearHeader();
@@ -135,9 +143,9 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
         // check if there is a new header should be sticky
         if (mHeaderPosition == null || mHeaderPosition != headerPosition) {
             mHeaderPosition = headerPosition;
-            final long headerId = mAdapter.getHeaderId(headerPosition);
-            if (mHeaderId == null || mHeaderId != headerId) {
-                mHeaderId = headerId;
+            final Integer headerId = mAdapter.getHeaderId(headerPosition);
+            if (headerId != null && (mHeaderId == null || mHeaderId.intValue() != headerId.intValue())) {
+                mHeaderId = headerId.intValue();
                 final RecyclerView.ViewHolder holder = getHeader(mRecyclerView, headerPosition);
                 //                final View header = mAdapter.getHeaderView(mHeaderPosition, mHeader, this);
                 if ((holder== null || holder instanceof HeaderViewHolder) && mHeader != holder) {
