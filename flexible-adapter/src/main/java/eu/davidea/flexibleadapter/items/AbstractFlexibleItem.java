@@ -34,7 +34,7 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 		implements IFlexible<VH> {
 
 	/* Item flags recognized by the FlexibleAdapter */
-	boolean mEnabled = true, mHidden = false,
+	protected boolean mEnabled = true, mHidden = false,
 			mSelectable = true, mSelected = false,
 			mDraggable = false, mSwipeable = false;
 
