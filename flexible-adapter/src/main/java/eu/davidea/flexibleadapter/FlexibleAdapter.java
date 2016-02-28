@@ -266,8 +266,8 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	 *                         how many headers are normally displayed in the RecyclerView. It
 	 *                         depends by the specific use case.
 	 */
-	public void enableStickyHeaders(int maxCachedHeaders) {
-		setStickyHeaders(true, maxCachedHeaders);
+	public void enableStickyHeaders() {
+		setStickyHeaders(true);
 	}
 
 	/**
@@ -275,29 +275,31 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	 * {@link StickyHeaderDecoration} from the RecyclerView.
 	 */
 	public void disableStickyHeaders() {
-		setStickyHeaders(false, -1);
+		setStickyHeaders(false);
 	}
 
-	private void setStickyHeaders(boolean headersSticky, int maxCachedHeaders) {
+	public void setStickyHeaders(boolean headersSticky) {
 		//Add or Remove the sticky headers decoration
 		if (headersSticky) {
 			this.headersSticky = true;
 			if (stickyHeaderDecoration == null) {
-//			    stickyHeaderDecoration = new StickyHeaderDecoration(this, maxCachedHeaders);
 	            stickyHeaderDecoration = new StickyHeaderDecoration(this);
 			}
 			if (!stickyHeaderDecorationAttached && headersShown && mRecyclerView != null) {
 			    stickyHeaderDecorationAttached = true;
+                stickyHeaderDecoration.setParent(mRecyclerView);
 			    mRecyclerView.addItemDecoration(stickyHeaderDecoration);
+                stickyHeaderDecoration.setStickyHeadersHolder(getStickyHeadersHolder());
             }
 		} else if (stickyHeaderDecoration != null) {
 			this.headersSticky = false;
 			
 			if (stickyHeaderDecoration != null) {
-//	            stickyHeaderDecoration.clearHeadersCache();
 	            if (mRecyclerView != null) {
 	                mRecyclerView.removeItemDecoration(stickyHeaderDecoration);
+	                stickyHeaderDecoration.setParent(null);
 	            }
+	            stickyHeaderDecoration.setStickyHeadersHolder(null);
 	            stickyHeaderDecoration = null;
                 stickyHeaderDecorationAttached = false;
             }
@@ -484,7 +486,7 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	}
 
 	public boolean isHeader(int position) {
-        return getHeaderPosition(position) == position;
+        return headersShown && getHeaderPosition(position) == position;
     }
 	   
     /**
