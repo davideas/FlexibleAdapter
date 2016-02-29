@@ -219,7 +219,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>This method is also called after a screen rotation.</p>
 	 */
 	protected void initializeItems() {
-		for (int position = 0; position < mItems.size(); position++) {
+		int position = 0;
+		while (position < mItems.size()) {
 			T item = getItem(position);
 			//Map the view type if not done yet
 			//mapViewTypeFrom(item);
@@ -230,6 +231,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					position += addAllSubItemsFrom(position, expandable, false, null);
 				}
 			}
+			position++;
 		}
 	}
 
@@ -650,9 +652,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		multiRange = true;
 		//Show linked headers only
 		resetHiddenStatus();
-		for (int position = 0; position < mItems.size(); position++) {
+		int position = 0;
+		while (position < mItems.size()) {
 			if (showHeaderOf(position, mItems.get(position)))
 				position++;//It's the same element, skip it.
+			position++;
 		}
 		headersShown = true;
 		multiRange = false;
@@ -671,9 +675,11 @@ public class FlexibleAdapter<T extends IFlexible>
 			hideHeader(getGlobalPositionOf(header), header);
 		}
 		//Hide linked headers
-		for (int position = mItems.size() - 1; position >= 0; position--) {
+		int position = mItems.size() - 1;
+		while (position >= 0) {
 			if (hideHeaderOf(mItems.get(position)))
 				position--;//It's the same element, skip it.
+			position--;
 		}
 		headersShown = false;
 		multiRange = false;
@@ -1113,9 +1119,9 @@ public class FlexibleAdapter<T extends IFlexible>
 
 			//Collapse others expandable if configured so
 			//Skipped when expanding all is requested
-			if (collapseOnExpand && !expandAll) {
-				//Fetch again the new position after collapsing all!!
-				if (collapseAll() > 0) position = getGlobalPositionOf(item);
+			//Fetch again the new position after collapsing all!!
+			if ((collapseOnExpand && !expandAll) && collapseAll() > 0) {
+				position = getGlobalPositionOf(item);
 			}
 
 			//Every time an expansion is requested, subItems must be taken from the original Object!
@@ -1924,9 +1930,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public IExpandable getExpandableOfDeletedChild(T child) {
 		for (RestoreInfo restoreInfo : mRestoreList) {
-			if (restoreInfo.item.equals(child))
-				if (isExpandable(restoreInfo.refItem))
-					return (IExpandable) restoreInfo.refItem;
+			if (restoreInfo.item.equals(child) && isExpandable(restoreInfo.refItem))
+				return (IExpandable) restoreInfo.refItem;
 		}
 		return null;
 	}
