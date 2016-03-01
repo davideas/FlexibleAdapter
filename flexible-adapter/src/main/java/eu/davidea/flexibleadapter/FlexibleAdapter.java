@@ -409,7 +409,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the global position in the Adapter if found, -1 otherwise
 	 */
 	public int getGlobalPositionOf(@NonNull IFlexible item) {
-		return item != null && mItems != null && mItems.size() > 0 ? mItems.indexOf(item) : -1;
+		return item != null && mItems != null && !mItems.isEmpty() ? mItems.indexOf(item) : -1;
 	}
 
 	/**
@@ -1852,7 +1852,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			restoreInfo.item.setHidden(false);
 		}
 		//Restore selection if requested, before emptyBin
-		if (restoreSelection && mRestoreList.size() > 0) {
+		if (restoreSelection && !mRestoreList.isEmpty()) {
 			if (isExpandable(mRestoreList.get(0).item) || getExpandableOf(mRestoreList.get(0).item) == null) {
 				parentSelected = true;
 			} else {
@@ -1914,7 +1914,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	public boolean isRestoreInTime() {
-		return mRestoreList != null && mRestoreList.size() > 0;
+		return mRestoreList != null && !mRestoreList.isEmpty();
 	}
 
 	/**
@@ -1985,7 +1985,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Take a copy of the subItems list
 		List<T> subItems = new ArrayList<T>(expandable.getSubItems());
 		//Remove all children pending removal
-		if (mRestoreList.size() > 0) {
+		if (!mRestoreList.isEmpty()) {
 			subItems.removeAll(getDeletedChildren(expandable));
 		}
 		return subItems;
