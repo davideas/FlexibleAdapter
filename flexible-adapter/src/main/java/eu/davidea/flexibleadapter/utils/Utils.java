@@ -30,7 +30,7 @@ import java.util.Locale;
 
 public final class Utils {
 
-	public static int INVALID_COLOR = -1;
+	public static final int INVALID_COLOR = -1;
 	private static int colorAccent = INVALID_COLOR;
 
 	/**
@@ -69,7 +69,7 @@ public final class Utils {
 	}
 
 	/**
-	 * Reset the internal accent color to {@value INVALID_COLOR}, to give the possibility
+	 * Reset the internal accent color to {@link #INVALID_COLOR}, to give the possibility
 	 * to re-fetch it at runtime, since once it is fetched it cannot be changed.
 	 */
 	public static void resetAccentColor() {

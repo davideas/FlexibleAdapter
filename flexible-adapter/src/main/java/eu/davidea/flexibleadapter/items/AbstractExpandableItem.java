@@ -33,10 +33,10 @@ public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder,
 		implements IExpandable<VH, S> {
 
 	/* Flags for FlexibleAdapter */
-	private boolean mExpanded = false;
+	protected boolean mExpanded = false;
 
 	/* subItems list */
-	private List<S> mSubItems;
+	protected List<S> mSubItems;
 
 	/*--------------------*/
 	/* EXPANDABLE METHODS */
@@ -66,7 +66,7 @@ public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder,
 	}
 
 	public IFlexible setSubItems(List<S> subItem) {
-		mSubItems = new ArrayList<>(subItem);
+		mSubItems = subItem;
 		return this;
 	}
 

@@ -261,7 +261,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public String onCreateBubbleText(int position) {
 		if (!DatabaseService.userLearnedSelection && position == 0) {//This 'if' is for my example only
 			//TODO FOR YOU: This is the normal line you should use: Usually it's the first letter
-			return ""+position;
+			return Integer.toString(position);
 		}
 		return super.onCreateBubbleText(position);
 	}

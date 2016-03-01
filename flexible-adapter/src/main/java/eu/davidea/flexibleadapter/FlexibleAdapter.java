@@ -591,6 +591,435 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 		this.restoreSelection = restoreSelection;
 	}
 
+	/**
+	 * Restore items just removed.
+	 * <p><b>NOTE:</b> If filter is active, only items that match that filter will be shown(restored).</p>
+	 *
+	 * @see #setRestoreSelectionOnUndo(boolean)
+	 */
+	@SuppressWarnings("ResourceType")
+	public void restoreDeletedItems() {
+		stopUndoTimer();
+		multiRange = true;
+		int initialCount = getItemCount();
+		//Selection coherence: start from a clear situation
+		clearSelection();
+		//Start from latest item deleted, since others could rely on it
+		for (int i = mRestoreList.size() - 1; i >= 0; i--) {
+			adjustSelected = false;
+			RestoreInfo restoreInfo = mRestoreList.get(i);
+			//Restore header linkage
+			restoreHeaderLinkage(restoreInfo);
+
+			if (restoreInfo.relativePosition >= 0) {
+				//Restore child, if not deleted
+				if (DEBUG) Log.v(TAG, "Restore Child " + restoreInfo);
+				//Skip subItem addition if filter is active
+				if (hasSearchText() && !filterObject(restoreInfo.item, getSearchText()))
+					continue;
+				//Add subItem
+				addSubItem(restoreInfo.getRefPosition(), restoreInfo.relativePosition,
+						restoreInfo.item, false, restoreInfo.payload);
+			} else {
+				//Restore parent or simple item, if not deleted
+				if (DEBUG) Log.v(TAG, "Restore Parent " + restoreInfo);
+				//Skip item addition if filter is active
+				if (hasSearchText() && !filterExpandableObject(restoreInfo.item, getSearchText()))
+					continue;
+				//Add item
+				addItem(restoreInfo.getRestorePosition(), restoreInfo.item);
+			}
+			//Item is again visible
+			restoreInfo.item.setHidden(false);
+		}
+		//Restore selection if requested, before emptyBin
+		if (restoreSelection && mRestoreList.size() > 0) {
+			if (isExpandable(mRestoreList.get(0).item) || getExpandableOf(mRestoreList.get(0).item) == null) {
+				parentSelected = true;
+			} else {
+				childSelected = true;
+			}
+			for (RestoreInfo restoreInfo : mRestoreList) {
+				if (restoreInfo.item.isSelectable()) {
+					getSelectedPositions().add(getGlobalPositionOf(restoreInfo.item));
+				}
+			}
+			if (DEBUG) Log.v(TAG, "Selected positions after restore " + getSelectedPositions());
+		}
+
+		//Call listener to update EmptyView
+		multiRange = false;
+		if (mUpdateListener != null && initialCount != getItemCount())
+			mUpdateListener.onUpdateEmptyView(getItemCount());
+
+		emptyBin();
+	}
+
+	/**
+	 * Clean memory from items just removed.
+	 * <p><b>Note:</b> This method is automatically called after timer is over and after a
+	 * restoration.</p>
+	 */
+	public synchronized void emptyBin() {
+		if (DEBUG) Log.v(TAG, "emptyBin!");
+		mRestoreList.clear();
+	}
+
+	/**
+	 * Convenience method to start Undo timer with default timeout of 5''
+	 *
+	 * @param listener the listener that will be called after timeout to commit the change
+	 */
+	public void startUndoTimer(OnDeleteCompleteListener listener) {
+		startUndoTimer(0, listener);
+	}
+
+	/**
+	 * Start Undo timer with custom timeout
+	 *
+	 * @param timeout  custom timeout
+	 * @param listener the listener that will be called after timeout to commit the change
+	 */
+	public void startUndoTimer(long timeout, OnDeleteCompleteListener listener) {
+		//Make longer the timer for new coming deleted items
+		mHandler.removeMessages(1);
+		mHandler.sendMessageDelayed(Message.obtain(mHandler, 1, listener), timeout > 0 ? timeout : UNDO_TIMEOUT);
+	}
+
+	/**
+	 * Stop Undo timer.
+	 * <p><b>Note:</b> This method is automatically called in case of restoration.</p>
+	 */
+	protected void stopUndoTimer() {
+		mHandler.removeCallbacksAndMessages(null);
+	}
+
+	public boolean isRestoreInTime() {
+		return mRestoreList != null && mRestoreList.size() > 0;
+	}
+
+	/**
+	 * @return the list of deleted items
+	 */
+	public List<T> getDeletedItems() {
+		List<T> deletedItems = new ArrayList<T>();
+		for (RestoreInfo restoreInfo : mRestoreList) {
+			deletedItems.add(restoreInfo.item);
+		}
+		return deletedItems;
+	}
+
+	/**
+	 * @return a list with the global positions of all deleted items
+	 */
+//	public List<Integer> getDeletedPositions() {
+//		List<Integer> deletedItems = new ArrayList<Integer>();
+//		for (RestoreInfo restoreInfo : mRestoreList) {
+//			if (!deletedItems.contains(restoreInfo.refPosition))
+//				deletedItems.add(restoreInfo.refPosition);
+//		}
+//		return deletedItems;
+//	}
+
+	/**
+	 * Retrieves the expandable of the deleted child.
+	 *
+	 * @param child the deleted child
+	 * @return the expandable(parent) of this child, or null if no parent found.
+	 */
+	public IExpandable getExpandableOfDeletedChild(T child) {
+		for (RestoreInfo restoreInfo : mRestoreList) {
+			if (restoreInfo.item.equals(child) && isExpandable(restoreInfo.refItem))
+				return (IExpandable) restoreInfo.refItem;
+		}
+		return null;
+	}
+
+	/**
+	 * Retrieves only the deleted children of the specified parent.
+	 *
+	 * @param expandable the parent item
+	 * @return the list of deleted children
+	 */
+	public List<T> getDeletedChildren(IExpandable expandable) {
+		List<T> deletedChild = new ArrayList<T>();
+		for (RestoreInfo restoreInfo : mRestoreList) {
+			if (restoreInfo.refItem != null && restoreInfo.refItem.equals(expandable) && restoreInfo.relativePosition >= 0)
+				deletedChild.add(restoreInfo.item);
+		}
+		return deletedChild;
+	}
+
+	/**
+	 * Retrieves all the original children of the specified parent, filtering out all the
+	 * deleted children if any.
+	 *
+	 * @param expandable the parent item
+	 * @return a non null list of the original children minus the deleted children if some are
+	 * pending removal.
+	 */
+	public List<T> getCurrentChildren(@NonNull IExpandable expandable) {
+		//Check item and subItems existence
+		if (expandable == null || !hasSubItems(expandable))
+			return new ArrayList<T>();
+
+		//Take a copy of the subItems list
+		List<T> subItems = new ArrayList<T>(expandable.getSubItems());
+		//Remove all children pending removal
+		if (mRestoreList.size() > 0) {
+			subItems.removeAll(getDeletedChildren(expandable));
+		}
+		return subItems;
+	}
+
+	/*----------------*/
+	/* FILTER METHODS */
+	/*----------------*/
+
+	public boolean hasSearchText() {
+		return mSearchText != null && mSearchText.length() > 0;
+	}
+
+	public String getSearchText() {
+		return mSearchText;
+	}
+
+	public void setSearchText(String searchText) {
+		if (searchText != null)
+			mSearchText = searchText.trim().toLowerCase(Locale.getDefault());
+		else mSearchText = "";
+	}
+
+	/**
+	 * Sometimes it is necessary, while filtering, to rebound the items that remain unfiltered.
+	 * If the items have highlighted text, those items must be refreshed in order to update the
+	 * highlighted text.
+	 * <p>This happens systematically when searchText is reduced in length by the user. It doesn't
+	 * reduce performance in other cases, since the notification is triggered only in
+	 * {@link #applyAndAnimateAdditions(List, List)} when new items are not added.</p>
+	 *
+	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)} while filtering,
+	 *                     false otherwise
+	 */
+	public final void setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
+		this.mNotifyChangeOfUnfilteredItems = notifyChange;
+	}
+
+	/**
+	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal mechanism,
+	 * items are removed and/or added in order to animate items in the final list.
+	 * <p>Same as {@link #filterItems(List)}, but with a delay in the execution, useful to grab
+	 * more characters from user before starting the search.</p>
+	 *
+	 * @param unfilteredItems the list to filter
+	 * @param delay           any non negative delay
+	 * @see #filterObject(IFlexible, String)
+	 */
+	public void filterItems(@NonNull List<T> unfilteredItems, @IntRange(from = 0) long delay) {
+		//Make longer the timer for new coming deleted items
+		mHandler.removeMessages(0);
+		mHandler.sendMessageDelayed(Message.obtain(mHandler, 0, unfilteredItems), delay > 0 ? delay : 0);
+	}
+
+	/**
+	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal mechanism,
+	 * items are removed and/or added in order to animate items in the final list.
+	 * <p>This method filters the provided list with the search text previously set with
+	 * {@link #setSearchText(String)}.</p>
+	 * <b>Note:</b>
+	 * <br/>- This method calls {@link #filterObject(IFlexible, String)}.
+	 * <br/>- If search text is empty or null, the provided list is the current list.
+	 * <br/>- Any pending deleted items are always filtered out, but if restored, they will be
+	 * displayed according to the current filter and in the correct positions.
+	 * <br/>- <b>NEW!</b> Expandable items are picked up and displayed if at least a child is
+	 * collected by the current filter.
+	 * <br/>- <b>NEW!</b> Items are animated thanks to {@link #animateTo(List)}.
+	 *
+	 * @param unfilteredItems the list to filter
+	 * @see #filterObject(IFlexible, String)
+	 */
+	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
+		// NOTE: In case user has deleted some items and he changes or applies a filter while
+		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
+		// the new position in the new list and finally skip those items to avoid they are shown!
+		List<T> values = new ArrayList<T>();
+		//Enable flag: skip adjustPositions!
+		filtering = true;
+		//Reset values
+		int initialCount = getItemCount();
+		if (hasSearchText()) {
+			int newOriginalPosition = -1;
+			for (T item : unfilteredItems) {
+				if (filterExpandableObject(item, getSearchText())) {
+					RestoreInfo restoreInfo = getPendingRemovedItem(item);
+					if (restoreInfo != null) {
+						//If found point to the new reference while filtering
+						restoreInfo.filterRefItem = ++newOriginalPosition < values.size() ? values.get(newOriginalPosition) : null;
+					} else {
+						values.add(item);
+						newOriginalPosition++;
+						if (isExpandable(item)) {
+							IExpandable expandable = (IExpandable) item;
+							if (expandable.isExpanded()) {
+								List<T> filteredSubItems = new ArrayList<T>();
+								//Add subItems if not hidden by filterObject()
+								List<T> subItems = expandable.getSubItems();
+								for (T subItem : subItems) {
+									if (!subItem.isHidden()) filteredSubItems.add(subItem);
+								}
+								//Map the view types if not done yet
+								//mapViewTypesFrom(filteredSubItems);
+								values.addAll(filteredSubItems);
+								newOriginalPosition += filteredSubItems.size();
+							}
+						}
+					}
+				}
+			}
+		} else {
+			values = unfilteredItems; //with no filter
+			if (!mRestoreList.isEmpty()) {
+				for (RestoreInfo restoreInfo : mRestoreList) {
+					//Clear the refItem generated by the filter
+					restoreInfo.clearFilterRef();
+					//Find the real reference
+					restoreInfo.refItem = values.get(Math.max(0, values.indexOf(restoreInfo.item) - 1));
+				}
+				values.removeAll(getDeletedItems());
+			}
+			resetFilterFlags(values);
+		}
+
+		//Animate search results only in case of new SearchText
+		if (!mOldSearchText.equalsIgnoreCase(mSearchText)) {
+			mOldSearchText = mSearchText;
+			animateTo(values);
+		} else mItems = values;
+		//Restore headers if necessary
+		if (mSearchText.isEmpty()) {
+			showAllHeaders();
+		}
+
+		//Reset filtering flag
+		filtering = false;
+
+		//Call listener to update EmptyView
+		if (mUpdateListener != null && initialCount != getItemCount())
+			mUpdateListener.onUpdateEmptyView(getItemCount());
+	}
+
+	/**
+	 * This method is a wrapper filter for expandable items.<br/>
+	 * It performs filtering on the subItems returning true, if the any child should be in the
+	 * filtered collection.
+	 * <p>If the provided item is not an expandable it will be filtered as usual by
+	 * {@link #filterObject(T, String)}.</p>
+	 *
+	 * @param item       the object with subItems to be inspected
+	 * @param constraint constraint, that the object has to fulfil
+	 * @return true, if the object should be in the filteredResult, false otherwise
+	 */
+	private boolean filterExpandableObject(T item, String constraint) {
+		//Reset expansion flag
+		boolean filtered = false;
+		if (isExpandable(item)) {
+			IExpandable expandable = (IExpandable) item;
+			expandable.setExpanded(false);
+			//Children scan filter
+			for (T subItem : getCurrentChildren(expandable)) {
+				//Reuse normal filter for Children
+				subItem.setHidden(!filterObject(subItem, constraint));
+				if (!filtered && !subItem.isHidden()) {
+					filtered = true;
+				}
+			}
+			//Expand if filter found text in subItems
+			expandable.setExpanded(filtered);
+		}
+		//if not filtered already, fallback to Normal filter
+		return filtered || filterObject(item, constraint);
+	}
+
+	/**
+	 * This method checks if the provided object is a type of {@link IFilterable} interface,
+	 * if yes, performs the filter on the implemented method {@link IFilterable#filter(String)}.
+	 * <p><b>NOTE:</b>
+	 * <br/>- The item will be collected if the implemented method returns true.
+	 * <br/>- {@code IExpandable} items are automatically picked up and displayed if at least a
+	 * child is collected by the current filter: however, you also need to implement
+	 * {@code IFilterable} interface on the {@code IExpandable} item and on the child type. What
+	 * you DON'T NEED to implement is the scan for the children: this is already done :-)
+	 * <br/>- If you don't want to implement the {@code IFilterable} interface on the items, then
+	 * you can override this method to have another filter logic!
+	 *
+	 * @param item       the object to be inspected
+	 * @param constraint constraint, that the object has to fulfil
+	 * @return true, if the object returns true as well, and so if it should be in the
+	 * filteredResult, false otherwise
+	 */
+	protected boolean filterObject(T item, String constraint) {
+		if (item instanceof IFilterable) {
+			IFilterable filterable = (IFilterable) item;
+			return filterable.filter(constraint);
+		}
+		return false;
+	}
+
+	/**
+	 * Animate from the current list to the another.
+	 * <p>Used by the filter.</p>
+	 * Unchanged items will be notified if {@code mNotifyChangeOfUnfilteredItems} is set true, and
+	 * payload will be set as a Boolean.
+	 *
+	 * @param models the new list containing the new items
+	 * @return the cleaned up item list. make sure to set your new list to this one
+	 * @see #setNotifyChangeOfUnfilteredItems(boolean)
+	 */
+	public List<T> animateTo(List<T> models) {
+		applyAndAnimateRemovals(mItems, models);
+		applyAndAnimateAdditions(mItems, models);
+		return mItems;
+	}
+
+	/**
+	 * Find out all removed items and animate them.
+	 */
+	protected void applyAndAnimateRemovals(List<T> from, List<T> newItems) {
+		int out = 0;
+		for (int i = from.size() - 1; i >= 0; i--) {
+			final T item = from.get(i);
+			if (!newItems.contains(item)) {
+				if (DEBUG) Log.v(TAG, "animateRemovals remove position=" + i + " item=" + item);
+				from.remove(i);
+				notifyItemRemoved(i);
+				out++;
+			} else {
+				if (DEBUG) Log.v(TAG, "animateRemovals   keep position=" + i + " item=" + item);
+			}
+		}
+		if (DEBUG) Log.v(TAG, "animateRemovals total out=" + out + " in=" + newItems.size());
+	}
+
+	/**
+	 * Find out all added items and animate them.
+	 */
+	protected void applyAndAnimateAdditions(List<T> from, List<T> newItems) {
+		int out = 0;
+		for (int i = 0, count = newItems.size(); i < count; i++) {
+			final T item = newItems.get(i);
+			if (!from.contains(item)) {
+				if (DEBUG) Log.v(TAG, "animateAdditions  add position=" + i + " item=" + item);
+				from.add(i, item);
+				notifyItemInserted(i);
+			} else if (mNotifyChangeOfUnfilteredItems) {
+				out++;
+				notifyItemChanged(i, mNotifyChangeOfUnfilteredItems);
+				if (DEBUG) Log.v(TAG, "animateAdditions keep position=" + i + " item=" + item);
+			}
+		}
+		if (DEBUG) Log.v(TAG, "animateAdditions total out=" + out + " in=" + newItems.size());
+	}
+
 	/*---------------*/
 	/* TOUCH METHODS */
 	/*---------------*/
@@ -615,7 +1044,7 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	 * false otherwise. Default value is false.
 	 */
 	public boolean isLongPressDragEnabled() {
-		return mItemTouchHelperCallback.isLongPressDragEnabled();
+		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.isLongPressDragEnabled();
 	}
 
 	/**
@@ -663,7 +1092,7 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	 * over the View, false otherwise. Default value is false.
 	 */
 	public final boolean isSwipeEnabled() {
-		return mItemTouchHelperCallback.isItemViewSwipeEnabled();
+		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.isItemViewSwipeEnabled();
 	}
 
 	/**
@@ -751,14 +1180,7 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 		if (savedInstanceState != null) {
 			super.onRestoreInstanceState(savedInstanceState);
 			headersShown = savedInstanceState.getBoolean(EXTRA_HEADERS);
-			showAllHeaders();
-			
-			//TODO: not sure how to handle this :s
-//			if (expandedItemsSavedState != null) {
-//	            // NOTE: do not call hook routines and listener methods
-//	            mPositionTranslator.restoreExpandedSectionItems(
-//	                    expandedItemsSavedState, null);
-//	        }
+			if (headersShown) showAllHeaders();
 		}
 	}
 
