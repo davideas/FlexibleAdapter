@@ -514,7 +514,11 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
         //TODO: how to handle non section adapter?
         if (viewType != -1 && (viewType & HEADER_TYPE_FLAG) != 0) {
             viewType &= ~HEADER_TYPE_FLAG;
-            return new HeaderViewHolder(onCreateSectionHeaderViewHolder(parent, viewType));
+            if (viewType == SECTION_NO_HEADER_VIEW_TYPE) {
+                return new HeaderViewHolder(null);
+            } else {
+                return new HeaderViewHolder(onCreateSectionHeaderViewHolder(parent, viewType));
+            }
         }
         return onCreateSectionChildViewHolder(parent, viewType);
     }
