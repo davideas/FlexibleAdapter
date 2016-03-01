@@ -925,13 +925,21 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     }
 
     public int getSectionPosition(int flatPosition) {
+        return getFlatPosition(mPositionTranslator.getExpandablePosition(flatPosition));
+    }
+    
+    public int getSectionIndex(int flatPosition) {
         final long expandablePosition = mPositionTranslator
                 .getExpandablePosition(flatPosition);
         return SectionAdapterHelper.getPackedPositionSection(expandablePosition);
-    }
+        }
 
     public int getFlatPosition(long packedPosition) {
         return mPositionTranslator.getFlatPosition(packedPosition);
+    }
+    
+    public int getFlatPosition(int sectionIndex, int sectionItemIndex) {
+        return mPositionTranslator.getFlatPosition(SectionAdapterHelper.getPackedPositionForChild(sectionIndex, sectionItemIndex));
     }
     
     private void rebuildPositionTranslator() {

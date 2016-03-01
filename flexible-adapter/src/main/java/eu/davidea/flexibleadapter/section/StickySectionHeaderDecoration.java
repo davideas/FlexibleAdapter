@@ -39,7 +39,7 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
     private HeaderViewHolder mHeader;
 
     /* --- Header state --- */
-    private long mHeaderId = RecyclerView.NO_ID;
+    private long mSectionIndex = -1;
     // used to not have to call getHeaderId() all the time
     private Integer mHeaderPosition;
     
@@ -144,10 +144,11 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
         // check if there is a new header should be sticky
         if (mHeaderPosition == null || mHeaderPosition != headerPosition) {
             mHeaderPosition = headerPosition;
-            final long headerId = mAdapter.getSectionId(headerPosition);
-            if (headerId != RecyclerView.NO_ID && (mHeaderId == RecyclerView.NO_ID || mHeaderId != headerId)) {
-                mHeaderId = headerId;
-                final RecyclerView.ViewHolder holder = getHeader(mRecyclerView, headerPosition);
+            final int sectionIndex = mAdapter.getSectionIndex(headerPosition);
+            if (mSectionIndex != sectionIndex) {
+                mSectionIndex = sectionIndex;
+                int sectionHeaderPosition = mAdapter.getFlatPosition(sectionIndex, RecyclerView.NO_POSITION);
+                final RecyclerView.ViewHolder holder = getHeader(mRecyclerView, sectionHeaderPosition);
                 //                final View header = mAdapter.getHeaderView(mHeaderPosition, mHeader, this);
                 if ((holder== null || holder instanceof HeaderViewHolder) && mHeader != holder) {
                     swapHeader((HeaderViewHolder) holder);
@@ -175,10 +176,8 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
             for (int i = 0; i < childCount; i++) {
                 final View child = mRecyclerView.getChildAt(i);
                 int adapterPos = mRecyclerView.getChildAdapterPosition(child);
-                int sectionIndex = mAdapter.getSectionPosition(adapterPos);
-                final long headerId = mAdapter.getSectionId(sectionIndex);
-                //headerId == null means new section with no header!
-                if (headerId == RecyclerView.NO_ID || headerId != mHeaderId) {
+                int sectionIndex = mAdapter.getSectionIndex(adapterPos);
+                if (sectionIndex != mSectionIndex) {
                     if (orientation == LinearLayoutManager.HORIZONTAL) {
                         if (child.getLeft() > 0) {
                             headerOffsetX = Math.min(child.getLeft() - headerRight, 0);
@@ -258,7 +257,7 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
         if (mHeader != null) {
             resetHeader(mHeader);
             mHeader = null;
-            mHeaderId = RecyclerView.NO_ID;
+            mSectionIndex = -1;
             mHeaderPosition = null;
         }
     }

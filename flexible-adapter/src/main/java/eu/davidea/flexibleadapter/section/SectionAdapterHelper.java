@@ -11,12 +11,12 @@ public class SectionAdapterHelper {
 
     /*package*/ static final int VIEW_TYPE_FLAG_IS_GROUP = 0x80000000;
 
-    public static long getPackedPositionForChild(int sectionPosition, int childPosition) {
-        return ((long) childPosition << 32) | (sectionPosition & LOWER_32BIT_MASK);
+    public static long getPackedPositionForChild(int sectionIndex, int sectionItemIndex) {
+        return ((long) sectionItemIndex << 32) | (sectionIndex & LOWER_32BIT_MASK);
     }
 
-    public static long getPackedPositionForSection(int sectionPosition) {
-        return ((long) RecyclerView.NO_POSITION << 32) | (sectionPosition & LOWER_32BIT_MASK);
+    public static long getPackedPositionForSection(int sectionIndex) {
+        return ((long) RecyclerView.NO_POSITION << 32) | (sectionIndex & LOWER_32BIT_MASK);
     }
 
     public static int getPackedPositionChild(long packedPosition) {
