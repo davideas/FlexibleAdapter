@@ -30,14 +30,6 @@ public class DatabaseService {
 	//Database original items
 	private List<AbstractFlexibleItem> mItems = new ArrayList<AbstractFlexibleItem>();
 
-
-	public static DatabaseService getInstance() {
-		if (mInstance == null) {
-			mInstance = new DatabaseService();
-		}
-		return mInstance;
-	}
-
 	DatabaseService() {
 		HeaderItem header = null;
 		for (int i = 0; i < ITEMS; i++) {
@@ -46,6 +38,13 @@ public class DatabaseService {
 					newExpandableItem(i + 1, header) :
 					newSimpleItem(i + 1, header));
 		}
+	}
+
+	public static DatabaseService getInstance() {
+		if (mInstance == null) {
+			mInstance = new DatabaseService();
+		}
+		return mInstance;
 	}
 
 	public static HeaderItem newHeader(int i) {

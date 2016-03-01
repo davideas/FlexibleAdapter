@@ -57,10 +57,8 @@ public class MessageDialog extends DialogFragment {
 						dialog.dismiss();
 					}
 				});
-		
-		final AlertDialog dialog = builder.create();
-		
-		return dialog;
+
+		return builder.create();
 	}
 	
 }
