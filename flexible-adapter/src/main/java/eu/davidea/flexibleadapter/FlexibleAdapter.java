@@ -37,6 +37,10 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
+import eu.davidea.flexibleadapter.section.SectionAdapter;
+import eu.davidea.flexibleadapter.section.SectionAdapterHelper;
+import eu.davidea.flexibleadapter.section.SectionPositionTranslator;
+import eu.davidea.flexibleadapter.section.StickySectionHeaderDecoration;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -78,17 +82,20 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	private LayoutManager mLayoutManager;
 
 	/**
-	 * Header/Section items
+	 * Section Feature
 	 */
+    private SectionAdapter mSectionAdapter;
+    private SectionPositionTranslator mPositionTranslator;
 	private boolean headersShown = false, headersSticky = false;
     private GridLayoutManager.SpanSizeLookup gridSpanSizeLookup;
     private GridLayoutManager.SpanSizeLookup externalSpanSizeLookup;
+    private StickySectionHeaderDecoration stickyHeaderDecoration;
+    private boolean stickyHeaderDecorationAttached = false;
 
 	/**
 	 * Used to save deleted items and to recover them (Undo).
 	 */
-    private StickyHeaderDecoration stickyHeaderDecoration;
-    private boolean stickyHeaderDecorationAttached = false;
+
 	private boolean restoreSelection = false;
 
 	/* Drag&Drop and Swipe helpers */
@@ -123,7 +130,13 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	 *                  <br/>- {@link OnItemSwipeListener}
 	 */
 	public FlexibleAdapter(@Nullable Object listeners) {
+	    if (this instanceof SectionAdapter) {
+	        mSectionAdapter = (SectionAdapter) this;
+	        mPositionTranslator = new SectionPositionTranslator();
+	        mPositionTranslator.build(mSectionAdapter, true);
+	    }
 	    
+        
 		if (listeners instanceof OnItemClickListener)
 			mItemClickListener = (OnItemClickListener) listeners;
 		if (listeners instanceof OnItemLongClickListener)
@@ -204,10 +217,49 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	/*--------------*/
 	/* MAIN METHODS */
 	/*--------------*/
+	
+	@Override
+    public int getItemCount() {
+	    if (mPositionTranslator != null) {
+	        return mPositionTranslator.getItemCount();
+	    }
+	    return 0;
+    }
 
 	@Override
-	public long getItemId(int position) {
-		return position;
+    public long getItemId(int position) {
+        if (mPositionTranslator != null) {
+            final long expandablePosition = mPositionTranslator
+                    .getExpandablePosition(position);
+            final int sectionIndex = SectionAdapterHelper
+                    .getPackedPositionSection(expandablePosition);
+            final int sectionItemIndex = SectionAdapterHelper
+                    .getPackedPositionChild(expandablePosition);
+
+            if (sectionItemIndex == RecyclerView.NO_POSITION) {
+                final long groupId = mSectionAdapter
+                        .getSectionId(sectionIndex);
+                return SectionAdapterHelper.getCombinedSectionId(groupId);
+            } else {
+                final long groupId = mSectionAdapter
+                        .getSectionId(sectionIndex);
+                final long childId = mSectionAdapter.getChildId(sectionIndex,
+                        sectionItemIndex);
+                if (childId == RecyclerView.NO_ID) {
+                    return RecyclerView.NO_ID;
+                }
+                return SectionAdapterHelper.getCombinedChildId(groupId,
+                        childId);
+            }
+        }
+        return position;
+    }
+	
+	public long getSectionId(int sectionIndex) {
+	    if (mSectionAdapter != null) {
+	        return mSectionAdapter.getSectionId(sectionIndex);
+	    }
+	    return RecyclerView.NO_ID;
 	}
 
 	/**
@@ -256,7 +308,7 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	}
 
 	/**
-	 * Enables the sticky header functionality. Adds {@link StickyHeaderDecoration} to the
+	 * Enables the sticky header functionality. Adds {@link StickySectionHeaderDecoration} to the
 	 * RecyclerView.
 	 * <p>Headers can be sticky only if they are shown. Command is otherwise ignored!</p>
 	 * <b>NOTE:</b> Sticky headers cannot be dragged, swiped, moved nor deleted. They, instead,
@@ -266,30 +318,34 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	 *                         how many headers are normally displayed in the RecyclerView. It
 	 *                         depends by the specific use case.
 	 */
-	public void enableStickyHeaders() {
-		setStickyHeaders(true);
+	public void enableStickySectionHeaders() {
+		setStickySectionHeaders(true);
 	}
 
 	/**
 	 * Disables the sticky header functionality. Clears the cache and removes the
-	 * {@link StickyHeaderDecoration} from the RecyclerView.
+	 * {@link StickySectionHeaderDecoration} from the RecyclerView.
 	 */
-	public void disableStickyHeaders() {
-		setStickyHeaders(false);
+	public void disableStickySectionHeaders() {
+		setStickySectionHeaders(false);
 	}
 
-	public void setStickyHeaders(boolean headersSticky) {
+	public void setStickySectionHeaders(boolean headersSticky) {
+	    if (mSectionAdapter == null) {
+	        //makes no sense when not using sections
+	        return;
+	    }
 		//Add or Remove the sticky headers decoration
 		if (headersSticky) {
 			this.headersSticky = true;
 			if (stickyHeaderDecoration == null) {
-	            stickyHeaderDecoration = new StickyHeaderDecoration(this);
+	            stickyHeaderDecoration = new StickySectionHeaderDecoration(this);
 			}
 			if (!stickyHeaderDecorationAttached && headersShown && mRecyclerView != null) {
 			    stickyHeaderDecorationAttached = true;
                 stickyHeaderDecoration.setParent(mRecyclerView);
 			    mRecyclerView.addItemDecoration(stickyHeaderDecoration);
-                stickyHeaderDecoration.setStickyHeadersHolder(getStickyHeadersHolder());
+                stickyHeaderDecoration.setStickyHeadersHolder(getStickySectionHeadersHolder());
             }
 		} else if (stickyHeaderDecoration != null) {
 			this.headersSticky = false;
@@ -312,20 +368,14 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
         super.onAttachedToRecyclerView(recyclerView);
         if (stickyHeaderDecoration != null) {
             stickyHeaderDecoration.setParent(mRecyclerView);
-            stickyHeaderDecoration.setStickyHeadersHolder(getStickyHeadersHolder());
+            stickyHeaderDecoration.setStickyHeadersHolder(getStickySectionHeadersHolder());
             if (!stickyHeaderDecorationAttached && headersShown) {
                 stickyHeaderDecorationAttached = true;
                 mRecyclerView.addItemDecoration(stickyHeaderDecoration);
             }
         }
     }
-	
-	/**
-     * Returns the view sticky headers will be attached to
-     *
-     * @return FrameLayout the view
-     */
-	public abstract FrameLayout getStickyHeadersHolder();
+
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
@@ -400,16 +450,10 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	/**
      * Returns the view type for the header
      *
-     * @param position position of the headerView
+     * @param sectionIndex section index
+     * @param sectionItemIndex child index in the section
      */
-	public abstract int getHeaderViewType(int position);
-	
-	/**
-     * Returns the view type for a normal view
-     *
-     * @param position position of the view
-     */
-    public abstract int getNormalViewType(int position);
+	public abstract int getSectionViewType(int position, int sectionIndex, int sectionItemIndex);
     
     /**
      * Returns the ViewHolder for a header
@@ -417,76 +461,74 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
      * @param parent the RecyclerView
      * @param viewType the ViewType
      */
-    public abstract RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent, int viewType);
-    
+    public abstract RecyclerView.ViewHolder onCreateSectionHeaderViewHolder(ViewGroup parent, int viewType);
     /**
-     * Returns the ViewHolder for a normal view
+     * Returns the ViewHolder for a header
      *
      * @param parent the RecyclerView
      * @param viewType the ViewType
      */
-    public abstract RecyclerView.ViewHolder onCreateNormalViewHolder(ViewGroup parent, int viewType);
-   
+    public abstract RecyclerView.ViewHolder onCreateSectionChildViewHolder(ViewGroup parent, int viewType);
+
     /**
      * Bind a header view
      *
      * @param holder the ViewHolder
-     * @param position position of the view
+     * @param sectionIndex section index
+     * @param sectionItemIndex child index in the section
      */
-    public abstract void onBindHeaderViewHolder(ViewHolder holder, int position);
-    
-    /**
-     * Bind a view
-     *
-     * @param holder the ViewHolder
-     * @param position position of the view
-     */
-    public abstract void onBindNormalViewHolder(ViewHolder holder, int position, boolean selected);
-    
-    /**
-     * return the header id at one position. This is a unique identifier for your section
-     *
-     * @return id the id for the section corresponding to position
-     */
-    public abstract Integer getHeaderId(int position);
-    
-    /**
-     * return the position of the header of the item at position
-     *
-      * @param position position of the item for which we are searching for
-    * @return id the id for the section corresponding to position
-     */
-    public abstract int getHeaderPosition(int position);
+    public abstract void onBindSectionViewHolder(ViewHolder holder, int position, int sectionIndex, int sectionItemIndex, boolean selected);
     
 	@Override
-    public final int getItemViewType(int position) {
-	    if (isHeader(position)) {
-            return getHeaderViewType(position) | HEADER_TYPE_FLAG;
-        } else {
-            return getNormalViewType(position);
+    public int getItemViewType(int position) {
+        if (mSectionAdapter != null) {
+            final long expandablePosition = mPositionTranslator
+                    .getExpandablePosition(position);
+            final int sectionIndex = SectionAdapterHelper
+                    .getPackedPositionSection(expandablePosition);
+            final int sectionItemIndex = SectionAdapterHelper
+                    .getPackedPositionChild(expandablePosition);
+            return getSectionViewType(position, sectionIndex, sectionItemIndex);
         }
+        // TODO: what to return here?
+        return -1;
     }
 	
     @Override
-    public final RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
             int viewType) {
+        //TODO: how to handle non section adapter?
         if ((viewType & HEADER_TYPE_FLAG) != 0) {
-            return new HeaderViewHolder(onCreateHeaderViewHolder(parent, viewType & ~HEADER_TYPE_FLAG));
+            return new HeaderViewHolder(onCreateSectionHeaderViewHolder(parent, viewType & ~HEADER_TYPE_FLAG));
         }
-        return onCreateNormalViewHolder(parent, viewType);
+        return onCreateSectionChildViewHolder(parent, viewType);
     }
 
 	@Override
-	public final void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-	    if (holder instanceof HeaderViewHolder) {
-	        this.onBindHeaderViewHolder(((HeaderViewHolder) holder).realItemHolder, position);
-	    } else {
-	        this.onBindNormalViewHolder(holder, position, isSelected(position));
-	    }
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+	    if (mSectionAdapter != null) {
+            final long expandablePosition = mPositionTranslator
+                    .getExpandablePosition(position);
+            final int sectionIndex = SectionAdapterHelper
+                    .getPackedPositionSection(expandablePosition);
+            final int sectionItemIndex = SectionAdapterHelper
+                    .getPackedPositionChild(expandablePosition);
+            if (holder instanceof HeaderViewHolder) {
+                holder = ((HeaderViewHolder) holder).realItemHolder;
+            }
+            onBindSectionViewHolder(holder, position, sectionIndex, sectionItemIndex, isSelected(position));
+        }
 	}
 
 	public boolean isHeader(int position) {
-        return headersShown && getHeaderPosition(position) == position;
+	    if (headersShown) {
+	        final long expandablePosition = mPositionTranslator
+                    .getExpandablePosition(position);
+            final int sectionItemIndex = SectionAdapterHelper
+                    .getPackedPositionChild(expandablePosition);
+            return sectionItemIndex == RecyclerView.NO_POSITION;
+	    }
+        return false;
     }
 	   
     /**
@@ -691,6 +733,13 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 			super.onRestoreInstanceState(savedInstanceState);
 			headersShown = savedInstanceState.getBoolean(EXTRA_HEADERS);
 			showAllHeaders();
+			
+			//TODO: not sure how to handle this :s
+//			if (expandedItemsSavedState != null) {
+//	            // NOTE: do not call hook routines and listener methods
+//	            mPositionTranslator.restoreExpandedSectionItems(
+//	                    expandedItemsSavedState, null);
+//	        }
 		}
 	}
 
@@ -799,7 +848,154 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	}
 
 
-    public LayoutParams getStickyHeadersLayoutParams() {
+    /*------------------*/
+    /* SECTION FEATURES */
+    /*------------------*/
+	
+	   
+    /**
+     * Returns the view sticky headers will be attached to
+     *
+     * @return FrameLayout the view
+     */
+    public abstract FrameLayout getStickySectionHeadersHolder();
+	
+    public boolean collapseSection(int sectionIndex, boolean fromUser) {
+        if (!mPositionTranslator.isSectionExpanded(sectionIndex)) {
+            return false;
+        }
+
+        if (mPositionTranslator.collapseSection(sectionIndex)) {
+            final long packedPosition = SectionAdapterHelper
+                    .getPackedPositionForSection(sectionIndex);
+            final int flatPosition = mPositionTranslator
+                    .getFlatPosition(packedPosition);
+            final int childCount = mPositionTranslator
+                    .getChildCount(sectionIndex);
+
+            notifyItemRangeRemoved(flatPosition + 1, childCount);
+        }
+
+        {
+            final long packedPosition = SectionAdapterHelper
+                    .getPackedPositionForSection(sectionIndex);
+            final int flatPosition = mPositionTranslator
+                    .getFlatPosition(packedPosition);
+
+            notifyItemChanged(flatPosition);
+        }
+        return true;
+    }
+
+    public boolean expandSection(int sectionIndex, boolean fromUser) {
+        if (mPositionTranslator.isSectionExpanded(sectionIndex)) {
+            return false;
+        }
+
+        if (mPositionTranslator.expandSection(sectionIndex)) {
+            final long packedPosition = SectionAdapterHelper
+                    .getPackedPositionForSection(sectionIndex);
+            final int flatPosition = mPositionTranslator
+                    .getFlatPosition(packedPosition);
+            final int childCount = mPositionTranslator
+                    .getChildCount(sectionIndex);
+
+            notifyItemRangeInserted(flatPosition + 1, childCount);
+        }
+
+        {
+            final long packedPosition = SectionAdapterHelper
+                    .getPackedPositionForSection(sectionIndex);
+            final int flatPosition = mPositionTranslator
+                    .getFlatPosition(packedPosition);
+
+            notifyItemChanged(flatPosition);
+        }
+
+        return true;
+    }
+
+    public boolean isSectionExpanded(int sectionIndex) {
+        return mPositionTranslator.isSectionExpanded(sectionIndex);
+    }
+
+    public int getSectionPosition(int flatPosition) {
+        final long expandablePosition = mPositionTranslator
+                .getExpandablePosition(flatPosition);
+        return SectionAdapterHelper.getPackedPositionSection(expandablePosition);
+    }
+
+    public int getFlatPosition(long packedPosition) {
+        return mPositionTranslator.getFlatPosition(packedPosition);
+    }
+    
+    private void rebuildPositionTranslator() {
+        if (mPositionTranslator != null) {
+            int[] savedState = mPositionTranslator.getSavedStateArray();
+            mPositionTranslator.build(mSectionAdapter, true);
+            mPositionTranslator.restoreExpandedSectionItems(savedState,
+                    null);
+        }
+    }
+    
+    public void notifySectionDataSetChanged() {
+        rebuildPositionTranslator();
+        super.notifyDataSetChanged();
+    }
+
+    public void notifySectionItemRangeChanged(int sectionIndex,
+            int sectionItemIndex, int itemCount) {
+        final long packedPosition = SectionAdapterHelper
+                .getPackedPositionForChild(sectionIndex, sectionItemIndex);
+        final int flatPosition = mPositionTranslator
+                .getFlatPosition(packedPosition);
+        this.notifyItemRangeChanged(flatPosition, itemCount);
+    }
+
+    public void notifySectionItemRangeInserted(int sectionIndex,
+            int sectionItemIndex, int itemCount) {
+        rebuildPositionTranslator();
+        final long packedPosition = SectionAdapterHelper
+                .getPackedPositionForChild(sectionIndex, sectionItemIndex);
+        final int flatPosition = mPositionTranslator
+                .getFlatPosition(packedPosition);
+        super.notifyItemRangeInserted(flatPosition, itemCount);
+        mRecyclerView.scrollToPosition(flatPosition);
+    }
+
+
+    public void notifySectionItemRangeRemoved(int sectionIndex,
+            int sectionItemIndex, int itemCount) {
+        if (itemCount == 1) {
+
+            if (sectionItemIndex == RecyclerView.NO_POSITION) {
+                mPositionTranslator.removeSectionItem(sectionIndex);
+            } else {
+                mPositionTranslator.removeChildItem(sectionIndex,
+                        sectionItemIndex);
+            }
+        } else {
+            rebuildPositionTranslator();
+        }
+        final long packedPosition = SectionAdapterHelper
+                .getPackedPositionForChild(sectionIndex, sectionItemIndex);
+        final int flatPosition = mPositionTranslator
+                .getFlatPosition(packedPosition);
+        super.notifyItemRangeRemoved(flatPosition, itemCount);
+    }
+
+    public void notifySectionItemMoved(int fromPosition, int toPosition,
+            int itemCount) {
+        rebuildPositionTranslator();
+        if (itemCount != 1) {
+            throw new IllegalStateException(
+                    "itemCount should be always 1  (actual: " + itemCount
+                            + ")");
+        }
+        super.notifyItemMoved(fromPosition, toPosition);
+    }
+
+    public LayoutParams getStickySectionHeadersLayoutParams() {
         FrameLayout.LayoutParams newParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         newParams.gravity = Gravity.TOP | Gravity.LEFT;
         return newParams;
