@@ -454,6 +454,9 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+        if (mItemTouchHelper != null) {
+            mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+        }
         if (stickyHeaderDecoration != null) {
             stickyHeaderDecoration.setParent(mRecyclerView);
             stickyHeaderDecoration
@@ -1004,13 +1007,11 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 
     private void initializeItemTouchHelper() {
         if (mItemTouchHelper == null) {
-            if (mRecyclerView == null) {
-                throw new IllegalStateException(
-                        "RecyclerView cannot be null. Enabling LongPressDrag or Swipe must be done after the Adapter is added to the RecyclerView.");
-            }
             mItemTouchHelperCallback = new ItemTouchHelperCallback(this);
             mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
-            mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+            if (mRecyclerView != null) {
+                mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+            }
         }
     }
 
