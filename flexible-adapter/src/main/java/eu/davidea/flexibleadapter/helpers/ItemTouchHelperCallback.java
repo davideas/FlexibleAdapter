@@ -207,23 +207,23 @@ public class ItemTouchHelperCallback extends Callback {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-							float dX, float dY, int actionState, boolean isCurrentlyActive) {
-		super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-								float dX, float dY, int actionState, boolean isCurrentlyActive) {
-		super.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-	}
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+//							float dX, float dY, int actionState, boolean isCurrentlyActive) {
+//		super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+//	}
+//
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+//								float dX, float dY, int actionState, boolean isCurrentlyActive) {
+//		super.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+//	}
 
 	/*------------------*/
 	/* INNER INTERFACES */
