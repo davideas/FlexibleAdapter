@@ -123,6 +123,9 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
     }
     
     private void ensureHeaderParent() {
+        if (this.mHeader.realItemHolder == null) {
+            return;
+        }
         final View view = this.mHeader.realItemHolder.itemView;
         final ViewParent parent = view.getParent();
         if(parent != mStickyHolder) {
@@ -200,8 +203,10 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
                 
                 
             }
-            mHeader.realItemHolder.itemView.setTranslationX(headerOffsetX);
-            mHeader.realItemHolder.itemView.setTranslationY(headerOffsetY);
+            if (mHeader.realItemHolder != null) {
+                mHeader.realItemHolder.itemView.setTranslationX(headerOffsetX);
+                mHeader.realItemHolder.itemView.setTranslationY(headerOffsetY);
+            }
         }
 
     }
@@ -216,6 +221,9 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
     }
     
     private void resetHeader(HeaderViewHolder header) {
+        if (header.realItemHolder == null) {
+            return;
+        }
         final View view = header.realItemHolder.itemView;
         if (view.getParent() != header.layout) {
             removeViewFromParent(view);

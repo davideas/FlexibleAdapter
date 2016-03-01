@@ -84,6 +84,7 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	/**
 	 * Section Feature
 	 */
+	private final Context mContext;
     private SectionAdapter mSectionAdapter;
     private SectionPositionTranslator mPositionTranslator;
 	private boolean headersShown = false, headersSticky = false;
@@ -129,7 +130,8 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	 *                  <br/>- {@link OnItemMoveListener}
 	 *                  <br/>- {@link OnItemSwipeListener}
 	 */
-	public FlexibleAdapter(@Nullable Object listeners) {
+	public FlexibleAdapter(final Context context, @Nullable Object listeners) {
+	    mContext = context;//needed to create empty HeaderViewHolder
 	    if (this instanceof SectionAdapter) {
 	        mSectionAdapter = (SectionAdapter) this;
 	        mPositionTranslator = new SectionPositionTranslator();
@@ -432,11 +434,13 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	    
 	    
         public HeaderViewHolder(RecyclerView.ViewHolder itemHolder) {
-            super(new FrameLayout(itemHolder.itemView.getContext()));
+            super(new FrameLayout(mContext));
             this.layout = (FrameLayout) this.itemView;
-            this.layout.setClipChildren(false);
-            this.realItemHolder = itemHolder;
-            this.layout.addView(this.realItemHolder.itemView);
+            if (itemHolder != null) {
+                this.layout.setClipChildren(false);
+                this.realItemHolder = itemHolder;
+                this.layout.addView(this.realItemHolder.itemView);
+            }
         }
 	}
 
@@ -445,7 +449,11 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 	/*---------------------*/
 	
 
-	private static int HEADER_TYPE_FLAG = 0x80000000;
+    private static int HEADER_TYPE_FLAG = 0x80000000;
+    
+    //if you return that type FlexibleAdapter will hande it as a section
+    //without a header
+    protected static int SECTION_NO_HEADER_VIEW_TYPE = 0x08000000;
 	
 	/**
      * Returns the view type for the header
@@ -494,17 +502,19 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
                 result |= HEADER_TYPE_FLAG;
             }
             return result;
+        } else {
+            // TODO: what to return here?
+            return -1;
         }
-        // TODO: what to return here?
-        return -1;
     }
 	
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
             int viewType) {
         //TODO: how to handle non section adapter?
-        if ((viewType & HEADER_TYPE_FLAG) != 0) {
-            return new HeaderViewHolder(onCreateSectionHeaderViewHolder(parent, viewType & ~HEADER_TYPE_FLAG));
+        if (viewType != -1 && (viewType & HEADER_TYPE_FLAG) != 0) {
+            viewType &= ~HEADER_TYPE_FLAG;
+            return new HeaderViewHolder(onCreateSectionHeaderViewHolder(parent, viewType));
         }
         return onCreateSectionChildViewHolder(parent, viewType);
     }
