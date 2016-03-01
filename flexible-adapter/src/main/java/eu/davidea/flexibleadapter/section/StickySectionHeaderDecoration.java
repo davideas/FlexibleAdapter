@@ -175,7 +175,8 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
             for (int i = 0; i < childCount; i++) {
                 final View child = mRecyclerView.getChildAt(i);
                 int adapterPos = mRecyclerView.getChildAdapterPosition(child);
-                final long headerId = mAdapter.getSectionId(adapterPos);
+                int sectionIndex = mAdapter.getSectionPosition(adapterPos);
+                final long headerId = mAdapter.getSectionId(sectionIndex);
                 //headerId == null means new section with no header!
                 if (headerId == RecyclerView.NO_ID || headerId != mHeaderId) {
                     if (orientation == LinearLayoutManager.HORIZONTAL) {
