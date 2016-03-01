@@ -239,7 +239,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		int positionStart = 0, itemCount = 0;
 		for (int i = 0; i < getItemCount(); i++) {
 			if (isSelectable(i) &&
-					(viewTypesToSelect.size() == 0 || viewTypesToSelect.contains(getItemViewType(i)))) {
+					(viewTypesToSelect.isEmpty() || viewTypesToSelect.contains(getItemViewType(i)))) {
 				mSelectedPositions.add(i);
 				itemCount++;
 			} else {
