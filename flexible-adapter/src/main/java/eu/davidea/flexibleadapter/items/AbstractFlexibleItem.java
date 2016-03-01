@@ -33,6 +33,8 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 		implements IFlexible<VH> {
 
+	private static final String MAPPING_ILLEGAL_STATE = "If you want FlexibleAdapter creates and binds ViewHolder for you, you must override and implement the method ";
+
 	/* Item flags recognized by the FlexibleAdapter */
 	protected boolean mEnabled = true, mHidden = false,
 			mSelectable = true, mSelected = false,
@@ -123,8 +125,6 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	/*---------------------*/
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/
-
-	private static final String MAPPING_ILLEGAL_STATE = "If you want FlexibleAdapter creates and binds ViewHolder for you, you must override and implement the method ";
 
 //	/**
 //	 * Wrapper of {#getLayoutRes()}.

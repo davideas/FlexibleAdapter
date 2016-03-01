@@ -240,7 +240,7 @@ public class FastScroller extends FrameLayout {
 		}
 	}
 
-	private int getValueInRange(int min, int max, int value) {
+	private static int getValueInRange(int min, int max, int value) {
 		int minimum = Math.max(min, value);
 		return Math.min(minimum, max);
 	}
