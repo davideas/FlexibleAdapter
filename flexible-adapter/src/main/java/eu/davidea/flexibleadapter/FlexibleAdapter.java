@@ -488,7 +488,12 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
                     .getPackedPositionSection(expandablePosition);
             final int sectionItemIndex = SectionAdapterHelper
                     .getPackedPositionChild(expandablePosition);
-            return getSectionViewType(position, sectionIndex, sectionItemIndex);
+            
+            int result = getSectionViewType(position, sectionIndex, sectionItemIndex);
+            if (sectionItemIndex == RecyclerView.NO_POSITION) {
+                result |= HEADER_TYPE_FLAG;
+            }
+            return result;
         }
         // TODO: what to return here?
         return -1;
