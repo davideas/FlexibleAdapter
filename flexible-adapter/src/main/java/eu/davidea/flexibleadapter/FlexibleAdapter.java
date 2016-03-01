@@ -222,17 +222,22 @@ public class FlexibleAdapter<T extends IFlexible>
 		int position = 0;
 		while (position < mItems.size()) {
 			T item = getItem(position);
-			//Map the view type if not done yet
-			//mapViewTypeFrom(item);
-			if (isExpandable(item)) {
-				IExpandable expandable = (IExpandable) item;
-				if (expandable.isExpanded()) {
-					if (DEBUG) Log.v(TAG, "Initially expand item on position " + position);
-					position += addAllSubItemsFrom(position, expandable, false, null);
-				}
-			}
+			position = getPosition(position, item);
 			position++;
 		}
+	}
+
+	private int getPosition(int position, T item) {
+		//Map the view type if not done yet
+		//mapViewTypeFrom(item);
+		if (isExpandable(item)) {
+			IExpandable expandable = (IExpandable) item;
+			if (expandable.isExpanded()) {
+				if (DEBUG) Log.v(TAG, "Initially expand item on position " + position);
+				position += addAllSubItemsFrom(position, expandable, false, null);
+			}
+		}
+		return position;
 	}
 
 	/*------------------------------*/
@@ -1009,16 +1014,20 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (isExpandable(parent)) {
 				IExpandable expandable = (IExpandable) parent;
 				if (expandable.isExpanded() && hasSubItems(expandable)) {
-					List<T> list = expandable.getSubItems();
-					for (T subItem : list) {
-						//Pick up only no-hidden items
-						if (!subItem.isHidden() && subItem.equals(child))
-							return expandable;
-					}
+					return findExpandable(expandable.getSubItems(), child) ? expandable : null;
 				}
 			}
 		}
 		return null;
+	}
+
+	private boolean findExpandable(List<T> list, T child) {
+		for (T subItem : list) {
+			//Pick up only no-hidden items
+			if (!subItem.isHidden() && subItem.equals(child))
+				return Boolean.TRUE;
+		}
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -1151,17 +1160,21 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Expand!
 			notifyItemRangeInserted(position + 1, subItemsCount);
 			//Show also the headers of the subItems
-			if (headersShown) {
-				int count = 0;
-				for (T subItem : subItems) {
-					if (showHeaderOf(position + (++count), subItem)) count++;
-				}
-			}
+			showSubItemHeaders(position, subItems);
 
 			if (DEBUG)
 				Log.v(TAG, "Expanded " + subItemsCount + " subItems on position=" + position + " ExpandedItems=" + getExpandedPositions());
 		}
 		return subItemsCount;
+	}
+
+	private void showSubItemHeaders(int position, List<T> subItems) {
+		if (headersShown) {
+			int count = 0;
+			for (T subItem : subItems) {
+				if (showHeaderOf(position + (++count), subItem)) count++;
+			}
+		}
 	}
 
 	/**
@@ -1737,21 +1750,25 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		//Remove orphan headers
 		if (removeOrphanHeaders) {
-			for (IHeader orphanHeader : mOrphanHeaders) {
-				int headerPosition = getGlobalPositionOf(orphanHeader);
-				if (headerPosition >= 0) {
-					if (DEBUG) Log.d(TAG, "Removing orphan header " + orphanHeader);
-					createRestoreItemInfo(headerPosition, (T) orphanHeader, payload);
-					mItems.remove(headerPosition);
-					notifyItemRemoved(headerPosition);
-				}
-			}
-			mOrphanHeaders.clear();
+			doRemoveOrphanHeaders(payload);
 		}
 
 		//Update empty view
 		if (mUpdateListener != null && !multiRange && initialCount != getItemCount())
 			mUpdateListener.onUpdateEmptyView(getItemCount());
+	}
+
+	private void doRemoveOrphanHeaders(@Nullable Object payload) {
+		for (IHeader orphanHeader : mOrphanHeaders) {
+			int headerPosition = getGlobalPositionOf(orphanHeader);
+			if (headerPosition >= 0) {
+				if (DEBUG) Log.d(TAG, "Removing orphan header " + orphanHeader);
+				createRestoreItemInfo(headerPosition, (T) orphanHeader, payload);
+				mItems.remove(headerPosition);
+				notifyItemRemoved(headerPosition);
+			}
+		}
+		mOrphanHeaders.clear();
 	}
 
 	/**
@@ -2069,31 +2086,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (hasSearchText()) {
 			int newOriginalPosition = -1;
 			for (T item : unfilteredItems) {
-				if (filterExpandableObject(item, getSearchText())) {
-					RestoreInfo restoreInfo = getPendingRemovedItem(item);
-					if (restoreInfo != null) {
-						//If found point to the new reference while filtering
-						restoreInfo.filterRefItem = ++newOriginalPosition < values.size() ? values.get(newOriginalPosition) : null;
-					} else {
-						values.add(item);
-						newOriginalPosition++;
-						if (isExpandable(item)) {
-							IExpandable expandable = (IExpandable) item;
-							if (expandable.isExpanded()) {
-								List<T> filteredSubItems = new ArrayList<T>();
-								//Add subItems if not hidden by filterObject()
-								List<T> subItems = expandable.getSubItems();
-								for (T subItem : subItems) {
-									if (!subItem.isHidden()) filteredSubItems.add(subItem);
-								}
-								//Map the view types if not done yet
-								//mapViewTypesFrom(filteredSubItems);
-								values.addAll(filteredSubItems);
-								newOriginalPosition += filteredSubItems.size();
-							}
-						}
-					}
-				}
+				newOriginalPosition = getNewOriginalPosition(values, newOriginalPosition, item);
 			}
 		} else {
 			values = unfilteredItems; //with no filter
@@ -2125,6 +2118,35 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Call listener to update EmptyView
 		if (mUpdateListener != null && initialCount != getItemCount())
 			mUpdateListener.onUpdateEmptyView(getItemCount());
+	}
+
+	private int getNewOriginalPosition(List<T> values, int newOriginalPosition, T item) {
+		if (filterExpandableObject(item, getSearchText())) {
+			RestoreInfo restoreInfo = getPendingRemovedItem(item);
+			if (restoreInfo != null) {
+				//If found point to the new reference while filtering
+				// restoreInfo.filterRefItem = ++newOriginalPosition < values.size() ? values.get(newOriginalPosition) : null;
+			} else {
+				values.add(item);
+				newOriginalPosition++;
+				if (isExpandable(item)) {
+					IExpandable expandable = (IExpandable) item;
+					if (expandable.isExpanded()) {
+						List<T> filteredSubItems = new ArrayList<T>();
+						//Add subItems if not hidden by filterObject()
+						// List<T> subItems = expandable.getSubItems();
+						for (T subItem : subItems) {
+							if (!subItem.isHidden()) filteredSubItems.add(subItem);
+						}
+						//Map the view types if not done yet
+						//mapViewTypesFrom(filteredSubItems);
+						values.addAll(filteredSubItems);
+						newOriginalPosition += filteredSubItems.size();
+					}
+				}
+			}
+		}
+		return newOriginalPosition;
 	}
 
 	/**
