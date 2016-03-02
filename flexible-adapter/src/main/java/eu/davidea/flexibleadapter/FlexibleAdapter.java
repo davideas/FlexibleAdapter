@@ -35,10 +35,11 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
-import eu.davidea.fastscroller.FastScroller.BubbleTextCreator;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.section.SectionAdapter;
@@ -90,7 +91,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  */
 @SuppressWarnings({ "unchecked" })
 public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
-        implements ItemTouchHelperCallback.AdapterCallback, BubbleTextCreator {
+        implements ItemTouchHelperCallback.AdapterCallback {
 
     private static final String TAG = FlexibleAdapter.class.getSimpleName();
     private static final String EXTRA_HEADERS = TAG + "_headersShown";
@@ -594,8 +595,6 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
             int position, int sectionIndex, int sectionItemIndex,
             boolean selected);
 
-    public abstract String onCreateSectionBubbleText(int position, int sectionIndex, int sectionItemIndex);
-
     @Override
     public int getItemViewType(int position) {
         if (mSectionAdapter != null) {
@@ -655,22 +654,6 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
             }
             
         }
-    }
-    
-
-    @Override
-    public String onCreateBubbleText(int position) {
-        if (mSectionAdapter != null) {
-            final long expandablePosition = mPositionTranslator
-                    .getExpandablePosition(position);
-            final int sectionIndex = SectionAdapterHelper
-                    .getPackedPositionSection(expandablePosition);
-            final int sectionItemIndex = SectionAdapterHelper
-                    .getPackedPositionChild(expandablePosition);
-            return onCreateSectionBubbleText(position, sectionIndex,
-                    sectionItemIndex);
-        }
-        return null;
     }
 
     public boolean isHeader(int position) {
@@ -1276,6 +1259,13 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
                 .getExpandablePosition(flatPosition);
         return SectionAdapterHelper
                 .getPackedPositionSection(expandablePosition);
+    }
+    
+    public int getSectionItemIndex(int flatPosition) {
+        final long expandablePosition = mPositionTranslator
+                .getExpandablePosition(flatPosition);
+        return SectionAdapterHelper
+                .getPackedPositionChild(expandablePosition);
     }
 
     public int getFlatPosition(long packedPosition) {
