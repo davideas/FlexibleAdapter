@@ -132,7 +132,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 				View view = moves.get(0).holder.itemView;
 				ViewCompat.postOnAnimationDelayed(view, mover, getRemoveDuration());
 			} else {
-				mover.run();
+				new Thread(mover).start();
 			}
 		}
 		// Next, change stuff, to run in parallel with move animations
@@ -155,7 +155,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 				ViewHolder holder = changes.get(0).oldHolder;
 				ViewCompat.postOnAnimationDelayed(holder.itemView, changer, getRemoveDuration());
 			} else {
-				changer.run();
+				new Thread(changer).start();
 			}
 		}
 		// Next, add stuff
@@ -181,7 +181,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 				View view = additions.get(0).itemView;
 				ViewCompat.postOnAnimationDelayed(view, adder, totalDelay);
 			} else {
-				adder.run();
+				new Thread(adder).start();
 			}
 		}
 	}
