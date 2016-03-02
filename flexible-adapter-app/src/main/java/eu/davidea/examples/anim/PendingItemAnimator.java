@@ -109,7 +109,7 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
 				View view = mMoves.get(0).holder.itemView;
 				ViewCompat.postOnAnimationDelayed(view, mover, getRemoveDuration());
 			} else {
-				mover.run();
+				new Thread(mover).start();
 			}
 		}
 	}
@@ -144,7 +144,7 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
 						, (removalsPending ? getRemoveDuration() : 0)
 						+ (movesPending ? getMoveDuration() : 0));
 			} else {
-				adder.run();
+				new Thread(adder).start();
 			}
 		}
 	}
