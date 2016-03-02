@@ -19,16 +19,16 @@ import java.util.ArrayList;
  **/
 public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleItemAnimator {
 
-	private ArrayList<H> mPendingRemovals = new ArrayList<H>();
-	private ArrayList<H> mPendingAdditions = new ArrayList<H>();
-	private ArrayList<MoveInfo> mPendingMoves = new ArrayList<MoveInfo>();
+	private ArrayList<H> mPendingRemovals = new ArrayList<>();
+	private ArrayList<H> mPendingAdditions = new ArrayList<>();
+	private ArrayList<MoveInfo> mPendingMoves = new ArrayList<>();
 
-	private ArrayList<H> mAdditions = new ArrayList<H>();
-	private ArrayList<MoveInfo> mMoves = new ArrayList<MoveInfo>();
+	private ArrayList<H> mAdditions = new ArrayList<>();
+	private ArrayList<MoveInfo> mMoves = new ArrayList<>();
 
-	private ArrayList<H> mAddAnimations = new ArrayList<H>();
-	private ArrayList<ViewHolder> mMoveAnimations = new ArrayList<ViewHolder>();
-	private ArrayList<H> mRemoveAnimations = new ArrayList<H>();
+	private ArrayList<H> mAddAnimations = new ArrayList<>();
+	private ArrayList<ViewHolder> mMoveAnimations = new ArrayList<>();
+	private ArrayList<H> mRemoveAnimations = new ArrayList<>();
 
 	private static class MoveInfo {
 		public ViewHolder holder;

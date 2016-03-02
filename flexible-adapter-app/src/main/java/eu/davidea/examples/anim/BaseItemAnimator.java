@@ -113,7 +113,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 		mPendingRemovals.clear();
 		// Next, move stuff
 		if (movesPending) {
-			final ArrayList<MoveInfo> moves = new ArrayList<MoveInfo>();
+			final ArrayList<MoveInfo> moves = new ArrayList<>();
 			moves.addAll(mPendingMoves);
 			mMovesList.add(moves);
 			mPendingMoves.clear();
@@ -137,7 +137,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 		}
 		// Next, change stuff, to run in parallel with move animations
 		if (changesPending) {
-			final ArrayList<ChangeInfo> changes = new ArrayList<ChangeInfo>();
+			final ArrayList<ChangeInfo> changes = new ArrayList<>();
 			changes.addAll(mPendingChanges);
 			mChangesList.add(changes);
 			mPendingChanges.clear();
@@ -160,7 +160,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 		}
 		// Next, add stuff
 		if (additionsPending) {
-			final ArrayList<ViewHolder> additions = new ArrayList<ViewHolder>();
+			final ArrayList<ViewHolder> additions = new ArrayList<>();
 			additions.addAll(mPendingAdditions);
 			mAdditionsList.add(additions);
 			mPendingAdditions.clear();
