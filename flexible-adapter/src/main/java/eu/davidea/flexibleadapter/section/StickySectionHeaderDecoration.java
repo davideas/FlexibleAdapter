@@ -25,7 +25,6 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.FlexibleAdapter.HeaderViewHolder;
 
 /**
  * A sticky header decoration for RecyclerView, to use only with
@@ -36,7 +35,7 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
     private RecyclerView mRecyclerView;
     private FrameLayout mStickyHolder;
     private FlexibleAdapter mAdapter;
-    private HeaderViewHolder mHeader;
+    private StickyHeaderViewHolder mHeader;
 
     /* --- Header state --- */
     private long mSectionIndex = -1;
@@ -153,8 +152,8 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
                 int sectionHeaderPosition = mAdapter.getFlatPosition(sectionIndex, RecyclerView.NO_POSITION);
                 final RecyclerView.ViewHolder holder = getHeader(mRecyclerView, sectionHeaderPosition);
                 //                final View header = mAdapter.getHeaderView(mHeaderPosition, mHeader, this);
-                if ((holder== null || holder instanceof HeaderViewHolder) && mHeader != holder) {
-                    swapHeader((HeaderViewHolder) holder);
+                if ((holder== null || holder instanceof StickyHeaderViewHolder) && mHeader != holder) {
+                    swapHeader((StickyHeaderViewHolder) holder);
 
                 }
                 else if(mHeader != null) {
@@ -164,8 +163,8 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
                 //make sure if the real header (one created by the layoutManager
                 //appear, we use it!
                 RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForAdapterPosition(headerPosition);
-                if (holder instanceof HeaderViewHolder && holder != mHeader) {
-                    swapHeader((HeaderViewHolder) holder);
+                if (holder instanceof StickyHeaderViewHolder && holder != mHeader) {
+                    swapHeader((StickyHeaderViewHolder) holder);
                 }
             }
         }
@@ -178,6 +177,13 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
             final int childCount = mRecyclerView.getChildCount();
             for (int i = 0; i < childCount; i++) {
                 final View child = mRecyclerView.getChildAt(i);
+                if (i == 0) {
+                    int top = child.getTop();
+                    if (top == 0) {
+                        clearHeader();
+                        return;
+                    }
+                }
                 int adapterPos = mRecyclerView.getChildAdapterPosition(child);
                 int sectionIndex = mAdapter.getSectionIndex(adapterPos);
                 if (sectionIndex != mSectionIndex) {
@@ -220,7 +226,7 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
         }
     }
     
-    private void resetHeader(HeaderViewHolder header) {
+    private void resetHeader(StickyHeaderViewHolder header) {
         if (header.realItemHolder == null) {
             return;
         }
@@ -241,7 +247,7 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
         }
     }
 
-    private void swapHeader(HeaderViewHolder newHeader) {
+    private void swapHeader(StickyHeaderViewHolder newHeader) {
         if (mHeader != null) {
             resetHeader(mHeader);
        }

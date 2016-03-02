@@ -33,8 +33,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.ListView.FixedViewInfo;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -42,6 +47,8 @@ import java.util.Set;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
+import eu.davidea.flexibleadapter.section.StickyHeaderViewHolder;
+import eu.davidea.flexibleadapter.section.HeaderViewHolder;
 import eu.davidea.flexibleadapter.section.SectionAdapter;
 import eu.davidea.flexibleadapter.section.SectionAdapterHelper;
 import eu.davidea.flexibleadapter.section.SectionPositionTranslator;
@@ -108,6 +115,22 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     private GridLayoutManager.SpanSizeLookup externalSpanSizeLookup;
     private StickySectionHeaderDecoration stickyHeaderDecoration;
     private boolean stickyHeaderDecorationAttached = false;
+    
+    /**
+     * Header/Footer
+     */
+    
+    public static final int ITEM_VIEW_TYPE_HEADER_OR_FOOTER = -2;
+    public class FixedViewInfo {
+        /** The view to add to the list */
+        public View view;
+        /** The data backing the view. This is returned from {@link ListAdapter#getItem(int)}. */
+        public Object data;
+        /** <code>true</code> if the fixed view should be selectable in the list */
+        public boolean isSelectable;
+    }
+    private ArrayList<FixedViewInfo> mHeaderViewInfos = null;
+    private ArrayList<FixedViewInfo> mFooterViewInfos = null;
 
     /**
      * Used to save deleted items and to recover them (Undo).
@@ -284,48 +307,138 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
                                        // passed
         }
     }
+    
+    /*--------------*/
+    /* HEADER FOOTER */
+    /*--------------*/
+
+    
+    public void addHeaderView(View v) {
+        addHeaderView(v, null, true);
+    }
+    public void addHeaderView(View v, Object data, boolean isSelectable) {
+        final FixedViewInfo info = new FixedViewInfo();
+        info.view = v;
+        info.data = data;
+        info.isSelectable = isSelectable;
+        if (mHeaderViewInfos == null) {
+            mHeaderViewInfos = new ArrayList<>();
+        }
+        mHeaderViewInfos.add(info);
+        notifyDataSetChanged();
+    }
+    
+    public void addFooterView(View v) {
+        addFooterView(v, null, true);
+    }
+    public void addFooterView(View v, Object data, boolean isSelectable) {
+        final FixedViewInfo info = new FixedViewInfo();
+        info.view = v;
+        info.data = data;
+        info.isSelectable = isSelectable;
+        if (mFooterViewInfos == null) {
+            mFooterViewInfos = new ArrayList<>();
+        }
+        mFooterViewInfos.add(info);
+        notifyDataSetChanged();
+    }
+    
+    public boolean removeHeader(View v) {
+        if (mHeaderViewInfos == null) {
+            return false;
+        }
+        for (int i = 0; i < mHeaderViewInfos.size(); i++) {
+            FixedViewInfo info = mHeaderViewInfos.get(i);
+            if (info.view == v) {
+                mHeaderViewInfos.remove(i);
+                notifyDataSetChanged();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean removeFooter(View v) {
+        if (mFooterViewInfos == null) {
+            return false;
+        }
+        for (int i = 0; i < mFooterViewInfos.size(); i++) {
+            FixedViewInfo info = mFooterViewInfos.get(i);
+            if (info.view == v) {
+                mFooterViewInfos.remove(i);
+                notifyDataSetChanged();
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    public int getHeadersCount() {
+        if (mHeaderViewInfos != null) {
+            return mHeaderViewInfos.size();
+        }
+        return 0;
+    }
+
+    public int getFootersCount() {
+        if (mFooterViewInfos != null) {
+            return mFooterViewInfos.size();
+        }
+        return 0;
+    }
 
     /*--------------*/
     /* MAIN METHODS */
     /*--------------*/
-
-    @Override
-    public int getItemCount() {
+    
+    protected int getRealItemCount() {
         int count = 0;
         if (mPositionTranslator != null) {
             count+= mPositionTranslator.getItemCount();
         }
-//        if (currentlyHiddenItems != null) {
-//            count-= currentlyHiddenItems.size();
-//        }
         return count;
     }
 
     @Override
-    public long getItemId(int position) {
-        if (mPositionTranslator != null) {
-            final long expandablePosition = mPositionTranslator
-                    .getExpandablePosition(position);
-            final int sectionIndex = SectionAdapterHelper
-                    .getPackedPositionSection(expandablePosition);
-            final int sectionItemIndex = SectionAdapterHelper
-                    .getPackedPositionChild(expandablePosition);
+    public int getItemCount() {
+        return getRealItemCount() + getFootersCount() + getHeadersCount();
+    }
 
-            if (sectionItemIndex == RecyclerView.NO_POSITION) {
-                final long groupId = mSectionAdapter.getSectionId(sectionIndex);
-                return SectionAdapterHelper.getCombinedSectionId(groupId);
-            } else {
-                final long groupId = mSectionAdapter.getSectionId(sectionIndex);
-                final long childId = mSectionAdapter.getChildId(sectionIndex,
-                        sectionItemIndex);
-                if (childId == RecyclerView.NO_ID) {
-                    return RecyclerView.NO_ID;
+    @Override
+    public long getItemId(int position) {
+        int numHeaders = getHeadersCount();
+        if (position >= numHeaders) {
+            int adjPosition = position - numHeaders;
+            int adapterCount = getRealItemCount();
+            if (adjPosition < adapterCount) {
+                position = adjPosition;
+                if (mPositionTranslator != null) {
+                    final long expandablePosition = mPositionTranslator
+                            .getExpandablePosition(position);
+                    final int sectionIndex = SectionAdapterHelper
+                            .getPackedPositionSection(expandablePosition);
+                    final int sectionItemIndex = SectionAdapterHelper
+                            .getPackedPositionChild(expandablePosition);
+
+                    if (sectionItemIndex == RecyclerView.NO_POSITION) {
+                        final long groupId = mSectionAdapter.getSectionId(sectionIndex);
+                        return SectionAdapterHelper.getCombinedSectionId(groupId);
+                    } else {
+                        final long groupId = mSectionAdapter.getSectionId(sectionIndex);
+                        final long childId = mSectionAdapter.getChildId(sectionIndex,
+                                sectionItemIndex);
+                        if (childId == RecyclerView.NO_ID) {
+                            return RecyclerView.NO_ID;
+                        }
+                        return SectionAdapterHelper.getCombinedChildId(groupId,
+                                childId);
+                    }
                 }
-                return SectionAdapterHelper.getCombinedChildId(groupId,
-                        childId);
             }
         }
-        return position;
+        return -1;
     }
 
     public long getSectionId(int sectionIndex) {
@@ -523,20 +636,7 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     //// }
     // }
 
-    public class HeaderViewHolder extends RecyclerView.ViewHolder {
-        public RecyclerView.ViewHolder realItemHolder;
-        public FrameLayout layout;
-
-        public HeaderViewHolder(RecyclerView.ViewHolder itemHolder) {
-            super(new FrameLayout(mContext));
-            this.layout = (FrameLayout) this.itemView;
-            if (itemHolder != null) {
-                this.layout.setClipChildren(false);
-                this.realItemHolder = itemHolder;
-                this.layout.addView(this.realItemHolder.itemView);
-            }
-        }
-    }
+    
 
     /*---------------------*/
     /* VIEW HOLDER METHODS */
@@ -597,36 +697,49 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 
     @Override
     public int getItemViewType(int position) {
-        if (mSectionAdapter != null) {
-            final long expandablePosition = mPositionTranslator
-                    .getExpandablePosition(position);
-            final int sectionIndex = SectionAdapterHelper
-                    .getPackedPositionSection(expandablePosition);
-            final int sectionItemIndex = SectionAdapterHelper
-                    .getPackedPositionChild(expandablePosition);
+        int numHeaders = getHeadersCount();
+        if (position >= numHeaders) {
+            int adjPosition = position - numHeaders;
+            int adapterCount = getRealItemCount();
+            if (adjPosition < adapterCount) {
+                position = adjPosition;
+                if (mSectionAdapter != null) {
+                    final long expandablePosition = mPositionTranslator
+                            .getExpandablePosition(position);
+                    final int sectionIndex = SectionAdapterHelper
+                            .getPackedPositionSection(expandablePosition);
+                    final int sectionItemIndex = SectionAdapterHelper
+                            .getPackedPositionChild(expandablePosition);
 
-            int result = getSectionViewType(position, sectionIndex,
-                    sectionItemIndex);
-            if (sectionItemIndex == RecyclerView.NO_POSITION) {
-                result |= HEADER_TYPE_FLAG;
+                    int result = getSectionViewType(position, sectionIndex,
+                            sectionItemIndex);
+                    if (sectionItemIndex == RecyclerView.NO_POSITION) {
+                        result |= HEADER_TYPE_FLAG;
+                    }
+                    return result;
+                } else {
+                    return -1;
+                }
             }
-            return result;
-        } else {
-            // TODO: what to return here?
-            return -1;
         }
+
+        return ITEM_VIEW_TYPE_HEADER_OR_FOOTER;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
             int viewType) {
+        
+        if (viewType == ITEM_VIEW_TYPE_HEADER_OR_FOOTER) {
+            return new HeaderViewHolder(parent.getContext());
+        }
         // TODO: how to handle non section adapter?
         if (viewType != -1 && (viewType & HEADER_TYPE_FLAG) != 0) {
             viewType &= ~HEADER_TYPE_FLAG;
             if (viewType == SECTION_NO_HEADER_VIEW_TYPE) {
-                return new HeaderViewHolder(null);
+                return new StickyHeaderViewHolder(mContext, null);
             } else {
-                return new HeaderViewHolder(
+                return new StickyHeaderViewHolder(mContext, 
                         onCreateSectionHeaderViewHolder(parent, viewType));
             }
         }
@@ -635,24 +748,47 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (mSectionAdapter != null) {
-            final long expandablePosition = mPositionTranslator
-                    .getExpandablePosition(position);
-            final int sectionIndex = SectionAdapterHelper
-                    .getPackedPositionSection(expandablePosition);
-            final int sectionItemIndex = SectionAdapterHelper
-                    .getPackedPositionChild(expandablePosition);
+        // Header (negative positions will throw an IndexOutOfBoundsException)
+        int numHeaders = getHeadersCount();
+        if (position < numHeaders) {
             if (holder instanceof HeaderViewHolder) {
-                holder = ((HeaderViewHolder) holder).realItemHolder;
+                ((HeaderViewHolder) holder).layout.removeAllViews();
+                ((HeaderViewHolder) holder).layout
+                        .addView(mHeaderViewInfos.get(position).view);
+                return;
             }
-            if (holder != null) {
-                // When user scrolls, this line binds the correct selection status
-                final boolean isSelected = isSelected(position);
-                holder.itemView.setActivated(isSelected);
-                onBindSectionViewHolder(holder, position, sectionIndex,
-                        sectionItemIndex, isSelected);
+        }
+
+        // Adapter
+        final int adjPosition = position - numHeaders;
+        int adapterCount = getRealItemCount();
+        if (adjPosition < adapterCount) {
+            if (mSectionAdapter != null) {
+                final long expandablePosition = mPositionTranslator
+                        .getExpandablePosition(adjPosition);
+                final int sectionIndex = SectionAdapterHelper
+                        .getPackedPositionSection(expandablePosition);
+                final int sectionItemIndex = SectionAdapterHelper
+                        .getPackedPositionChild(expandablePosition);
+                if (holder instanceof StickyHeaderViewHolder) {
+                    holder = ((StickyHeaderViewHolder) holder).realItemHolder;
+                }
+                if (holder != null) {
+                    // When user scrolls, this line binds the correct selection
+                    // status
+                    final boolean isSelected = isSelected(adjPosition);
+                    holder.itemView.setActivated(isSelected);
+                    onBindSectionViewHolder(holder, adjPosition, sectionIndex,
+                            sectionItemIndex, isSelected);
+                    return;
+                }
+
             }
-            
+        }
+        if (mFooterViewInfos != null && holder instanceof HeaderViewHolder) {
+            ((HeaderViewHolder) holder).layout.removeAllViews();
+            ((HeaderViewHolder) holder).layout.addView(
+                    mFooterViewInfos.get(adjPosition - adapterCount).view);
         }
     }
 
