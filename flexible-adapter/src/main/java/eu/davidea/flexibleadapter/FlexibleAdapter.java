@@ -645,11 +645,14 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
             if (holder instanceof HeaderViewHolder) {
                 holder = ((HeaderViewHolder) holder).realItemHolder;
             }
-            final boolean isSelected = isSelected(position);
-            // When user scrolls, this line binds the correct selection status
-            holder.itemView.setActivated(isSelected);
-            onBindSectionViewHolder(holder, position, sectionIndex,
-                    sectionItemIndex, isSelected);
+            if (holder != null) {
+                // When user scrolls, this line binds the correct selection status
+                final boolean isSelected = isSelected(position);
+                holder.itemView.setActivated(isSelected);
+                onBindSectionViewHolder(holder, position, sectionIndex,
+                        sectionItemIndex, isSelected);
+            }
+            
         }
     }
 
