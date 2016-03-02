@@ -31,6 +31,8 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * This class is an implementation of {@link Callback} that enables drag & drop
  * and swipe actions. Drag and Swipe events are started depending by its configuration.
  *
+ * TODO: http://cjainewbw.blogspot.be/2015/06/design-support-library-recyclerview.html
+ *
  * @author Davide Steduto
  * @since 23/01/2016 Created
  */
