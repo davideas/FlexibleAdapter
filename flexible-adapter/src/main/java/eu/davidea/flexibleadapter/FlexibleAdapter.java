@@ -48,11 +48,11 @@ import java.util.Set;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.section.StickyHeaderViewHolder;
+import eu.davidea.flexibleadapter.section.StickySectionHeaderManager;
 import eu.davidea.flexibleadapter.section.HeaderViewHolder;
 import eu.davidea.flexibleadapter.section.SectionAdapter;
 import eu.davidea.flexibleadapter.section.SectionAdapterHelper;
 import eu.davidea.flexibleadapter.section.SectionPositionTranslator;
-import eu.davidea.flexibleadapter.section.StickySectionHeaderDecoration;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -113,7 +113,7 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     private boolean headersShown = false, headersSticky = false;
     private GridLayoutManager.SpanSizeLookup gridSpanSizeLookup;
     private GridLayoutManager.SpanSizeLookup externalSpanSizeLookup;
-    private StickySectionHeaderDecoration stickyHeaderDecoration;
+    private StickySectionHeaderManager stickyHeaderManager;
     private boolean stickyHeaderDecorationAttached = false;
 
     /**
@@ -525,28 +525,25 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
         // Add or Remove the sticky headers decoration
         if (headersSticky) {
             this.headersSticky = true;
-            if (stickyHeaderDecoration == null) {
-                stickyHeaderDecoration = new StickySectionHeaderDecoration(
-                        this);
+            if (stickyHeaderManager == null) {
+                stickyHeaderManager = new StickySectionHeaderManager(this);
             }
             if (!stickyHeaderDecorationAttached && headersShown
                     && mRecyclerView != null) {
                 stickyHeaderDecorationAttached = true;
-                stickyHeaderDecoration.setParent(mRecyclerView);
-                mRecyclerView.addItemDecoration(stickyHeaderDecoration);
-                stickyHeaderDecoration.setStickyHeadersHolder(
+                stickyHeaderManager.attachToRecyclerView(mRecyclerView);
+                stickyHeaderManager.setStickyHeadersHolder(
                         getStickySectionHeadersHolder());
             }
-        } else if (stickyHeaderDecoration != null) {
+        } else if (stickyHeaderManager != null) {
             this.headersSticky = false;
 
-            if (stickyHeaderDecoration != null) {
+            if (stickyHeaderManager != null) {
                 if (mRecyclerView != null) {
-                    mRecyclerView.removeItemDecoration(stickyHeaderDecoration);
-                    stickyHeaderDecoration.setParent(null);
+                    stickyHeaderManager.detachFromRecyclerView(mRecyclerView);
                 }
-                stickyHeaderDecoration.setStickyHeadersHolder(null);
-                stickyHeaderDecoration = null;
+                stickyHeaderManager.setStickyHeadersHolder(null);
+                stickyHeaderManager = null;
                 stickyHeaderDecorationAttached = false;
             }
 
@@ -556,30 +553,29 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+        mRecyclerView = recyclerView;
         if (mItemTouchHelper != null) {
             mItemTouchHelper.attachToRecyclerView(mRecyclerView);
         }
-        if (stickyHeaderDecoration != null) {
-            stickyHeaderDecoration.setParent(mRecyclerView);
-            stickyHeaderDecoration
-                    .setStickyHeadersHolder(getStickySectionHeadersHolder());
+        if (stickyHeaderManager != null) {
+            stickyHeaderManager.setStickyHeadersHolder(getStickySectionHeadersHolder());
             if (!stickyHeaderDecorationAttached && headersShown) {
                 stickyHeaderDecorationAttached = true;
-                mRecyclerView.addItemDecoration(stickyHeaderDecoration);
+                stickyHeaderManager.attachToRecyclerView(mRecyclerView);
             }
         }
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
-        if (stickyHeaderDecoration != null) {
-            stickyHeaderDecoration.setParent(null);
-            stickyHeaderDecoration.setStickyHeadersHolder(null);
+        if (stickyHeaderManager != null) {
+            stickyHeaderManager.setStickyHeadersHolder(null);
             if (stickyHeaderDecorationAttached) {
                 stickyHeaderDecorationAttached = false;
-                recyclerView.removeItemDecoration(stickyHeaderDecoration);
+                stickyHeaderManager.detachFromRecyclerView(mRecyclerView);
             }
         }
+        mRecyclerView = null;
         super.onDetachedFromRecyclerView(recyclerView);
     }
 
@@ -815,13 +811,13 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
          * @param position
          *            the position of header
          */
-        void onStickyHeaderChange(int position);
+        void onStickyHeaderChange(int sectionIndex);
     }
 
-    public void onStickyHeaderChange(int position) {
+    public void onStickyHeaderChange(int sectionIndex) {
 
         if (mStickyHeaderChangeListener != null) {
-            mStickyHeaderChangeListener.onStickyHeaderChange(position);
+            mStickyHeaderChangeListener.onStickyHeaderChange(sectionIndex);
         }
     }
 
@@ -1467,33 +1463,44 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
 
     public void notifySectionItemRangeInserted(int sectionIndex,
             int sectionItemIndex, int itemCount) {
-        rebuildPositionTranslator();
         final long packedPosition = SectionAdapterHelper
                 .getPackedPositionForChild(sectionIndex, sectionItemIndex);
         final int flatPosition = mPositionTranslator
                 .getFlatPosition(packedPosition);
+        mPositionTranslator.insertChildItems(sectionIndex, sectionItemIndex, itemCount);
         super.notifyItemRangeInserted(flatPosition, itemCount);
-        mRecyclerView.scrollToPosition(flatPosition);
+//        mRecyclerView.scrollToPosition(flatPosition);
     }
 
     public void notifySectionItemRangeRemoved(int sectionIndex,
             int sectionItemIndex, int itemCount) {
-        if (itemCount == 1) {
-
-            if (sectionItemIndex == RecyclerView.NO_POSITION) {
-                mPositionTranslator.removeSectionItem(sectionIndex);
-            } else {
-                mPositionTranslator.removeChildItem(sectionIndex,
-                        sectionItemIndex);
-            }
-        } else {
-            rebuildPositionTranslator();
-        }
         final long packedPosition = SectionAdapterHelper
                 .getPackedPositionForChild(sectionIndex, sectionItemIndex);
         final int flatPosition = mPositionTranslator
                 .getFlatPosition(packedPosition);
+        
+        if (sectionItemIndex == RecyclerView.NO_POSITION) {
+            mPositionTranslator.removeSectionItem(sectionIndex);
+        } else {
+            mPositionTranslator.removeChildItems(sectionIndex,
+                    sectionItemIndex, itemCount);
+        }
+        
         super.notifyItemRangeRemoved(flatPosition, itemCount);
+    }
+    
+    public void notifySectionItemMoved(int fromSectionIndex, int fromSectionItemIndex, int toSectionIndex, int toSectionItemIndex) {
+        long packedPosition = SectionAdapterHelper
+                .getPackedPositionForChild(fromSectionIndex, fromSectionItemIndex);
+        final int fromFlatPosition = mPositionTranslator
+                .getFlatPosition(packedPosition);
+        packedPosition = SectionAdapterHelper
+                .getPackedPositionForChild(toSectionIndex, toSectionItemIndex);
+        final int toFlatPosition = mPositionTranslator
+                .getFlatPosition(packedPosition);
+        
+        mPositionTranslator.moveChildItem(fromSectionIndex, fromSectionItemIndex, toSectionIndex, toSectionItemIndex);
+        super.notifyItemMoved(fromFlatPosition, toFlatPosition);
     }
 
     public void notifySectionItemMoved(int fromPosition, int toPosition,

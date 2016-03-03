@@ -30,7 +30,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * A sticky header decoration for RecyclerView, to use only with
  * {@link FlexibleAdapter}.
  */
-public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
+public class StickySectionHeaderManager extends OnScrollListener {
 
     private RecyclerView mRecyclerView;
     private FrameLayout mStickyHolder;
@@ -38,11 +38,11 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
     private StickyHeaderViewHolder mHeader;
 
     /* --- Header state --- */
-    private long mSectionIndex = -1;
+    private int mSectionIndex = -1;
     // used to not have to call getHeaderId() all the time
     private Integer mHeaderPosition;
     
-    public StickySectionHeaderDecoration(FlexibleAdapter adapter) {
+    public StickySectionHeaderManager(FlexibleAdapter adapter) {
         mAdapter = adapter;
         mAdapter.registerAdapterDataObserver(new AdapterDataObserver() {
             public void onChanged() {
@@ -50,10 +50,10 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
             }
 
             public void onItemRangeChanged(int positionStart, int itemCount) {
-                updateHeader();
+//                updateHeader();
             }
             public void onItemRangeInserted(int positionStart, int itemCount) {
-                updateHeader();
+//                updateHeader();
             }
 
             public void onItemRangeRemoved(int positionStart, int itemCount) {
@@ -61,25 +61,35 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
             }
 
             public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-                updateHeader();
+//                updateHeader();
             }
         });
     }
     
-    private final OnScrollListener scrollListener = new OnScrollListener() {
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy){
-            updateHeader();
-        }
-   };
+    public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+        updateHeader();
+    }
     
-    public void setParent(RecyclerView parent) {
+//    private final OnScrollListener scrollListener = new OnScrollListener() {
+//        
+//   };
+    
+    public void attachToRecyclerView(RecyclerView parent) {
         if (mRecyclerView != null) {
-            mRecyclerView.removeOnScrollListener(scrollListener);
+            mRecyclerView.removeOnScrollListener(this);
             clearHeader();
         }
         mRecyclerView = parent;
         if (mRecyclerView != null) {
-            mRecyclerView.addOnScrollListener(scrollListener);
+            mRecyclerView.addOnScrollListener(this);
+        }
+    }
+    
+    public void detachFromRecyclerView(RecyclerView parent) {
+        if (mRecyclerView == parent) {
+            mRecyclerView.removeOnScrollListener(this);
+            clearHeader();
+            mRecyclerView = null;
         }
     }
     
@@ -152,10 +162,9 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
                 int sectionHeaderPosition = mAdapter.getFlatPosition(sectionIndex, RecyclerView.NO_POSITION);
                 if (sectionHeaderPosition >= 0) {
                     final RecyclerView.ViewHolder holder = getHeader(mRecyclerView, sectionHeaderPosition);
-                    //                final View header = mAdapter.getHeaderView(mHeaderPosition, mHeader, this);
                     if ((holder== null || holder instanceof StickyHeaderViewHolder) && mHeader != holder) {
                         swapHeader((StickyHeaderViewHolder) holder);
-
+                        mAdapter.onStickyHeaderChange(mSectionIndex);
                     }
                     else if(mHeader != null) {
                         ensureHeaderParent();
