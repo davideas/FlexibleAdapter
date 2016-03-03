@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="java"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="lib" path="/Volumes/data/dev/androidSDK/platforms/android-23/android.jar" sourcepath="/Volumes/data/dev/androidSDK/sources/android-23">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/Volumes/data/dev/androidSDK/docs/reference"/>
+		</attributes>
+		<accessrules>
+			<accessrule kind="nonaccessible" pattern="com/android/internal/**"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="lib" path="/titanium-appcompat/lib/android-support-v4.jar"/>
+	<classpathentry exported="true" kind="lib" path="/titanium-ui/lib/android-support-v7-recyclerview.jar" sourcepath="/Volumes/data/dev/androidSDK/extras/android/m2repository/com/android/support/recyclerview-v7/23.1.0/recyclerview-v7-23.1.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Volumes/data/dev/androidSDK/extras/android/m2repository/com/android/support/recyclerview-v7/23.2.0/recyclerview-v7-23.2.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>
