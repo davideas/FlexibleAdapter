@@ -150,15 +150,21 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
             if (mSectionIndex != sectionIndex) {
                 mSectionIndex = sectionIndex;
                 int sectionHeaderPosition = mAdapter.getFlatPosition(sectionIndex, RecyclerView.NO_POSITION);
-                final RecyclerView.ViewHolder holder = getHeader(mRecyclerView, sectionHeaderPosition);
-                //                final View header = mAdapter.getHeaderView(mHeaderPosition, mHeader, this);
-                if ((holder== null || holder instanceof StickyHeaderViewHolder) && mHeader != holder) {
-                    swapHeader((StickyHeaderViewHolder) holder);
+                if (sectionHeaderPosition >= 0) {
+                    final RecyclerView.ViewHolder holder = getHeader(mRecyclerView, sectionHeaderPosition);
+                    //                final View header = mAdapter.getHeaderView(mHeaderPosition, mHeader, this);
+                    if ((holder== null || holder instanceof StickyHeaderViewHolder) && mHeader != holder) {
+                        swapHeader((StickyHeaderViewHolder) holder);
 
+                    }
+                    else if(mHeader != null) {
+                        ensureHeaderParent();
+                    }
+                } else {
+                    //-1 might be a recyclerView header
+                    clearHeader();
                 }
-                else if(mHeader != null) {
-                    ensureHeaderParent();
-                }
+                
             } else {
                 //make sure if the real header (one created by the layoutManager
                 //appear, we use it!
@@ -177,13 +183,7 @@ public class StickySectionHeaderDecoration extends RecyclerView.ItemDecoration {
             final int childCount = mRecyclerView.getChildCount();
             for (int i = 0; i < childCount; i++) {
                 final View child = mRecyclerView.getChildAt(i);
-                if (i == 0) {
-                    int top = child.getTop();
-                    if (top == 0) {
-                        clearHeader();
-                        return;
-                    }
-                }
+                
                 int adapterPos = mRecyclerView.getChildAdapterPosition(child);
                 int sectionIndex = mAdapter.getSectionIndex(adapterPos);
                 if (sectionIndex != mSectionIndex) {

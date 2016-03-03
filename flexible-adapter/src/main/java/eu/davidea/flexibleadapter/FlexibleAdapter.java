@@ -115,20 +115,27 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     private GridLayoutManager.SpanSizeLookup externalSpanSizeLookup;
     private StickySectionHeaderDecoration stickyHeaderDecoration;
     private boolean stickyHeaderDecorationAttached = false;
-    
+
     /**
      * Header/Footer
      */
-    
+
     public static final int ITEM_VIEW_TYPE_HEADER_OR_FOOTER = -2;
+
     public class FixedViewInfo {
         /** The view to add to the list */
         public View view;
-        /** The data backing the view. This is returned from {@link ListAdapter#getItem(int)}. */
+        /**
+         * The data backing the view. This is returned from
+         * {@link ListAdapter#getItem(int)}.
+         */
         public Object data;
-        /** <code>true</code> if the fixed view should be selectable in the list */
+        /**
+         * <code>true</code> if the fixed view should be selectable in the list
+         */
         public boolean isSelectable;
     }
+
     private ArrayList<FixedViewInfo> mHeaderViewInfos = null;
     private ArrayList<FixedViewInfo> mFooterViewInfos = null;
 
@@ -143,10 +150,11 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     private ItemTouchHelperCallback mItemTouchHelperCallback;
     private ItemTouchHelper mItemTouchHelper;
 
-//    /* Filter */
-//    private String mSearchText = "", mOldSearchText = "";
-//    private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
-//    private Set<Integer> currentlyHiddenItems = null;
+    // /* Filter */
+    // private String mSearchText = "", mOldSearchText = "";
+    // private boolean mNotifyChangeOfUnfilteredItems = false, filtering =
+    // false;
+    // private Set<Integer> currentlyHiddenItems = null;
 
     /* Listeners */
     public OnItemClickListener mItemClickListener;
@@ -165,23 +173,17 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
      * 1 = deleteConfirmed when Undo timeout is over
      * </p>
      */
-    protected Handler mHandler = new Handler(Looper.getMainLooper(),
-            new Handler.Callback() {
-                public boolean handleMessage(Message message) {
-                    switch (message.what) {
-//                    case 0: // filterItems
-//                        filterItems(0, getItemCount());
-//                        return true;
-                    // case 1: //confirm delete
-                    // OnDeleteCompleteListener listener =
-                    // (OnDeleteCompleteListener) message.obj;
-                    // if (listener != null) listener.onDeleteConfirmed();
-                    // emptyBin();
-                    // return true;
-                    }
-                    return false;
-                }
-            });
+    protected Handler mHandler=new Handler(Looper.getMainLooper(),new Handler.Callback(){public boolean handleMessage(Message message){switch(message.what){
+    // case 0: // filterItems
+    // filterItems(0, getItemCount());
+    // return true;
+    // case 1: //confirm delete
+    // OnDeleteCompleteListener listener =
+    // (OnDeleteCompleteListener) message.obj;
+    // if (listener != null) listener.onDeleteConfirmed();
+    // emptyBin();
+    // return true;
+    }return false;}});
 
     /*--------------*/
     /* CONSTRUCTORS */
@@ -307,74 +309,58 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
                                        // passed
         }
     }
-    
+
     /*--------------*/
     /* HEADER FOOTER */
     /*--------------*/
 
-    
-    public void addHeaderView(View v) {
-        addHeaderView(v, null, true);
-    }
-    public void addHeaderView(View v, Object data, boolean isSelectable) {
+    private void addHeaderOrFooterView(View v, ArrayList list) {
         final FixedViewInfo info = new FixedViewInfo();
         info.view = v;
-        info.data = data;
-        info.isSelectable = isSelectable;
+        info.data = null;
+        info.isSelectable = false;
+
+        list.add(info);
+        notifyDataSetChanged();
+    }
+
+    public void addHeaderView(View v) {
         if (mHeaderViewInfos == null) {
             mHeaderViewInfos = new ArrayList<>();
         }
-        mHeaderViewInfos.add(info);
-        notifyDataSetChanged();
+        addHeaderOrFooterView(v, mHeaderViewInfos);
     }
-    
+
     public void addFooterView(View v) {
-        addFooterView(v, null, true);
-    }
-    public void addFooterView(View v, Object data, boolean isSelectable) {
-        final FixedViewInfo info = new FixedViewInfo();
-        info.view = v;
-        info.data = data;
-        info.isSelectable = isSelectable;
         if (mFooterViewInfos == null) {
             mFooterViewInfos = new ArrayList<>();
         }
-        mFooterViewInfos.add(info);
-        notifyDataSetChanged();
+        addHeaderOrFooterView(v, mFooterViewInfos);
     }
-    
-    public boolean removeHeader(View v) {
-        if (mHeaderViewInfos == null) {
-            return false;
-        }
-        for (int i = 0; i < mHeaderViewInfos.size(); i++) {
-            FixedViewInfo info = mHeaderViewInfos.get(i);
-            if (info.view == v) {
-                mHeaderViewInfos.remove(i);
-                notifyDataSetChanged();
-                return true;
+
+    private boolean removeHeaderOrFooterView(View v,
+            ArrayList<FixedViewInfo> list) {
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                FixedViewInfo info = list.get(i);
+                if (info.view == v) {
+                    list.remove(i);
+                    notifyDataSetChanged();
+                    return true;
+                }
             }
         }
-
         return false;
+    }
+
+    public boolean removeHeader(View v) {
+        return removeHeaderOrFooterView(v, mHeaderViewInfos);
     }
 
     public boolean removeFooter(View v) {
-        if (mFooterViewInfos == null) {
-            return false;
-        }
-        for (int i = 0; i < mFooterViewInfos.size(); i++) {
-            FixedViewInfo info = mFooterViewInfos.get(i);
-            if (info.view == v) {
-                mFooterViewInfos.remove(i);
-                notifyDataSetChanged();
-                return true;
-            }
-        }
-
-        return false;
+        return removeHeaderOrFooterView(v, mFooterViewInfos);
     }
-    
+
     public int getHeadersCount() {
         if (mHeaderViewInfos != null) {
             return mHeaderViewInfos.size();
@@ -392,11 +378,11 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     /*--------------*/
     /* MAIN METHODS */
     /*--------------*/
-    
+
     protected int getRealItemCount() {
         int count = 0;
         if (mPositionTranslator != null) {
-            count+= mPositionTranslator.getItemCount();
+            count += mPositionTranslator.getItemCount();
         }
         return count;
     }
@@ -423,12 +409,15 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
                             .getPackedPositionChild(expandablePosition);
 
                     if (sectionItemIndex == RecyclerView.NO_POSITION) {
-                        final long groupId = mSectionAdapter.getSectionId(sectionIndex);
-                        return SectionAdapterHelper.getCombinedSectionId(groupId);
+                        final long groupId = mSectionAdapter
+                                .getSectionId(sectionIndex);
+                        return SectionAdapterHelper
+                                .getCombinedSectionId(groupId);
                     } else {
-                        final long groupId = mSectionAdapter.getSectionId(sectionIndex);
-                        final long childId = mSectionAdapter.getChildId(sectionIndex,
-                                sectionItemIndex);
+                        final long groupId = mSectionAdapter
+                                .getSectionId(sectionIndex);
+                        final long childId = mSectionAdapter
+                                .getChildId(sectionIndex, sectionItemIndex);
                         if (childId == RecyclerView.NO_ID) {
                             return RecyclerView.NO_ID;
                         }
@@ -636,8 +625,6 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     //// }
     // }
 
-    
-
     /*---------------------*/
     /* VIEW HOLDER METHODS */
     /*---------------------*/
@@ -729,9 +716,12 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
             int viewType) {
-        
+
         if (viewType == ITEM_VIEW_TYPE_HEADER_OR_FOOTER) {
-            return new HeaderViewHolder(parent.getContext());
+            HeaderViewHolder holder = new HeaderViewHolder(parent.getContext());
+            holder.setIsRecyclable(false);
+
+            return holder;
         }
         // TODO: how to handle non section adapter?
         if (viewType != -1 && (viewType & HEADER_TYPE_FLAG) != 0) {
@@ -739,7 +729,7 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
             if (viewType == SECTION_NO_HEADER_VIEW_TYPE) {
                 return new StickyHeaderViewHolder(mContext, null);
             } else {
-                return new StickyHeaderViewHolder(mContext, 
+                return new StickyHeaderViewHolder(mContext,
                         onCreateSectionHeaderViewHolder(parent, viewType));
             }
         }
@@ -752,9 +742,15 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
         int numHeaders = getHeadersCount();
         if (position < numHeaders) {
             if (holder instanceof HeaderViewHolder) {
-                ((HeaderViewHolder) holder).layout.removeAllViews();
-                ((HeaderViewHolder) holder).layout
-                        .addView(mHeaderViewInfos.get(position).view);
+                HeaderViewHolder headerHolder = (HeaderViewHolder) holder;
+                final View view = mHeaderViewInfos.get(position).view;
+                if (view.getParent() != headerHolder.layout) {
+                    headerHolder.layout.removeAllViews();
+                    if (view.getParent() instanceof ViewGroup) {
+                        ((ViewGroup) view.getParent()).removeView(view);
+                    }
+                    headerHolder.layout.addView(view);
+                }
                 return;
             }
         }
@@ -786,9 +782,15 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
             }
         }
         if (mFooterViewInfos != null && holder instanceof HeaderViewHolder) {
-            ((HeaderViewHolder) holder).layout.removeAllViews();
-            ((HeaderViewHolder) holder).layout.addView(
-                    mFooterViewInfos.get(adjPosition - adapterCount).view);
+            HeaderViewHolder headerHolder = (HeaderViewHolder) holder;
+            final View view = mFooterViewInfos
+                    .get(adjPosition - adapterCount).view;
+            if (view.getParent() != headerHolder.layout
+                    && view.getParent() instanceof ViewGroup) {
+                ((ViewGroup) view.getParent()).removeView(view);
+            }
+            headerHolder.layout.removeAllViews();
+            headerHolder.layout.addView(view);
         }
     }
 
@@ -852,20 +854,20 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     /* FILTER METHODS */
     /*----------------*/
 
-//    public boolean hasSearchText() {
-//        return mSearchText != null && mSearchText.length() > 0;
-//    }
-//
-//    public String getSearchText() {
-//        return mSearchText;
-//    }
-//
-//    public void setSearchText(String searchText) {
-//        if (searchText != null)
-//            mSearchText = searchText.trim().toLowerCase(Locale.getDefault());
-//        else
-//            mSearchText = "";
-//    }
+    // public boolean hasSearchText() {
+    // return mSearchText != null && mSearchText.length() > 0;
+    // }
+    //
+    // public String getSearchText() {
+    // return mSearchText;
+    // }
+    //
+    // public void setSearchText(String searchText) {
+    // if (searchText != null)
+    // mSearchText = searchText.trim().toLowerCase(Locale.getDefault());
+    // else
+    // mSearchText = "";
+    // }
 
     /**
      * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to
@@ -885,8 +887,7 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     public void filterItems(@IntRange(from = 0) long delay) {
         // Make longer the timer for new coming deleted items
         mHandler.removeMessages(0);
-        mHandler.sendMessageDelayed(
-                Message.obtain(mHandler, 0),
+        mHandler.sendMessageDelayed(Message.obtain(mHandler, 0),
                 delay > 0 ? delay : 0);
     }
 
@@ -914,57 +915,57 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
      * @see #filterObject(IFlexible, String)
      */
 
-//    public synchronized void filterItems(int startPosition, int count) {
-//
-//        // Enable flag: skip adjustPositions!
-//        filtering = true;
-//        if (hasSearchText()) {
-//            if (mOldSearchText.equalsIgnoreCase(mSearchText)) {
-//                mOldSearchText = mSearchText;
-//                return;
-//            }
-//            if (currentlyHiddenItems == null) {
-//                currentlyHiddenItems = new HashSet<Integer>();
-//            }
-//            Set<Integer> filtered = new HashSet<Integer>();
-//            Set<Integer> unfiltered = new HashSet<Integer>();
-//            for (int i = startPosition; i < count; i++) {
-//                if (shouldFilter(i, mSearchText)) {
-//                    if (currentlyHiddenItems.add(i)) {
-//                        filtered.add(i);
-//                    }
-//                } else if (currentlyHiddenItems.remove(i)){
-//                    unfiltered.add(i);
-//                }
-//            }
-//            applyAndAnimateRemovals(unfiltered);
-//            applyAndAnimateAdditions(filtered);
-//        } else {
-//            if (currentlyHiddenItems != null) {
-//                applyAndAnimateRemovals(currentlyHiddenItems);
-//                currentlyHiddenItems = null;
-//            }
-//
-//        }
-//
-//        // Reset filtering flag
-//        filtering = false;
-//    }
+    // public synchronized void filterItems(int startPosition, int count) {
+    //
+    // // Enable flag: skip adjustPositions!
+    // filtering = true;
+    // if (hasSearchText()) {
+    // if (mOldSearchText.equalsIgnoreCase(mSearchText)) {
+    // mOldSearchText = mSearchText;
+    // return;
+    // }
+    // if (currentlyHiddenItems == null) {
+    // currentlyHiddenItems = new HashSet<Integer>();
+    // }
+    // Set<Integer> filtered = new HashSet<Integer>();
+    // Set<Integer> unfiltered = new HashSet<Integer>();
+    // for (int i = startPosition; i < count; i++) {
+    // if (shouldFilter(i, mSearchText)) {
+    // if (currentlyHiddenItems.add(i)) {
+    // filtered.add(i);
+    // }
+    // } else if (currentlyHiddenItems.remove(i)){
+    // unfiltered.add(i);
+    // }
+    // }
+    // applyAndAnimateRemovals(unfiltered);
+    // applyAndAnimateAdditions(filtered);
+    // } else {
+    // if (currentlyHiddenItems != null) {
+    // applyAndAnimateRemovals(currentlyHiddenItems);
+    // currentlyHiddenItems = null;
+    // }
+    //
+    // }
+    //
+    // // Reset filtering flag
+    // filtering = false;
+    // }
 
     /**
      * animate removal
      */
     protected void applyAndAnimateAdditions(Set<Integer> hide) {
-        for (Integer i: hide) {
+        for (Integer i : hide) {
             notifyItemInserted(i);
         }
     }
-    
+
     /**
      * animate insertion
      */
     protected void applyAndAnimateRemovals(Set<Integer> hide) {
-        for (Integer i: hide) {
+        for (Integer i : hide) {
             notifyItemRemoved(i);
         }
     }
@@ -1386,31 +1387,60 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
     }
 
     public int getSectionPosition(int flatPosition) {
-        return getFlatPosition(
-                mPositionTranslator.getExpandablePosition(flatPosition));
+        int numHeaders = getHeadersCount();
+        if (flatPosition >= numHeaders) {
+            int adjPosition = flatPosition - numHeaders;
+            int adapterCount = getRealItemCount();
+            if (adjPosition < adapterCount) {
+                flatPosition = adjPosition;
+                return getFlatPosition(mPositionTranslator
+                        .getExpandablePosition(flatPosition));
+            }
+        }
+        return -1;
     }
 
     public int getSectionIndex(int flatPosition) {
-        final long expandablePosition = mPositionTranslator
-                .getExpandablePosition(flatPosition);
-        return SectionAdapterHelper
-                .getPackedPositionSection(expandablePosition);
+//        int numHeaders = getHeadersCount();
+//        if (flatPosition >= numHeaders) {
+//            int adjPosition = flatPosition - numHeaders;
+//            int adapterCount = getRealItemCount();
+//            if (adjPosition < adapterCount) {
+//                flatPosition = adjPosition;
+                final long expandablePosition = mPositionTranslator
+                        .getExpandablePosition(flatPosition);
+                return SectionAdapterHelper
+                        .getPackedPositionSection(expandablePosition);
+//            }
+//        }
+//        return -1;
     }
-    
+
     public int getSectionItemIndex(int flatPosition) {
-        final long expandablePosition = mPositionTranslator
-                .getExpandablePosition(flatPosition);
-        return SectionAdapterHelper
-                .getPackedPositionChild(expandablePosition);
+//        int numHeaders = getHeadersCount();
+//        if (flatPosition >= numHeaders) {
+//            int adjPosition = flatPosition - numHeaders;
+//            int adapterCount = getRealItemCount();
+//            if (adjPosition < adapterCount) {
+//                flatPosition = adjPosition;
+                final long expandablePosition = mPositionTranslator
+                        .getExpandablePosition(flatPosition);
+                return SectionAdapterHelper.getPackedPositionChild(expandablePosition);
+//            }
+//        }
+//        return -1;
+        
     }
 
     public int getFlatPosition(long packedPosition) {
-        return mPositionTranslator.getFlatPosition(packedPosition);
+        int result = mPositionTranslator.getFlatPosition(packedPosition);
+        return result + getHeadersCount();
     }
 
     public int getFlatPosition(int sectionIndex, int sectionItemIndex) {
-        return mPositionTranslator.getFlatPosition(SectionAdapterHelper
+        int result = mPositionTranslator.getFlatPosition(SectionAdapterHelper
                 .getPackedPositionForChild(sectionIndex, sectionItemIndex));
+        return result + getHeadersCount();
     }
 
     private void rebuildPositionTranslator() {
