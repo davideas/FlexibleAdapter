@@ -42,12 +42,12 @@ import java.util.Set;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.flexibleadapter.section.StickyHeaderViewHolder;
-import eu.davidea.flexibleadapter.section.StickySectionHeaderManager;
 import eu.davidea.flexibleadapter.section.HeaderViewHolder;
 import eu.davidea.flexibleadapter.section.SectionAdapter;
 import eu.davidea.flexibleadapter.section.SectionAdapterHelper;
 import eu.davidea.flexibleadapter.section.SectionPositionTranslator;
+import eu.davidea.flexibleadapter.section.StickyHeaderViewHolder;
+import eu.davidea.flexibleadapter.section.StickySectionHeaderManager;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -80,18 +80,18 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @see FlexibleViewHolder
  * @see ExpandableViewHolder
  * @since 03/05/2015 Created <br/>
- *        16/01/2016 Expandable items <br/>
- *        24/01/2016 Drag&Drop, Swipe <br/>
- *        30/01/2016 Class now extends {@link FlexibleAnimatorAdapter} that
- *        extends {@link SelectableAdapterSections} <br/>
- *        02/02/2016 New code reorganization, new item interfaces and full
- *        refactoring <br/>
- *        08/02/2016 Headers/Sections <br/>
- *        10/02/2016 The class is not abstract anymore, it is ready to be used
- *        <br/>
- *        20/02/2016 Sticky headers
+ * 16/01/2016 Expandable items <br/>
+ * 24/01/2016 Drag&Drop, Swipe <br/>
+ * 30/01/2016 Class now extends {@link FlexibleAnimatorAdapter} that
+ * extends {@link SelectableAdapterSections} <br/>
+ * 02/02/2016 New code reorganization, new item interfaces and full
+ * refactoring <br/>
+ * 08/02/2016 Headers/Sections <br/>
+ * 10/02/2016 The class is not abstract anymore, it is ready to be used
+ * <br/>
+ * 20/02/2016 Sticky headers
  */
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked"})
 public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
 
@@ -118,7 +118,9 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	public static final int ITEM_VIEW_TYPE_HEADER_OR_FOOTER = -2;
 
 	public class FixedViewInfo {
-		/** The view to add to the list */
+		/**
+		 * The view to add to the list
+		 */
 		public View view;
 		/**
 		 * The data backing the view. This is returned from
@@ -168,20 +170,25 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * 1 = deleteConfirmed when Undo timeout is over
 	 * </p>
 	 */
-	protected Handler mHandler=new Handler(Looper.getMainLooper(),new Handler.Callback(){public boolean handleMessage(Message message){switch(message.what){
-		// case 0: // filterItems
-		// filterItems(0, getItemCount());
-		// return true;
-		// case 1: //confirm delete
-		// OnDeleteCompleteListener listener =
-		// (OnDeleteCompleteListener) message.obj;
-		// if (listener != null) listener.onDeleteConfirmed();
-		// emptyBin();
-		// return true;
-	}return false;}});
+	protected Handler mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+		public boolean handleMessage(Message message) {
+			switch (message.what) {
+				// case 0: // filterItems
+				// filterItems(0, getItemCount());
+				// return true;
+				// case 1: //confirm delete
+				// OnDeleteCompleteListener listener =
+				// (OnDeleteCompleteListener) message.obj;
+				// if (listener != null) listener.onDeleteConfirmed();
+				// emptyBin();
+				// return true;
+			}
+			return false;
+		}
+	});
 
     /*--------------*/
-    /* CONSTRUCTORS */
+	/* CONSTRUCTORS */
     /*--------------*/
 
 	/**
@@ -198,15 +205,13 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * ArrayList&lt;T&gt;(originalList);</i>
 	 * </p>
 	 *
-	 * @param items
-	 *            items to display
-	 * @param listeners
-	 *            can be an instance of: <br/>
-	 *            - {@link OnUpdateListener} <br/>
-	 *            - {@link OnItemClickListener} <br/>
-	 *            - {@link OnItemLongClickListener} <br/>
-	 *            - {@link OnItemMoveListener} <br/>
-	 *            - {@link OnItemSwipeListener}
+	 * @param items     items to display
+	 * @param listeners can be an instance of: <br/>
+	 *                  - {@link OnUpdateListener} <br/>
+	 *                  - {@link OnItemClickListener} <br/>
+	 *                  - {@link OnItemLongClickListener} <br/>
+	 *                  - {@link OnItemMoveListener} <br/>
+	 *                  - {@link OnItemSwipeListener}
 	 */
 	public FlexibleAdapterSections(final Context context, @Nullable Object listeners) {
 		mContext = context;// needed to create empty HeaderViewHolder
@@ -286,10 +291,9 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * viewTypes for which he wants to force the selection.
 	 * </p>
 	 *
-	 * @param viewTypes
-	 *            All the desired viewTypes to be selected, pass nothing to
-	 *            automatically select all the viewTypes of the first item user
-	 *            selected
+	 * @param viewTypes All the desired viewTypes to be selected, pass nothing to
+	 *                  automatically select all the viewTypes of the first item user
+	 *                  selected
 	 */
 	@Override
 	public void selectAll(Integer... viewTypes) {
@@ -465,8 +469,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * Default value is false.
 	 * </p>
 	 *
-	 * @param displayHeaders
-	 *            true to display them, false to keep them hidden
+	 * @param displayHeaders true to display them, false to keep them hidden
 	 * @return this adapter so the call can be chained
 	 */
 	public FlexibleAdapterSections setDisplayHeaders(boolean displayHeaders) {
@@ -478,7 +481,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * Returns if Adapter will display sticky headers on the top.
 	 *
 	 * @return true if headers can be sticky, false if headers are scrolled
-	 *         together with all items
+	 * together with all items
 	 */
 	public boolean areHeadersSticky() {
 		return headersSticky;
@@ -495,10 +498,9 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * They, instead, are automatically re-linked if the linked Sectionable item
 	 * is different.
 	 *
-	 * @param maxCachedHeaders
-	 *            the max view instances to keep in the cache. This number
-	 *            depends by how many headers are normally displayed in the
-	 *            RecyclerView. It depends by the specific use case.
+	 * @param maxCachedHeaders the max view instances to keep in the cache. This number
+	 *                         depends by how many headers are normally displayed in the
+	 *                         RecyclerView. It depends by the specific use case.
 	 */
 	public void enableStickySectionHeaders() {
 		setStickySectionHeaders(true);
@@ -629,10 +631,8 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	/**
 	 * Returns the view type for the header
 	 *
-	 * @param sectionIndex
-	 *            section index
-	 * @param sectionItemIndex
-	 *            child index in the section
+	 * @param sectionIndex     section index
+	 * @param sectionItemIndex child index in the section
 	 */
 	public abstract int getSectionViewType(int position, int sectionIndex,
 										   int sectionItemIndex);
@@ -640,10 +640,8 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	/**
 	 * Returns the ViewHolder for a header
 	 *
-	 * @param parent
-	 *            the RecyclerView
-	 * @param viewType
-	 *            the ViewType
+	 * @param parent   the RecyclerView
+	 * @param viewType the ViewType
 	 */
 	public abstract RecyclerView.ViewHolder onCreateSectionHeaderViewHolder(
 			ViewGroup parent, int viewType);
@@ -651,10 +649,8 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	/**
 	 * Returns the ViewHolder for a header
 	 *
-	 * @param parent
-	 *            the RecyclerView
-	 * @param viewType
-	 *            the ViewType
+	 * @param parent   the RecyclerView
+	 * @param viewType the ViewType
 	 */
 	public abstract RecyclerView.ViewHolder onCreateSectionChildViewHolder(
 			ViewGroup parent, int viewType);
@@ -662,12 +658,9 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	/**
 	 * Bind a header view
 	 *
-	 * @param holder
-	 *            the ViewHolder
-	 * @param sectionIndex
-	 *            section index
-	 * @param sectionItemIndex
-	 *            child index in the section
+	 * @param holder           the ViewHolder
+	 * @param sectionIndex     section index
+	 * @param sectionItemIndex child index in the section
 	 */
 	public abstract void onBindSectionViewHolder(ViewHolder holder,
 												 int position, int sectionIndex, int sectionItemIndex,
@@ -803,8 +796,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		/**
 		 * Called when the current sticky header changed
 		 *
-		 * @param position
-		 *            the position of header
+		 * @param position the position of header
 		 */
 		void onStickyHeaderChange(int sectionIndex);
 	}
@@ -833,9 +825,8 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * </p>
 	 * Default value is false.
 	 *
-	 * @param restoreSelection
-	 *            true to have restored items still selected, false to empty
-	 *            selections.
+	 * @param restoreSelection true to have restored items still selected, false to empty
+	 *                         selections.
 	 */
 	public void setRestoreSelectionOnUndo(boolean restoreSelection) {
 		this.restoreSelection = restoreSelection;
@@ -869,10 +860,8 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * useful to grab more characters from user before starting the search.
 	 * </p>
 	 *
-	 * @param unfilteredItems
-	 *            the list to filter
-	 * @param delay
-	 *            any non negative delay
+	 * @param unfilteredItems the list to filter
+	 * @param delay           any non negative delay
 	 * @see #filterObject(IFlexible, String)
 	 */
 	public void filterItems(@IntRange(from = 0) long delay) {
@@ -965,7 +954,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * This method checks if the provided object is a type of
 	 * {@link IFilterable} interface, if yes, performs the filter on the
 	 * implemented method {@link IFilterable#filter(String)}.
-	 * <p>
+	 * <p/>
 	 * <b>NOTE:</b> <br/>
 	 * - The item will be collected if the implemented method returns true.
 	 * <br/>
@@ -977,12 +966,10 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * - If you don't want to implement the {@code IFilterable} interface on the
 	 * items, then you can override this method to have another filter logic!
 	 *
-	 * @param item
-	 *            the object to be inspected
-	 * @param constraint
-	 *            constraint, that the object has to fulfil
+	 * @param item       the object to be inspected
+	 * @param constraint constraint, that the object has to fulfil
 	 * @return true, if the object returns true as well, and so if it should be
-	 *         in the filteredResult, false otherwise
+	 * in the filteredResult, false otherwise
 	 */
 	protected boolean shouldFilter(int position, String constraint) {
 		// if (item instanceof IFilterable) {
@@ -1013,11 +1000,11 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	/**
 	 * Returns whether ItemTouchHelper should start a drag and drop operation if
 	 * an item is long pressed.
-	 * <p>
+	 * <p/>
 	 * Default value returns false.
 	 *
 	 * @return true if ItemTouchHelper should start dragging an item when it is
-	 *         long pressed, false otherwise. Default value is false.
+	 * long pressed, false otherwise. Default value is false.
 	 */
 	public boolean isLongPressDragEnabled() {
 		return mItemTouchHelperCallback != null
@@ -1033,8 +1020,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * </p>
 	 * Default value is false.
 	 *
-	 * @param longPressDragEnabled
-	 *            true to activate, false otherwise
+	 * @param longPressDragEnabled true to activate, false otherwise
 	 */
 	public final void setLongPressDragEnabled(boolean longPressDragEnabled) {
 		initializeItemTouchHelper();
@@ -1061,8 +1047,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * Default value is true.
 	 * </p>
 	 *
-	 * @param handleDragEnabled
-	 *            true to activate, false otherwise
+	 * @param handleDragEnabled true to activate, false otherwise
 	 */
 	public void setHandleDragEnabled(boolean handleDragEnabled) {
 		this.handleDragEnabled = handleDragEnabled;
@@ -1076,8 +1061,8 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * </p>
 	 *
 	 * @return true if ItemTouchHelper should start swiping an item when user
-	 *         swipes a pointer over the View, false otherwise. Default value is
-	 *         false.
+	 * swipes a pointer over the View, false otherwise. Default value is
+	 * false.
 	 */
 	public final boolean isSwipeEnabled() {
 		return mItemTouchHelperCallback != null
@@ -1090,8 +1075,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * Default value is false.
 	 * </p>
 	 *
-	 * @param swipeEnabled
-	 *            true to activate, false otherwise
+	 * @param swipeEnabled true to activate, false otherwise
 	 */
 	public final void setSwipeEnabled(boolean swipeEnabled) {
 		initializeItemTouchHelper();
@@ -1153,8 +1137,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	/**
 	 * Save the state of the current expanded items.
 	 *
-	 * @param outState
-	 *            Current state
+	 * @param outState Current state
 	 */
 	public void onSaveInstanceState(Bundle outState) {
 		if (outState != null) {
@@ -1166,8 +1149,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	/**
 	 * Restore the previous state of the expanded items.
 	 *
-	 * @param savedInstanceState
-	 *            Previous state
+	 * @param savedInstanceState Previous state
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
@@ -1190,9 +1172,8 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		 * Called at startup and every time an item is inserted, removed or
 		 * filtered.
 		 *
-		 * @param size
-		 *            the current number of items in the adapter, result of
-		 *            {@link #getItemCount()}
+		 * @param size the current number of items in the adapter, result of
+		 *             {@link #getItemCount()}
 		 */
 		void onUpdateEmptyView(int size);
 	}
@@ -1226,10 +1207,9 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		 * </p>
 		 * For Expandable Views it will toggle the Expansion if configured so.
 		 *
-		 * @param position
-		 *            the adapter position of the item clicked
+		 * @param position the adapter position of the item clicked
 		 * @return true if the click should activate the ItemView, false for no
-		 *         change.
+		 * change.
 		 */
 		boolean onItemClick(int position);
 	}
@@ -1246,8 +1226,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		 * </p>
 		 * For Expandable Views it will collapse the View if configured so.
 		 *
-		 * @param position
-		 *            the adapter position of the item clicked
+		 * @param position the adapter position of the item clicked
 		 */
 		void onItemLongClick(int position);
 	}
@@ -1282,11 +1261,9 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		 * </p>
 		 * .
 		 *
-		 * @param fromPosition
-		 *            the start position of the moved item
-		 * @param toPosition
-		 *            the resolved position of the moved item // * @see
-		 *            #shouldMoveItem(int, int)
+		 * @param fromPosition the start position of the moved item
+		 * @param toPosition   the resolved position of the moved item // * @see
+		 *                     #shouldMoveItem(int, int)
 		 */
 		void onItemMove(int fromPosition, int toPosition);
 	}
@@ -1299,10 +1276,8 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		 * Called when swiping ended its animation and Item is not visible
 		 * anymore.
 		 *
-		 * @param position
-		 *            the position of the item swiped
-		 * @param direction
-		 *            the direction to which the ViewHolder is swiped
+		 * @param position  the position of the item swiped
+		 * @param direction the direction to which the ViewHolder is swiped
 		 */
 		void onItemSwipe(int position, int direction);
 	}
