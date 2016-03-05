@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -236,6 +237,11 @@ public class FastScroller extends FrameLayout {
 			String bubbleText = bubbleTextCreator.onCreateBubbleText(targetPos);
 			layoutManager.scrollToPositionWithOffset(targetPos, 0);
 			if (bubble != null)
+			    if (bubbleText != null) {
+                    bubble.setVisibility(View.VISIBLE);
+                } else {
+                    bubble.setVisibility(View.GONE);
+                }
 				bubble.setText(bubbleText);
 		}
 	}
