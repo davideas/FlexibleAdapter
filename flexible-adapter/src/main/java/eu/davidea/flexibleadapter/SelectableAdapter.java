@@ -127,6 +127,12 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		mRecyclerView = recyclerView;
 	}
 
+	@Override
+	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+		super.onDetachedFromRecyclerView(recyclerView);
+		mRecyclerView = null;
+	}
+
 	/**
 	 * Sets the mode of the selection, MODE_SINGLE is the default:
 	 * <ul>
@@ -192,10 +198,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	/**
 	 * Toggles the selection status of the item at a given position.<br/>
 	 * The behaviour depends on the selection mode previously set with {@link #setMode(int)}.
-	 *
 	 * <p>The Activated State of the ItemView is automatically set in
 	 * {@link FlexibleViewHolder#toggleActivation()} called in {@code onClick} event</p>
-	 *
 	 * <b>Usage:</b>
 	 * <ul>
 	 * <li>If you don't want any item to be selected/activated at all, just don't call this method.</li>

@@ -92,7 +92,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  *        20/02/2016 Sticky headers
  */
 @SuppressWarnings({ "unchecked" })
-public abstract class FlexibleAdapterSections extends SelectableAdapterSections
+public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
 
 	private static final String TAG = FlexibleAdapterSections.class.getSimpleName();
