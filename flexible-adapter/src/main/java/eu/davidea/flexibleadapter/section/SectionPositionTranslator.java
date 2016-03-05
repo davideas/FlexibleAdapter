@@ -7,12 +7,11 @@ import java.util.Arrays;
 
 public class SectionPositionTranslator {
 
-	private final int ALLOCATE_UNIT = 256;
-
-	private final static long FLAG_EXPANDED = 0x0000000080000000l;
-	private final static long LOWER_31BIT_MASK = 0x000000007fffffffl;
-	private final static long LOWER_32BIT_MASK = 0x00000000ffffffffl;
-	private final static long UPPER_32BIT_MASK = 0xffffffff00000000l;
+	private static final int ALLOCATE_UNIT = 256;
+	private static final long FLAG_EXPANDED = 0x0000000080000000L;
+	private static final long LOWER_31BIT_MASK = 0x000000007fffffffL;
+	private static final long LOWER_32BIT_MASK = 0x00000000ffffffffL;
+	private static final long UPPER_32BIT_MASK = 0xffffffff00000000L;
 
 	/*
 	 * bit 64-32: offset  (use for caching purpose)
@@ -57,7 +56,7 @@ public class SectionPositionTranslator {
 			totalChildCount += childCount;
 		}
 
-		mAdapter = adapter;
+		mAdapter = adapter;//Davideas: are you sure about this assignment? is never used.
 		mSectionCount = sectionCount;
 		mExpandedSectionCount = (allExpanded) ? sectionCount : 0;
 		mExpandedChildCount = (allExpanded) ? totalChildCount : 0;
@@ -139,7 +138,7 @@ public class SectionPositionTranslator {
 		}
 
 		if (index != mExpandedSectionCount) {
-			throw new IllegalStateException("may be a bug  (index = " + index + ", mExpandedSectionCount = " + mExpandedSectionCount + ")");
+			throw new IllegalStateException("may be a bug (index = " + index + ", mExpandedSectionCount = " + mExpandedSectionCount + ")");
 		}
 
 		Arrays.sort(expandedSections);
@@ -152,7 +151,7 @@ public class SectionPositionTranslator {
 	}
 
 	public boolean isSectionExpanded(int sectionPosition) {
-		return ((mCachedSectionPosInfo[sectionPosition] & FLAG_EXPANDED) != 0);
+		return (mCachedSectionPosInfo[sectionPosition] & FLAG_EXPANDED) != 0;
 	}
 
 	public int getChildCount(int sectionPosition) {
@@ -168,15 +167,12 @@ public class SectionPositionTranslator {
 	}
 
 	public boolean collapseSection(int sectionPosition) {
-		if ((mCachedSectionPosInfo[sectionPosition] & FLAG_EXPANDED) == 0) {
+		if (!isSectionExpanded(sectionPosition)) {
 			return false;
 		}
-
 		final int childCount = (int) (mCachedSectionPosInfo[sectionPosition] & LOWER_31BIT_MASK);
-
 		mCachedSectionPosInfo[sectionPosition] &= (~FLAG_EXPANDED);
 		mExpandedSectionCount -= 1;
-
 		mExpandedChildCount -= childCount;
 		mEndOfCalculatedOffsetSectionPosition = Math.min(mEndOfCalculatedOffsetSectionPosition, sectionPosition);
 
@@ -185,15 +181,12 @@ public class SectionPositionTranslator {
 	}
 
 	public boolean expandSection(int sectionPosition) {
-		if ((mCachedSectionPosInfo[sectionPosition] & FLAG_EXPANDED) != 0) {
+		if (isSectionExpanded(sectionPosition)) {
 			return false;
 		}
-
 		final int childCount = (int) (mCachedSectionPosInfo[sectionPosition] & LOWER_31BIT_MASK);
-
 		mCachedSectionPosInfo[sectionPosition] |= FLAG_EXPANDED;
 		mExpandedSectionCount += 1;
-
 		mExpandedChildCount += childCount;
 		mEndOfCalculatedOffsetSectionPosition = Math.min(mEndOfCalculatedOffsetSectionPosition, sectionPosition);
 
@@ -449,31 +442,29 @@ public class SectionPositionTranslator {
 		mEndOfCalculatedOffsetSectionPosition = Math.min(mEndOfCalculatedOffsetSectionPosition, sectionPosition);
 	}
 
-	public int insertSectionItems(int sectionPosition, int count, boolean expanded) {
+	public int insertSectionItems(int sectionPosition, final int count, boolean expanded) {
 		if (count <= 0) {
 			return 0;
 		}
 
-		final int n = count;
-
-		enlargeArraysIfNeeded(mSectionCount + n, true);
+		enlargeArraysIfNeeded(mSectionCount + count, true);
 
 		// shift to backward
 		final SectionAdapter adapter = mAdapter;
 		final long[] info = mCachedSectionPosInfo;
 		final int[] ids = mCachedSectionId;
 
-		int start = mSectionCount - 1 + n;
-		int end = sectionPosition - 1 + n;
+		int start = mSectionCount - 1 + count;
+		int end = sectionPosition - 1 + count;
 		for (int i = start; i > end; i--) {
-			info[i] = info[i - n];
-			ids[i] = ids[i - n];
+			info[i] = info[i - count];
+			ids[i] = ids[i - count];
 		}
 
 		// insert items
 		final long expandedFlag = (expanded) ? FLAG_EXPANDED : 0;
 		int insertedChildCount = 0;
-		int end2 = sectionPosition + n;
+		int end2 = sectionPosition + count;
 		for (int i = sectionPosition; i < end2; i++) {
 			final long sectionId = adapter.getSectionId(i);
 			final int childCount = adapter.getChildCount(i);
@@ -484,31 +475,30 @@ public class SectionPositionTranslator {
 			insertedChildCount += childCount;
 		}
 
-		mSectionCount += n;
+		mSectionCount += count;
 		if (expanded) {
-			mExpandedSectionCount += n;
+			mExpandedSectionCount += count;
 			mExpandedChildCount += insertedChildCount;
 		}
 
 		int calculatedOffset = (mSectionCount == 0) ? RecyclerView.NO_POSITION : (sectionPosition - 1);
 		mEndOfCalculatedOffsetSectionPosition = Math.min(mEndOfCalculatedOffsetSectionPosition, calculatedOffset);
 
-		return (expanded) ? (n + insertedChildCount) : n;
+		return (expanded) ? (count + insertedChildCount) : count;
 	}
 
 	public int insertSectionItem(int sectionPosition, boolean expanded) {
 		return insertSectionItems(sectionPosition, 1, expanded);
 	}
 
-	public int removeSectionItems(int sectionPosition, int count) {
+	public int removeSectionItems(int sectionPosition, final int count) {
 		if (count <= 0) {
 			return 0;
 		}
 
-		final int n = count;
 		int removedVisibleItemCount = 0;
 
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < count; i++) {
 			final long t = mCachedSectionPosInfo[sectionPosition + i];
 
 			if ((t & FLAG_EXPANDED) != 0) {
@@ -518,13 +508,13 @@ public class SectionPositionTranslator {
 				mExpandedSectionCount -= 1;
 			}
 		}
-		removedVisibleItemCount += n;
-		mSectionCount -= n;
+		removedVisibleItemCount += count;
+		mSectionCount -= count;
 
 		// shift to forward
 		for (int i = sectionPosition; i < mSectionCount; i++) {
-			mCachedSectionPosInfo[i] = mCachedSectionPosInfo[i + n];
-			mCachedSectionId[i] = mCachedSectionId[i + n];
+			mCachedSectionPosInfo[i] = mCachedSectionPosInfo[i + count];
+			mCachedSectionId[i] = mCachedSectionId[i + count];
 		}
 
 		int calculatedOffset = (mSectionCount == 0) ? RecyclerView.NO_POSITION : (sectionPosition - 1);

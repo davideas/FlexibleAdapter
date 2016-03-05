@@ -37,19 +37,21 @@ import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.flexibleadapter.section.HeaderViewHolder;
 import eu.davidea.flexibleadapter.section.SectionAdapter;
 import eu.davidea.flexibleadapter.section.SectionAdapterHelper;
 import eu.davidea.flexibleadapter.section.SectionPositionTranslator;
-import eu.davidea.flexibleadapter.section.StickyHeaderViewHolder;
 import eu.davidea.flexibleadapter.section.StickySectionHeaderManager;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
+import eu.davidea.viewholders.HeaderViewHolder;
+import eu.davidea.viewholders.StickyHeaderViewHolder;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set such as
@@ -98,28 +100,11 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	private GridLayoutManager.SpanSizeLookup gridSpanSizeLookup;
 	private GridLayoutManager.SpanSizeLookup externalSpanSizeLookup;
 	private StickySectionHeaderManager stickyHeaderManager;
-	private boolean stickyHeaderDecorationAttached = false;
 
 	/**
 	 * Header/Footer
 	 */
 	public static final int ITEM_VIEW_TYPE_HEADER_OR_FOOTER = -2;
-
-	public class FixedViewInfo {
-		/**
-		 * The view to add to the list
-		 */
-		public View view;
-		/**
-		 * The data backing the view. This is returned from
-		 * {@link ListAdapter#getItem(int)}.
-		 */
-		public Object data;
-		/**
-		 * <code>true</code> if the fixed view should be selectable in the list
-		 */
-		public boolean isSelectable;
-	}
 
 	private ArrayList<FixedViewInfo> mHeaderViewInfos = null;
 	private ArrayList<FixedViewInfo> mFooterViewInfos = null;
@@ -134,11 +119,10 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	private ItemTouchHelperCallback mItemTouchHelperCallback;
 	private ItemTouchHelper mItemTouchHelper;
 
-	// /* Filter */
-	// private String mSearchText = "", mOldSearchText = "";
-	// private boolean mNotifyChangeOfUnfilteredItems = false, filtering =
-	// false;
-	// private Set<Integer> currentlyHiddenItems = null;
+	/* Filter */
+	private String mSearchText = "", mOldSearchText = "";
+	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
+	private Set<Integer> currentlyHiddenItems = null;
 
 	/* Listeners */
 	public OnItemClickListener mItemClickListener;
@@ -160,15 +144,14 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	protected Handler mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
 			switch (message.what) {
-				// case 0: // filterItems
-				// filterItems(0, getItemCount());
-				// return true;
-				// case 1: //confirm delete
-				// OnDeleteCompleteListener listener =
-				// (OnDeleteCompleteListener) message.obj;
-				// if (listener != null) listener.onDeleteConfirmed();
-				// emptyBin();
-				// return true;
+//				case 0: // filterItems
+//					filterItems(0, getItemCount());
+//					return true;
+//				case 1: //confirm delete
+//					OnDeleteCompleteListener listener = (OnDeleteCompleteListener) message.obj;
+//					if (listener != null) listener.onDeleteConfirmed();
+//					emptyBin();
+//					return true;
 			}
 			return false;
 		}
@@ -221,34 +204,6 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 
 	}
 
-	public void setLayoutManager(LayoutManager layoutManager) {
-		mLayoutManager = layoutManager;
-		if (layoutManager instanceof GridLayoutManager) {
-			gridSpanSizeLookup = new GridLayoutManager.SpanSizeLookup() {
-				@Override
-				public int getSpanSize(int position) {
-					if (isHeader(position)) {
-						return ((GridLayoutManager) mLayoutManager)
-								.getSpanCount();
-					}
-					if (externalSpanSizeLookup != null) {
-						return externalSpanSizeLookup.getSpanSize(position);
-					}
-					return 1;
-				}
-			};
-			((GridLayoutManager) mLayoutManager)
-					.setSpanSizeLookup(gridSpanSizeLookup);
-		} else {
-			gridSpanSizeLookup = null;
-		}
-	}
-
-	public void setSpanSizeLookup(
-			GridLayoutManager.SpanSizeLookup spanSizeLookup) {
-		externalSpanSizeLookup = spanSizeLookup;
-	}
-
     /*------------------------------*/
 	/* SELECTION METHODS OVERRIDDEN */
 	/*------------------------------*/
@@ -291,9 +246,9 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		}
 	}
 
-    /*--------------*/
+    /*---------------*/
 	/* HEADER FOOTER */
-	/*--------------*/
+	/*---------------*/
 
 	public void addHeaderView(View v) {
 		if (mHeaderViewInfos == null) {
@@ -324,7 +279,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		info.isSelectable = false;
 
 		list.add(info);
-		notifyDataSetChanged();
+		notifyDataSetChanged();//Davideas: Here we can improve by accepting also the position of the info.data and notifyItemInserted(position)
 	}
 
 	private boolean removeHeaderOrFooterView(View v, ArrayList<FixedViewInfo> list) {
@@ -333,7 +288,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 				FixedViewInfo info = list.get(i);
 				if (info.view == v) {
 					list.remove(i);
-					notifyDataSetChanged();
+					notifyDataSetChanged();//Davideas: Here we can improve with getItem(info.data) and then the position of that item, notifyItemRemoved(position)
 					return true;
 				}
 			}
@@ -357,7 +312,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 
     /*--------------*/
 	/* MAIN METHODS */
-    /*--------------*/
+	/*--------------*/
 
 	protected int getRealItemCount() {
 		if (mPositionTranslator != null) {
@@ -424,8 +379,8 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	}
 
     /*--------------------------*/
-    /* HEADERS/SECTIONS METHODS */
-    /*--------------------------*/
+	/* HEADERS/SECTIONS METHODS */
+	/*--------------------------*/
 
 	public boolean isHeader(int position) {
 		if (headersShown) {
@@ -506,52 +461,18 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 			if (stickyHeaderManager == null) {
 				stickyHeaderManager = new StickySectionHeaderManager(this);
 			}
-			if (!stickyHeaderDecorationAttached && headersShown && mRecyclerView != null) {
-				stickyHeaderDecorationAttached = true;
+			if (headersShown && mRecyclerView != null) {
 				stickyHeaderManager.attachToRecyclerView(mRecyclerView);
 				stickyHeaderManager.setStickyHeadersHolder(getStickySectionHeadersHolder());
 			}
 		} else if (stickyHeaderManager != null) {
 			this.headersSticky = false;
-
-			if (stickyHeaderManager != null) {
-				if (mRecyclerView != null) {
-					stickyHeaderManager.detachFromRecyclerView(mRecyclerView);
-				}
-				stickyHeaderManager.setStickyHeadersHolder(null);
-				stickyHeaderManager = null;
-				stickyHeaderDecorationAttached = false;
-			}
-		}
-	}
-
-	@Override
-	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-		super.onAttachedToRecyclerView(recyclerView);
-		mRecyclerView = recyclerView;
-		if (mItemTouchHelper != null) {
-			mItemTouchHelper.attachToRecyclerView(mRecyclerView);
-		}
-		if (stickyHeaderManager != null) {
-			stickyHeaderManager.setStickyHeadersHolder(getStickySectionHeadersHolder());
-			if (!stickyHeaderDecorationAttached && headersShown) {
-				stickyHeaderDecorationAttached = true;
-				stickyHeaderManager.attachToRecyclerView(mRecyclerView);
-			}
-		}
-	}
-
-	@Override
-	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
-		if (stickyHeaderManager != null) {
-			stickyHeaderManager.setStickyHeadersHolder(null);
-			if (stickyHeaderDecorationAttached) {
-				stickyHeaderDecorationAttached = false;
+			if (mRecyclerView != null) {
 				stickyHeaderManager.detachFromRecyclerView(mRecyclerView);
 			}
+			stickyHeaderManager.setStickyHeadersHolder(null);
+			stickyHeaderManager = null;
 		}
-		mRecyclerView = null;
-		super.onDetachedFromRecyclerView(recyclerView);
 	}
 
 	/**
@@ -564,7 +485,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 */
 	public void showAllHeaders() {
 		headersShown = true;
-		notifyDataSetChanged();
+		notifyDataSetChanged();//Davideas: we can improve this by retrieving the correct positions maybe with an abstract method
 	}
 
 	/**
@@ -577,24 +498,60 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 */
 	public void hideAllHeaders() {
 		headersShown = false;
-		notifyDataSetChanged();
+		notifyDataSetChanged();//Davideas: we can improve this by retrieving the correct positions maybe with an abstract method
 	}
 
-//	private class HeaderFrameLayout extends FrameLayout {
-//
-//		private final View shapeView;
-//
-//		public HeaderFrameLayout(View view) {
-//			super(view.getContext());
-//			this.shapeView = view;
-//		}
-//
-//		@Override
-//		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//			measureChildWithMargins(shapeView, widthMeasureSpec, 0, heightMeasureSpec, 0);
-//			setMeasuredDimension(shapeView.getMeasuredWidth(), shapeView.getMeasuredHeight());
-//		}
-//	}
+	@Override
+	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+		super.onAttachedToRecyclerView(recyclerView);
+		//Setup the spanSizeLookup if any
+		setLayoutManager(recyclerView.getLayoutManager());
+
+		if (mItemTouchHelper != null) {
+			mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+		}
+		if (stickyHeaderManager != null) {
+			stickyHeaderManager.setStickyHeadersHolder(getStickySectionHeadersHolder());
+			if (headersShown) {
+				stickyHeaderManager.attachToRecyclerView(mRecyclerView);
+			}
+		}
+	}
+
+	@Override
+	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+		if (stickyHeaderManager != null) {
+			stickyHeaderManager.setStickyHeadersHolder(null);
+			stickyHeaderManager.detachFromRecyclerView(mRecyclerView);
+			stickyHeaderManager = null;
+		}
+		super.onDetachedFromRecyclerView(recyclerView);
+	}
+
+	public void setSpanSizeLookup(GridLayoutManager.SpanSizeLookup spanSizeLookup) {
+		externalSpanSizeLookup = spanSizeLookup;
+	}
+
+	public void setLayoutManager(LayoutManager layoutManager) {
+		mLayoutManager = layoutManager;
+		if (layoutManager instanceof GridLayoutManager) {
+			gridSpanSizeLookup = new GridLayoutManager.SpanSizeLookup() {
+				@Override
+				public int getSpanSize(int position) {
+					if (isHeader(position)) {
+						return ((GridLayoutManager) mLayoutManager).getSpanCount();
+					}
+					if (externalSpanSizeLookup != null) {
+						return externalSpanSizeLookup.getSpanSize(position);
+					}
+					return 1;
+				}
+			};
+			((GridLayoutManager) mLayoutManager).setSpanSizeLookup(gridSpanSizeLookup);
+		} else {
+			gridSpanSizeLookup = null;
+		}
+	}
 
     /*---------------------*/
     /* VIEW HOLDER METHODS */
@@ -685,8 +642,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 			if (viewType == SECTION_NO_HEADER_VIEW_TYPE) {
 				return new StickyHeaderViewHolder(mContext, null);
 			} else {
-				return new StickyHeaderViewHolder(mContext,
-						onCreateSectionHeaderViewHolder(parent, viewType));
+				return new StickyHeaderViewHolder(mContext, onCreateSectionHeaderViewHolder(parent, viewType));
 			}
 		}
 		return onCreateSectionChildViewHolder(parent, viewType);
@@ -719,9 +675,10 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 				final long expandablePosition = mPositionTranslator.getExpandablePosition(adjPosition);
 				final int sectionIndex = SectionAdapterHelper.getPackedPositionSection(expandablePosition);
 				final int sectionItemIndex = SectionAdapterHelper.getPackedPositionChild(expandablePosition);
-				if (holder instanceof StickyHeaderViewHolder) {
-					holder = ((StickyHeaderViewHolder) holder).realItemHolder;
-				}
+//				Davideas: Seems unused cast
+//				if (holder instanceof StickyHeaderViewHolder) {
+//					holder = ((StickyHeaderViewHolder) holder).realItemHolder;
+//				}
 				if (holder != null) {
 					// When user scrolls, this line binds the correct selection status
 					final boolean isSelected = isSelected(adjPosition);
@@ -777,20 +734,20 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
     /* FILTER METHODS */
     /*----------------*/
 
-//	public boolean hassearchtext() {
-//		return msearchtext != null && msearchtext.length() > 0;
-//	}
-//
-//	public string getsearchtext() {
-//		return msearchtext;
-//	}
-//
-//	public void setsearchtext(string searchtext) {
-//		if (searchtext != null)
-//			msearchtext = searchtext.trim().tolowercase(locale.getdefault());
-//		else
-//			msearchtext = "";
-//	}
+	public boolean hasSearchText() {
+		return mSearchText != null && mSearchText.length() > 0;
+	}
+
+	public String getSearchText() {
+		return mSearchText;
+	}
+
+	public void setSearchText(String searchText) {
+		if (searchText != null)
+			mSearchText = searchText.trim().toLowerCase(Locale.getDefault());
+		else
+			mSearchText = "";
+	}
 
 	/**
 	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to
@@ -830,46 +787,37 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 	 * child is collected by the current filter. <br/>
 	 * - <b>NEW!</b> Items are animated thanks to {@link #animateTo(List)}.
 	 *
-	 * @param unfilteredItems
-	 *            the list to filter
+	 * @param unfilteredItems the list to filter
 	 * @see #filterObject(IFlexible, String)
 	 */
-//	public synchronized void filterItems(int startPosition, int count) {
-//
-//		// Enable flag: skip adjustPositions!
-//		filtering = true;
-//		if (hasSearchText()) {
-//			if (mOldSearchText.equalsIgnoreCase(mSearchText)) {
-//				mOldSearchText = mSearchText;
-//				return;
-//			}
-//			if (currentlyHiddenItems == null) {
-//				currentlyHiddenItems = new HashSet<Integer>();
-//			}
-//			Set<Integer> filtered = new HashSet<Integer>();
-//			Set<Integer> unfiltered = new HashSet<Integer>();
-//			for (int i = startPosition; i < count; i++) {
-//				if (shouldFilter(i, mSearchText)) {
-//					if (currentlyHiddenItems.add(i)) {
-//						filtered.add(i);
-//					}
-//				} else if (currentlyHiddenItems.remove(i)) {
-//					unfiltered.add(i);
-//				}
-//			}
-//			applyAndAnimateRemovals(unfiltered);
-//			applyAndAnimateAdditions(filtered);
-//		} else {
-//			if (currentlyHiddenItems != null) {
-//				applyAndAnimateRemovals(currentlyHiddenItems);
-//				currentlyHiddenItems = null;
-//			}
-//
-//		}
-//
-//		// Reset filtering flag
-//		filtering = false;
-//	}
+	public synchronized void filteritems(int startPosition, int count) {
+		// enable flag: skip adjustpositions!
+		filtering = true;
+		if (hasSearchText()) {
+			if (mOldSearchText.equalsIgnoreCase(mSearchText)) {
+				mOldSearchText = mSearchText;
+				return;
+			}
+			if (currentlyHiddenItems == null) {
+				currentlyHiddenItems = new HashSet<Integer>();
+			}
+			for (int i = startPosition; i < count; i++) {
+				if (shouldFilter(i, mSearchText)) {
+					if (currentlyHiddenItems.add(i)) {
+						notifyItemInserted(i);
+					}
+				} else if (currentlyHiddenItems.remove(i)) {
+					notifyItemRemoved(i);
+				}
+			}
+		} else if (currentlyHiddenItems != null) {
+			applyAndAnimateRemovals(currentlyHiddenItems);
+			currentlyHiddenItems = null;
+		}
+
+		// reset filtering flag
+		filtering = false;
+	}
 
 	/**
 	 * animate removal
@@ -1067,6 +1015,167 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		}
 	}
 
+    /*------------------*/
+    /* SECTION FEATURES */
+    /*------------------*/
+
+	/**
+	 * Returns the view sticky headers will be attached to
+	 *
+	 * @return FrameLayout the view
+	 */
+	public abstract FrameLayout getStickySectionHeadersHolder();
+
+	public boolean collapseSection(int sectionIndex, boolean fromUser) {
+		if (mPositionTranslator.collapseSection(sectionIndex)) {
+			final long packedPosition = SectionAdapterHelper.getPackedPositionForSection(sectionIndex);
+			final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
+			final int childCount = mPositionTranslator.getChildCount(sectionIndex);
+			notifyItemRangeRemoved(flatPosition + 1, childCount);
+			notifyItemChanged(flatPosition);//Davideas: this should not be done all the time, but only when requested
+			return true;
+		}
+		return false;
+	}
+
+	public boolean expandSection(int sectionIndex, boolean fromUser) {
+		if (mPositionTranslator.expandSection(sectionIndex)) {
+			final long packedPosition = SectionAdapterHelper.getPackedPositionForSection(sectionIndex);
+			final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
+			final int childCount = mPositionTranslator.getChildCount(sectionIndex);
+			notifyItemRangeInserted(flatPosition + 1, childCount);
+			notifyItemChanged(flatPosition);//Davideas: this should not be done all the time, but only when requested
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isSectionExpanded(int sectionIndex) {
+		return mPositionTranslator.isSectionExpanded(sectionIndex);
+	}
+
+	public int getSectionPosition(int flatPosition) {
+		int numHeaders = getHeadersCount();
+		if (flatPosition >= numHeaders) {
+			int adjPosition = flatPosition - numHeaders;
+			int adapterCount = getRealItemCount();
+			if (adjPosition < adapterCount) {
+				flatPosition = adjPosition;
+				return getFlatPosition(mPositionTranslator.getExpandablePosition(flatPosition));
+			}
+		}
+		return -1;
+	}
+
+	public int getSectionIndex(int flatPosition) {
+//        int numHeaders = getHeadersCount();
+//        if (flatPosition >= numHeaders) {
+//            int adjPosition = flatPosition - numHeaders;
+//            int adapterCount = getRealItemCount();
+//            if (adjPosition < adapterCount) {
+//                flatPosition = adjPosition;
+		final long expandablePosition = mPositionTranslator.getExpandablePosition(flatPosition);
+		return SectionAdapterHelper.getPackedPositionSection(expandablePosition);
+//            }
+//        }
+//        return -1;
+	}
+
+	public int getSectionItemIndex(int flatPosition) {
+//        int numHeaders = getHeadersCount();
+//        if (flatPosition >= numHeaders) {
+//            int adjPosition = flatPosition - numHeaders;
+//            int adapterCount = getRealItemCount();
+//            if (adjPosition < adapterCount) {
+//                flatPosition = adjPosition;
+		final long expandablePosition = mPositionTranslator.getExpandablePosition(flatPosition);
+		return SectionAdapterHelper.getPackedPositionChild(expandablePosition);
+//            }
+//        }
+//        return -1;
+	}
+
+	public int getFlatPosition(long packedPosition) {
+		int result = mPositionTranslator.getFlatPosition(packedPosition);
+		return result + getHeadersCount();
+	}
+
+	public int getFlatPosition(int sectionIndex, int sectionItemIndex) {
+		int result = mPositionTranslator.getFlatPosition(SectionAdapterHelper
+				.getPackedPositionForChild(sectionIndex, sectionItemIndex));
+		return result + getHeadersCount();
+	}
+
+	private void rebuildPositionTranslator() {
+		if (mPositionTranslator != null) {
+			int[] savedState = mPositionTranslator.getSavedStateArray();
+			mPositionTranslator.build(mSectionAdapter, true);
+			mPositionTranslator.restoreExpandedSectionItems(savedState, null);
+		}
+	}
+
+	public void notifySectionDataSetChanged() {
+		rebuildPositionTranslator();
+		super.notifyDataSetChanged();
+	}
+
+	public void notifySectionItemRangeChanged(int sectionIndex,
+											  int sectionItemIndex, int itemCount) {
+		final long packedPosition = SectionAdapterHelper.getPackedPositionForChild(sectionIndex, sectionItemIndex);
+		final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
+		this.notifyItemRangeChanged(flatPosition, itemCount);
+	}
+
+	public void notifySectionItemRangeInserted(int sectionIndex,
+											   int sectionItemIndex, int itemCount) {
+		final long packedPosition = SectionAdapterHelper.getPackedPositionForChild(sectionIndex, sectionItemIndex);
+		final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
+		mPositionTranslator.insertChildItems(sectionIndex, sectionItemIndex, itemCount);
+		super.notifyItemRangeInserted(flatPosition, itemCount);
+//		mRecyclerView.scrollToPosition(flatPosition);
+	}
+
+	public void notifySectionItemRangeRemoved(int sectionIndex,
+											  int sectionItemIndex, int itemCount) {
+		final long packedPosition = SectionAdapterHelper.getPackedPositionForChild(sectionIndex, sectionItemIndex);
+		final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
+
+		if (sectionItemIndex == RecyclerView.NO_POSITION) {
+			mPositionTranslator.removeSectionItem(sectionIndex);
+		} else {
+			mPositionTranslator.removeChildItems(sectionIndex, sectionItemIndex, itemCount);
+		}
+
+		super.notifyItemRangeRemoved(flatPosition, itemCount);
+	}
+
+	public void notifySectionItemMoved(int fromSectionIndex, int fromSectionItemIndex,
+									   int toSectionIndex, int toSectionItemIndex) {
+		long packedPosition = SectionAdapterHelper.getPackedPositionForChild(fromSectionIndex, fromSectionItemIndex);
+		final int fromFlatPosition = mPositionTranslator.getFlatPosition(packedPosition);
+		packedPosition = SectionAdapterHelper.getPackedPositionForChild(toSectionIndex, toSectionItemIndex);
+		final int toFlatPosition = mPositionTranslator.getFlatPosition(packedPosition);
+
+		mPositionTranslator.moveChildItem(fromSectionIndex, fromSectionItemIndex, toSectionIndex, toSectionItemIndex);
+		super.notifyItemMoved(fromFlatPosition, toFlatPosition);
+	}
+
+	public void notifySectionItemMoved(int fromPosition, int toPosition, int itemCount) {
+		rebuildPositionTranslator();
+		if (itemCount != 1) {
+			throw new IllegalStateException("itemCount should be always 1  (actual: " + itemCount + ")");
+		}
+		super.notifyItemMoved(fromPosition, toPosition);
+	}
+
+	public LayoutParams getStickySectionHeadersLayoutParams() {
+		FrameLayout.LayoutParams newParams = new FrameLayout.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		newParams.gravity = Gravity.TOP | Gravity.LEFT;
+		return newParams;
+	}
+
     /*----------------*/
     /* INSTANCE STATE */
     /*----------------*/
@@ -1231,187 +1340,36 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		void onStickyHeaderChange(int sectionIndex);
 	}
 
-
-    /*------------------*/
-    /* SECTION FEATURES */
-    /*------------------*/
-
-	/**
-	 * Returns the view sticky headers will be attached to
-	 *
-	 * @return FrameLayout the view
-	 */
-	public abstract FrameLayout getStickySectionHeadersHolder();
-
-	public boolean collapseSection(int sectionIndex, boolean fromUser) {
-		if (!mPositionTranslator.isSectionExpanded(sectionIndex)) {
-			return false;
-		}
-
-		if (mPositionTranslator.collapseSection(sectionIndex)) {
-			final long packedPosition = SectionAdapterHelper.getPackedPositionForSection(sectionIndex);
-			final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
-			final int childCount = mPositionTranslator.getChildCount(sectionIndex);
-
-			notifyItemRangeRemoved(flatPosition + 1, childCount);
-		}
-
-		{
-			final long packedPosition = SectionAdapterHelper.getPackedPositionForSection(sectionIndex);
-			final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
-			notifyItemChanged(flatPosition);
-		}
-		return true;
+	public class FixedViewInfo {
+		/**
+		 * The view to add to the list
+		 */
+		public View view;
+		/**
+		 * The data backing the view. This is returned from
+		 * {@link ListAdapter#getItem(int)}.
+		 */
+		public Object data;
+		/**
+		 * <code>true</code> if the fixed view should be selectable in the list
+		 */
+		public boolean isSelectable;
 	}
 
-	public boolean expandSection(int sectionIndex, boolean fromUser) {
-		if (mPositionTranslator.isSectionExpanded(sectionIndex)) {
-			return false;
-		}
-
-		if (mPositionTranslator.expandSection(sectionIndex)) {
-			final long packedPosition = SectionAdapterHelper.getPackedPositionForSection(sectionIndex);
-			final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
-			final int childCount = mPositionTranslator.getChildCount(sectionIndex);
-			notifyItemRangeInserted(flatPosition + 1, childCount);
-		}
-
-		{
-			final long packedPosition = SectionAdapterHelper.getPackedPositionForSection(sectionIndex);
-			final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
-			notifyItemChanged(flatPosition);
-		}
-
-		return true;
-	}
-
-	public boolean isSectionExpanded(int sectionIndex) {
-		return mPositionTranslator.isSectionExpanded(sectionIndex);
-	}
-
-	public int getSectionPosition(int flatPosition) {
-		int numHeaders = getHeadersCount();
-		if (flatPosition >= numHeaders) {
-			int adjPosition = flatPosition - numHeaders;
-			int adapterCount = getRealItemCount();
-			if (adjPosition < adapterCount) {
-				flatPosition = adjPosition;
-				return getFlatPosition(mPositionTranslator.getExpandablePosition(flatPosition));
-			}
-		}
-		return -1;
-	}
-
-	public int getSectionIndex(int flatPosition) {
-//        int numHeaders = getHeadersCount();
-//        if (flatPosition >= numHeaders) {
-//            int adjPosition = flatPosition - numHeaders;
-//            int adapterCount = getRealItemCount();
-//            if (adjPosition < adapterCount) {
-//                flatPosition = adjPosition;
-		final long expandablePosition = mPositionTranslator
-				.getExpandablePosition(flatPosition);
-		return SectionAdapterHelper
-				.getPackedPositionSection(expandablePosition);
-//            }
-//        }
-//        return -1;
-	}
-
-	public int getSectionItemIndex(int flatPosition) {
-//        int numHeaders = getHeadersCount();
-//        if (flatPosition >= numHeaders) {
-//            int adjPosition = flatPosition - numHeaders;
-//            int adapterCount = getRealItemCount();
-//            if (adjPosition < adapterCount) {
-//                flatPosition = adjPosition;
-		final long expandablePosition = mPositionTranslator.getExpandablePosition(flatPosition);
-		return SectionAdapterHelper.getPackedPositionChild(expandablePosition);
-//            }
-//        }
-//        return -1;
-
-	}
-
-	public int getFlatPosition(long packedPosition) {
-		int result = mPositionTranslator.getFlatPosition(packedPosition);
-		return result + getHeadersCount();
-	}
-
-	public int getFlatPosition(int sectionIndex, int sectionItemIndex) {
-		int result = mPositionTranslator.getFlatPosition(SectionAdapterHelper
-				.getPackedPositionForChild(sectionIndex, sectionItemIndex));
-		return result + getHeadersCount();
-	}
-
-	private void rebuildPositionTranslator() {
-		if (mPositionTranslator != null) {
-			int[] savedState = mPositionTranslator.getSavedStateArray();
-			mPositionTranslator.build(mSectionAdapter, true);
-			mPositionTranslator.restoreExpandedSectionItems(savedState, null);
-		}
-	}
-
-	public void notifySectionDataSetChanged() {
-		rebuildPositionTranslator();
-		super.notifyDataSetChanged();
-	}
-
-	public void notifySectionItemRangeChanged(int sectionIndex,
-											  int sectionItemIndex, int itemCount) {
-		final long packedPosition = SectionAdapterHelper.getPackedPositionForChild(sectionIndex, sectionItemIndex);
-		final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
-		this.notifyItemRangeChanged(flatPosition, itemCount);
-	}
-
-	public void notifySectionItemRangeInserted(int sectionIndex,
-											   int sectionItemIndex, int itemCount) {
-		final long packedPosition = SectionAdapterHelper.getPackedPositionForChild(sectionIndex, sectionItemIndex);
-		final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
-		mPositionTranslator.insertChildItems(sectionIndex, sectionItemIndex, itemCount);
-		super.notifyItemRangeInserted(flatPosition, itemCount);
-//		mRecyclerView.scrollToPosition(flatPosition);
-	}
-
-	public void notifySectionItemRangeRemoved(int sectionIndex,
-											  int sectionItemIndex, int itemCount) {
-		final long packedPosition = SectionAdapterHelper.getPackedPositionForChild(sectionIndex, sectionItemIndex);
-		final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
-
-		if (sectionItemIndex == RecyclerView.NO_POSITION) {
-			mPositionTranslator.removeSectionItem(sectionIndex);
-		} else {
-			mPositionTranslator.removeChildItems(sectionIndex, sectionItemIndex, itemCount);
-		}
-
-		super.notifyItemRangeRemoved(flatPosition, itemCount);
-	}
-
-	public void notifySectionItemMoved(int fromSectionIndex, int fromSectionItemIndex,
-									   int toSectionIndex, int toSectionItemIndex) {
-		long packedPosition = SectionAdapterHelper.getPackedPositionForChild(fromSectionIndex, fromSectionItemIndex);
-		final int fromFlatPosition = mPositionTranslator.getFlatPosition(packedPosition);
-		packedPosition = SectionAdapterHelper.getPackedPositionForChild(toSectionIndex, toSectionItemIndex);
-		final int toFlatPosition = mPositionTranslator.getFlatPosition(packedPosition);
-
-		mPositionTranslator.moveChildItem(fromSectionIndex, fromSectionItemIndex, toSectionIndex, toSectionItemIndex);
-		super.notifyItemMoved(fromFlatPosition, toFlatPosition);
-	}
-
-	public void notifySectionItemMoved(int fromPosition, int toPosition, int itemCount) {
-		rebuildPositionTranslator();
-		if (itemCount != 1) {
-			throw new IllegalStateException("itemCount should be always 1  (actual: " + itemCount + ")");
-		}
-		super.notifyItemMoved(fromPosition, toPosition);
-	}
-
-	public LayoutParams getStickySectionHeadersLayoutParams() {
-		FrameLayout.LayoutParams newParams = new FrameLayout.LayoutParams(
-				ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		newParams.gravity = Gravity.TOP | Gravity.LEFT;
-		return newParams;
-	}
+//	private class HeaderFrameLayout extends FrameLayout {
+//
+//		private final View shapeView;
+//
+//		public HeaderFrameLayout(View view) {
+//			super(view.getContext());
+//			this.shapeView = view;
+//		}
+//
+//		@Override
+//		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//			measureChildWithMargins(shapeView, widthMeasureSpec, 0, heightMeasureSpec, 0);
+//			setMeasuredDimension(shapeView.getMeasuredWidth(), shapeView.getMeasuredHeight());
+//		}
+//	}
 
 }

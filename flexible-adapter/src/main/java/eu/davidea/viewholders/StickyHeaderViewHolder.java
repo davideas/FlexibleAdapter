@@ -1,4 +1,4 @@
-package eu.davidea.flexibleadapter.section;
+package eu.davidea.viewholders;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
