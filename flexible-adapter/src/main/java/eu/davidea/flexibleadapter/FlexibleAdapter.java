@@ -1465,10 +1465,14 @@ public abstract class FlexibleAdapter extends FlexibleAnimatorAdapter
             int sectionItemIndex, int itemCount) {
         final long packedPosition = SectionAdapterHelper
                 .getPackedPositionForChild(sectionIndex, sectionItemIndex);
+        mPositionTranslator.insertChildItems(sectionIndex, sectionItemIndex, itemCount);
         final int flatPosition = mPositionTranslator
                 .getFlatPosition(packedPosition);
-        mPositionTranslator.insertChildItems(sectionIndex, sectionItemIndex, itemCount);
-        super.notifyItemRangeInserted(flatPosition, itemCount);
+        if (flatPosition != RecyclerView.NO_POSITION) {
+            super.notifyItemRangeInserted(flatPosition, itemCount);
+        } else {
+            super.notifyDataSetChanged();
+        }
 //        mRecyclerView.scrollToPosition(flatPosition);
     }
 
