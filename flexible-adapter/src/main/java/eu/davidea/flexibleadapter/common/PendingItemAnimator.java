@@ -20,16 +20,16 @@ import java.util.ArrayList;
  **/
 public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleItemAnimator {
 
-    private ArrayList<H> mPendingRemovals = new ArrayList<H>();
-    private ArrayList<H> mPendingAdditions = new ArrayList<H>();
+    private ArrayList<ViewHolder> mPendingRemovals = new ArrayList<ViewHolder>();
+    private ArrayList<ViewHolder> mPendingAdditions = new ArrayList<ViewHolder>();
     private ArrayList<MoveInfo> mPendingMoves = new ArrayList<MoveInfo>();
 
-    private ArrayList<H> mAdditions = new ArrayList<H>();
+    private ArrayList<ViewHolder> mAdditions = new ArrayList<ViewHolder>();
     private ArrayList<MoveInfo> mMoves = new ArrayList<MoveInfo>();
 
-    private ArrayList<H> mAddAnimations = new ArrayList<H>();
+    private ArrayList<ViewHolder> mAddAnimations = new ArrayList<ViewHolder>();
     private ArrayList<ViewHolder> mMoveAnimations = new ArrayList<ViewHolder>();
-    private ArrayList<H> mRemoveAnimations = new ArrayList<H>();
+    private ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<ViewHolder>();
 
     private static class MoveInfo {
         public ViewHolder holder;
@@ -62,7 +62,7 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
     }
 
     protected final void runRemoveAnimation() {
-        for (final H holder : mPendingRemovals) {
+        for (final ViewHolder holder : mPendingRemovals) {
             animateRemoveImpl(holder).setDuration(getRemoveDuration())
                     .setListener(new ItemAnimatorListener() {
                         @Override
@@ -121,7 +121,7 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
             mPendingAdditions.clear();
             Runnable adder = new Runnable() {
                 public void run() {
-                    for (final H holder : mAdditions) {
+                    for (final ViewHolder holder : mAdditions) {
                         animateAddImpl(holder).setDuration(getAddDuration())
                                 .setListener(new ItemAnimatorListener() {
                                     @Override
@@ -175,28 +175,28 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
      * false otherwise.
      */
     public boolean animateRemove(final ViewHolder holder) {
-        mPendingRemovals.add((H) holder);
-        return prepHolderForAnimateRemove((H) holder);
+        mPendingRemovals.add(holder);
+        return prepHolderForAnimateRemove(holder);
     }
 
     /**
      * Do whatever you need to do before animation like translating X.
      **/
-    protected abstract boolean prepHolderForAnimateRemove(H holder);
+    protected abstract boolean prepHolderForAnimateRemove(final ViewHolder holder);
 
     /**
      * Preform your animation. Listener will be overridden.
      **/
-    protected abstract ViewPropertyAnimatorCompat animateRemoveImpl(H holder);
+    protected abstract ViewPropertyAnimatorCompat animateRemoveImpl(final ViewHolder holder);
 
     /**
      * This should reset the remove animation.
      *
      * @param holder
      **/
-    protected abstract void onRemoveCanceled(H holder);
+    protected abstract void onRemoveCanceled(final ViewHolder holder);
 
-    protected void animateRemoveEnded(H holder) {
+    protected void animateRemoveEnded(final ViewHolder holder) {
         dispatchRemoveFinished(holder);
         mRemoveAnimations.remove(holder);
         dispatchFinishedWhenDone();
@@ -234,21 +234,21 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
     /**
      * Do whatever you need to do before animation like translating X.
      **/
-    protected abstract boolean prepHolderForAnimateAdd(H holder);
+    protected abstract boolean prepHolderForAnimateAdd(final ViewHolder holder);
 
     /**
      * Preform your animation. Listeners will be overridden
      **/
-    protected abstract ViewPropertyAnimatorCompat animateAddImpl(H holder);
+    protected abstract ViewPropertyAnimatorCompat animateAddImpl(final ViewHolder holder);
 
     /**
      * This should reset the add animation
      *
      * @param holder
      **/
-    protected abstract void onAddCanceled(H holder);
+    protected abstract void onAddCanceled(final ViewHolder holder);
 
-    protected void animateAddEnded(H holder) {
+    protected void animateAddEnded(final ViewHolder holder) {
         dispatchAddFinished(holder);
         mAddAnimations.remove(holder);
         dispatchFinishedWhenDone();
@@ -287,7 +287,7 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
     /**
      * Do whatever you need to do before animation.
      **/
-    protected boolean prepHolderForAnimateMove(final H holder, int fromX, int fromY, int toX, int toY) {
+    protected boolean prepHolderForAnimateMove(final ViewHolder holder, int fromX, int fromY, int toX, int toY) {
         final View view = holder.itemView;
         int deltaX = toX - fromX;
         int deltaY = toY - fromY;
@@ -408,13 +408,13 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
         }
         count = mPendingRemovals.size();
         for (int i = count - 1; i >= 0; i--) {
-            H item = mPendingRemovals.get(i);
+            ViewHolder item = mPendingRemovals.get(i);
             dispatchRemoveFinished(item);
             mPendingRemovals.remove(item);
         }
         count = mPendingAdditions.size();
         for (int i = count - 1; i >= 0; i--) {
-            H item = mPendingAdditions.get(i);
+            ViewHolder item = mPendingAdditions.get(i);
             dispatchAddFinished(item);
             mPendingAdditions.remove(item);
         }
@@ -433,7 +433,7 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
         }
         count = mRemoveAnimations.size();
         for (int i = count - 1; i >= 0; i--) {
-            H item = mRemoveAnimations.get(i);
+            ViewHolder item = mRemoveAnimations.get(i);
             View view = item.itemView;
             ViewCompat.animate(view).cancel();
             dispatchRemoveFinished(item);
@@ -441,7 +441,7 @@ public abstract class PendingItemAnimator<H extends ViewHolder> extends SimpleIt
         }
         count = mAddAnimations.size();
         for (int i = count - 1; i >= 0; i--) {
-            H item = mAddAnimations.get(i);
+            ViewHolder item = mAddAnimations.get(i);
             View view = item.itemView;
             ViewCompat.animate(view).cancel();
             dispatchAddFinished(item);
