@@ -6,7 +6,7 @@ android {
 
 	defaultConfig {
 		applicationId "eu.davidea.examples.flexibleadapter"
-		minSdkVersion minSdk
+		minSdkVersion minSdkApp
 		targetSdkVersion targetSdk
 		versionCode libraryCode
 		versionName libraryVersion + libraryDate
