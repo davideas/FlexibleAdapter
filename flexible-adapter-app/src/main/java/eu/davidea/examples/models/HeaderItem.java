@@ -12,13 +12,14 @@ import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractHeaderItem;
 import eu.davidea.viewholders.FlexibleViewHolder;
+import eu.davidea.viewholders.StickyHeaderViewHolder;
 
 /**
  * This is a simple item with custom layout for headers.
  * <p>A Section should not contain others Sections!</p>
  * Headers are not Sectionable!
  */
-public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> {
+public class HeaderItem extends AbstractHeaderItem<StickyHeaderViewHolder> {
 
 	private static final long serialVersionUID = -7408637077727563374L;
 
@@ -70,20 +71,23 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 	}
 
 	@Override
-	public HeaderViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new HeaderViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public StickyHeaderViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new StickyHeaderViewHolder(
+				inflater.getContext(),
+				new HeaderViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter));
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
+	public void bindViewHolder(FlexibleAdapter adapter, StickyHeaderViewHolder holder, int position, List payloads) {
+		HeaderViewHolder headerVH = (HeaderViewHolder) holder.realItemHolder;
 		if (payloads.size() > 0) {
 			Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
 		} else {
-			holder.mTitle.setText(getTitle());
+			headerVH.mTitle.setText(getTitle());
 		}
 		AbstractExampleItem item = (AbstractExampleItem) adapter.getSectionableOf(this);
 		String subTitle = "Attached to " + (item != null ? item.getTitle() : "none");
-		holder.mSubtitle.setText(subTitle);
+		headerVH.mSubtitle.setText(subTitle);
 		//holder.mSubtitle.setText(getSubtitle());
 	}
 

@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +44,7 @@ import java.util.Locale;
 
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
+import eu.davidea.flexibleadapter.helpers.StickyHeaderHelper;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IFlexible;
@@ -103,6 +105,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private List<IHeader> mOrphanHeaders;
 	private boolean headersShown = false, headersSticky = false, recursive = false;
+	private StickyHeaderHelper mStickyHeaderHelper;
 
 	/**
 	 * Handler for delayed {@link #filterItems(List)} and {@link OnDeleteCompleteListener#onDeleteConfirmed}
@@ -159,6 +162,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public OnItemLongClickListener mItemLongClickListener;
 	protected OnItemMoveListener mItemMoveListener;
 	protected OnItemSwipeListener mItemSwipeListener;
+	protected OnStickyHeaderChangeListener mStickyHeaderChangeListener;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -209,6 +213,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			mItemMoveListener = (OnItemMoveListener) listeners;
 		if (listeners instanceof OnItemSwipeListener)
 			mItemSwipeListener = (OnItemSwipeListener) listeners;
+		if (listeners instanceof OnStickyHeaderChangeListener)
+			mStickyHeaderChangeListener = (OnStickyHeaderChangeListener) listeners;
 
 		//Get notified when items are inserted or removed (it adjusts selected positions)
 		registerAdapterDataObserver(new ExpandableAdapterDataObserver());
@@ -318,8 +324,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param items the new data set
 	 */
 	public void updateDataSet(List<T> items) {
-		mItems = items;
-		notifyDataSetChanged();
+		animateTo(items);
 		showAllHeaders();
 	}
 
@@ -548,7 +553,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                         depends by the specific use case.
 	 */
 	public void enableStickyHeaders(int maxCachedHeaders) {
-		setStickyHeaders(true, maxCachedHeaders);
+		setStickyHeaders(true);
 	}
 
 	/**
@@ -556,7 +561,36 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * {@link StickyHeaderDecoration} from the RecyclerView.
 	 */
 	public void disableStickyHeaders() {
-		setStickyHeaders(false, -1);
+		setStickyHeaders(false);
+	}
+
+	private void setStickyHeaders(boolean headersSticky) {
+		// Add or Remove the sticky headers
+		if (headersShown && headersSticky) {
+			this.headersSticky = true;
+			if (mStickyHeaderHelper == null)
+				mStickyHeaderHelper = new StickyHeaderHelper(this);
+			mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
+		} else if (mStickyHeaderHelper != null) {
+			this.headersSticky = false;
+			mStickyHeaderHelper.detachFromRecyclerView(mRecyclerView);
+			mStickyHeaderHelper = null;
+		}
+	}
+
+	public void onStickyHeaderChange(int sectionIndex) {
+		if (mStickyHeaderChangeListener != null) {
+			mStickyHeaderChangeListener.onStickyHeaderChange(sectionIndex);
+		}
+	}
+
+	/**
+	 * Returns the view sticky header will be attached to.
+	 *
+	 * @return FrameLayout the layout that holds the sticky headerView
+	 */
+	public FrameLayout getStickySectionHeadersHolder() {
+		return new FrameLayout(mRecyclerView.getContext());
 	}
 
 	private void setStickyHeaders(boolean headersSticky, int maxCachedHeaders) {
@@ -2769,6 +2803,18 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * @since 05/03/2016
+	 */
+	public interface OnStickyHeaderChangeListener {
+		/**
+		 * Called when the current sticky header changed.
+		 *
+		 * @param position the position of header
+		 */
+		void onStickyHeaderChange(int sectionIndex);
+	}
+
+	/**
 	 * Observer Class responsible to recalculate Selection and Expanded positions.
 	 */
 	private class ExpandableAdapterDataObserver extends RecyclerView.AdapterDataObserver {
@@ -2782,9 +2828,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 
 		private void clearHeadersCache() {
-			if (headersSticky) {
-				stickyHeaderDecoration.clearHeadersCache();
-			}
+//			if (headersSticky) {//TODO: reimplement
+//				stickyHeaderDecoration.clearHeadersCache();
+//			}
 		}
 
 		/* Triggered by {@link #notifyDataSetChanged()} */
