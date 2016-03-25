@@ -246,7 +246,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*------------------------------*/
 
 	public boolean isEnabled(int position) {
-		return getItem(position).isEnabled();
+		T item = getItem(position);
+		return item != null && item.isEnabled();
 	}
 
 	@Override
@@ -590,7 +591,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return FrameLayout the layout that holds the sticky headerView
 	 */
 	public FrameLayout getStickySectionHeadersHolder() {
-		return new FrameLayout(mRecyclerView.getContext());
+		ViewGroup parent = ((ViewGroup) mRecyclerView.getParent());
+		FrameLayout frameLayout = (FrameLayout) mInflater.inflate(R.layout.sticky_header_layout, parent, false);
+		//FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
+		parent.removeView(mRecyclerView);
+		frameLayout.addView(mRecyclerView);
+		parent.addView(frameLayout);
+		return frameLayout;
 	}
 
 	private void setStickyHeaders(boolean headersSticky, int maxCachedHeaders) {
@@ -642,7 +649,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		return null;
 	}
 
-	public IHeader getHeaderStickyOn(@IntRange(from = 0) int position) {
+	public IHeader getSectionHeader(@IntRange(from = 0) int position) {
 		//Headers are not visible nor sticky
 		if (!headersShown || !headersSticky) return null;
 		//When headers are visible and sticky, get the previous header
@@ -653,6 +660,19 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (header != null) return header;
 		}
 		return null;
+	}
+
+	public int getSectionIndex(@NonNull IHeader header) {
+		int position = getGlobalPositionOf(header);
+		return getSectionIndex(position);
+	}
+
+	public int getSectionIndex(@IntRange(from = 0) int headerPosition) {
+		int sectionIndex = 0;
+		for (int i = 0; i <= headerPosition; i++) {
+			if (isHeader(getItem(i))) sectionIndex++;
+		}
+		return sectionIndex;
 	}
 
 	/**
@@ -2809,7 +2829,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		/**
 		 * Called when the current sticky header changed.
 		 *
-		 * @param position the position of header
+		 * @param sectionIndex the position of header
 		 */
 		void onStickyHeaderChange(int sectionIndex);
 	}

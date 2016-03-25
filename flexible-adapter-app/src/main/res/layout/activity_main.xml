@@ -4,7 +4,7 @@
 	android:id="@+id/main_view"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context="eu.davidea.examples.flexibleadapter.example.MainActivity">
+	tools:context="eu.davidea.examples.flexibleadapter.MainActivity">
 
 	<android.support.v4.widget.SwipeRefreshLayout
 		android:id="@+id/swipeRefreshLayout"
@@ -19,9 +19,10 @@
 
 	</android.support.v4.widget.SwipeRefreshLayout>
 
-
-
-
+	<FrameLayout
+		android:id="@+id/sticky_header_holder"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"/>
 
 	<!--<include layout="@layout/progress_bar"/>-->
 

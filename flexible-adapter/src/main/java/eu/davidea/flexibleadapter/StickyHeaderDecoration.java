@@ -54,7 +54,7 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 	 * @return Header view or null if the associated position and previous has no header
 	 */
 	private View getHeader(RecyclerView recyclerView, int position) {
-		final IHeader key = mAdapter.getHeaderStickyOn(position);
+		final IHeader key = mAdapter.getSectionHeader(position);
 
 		if (key != null && mHeaderCache.containsKey(key)) {
 //			Log.v("getHeader", "Returning existing Header " + key);
@@ -144,14 +144,14 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 		int top = Math.max(0, (int) child.getY());
 
 		//Check item availability
-		IHeader current = mAdapter.getHeaderStickyOn(adapterPos);
+		IHeader current = mAdapter.getSectionHeader(adapterPos);
 		if (current == null || recyclerView.getChildCount() < 1)
 			return top;
 
 		//Get next(+1) view with header and compute the offscreen push if needed
 		View nextItemView = recyclerView.getChildAt(1);
 		int adapterPosHere = recyclerView.getChildAdapterPosition(nextItemView);
-		IHeader next = mAdapter.getHeaderStickyOn(adapterPosHere);
+		IHeader next = mAdapter.getSectionHeader(adapterPosHere);
 
 		if (next != null && !next.equals(current)) {
 			View nextHeaderView = getHeader(recyclerView, adapterPosHere);

@@ -155,7 +155,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 			removeViewFromParent(view);
 
-			mStickyHolderLayout.addView(view, getStickyHeadersLayoutParams());
+			mStickyHolderLayout.addView(view, params);
 		}
 	}
 
@@ -163,9 +163,9 @@ public class StickyHeaderHelper extends OnScrollListener {
 		// Check if there is a new header should be sticky
 		if (mHeaderPosition == null || mHeaderPosition != headerPosition) {
 			mHeaderPosition = headerPosition;
-			//final int sectionIndex = mAdapter.getSectionIndex(headerPosition);
-			if (mSectionIndex != headerPosition) {
-				mSectionIndex = headerPosition;
+			final int sectionIndex = mAdapter.getSectionIndex(headerPosition);
+			if (mSectionIndex != sectionIndex) {
+				mSectionIndex = sectionIndex;
 				//int sectionHeaderPosition = mAdapter.getFlatPosition(headerPosition, RecyclerView.NO_POSITION);
 				if (headerPosition >= 0) {
 					final RecyclerView.ViewHolder holder = getHeaderViewHolder(mRecyclerView, headerPosition);
@@ -201,8 +201,8 @@ public class StickyHeaderHelper extends OnScrollListener {
 				final View child = mRecyclerView.getChildAt(i);
 
 				int adapterPos = mRecyclerView.getChildAdapterPosition(child);
-				//int sectionIndex = mAdapter.getSectionIndex(adapterPos);
-				int sectionIndex = getHeaderPosition(adapterPos);
+				int sectionIndex = mAdapter.getSectionIndex(adapterPos);
+				//int sectionIndex = getHeaderPosition(adapterPos);
 				if (mSectionIndex != sectionIndex) {
 					if (orientation == LinearLayoutManager.HORIZONTAL) {
 						if (child.getLeft() > 0) {
@@ -217,12 +217,6 @@ public class StickyHeaderHelper extends OnScrollListener {
 						}
 					}
 				}
-				//old code for now
-//                RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForAdapterPosition(adapterPos);
-//                final boolean doesChildHaveHeader = holder instanceof HeaderViewHolder && holder != mStickyHeaderViewHolder;
-//                if (!doesChildHaveHeader) {
-//                    continue;
-//                }
 			}
 			if (mStickyHeaderViewHolder.realItemHolder != null) {
 				mStickyHeaderViewHolder.realItemHolder.itemView.setTranslationX(headerOffsetX);
@@ -254,8 +248,8 @@ public class StickyHeaderHelper extends OnScrollListener {
 			header.setIsRecyclable(true);
 			ViewGroup.LayoutParams params = header.layout.getLayoutParams();
 			if (params != null) {
-				params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-				params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+				params.width = view.getMeasuredWidth();
+				params.height = view.getMeasuredHeight();
 				header.layout.setLayoutParams(params);
 			}
 		}
@@ -339,15 +333,16 @@ public class StickyHeaderHelper extends OnScrollListener {
 			View nextItemView = mRecyclerView.getChildAt(0);
 			adapterPosHere = mRecyclerView.getChildAdapterPosition(nextItemView);
 		}
-		IHeader header = mAdapter.getHeaderStickyOn(adapterPosHere);
+		IHeader header = mAdapter.getSectionHeader(adapterPosHere);
+		//IHeader header = mAdapter.getHeaderStickyOn(adapterPosHere);
 		return mAdapter.getGlobalPositionOf(header);
 	}
 
 	private static ViewGroup.LayoutParams getStickyHeadersLayoutParams() {
 		FrameLayout.LayoutParams newParams = new FrameLayout.LayoutParams(
 				ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.MATCH_PARENT);//TODO: Make LayoutParams configurable?
-		newParams.gravity = Gravity.TOP | Gravity.START;
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		newParams.gravity = Gravity.TOP | Gravity.LEFT;
 		return newParams;
 	}
 
