@@ -49,9 +49,8 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 	}
 
 	@Override
-	public SimpleItem setHeader(HeaderItem header) {
+	public void setHeader(HeaderItem header) {
 		this.header = header;
-		return this;
 	}
 
 	@Override

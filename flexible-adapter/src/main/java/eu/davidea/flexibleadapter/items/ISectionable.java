@@ -26,6 +26,6 @@ public interface ISectionable<VH extends RecyclerView.ViewHolder, T extends IHea
 
 	T getHeader();
 
-	IFlexible setHeader(T header);
+	void setHeader(T header);
 
 }
