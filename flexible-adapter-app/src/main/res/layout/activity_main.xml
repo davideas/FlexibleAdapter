@@ -19,10 +19,7 @@
 
 	</android.support.v4.widget.SwipeRefreshLayout>
 
-	<FrameLayout
-		android:id="@+id/sticky_header_holder"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"/>
+	<include layout="@layout/sticky_header_layout"/>
 
 	<!--<include layout="@layout/progress_bar"/>-->
 

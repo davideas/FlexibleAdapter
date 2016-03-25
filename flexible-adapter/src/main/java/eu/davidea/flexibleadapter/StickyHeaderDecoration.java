@@ -28,8 +28,12 @@ import java.util.Map;
 import eu.davidea.flexibleadapter.items.IHeader;
 
 /**
- * A sticky header decoration for RecyclerView, to use only with {@link FlexibleAdapter}.
+ * A higher optimized sticky header decoration for RecyclerView,
+ * to use only with {@link FlexibleAdapter}.
+ *
+ * @deprecated New solution to make StickyHeader clickable made this class useless.
  */
+@Deprecated
 public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 
 	private FlexibleAdapter mAdapter;

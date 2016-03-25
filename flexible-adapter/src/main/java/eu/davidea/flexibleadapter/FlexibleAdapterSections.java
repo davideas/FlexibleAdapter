@@ -51,7 +51,7 @@ import eu.davidea.flexibleadapter.section.StickySectionHeaderManager;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 import eu.davidea.viewholders.HeaderViewHolder;
-import eu.davidea.viewholders.StickyHeaderViewHolder;
+import eu.davidea.flexibleadapter.section.StickyHeaderViewHolder;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set such as

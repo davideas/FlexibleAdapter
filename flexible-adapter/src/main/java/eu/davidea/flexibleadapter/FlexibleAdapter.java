@@ -16,6 +16,7 @@
 package eu.davidea.flexibleadapter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,7 +33,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,7 +82,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
  * <br/>20/02/2016 Sticky headers
  */
-@SuppressWarnings({"//unused", "Range", "Convert2Diamond", "ConstantConditions", "unchecked"})
+@SuppressWarnings({"unused", "Range", "Convert2Diamond", "ConstantConditions", "unchecked"})
 public class FlexibleAdapter<T extends IFlexible>
 		extends FlexibleAnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
@@ -377,7 +377,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * the specified position.
 	 * <p>Useful to retrieve the correct position where to insert the new items.</p>
 	 *
-	 * @param position  the position limit to stop counting
+	 * @param position  the position limit where to stop counting (included)
 	 * @param viewTypes the viewTypes to count
 	 * @see #getItemCount()
 	 * @see #getItemCountOfTypes(Integer...)
@@ -386,7 +386,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public int getItemCountOfTypesUntil(@IntRange(from = 0) int position, Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
 		int count = 0;
-		for (int i = 0; i < position; i++) {
+		for (int i = 0; i <= position; i++) {
 			//Privilege faster counting if autoMap is active
 			if ((autoMap && viewTypeList.contains(mItems.get(i).getLayoutRes())) ||
 					viewTypeList.contains(getItemViewType(i)))
@@ -552,14 +552,30 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param maxCachedHeaders the max view instances to keep in the cache. This number depends by
 	 *                         how many headers are normally displayed in the RecyclerView. It
 	 *                         depends by the specific use case.
+	 * @deprecated Use {@link #enableStickyHeaders()} instead.
 	 */
+	@Deprecated
 	public void enableStickyHeaders(int maxCachedHeaders) {
 		setStickyHeaders(true);
 	}
 
 	/**
-	 * Disables the sticky header functionality. Clears the cache and removes the
-	 * {@link StickyHeaderDecoration} from the RecyclerView.
+	 * Enables the sticky header functionality.
+	 * <p>Headers can be sticky only if they are shown. Command is otherwise ignored!</p>
+	 * <b>NOTE:</b>
+	 * <br/>- You must implement {@code getStickySectionHeadersHolder()}.
+	 * <br/>- Sticky headers are now clickable as any Views, but cannot be dragged, swiped,
+	 * moved nor deleted.
+	 * <br/>- Content and linkage are automatically updated.
+	 *
+	 * @see #getStickySectionHeadersHolder()
+	 */
+	public void enableStickyHeaders() {
+		setStickyHeaders(true);
+	}
+
+	/**
+	 * Disables the sticky header functionality.
 	 */
 	public void disableStickyHeaders() {
 		setStickyHeaders(false);
@@ -570,7 +586,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (headersShown && headersSticky) {
 			this.headersSticky = true;
 			if (mStickyHeaderHelper == null)
-				mStickyHeaderHelper = new StickyHeaderHelper(this);
+				mStickyHeaderHelper = new StickyHeaderHelper(this, mStickyHeaderChangeListener);
 			mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
 		} else if (mStickyHeaderHelper != null) {
 			this.headersSticky = false;
@@ -579,39 +595,21 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
-	public void onStickyHeaderChange(int sectionIndex) {
-		if (mStickyHeaderChangeListener != null) {
-			mStickyHeaderChangeListener.onStickyHeaderChange(sectionIndex);
-		}
-	}
-
 	/**
-	 * Returns the view sticky header will be attached to.
+	 * Returns the ViewGroup (FrameLayout) that will hold the headers when sticky.
+	 * <p><b>INCLUDE</b> the predefined layout after the RecyclerView widget:
+	 * <pre>&lt;android.support.v7.widget.RecyclerView
+	 * android:id="@+id/recycler_view"
+	 * android:layout_width="match_parent"
+	 * android:layout_height="match_parent"/&gt;</pre>
+	 * <pre>&lt;include layout="@layout/sticky_header_layout"/&gt;</pre></p>
+	 * <b>OR</b>
+	 * <p>Implement this method to return a ViewGroup.</p>
 	 *
-	 * @return FrameLayout the layout that holds the sticky headerView
+	 * @return ViewGroup layout that will hold the sticky headers ItemViews
 	 */
-	public FrameLayout getStickySectionHeadersHolder() {
-		ViewGroup parent = ((ViewGroup) mRecyclerView.getParent());
-		FrameLayout frameLayout = (FrameLayout) mInflater.inflate(R.layout.sticky_header_layout, parent, false);
-		//FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
-		parent.removeView(mRecyclerView);
-		frameLayout.addView(mRecyclerView);
-		parent.addView(frameLayout);
-		return frameLayout;
-	}
-
-	private void setStickyHeaders(boolean headersSticky, int maxCachedHeaders) {
-		//Add or Remove the sticky headers decoration
-		if (headersShown && headersSticky) {
-			this.headersSticky = true;
-			stickyHeaderDecoration = new StickyHeaderDecoration(this, maxCachedHeaders);
-			mRecyclerView.addItemDecoration(stickyHeaderDecoration);
-		} else if (stickyHeaderDecoration != null) {
-			this.headersSticky = false;
-			stickyHeaderDecoration.clearHeadersCache();
-			mRecyclerView.removeItemDecoration(stickyHeaderDecoration);
-			stickyHeaderDecoration = null;
-		}
+	public ViewGroup getStickySectionHeadersHolder() {
+		return (ViewGroup) ((Activity) mRecyclerView.getContext()).findViewById(R.id.sticky_header_container);
 	}
 
 	/**
@@ -637,9 +635,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Provides the header of the passed Sectionable.
+	 * Provides the header of the specified Sectionable.
 	 *
-	 * @param item the item holding a header
+	 * @param item the ISectionable item holding a header
 	 * @return the header of the passed Sectionable, null otherwise
 	 */
 	public IHeader getHeaderOf(@NonNull T item) {
@@ -649,6 +647,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		return null;
 	}
 
+	/**
+	 * Retrieves the {@link IHeader} item of any specified position.
+	 *
+	 * @param position the item position
+	 * @return the IHeader item linked to the specified item position
+	 */
 	public IHeader getSectionHeader(@IntRange(from = 0) int position) {
 		//Headers are not visible nor sticky
 		if (!headersShown || !headersSticky) return null;
@@ -662,21 +666,33 @@ public class FlexibleAdapter<T extends IFlexible>
 		return null;
 	}
 
+	/**
+	 * Retrieves the index of the specified header/section item.
+	 *
+	 * @param header the header/section item
+	 * @return the index of the specified header/section
+	 */
 	public int getSectionIndex(@NonNull IHeader header) {
 		int position = getGlobalPositionOf(header);
 		return getSectionIndex(position);
 	}
 
-	public int getSectionIndex(@IntRange(from = 0) int headerPosition) {
+	/**
+	 * Retrieves the header/section index of any specified position.
+	 *
+	 * @param position any item position
+	 * @return the index of the specified item position
+	 */
+	public int getSectionIndex(@IntRange(from = 0) int position) {
 		int sectionIndex = 0;
-		for (int i = 0; i <= headerPosition; i++) {
+		for (int i = 0; i <= position; i++) {
 			if (isHeader(getItem(i))) sectionIndex++;
 		}
 		return sectionIndex;
 	}
 
 	/**
-	 * Provides the item that holds the passed header.
+	 * Provides the item that holds the specified header.
 	 * <p>The Sectionable is searched starting from Header position -1 to Header position +2.</p>
 	 *
 	 * @param header the header
@@ -733,6 +749,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			position--;
 		}
 		headersShown = false;
+		setStickyHeaders(false);
 		multiRange = false;
 	}
 
@@ -767,7 +784,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			header.setHidden(false);
 			return addItem(position, (T) header);
 		} else {
-			if (DEBUG) Log.w(TAG, "Header already shown at position " + position + "=" + header);
+//			if (DEBUG) Log.w(TAG, "Header already shown at position " + position + "=" + header);
 			return false;
 		}
 	}
@@ -780,15 +797,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	private boolean hideHeaderOf(@NonNull T item) {
 		//Take the header
 		IHeader header = getHeaderOf(item);
+//		if (header.isHidden() && DEBUG)
+//			Log.w(TAG, "Header already hidden at position " + getGlobalPositionOf(header) + "=" + header);
 		//Check header existence
-		if (header == null) return false;
-		if (!header.isHidden()) {
-			return hideHeader(getGlobalPositionOf(header), header);
-		} else {
-			if (DEBUG)
-				Log.w(TAG, "Header already hidden at position " + getGlobalPositionOf(header) + "=" + header);
-			return false;
-		}
+		return header != null && !header.isHidden() && hideHeader(getGlobalPositionOf(header), header);
 	}
 
 	private boolean hideHeader(int position, IHeader header) {

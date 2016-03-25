@@ -12,14 +12,13 @@ import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractHeaderItem;
 import eu.davidea.viewholders.FlexibleViewHolder;
-import eu.davidea.viewholders.StickyHeaderViewHolder;
 
 /**
  * This is a simple item with custom layout for headers.
  * <p>A Section should not contain others Sections!</p>
  * Headers are not Sectionable!
  */
-public class HeaderItem extends AbstractHeaderItem<StickyHeaderViewHolder> {
+public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> {
 
 	private static final long serialVersionUID = -7408637077727563374L;
 
@@ -71,24 +70,20 @@ public class HeaderItem extends AbstractHeaderItem<StickyHeaderViewHolder> {
 	}
 
 	@Override
-	public StickyHeaderViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new StickyHeaderViewHolder(
-				inflater.getContext(),
-				new HeaderViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter));
+	public HeaderViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new HeaderViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, StickyHeaderViewHolder holder, int position, List payloads) {
-		HeaderViewHolder headerVH = (HeaderViewHolder) holder.realItemHolder;
+	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
 			Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
 		} else {
-			headerVH.mTitle.setText(getTitle());
+			holder.mTitle.setText(getTitle());
 		}
 		AbstractExampleItem item = (AbstractExampleItem) adapter.getSectionableOf(this);
 		String subTitle = "Attached to " + (item != null ? item.getTitle() : "none");
-		headerVH.mSubtitle.setText(subTitle);
-		//holder.mSubtitle.setText(getSubtitle());
+		holder.mSubtitle.setText(subTitle);
 	}
 
 	public static class HeaderViewHolder extends FlexibleViewHolder {
@@ -103,7 +98,7 @@ public class HeaderItem extends AbstractHeaderItem<StickyHeaderViewHolder> {
 			mTitle.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Log.d("HeaderTitle", "Registered click on Header TitleTextView! " + mTitle.getText());
+					Log.d("HeaderTitle", "Registered internal click on Header TitleTextView! " + mTitle.getText());
 				}
 			});
 		}

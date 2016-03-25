@@ -6,7 +6,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -228,11 +227,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //		else
 //			return item.getSubtitle();
 //	}
-
-	@Override
-	public FrameLayout getStickySectionHeadersHolder() {
-		return (FrameLayout) ((Activity) mContext).findViewById(R.id.sticky_header_holder);
-	}
 
 	@Override
 	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
