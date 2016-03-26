@@ -29,6 +29,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnStickyHeaderChangeListener;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * A sticky header helper, to use only with {@link FlexibleAdapter}.
@@ -39,9 +40,9 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();
 
+	private FlexibleAdapter mAdapter;
 	private RecyclerView mRecyclerView;
 	private ViewGroup mStickyHolderLayout;
-	private FlexibleAdapter mAdapter;
 	private RecyclerView.ViewHolder mStickyHeaderViewHolder;
 	private OnStickyHeaderChangeListener mStickyHeaderChangeListener;
 
@@ -110,7 +111,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 			}
 			updateOrClearHeader(false);
 		} else {
-			Log.w(TAG, "WARNING! FrameLayout for Sticky Headers unspecified! You must implement FlexibleAdapter.getStickySectionHeadersHolder() method");
+			Log.w(TAG, "WARNING! ViewGroup for Sticky Headers unspecified! You must include @layout/sticky_header_layout or implement FlexibleAdapter.getStickySectionHeadersHolder() method");
 		}
 	}
 
@@ -145,7 +146,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		// Check if there is a new header should be sticky
 		if (mHeaderPosition != headerPosition) {
 			mHeaderPosition = headerPosition;
-			RecyclerView.ViewHolder holder = getHeaderViewHolder(mRecyclerView, headerPosition);
+			RecyclerView.ViewHolder holder = getHeaderViewHolder(headerPosition);
 			if (mStickyHeaderViewHolder != holder) {
 				if (FlexibleAdapter.DEBUG) Log.d(TAG, "swapHeader newPosition=" + headerPosition);
 				swapHeader(holder);
@@ -222,39 +223,46 @@ public class StickyHeaderHelper extends OnScrollListener {
 	 * Gets the header view for the associated position. If it doesn't exist
 	 * yet, it will be created, measured, and laid out.
 	 *
-	 * @param recyclerView the RecyclerView
-	 * @param position     the adapter position to get the header view for
+	 * @param position the adapter position to get the header view for
 	 * @return Header view or null if the associated position and previous has
 	 * no header
 	 */
-	private RecyclerView.ViewHolder getHeaderViewHolder(RecyclerView recyclerView, int position) {
-		RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(position);
-		if (holder != null) {
-			return holder;
+	@SuppressWarnings("unchecked")
+	private RecyclerView.ViewHolder getHeaderViewHolder(int position) {
+		//Find existing ViewHolder
+		RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForAdapterPosition(position);
+		if (holder == null) {
+			//Create and binds a new ViewHolder
+			holder = mAdapter.createViewHolder(mRecyclerView, mAdapter.getItemViewType(position));
+			mAdapter.bindViewHolder(holder, position);
+
+			//Restore the Adapter position
+			if (holder instanceof FlexibleViewHolder)
+				((FlexibleViewHolder) holder).setBackupPosition(position);
+
+			//Calculate width and height
+			int widthSpec;
+			int heightSpec;
+			if (getOrientation(mRecyclerView) == LinearLayoutManager.VERTICAL) {
+				widthSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getWidth(), View.MeasureSpec.EXACTLY);
+				heightSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getHeight(), View.MeasureSpec.UNSPECIFIED);
+			} else {
+				widthSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+				heightSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getHeight(), View.MeasureSpec.EXACTLY);
+			}
+
+			//Measure and Layout the itemView
+			final View headerView = holder.itemView;
+			int childWidth = ViewGroup.getChildMeasureSpec(widthSpec,
+					mRecyclerView.getPaddingLeft() + mRecyclerView.getPaddingRight(),
+					headerView.getLayoutParams().width);
+			int childHeight = ViewGroup.getChildMeasureSpec(heightSpec,
+					mRecyclerView.getPaddingTop() + mRecyclerView.getPaddingBottom(),
+					headerView.getLayoutParams().height);
+
+			headerView.measure(childWidth, childHeight);
+			headerView.layout(0, 0, headerView.getMeasuredWidth(), headerView.getMeasuredHeight());
 		}
-		holder = mAdapter.onCreateViewHolder(recyclerView, mAdapter.getItemViewType(position));
-		final View headerView = holder.itemView;
-
-		mAdapter.onBindViewHolder(holder, position);
-		int widthSpec;
-		int heightSpec;
-
-		if (getOrientation(recyclerView) == LinearLayoutManager.VERTICAL) {
-			widthSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getWidth(), View.MeasureSpec.EXACTLY);
-			heightSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getHeight(), View.MeasureSpec.UNSPECIFIED);
-		} else {
-			widthSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getWidth(), View.MeasureSpec.UNSPECIFIED);
-			heightSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.getHeight(), View.MeasureSpec.EXACTLY);
-		}
-		int childWidth = ViewGroup.getChildMeasureSpec(widthSpec,
-				recyclerView.getPaddingLeft() + recyclerView.getPaddingRight(),
-				headerView.getLayoutParams().width);
-		int childHeight = ViewGroup.getChildMeasureSpec(heightSpec,
-				recyclerView.getPaddingTop() + recyclerView.getPaddingBottom(),
-				headerView.getLayoutParams().height);
-
-		headerView.measure(childWidth, childHeight);
-		headerView.layout(0, 0, headerView.getMeasuredWidth(), headerView.getMeasuredHeight());
 		return holder;
 	}
 

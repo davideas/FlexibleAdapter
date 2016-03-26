@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.davidea.flexibleadapter;
+package eu.davidea.flexibleadapter.section;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -42,16 +42,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import eu.davidea.flexibleadapter.FlexibleAnimatorAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.flexibleadapter.section.SectionAdapter;
-import eu.davidea.flexibleadapter.section.SectionAdapterHelper;
-import eu.davidea.flexibleadapter.section.SectionPositionTranslator;
-import eu.davidea.flexibleadapter.section.StickySectionHeaderManager;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
-import eu.davidea.viewholders.HeaderViewHolder;
-import eu.davidea.flexibleadapter.section.StickyHeaderViewHolder;
 
 /**
  * This class provides a set of standard methods to handle changes on the data set such as

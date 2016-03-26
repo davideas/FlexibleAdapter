@@ -39,8 +39,8 @@ import eu.davidea.flexibleadapter.utils.Utils;
  *
  * @author Davide Steduto
  * @since 03/01/2016 Created
- *   <br/>23/01/2016 ItemTouch with Drag&Drop, Swipe
- *   <br/>26/01/2016 Constructor revisited
+ * <br/>23/01/2016 ItemTouch with Drag&Drop, Swipe
+ * <br/>26/01/2016 Constructor revisited
  */
 public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		implements View.OnClickListener, View.OnLongClickListener,
@@ -49,6 +49,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	private static final String TAG = FlexibleViewHolder.class.getSimpleName();
 
 	protected final FlexibleAdapter mAdapter;
+	private int mBackupPosition = RecyclerView.NO_POSITION;
 
 	/* These 2 fields avoid double tactile feedback triggered by Android and allow to Drag an
 	   item maintaining LongClick events for ActionMode, all at the same time */
@@ -83,7 +84,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	@Override
 	@CallSuper
 	public void onClick(View view) {
-		int position = getAdapterPosition();
+		int position = getFlexibleAdapterPosition();
 		if (!mAdapter.isEnabled(position)) return;
 		//Experimented that, if LongClick is not consumed, onClick is fired. We skip the
 		//call to the listener in this case, which is allowed only in ACTION_STATE_IDLE.
@@ -94,7 +95,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 			if (mAdapter.mItemClickListener.onItemClick(position)) {
 				//Now toggle the activation
 				if (!mAdapter.isSelected(position) && itemView.isActivated() ||
-						mAdapter.isSelected(position) && !itemView.isActivated() ) {
+						mAdapter.isSelected(position) && !itemView.isActivated()) {
 					toggleActivation();
 				}
 			}
@@ -107,7 +108,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	@Override
 	@CallSuper
 	public boolean onLongClick(View view) {
-		int position = getAdapterPosition();
+		int position = getFlexibleAdapterPosition();
 		if (!mAdapter.isEnabled(position)) return false;
 		if (FlexibleAdapter.DEBUG)
 			Log.v(TAG, "onLongClick on position " + position + " mode=" + mAdapter.getMode());
@@ -130,7 +131,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 */
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
-		int position = getAdapterPosition();
+		int position = getFlexibleAdapterPosition();
 		if (!mAdapter.isEnabled(position)) return false;
 		if (FlexibleAdapter.DEBUG)
 			Log.v(TAG, "onTouch with DragHandleView on position " + position + " mode=" + mAdapter.getMode());
@@ -172,7 +173,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 */
 	@CallSuper
 	protected void toggleActivation() {
-		itemView.setActivated(mAdapter.isSelected(getAdapterPosition()));
+		itemView.setActivated(mAdapter.isSelected(getFlexibleAdapterPosition()));
 		ViewCompat.setElevation(itemView,
 				itemView.isActivated() && getElevation() > 0 ? getElevation() : 0);
 	}
@@ -251,7 +252,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 				}
 			}
 			//Now toggle the activation, Activate view and make selection visible only if necessary
-			if (!itemView.isActivated() ) {
+			if (!itemView.isActivated()) {
 				toggleActivation();
 			}
 		} else if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE &&
@@ -284,6 +285,34 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		//Reset internal action state ready for next action
 		mLongClickSkipped = false;
 		mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
+	}
+
+	/**
+	 * Overcomes the situation of returning an unknown position (-1) of ViewHolders created out of
+	 * the LayoutManager (ex. StickyHeaders).
+	 * <p><b>NOTE:</b> Always call this method, instead of {@code getAdapterPosition()}, in case
+	 * of StickyHeaders use case.</p>
+	 *
+	 * @return the Adapter position result of {@link #getAdapterPosition()} OR the backup position
+	 *         preset and known, if the previous result was {@link RecyclerView#NO_POSITION}.
+	 * @see #setBackupPosition(int)
+	 */
+	public int getFlexibleAdapterPosition() {
+		int position = getAdapterPosition();
+		if (position == RecyclerView.NO_POSITION) {
+			position = mBackupPosition;
+		}
+		return position;
+	}
+
+	/**
+	 * Restore the Adapter position if the original Adapter position is unknown.
+	 * <p>Called by StickyHeaderHelper to support the clickListeners events.</p>
+	 *
+	 * @param backupPosition the known position of this ViewHolder
+	 */
+	public void setBackupPosition(int backupPosition) {
+		mBackupPosition = backupPosition;
 	}
 
 }

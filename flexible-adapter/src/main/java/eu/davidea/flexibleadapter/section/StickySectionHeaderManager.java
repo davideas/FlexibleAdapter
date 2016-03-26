@@ -25,8 +25,6 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 
-import eu.davidea.flexibleadapter.FlexibleAdapterSections;
-
 /**
  * A sticky header decoration for RecyclerView, to use only with
  * {@link FlexibleAdapterSections}.

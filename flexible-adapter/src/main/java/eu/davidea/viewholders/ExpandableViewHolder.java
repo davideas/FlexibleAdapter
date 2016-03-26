@@ -86,7 +86,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@CallSuper
 	protected void toggleExpansion() {
-		int position = getAdapterPosition();
+		int position = getFlexibleAdapterPosition();
 		if (mAdapter.isExpanded(position)) {
 			collapseView(position);
 		} else if (!mAdapter.isSelected(position)) {
@@ -138,7 +138,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@Override
 	public boolean onLongClick(View view) {
-		int position = getAdapterPosition();
+		int position = getFlexibleAdapterPosition();
 		if (isViewCollapsibleOnLongClick()) {
 			collapseView(position);
 		}
@@ -148,7 +148,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 //	@Override
 //	public boolean onTouch(View view, MotionEvent event) {
 //		//We don't allow Drag of Children if a parent is selected
-//		boolean expandable = mAdapter.isExpandable(getAdapterPosition());
+//		boolean expandable = mAdapter.isExpandable(getFlexibleAdapterPosition());
 //		if (expandable && !mAdapter.isAnyChildSelected() || !expandable && !mAdapter.isAnyParentSelected())
 //			return super.onTouch(view, event);
 //		return false;
@@ -160,7 +160,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@Override
 	public void onActionStateChanged(int position, int actionState) {
-		if (mAdapter.isExpanded(getAdapterPosition())) {
+		if (mAdapter.isExpanded(getFlexibleAdapterPosition())) {
 			collapseView(position);
 		}
 		super.onActionStateChanged(position, actionState);

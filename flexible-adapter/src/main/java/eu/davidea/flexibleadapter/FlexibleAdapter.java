@@ -597,7 +597,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Returns the ViewGroup (FrameLayout) that will hold the headers when sticky.
-	 * <p><b>INCLUDE</b> the predefined layout after the RecyclerView widget:
+	 * <p><b>INCLUDE</b> the predefined layout after the RecyclerView widget, example:
 	 * <pre>&lt;android.support.v7.widget.RecyclerView
 	 * android:id="@+id/recycler_view"
 	 * android:layout_width="match_parent"

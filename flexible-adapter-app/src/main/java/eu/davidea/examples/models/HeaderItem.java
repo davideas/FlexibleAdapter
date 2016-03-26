@@ -77,7 +77,7 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
-			Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
+			Log.i(this.getClass().getSimpleName(), "HeaderItem Payload " + payloads);
 		} else {
 			holder.mTitle.setText(getTitle());
 		}
@@ -98,7 +98,7 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 			mTitle.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Log.d("HeaderTitle", "Registered internal click on Header TitleTextView! " + mTitle.getText());
+					Log.d("HeaderTitle", "Registered internal click on Header TitleTextView! " + mTitle.getText() + " position=" + getFlexibleAdapterPosition());
 				}
 			});
 		}

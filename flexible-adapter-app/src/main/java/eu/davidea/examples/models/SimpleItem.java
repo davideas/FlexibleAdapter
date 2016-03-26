@@ -66,7 +66,7 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 	@Override
 	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
 		if (adapter.isExpandable(this) && payloads.size() > 0){
-			Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
+			Log.i(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
 			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems");
 			if (adapter.hasSearchText()) {
 				Utils.setHighlightText(holder.itemView.getContext(), holder.mSubtitle,
