@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Davide Steduto
+ * Copyright 2015-2016 Davide Steduto & Martin Guillon
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,43 +43,16 @@ import java.util.Locale;
 import java.util.Set;
 
 import eu.davidea.flexibleadapter.FlexibleAnimatorAdapter;
-import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * This class provides a set of standard methods to handle changes on the data set such as
- * filtering, adding, removing, moving and animating an item.
- * <p><b>T</b> is your Model object containing the data, with version 5.0.0 it must implement
- * {@link IFlexible} interface.</p>
- * With version 5.0.0, this Adapter supports a set of standard methods for Headers/Sections to
- * expand and collapse an Expandable item, to Drag&Drop and Swipe any item.
- * <p><b>NOTE:</b>This Adapter supports Expandable of Expandable, but selection and restoration
- * don't work well in conjunction of multi level expansion. You should not enable functionalities
- * like: ActionMode, Undo, Drag and CollapseOnExpand in that case. Better to change approach in
- * favor of a better and clearer design/layout: Open the list of the subItem in a new Activity...
- * <br/>Instead, this extra level of expansion is useful in situations where those items are not
- * selectable nor draggable, and information in them are in read only mode or are action buttons.</p>
- *
- * @author Davide Steduto
- * @see FlexibleAnimatorAdapter
- * @see SelectableAdapter
- * @see IFlexible
- * @see FlexibleViewHolder
- * @see ExpandableViewHolder
- * @since 03/05/2015 Created
- * <br/>16/01/2016 Expandable items
- * <br/>24/01/2016 Drag&Drop, Swipe
- * <br/>30/01/2016 Class now extends {@link FlexibleAnimatorAdapter} that extends {@link SelectableAdapter}
- * <br/>02/02/2016 New code reorganization, new item interfaces and full refactoring
- * <br/>08/02/2016 Headers/Sections
- * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
- * <br/>20/02/2016 Sticky headers
+ * FlexibleAdapter class customized by Martin Guillon.
+ * Not avaliable to users. Taking inspiration for some functionalities.
  */
 @SuppressWarnings({"unchecked"})
-public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
+abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
 
 	private static final String TAG = FlexibleAdapterSections.class.getSimpleName();
@@ -528,14 +501,13 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 		externalSpanSizeLookup = spanSizeLookup;
 	}
 
-	public void setLayoutManager(LayoutManager layoutManager) {
-		mLayoutManager = layoutManager;
+	public void setLayoutManager(final LayoutManager layoutManager) {
 		if (layoutManager instanceof GridLayoutManager) {
 			gridSpanSizeLookup = new GridLayoutManager.SpanSizeLookup() {
 				@Override
 				public int getSpanSize(int position) {
 					if (isHeader(position)) {
-						return ((GridLayoutManager) mLayoutManager).getSpanCount();
+						return ((GridLayoutManager) layoutManager).getSpanCount();
 					}
 					if (externalSpanSizeLookup != null) {
 						return externalSpanSizeLookup.getSpanSize(position);
@@ -543,7 +515,7 @@ public abstract class FlexibleAdapterSections extends FlexibleAnimatorAdapter
 					return 1;
 				}
 			};
-			((GridLayoutManager) mLayoutManager).setSpanSizeLookup(gridSpanSizeLookup);
+			((GridLayoutManager) layoutManager).setSpanSizeLookup(gridSpanSizeLookup);
 		} else {
 			gridSpanSizeLookup = null;
 		}

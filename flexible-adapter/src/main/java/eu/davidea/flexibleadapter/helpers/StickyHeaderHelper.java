@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Martin Guillon && Davide Steduto (Hyper-Optimized for FlexibleAdapter project)
+ * Copyright 2016 Martin Guillon & Davide Steduto (Hyper-Optimized for FlexibleAdapter project)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
