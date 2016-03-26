@@ -22,7 +22,7 @@ This library is configurable and it guides the developers (thanks to quality com
 * **NEW!** Expandable items with <u>selection coherence</u>.
 * **NEW!** Adapter Animations with custom configuration based on adapter position and beyond.
 * **NEW!** Drag&Drop and Swipe actions with <u>selection coherence</u>.
-* **NEW!** Headers/Sections with automatic re-linkage and with sticky behaviour!
+* **NEW!** Headers/Sections with automatic re-linkage and with sticky behaviour fully clickable!
 * **NEW!** Auto mapping ViewTypes with Item interfaces.
 * **NEW!** 1 simple constructor for all events.
 

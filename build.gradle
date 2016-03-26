@@ -8,7 +8,7 @@ ext {
 	//Library
 	libraryCode = 14
 	libraryVersion = '5.0.0-SNAPSHOT'
-	libraryDate = " of 2016.02.23"
+	libraryDate = " of 2016.03.26"
 	libraryDescription = '1 Adapter for SelectionMode, ViewHolders, Filter, FastScroller, Animations, Undo, Headers, Expandable, Draggable, Swipeable :-)'
 	libraryName = 'FlexibleAdapter'
 	packageExt = 'aar'
@@ -25,7 +25,7 @@ ext {
 	minSdk = 14
 	targetSdk = 23
 	buildTools = "23.0.2"
-	supportLib = '23.2.0'
+	supportLib = '23.2.1'
 
 	//Support Libraries dependencies
 	supportDependencies = [
