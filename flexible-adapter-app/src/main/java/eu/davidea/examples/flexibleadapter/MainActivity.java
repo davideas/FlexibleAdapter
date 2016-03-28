@@ -1,5 +1,7 @@
 package eu.davidea.examples.flexibleadapter;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
@@ -7,17 +9,20 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -28,7 +33,6 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.examples.models.AbstractExampleItem;
 import eu.davidea.examples.models.ExpandableItem;
 import eu.davidea.examples.models.HeaderItem;
@@ -48,7 +52,10 @@ public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener, SearchView.OnQueryTextListener,
 		FlexibleAdapter.OnUpdateListener, FlexibleAdapter.OnDeleteCompleteListener,
 		FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener,
-		FlexibleAdapter.OnItemMoveListener, FlexibleAdapter.OnItemSwipeListener {
+		FlexibleAdapter.OnItemMoveListener, FlexibleAdapter.OnItemSwipeListener,
+		FastScroller.OnScrollStateChangeListener,
+		NavigationView.OnNavigationItemSelectedListener,
+		OnListFragmentInteractionListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -72,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements
 	private ActionMode mActionMode;
 	private Snackbar mSnackBar;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
+	private Toolbar mToolbar;
+	private DrawerLayout mDrawer;
 	private SearchView mSearchView;
 	private final Handler mSwipeHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
@@ -104,38 +113,139 @@ public class MainActivity extends AppCompatActivity implements
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Adapter & RecyclerView
+		initializeRecyclerView(savedInstanceState);
+		//SwipeToRefresh, Toolbar, Drawer & FAB
+		//initializeSwipeToRefresh();
+		initializeToolbar();
+		initializeDrawer();
+		initializeFab();
+
+		//With FlexibleAdapter v5.0.0 we don't need to call this function anymore
+		//It is automatically called if Activity implements FlexibleAdapter.OnUpdateListener
+		//updateEmptyView();
+
+		//Restore previous state
+		if (savedInstanceState != null) {
+			//Selection
+			mAdapter.onRestoreInstanceState(savedInstanceState);
+			if (mAdapter.getSelectedItemCount() > 0) {
+				mActionMode = startSupportActionMode(this);
+				setContextTitle(mAdapter.getSelectedItemCount());
+			}
+			//Previously serialized activated item position
+			if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
+				setSelection(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
+		}
+
+		//Settings for FlipView
+		FlipView.stopLayoutAnimation();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		Log.v(TAG, "onSaveInstanceState start!");
+
+		mAdapter.onSaveInstanceState(outState);
+
+		if (mActivatedPosition != AdapterView.INVALID_POSITION) {
+			//Serialize and persist the activated item position.
+			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+			Log.d(TAG, STATE_ACTIVATED_POSITION + "=" + mActivatedPosition);
+		}
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void onAdapterChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView, ExampleAdapter adapter) {
+		mRecyclerView = recyclerView;
+		mAdapter = adapter;
+		mSwipeRefreshLayout = swipeRefreshLayout;
+		initializeSwipeToRefresh();
+	}
+
+	private void initializeRecyclerView(Bundle savedInstanceState) {
 		FlexibleAdapter.enableLogs(true);
-		mAdapter = new ExampleAdapter(this);
-		//Experimenting NEW features
-		mAdapter.setAnimationOnScrolling(true);
-		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAutoCollapseOnExpand(false);
-		mAdapter.setAutoScrollOnExpand(true);
-		mAdapter.setRemoveOrphanHeaders(false);
-		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-		mRecyclerView.setAdapter(mAdapter);
-		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.recycler_view_container,
+				FragmentExpandableSections.newInstance(1)).commit();
+
+//		mAdapter = new ExampleAdapter(this);
+//		//Experimenting NEW features (v5.0.0)
+//		mAdapter.setAnimationOnScrolling(true);
+//		mAdapter.setAnimationOnReverseScrolling(true);
+//		mAdapter.setAutoCollapseOnExpand(false);
+//		mAdapter.setAutoScrollOnExpand(true);
+//		mAdapter.setRemoveOrphanHeaders(false);
+//		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+//		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+//		mRecyclerView.setAdapter(mAdapter);
+//		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
+//		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
+//			@Override
+//			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
+//				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!!
+//				return true;
+//			}
+//		});
+//		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
+//		mRecyclerView.addItemDecoration(new DividerItemDecoration(this, R.drawable.divider));
+//
+//		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
+//		mAdapter.setFastScroller((FastScroller) findViewById(R.id.fast_scroller), Utils.getColorAccent(this), this);
+//		//Experimenting NEW features (v5.0.0)
+//		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
+//		mAdapter.setSwipeEnabled(true);//Enable swipe items
+//		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
+//		//Add sample item on the top (not belongs to the library)
+//		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+	}
+
+	private void initializeSwipeToRefresh() {
+		//Swipe down to force synchronize
+		//mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+		mSwipeRefreshLayout.setDistanceToTriggerSync(390);
+		mSwipeRefreshLayout.setEnabled(true);
+		mSwipeRefreshLayout.setColorSchemeResources(
+				android.R.color.holo_purple, android.R.color.holo_blue_light,
+				android.R.color.holo_green_light, android.R.color.holo_orange_light);
+		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
-			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!!
-				return true;
+			public void onRefresh() {
+				mAdapter.updateDataSet(DatabaseService.getInstance().getListById());
+				mSwipeRefreshLayout.setEnabled(false);
+				mSwipeHandler.sendEmptyMessageDelayed(0, 1000L);
+				destroyActionModeIfCan();
 			}
 		});
-		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(this, R.drawable.divider));
+	}
 
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) findViewById(R.id.fast_scroller), Utils.getColorAccent(this));
-		//Experimenting NEW features
-		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
-		mAdapter.setSwipeEnabled(true);//Enable swipe items
-		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
-		//Add sample item on the top (not part of library)
-		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+	private void initializeToolbar() {
+		Log.d(TAG, "initializeToolbar as actionBar");
+		mToolbar = (Toolbar) findViewById(R.id.toolbar);
+		//Toolbar will now take on default Action Bar characteristics
+		setSupportActionBar(mToolbar);
+	}
 
-		//FAB
+	@SuppressWarnings("ConstantConditions")
+	private void initializeDrawer() {
+		mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+				this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+		mDrawer.addDrawerListener(toggle);
+		toggle.syncState();
+
+		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+		navigationView.setNavigationItemSelectedListener(this);
+
+		//Version
+		TextView appVersion = (TextView) navigationView.getHeaderView(0).findViewById(R.id.app_version);
+		appVersion.setText(getString(R.string.about_version,
+				Utils.getVersionName(this),
+				Utils.getVersionCode(this)));
+
+	}
+
+	private void initializeFab() {
 		mFab = (FloatingActionButton) findViewById(R.id.fab);
 		mFab.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -160,68 +270,61 @@ public class MainActivity extends AppCompatActivity implements
 						//Adapter's list is a copy, to animate the item you must call addItem on the new position
 						mAdapter.addItem(adapterPos, item);
 						Toast.makeText(MainActivity.this, "Added New " + item.getTitle(), Toast.LENGTH_SHORT).show();
-						mRecyclerView.smoothScrollToPosition(position);
+						mRecyclerView.smoothScrollToPosition(adapterPos);
 						break;
 					}
 				}
 			}
 		});
-
-		//With FlexibleAdapter v5.0.0 we don't need to call this function anymore
-		//It is automatically called if Activity implements FlexibleAdapter.OnUpdateListener
-		//updateEmptyView();
-
-		//SwipeToRefresh
-		initializeSwipeToRefresh();
-
-		//Restore previous state
-		if (savedInstanceState != null) {
-			//Selection
-			mAdapter.onRestoreInstanceState(savedInstanceState);
-			if (mAdapter.getSelectedItemCount() > 0) {
-				mActionMode = startSupportActionMode(this);
-				setContextTitle(mAdapter.getSelectedItemCount());
-			}
-			//Previously serialized activated item position
-			if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
-				setSelection(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-		}
-
-		//Settings for FlipView
-		FlipView.stopLayoutAnimation();
-	}
-
-	private void initializeSwipeToRefresh() {
-		//Swipe down to force synchronize
-		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-		mSwipeRefreshLayout.setDistanceToTriggerSync(390);
-		mSwipeRefreshLayout.setEnabled(true);
-		mSwipeRefreshLayout.setColorSchemeResources(
-				android.R.color.holo_purple, android.R.color.holo_blue_light,
-				android.R.color.holo_green_light, android.R.color.holo_orange_light);
-		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-			@Override
-			public void onRefresh() {
-				mAdapter.updateDataSet(DatabaseService.getInstance().getListById());
-				mSwipeRefreshLayout.setEnabled(false);
-				mSwipeHandler.sendEmptyMessageDelayed(0, 1000L);
-				destroyActionModeIfCan();
-			}
-		});
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		Log.v(TAG, "onSaveInstanceState start!");
-
-		mAdapter.onSaveInstanceState(outState);
-
-		if (mActivatedPosition != AdapterView.INVALID_POSITION) {
-			//Serialize and persist the activated item position.
-			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
-			Log.d(TAG, STATE_ACTIVATED_POSITION + "=" + mActivatedPosition);
+	public void onFastScrollerStateChange(boolean scrolling) {
+		if (scrolling) {
+			mFab.hide();
+		} else {
+			mFab.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mFab.show();
+				}
+			}, 200L);
 		}
-		super.onSaveInstanceState(outState);
+	}
+
+	@SuppressWarnings("StatementWithEmptyBody")
+	@Override
+	public boolean onNavigationItemSelected(MenuItem item) {
+		Fragment fragment = null;
+		//Handle navigation view item clicks
+		int id = item.getItemId();
+		if (id == R.id.nav_overall) {
+			fragment = FragmentOverall.newInstance(1);
+		} else if (id == R.id.nav_headers_and_sections) {
+			fragment = FragmentHeadersSections.newInstance(1);
+		} else if (id == R.id.nav_selection_modes) {
+			fragment = FragmentSelectionModes.newInstance(1);
+		} else if (id == R.id.nav_expandable) {
+			fragment = FragmentExpandable.newInstance(1);
+		} else if (id == R.id.nav_expandable_sections) {
+			fragment = FragmentExpandableSections.newInstance(1);
+		} else if (id == R.id.nav_share) {
+
+		} else if (id == R.id.nav_send) {
+
+		}
+		// Insert the fragment by replacing any existing fragment
+		if (fragment != null) {
+			FragmentManager fragmentManager = getFragmentManager();
+			fragmentManager.beginTransaction().replace(R.id.recycler_view_container, fragment).commit();
+			// Highlight the selected item has been done by NavigationView
+			item.setChecked(true);
+			mToolbar.setSubtitle(item.getTitle());
+			//Close drawer
+			mDrawer.closeDrawer(GravityCompat.START);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -236,30 +339,26 @@ public class MainActivity extends AppCompatActivity implements
 		//Associate searchable configuration with the SearchView
 		Log.d(TAG, "onCreateOptionsMenu setup SearchView!");
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-		mSearchView = (SearchView) MenuItemCompat
-				.getActionView(menu.findItem(R.id.action_search));
+		MenuItemCompat.setOnActionExpandListener(
+				menu.findItem(R.id.action_search), new MenuItemCompat.OnActionExpandListener() {
+					@Override
+					public boolean onMenuItemActionExpand(MenuItem item) {
+						menu.findItem(R.id.action_list_type).setVisible(false);
+						return true;
+					}
+
+					@Override
+					public boolean onMenuItemActionCollapse(MenuItem item) {
+						menu.findItem(R.id.action_list_type).setVisible(true);
+						return true;
+					}
+				});
+		mSearchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
 		mSearchView.setInputType(InputType.TYPE_TEXT_VARIATION_FILTER);
 		mSearchView.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_FULLSCREEN);
 		mSearchView.setQueryHint(getString(R.string.action_search));
 		mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 		mSearchView.setOnQueryTextListener(this);
-		mSearchView.setOnSearchClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				menu.findItem(R.id.action_list_type).setVisible(false);
-				menu.findItem(R.id.action_reverse).setVisible(false);
-				menu.findItem(R.id.action_about).setVisible(false);
-			}
-		});
-		mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
-			@Override
-			public boolean onClose() {
-				menu.findItem(R.id.action_list_type).setVisible(true);
-				menu.findItem(R.id.action_reverse).setVisible(true);
-				menu.findItem(R.id.action_about).setVisible(true);
-				return false;
-			}
-		});
 	}
 
 	@Override
@@ -289,14 +388,15 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onQueryTextChange(String newText) {
-		if (!mAdapter.hasSearchText()
-				|| !mAdapter.getSearchText().equalsIgnoreCase(newText)) {
+		if (!mAdapter.hasSearchText() || mAdapter.hasNewSearchText(newText)) {
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			mAdapter.setSearchText(newText);
 			//Fill and Filter mItems with your custom list and automatically animate the changes
 			//Watch out! The original list must be a copy
 			mAdapter.filterItems(DatabaseService.getInstance().getListById(), 450L);
 		}
+		//Disable SwipeRefresh if search is active!!
+		mSwipeRefreshLayout.setEnabled(!mAdapter.hasSearchText());
 
 		if (mAdapter.hasSearchText()) {
 			//mFab.setVisibility(View.GONE);
@@ -398,7 +498,7 @@ public class MainActivity extends AppCompatActivity implements
 				mAdapter.disableStickyHeaders();
 				item.setTitle(R.string.sticky_headers);
 			} else {
-				mAdapter.enableStickyHeaders(3);
+				mAdapter.enableStickyHeaders();
 				item.setTitle(R.string.scroll_headers);
 			}
 		}
@@ -703,21 +803,13 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	/**
-	 * Utility method called from MainActivity on BackPressed
-	 *
-	 * @return true if ActionMode was active (in case it is also terminated), false otherwise
-	 */
-	public boolean destroyActionModeIfCan() {
-		if (mActionMode != null) {
-			mActionMode.finish();
-			return true;
-		}
-		return false;
-	}
-
 	@Override
 	public void onBackPressed() {
+		//If Drawer is open, back key closes it
+		if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+			mDrawer.closeDrawer(GravityCompat.START);
+			return;
+		}
 		//If ActionMode is active, back key closes it
 		if (destroyActionModeIfCan()) return;
 		//If SearchView is visible, back key cancels search and iconify it
@@ -728,6 +820,19 @@ public class MainActivity extends AppCompatActivity implements
 		//Close the App
 		DatabaseService.onDestroy();
 		super.onBackPressed();
+	}
+
+	/**
+	 * Utility method called from MainActivity on BackPressed
+	 *
+	 * @return true if ActionMode was active (in case it is also terminated), false otherwise
+	 */
+	private boolean destroyActionModeIfCan() {
+		if (mActionMode != null) {
+			mActionMode.finish();
+			return true;
+		}
+		return false;
 	}
 
 	private void logOrphanHeaders() {

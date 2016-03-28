@@ -17,7 +17,6 @@ package eu.davidea.flexibleadapter.helpers;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.AdapterDataObserver;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.util.Log;
 import android.view.View;
@@ -54,27 +53,6 @@ public class StickyHeaderHelper extends OnScrollListener {
 							  OnStickyHeaderChangeListener stickyHeaderChangeListener) {
 		mAdapter = adapter;
 		mStickyHeaderChangeListener = stickyHeaderChangeListener;
-		mAdapter.registerAdapterDataObserver(new AdapterDataObserver() {
-			public void onChanged() {
-				updateOrClearHeader(true);
-			}
-
-			public void onItemRangeChanged(int positionStart, int itemCount) {
-				updateOrClearHeader(true);
-			}
-
-			public void onItemRangeInserted(int positionStart, int itemCount) {
-				updateOrClearHeader(true);
-			}
-
-			public void onItemRangeRemoved(int positionStart, int itemCount) {
-				updateOrClearHeader(true);
-			}
-
-			public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-				updateOrClearHeader(true);
-			}
-		});
 	}
 
 	@Override
@@ -108,6 +86,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		if (mStickyHolderLayout != null) {
 			if (mStickyHolderLayout.getLayoutParams() == null) {
 				mStickyHolderLayout.setLayoutParams(getDefaultLayoutParams());
+				//TODO: Animate Layout change when attach and detach
 			}
 			updateOrClearHeader(false);
 		} else {
@@ -121,8 +100,10 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 	}
 
-	private void updateOrClearHeader(boolean updateHeaderContent) {
-		if (mStickyHolderLayout == null || mRecyclerView == null || mRecyclerView.getChildCount() == 0) {
+	public void updateOrClearHeader(boolean updateHeaderContent) {
+		if (mAdapter.hasSearchText() || mStickyHolderLayout == null ||
+				mRecyclerView == null || mRecyclerView.getChildCount() == 0) {
+			clearHeader();
 			return;
 		}
 		int firstHeaderPosition = getHeaderPosition(RecyclerView.NO_POSITION);
@@ -201,7 +182,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		onStickyHeaderChange(mHeaderPosition);
 	}
 
-	private void clearHeader() {
+	public void clearHeader() {
 		if (mStickyHeaderViewHolder != null) {
 			resetHeader(mStickyHeaderViewHolder);
 			mStickyHeaderViewHolder = null;

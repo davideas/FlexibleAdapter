@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+	<group android:checkableBehavior="single">
+		<item
+			android:id="@+id/nav_overall"
+			android:checked="true"
+			android:icon="@drawable/ic_view_headline"
+			android:title="@string/overall"/>
+		<item
+			android:id="@+id/nav_selection_modes"
+			android:icon="@drawable/ic_view_headline"
+			android:title="@string/selection_mode"/>
+		<item
+			android:id="@+id/nav_headers_and_sections"
+			android:icon="@drawable/ic_view_headline"
+			android:title="@string/headers_sections"/>
+		<item
+			android:id="@+id/nav_expandable"
+			android:icon="@drawable/ic_view_headline"
+			android:title="@string/expandable"/>
+		<item
+			android:id="@+id/nav_expandable_sections"
+			android:icon="@drawable/ic_view_headline"
+			android:title="@string/expandable_sections"/>
+	</group>
+
+	<item android:title="Options">
+		<menu>
+			<item
+				android:id="@+id/nav_switch"
+				android:title="Grid Layout"
+				app:actionLayout="@layout/action_view_switch"/>
+		</menu>
+	</item>
+
+	<item android:title="About">
+		<menu>
+			<item
+				android:id="@+id/nav_share"
+				android:icon="@drawable/ic_menu_share"
+				android:title="Share"/>
+			<item
+				android:id="@+id/nav_send"
+				android:icon="@drawable/ic_menu_send"
+				android:title="Send"/>
+			<item
+				android:id="@+id/nav_empty_space"
+				android:title=""/>
+		</menu>
+	</item>
+
+</menu>

@@ -1,33 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="AppTheme.Base">
-    </style>
+	<style name="AppTheme" parent="AppTheme.Base">
+	</style>
 
-    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
-		<!--<item name="windowActionBar">false</item>-->
-		<!--<item name="windowNoTitle">true</item>-->
+	<style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+		<item name="windowActionModeOverlay">true</item>
+		<item name="windowActionBar">false</item>
+		<item name="windowNoTitle">true</item>
 
-        <item name="colorPrimary">@color/colorPrimary_light</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
-        <item name="colorAccent">@color/colorAccent_light</item>
+		<item name="colorPrimary">@color/colorPrimary_light</item>
+		<item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
+		<item name="colorAccent">@color/colorAccent_light</item>
 
 		<!-- For selection -->
 		<item name="selectableItemBackground">@drawable/selector_item_light</item>
 		<item name="primaryTextSelector">@drawable/primary_text_selector_light</item>
-    </style>
+	</style>
 
 	<style name="animation_slide_from_right">
 		<item name="android:windowEnterAnimation">@anim/fab_slide_in_from_right</item>
 		<item name="android:windowExitAnimation">@anim/fab_slide_out_to_left</item>
 	</style>
 
-    <style name="AppTheme.DialogMetrics">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingLeft">@dimen/dialog_padding_horizontal</item>
-        <item name="android:paddingRight">@dimen/dialog_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/dialog_padding_vertical</item>
-    </style>
+	<style name="AppTheme.DialogMetrics">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:paddingLeft">@dimen/dialog_padding_horizontal</item>
+		<item name="android:paddingRight">@dimen/dialog_padding_horizontal</item>
+		<item name="android:paddingTop">@dimen/dialog_padding_vertical</item>
+	</style>
+
+	<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+	<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
 </resources>

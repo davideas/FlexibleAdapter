@@ -45,7 +45,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  */
 @SuppressWarnings({"unused", "Convert2Diamond", "unchecked"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
-		implements FastScroller.BubbleTextCreator, FastScroller.ScrollStateChangeListener {
+		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
 	public static boolean DEBUG = false;
@@ -367,6 +367,16 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	/**
+	 * Convenience method of {@link #setFastScroller(FastScroller, int, FastScroller.OnScrollStateChangeListener)}.
+	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
+	 *
+	 * @see #setFastScroller(FastScroller, int, FastScroller.OnScrollStateChangeListener)
+	 */
+	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor) {
+		setFastScroller(fastScroller, accentColor, null);
+	}
+
+	/**
 	 * Sets up the {@link FastScroller} with automatic fetch of accent color.
 	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
 	 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
@@ -374,15 +384,21 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 *
 	 * @param fastScroller instance of {@link FastScroller}
 	 * @param accentColor  the default value color if the accentColor cannot be fetched
+	 * @param stateChangeListener the listener to monitor when fast scrolling state changes
 	 */
-	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor) {
+	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor,
+								FastScroller.OnScrollStateChangeListener stateChangeListener) {
 		if (mRecyclerView == null) {
 			throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter is added to the RecyclerView.");
 		}
 		mFastScroller = fastScroller;
 		mFastScroller.setRecyclerView(mRecyclerView);
+		mFastScroller.addOnScrollStateChangeListener(stateChangeListener);
 		accentColor = Utils.fetchAccentColor(fastScroller.getContext(), accentColor);
-		mFastScroller.setViewsToUse(R.layout.fast_scroller, R.id.fast_scroller_bubble, R.id.fast_scroller_handle, accentColor);
+		mFastScroller.setViewsToUse(
+				R.layout.library_fast_scroller_layout,
+				R.id.fast_scroller_bubble,
+				R.id.fast_scroller_handle, accentColor);
 	}
 
 	@Override

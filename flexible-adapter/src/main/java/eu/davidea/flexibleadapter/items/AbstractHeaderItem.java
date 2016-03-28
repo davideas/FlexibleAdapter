@@ -29,6 +29,9 @@ public abstract class AbstractHeaderItem<VH extends RecyclerView.ViewHolder>
 		extends AbstractFlexibleItem<VH>
 		implements IHeader<VH> {
 
+	/**
+	 * By default, header is hidden and not selectable
+	 */
 	public AbstractHeaderItem() {
 		setHidden(true);
 		setSelectable(false);

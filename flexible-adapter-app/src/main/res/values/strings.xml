@@ -19,6 +19,7 @@
 
 	<!-- About -->
 	<string name="about_title">About</string>
+	<string name="about_version">%1$s #%2$s</string>
 	<string name="about_body"><![CDATA[
 <b>Flexible Adapter</b><br/>
 %1$s #%2$s
@@ -57,6 +58,18 @@ limitations under the License.
 	<string name="hide_headers">Hide Headers</string>
 	<string name="sticky_headers">Sticky Headers</string>
 	<string name="scroll_headers">Scroll Headers</string>
+	<string name="title_activity_entry">EntryActivity</string>
 
+	<string name="navigation_drawer_open">Open navigation drawer</string>
+	<string name="navigation_drawer_close">Close navigation drawer</string>
+
+	<string name="action_settings">Settings</string>
+
+	<!-- Menu Drawers -->
+	<string name="overall">Overall</string>
+	<string name="selection_mode">Selection modes</string>
+	<string name="headers_sections">Headers and Sections</string>
+	<string name="expandable">Expandable</string>
+	<string name="expandable_sections">Expandable Sections</string>
 
 </resources>

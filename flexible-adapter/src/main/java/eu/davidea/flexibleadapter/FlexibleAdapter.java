@@ -133,8 +133,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Used to save deleted items and to recover them (Undo).
 	 */
 	private List<RestoreInfo> mRestoreList;
-	private StickyHeaderDecoration stickyHeaderDecoration;
-	private boolean restoreSelection = false, multiRange = false,
+	private boolean restoreSelection = false, multiRange = false, unlinkOnRemoveHeader = true,
 			removeOrphanHeaders = false, permanentDelete = false, adjustSelected = true;
 
 	/* ViewTypes */
@@ -386,7 +385,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public int getItemCountOfTypesUntil(@IntRange(from = 0) int position, Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
 		int count = 0;
-		for (int i = 0; i <= position; i++) {
+		for (int i = 0; i < position; i++) {
 			//Privilege faster counting if autoMap is active
 			if ((autoMap && viewTypeList.contains(mItems.get(i).getLayoutRes())) ||
 					viewTypeList.contains(getItemViewType(i)))
@@ -470,6 +469,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public FlexibleAdapter setRemoveOrphanHeaders(boolean removeOrphanHeaders) {
 		this.removeOrphanHeaders = removeOrphanHeaders;
+		return this;
+	}
+
+	public FlexibleAdapter setUnlinkAllItemsOnRemoveHeaders(boolean unlinkOnRemoveHeader) {
+		this.unlinkOnRemoveHeader = unlinkOnRemoveHeader;
 		return this;
 	}
 
@@ -603,8 +607,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * android:layout_width="match_parent"
 	 * android:layout_height="match_parent"/&gt;</pre>
 	 * <pre>&lt;include layout="@layout/sticky_header_layout"/&gt;</pre></p>
-	 * <b>OR</b>
-	 * <p>Implement this method to return a ViewGroup.</p>
+	 * The ViewGroup must have {@code @+id/sticky_header_container}.
+	 * <p><b>OR</b></p>
+	 * Implement this method to return a ViewGroup.
 	 *
 	 * @return ViewGroup layout that will hold the sticky headers ItemViews
 	 */
@@ -707,6 +712,22 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Provides all the items that belongs to the section represented by the specified header.
+	 *
+	 * @param header the header that represents the section
+	 * @return list of all items in the specified section.
+	 */
+	public List<ISectionable> getSectionItems(@NonNull IHeader header) {
+		ISectionable sectionable;
+		List<ISectionable> sectionItems = new ArrayList<ISectionable>();
+		do {
+			sectionable = getSectionableOf(header);
+			if (sectionable != null) sectionItems.add(sectionable);
+		} while (sectionable != null);
+		return sectionItems;
 	}
 
 	/**
@@ -1372,9 +1393,10 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (addItem(position, item) && scrollToPosition)
+				if (addItem(position, item) && scrollToPosition) {
 					mRecyclerView.scrollToPosition(
 							Math.min(Math.max(0, position), getItemCount() - 1));
+				}
 			}
 		}, delay);
 	}
@@ -1780,10 +1802,13 @@ public class FlexibleAdapter<T extends IFlexible>
 					parentPosition = createRestoreSubItemInfo(parent, item, payload);
 				}
 			}
-			//If item is a Header, remove linkage from Sectionable if exists
-			if (isHeader(item)) {
-				ISectionable sectionable = getSectionableOf((IHeader) item);
-				if (sectionable != null) sectionable.setHeader(null);
+			//If item is a Header, remove linkage from ALL Sectionable items if exist
+			if (unlinkOnRemoveHeader && isHeader(item)) {
+				ISectionable sectionable;
+				do {
+					sectionable = getSectionableOf((IHeader) item);
+					if (sectionable != null) sectionable.setHeader(null);
+				} while (sectionable != null);
 			}
 			//Remove item from internal list
 			mItems.remove(positionStart);
@@ -2062,7 +2087,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*----------------*/
 
 	public boolean hasSearchText() {
-		return mSearchText != null && mSearchText.length() > 0;
+		return mSearchText != null && !mSearchText.isEmpty();
+	}
+
+	public boolean hasNewSearchText(String newText) {
+		return !mOldSearchText.equalsIgnoreCase(newText);
 	}
 
 	public String getSearchText() {
@@ -2161,7 +2190,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					}
 				}
 			}
-		} else {
+		} else if (hasNewSearchText(mSearchText)) {
 			values = unfilteredItems; //with no filter
 			if (!mRestoreList.isEmpty()) {
 				for (RestoreInfo restoreInfo : mRestoreList) {
@@ -2176,13 +2205,21 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 
 		//Animate search results only in case of new SearchText
-		if (!mOldSearchText.equalsIgnoreCase(mSearchText)) {
+		if (hasNewSearchText(mSearchText)) {
 			mOldSearchText = mSearchText;
 			animateTo(values);
-		} else mItems = values;
-		//Restore headers if necessary
-		if (mSearchText.isEmpty()) {
-			showAllHeaders();
+			//Restore headers if necessary
+			if (!hasSearchText()) {
+				//Add headers delayed. It gives time to the LayoutManager to fulfill the previous animation:
+				//Attempt to read from field 'android.support.v7.widget.RecyclerView$ViewHolder
+				// android.support.v7.widget.RecyclerView$LayoutParams.mViewHolder' on a null object reference
+				mHandler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						showAllHeaders();
+					}
+				}, 50L);
+			}
 		}
 
 		//Reset filtering flag
@@ -2859,34 +2896,39 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 		}
 
-		private void clearHeadersCache() {
-//			if (headersSticky) {//TODO: reimplement
-//				stickyHeaderDecoration.clearHeadersCache();
-//			}
+		private void updateOrClearHeader() {
+			if (mStickyHeaderHelper != null && !multiRange && !filtering) {
+				mStickyHeaderHelper.updateOrClearHeader(true);
+			}
 		}
 
-		/* Triggered by {@link #notifyDataSetChanged()} */
+		/* Triggered by notifyDataSetChanged() */
 		@Override
 		public void onChanged() {
 			initializeItems();
-			clearHeadersCache();
+			updateOrClearHeader();
 		}
 
 		@Override
 		public void onItemRangeInserted(int positionStart, int itemCount) {
 			adjustPositions(positionStart, itemCount);
-			clearHeadersCache();
+			updateOrClearHeader();
 		}
 
 		@Override
 		public void onItemRangeRemoved(int positionStart, int itemCount) {
 			adjustPositions(positionStart, -itemCount);
-			clearHeadersCache();
+			updateOrClearHeader();
+		}
+
+		@Override
+		public void onItemRangeChanged(int positionStart, int itemCount) {
+			updateOrClearHeader();
 		}
 
 		@Override
 		public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-			clearHeadersCache();
+			updateOrClearHeader();
 		}
 	}
 

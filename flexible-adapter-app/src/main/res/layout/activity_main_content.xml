@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/main_view"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fitsSystemWindows="true"
+	tools:context="eu.davidea.examples.flexibleadapter.MainActivity">
+
+	<!-- Toolbar -->
+	<android.support.design.widget.AppBarLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:theme="@style/AppTheme.AppBarOverlay">
+
+		<include layout="@layout/toolbar"/>
+
+	</android.support.design.widget.AppBarLayout>
+
+	<!-- Main Content -->
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		tools:context="eu.davidea.examples.flexibleadapter.MainActivity"
+		app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+		<FrameLayout
+			android:id="@+id/recycler_view_container"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"/>
+
+		<include layout="@layout/sticky_header_layout"/>
+
+		<include layout="@layout/empty_view"/>
+
+		<!--<include layout="@layout/progress_bar"/>-->
+
+	</RelativeLayout>
+
+	<android.support.design.widget.FloatingActionButton
+		android:id="@+id/fab"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:layout_gravity="end|bottom"
+		android:layout_margin="@dimen/fab_margin"
+		android:clickable="true"
+		android:src="@drawable/fab_add"
+		app:layout_behavior="eu.davidea.utils.ScrollAwareFABBehavior"
+		app:borderWidth="0dp"/>
+
+	<include layout="@layout/fast_scroller"/>
+
+</android.support.design.widget.CoordinatorLayout>

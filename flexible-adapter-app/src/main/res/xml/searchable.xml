@@ -2,4 +2,4 @@
 <searchable xmlns:android="http://schemas.android.com/apk/res/android"
 	android:label="@string/app_name"
 	android:searchMode="showSearchIconAsBadge"
-	android:hint="@string/action_search" />
+	android:hint="@string/action_search"/>

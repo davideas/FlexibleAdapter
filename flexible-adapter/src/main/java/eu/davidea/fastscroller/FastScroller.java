@@ -48,7 +48,7 @@ public class FastScroller extends FrameLayout {
 	private RecyclerView recyclerView;
 	private LinearLayoutManager layoutManager;
 	private BubbleTextCreator bubbleTextCreator;
-	private List<ScrollStateChangeListener> scrollerListeners = new ArrayList<ScrollStateChangeListener>();
+	private List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<OnScrollStateChangeListener>();
 
 	private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
 		@Override
@@ -89,8 +89,8 @@ public class FastScroller extends FrameLayout {
 
 		if (recyclerView.getAdapter() instanceof  BubbleTextCreator)
 			this.bubbleTextCreator = (BubbleTextCreator) recyclerView.getAdapter();
-		if (recyclerView.getAdapter() instanceof ScrollStateChangeListener)
-			addScrollListener((ScrollStateChangeListener) recyclerView.getAdapter());
+		if (recyclerView.getAdapter() instanceof OnScrollStateChangeListener)
+			addOnScrollStateChangeListener((OnScrollStateChangeListener) recyclerView.getAdapter());
 
 		this.recyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 			@Override
@@ -106,14 +106,18 @@ public class FastScroller extends FrameLayout {
 		});
 	}
 
-	public void addScrollListener(ScrollStateChangeListener scrollerListener) {
-		if (!scrollerListeners.contains(scrollerListener))
-			scrollerListeners.add(scrollerListener);
+	public void addOnScrollStateChangeListener(OnScrollStateChangeListener stateChangeListener) {
+		if (stateChangeListener != null && !scrollStateChangeListeners.contains(stateChangeListener))
+			scrollStateChangeListeners.add(stateChangeListener);
+	}
+
+	public void removeOnScrollStateChangeListener(OnScrollStateChangeListener stateChangeListener) {
+		scrollStateChangeListeners.remove(stateChangeListener);
 	}
 
 	private void notifyScrollStateChange(boolean scrolling) {
-		for (ScrollStateChangeListener scrollerListener : scrollerListeners) {
-			scrollerListener.onFastScrollerStateChange(scrolling);
+		for (OnScrollStateChangeListener stateChangeListener : scrollStateChangeListeners) {
+			stateChangeListener.onFastScrollerStateChange(scrolling);
 		}
 	}
 
@@ -298,7 +302,7 @@ public class FastScroller extends FrameLayout {
 		String onCreateBubbleText(int pos);
 	}
 
-	public interface ScrollStateChangeListener {
+	public interface OnScrollStateChangeListener {
 		void onFastScrollerStateChange(boolean scrolling);
 	}
 
