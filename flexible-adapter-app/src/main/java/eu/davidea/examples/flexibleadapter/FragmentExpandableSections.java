@@ -69,7 +69,8 @@ public class FragmentExpandableSections extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
+		//Create New Database and Initialize RecyclerView
+		DatabaseService.getInstance().createExpandableSectionsDatabase();
 		initializeRecyclerView(savedInstanceState);
 	}
 
@@ -102,7 +103,7 @@ public class FragmentExpandableSections extends Fragment {
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
 		mAdapter.setSwipeEnabled(true);//Enable swipe items
-		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
+		mAdapter.setDisplayHeadersAtStartUp(false);//Show Headers at startUp!
 		//Add sample item on the top (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 

@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements
 		FlexibleAdapter.enableLogs(true);
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.recycler_view_container,
-				FragmentExpandableSections.newInstance(1)).commit();
+				FragmentOverall.newInstance(1)).commit();
 
 //		mAdapter = new ExampleAdapter(this);
 //		//Experimenting NEW features (v5.0.0)
@@ -301,11 +301,11 @@ public class MainActivity extends AppCompatActivity implements
 		if (id == R.id.nav_overall) {
 			fragment = FragmentOverall.newInstance(1);
 		} else if (id == R.id.nav_headers_and_sections) {
-			fragment = FragmentHeadersSections.newInstance(1);
+
 		} else if (id == R.id.nav_selection_modes) {
-			fragment = FragmentSelectionModes.newInstance(1);
+
 		} else if (id == R.id.nav_expandable) {
-			fragment = FragmentExpandable.newInstance(1);
+
 		} else if (id == R.id.nav_expandable_sections) {
 			fragment = FragmentExpandableSections.newInstance(1);
 		} else if (id == R.id.nav_share) {
@@ -685,6 +685,7 @@ public class MainActivity extends AppCompatActivity implements
 				switch (adapterItem.getLayoutRes()) {
 					case R.layout.recycler_child_row:
 						SubItem subItem = (SubItem) adapterItem;
+
 						ExpandableItem expandable = (ExpandableItem) mAdapter.getExpandableOfDeletedChild(subItem);
 						DatabaseService.getInstance().removeSubItem(expandable, subItem);
 						Log.d(TAG, "Confirm removed " + subItem.getTitle());

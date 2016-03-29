@@ -225,6 +225,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	protected void initializeItems() {
 		int position = 0;
+		multiRange = true;
 		while (position < mItems.size()) {
 			T item = getItem(position);
 			//Map the view type if not done yet
@@ -238,6 +239,10 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 			position++;
 		}
+		multiRange = false;
+		//Update empty view
+		if (mUpdateListener != null)
+			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	/*------------------------------*/
@@ -325,6 +330,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void updateDataSet(List<T> items) {
 		animateTo(items);
+		initializeItems();
 		showAllHeaders();
 	}
 
@@ -786,7 +792,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private void resetHiddenStatus() {
 		for (T item : mItems) {
 			IHeader header = getHeaderOf(item);
-			if (header != null)
+			if (header != null && !isExpandable((T)header))
 				header.setHidden(true);
 		}
 	}
@@ -806,10 +812,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (DEBUG) Log.v(TAG, "Showing header at position " + position + "=" + header);
 			header.setHidden(false);
 			return addItem(position, (T) header);
-		} else {
-//			if (DEBUG) Log.w(TAG, "Header already shown at position " + position + "=" + header);
-			return false;
 		}
+		return false;
 	}
 
 	/**
@@ -820,8 +824,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	private boolean hideHeaderOf(@NonNull T item) {
 		//Take the header
 		IHeader header = getHeaderOf(item);
-//		if (header.isHidden() && DEBUG)
-//			Log.w(TAG, "Header already hidden at position " + getGlobalPositionOf(header) + "=" + header);
 		//Check header existence
 		return header != null && !header.isHidden() && hideHeader(getGlobalPositionOf(header), header);
 	}
@@ -1285,7 +1287,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Collapse!
 			notifyItemRangeRemoved(position + 1, subItemsCount);
 			//Hide also the headers of the subItems
-			if (headersShown) {
+			if (headersShown && !isHeader(item)) {
 				for (T subItem : subItems) {
 					hideHeaderOf(subItem);
 				}

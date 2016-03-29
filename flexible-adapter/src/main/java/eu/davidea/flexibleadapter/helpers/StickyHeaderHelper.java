@@ -247,12 +247,13 @@ public class StickyHeaderHelper extends OnScrollListener {
 		return holder;
 	}
 
-	private static void resetHeader(RecyclerView.ViewHolder header) {
+	private void resetHeader(RecyclerView.ViewHolder header) {
 		final View view = header.itemView;
 		removeViewFromParent(view);
 		//Reset transformation on removed header
 		view.setTranslationX(0);
 		view.setTranslationY(0);
+		view.setLayoutParams(mRecyclerView.getLayoutParams());
 		header.setIsRecyclable(true);
 	}
 

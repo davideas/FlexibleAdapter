@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.davidea.examples.models.AbstractExampleItem;
+import eu.davidea.examples.models.ExpandableHeaderItem;
 import eu.davidea.examples.models.ExpandableItem;
 import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.flexibleadapter.items.ISectionable;
 
 /**
  * Created by Davide Steduto on 23/11/2015.
@@ -31,7 +31,18 @@ public class DatabaseService {
 	private List<AbstractFlexibleItem> mItems = new ArrayList<AbstractFlexibleItem>();
 
 	DatabaseService() {
+	}
+
+	public static DatabaseService getInstance() {
+		if (mInstance == null) {
+			mInstance = new DatabaseService();
+		}
+		return mInstance;
+	}
+
+	public void createOverallDatabase() {
 		HeaderItem header = null;
+		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
 			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i) : header;
 			mItems.add(i % 3 == 0 ?
@@ -40,11 +51,13 @@ public class DatabaseService {
 		}
 	}
 
-	public static DatabaseService getInstance() {
-		if (mInstance == null) {
-			mInstance = new DatabaseService();
+	public void createExpandableSectionsDatabase() {
+		HeaderItem header = null;
+		mItems.clear();
+		for (int i = 0; i < ITEMS; i++) {
+			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i) : header;
+			mItems.add(newExpandableSectionItem(i + 1));
 		}
-		return mInstance;
 	}
 
 	public static HeaderItem newHeader(int i) {
@@ -91,30 +104,23 @@ public class DatabaseService {
 		return expandableItem;
 	}
 
-	/*
-	 * Or you can add headers later with this kind of method
-	 * BUT, DO NOT CREATE SECTIONABLE OF SECTIONABLE!
-	 */
-	public void buildHeaders() {
-		for (int i = 0; i < (ITEMS / HEADERS); i++) {
-			HeaderItem header = new HeaderItem("H" + i);
-			header.setTitle("Header " + (i + 1));
-			header.setSubtitle("Attached to " + mItems.get(i * HEADERS));
-			header.setHidden(true);
-			IFlexible item = mItems.get(i * HEADERS);
-			if (item instanceof ISectionable) {
-				ISectionable sectionable = (ISectionable) item;
-				//noinspection unchecked
-				sectionable.setHeader(header);
-			}
+	private AbstractFlexibleItem newExpandableSectionItem(int i) {
+		ExpandableHeaderItem expandableItem = new ExpandableHeaderItem("E" + i);
+		expandableItem.setTitle("Expandable Header Item " + i);
+		for (int j = 1; j <= SUB_ITEMS; j++) {
+			SubItem subItem = new SubItem(expandableItem.getId() + "S" + j);
+			subItem.setTitle("Sub Item " + j + " in expandable section header");
+			//In this case the header is the same parent: ExpandableHeaderItem
+			subItem.setHeader(expandableItem);
+			expandableItem.addSubItem(subItem);
 		}
+		return expandableItem;
 	}
 
 	/**
 	 * @return Always a copy of the original list.
 	 */
 	public List<AbstractFlexibleItem> getListById() {
-		//listId is not used: we have only 1 type of list in this example
 		//Return a copy of the DB: we will perform some tricky code on this list.
 		return new ArrayList<AbstractFlexibleItem>(mItems);
 	}

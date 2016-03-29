@@ -11,6 +11,7 @@ import java.util.List;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IFilterable;
+import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -21,26 +22,26 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * implemented methods (getter and setters).
  */
 public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
-		implements ISectionable<SubItem.ChildViewHolder, HeaderItem>, IFilterable {
+		implements ISectionable<SubItem.ChildViewHolder, IHeader>, IFilterable {
 
 	private static final long serialVersionUID = 2519281529221244210L;
 
 	/**
 	 * The header of this item
 	 */
-	HeaderItem header;
+	IHeader header;
 
 	public SubItem(String id) {
 		super(id);
 	}
 
 	@Override
-	public HeaderItem getHeader() {
+	public IHeader getHeader() {
 		return header;
 	}
 
 	@Override
-	public void setHeader(HeaderItem header) {
+	public void setHeader(IHeader header) {
 		this.header = header;
 	}
 

@@ -69,7 +69,8 @@ public class FragmentOverall extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
+		//Create New Database and Initialize RecyclerView
+		DatabaseService.getInstance().createOverallDatabase();
 		initializeRecyclerView(savedInstanceState);
 	}
 
