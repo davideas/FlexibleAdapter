@@ -673,6 +673,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Retrieves the index of the specified header/section item.
+	 * <p>Counts the headers until this one.</p>
 	 *
 	 * @param header the header/section item
 	 * @return the index of the specified header/section
@@ -684,6 +685,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Retrieves the header/section index of any specified position.
+	 * <p>Counts the headers until this one.</p>
 	 *
 	 * @param position any item position
 	 * @return the index of the specified item position
@@ -1758,21 +1760,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Handle header linkage
 		IHeader header = getHeaderOf(getItem(positionStart));
 		if (header != null) {
-//			T newItem = getItem(positionStart + itemCount);
-//			if (isHeaderShared(header, positionStart, itemCount)) {
-//				//The header still represents a group, so rebound header content
-//				notifyItemChanged(getGlobalPositionOf(header), payload);
-//			} else if (!hasHeader(newItem)) {
-//				//Link the new header to the newItem, and eventually
-//				// collect the orphan header if linkage didn't succeed
-//				linkHeaderTo(newItem, header, payload);
-//			} else {
-//				//Header becomes orphan, also if newItem has a different header!
-//				//We cannot delete headers during remove range, otherwise positions
-//				// becomes wrongs. Headers will be deleted at the end of this process.
-//				addToOrphanListIfNeeded(header);
-//				notifyItemChanged(getGlobalPositionOf(header), payload);
-//			}
 			//The header does not represents a group anymore, add it to the Orphan list
 			addToOrphanListIfNeeded(header, positionStart, itemCount);
 			notifyItemChanged(getGlobalPositionOf(header), payload);
@@ -1892,19 +1879,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		this.restoreSelection = restoreSelection;
 	}
 
-	private void restoreHeaderLinkage(RestoreInfo restoreInfo) {
-		IHeader header = getHeaderOf(restoreInfo.item);
-		if (header != null) {
-			//First unlink header from current sectionable, otherwise it could not be found
-			unlinkHeaderFrom((T) getSectionableOf(header), restoreInfo.payload);
-			//Then link the header to the new sectionable
-			linkHeaderTo(restoreInfo.item, header, restoreInfo.payload);
-			} else if (isHeader(restoreInfo.item)) {
-			//Restore header into the sectionable
-			linkHeaderTo(getItem(restoreInfo.getRestorePosition()), (IHeader) restoreInfo.item, null);
-		}
-	}
-
 	/**
 	 * Restore items just removed.
 	 * <p><b>NOTE:</b> If filter is active, only items that match that filter will be shown(restored).</p>
@@ -1922,8 +1896,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		for (int i = mRestoreList.size() - 1; i >= 0; i--) {
 			adjustSelected = false;
 			RestoreInfo restoreInfo = mRestoreList.get(i);
-			//Restore header linkage (not necessary anymore!!)
-			//restoreHeaderLinkage(restoreInfo);
+			//Notify header if exists
 			IHeader header = getHeaderOf(restoreInfo.item);
 			if (header != null) {
 				notifyItemChanged(getGlobalPositionOf(header), restoreInfo.payload);
