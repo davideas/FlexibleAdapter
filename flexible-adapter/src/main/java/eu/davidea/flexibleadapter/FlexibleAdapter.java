@@ -839,13 +839,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Internal method to link the header to the new item.
 	 * <p>Used by the Adapter during the Remove/Restore/Move operations.</p>
-	 * The new item looses the previous header if was
+	 * The new item looses the previous header, and if the old header is not shared,
+	 * old header is added to the orphan list.
 	 *
 	 * @param item    the item that holds the header
 	 * @param header  the header item
 	 * @param payload any non-null user object to notify the header (the payload will be
 	 *                therefore passed to the bind method of the header ViewHolder),
-	 *                pass null to <u>not</u> notify the parent
+	 *                pass null to <u>not</u> notify the header
 	 */
 	private boolean linkHeaderTo(@NonNull T item, @NonNull IHeader header, @Nullable Object payload) {
 		boolean linked = false;
@@ -857,20 +858,20 @@ public class FlexibleAdapter<T extends IFlexible>
 			linked = true;
 			removeFromOrphanList(header);
 		} else {
-			addToOrphanList(header);
+			addToOrphanListIfNeeded(header, 0, getItemCount());
 		}
 		notifyItemChanged(getGlobalPositionOf(header), payload);
 		return linked;
 	}
 
 	/**
-	 * Internal method to unlink the header from the passed item.
+	 * Internal method to unlink the header from the specified item.
 	 * <p>Used by the Adapter during the Remove/Restore/Move operations.</p>
 	 *
 	 * @param item    the item that holds the header
 	 * @param payload any non-null user object to notify the header (the payload will be
 	 *                therefore passed to the bind method of the header ViewHolder),
-	 *                pass null to <u>not</u> notify the parent
+	 *                pass null to <u>not</u> notify the header
 	 */
 	private IHeader unlinkHeaderFrom(@NonNull T item, @Nullable Object payload) {
 		if (hasHeader(item)) {
@@ -881,28 +882,15 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (!header.isHidden()) {
 				notifyItemChanged(getGlobalPositionOf(header), payload);
 			}
-			addToOrphanList(header);
+			addToOrphanListIfNeeded(header, 0, getItemCount());
 			return header;
 		}
 		return null;
 	}
 
-	private void restoreHeaderLinkage(RestoreInfo restoreInfo) {
-		IHeader header = getHeaderOf(restoreInfo.item);
-		if (header != null) {
-			//First unlink header from current sectionable, otherwise it could not be found
-			unlinkHeaderFrom((T) getSectionableOf(header), restoreInfo.payload);
-			//Then link the header to the new sectionable
-			linkHeaderTo(restoreInfo.item, header, restoreInfo.payload);
-		} else if (isHeader(restoreInfo.item)) {
-			//Restore header into the sectionable
-			linkHeaderTo(getItem(restoreInfo.getRestorePosition()), (IHeader) restoreInfo.item, null);
-		}
-	}
-
-	private void addToOrphanList(IHeader header) {
+	private void addToOrphanListIfNeeded(IHeader header, int positionStart, int itemCount) {
 		//Check if the header is not already added (happens after un-linkage with un-success linkage)
-		if (!mOrphanHeaders.contains(header)) {
+		if (!mOrphanHeaders.contains(header) && !isHeaderShared(header, positionStart, itemCount)) {
 			mOrphanHeaders.add(header);
 			if (DEBUG)
 				Log.d(TAG, "Added to orphan list [" + mOrphanHeaders.size() + "] Header " + header);
@@ -923,7 +911,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Skip the items to delete
 			if (i >= positionStart && i < positionStart + itemCount) continue;
 			//An element with same header is met
-			if (!hasHeader(item) || hasSameHeader(item, header))
+			if (hasSameHeader(item, header))
 				return true;
 		}
 		return false;
@@ -1770,21 +1758,24 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Handle header linkage
 		IHeader header = getHeaderOf(getItem(positionStart));
 		if (header != null) {
-			T newItem = getItem(positionStart + itemCount);
-			if (isHeaderShared(header, positionStart, itemCount)) {
-				//The header still represents a group, so rebound header content
-				notifyItemChanged(getGlobalPositionOf(header), payload);
-			} else if (!hasHeader(newItem)) {
-				//Link the new header to the newItem, and eventually
-				// collect the orphan header if linkage didn't succeed
-				linkHeaderTo(newItem, header, payload);
-			} else {
-				//Header becomes orphan, also if newItem has a different header!
-				//We cannot delete headers during remove range, otherwise positions
-				// becomes wrongs. Headers will be deleted at the end of this process.
-				addToOrphanList(header);
-				notifyItemChanged(getGlobalPositionOf(header), payload);
-			}
+//			T newItem = getItem(positionStart + itemCount);
+//			if (isHeaderShared(header, positionStart, itemCount)) {
+//				//The header still represents a group, so rebound header content
+//				notifyItemChanged(getGlobalPositionOf(header), payload);
+//			} else if (!hasHeader(newItem)) {
+//				//Link the new header to the newItem, and eventually
+//				// collect the orphan header if linkage didn't succeed
+//				linkHeaderTo(newItem, header, payload);
+//			} else {
+//				//Header becomes orphan, also if newItem has a different header!
+//				//We cannot delete headers during remove range, otherwise positions
+//				// becomes wrongs. Headers will be deleted at the end of this process.
+//				addToOrphanListIfNeeded(header);
+//				notifyItemChanged(getGlobalPositionOf(header), payload);
+//			}
+			//The header does not represents a group anymore, add it to the Orphan list
+			addToOrphanListIfNeeded(header, positionStart, itemCount);
+			notifyItemChanged(getGlobalPositionOf(header), payload);
 		}
 
 		int parentPosition = -1;
@@ -1901,6 +1892,19 @@ public class FlexibleAdapter<T extends IFlexible>
 		this.restoreSelection = restoreSelection;
 	}
 
+	private void restoreHeaderLinkage(RestoreInfo restoreInfo) {
+		IHeader header = getHeaderOf(restoreInfo.item);
+		if (header != null) {
+			//First unlink header from current sectionable, otherwise it could not be found
+			unlinkHeaderFrom((T) getSectionableOf(header), restoreInfo.payload);
+			//Then link the header to the new sectionable
+			linkHeaderTo(restoreInfo.item, header, restoreInfo.payload);
+			} else if (isHeader(restoreInfo.item)) {
+			//Restore header into the sectionable
+			linkHeaderTo(getItem(restoreInfo.getRestorePosition()), (IHeader) restoreInfo.item, null);
+		}
+	}
+
 	/**
 	 * Restore items just removed.
 	 * <p><b>NOTE:</b> If filter is active, only items that match that filter will be shown(restored).</p>
@@ -1918,8 +1922,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		for (int i = mRestoreList.size() - 1; i >= 0; i--) {
 			adjustSelected = false;
 			RestoreInfo restoreInfo = mRestoreList.get(i);
-			//Restore header linkage
-			restoreHeaderLinkage(restoreInfo);
+			//Restore header linkage (not necessary anymore!!)
+			//restoreHeaderLinkage(restoreInfo);
+			IHeader header = getHeaderOf(restoreInfo.item);
+			if (header != null) {
+				notifyItemChanged(getGlobalPositionOf(header), restoreInfo.payload);
+			}
 
 			if (restoreInfo.relativePosition >= 0) {
 				//Restore child, if not deleted
