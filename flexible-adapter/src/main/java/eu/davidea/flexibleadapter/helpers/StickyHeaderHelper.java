@@ -60,6 +60,10 @@ public class StickyHeaderHelper extends OnScrollListener {
 		updateOrClearHeader(false);
 	}
 
+	public boolean isAttachedToRecyclerView() {
+		return mRecyclerView != null;
+	}
+
 	public void attachToRecyclerView(RecyclerView parent) {
 		if (mRecyclerView != null) {
 			mRecyclerView.removeOnScrollListener(this);
@@ -75,8 +79,8 @@ public class StickyHeaderHelper extends OnScrollListener {
 	public void detachFromRecyclerView(RecyclerView parent) {
 		if (mRecyclerView == parent) {
 			mRecyclerView.removeOnScrollListener(this);
-			mRecyclerView = null;
 			clearHeader();
+			mRecyclerView = null;
 		}
 	}
 
@@ -120,7 +124,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		params.width = view.getMeasuredWidth();
 		params.height = view.getMeasuredHeight();
 		removeViewFromParent(view);
-		mStickyHolderLayout.addView(view, params);
+		mStickyHolderLayout.addView(view);
 	}
 
 	private void updateHeader(int headerPosition, boolean updateHeaderContent) {
@@ -168,6 +172,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		//Apply translation
 		mStickyHeaderViewHolder.itemView.setTranslationX(headerOffsetX);
 		mStickyHeaderViewHolder.itemView.setTranslationY(headerOffsetY);
+		if (FlexibleAdapter.DEBUG) Log.d(TAG, "headerOffsetY=" + headerOffsetY);
 	}
 
 	private void swapHeader(RecyclerView.ViewHolder newHeader) {
@@ -176,7 +181,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 		mStickyHeaderViewHolder = newHeader;
 		if (mStickyHeaderViewHolder != null) {
-			mStickyHeaderViewHolder.setIsRecyclable(false);
+			//mStickyHeaderViewHolder.setIsRecyclable(false);
 			ensureHeaderParent();
 		}
 		onStickyHeaderChange(mHeaderPosition);
@@ -253,8 +258,8 @@ public class StickyHeaderHelper extends OnScrollListener {
 		//Reset transformation on removed header
 		view.setTranslationX(0);
 		view.setTranslationY(0);
-		view.setLayoutParams(mRecyclerView.getLayoutParams());
-		header.setIsRecyclable(true);
+		//view.setLayoutParams(mRecyclerView.getLayoutParams());
+		//header.setIsRecyclable(true);
 	}
 
 	private static void removeViewFromParent(final View view) {

@@ -123,6 +123,11 @@ public class ExpandableHeaderItem
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 		}
+
+		@Override
+		protected boolean isViewExpandableOnClick() {
+			return true;
+		}
 	}
 
 	@Override

@@ -117,10 +117,10 @@ public class DatabaseService {
 	 */
 	private ExpandableHeaderItem newExpandableSectionItem(int i) {
 		ExpandableHeaderItem expandableItem = new ExpandableHeaderItem("E" + i);
-		expandableItem.setTitle("Expandable Header Item " + i);
+		expandableItem.setTitle("Expandable Header " + i);
 		for (int j = 1; j <= SUB_ITEMS; j++) {
 			SubItem subItem = new SubItem(expandableItem.getId() + "S" + j);
-			subItem.setTitle("Sub Item " + j + " in expandable section header");
+			subItem.setTitle("Sub Item " + j + " in expandable section");
 			//In this case the Header is the same parent: ExpandableHeaderItem instance
 			subItem.setHeader(expandableItem);
 			expandableItem.addSubItem(subItem);

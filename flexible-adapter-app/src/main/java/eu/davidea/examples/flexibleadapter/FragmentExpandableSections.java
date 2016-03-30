@@ -90,7 +90,7 @@ public class FragmentExpandableSections extends Fragment {
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 			@Override
 			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!!
+				//NOTE: This allows to receive Payload objects when notifyItemChanged is called by the Adapter!!!
 				return true;
 			}
 		});
@@ -103,7 +103,9 @@ public class FragmentExpandableSections extends Fragment {
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
 		mAdapter.setSwipeEnabled(true);//Enable swipe items
-		mAdapter.setDisplayHeadersAtStartUp(false);//Show Headers at startUp!
+		//Show Headers at startUp! (not necessary if Headers are also Expandable)
+		//mAdapter.setDisplayHeadersAtStartUp(true);
+
 		//Add sample item on the top (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 

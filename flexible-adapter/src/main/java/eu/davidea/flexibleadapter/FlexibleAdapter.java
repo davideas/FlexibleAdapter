@@ -218,7 +218,24 @@ public class FlexibleAdapter<T extends IFlexible>
 			mStickyHeaderChangeListener = (OnStickyHeaderChangeListener) listeners;
 
 		//Get notified when items are inserted or removed (it adjusts selected positions)
-		registerAdapterDataObserver(new ExpandableAdapterDataObserver());
+		registerAdapterDataObserver(new AdapterDataObserver());
+	}
+
+	@Override
+	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+		super.onAttachedToRecyclerView(recyclerView);
+		if (mStickyHeaderHelper != null && headersShown) {
+			mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
+		}
+	}
+
+	@Override
+	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+		if (mStickyHeaderHelper != null) {
+			mStickyHeaderHelper.detachFromRecyclerView(mRecyclerView);
+			mStickyHeaderHelper = null;
+		}
+		super.onDetachedFromRecyclerView(recyclerView);
 	}
 
 	/**
@@ -238,6 +255,8 @@ public class FlexibleAdapter<T extends IFlexible>
 					if (DEBUG) Log.v(TAG, "Initially expand item on position " + position);
 					position += addAllSubItemsFrom(position, expandable, false, null);
 				}
+				if (!headersShown && isHeader(item) && !item.isHidden())
+					headersShown = true;
 			}
 			position++;
 		}
@@ -596,7 +615,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			this.headersSticky = true;
 			if (mStickyHeaderHelper == null)
 				mStickyHeaderHelper = new StickyHeaderHelper(this, mStickyHeaderChangeListener);
-			mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
+			if (!mStickyHeaderHelper.isAttachedToRecyclerView())
+				mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
 		} else if (mStickyHeaderHelper != null) {
 			this.headersSticky = false;
 			mStickyHeaderHelper.detachFromRecyclerView(mRecyclerView);
@@ -2868,7 +2888,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Observer Class responsible to recalculate Selection and Expanded positions.
 	 */
-	private class ExpandableAdapterDataObserver extends RecyclerView.AdapterDataObserver {
+	private class AdapterDataObserver extends RecyclerView.AdapterDataObserver {
 
 		private void adjustPositions(int positionStart, int itemCount) {
 			if (!filtering) {//Filtering has multiple insert and removal, we skip this process

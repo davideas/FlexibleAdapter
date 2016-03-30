@@ -314,13 +314,20 @@ public class MainActivity extends AppCompatActivity implements
 		}
 		// Insert the fragment by replacing any existing fragment
 		if (fragment != null) {
+			//Highlight the selected item has been done by NavigationView
+			item.setChecked(true);
+			//THIS IS VERY IMPORTANT. Because you are going to inflate a new RecyclerView, its
+			//Adapter will be null, therefore the following method cannot be called automatically!
+			//If your StickyHeaderContainer is in the main view, you must call this method to clean
+			//the previous sticky view. Alternatively you can move the include of StickyHeaderLayout
+			//in the Fragment view.
+			mAdapter.onDetachedFromRecyclerView(mRecyclerView);
+			//Inflate the new Fragment with the new RecyclerView and a new Adapter
 			FragmentManager fragmentManager = getFragmentManager();
 			fragmentManager.beginTransaction().replace(R.id.recycler_view_container, fragment).commit();
-			// Highlight the selected item has been done by NavigationView
-			item.setChecked(true);
-			mToolbar.setSubtitle(item.getTitle());
 			//Close drawer
 			mDrawer.closeDrawer(GravityCompat.START);
+			mToolbar.setSubtitle(item.getTitle());
 			return true;
 		}
 		return false;

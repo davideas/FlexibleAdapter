@@ -90,7 +90,7 @@ public class FragmentOverall extends Fragment {
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 			@Override
 			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!!
+				//NOTE: This allows to receive Payload objects when notifyItemChanged is called by the Adapter!!!
 				return true;
 			}
 		});
