@@ -36,10 +36,10 @@ public class ExpandableHeaderItem
 
 	public ExpandableHeaderItem(String id) {
 		super(id);
-		//We start with header shown, expanded and selectable!
+		//We start with header shown, expanded and NOT selectable!
 		setHidden(false);
 		setExpanded(true);
-		setSelectable(true);
+		setSelectable(false);
 	}
 
 	@Override
