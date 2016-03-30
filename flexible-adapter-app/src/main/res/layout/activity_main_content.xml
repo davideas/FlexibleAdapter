@@ -23,7 +23,6 @@
 	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		tools:context="eu.davidea.examples.flexibleadapter.MainActivity"
 		app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 		<FrameLayout
@@ -31,6 +30,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"/>
 
+		<!-- Needed by FlexibleAdapter for headers to be sticky.
+		     This little layout is included in the library -->
 		<include layout="@layout/sticky_header_layout"/>
 
 		<include layout="@layout/empty_view"/>

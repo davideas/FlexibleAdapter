@@ -29,6 +29,10 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * <p>Implements this interface or use {@link AbstractFlexibleItem}.</p>
  *
  * @author Davide Steduto
+ * @see IExpandable
+ * @see IFilterable
+ * @see IHeader
+ * @see ISectionable
  * @since 19/01/2016 Created
  */
 public interface IFlexible<VH extends RecyclerView.ViewHolder> {

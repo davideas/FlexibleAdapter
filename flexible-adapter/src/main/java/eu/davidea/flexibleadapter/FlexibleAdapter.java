@@ -54,10 +54,12 @@ import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * This class provides a set of standard methods to handle changes on the data set such as
- * filtering, adding, removing, moving and animating an item.
- * <p><b>T</b> is your Model object containing the data, with version 5.0.0 it must implement
- * {@link IFlexible} interface.</p>
+ * This class is backed by an ArrayList of arbitrary objects of <b>T</b>, where <b>T</b> is
+ * your Model object containing the data, with version 5.0.0 it must implement {@link IFlexible}
+ * interface. Read <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki page</a> on
+ * Github for more details.
+ * <p>This class provides a set of standard methods to handle changes on the data set such as
+ * filtering, adding, removing, moving and animating an item.</p>
  * With version 5.0.0, this Adapter supports a set of standard methods for Headers/Sections to
  * expand and collapse an Expandable item, to Drag&Drop and Swipe any item.
  * <p><b>NOTE:</b>This Adapter supports Expandable of Expandable, but selection and restoration

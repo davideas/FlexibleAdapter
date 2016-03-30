@@ -25,6 +25,10 @@ import java.util.List;
  * <p>Implements this interface or use {@link AbstractExpandableItem}.</p>
  *
  * @author Davide Steduto
+ * @see IFlexible
+ * @see IFilterable
+ * @see IHeader
+ * @see ISectionable
  * @since 17/01/2016 Created
  */
 public interface IExpandable<VH extends RecyclerView.ViewHolder, S extends IFlexible>

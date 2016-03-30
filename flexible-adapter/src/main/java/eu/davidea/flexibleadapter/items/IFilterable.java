@@ -20,6 +20,10 @@ package eu.davidea.flexibleadapter.items;
  * this interface.
  *
  * @author Davide Steduto
+ * @see IFlexible
+ * @see IExpandable
+ * @see IHeader
+ * @see ISectionable
  * @since 18/02/2016 Created
  */
 public interface IFilterable {
