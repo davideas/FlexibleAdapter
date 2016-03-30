@@ -18,7 +18,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
 /**
  * This is an experiment to evaluate how a Section with header can also be expanded/collapsed.
  * <p>Here, it still benefits of the common fields declared in AbstractExampleItem.</p>
- * It's imporant to note that the ViewHolder must be specified in all &lt;diamond&gt; signature.
+ * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
  */
 public class ExpandableHeaderItem
 		extends AbstractExampleItem<ExpandableHeaderItem.ExpandableHeaderViewHolder>
@@ -36,9 +36,10 @@ public class ExpandableHeaderItem
 
 	public ExpandableHeaderItem(String id) {
 		super(id);
-		//We start with header shown, expanded and NOT selectable!
+		//We start with header shown, expanded
 		setHidden(false);
 		setExpanded(true);
+		//NOT selectable (otherwise ActionMode will be activated on long click)!
 		setSelectable(false);
 	}
 

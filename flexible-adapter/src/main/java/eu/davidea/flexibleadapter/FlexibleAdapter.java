@@ -242,9 +242,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			position++;
 		}
 		multiRange = false;
-		//Update empty view
-		if (mUpdateListener != null)
-			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	/*------------------------------*/

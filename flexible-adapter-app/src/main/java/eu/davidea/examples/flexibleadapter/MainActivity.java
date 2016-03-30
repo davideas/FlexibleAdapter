@@ -68,8 +68,7 @@ public class MainActivity extends AppCompatActivity implements
 	/**
 	 * The current activated item position.
 	 */
-	private static final int INVALID_POSITION = -1;
-	private int mActivatedPosition = INVALID_POSITION;
+	private int mActivatedPosition = RecyclerView.NO_POSITION;
 
 	/**
 	 * RecyclerView and related objects
@@ -531,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onItemClick(int position) {
-		if (mActionMode != null && position != INVALID_POSITION) {
+		if (mActionMode != null && position != RecyclerView.NO_POSITION) {
 			toggleSelection(position);
 			return true;
 		} else {
@@ -685,9 +684,7 @@ public class MainActivity extends AppCompatActivity implements
 				switch (adapterItem.getLayoutRes()) {
 					case R.layout.recycler_child_row:
 						SubItem subItem = (SubItem) adapterItem;
-
-						ExpandableItem expandable = (ExpandableItem) mAdapter.getExpandableOfDeletedChild(subItem);
-						DatabaseService.getInstance().removeSubItem(expandable, subItem);
+						DatabaseService.getInstance().removeSubItem(mAdapter.getExpandableOfDeletedChild(subItem), subItem);
 						Log.d(TAG, "Confirm removed " + subItem.getTitle());
 						break;
 					case R.layout.recycler_expandable_row:

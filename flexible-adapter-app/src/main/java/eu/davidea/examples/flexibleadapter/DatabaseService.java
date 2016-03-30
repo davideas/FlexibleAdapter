@@ -12,6 +12,7 @@ import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 
 /**
@@ -40,6 +41,10 @@ public class DatabaseService {
 		return mInstance;
 	}
 
+	/*---------------------------*/
+	/* EXAMPLE DATABASE CREATION */
+	/*---------------------------*/
+
 	public void createOverallDatabase() {
 		HeaderItem header = null;
 		mItems.clear();
@@ -60,6 +65,13 @@ public class DatabaseService {
 		}
 	}
 
+	/*---------------*/
+	/* ITEM CREATION */
+	/*---------------*/
+
+	/*
+	 * Create a Header item for normal items.
+	 */
 	public static HeaderItem newHeader(int i) {
 		i = i * HEADERS/ITEMS + 1;
 		HeaderItem header = new HeaderItem("H" + i);
@@ -68,32 +80,27 @@ public class DatabaseService {
 		return header;
 	}
 
+	/*
+	 * Creates a normal item with a Header linked.
+	 */
 	public static SimpleItem newSimpleItem(int i, HeaderItem header) {
 		SimpleItem item;
-		if (header != null) {
-			header.setSubtitle("Attached to Simple Item " + i);
-			item = new SimpleItem("I" + i, header);
-		} else {
-			item = new SimpleItem("I" + i);
-		}
+		header.setSubtitle("Attached to Simple Item " + i);
+		item = new SimpleItem("I" + i, header);
 		item.setTitle("Simple Item " + i);
 		item.setSubtitle("Subtitle " + i);
 		return item;
 	}
 
+	/*
+	 * Creates a normal expandable item with some subItems.
+	 * The expandable has a Header linked.
+	 */
 	public static ExpandableItem newExpandableItem(int i, HeaderItem header) {
 		//Items are expandable because they implements IExpandable
 		ExpandableItem expandableItem;
-		if (header != null) {
-			header.setSubtitle("Attached to Expandable Item " + i);
-			expandableItem = new ExpandableItem("E" + i, header);
-		} else {
-			expandableItem = new ExpandableItem("E" + i);
-		}
-		//Experimenting NEW features
-		//Let's initially expand the first parent item with subElements
-//		expandableItem.setExpanded(i == 3);
-//		expandableItem.setSelectable(false);
+		header.setSubtitle("Attached to Expandable Item " + i);
+		expandableItem = new ExpandableItem("E" + i, header);
 		expandableItem.setTitle("Expandable Item " + i);
 		//SubItems are not expandable by default, but thy might be if extends/implements IExpandable
 		for (int j = 1; j <= SUB_ITEMS; j++) {
@@ -104,18 +111,26 @@ public class DatabaseService {
 		return expandableItem;
 	}
 
-	private AbstractFlexibleItem newExpandableSectionItem(int i) {
+	/*
+	 * Creates a special expandable item which is also a Header.
+	 * The subItems will have linked its parent as Header!
+	 */
+	private ExpandableHeaderItem newExpandableSectionItem(int i) {
 		ExpandableHeaderItem expandableItem = new ExpandableHeaderItem("E" + i);
 		expandableItem.setTitle("Expandable Header Item " + i);
 		for (int j = 1; j <= SUB_ITEMS; j++) {
 			SubItem subItem = new SubItem(expandableItem.getId() + "S" + j);
 			subItem.setTitle("Sub Item " + j + " in expandable section header");
-			//In this case the header is the same parent: ExpandableHeaderItem
+			//In this case the Header is the same parent: ExpandableHeaderItem instance
 			subItem.setHeader(expandableItem);
 			expandableItem.addSubItem(subItem);
 		}
 		return expandableItem;
 	}
+
+	/*-----------------------*/
+	/* MAIN DATABASE METHODS */
+	/*-----------------------*/
 
 	/**
 	 * @return Always a copy of the original list.
@@ -133,8 +148,12 @@ public class DatabaseService {
 		mItems.remove(item);
 	}
 
-	public void removeSubItem(ExpandableItem parent, SubItem child) {
-		parent.removeSubItem(child);
+	public void removeSubItem(IExpandable parent, SubItem child) {
+		//This split is for my examples
+		if (parent instanceof ExpandableItem)
+			((ExpandableItem) parent).removeSubItem(child);
+		else if (parent instanceof ExpandableHeaderItem)
+			((ExpandableHeaderItem) parent).removeSubItem(child);
 	}
 
 	public void addItem(int position, AbstractExampleItem item) {
@@ -144,8 +163,12 @@ public class DatabaseService {
 			mItems.add(item);
 	}
 
-	public void addSubItem(int position, ExpandableItem parent, SubItem subItem) {
-		parent.addSubItem(position, subItem);
+	public void addSubItem(int position, IExpandable parent, SubItem subItem) {
+		//This split is for my examples
+		if (parent instanceof ExpandableItem)
+			((ExpandableItem) parent).removeSubItem(subItem);
+		else if (parent instanceof ExpandableHeaderItem)
+			((ExpandableHeaderItem) parent).addSubItem(subItem);
 	}
 
 	public static void onDestroy() {

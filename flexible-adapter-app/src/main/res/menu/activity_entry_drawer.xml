@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+	  xmlns:app="http://schemas.android.com/apk/res-auto">
 
 	<group android:checkableBehavior="single">
 		<item
@@ -10,14 +10,17 @@
 			android:title="@string/overall"/>
 		<item
 			android:id="@+id/nav_selection_modes"
+			android:enabled="false"
 			android:icon="@drawable/ic_view_headline"
 			android:title="@string/selection_mode"/>
 		<item
 			android:id="@+id/nav_headers_and_sections"
+			android:enabled="false"
 			android:icon="@drawable/ic_view_headline"
 			android:title="@string/headers_sections"/>
 		<item
 			android:id="@+id/nav_expandable"
+			android:enabled="false"
 			android:icon="@drawable/ic_view_headline"
 			android:title="@string/expandable"/>
 		<item
@@ -30,6 +33,7 @@
 		<menu>
 			<item
 				android:id="@+id/nav_switch"
+				android:enabled="false"
 				android:title="Grid Layout"
 				app:actionLayout="@layout/action_view_switch"/>
 		</menu>
@@ -39,10 +43,12 @@
 		<menu>
 			<item
 				android:id="@+id/nav_share"
+				android:enabled="false"
 				android:icon="@drawable/ic_menu_share"
 				android:title="Share"/>
 			<item
 				android:id="@+id/nav_send"
+				android:enabled="false"
 				android:icon="@drawable/ic_menu_send"
 				android:title="Send"/>
 			<item
