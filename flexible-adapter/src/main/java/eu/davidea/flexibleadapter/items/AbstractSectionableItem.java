@@ -32,6 +32,10 @@ public abstract class AbstractSectionableItem<VH extends RecyclerView.ViewHolder
 	 */
 	protected T header;
 
+	public AbstractSectionableItem(T header) {
+		this.header = header;
+	}
+
 	@Override
 	public T getHeader() {
 		return header;

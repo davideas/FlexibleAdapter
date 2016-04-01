@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
@@ -26,9 +27,10 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * implemented methods (getter and setters).
  */
 public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
-		implements ISectionable<SimpleItem.ParentViewHolder, HeaderItem>, IFilterable {
+		implements ISectionable<SimpleItem.ParentViewHolder, HeaderItem>, IFilterable, Serializable {
 
 	private static final long serialVersionUID = -6882745111884490060L;
+
 	/**
 	 * The header of this item
 	 */
