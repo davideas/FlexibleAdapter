@@ -105,14 +105,14 @@ public class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	public void updateOrClearHeader(boolean updateHeaderContent) {
-		if (mAdapter.hasSearchText() || mStickyHolderLayout == null ||
+		if (mStickyHolderLayout == null || mAdapter.hasSearchText() ||
 				mRecyclerView == null || mRecyclerView.getChildCount() == 0) {
 			clearHeader();
 			return;
 		}
 		int firstHeaderPosition = getHeaderPosition(RecyclerView.NO_POSITION);
 		if (firstHeaderPosition >= 0 && firstHeaderPosition < mAdapter.getItemCount()) {
-			updateHeader(Math.max(0, firstHeaderPosition), updateHeaderContent);
+			updateHeader(firstHeaderPosition, updateHeaderContent);
 		} else {
 			clearHeader();
 		}
@@ -133,7 +133,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 			mHeaderPosition = headerPosition;
 			RecyclerView.ViewHolder holder = getHeaderViewHolder(headerPosition);
 			if (mStickyHeaderViewHolder != holder) {
-				if (FlexibleAdapter.DEBUG) Log.d(TAG, "swapHeader newPosition=" + headerPosition);
+				if (FlexibleAdapter.DEBUG) Log.v(TAG, "swapHeader newPosition=" + headerPosition);
 				swapHeader(holder);
 			}
 		} else if (updateHeaderContent && mStickyHeaderViewHolder != null) {
@@ -172,7 +172,6 @@ public class StickyHeaderHelper extends OnScrollListener {
 		//Apply translation
 		mStickyHeaderViewHolder.itemView.setTranslationX(headerOffsetX);
 		mStickyHeaderViewHolder.itemView.setTranslationY(headerOffsetY);
-		if (FlexibleAdapter.DEBUG) Log.d(TAG, "headerOffsetY=" + headerOffsetY);
 	}
 
 	private void swapHeader(RecyclerView.ViewHolder newHeader) {
@@ -181,7 +180,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 		mStickyHeaderViewHolder = newHeader;
 		if (mStickyHeaderViewHolder != null) {
-			//mStickyHeaderViewHolder.setIsRecyclable(false);
+			mStickyHeaderViewHolder.setIsRecyclable(false);
 			ensureHeaderParent();
 		}
 		onStickyHeaderChange(mHeaderPosition);
@@ -189,6 +188,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 	public void clearHeader() {
 		if (mStickyHeaderViewHolder != null) {
+			if (FlexibleAdapter.DEBUG) Log.v(TAG, "clearHeader");
 			resetHeader(mStickyHeaderViewHolder);
 			mStickyHeaderViewHolder = null;
 			mHeaderPosition = RecyclerView.NO_POSITION;
@@ -196,12 +196,17 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 	}
 
+	@SuppressWarnings({"unchecked", "ConstantConditions"})
 	private int getHeaderPosition(int adapterPosHere) {
 		if (adapterPosHere == RecyclerView.NO_POSITION) {
 			View firstChild = mRecyclerView.getChildAt(0);
 			adapterPosHere = mRecyclerView.getChildAdapterPosition(firstChild);
 		}
 		IHeader header = mAdapter.getSectionHeader(adapterPosHere);
+		//Header cannot be sticky if it's also an Expandable in collapsed status, RV will raise an exception
+		if (header == null || mAdapter.isExpandable(header) && !mAdapter.isExpanded(header)) {
+			return RecyclerView.NO_POSITION;
+		}
 		return mAdapter.getGlobalPositionOf(header);
 	}
 
@@ -252,14 +257,13 @@ public class StickyHeaderHelper extends OnScrollListener {
 		return holder;
 	}
 
-	private void resetHeader(RecyclerView.ViewHolder header) {
+	private static void resetHeader(RecyclerView.ViewHolder header) {
 		final View view = header.itemView;
 		removeViewFromParent(view);
 		//Reset transformation on removed header
 		view.setTranslationX(0);
 		view.setTranslationY(0);
-		//view.setLayoutParams(mRecyclerView.getLayoutParams());
-		//header.setIsRecyclable(true);
+		header.setIsRecyclable(true);
 	}
 
 	private static void removeViewFromParent(final View view) {

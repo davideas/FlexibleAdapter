@@ -241,7 +241,6 @@ public class MainActivity extends AppCompatActivity implements
 		appVersion.setText(getString(R.string.about_version,
 				Utils.getVersionName(this),
 				Utils.getVersionCode(this)));
-
 	}
 
 	private void initializeFab() {
