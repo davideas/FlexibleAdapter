@@ -45,7 +45,6 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
-import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements
@@ -108,9 +107,6 @@ public class MainActivity extends AppCompatActivity implements
 		setContentView(R.layout.activity_main);
 		Log.d(TAG, "onCreate");
 
-		//Settings for FlipView
-		FlipView.resetLayoutAnimationDelay(true, 1000L);
-
 		//Adapter & RecyclerView
 		initializeRecyclerView(savedInstanceState);
 		//SwipeToRefresh, Toolbar, Drawer & FAB
@@ -124,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements
 		//updateEmptyView();
 
 		//Restore previous state
-		if (savedInstanceState != null) {
+		if (savedInstanceState != null && mAdapter != null) {
 			//Selection
 			mAdapter.onRestoreInstanceState(savedInstanceState);
 			if (mAdapter.getSelectedItemCount() > 0) {
@@ -135,9 +131,6 @@ public class MainActivity extends AppCompatActivity implements
 			if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
 				setSelection(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 		}
-
-		//Settings for FlipView
-		FlipView.stopLayoutAnimation();
 	}
 
 	@Override

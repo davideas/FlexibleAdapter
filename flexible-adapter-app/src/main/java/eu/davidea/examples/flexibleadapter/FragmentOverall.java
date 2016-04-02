@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
+import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 
 /**
@@ -69,9 +70,15 @@ public class FragmentOverall extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		//Settings for FlipView
+		FlipView.resetLayoutAnimationDelay(true, 1000L);
+
 		//Create New Database and Initialize RecyclerView
 		DatabaseService.getInstance().createOverallDatabase();
 		initializeRecyclerView(savedInstanceState);
+
+		//Settings for FlipView
+		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
