@@ -82,9 +82,8 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 	 */
 	private EnumSet<AnimatorEnum> animatorsUsed = EnumSet.noneOf(AnimatorEnum.class);
 
-	private boolean isReverseEnabled = false,
-			shouldAnimate = true,
-			isFastScroll = false;
+	private boolean isReverseEnabled = false, shouldAnimate = true,
+			isFastScroll = false, isInitialize = false;
 
 	private long mInitialDelay = 500L,
 			mStepDelay = 100L,
@@ -108,6 +107,14 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 	/*-----------------------*/
 	/* CONFIGURATION SETTERS */
 	/*-----------------------*/
+
+	/**
+	 *
+	 * @param initialize true to notify this Adapter that
+	 */
+	void setInitialize(boolean initialize) {
+		isInitialize = initialize;
+	}
 
 	/**
 	 * Customize the initial delay for the first item animation.
@@ -486,23 +493,28 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 			mAnimatorHandler.sendMessageDelayed(Message.obtain(mAnimatorHandler), 200L);
 		}
 
-		private void markNotified(int positionStart, int itemCount) {
-			isNotified = true;
+		private void markNotified() {
+			isNotified = !isInitialize;
 		}
 
 		@Override
 		public void onItemRangeChanged(int positionStart, int itemCount) {
-			markNotified(positionStart, itemCount);
+			markNotified();
 		}
 
 		@Override
 		public void onItemRangeInserted(int positionStart, int itemCount) {
-			markNotified(positionStart, itemCount);
+			markNotified();
 		}
 
 		@Override
 		public void onItemRangeRemoved(int positionStart, int itemCount) {
-			markNotified(positionStart, itemCount);
+			markNotified();
+		}
+
+		@Override
+		public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+			markNotified();
 		}
 	}
 

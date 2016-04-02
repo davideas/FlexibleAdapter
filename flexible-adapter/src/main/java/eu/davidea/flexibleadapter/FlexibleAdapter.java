@@ -244,6 +244,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	protected void initializeItems() {
 		int position = 0;
+		setInitialize(true);
 		multiRange = true;
 		while (position < mItems.size()) {
 			T item = getItem(position);
@@ -261,6 +262,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			position++;
 		}
 		multiRange = false;
+		setInitialize(false);
 	}
 
 	/*------------------------------*/
@@ -470,8 +472,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this adapter so the call can be chained
 	 */
 	public FlexibleAdapter setDisplayHeadersAtStartUp(boolean displayHeaders) {
+		setInitialize(true);
 		headersShown = displayHeaders;
 		if (displayHeaders) showAllHeaders();
+		setInitialize(false);
 		return this;
 	}
 
@@ -2458,7 +2462,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.v(TAG, "moveItem afterSwap fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
 		}
 		//TODO: Allow child to be moved into another parent, update the 2 parents, optionally: 1) collapse the new parent 2) expand it 3) leave as it is
-		//TODO: If item with a section has being dragged, should section follow the item as well ??
 		//Header swap linkage
 		if (headersShown) {
 			//Situation AFTER items have been swapped, items are inverted!

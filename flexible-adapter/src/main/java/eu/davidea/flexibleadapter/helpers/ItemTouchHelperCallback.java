@@ -172,6 +172,7 @@ public class ItemTouchHelperCallback extends Callback {
 			final int swipeFlags = 0;
 			return makeMovementFlags(dragFlags, swipeFlags);
 		} else {
+			//TODO: Handle horizontal layout
 			final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
 			final int swipeFlags = mSwipeFlags;
 			return makeMovementFlags(dragFlags, swipeFlags);
