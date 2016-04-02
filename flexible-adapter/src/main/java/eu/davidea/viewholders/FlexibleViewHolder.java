@@ -28,7 +28,6 @@ import android.view.View;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
-import eu.davidea.flexibleadapter.utils.Utils;
 
 /**
  * Helper Class that implements:
@@ -153,6 +152,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * @param view handle view
 	 * @see #onTouch(View, MotionEvent)
 	 */
+	@SuppressWarnings("ConstantConditions")
 	protected final void setDragHandleView(@NonNull View view) {
 		if (view != null) view.setOnTouchListener(this);
 	}
@@ -174,19 +174,18 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	@CallSuper
 	protected void toggleActivation() {
 		itemView.setActivated(mAdapter.isSelected(getFlexibleAdapterPosition()));
-		ViewCompat.setElevation(itemView,
-				itemView.isActivated() && getElevation() > 0 ? getElevation() : 0);
+		if (itemView.isActivated() && getActivationElevation() > 0)
+			ViewCompat.setElevation(itemView, getActivationElevation());
 	}
 
 	/**
-	 * Allows to set view elevation while dragging.
-	 * <p>Override to return desired value or to return "0f" if you don't desire elevation
-	 * on this itemView.</p>
+	 * Allows to set elevation while the view is activated.
+	 * <p>Override to return desired value of elevation on this itemView.</p>
 	 *
-	 * @return always elevate of 4dp, if not overridden
+	 * @return never elevate, returns 0dp if not overridden
 	 */
-	protected float getElevation() {
-		return Utils.dpToPx(itemView.getContext(), 4f);
+	public float getActivationElevation() {
+		return 0f;
 	}
 
 	/**
@@ -241,7 +240,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 				if (mLongClickSkipped || mAdapter.getMode() == SelectableAdapter.MODE_MULTI) {
 					//Next check, allows to initiate the ActionMode and to add selection if configured
 					if ((shouldAddSelectionInActionMode() || mAdapter.getMode() != SelectableAdapter.MODE_MULTI) &&
-							mAdapter.mItemLongClickListener != null) {
+							mAdapter.mItemLongClickListener != null && mAdapter.isSelectable(position)) {
 						mAdapter.mItemLongClickListener.onItemLongClick(position);
 						alreadySelected = true; //Keep selection on release!
 					}

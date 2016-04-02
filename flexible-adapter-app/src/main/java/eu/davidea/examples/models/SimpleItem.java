@@ -171,6 +171,11 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 			//Here we use a custom Animation inside the ItemView
 			mFlipView.flip(mAdapter.isSelected(getAdapterPosition()));
 		}
+
+		@Override
+		public float getActivationElevation() {
+			return Utils.dpToPx(itemView.getContext(), 4f);
+		}
 	}
 
 	@Override

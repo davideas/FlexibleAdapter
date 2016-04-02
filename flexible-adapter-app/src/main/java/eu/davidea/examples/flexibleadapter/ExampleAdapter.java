@@ -145,9 +145,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 ////					break;//We stop the process here, we only want to update the subtitle
 ////				}
 //
-//				//When user scrolls, this line binds the correct selection status
-//				pvHolder.itemView.setActivated(isSelected(position));
-//
 //				//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
 //				if (mSelectAll || mLastItemInActionMode) {
 //					//Reset the flags with delay
@@ -199,9 +196,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //				SubItem subItem = (SubItem) getItem(position);
 //				SubItem.ChildViewHolder cvHolder = (SubItem.ChildViewHolder) holder;
 //				assert subItem != null;
-//
-//				//When user scrolls, this line binds the correct selection status
-//				cvHolder.itemView.setActivated(isSelected(position));
 //
 //				//This "if-else" is just an example of what you can do with item animation
 //				if (isSelected(position)) {

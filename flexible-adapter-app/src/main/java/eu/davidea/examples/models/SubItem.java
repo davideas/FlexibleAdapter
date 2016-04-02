@@ -95,6 +95,11 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
 			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
 			setDragHandleView(mHandleView);
 		}
+
+		@Override
+		public float getActivationElevation() {
+			return Utils.dpToPx(itemView.getContext(), 4f);
+		}
 	}
 
 	@Override

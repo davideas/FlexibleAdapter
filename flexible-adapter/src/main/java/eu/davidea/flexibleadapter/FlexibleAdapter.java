@@ -25,6 +25,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -1027,16 +1028,23 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
-		if (!autoMap) {
-			super.onBindViewHolder(holder, position, payloads);
-			return;
-		}
 		//When user scrolls, this line binds the correct selection status
 		holder.itemView.setActivated(isSelected(position));
-		T item = getItem(position);
-		if (item != null) {
-			holder.itemView.setEnabled(item.isEnabled());
-			item.bindViewHolder(this, holder, position, payloads);
+		//Bind the correct view elevation
+		if (holder.itemView.isActivated() && holder instanceof FlexibleViewHolder) {
+			FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
+			if (flexHolder.getActivationElevation() > 0)
+				ViewCompat.setElevation(flexHolder.itemView, flexHolder.getActivationElevation());
+		}
+		if (!autoMap) {
+			super.onBindViewHolder(holder, position, payloads);
+		} else {
+			//Bind the item
+			T item = getItem(position);
+			if (item != null) {
+				holder.itemView.setEnabled(item.isEnabled());
+				item.bindViewHolder(this, holder, position, payloads);
+			}
 		}
 	}
 
