@@ -28,6 +28,10 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
+/**
+ * @author Davide Steduto
+ * @since 27/01/2016 Created
+ */
 public final class Utils {
 
 	public static final int INVALID_COLOR = -1;
@@ -42,7 +46,6 @@ public final class Utils {
 		return Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP;
 	}
 
-
 	/**
 	 * Sets a spannable text with the accent color (if available) into the passed TextView.
 	 * <p>Internally calls {@link #fetchAccentColor(Context, int)}.</p>
@@ -51,10 +54,11 @@ public final class Utils {
 	 * @param textView     the TextView to transform
 	 * @param originalText the original text which the transformation is applied to
 	 * @param constraint   the text to highlight
-	 * @param defColor     the default color in case accentColor is not available
+	 * @param defColor     the default color in case accentColor is not found
 	 * @see #fetchAccentColor(Context, int)
 	 */
-	public static void setHighlightText(Context context, TextView textView, String originalText, String constraint, int defColor) {
+	public static void highlightText(Context context, TextView textView,
+									 String originalText, String constraint, int defColor) {
 		Spannable spanText = Spannable.Factory.getInstance().newSpannable(originalText);
 		int i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint);
 		if (i != -1) {

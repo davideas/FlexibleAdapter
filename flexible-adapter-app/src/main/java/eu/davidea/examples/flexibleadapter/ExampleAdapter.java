@@ -137,7 +137,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 ////					Log.i(this.getClass().getSimpleName(), "Payload " + payloads);
 ////					item.setSubtitle(getCurrentChildren(item).size() + " subItems");
 ////					if (hasSearchText()) {
-////						Utils.setHighlightText(holder.itemView.getContext(), pvHolder.mSubtitle,
+////						Utils.highlightText(holder.itemView.getContext(), pvHolder.mSubtitle,
 ////								item.getSubtitle(), getSearchText(), R.color.colorAccent_light);
 ////					} else {
 ////						pvHolder.mSubtitle.setText(item.getSubtitle());
@@ -171,9 +171,9 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //				//In case of searchText matches with Title or with an SimpleItem's field
 //				// this will be highlighted
 //				if (hasSearchText()) {
-//					Utils.setHighlightText(pvHolder.itemView.getContext(), pvHolder.mTitle,
+//					Utils.highlightText(pvHolder.itemView.getContext(), pvHolder.mTitle,
 //							item.getTitle(), getSearchText(), R.color.colorAccent_light);
-//					Utils.setHighlightText(pvHolder.itemView.getContext(), pvHolder.mSubtitle,
+//					Utils.highlightText(pvHolder.itemView.getContext(), pvHolder.mSubtitle,
 //							updateSubTitle(item), getSearchText(), R.color.colorAccent_light);
 //				} else {
 //					pvHolder.mTitle.setText(item.getTitle());
@@ -207,7 +207,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //				//In case of searchText matches with Title or with an SimpleItem's field
 //				// this will be highlighted
 //				if (hasSearchText()) {
-//					Utils.setHighlightText(cvHolder.itemView.getContext(), cvHolder.mTitle,
+//					Utils.highlightText(cvHolder.itemView.getContext(), cvHolder.mTitle,
 //							subItem.getTitle(), getSearchText(), R.color.colorAccent_light);
 //				} else {
 //					cvHolder.mTitle.setText(subItem.getTitle());

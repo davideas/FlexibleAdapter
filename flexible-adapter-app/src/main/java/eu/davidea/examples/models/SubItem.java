@@ -67,7 +67,7 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
 		//In case of searchText matches with Title or with an SimpleItem's field
 		// this will be highlighted
 		if (adapter.hasSearchText()) {
-			Utils.setHighlightText(holder.itemView.getContext(), holder.mTitle,
+			Utils.highlightText(holder.itemView.getContext(), holder.mTitle,
 					getTitle(), adapter.getSearchText(), R.color.colorAccent_light);
 		} else {
 			holder.mTitle.setText(getTitle());

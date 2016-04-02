@@ -71,7 +71,7 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 			Log.i(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
 			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems");
 			if (adapter.hasSearchText()) {
-				Utils.setHighlightText(holder.itemView.getContext(), holder.mSubtitle,
+				Utils.highlightText(holder.itemView.getContext(), holder.mSubtitle,
 						getSubtitle(), adapter.getSearchText(), R.color.colorAccent_light);
 			} else {
 				holder.mSubtitle.setText(getSubtitle());
@@ -100,9 +100,9 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 			if (adapter.isExpandable(this))
 				setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems");
 			if (adapter.hasSearchText()) {
-				Utils.setHighlightText(holder.itemView.getContext(), holder.mTitle,
+				Utils.highlightText(holder.itemView.getContext(), holder.mTitle,
 						getTitle(), adapter.getSearchText(), R.color.colorAccent_light);
-				Utils.setHighlightText(holder.itemView.getContext(), holder.mSubtitle,
+				Utils.highlightText(holder.itemView.getContext(), holder.mSubtitle,
 						getSubtitle(), adapter.getSearchText(), R.color.colorAccent_light);
 			} else {
 				holder.mTitle.setText(getTitle());
