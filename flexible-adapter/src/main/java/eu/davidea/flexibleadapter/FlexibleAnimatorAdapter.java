@@ -253,7 +253,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 //			);
 
 		if (shouldAnimate && !isFastScroll && !mAnimatorNotifierObserver.isPositionNotified() &&
-				(isReverseEnabled || (!isReverseEnabled && position > mLastAnimatedPosition))) {
+				(isReverseEnabled || position > mLastAnimatedPosition)) {
 
 			//Cancel animation is necessary when fling
 			cancelExistingAnimation(itemView);
@@ -402,7 +402,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 	 * @param percent   any % multiplier (between 0 and 1) of the LayoutManager Width
 	 */
 	public void addSlideInFromLeftAnimator(
-			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.5, to = 1.0) float percent) {
+			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float percent) {
 		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
 				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_RIGHT) ||
 				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_BOTTOM)) return;
@@ -421,7 +421,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 	 * @param percent   Any % multiplier (between 0 and 1) of the LayoutManager Width
 	 */
 	public void addSlideInFromRightAnimator(
-			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.5, to = 1.0) float percent) {
+			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float percent) {
 		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
 				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_RIGHT) ||
 				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_BOTTOM)) return;

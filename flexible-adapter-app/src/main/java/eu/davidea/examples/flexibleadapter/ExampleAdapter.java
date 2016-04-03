@@ -260,25 +260,4 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		return super.onCreateBubbleText(position);
 	}
 
-//	/**
-//	 * TODO: Rewrite Custom filter for the 2 examples Adapters (Expandable and simple Flexible)
-//	 * Custom filter.
-//	 *
-//	 * @param item   The item to filter
-//	 * @param constraint the current searchText
-//	 * @return true if a match exists in the title or in the subtitle, false if no match found.
-//	 */
-//	@Override
-//	protected boolean filterObject(SimpleItem item, String constraint) {
-//		String valueText = item.getTitle();
-//
-//		//Filter on Title
-//		if (valueText != null && valueText.toLowerCase().contains(constraint)) {
-//			return true;
-//		}
-//		//Filter on Subtitle
-//		valueText = item.getSubtitle();
-//		return valueText != null && valueText.toLowerCase().contains(constraint);
-//	}
-
 }
