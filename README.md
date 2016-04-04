@@ -2,7 +2,7 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Stable version v4.2 of 2015.12.16 - NEW! dev branch in beta: v5.0.0-b4 (usable library!)
+###### A pattern for every RecyclerView - Stable version v4.2 of 2015.12.16 - NEW! dev branch in beta: v5.0.0-b5 (usable library!)
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -22,7 +22,7 @@ This library is configurable and it guides the developers (thanks to quality com
 * **NEW!** Expandable items with <u>selection coherence</u>.
 * **NEW!** Adapter Animations with custom configuration based on adapter position and beyond.
 * **NEW!** Drag&Drop and Swipe actions with <u>selection coherence</u>.
-* **NEW!** Headers/Sections with automatic re-linkage and with sticky behaviour!
+* **NEW!** Headers/Sections with automatic re-linkage and with sticky behaviour fully clickable!
 * **NEW!** Auto mapping ViewTypes with Item interfaces.
 * **NEW!** 1 simple constructor for all events.
 
@@ -55,11 +55,11 @@ repositories {
 dependencies {
 	//Using bintray.com
 	compile 'eu.davidea:flexible-adapter:4.2.0@aar'
-	compile 'eu.davidea:flexible-adapter:5.0.0-b4@aar'
+	compile 'eu.davidea:flexible-adapter:5.0.0-b5@aar'
 	
 	//Using JCenter
 	compile 'eu.davidea:flexible-adapter:4.2.0'
-	compile 'eu.davidea:flexible-adapter:5.0.0-b4'
+	compile 'eu.davidea:flexible-adapter:5.0.0-b5'
 	
 	//Using MavenSnapshots repository for continuous updates from my development
 	compile 'eu.davidea:flexible-adapter:5.0.0-SNAPSHOT'
@@ -78,6 +78,37 @@ Wiki pages have been completely reviewed to support all the coming functionaliti
 Not all pages are filled, working in progress :-)
 
 # Change Log
+###### v5.0.0-b5 - 2016.04.04
+_Refactor_
+- Constructor of `AbstractSectionableItem` now accepts the `IHeader` interface.
+- `setHeader(header)` in `ISectionable` interface is changed to **void** method.
+- Renamed method `Utils.setHighlightText()` to `Utils.highlightText()`.
+- `StickyHeaderDecoration` is now deprecated, as consequence `enableStickyHeaders(maxCachedHeaders)` is also deprecated: use `enableStickyHeaders()`.
+
+_Improvements_
+- Headers are clickable when sticky! StickyHeaders can now benefit of the existing click listeners in `FlexibleViewHolder` [See #41]. Pay attention at the method `getStickySectionHeadersHolder()`.
+- `IHeader` item can be combined with `IExpandable` item to make a section expandable with header.
+- Adding items with new headers, headers are also shown.
+- Added `AbstractExpandableHeaderItem`. 
+- Added a new Wiki page about how to implement sections with sticky headers and expandable sections. Direct link: [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections).
+- Added new methods _getItemCountOfTypesUntil(), removeItemsOfType(), hasNewSearchText()_.
+- Multiple code improvements with **SonarQube** tool, thanks to @georgekankava.
+
+_Fixes_
+- Fixed NPE in `isEnabled(position)` when position is unknown.
+- Fixed header linkage when deleting/restore items with header. _It's important now that all sectionable items must initialize the own header at startup_.
+- Bug fixing on SearchView and FilterMethods.
+- Fixed view activation elevation [See #38].
+- Fixed adapter item animation at startup.
+
+_Demo App_
+- New example app supporting multiple fragments [See #19].
+- Added an example of `FlexibleItemHolder` to use simultaneously the same _modelData_ object in multiple RecyclerView/Adapters.
+- Adapted code for Expandable Sections with headers. Enabled demo option for `FragmentExpandableSections`.
+- Demo app has more clear DatabaseService. It shows how to create item interfaces.
+- FlipView animation for Fragments.
+- Unfortunately the demo app has a _known_ bug on FastScroller when changing Fragment, but FastScroller is planned to be changed.
+
 ###### v5.0.0-b4 - 2016.02.21
 - Added **Sticky Header** functionality [See #32].
 - _IHeader_ interface has been added to identify the fact the item is a Header item, as consequence, _ISectionable_ interface now has to be assigned to the items(!!) in order for them to hold the reference to the _IHeader_ item.
@@ -89,26 +120,10 @@ Not all pages are filled, working in progress :-)
 - Added methods _addSubItems()_ and _addAllSubItemsFrom()_.
 - Code optimization, nice to mention: removed unnecessary 8 casts; better use of Payload when _notifyItemChanged_ is triggered; Much faster restoration with big numbers (~1000)
 
-###### v5.0.0-b3 - 2016.02.08
-- **Header/Section** with new **ISectionable** item [See #31]. Still need to add features on this.
-- **Redesigned** the Item interfaces to simplify development and re-usability.
-- **Merged** the _FlexibleExpandableAdapter_ into _FlexibleAdapter_.
-- mItems is now private and fully synchronized, the new method updateDataSet allows to update full content and notifyChange.
-- **Auto-mapping** of the ViewType (using Layout resourceId) when using implementation of _IFlexibleItem_ interface.
-- Possibility to disjoint Creation and Binding of the View Holder in the Model items OR (user choice) to create and bind the view inside the Adapter (as usual).
-- 3 new configurations for _FlexibleViewHolder_ in combination with onTouch, selection and ActionMode state.
-- Customizable _view elevation_ on item activation [See #38].
-- Better implementation of Expandable items.
-- Added possibility to have Expandables inside another Expandable. Limits are described in the javadoc description of FlexibleAdapter.
-- Added support for **Payload** when notifyItemChanged is called.
-- New method _addItemWithDelay()_.
-- Use of Log.error instead of Log.warn.
-- New options menu for example App for the showcase.
-- FlexibleAdapter is not anymore abstract.
-
 ###### Old releases
 See [releases](https://github.com/davideas/FlexibleAdapter/releases) for old versions.
 
+v5.0.0-b3 - 2016.02.08 |
 v5.0.0-b2 - 2016.01.31 | v5.0.0-b1 - 2016.01.03 |
 v4.2.0 - 2015.12.12 | v4.1.0 - 2015.11.29 |
 v4.0.1 - 2015.11.01 | v4.0 - 2015.10.18 |
@@ -130,7 +145,7 @@ Improved and adapted to work in conjunction with `FlexibleAnimatorAdapter`.
 
 # License
 
-    Copyright 2016 Davide Steduto
+    Copyright 2015-2016 Davide Steduto
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
