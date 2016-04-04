@@ -10,6 +10,7 @@ import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
 import eu.davidea.flexibleadapter.items.IFilterable;
+import eu.davidea.flexibleadapter.items.IHolder;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
@@ -24,7 +25,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * Note: This object is not used in the demo.
  */
 public class FlexibleItemHolderExample<Model> extends AbstractSectionableItem<FlexibleItemHolderExample.ViewHolder, HeaderItem>
-		implements IFilterable {
+		implements IFilterable, IHolder<Model> {
 
 	/**
 	 * Your complex data model object
@@ -36,7 +37,8 @@ public class FlexibleItemHolderExample<Model> extends AbstractSectionableItem<Fl
 		this.modelData = modelData;
 	}
 
-	public Model getModelData() {
+	@Override
+	public Model getModel() {
 		return modelData;
 	}
 

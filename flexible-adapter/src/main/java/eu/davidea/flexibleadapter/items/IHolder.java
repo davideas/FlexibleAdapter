@@ -15,38 +15,22 @@
  */
 package eu.davidea.flexibleadapter.items;
 
-import android.support.v7.widget.RecyclerView;
-
-import java.util.List;
-
 /**
- * Interface to manage expanding operations on items with
- * {@link eu.davidea.flexibleadapter.FlexibleAdapter}.
- * <p>Implements this interface or use {@link AbstractExpandableItem}.</p>
+ * Simple interface to configure an item that holds the model object.
  *
  * @author Davide Steduto
  * @see IFlexible
+ * @see IExpandable
  * @see IFilterable
  * @see IHeader
- * @see IHolder
  * @see ISectionable
- * @since 17/01/2016 Created
+ * @since 04/04/2016 Created
  */
-public interface IExpandable<VH extends RecyclerView.ViewHolder, S extends IFlexible>
-		extends IFlexible<VH> {
+public interface IHolder<Model> {
 
-	/*--------------------*/
-	/* EXPANDABLE METHODS */
-	/*--------------------*/
-
-	boolean isExpanded();
-
-	void setExpanded(boolean expanded);
-
-	/*-------------------*/
-	/* SUB ITEMS METHODS */
-	/*-------------------*/
-
-	List<S> getSubItems();
+	/**
+	 * @return the model object
+	 */
+	Model getModel();
 
 }

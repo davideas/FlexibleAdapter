@@ -23,6 +23,7 @@ import android.support.v7.widget.RecyclerView;
  * @see IExpandable
  * @see IFilterable
  * @see IHeader
+ * @see IHolder
  * @since 07/02/2016 Created
  * <br/>26/03/2016 setHeader returns void
  */

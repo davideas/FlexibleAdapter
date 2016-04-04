@@ -23,6 +23,7 @@ package eu.davidea.flexibleadapter.items;
  * @see IFlexible
  * @see IExpandable
  * @see IHeader
+ * @see IHolder
  * @see ISectionable
  * @since 18/02/2016 Created
  */

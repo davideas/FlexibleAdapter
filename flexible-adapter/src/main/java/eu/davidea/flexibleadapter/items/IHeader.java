@@ -24,6 +24,7 @@ import android.support.v7.widget.RecyclerView;
  * @see IFlexible
  * @see IExpandable
  * @see IFilterable
+ * @see IHolder
  * @see ISectionable
  * @since 15/02/2016 Created
  */

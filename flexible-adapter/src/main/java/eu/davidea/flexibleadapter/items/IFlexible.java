@@ -32,6 +32,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @see IExpandable
  * @see IFilterable
  * @see IHeader
+ * @see IHolder
  * @see ISectionable
  * @since 19/01/2016 Created
  */
