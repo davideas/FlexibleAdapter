@@ -145,7 +145,7 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 	 * the previous offscreen
 	 */
 	private int getHeaderTop(RecyclerView recyclerView, View child, int adapterPos) {
-		int top = Math.max(0, (int) child.getY());
+		int top = Math.max(0, (int) ViewCompat.getY(child));
 
 		//Check item availability
 		IHeader current = mAdapter.getSectionHeader(adapterPos);
@@ -161,7 +161,7 @@ public class StickyHeaderDecoration extends RecyclerView.ItemDecoration {
 			View nextHeaderView = getHeader(recyclerView, adapterPosHere);
 			if (nextHeaderView == null) return top;
 
-			int offset = (int) nextItemView.getY() - nextHeaderView.getHeight();
+			int offset = (int) ViewCompat.getY(nextHeaderView) - nextHeaderView.getHeight();
 			if (offset < 0) {
 				return offset;//The new translated top, when pushing up
 			}

@@ -22,7 +22,8 @@ ext {
 	gitUrl = 'https://github.com/davideas/FlexibleAdapter.git'
 
 	//Support and Build tools version
-	minSdk = 14
+	minSdkLib = 9
+	minSdkApp = 14
 	targetSdk = 23
 	buildTools = "23.0.3"
 	supportLib = '23.2.1'
