@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import eu.davidea.examples.models.AbstractExampleItem;
 import eu.davidea.examples.models.ExpandableItem;
+import eu.davidea.examples.models.ExpandableLevel1Item;
 import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
@@ -297,6 +298,8 @@ public class MainActivity extends AppCompatActivity implements
 
 		} else if (id == R.id.nav_expandable) {
 
+		} else if (id == R.id.nav_multi_level_expandable) {
+			fragment = FragmentExpandableLevel.newInstance(1);
 		} else if (id == R.id.nav_expandable_sections) {
 			fragment = FragmentExpandableSections.newInstance(1);
 		} else if (id == R.id.nav_share) {
@@ -539,7 +542,8 @@ public class MainActivity extends AppCompatActivity implements
 				if (position != mActivatedPosition) setActivatedPosition(position);
 				AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
 				assert abstractItem != null;
-				if (!(abstractItem instanceof ExpandableItem) && !(abstractItem instanceof IHeader)) {
+				if (!(abstractItem instanceof ExpandableItem) && !(abstractItem instanceof IHeader) &&
+						!(abstractItem instanceof ExpandableLevel1Item)) {
 					//TODO FOR YOU: call your custom Action, for example mCallback.onItemSelected(item.getId());
 					String title = extractTitleFrom(abstractItem);
 					EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
+import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 
 /**
@@ -22,7 +23,7 @@ import eu.davidea.utils.Utils;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class FragmentExpandable extends Fragment {
+public class FragmentExpandableLevel extends Fragment {
 
 	// TODO: Customize parameters
 	private int mColumnCount = 1;
@@ -36,8 +37,8 @@ public class FragmentExpandable extends Fragment {
 
 	// TODO: Customize parameter initialization
 	@SuppressWarnings("unused")
-	public static FragmentExpandable newInstance(int columnCount) {
-		FragmentExpandable fragment = new FragmentExpandable();
+	public static FragmentExpandableLevel newInstance(int columnCount) {
+		FragmentExpandableLevel fragment = new FragmentExpandableLevel();
 		Bundle args = new Bundle();
 		args.putInt(ARG_COLUMN_COUNT, columnCount);
 		fragment.setArguments(args);
@@ -48,7 +49,7 @@ public class FragmentExpandable extends Fragment {
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
 	 */
-	public FragmentExpandable() {
+	public FragmentExpandableLevel() {
 	}
 
 	@Override
@@ -69,8 +70,15 @@ public class FragmentExpandable extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		//Settings for FlipView
+		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
+		//Create New Database and Initialize RecyclerView
+		DatabaseService.getInstance().createExpandableLevelDatabase();
 		initializeRecyclerView(savedInstanceState);
+
+		//Settings for FlipView
+		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})

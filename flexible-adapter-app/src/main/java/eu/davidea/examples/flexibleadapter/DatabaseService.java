@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import eu.davidea.examples.models.AbstractExampleItem;
 import eu.davidea.examples.models.ExpandableHeaderItem;
 import eu.davidea.examples.models.ExpandableItem;
+import eu.davidea.examples.models.ExpandableLevel0Item;
+import eu.davidea.examples.models.ExpandableLevel1Item;
 import eu.davidea.examples.models.HeaderItem;
 import eu.davidea.examples.models.SimpleItem;
 import eu.davidea.examples.models.SubItem;
@@ -61,7 +63,16 @@ public class DatabaseService {
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
 			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i) : header;
-			mItems.add(newExpandableSectionItem(i + 1));
+			mItems.add(newExpandableSectionItem(i + 1));//With level 0
+		}
+	}
+
+	public void createExpandableLevelDatabase() {
+		HeaderItem header = null;
+		mItems.clear();
+		for (int i = 0; i < ITEMS; i++) {
+			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i) : header;
+			mItems.add(newExpandableLevelItem(i + 1));//With level 1
 		}
 	}
 
@@ -102,7 +113,7 @@ public class DatabaseService {
 		header.setSubtitle("Attached to Expandable Item " + i);
 		expandableItem = new ExpandableItem("E" + i, header);
 		expandableItem.setTitle("Expandable Item " + i);
-		//SubItems are not expandable by default, but thy might be if extends/implements IExpandable
+		//SubItems are not expandable by default, but they might be if extends/implements IExpandable
 		for (int j = 1; j <= SUB_ITEMS; j++) {
 			SubItem subItem = new SubItem(expandableItem.getId() + "S" + j);
 			subItem.setTitle("Sub Item " + j);
@@ -124,6 +135,27 @@ public class DatabaseService {
 			//In this case the Header is the same parent: ExpandableHeaderItem instance
 			subItem.setHeader(expandableItem);
 			expandableItem.addSubItem(subItem);
+		}
+		return expandableItem;
+	}
+
+	/*
+	 * Creates a special expandable item which has another level of expandable.
+	 */
+	private ExpandableLevel0Item newExpandableLevelItem(int i) {
+		//ExpandableLevel0Item is an expandable with Level 0
+		ExpandableLevel0Item expandableItem = new ExpandableLevel0Item("E" + i);
+		expandableItem.setTitle("Expandable 2Level " + i);
+		for (int j = 1; j <= SUB_ITEMS; j++) {
+			//ExpandableLevel1Item is an expandable as well with Level 1
+			ExpandableLevel1Item expSubItem = new ExpandableLevel1Item(expandableItem.getId() + "S" + j);
+			expSubItem.setTitle("Sub Item " + j);
+			for (int k = 1; k <= 3; k++) {
+				SubItem subItem = new SubItem(expandableItem.getId() + "SS" + k);
+				subItem.setTitle("Sub Sub Item " + k);
+				expSubItem.addSubItem(subItem);
+			}
+			expandableItem.addSubItem(expSubItem);
 		}
 		return expandableItem;
 	}

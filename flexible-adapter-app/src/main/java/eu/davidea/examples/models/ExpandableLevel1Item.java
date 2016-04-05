@@ -12,7 +12,6 @@ import java.util.List;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IExpandable;
-import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
@@ -20,10 +19,9 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * <p>Here, it still benefits of the common fields declared in AbstractExampleItem.</p>
  * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
  */
-public class ExpandableHeaderItem
-		extends AbstractExampleItem<ExpandableHeaderItem.ExpandableHeaderViewHolder>
-		implements IExpandable<ExpandableHeaderItem.ExpandableHeaderViewHolder, SubItem>,
-		IHeader<ExpandableHeaderItem.ExpandableHeaderViewHolder> {
+public class ExpandableLevel1Item
+		extends AbstractExampleItem<ExpandableLevel1Item.ViewHolder>
+		implements IExpandable<ExpandableLevel1Item.ViewHolder, SubItem> {
 
 	private static final long serialVersionUID = -1882711111814491060L;
 
@@ -34,12 +32,8 @@ public class ExpandableHeaderItem
 	private List<SubItem> mSubItems;
 
 
-	public ExpandableHeaderItem(String id) {
+	public ExpandableLevel1Item(String id) {
 		super(id);
-		//We start with header shown and expanded
-		setHidden(false);
-		setExpanded(true);
-		//NOT selectable (otherwise ActionMode will be activated on long click)!
 		setSelectable(false);
 	}
 
@@ -55,8 +49,8 @@ public class ExpandableHeaderItem
 
 	@Override
 	public int getExpansionLevel() {
-		return 0;
-	}
+		return 1;
+	}//This allows +1 level of expansion
 
 	@Override
 	public List<SubItem> getSubItems() {
@@ -94,16 +88,16 @@ public class ExpandableHeaderItem
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_header_row;
+		return R.layout.recycler_expandable_row;
 	}
 
 	@Override
-	public ExpandableHeaderViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ExpandableHeaderViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new ViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, ExpandableHeaderViewHolder holder, int position, List payloads) {
+	public void bindViewHolder(FlexibleAdapter adapter, ViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
 			Log.i(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads);
 		} else {
@@ -118,12 +112,12 @@ public class ExpandableHeaderItem
 	 * Complex data labels may need more than one view per item, and
 	 * you provide access to all the views for a data item in a view holder.
 	 */
-	public static class ExpandableHeaderViewHolder extends ExpandableViewHolder {
+	public static class ViewHolder extends ExpandableViewHolder {
 
 		public TextView mTitle;
 		public TextView mSubtitle;
 
-		public ExpandableHeaderViewHolder(View view, FlexibleAdapter adapter) {
+		public ViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);

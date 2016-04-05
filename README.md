@@ -86,7 +86,7 @@ _Refactor_
 - `StickyHeaderDecoration` is now deprecated, as consequence `enableStickyHeaders(maxCachedHeaders)` is also deprecated: use `enableStickyHeaders()`.
 
 _Improvements_
-- Headers are clickable when sticky! StickyHeaders can now benefit of the existing click listeners in `FlexibleViewHolder` [See #41]. Pay attention at the method `getStickySectionHeadersHolder()`.
+- Headers are clickable when sticky! Thanks to @farfromrefug. StickyHeaders can now benefit of the existing click listeners in `FlexibleViewHolder` [See #41]. Pay attention at the method `getStickySectionHeadersHolder()`.
 - `IHeader` item can be combined with `IExpandable` item to make a section expandable with header.
 - Adding items with new headers, headers are also shown.
 - Added `AbstractExpandableHeaderItem`. 

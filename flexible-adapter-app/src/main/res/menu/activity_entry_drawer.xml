@@ -24,6 +24,10 @@
 			android:icon="@drawable/ic_view_headline"
 			android:title="@string/expandable"/>
 		<item
+			android:id="@+id/nav_multi_level_expandable"
+			android:icon="@drawable/ic_view_headline"
+			android:title="@string/multi_level_expandable"/>
+		<item
 			android:id="@+id/nav_expandable_sections"
 			android:icon="@drawable/ic_view_headline"
 			android:title="@string/expandable_sections"/>

@@ -52,6 +52,11 @@ public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder,
 		this.mExpanded = expanded;
 	}
 
+	@Override
+	public int getExpansionLevel() {
+		return 0;
+	}
+
 	/*-------------------*/
 	/* SUB ITEMS METHODS */
 	/*-------------------*/

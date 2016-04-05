@@ -41,6 +41,11 @@ public class ExpandableItem extends SimpleItem
 	}
 
 	@Override
+	public int getExpansionLevel() {
+		return 0;
+	}
+
+	@Override
 	public List<SubItem> getSubItems() {
 		return mSubItems;
 	}

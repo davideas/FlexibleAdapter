@@ -43,6 +43,15 @@ public interface IExpandable<VH extends RecyclerView.ViewHolder, S extends IFlex
 
 	void setExpanded(boolean expanded);
 
+	/**
+	 * Establish the level of the expansion of this type of item in case of multi level expansion.
+	 * <p>Default value of first level should return 0.</p>
+	 * Sub expandable items should return a level +1 for each sub level.
+	 *
+	 * @return the level of the expansion of this type of item
+	 */
+	int getExpansionLevel();
+
 	/*-------------------*/
 	/* SUB ITEMS METHODS */
 	/*-------------------*/

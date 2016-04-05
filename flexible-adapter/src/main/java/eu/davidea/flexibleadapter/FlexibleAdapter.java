@@ -150,6 +150,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
 
 	/* Expandable flags */
+	private int collapsibleLevel = 0;
 	private boolean scrollOnExpand = false, collapseOnExpand = false,
 			childSelected = false, parentSelected = false;
 
@@ -1096,6 +1097,14 @@ public class FlexibleAdapter<T extends IFlexible>
 		return item != null && item instanceof IExpandable;
 	}
 
+	public int getCollapsibleLevel() {
+		return collapsibleLevel;
+	}
+
+	public void setCollapsibleLevel(int collapsibleLevel) {
+		this.collapsibleLevel = collapsibleLevel;
+	}
+
 	public boolean hasSubItems(@NonNull IExpandable expandable) {
 		return expandable != null && expandable.getSubItems() != null &&
 				expandable.getSubItems().size() > 0;
@@ -1210,12 +1219,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position the position of the item to expand
 	 * @return the number of subItems expanded
+	 * @see #setCollapsibleLevel(int)
 	 */
 	public int expand(@IntRange(from = 0) int position) {
-		return expand(position, false);
+		return expand(position, false, collapsibleLevel);
 	}
 
-	private int expand(int position, boolean expandAll) {
+	private int expand(int position, boolean expandAll, int level) {
 		T item = getItem(position);
 		if (item == null || !item.isEnabled() || !isExpandable(item)) return 0;
 
@@ -1275,13 +1285,34 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Expands all expandable items with minimum of level {@link #collapsibleLevel}.
+	 *
 	 * @return the number of parent successfully expanded
+	 * @see #expandAll(int)
+	 * @see #setCollapsibleLevel(int)
 	 */
 	public int expandAll() {
+		return expandAll(collapsibleLevel);
+	}
+
+	/**
+	 * Expands all expandable items with at least the specified level.
+	 *
+	 * @param level the minimum level to expand the sub expandable items
+	 * @return the number of parent successfully expanded
+	 * @see #expandAll()
+	 */
+	public int expandAll(int level) {
 		int expanded = 0;
 		//More efficient if we expand from First expandable position
 		for (int i = 0; i < mItems.size(); i++) {
-			if (expand(i, true) > 0) expanded++;
+			T item = getItem(i);
+			if (isExpandable(item)) {
+				IExpandable expandable = (IExpandable) item;
+				if (expandable.getExpansionLevel() <= level && expand(i, true, level) > 0) {
+					expanded++;
+				}
+			}
 		}
 		return expanded;
 	}
@@ -1293,8 +1324,24 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position the position of the item to collapse
 	 * @return the number of subItems collapsed
+	 * @see #collapse(int, int)
+	 * @see #setCollapsibleLevel(int)
 	 */
 	public int collapse(@IntRange(from = 0) int position) {
+		return collapse(position, collapsibleLevel);
+	}
+
+	/**
+	 * Collapses an Expandable item that is already expanded, in conjunction with no subItems
+	 * selected or item is pending removal (used in combination with removeRange).
+	 * <p>All Expandable subItem, that are expanded, are recursively collapsed.</p>
+	 *
+	 * @param position the position of the item to collapse
+	 * @param level all the levels to collapse
+	 * @return the number of subItems collapsed
+	 * @see #collapse(int)
+	 */
+	public int collapse(@IntRange(from = 0) int position, int level) {
 		T item = getItem(position);
 		if (item == null || !item.isEnabled() || !isExpandable(item)) return 0;
 
@@ -1309,7 +1356,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Take the current subList
 			List<T> subItems = getExpandableList(expandable);
 			//Recursive collapse of all sub expandable
-			recursiveCount = recursiveCollapse(subItems);
+			recursiveCount = recursiveCollapse(subItems, 0);
 			mItems.removeAll(subItems);
 			subItemsCount = subItems.size();
 			//Save expanded state
@@ -1331,27 +1378,41 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	@SuppressWarnings("Range")
-	private int recursiveCollapse(List<T> subItems) {
+	private int recursiveCollapse(List<T> subItems, int level) {
 		int collapsed = 0;
-		for (T subItem : subItems) {
+		for (int i = subItems.size() - 1; i >= 0; i--) {
+			T subItem = subItems.get(i);
 			if (isExpanded(subItem)) {
-				if (DEBUG) Log.v(TAG, "Recursive collapsing on expandable subItem " + subItem);
-				collapsed += collapse(getGlobalPositionOf(subItem));
+				IExpandable expandable = (IExpandable) subItem;
+				if (expandable.getExpansionLevel() >= level &&
+						collapse(getGlobalPositionOf(subItem), level) > 0) {
+					collapsed++;
+				}
 			}
 		}
 		return collapsed;
 	}
 
 	/**
+	 * Collapses all expandable items with the minimum level of {@link #collapsibleLevel}.
+	 *
 	 * @return the number of parent successfully collapsed
+	 * @see #collapseAll(int)
+	 * @see #setCollapsibleLevel(int)
 	 */
 	public int collapseAll() {
-		int collapsed = 0;
-		//More efficient if we collapse from Last expanded position
-		for (int i = mItems.size() - 1; i >= 0; i--) {
-			if (collapse(i) > 0) collapsed++;
-		}
-		return collapsed;
+		return collapseAll(collapsibleLevel);
+	}
+
+	/**
+	 * Collapses all expandable items with the lower of the specified level.
+	 *
+	 * @param level all the levels to collapse
+	 * @return the number of parent successfully collapsed
+	 * @see #collapseAll()
+	 */
+	public int collapseAll(int level) {
+		return recursiveCollapse(mItems, level);
 	}
 
 	/*----------------*/
