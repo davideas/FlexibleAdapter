@@ -89,10 +89,6 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	 */
 	void setSelectable(boolean selectable);
 
-	boolean isSelected();
-
-	void setSelected(boolean selected);
-
 	/*-------------------*/
 	/* TOUCHABLE METHODS */
 	/*-------------------*/

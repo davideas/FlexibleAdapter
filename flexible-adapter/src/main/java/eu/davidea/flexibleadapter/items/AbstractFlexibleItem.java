@@ -97,16 +97,6 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 		this.mSelectable = selectable;
 	}
 
-	@Override
-	public boolean isSelected() {
-		return mSelected;
-	}
-
-	@Override
-	public void setSelected(boolean selected) {
-		this.mSelected = selected;
-	}
-
 	/*-------------------*/
 	/* TOUCHABLE METHODS */
 	/*-------------------*/
