@@ -123,7 +123,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@Override
 	public void onClick(View view) {
-		if (isViewExpandableOnClick()) {
+		if (mAdapter.isEnabled(getFlexibleAdapterPosition()) && isViewExpandableOnClick()) {
 			toggleExpansion();
 		}
 		super.onClick(view);
@@ -139,7 +139,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	@Override
 	public boolean onLongClick(View view) {
 		int position = getFlexibleAdapterPosition();
-		if (isViewCollapsibleOnLongClick()) {
+		if (mAdapter.isEnabled(position) && isViewCollapsibleOnLongClick()) {
 			collapseView(position);
 		}
 		return super.onLongClick(view);

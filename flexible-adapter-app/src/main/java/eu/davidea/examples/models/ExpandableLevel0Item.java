@@ -67,7 +67,7 @@ public class ExpandableLevel0Item
 		return mSubItems!= null && mSubItems.size() > 0;
 	}
 
-	public boolean removeSubItem(SubItem item) {
+	public boolean removeSubItem(ExpandableLevel1Item item) {
 		return item != null && mSubItems.remove(item);
 	}
 

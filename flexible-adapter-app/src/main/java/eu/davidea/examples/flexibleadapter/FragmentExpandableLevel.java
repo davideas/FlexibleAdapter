@@ -87,7 +87,8 @@ public class FragmentExpandableLevel extends Fragment {
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAutoCollapseOnExpand(false);
+		mAdapter.setAutoCollapseOnExpand(true);
+		mAdapter.setMinCollapsibleLevel(1);//Auto-collapse only items with level >= 1 (avoid to collapse also sections!)
 		mAdapter.setAutoScrollOnExpand(true);
 		mAdapter.setRemoveOrphanHeaders(false);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);

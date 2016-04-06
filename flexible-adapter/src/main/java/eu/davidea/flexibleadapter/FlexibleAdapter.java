@@ -150,7 +150,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
 
 	/* Expandable flags */
-	private int collapsibleLevel = 0;
+	private int minCollapsibleLevel = 0;
 	private boolean scrollOnExpand = false, collapseOnExpand = false,
 			childSelected = false, parentSelected = false;
 
@@ -1097,12 +1097,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		return item != null && item instanceof IExpandable;
 	}
 
-	public int getCollapsibleLevel() {
-		return collapsibleLevel;
+	public int getMinCollapsibleLevel() {
+		return minCollapsibleLevel;
 	}
 
-	public void setCollapsibleLevel(int collapsibleLevel) {
-		this.collapsibleLevel = collapsibleLevel;
+	public void setMinCollapsibleLevel(int minCollapsibleLevel) {
+		this.minCollapsibleLevel = minCollapsibleLevel;
 	}
 
 	public boolean hasSubItems(@NonNull IExpandable expandable) {
@@ -1219,15 +1219,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position the position of the item to expand
 	 * @return the number of subItems expanded
-	 * @see #setCollapsibleLevel(int)
 	 */
 	public int expand(@IntRange(from = 0) int position) {
-		return expand(position, false, collapsibleLevel);
+		return expand(position, false);
 	}
 
-	private int expand(int position, boolean expandAll, int level) {
+	private int expand(int position, boolean expandAll) {
 		T item = getItem(position);
-		if (item == null || !item.isEnabled() || !isExpandable(item)) return 0;
+		if (!isExpandable(item)) return 0;
 
 		IExpandable expandable = (IExpandable) item;
 		if (DEBUG) Log.v(TAG, "Request to Expand on position " + position +
@@ -1239,7 +1238,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Collapse others expandable if configured so
 			//Skipped when expanding all is requested
 			//Fetch again the new position after collapsing all!!
-			if ((collapseOnExpand && !expandAll) && collapseAll() > 0) {
+			if ((collapseOnExpand && !expandAll) && collapseAll(minCollapsibleLevel) > 0) {
 				position = getGlobalPositionOf(item);
 			}
 
@@ -1285,14 +1284,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Expands all expandable items with minimum of level {@link #collapsibleLevel}.
+	 * Expands all expandable items with minimum of level {@link #minCollapsibleLevel}.
 	 *
 	 * @return the number of parent successfully expanded
 	 * @see #expandAll(int)
-	 * @see #setCollapsibleLevel(int)
+	 * @see #setMinCollapsibleLevel(int)
 	 */
 	public int expandAll() {
-		return expandAll(collapsibleLevel);
+		return expandAll(minCollapsibleLevel);
 	}
 
 	/**
@@ -1309,7 +1308,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			T item = getItem(i);
 			if (isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
-				if (expandable.getExpansionLevel() <= level && expand(i, true, level) > 0) {
+				if (expandable.getExpansionLevel() <= level && expand(i, true) > 0) {
 					expanded++;
 				}
 			}
@@ -1325,10 +1324,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position the position of the item to collapse
 	 * @return the number of subItems collapsed
 	 * @see #collapse(int, int)
-	 * @see #setCollapsibleLevel(int)
+	 * @see #setMinCollapsibleLevel(int)
 	 */
 	public int collapse(@IntRange(from = 0) int position) {
-		return collapse(position, collapsibleLevel);
+		return collapse(position, minCollapsibleLevel);
 	}
 
 	/**
@@ -1343,7 +1342,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public int collapse(@IntRange(from = 0) int position, int level) {
 		T item = getItem(position);
-		if (item == null || !item.isEnabled() || !isExpandable(item)) return 0;
+		if (!isExpandable(item)) return 0;
 
 		IExpandable expandable = (IExpandable) item;
 		if (DEBUG)
@@ -1356,7 +1355,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Take the current subList
 			List<T> subItems = getExpandableList(expandable);
 			//Recursive collapse of all sub expandable
-			recursiveCount = recursiveCollapse(subItems, 0);
+			recursiveCount = recursiveCollapse(subItems, expandable.getExpansionLevel());
 			mItems.removeAll(subItems);
 			subItemsCount = subItems.size();
 			//Save expanded state
@@ -1394,14 +1393,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Collapses all expandable items with the minimum level of {@link #collapsibleLevel}.
+	 * Collapses all expandable items with the minimum level of {@link #minCollapsibleLevel}.
 	 *
 	 * @return the number of parent successfully collapsed
 	 * @see #collapseAll(int)
-	 * @see #setCollapsibleLevel(int)
+	 * @see #setMinCollapsibleLevel(int)
 	 */
 	public int collapseAll() {
-		return collapseAll(collapsibleLevel);
+		return collapseAll(minCollapsibleLevel);
 	}
 
 	/**
@@ -2762,7 +2761,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private boolean hasSubItemsSelected(IExpandable expandable) {
 		for (T subItem : getExpandableList(expandable)) {
-			if (isSelected(getGlobalPositionOf(subItem))) return true;
+			if (isSelected(getGlobalPositionOf(subItem)) ||
+					(isExpandable(subItem) && hasSubItemsSelected((IExpandable) subItem)))
+				return true;
 		}
 		return false;
 	}

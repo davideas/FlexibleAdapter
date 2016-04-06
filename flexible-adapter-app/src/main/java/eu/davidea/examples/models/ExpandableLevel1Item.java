@@ -1,10 +1,12 @@
 package eu.davidea.examples.models;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.List;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flipview.FlipView;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
@@ -34,7 +37,6 @@ public class ExpandableLevel1Item
 
 	public ExpandableLevel1Item(String id) {
 		super(id);
-		setSelectable(false);
 	}
 
 	@Override
@@ -97,7 +99,7 @@ public class ExpandableLevel1Item
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, ViewHolder holder, int position, List payloads) {
+	public void bindViewHolder(final FlexibleAdapter adapter, ViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
 			Log.i(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads);
 		} else {
@@ -105,6 +107,22 @@ public class ExpandableLevel1Item
 		}
 		setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
 		holder.mSubtitle.setText(getSubtitle());
+
+		//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
+		if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
+			//Reset the flags with delay
+			holder.itemView.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					adapter.resetActionModeFlags();
+				}
+			}, 200L);
+			//Consume the Animation
+			holder.mFlipView.flip(adapter.isSelected(position), 200L);
+		} else {
+			//Display the current flip status
+			holder.mFlipView.flipSilently(adapter.isSelected(position));
+		}
 	}
 
 	/**
@@ -116,11 +134,30 @@ public class ExpandableLevel1Item
 
 		public TextView mTitle;
 		public TextView mSubtitle;
+		public FlipView mFlipView;
+		public Context mContext;
 
 		public ViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
+			this.mContext = view.getContext();
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
+			this.mFlipView = (FlipView) view.findViewById(R.id.image);
+			this.mFlipView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					mAdapter.mItemLongClickListener.onItemLongClick(getAdapterPosition());
+					Toast.makeText(mContext, "ImageClick on " + mTitle.getText() + " position " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
+					toggleActivation();
+				}
+			});
+		}
+
+		@Override
+		protected void toggleActivation() {
+			super.toggleActivation();
+			//Here we use a custom Animation inside the ItemView
+			mFlipView.flip(mAdapter.isSelected(getAdapterPosition()));
 		}
 
 		@Override

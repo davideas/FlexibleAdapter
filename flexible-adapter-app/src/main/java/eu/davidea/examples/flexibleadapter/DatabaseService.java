@@ -141,17 +141,18 @@ public class DatabaseService {
 
 	/*
 	 * Creates a special expandable item which has another level of expandable.
+	 * <p>IMPORTANT: Give different IDs to each child.</p>
 	 */
 	private ExpandableLevel0Item newExpandableLevelItem(int i) {
 		//ExpandableLevel0Item is an expandable with Level 0
 		ExpandableLevel0Item expandableItem = new ExpandableLevel0Item("E" + i);
-		expandableItem.setTitle("Expandable 2Level " + i);
+		expandableItem.setTitle("Expandable Header Two-Levels " + i);
 		for (int j = 1; j <= SUB_ITEMS; j++) {
 			//ExpandableLevel1Item is an expandable as well with Level 1
-			ExpandableLevel1Item expSubItem = new ExpandableLevel1Item(expandableItem.getId() + "S" + j);
-			expSubItem.setTitle("Sub Item " + j);
+			ExpandableLevel1Item expSubItem = new ExpandableLevel1Item(expandableItem.getId() + "SA" + j);
+			expSubItem.setTitle("Expandable Sub Item " + j);
 			for (int k = 1; k <= 3; k++) {
-				SubItem subItem = new SubItem(expandableItem.getId() + "SS" + k);
+				SubItem subItem = new SubItem(expandableItem.getId() + expSubItem.getId() + "SB" + k);
 				subItem.setTitle("Sub Sub Item " + k);
 				expSubItem.addSubItem(subItem);
 			}
