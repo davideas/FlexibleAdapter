@@ -69,7 +69,7 @@ limitations under the License.
 	<string name="overall">Overall</string>
 	<string name="selection_mode">Selection modes</string>
 	<string name="headers_sections">Headers and Sections</string>
-	<string name="expandable">Expandable Multi-Level</string>
+	<string name="expandable">Expandable</string>
 	<string name="multi_level_expandable">Expandable Multi-Level</string>
 	<string name="expandable_sections">Expandable Sections</string>
 

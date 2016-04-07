@@ -1,7 +1,7 @@
 package eu.davidea.examples.flexibleadapter;
 
+import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -111,12 +111,13 @@ public class FragmentSelectionModes extends Fragment {
 	}
 
 	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
-		if (context instanceof OnListFragmentInteractionListener) {
-			mListener = (OnListFragmentInteractionListener) context;
+	@SuppressWarnings("deprecation")
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		if (activity instanceof OnListFragmentInteractionListener) {
+			mListener = (OnListFragmentInteractionListener) activity;
 		} else {
-			throw new RuntimeException(context.toString()
+			throw new RuntimeException(activity.toString()
 					+ " must implement OnListFragmentInteractionListener");
 		}
 	}
