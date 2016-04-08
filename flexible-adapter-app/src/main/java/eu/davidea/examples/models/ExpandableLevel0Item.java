@@ -137,7 +137,7 @@ public class ExpandableLevel0Item
 
 	@Override
 	public String toString() {
-		return "ExpandableHeaderItem[" + super.toString() + "//SubItems" + mSubItems + "]";
+		return "ExpandableLevel-0[" + super.toString() + "//SubItems" + mSubItems + "]";
 	}
 
 }

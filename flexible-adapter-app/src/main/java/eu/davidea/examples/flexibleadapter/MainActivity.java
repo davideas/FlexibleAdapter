@@ -440,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements
 				item.setIcon(R.drawable.ic_view_grid_white_24dp);
 				item.setTitle(R.string.grid_layout);
 			} else {
-				GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+				GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
 				gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 					@Override
 					public int getSpanSize(int position) {
@@ -450,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements
 							case R.layout.recycler_uls_row:
 							case R.layout.recycler_header_row:
 							case R.layout.recycler_expandable_row:
-								return 2;
+								return 3;
 							default:
 								return 1;
 						}

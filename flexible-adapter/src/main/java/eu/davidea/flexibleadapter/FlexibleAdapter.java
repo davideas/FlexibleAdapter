@@ -150,7 +150,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
 
 	/* Expandable flags */
-	private int minCollapsibleLevel = 0;
+	private int minCollapsibleLevel = 0, selectedLevel = -1;
 	private boolean scrollOnExpand = false, collapseOnExpand = false,
 			childSelected = false, parentSelected = false;
 
@@ -286,21 +286,27 @@ public class FlexibleAdapter<T extends IFlexible>
 		T item = getItem(position);
 		//Allow selection only for selectable items
 		if (item != null && item.isSelectable()) {
-			boolean hasParent = getExpandableOf(item) != null;
+			IExpandable parent = getExpandableOf(item);
+			boolean hasParent = parent != null;
 			if ((isExpandable(item) || !hasParent) && !childSelected) {
 				//Allow selection of Parent if no Child has been previously selected
 				parentSelected = true;
+				if (hasParent) selectedLevel = parent.getExpansionLevel();
 				super.toggleSelection(position);
-				//TODO: Set selected for items
-			} else if (!parentSelected && hasParent) {
-				//Allow selection of Child if no Parent has been previously selected
+			} else if (!parentSelected && hasParent && parent.getExpansionLevel() + 1 == selectedLevel
+					|| selectedLevel == -1) {
+				//Allow selection of Child of same level and if no Parent has been previously selected
 				childSelected = true;
+				selectedLevel = parent.getExpansionLevel() + 1;
 				super.toggleSelection(position);
 			}
 		}
 
 		//Reset flags if necessary, just to be sure
-		if (getSelectedItemCount() == 0) parentSelected = childSelected = false;
+		if (getSelectedItemCount() == 0) {
+			selectedLevel = -1;
+			parentSelected = childSelected = false;
+		}
 	}
 
 	/**
@@ -1233,7 +1239,8 @@ public class FlexibleAdapter<T extends IFlexible>
 				" expanded " + expandable.isExpanded() + " ExpandedItems=" + getExpandedPositions());
 
 		int subItemsCount = 0;
-		if (!expandable.isExpanded() && !parentSelected && hasSubItems(expandable)) {
+		if (!expandable.isExpanded() && (!parentSelected || expandable.getExpansionLevel() <= selectedLevel)
+				&& hasSubItems(expandable)) {
 
 			//Collapse others expandable if configured so
 			//Skipped when expanding all is requested
@@ -1867,7 +1874,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				//When removing a range of children, parent is always the same :-)
 				if (parent == null) parent = getExpandableOf(item);
 				//Differentiate: (Expandable & NonExpandable with No parent) from (NonExpandable with a parent)
-				if (isExpandable(item) || parent == null) {
+				if (parent == null) {
 					createRestoreItemInfo(positionStart, item, payload);
 				} else {
 					parentPosition = createRestoreSubItemInfo(parent, item, payload);
@@ -2002,7 +2009,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				if (hasSearchText() && !filterObject(restoreInfo.item, getSearchText()))
 					continue;
 				//Add subItem
-				addSubItem(restoreInfo.getRefPosition(), restoreInfo.relativePosition,
+				addSubItem(restoreInfo.getRestorePosition(true), restoreInfo.relativePosition,
 						restoreInfo.item, false, restoreInfo.payload);
 			} else {
 				//Restore parent or simple item, if not deleted
@@ -2011,7 +2018,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				if (hasSearchText() && !filterExpandableObject(restoreInfo.item, getSearchText()))
 					continue;
 				//Add item
-				addItem(restoreInfo.getRestorePosition(), restoreInfo.item);
+				addItem(restoreInfo.getRestorePosition(false), restoreInfo.item);
 			}
 			//Item is again visible
 			restoreInfo.item.setHidden(false);
@@ -3029,26 +3036,32 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 
 		/**
-		 * @return the reference position which this deleted item is referring to.
-		 * It is the parent position if this is a sub item
+		 * @return the position where the deleted item should be restored
 		 */
-		public int getRefPosition() {
+		public int getRestorePosition(boolean isChild) {
 			if (refPosition < 0) {
 				refPosition = getGlobalPositionOf(filterRefItem != null ? filterRefItem : refItem);
+			}
+			T item = getItem(refPosition);
+			//Assert the children are collapsed
+			if (isChild && isExpandable(item)) {
+				//TODO: refPosition += countExpandedSiblings((IExpandable) item);
+			} else if (isExpanded(item) && !isChild) {
+				refPosition += getExpandableList((IExpandable) item).size() + 1;
 			}
 			return refPosition;
 		}
 
-		/**
-		 * @return the position where the deleted item should be restored
-		 */
-		public int getRestorePosition() {
-			//noinspection Range
-			T item = getItem(getRefPosition());
-			if (isExpanded(item)) {
-				refPosition += getExpandableList((IExpandable) item).size();
+		private int countExpandedSiblings(IExpandable expandable) {
+			List<T> children = getCurrentChildren(expandable);
+			int count = 0;
+			for (T child : children) {
+				if (!child.isHidden() && isExpanded(child)) {
+					count += ((IExpandable) child).getSubItems().size();
+					countExpandedSiblings((IExpandable) child);
+				}
 			}
-			return refPosition + 1;
+			return count;
 		}
 
 		public void clearFilterRef() {
