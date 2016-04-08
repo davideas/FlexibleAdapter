@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: "com.android.application"
 
 android {
 	compileSdkVersion targetSdk
@@ -32,19 +32,18 @@ android {
 }
 
 dependencies {
-	//compile 'eu.davidea:flexible-adapter:5.0.0-b4@aar'
-	compile 'eu.davidea:flipview:1.1.0'
+	compile "eu.davidea:flipview:1.1.1"
 	compile project (":flexible-adapter")
 	compile supportDependencies.appcompat
 	compile (supportDependencies.design) {
-		exclude module: 'support-v4'
-		exclude module: 'support-annotations'
+		exclude module: "support-v4"
+		exclude module: "support-annotations"
 	}
 	compile (supportDependencies.recyclerview) {
-		exclude module: 'support-v4';
-		exclude module: 'support-annotations'
+		exclude module: "support-v4";
+		exclude module: "support-annotations"
 	}
-	compile('com.mikepenz:materialize:0.8.7@aar') {
+	compile("com.mikepenz:materialize:0.8.7@aar") {
 		transitive = true
 	}
 }

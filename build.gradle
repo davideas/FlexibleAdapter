@@ -1,31 +1,31 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 ext {
 	//Author
-	developerId = 'davideas'
-	developerName = 'Davide Steduto'
-	developerEmail = 'dave.dna@gmail.com'
+	developerId = "davideas"
+	developerName = "Davide Steduto"
+	developerEmail = "dave.dna@gmail.com"
 
 	//Library
 	libraryCode = 15
-	libraryVersion = '5.0.0-b5'
-	libraryDate = " of 2016.04.04"
-	libraryDescription = '1 Adapter for SelectionMode, ViewHolders, Filter, FastScroller, Animations, Undo, Headers, Expandable, Draggable, Swipeable :-)'
-	libraryName = 'FlexibleAdapter'
-	packageExt = 'aar'
+	libraryVersion = "5.0.0-SNAPSHOT"
+	libraryDate = " of 2016.04.07"
+	libraryDescription = "1 Adapter for SelectionMode, ViewHolders, Filter, FastScroller, Animations, Undo, Headers, Expandable, Draggable, Swipeable :-)"
+	libraryName = "FlexibleAdapter"
+	packageExt = "aar"
 
 	//Library Repository
-	bintrayRepo = 'maven'
-	bintrayName = 'flexible-adapter'
-	publishedGroupId = 'eu.davidea'
+	bintrayRepo = "maven"
+	bintrayName = "flexible-adapter"
+	publishedGroupId = "eu.davidea"
 	artifact = bintrayName
-	siteUrl = 'https://github.com/davideas/FlexibleAdapter'
-	gitUrl = 'https://github.com/davideas/FlexibleAdapter.git'
+	siteUrl = "https://github.com/davideas/FlexibleAdapter"
+	gitUrl = "https://github.com/davideas/FlexibleAdapter.git"
 
 	//Support and Build tools version
 	minSdk = 14
 	targetSdk = 23
 	buildTools = "23.0.3"
-	supportLib = '23.2.1'
+	supportLib = "23.3.0"
 
 	//Support Libraries dependencies
 	supportDependencies = [
@@ -34,14 +34,14 @@ ext {
 		cardview     : "com.android.support:cardview-v7:${supportLib}",
 		appcompat    : "com.android.support:appcompat-v7:${supportLib}",
 		customtabs   : "com.android.support:customtabs:${supportLib}",
-		support      : "com.android.support:support-v13:${supportLib}'",
+		support      : "com.android.support:support-v13:${supportLib}",
 		annotations  : "com.android.support:support-annotations:${supportLib}"
 	]
 
-	licenseName = 'The Apache Software License, Version 2.0'
-	licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+	licenseName = "The Apache Software License, Version 2.0"
+	licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
 	allLicenses = ["Apache-2.0"]
-	licenseDist = 'repo'
+	licenseDist = "repo"
 }
 
 buildscript {
@@ -51,9 +51,9 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:2.0.0-rc3'
-		classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
-		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+		classpath "com.android.tools.build:gradle:2.0.0"
+		classpath "com.github.dcendents:android-maven-gradle-plugin:1.3"
+		classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6"
 		classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1"
 		// NOTE: Do not place your application dependencies here; they belong
 		// in the individual module build.gradle files
