@@ -94,6 +94,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	private static final String EXTRA_PARENT = TAG + "_parentSelected";
 	private static final String EXTRA_CHILD = TAG + "_childSelected";
 	private static final String EXTRA_HEADERS = TAG + "_headersShown";
+	private static final String EXTRA_LEVEL = TAG + "_selectedLevel";
+	private static final String EXTRA_SEARCH = TAG + "_searchText";
+	private static final String EXTRA_SEARCH_OLD = TAG + "_searchTextOld";
 	public static final int EXPANDABLE_VIEW_TYPE = -1;
 	public static final int SECTION_VIEW_TYPE = -2;
 	public static final long UNDO_TIMEOUT = 5000L;
@@ -741,7 +744,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param header the header
 	 * @return the Sectionable of the passed header if found, null otherwise
+	 * @deprecated wrong implementation, use {@link #getSectionItems(IHeader)} instead
 	 */
+	@Deprecated
 	public ISectionable getSectionableOf(@NonNull IHeader header) {
 		int headerPosition = getGlobalPositionOf(header);
 		for (int position = headerPosition - 1; position <= headerPosition + 2; position++) {
@@ -760,12 +765,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return list of all items in the specified section.
 	 */
 	public List<ISectionable> getSectionItems(@NonNull IHeader header) {
-		ISectionable sectionable;
 		List<ISectionable> sectionItems = new ArrayList<ISectionable>();
-		do {
-			sectionable = getSectionableOf(header);
-			if (sectionable != null) sectionItems.add(sectionable);
-		} while (sectionable != null);
+		int startPosition = getGlobalPositionOf(header);
+		T item = getItem(++startPosition);
+		while (hasSameHeader(item, header)) {
+			sectionItems.add((ISectionable) item);
+			item = getItem(++startPosition);
+		}
 		return sectionItems;
 	}
 
@@ -1882,11 +1888,10 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 			//If item is a Header, remove linkage from ALL Sectionable items if exist
 			if (unlinkOnRemoveHeader && isHeader(item)) {
-				ISectionable sectionable;
-				do {
-					sectionable = getSectionableOf((IHeader) item);
-					if (sectionable != null) sectionable.setHeader(null);
-				} while (sectionable != null);
+				List<ISectionable> sectionableList = getSectionItems((IHeader) item);
+				for (ISectionable sectionable : sectionableList) {
+					sectionable.setHeader(null);
+				}
 			}
 			//Remove item from internal list
 			mItems.remove(positionStart);
@@ -1930,7 +1935,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeAllSelectedItems(Object)
 	 */
 	public void removeAllSelectedItems() {
-		this.removeItems(getSelectedPositions());
+		this.removeItems(getSelectedPositions(), null);
 	}
 
 	/**
@@ -2826,6 +2831,10 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Save selection coherence
 			outState.putBoolean(EXTRA_CHILD, childSelected);
 			outState.putBoolean(EXTRA_PARENT, parentSelected);
+			outState.putInt(EXTRA_LEVEL, selectedLevel);
+			//Current filter
+			outState.putString(EXTRA_SEARCH, mSearchText);
+			outState.putString(EXTRA_SEARCH_OLD, mOldSearchText);
 			//Save headers shown status
 			outState.putBoolean(EXTRA_HEADERS, headersShown);
 		}
@@ -2843,6 +2852,10 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Restore selection coherence
 			parentSelected = savedInstanceState.getBoolean(EXTRA_PARENT);
 			childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
+			selectedLevel = savedInstanceState.getInt(EXTRA_LEVEL);
+			//Current filter
+			mSearchText = savedInstanceState.getString(EXTRA_SEARCH);
+			mOldSearchText = savedInstanceState.getString(EXTRA_SEARCH_OLD);
 			//Restore headers shown status
 			headersShown = savedInstanceState.getBoolean(EXTRA_HEADERS);
 			if (headersShown) showAllHeaders();

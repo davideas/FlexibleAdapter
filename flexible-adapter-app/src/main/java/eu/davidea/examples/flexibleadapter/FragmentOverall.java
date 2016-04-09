@@ -90,6 +90,7 @@ public class FragmentOverall extends Fragment {
 		mAdapter.setAutoCollapseOnExpand(false);
 		mAdapter.setAutoScrollOnExpand(true);
 		mAdapter.setRemoveOrphanHeaders(false);
+		mAdapter.setUnlinkAllItemsOnRemoveHeaders(false);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);

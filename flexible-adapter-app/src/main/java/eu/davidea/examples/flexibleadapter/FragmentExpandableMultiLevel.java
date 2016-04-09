@@ -23,7 +23,7 @@ import eu.davidea.utils.Utils;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class FragmentExpandableLevel extends Fragment {
+public class FragmentExpandableMultiLevel extends Fragment {
 
 	// TODO: Customize parameters
 	private int mColumnCount = 1;
@@ -37,8 +37,8 @@ public class FragmentExpandableLevel extends Fragment {
 
 	// TODO: Customize parameter initialization
 	@SuppressWarnings("unused")
-	public static FragmentExpandableLevel newInstance(int columnCount) {
-		FragmentExpandableLevel fragment = new FragmentExpandableLevel();
+	public static FragmentExpandableMultiLevel newInstance(int columnCount) {
+		FragmentExpandableMultiLevel fragment = new FragmentExpandableMultiLevel();
 		Bundle args = new Bundle();
 		args.putInt(ARG_COLUMN_COUNT, columnCount);
 		fragment.setArguments(args);
@@ -49,7 +49,7 @@ public class FragmentExpandableLevel extends Fragment {
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
 	 */
-	public FragmentExpandableLevel() {
+	public FragmentExpandableMultiLevel() {
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class FragmentExpandableLevel extends Fragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createExpandableLevelDatabase();
+		DatabaseService.getInstance().createExpandableMultiLevelDatabase();
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -87,7 +87,7 @@ public class FragmentExpandableLevel extends Fragment {
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAutoCollapseOnExpand(true);
+		mAdapter.setAutoCollapseOnExpand(false);
 		mAdapter.setMinCollapsibleLevel(1);//Auto-collapse only items with level >= 1 (avoid to collapse also sections!)
 		mAdapter.setAutoScrollOnExpand(true);
 		mAdapter.setRemoveOrphanHeaders(false);

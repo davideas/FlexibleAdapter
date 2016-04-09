@@ -234,6 +234,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		} else {
 			//LinearLayout
 			switch (getItemViewType(position)) {
+				case R.layout.recycler_child_row:
 				case R.layout.recycler_uls_row:
 				case EXAMPLE_VIEW_TYPE:
 					addScaleInAnimator(animators, itemView, 0.0f);

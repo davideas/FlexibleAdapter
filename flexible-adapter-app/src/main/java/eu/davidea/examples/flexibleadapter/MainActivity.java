@@ -299,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_expandable) {
 
 		} else if (id == R.id.nav_multi_level_expandable) {
-			fragment = FragmentExpandableLevel.newInstance(1);
+			fragment = FragmentExpandableMultiLevel.newInstance(1);
 		} else if (id == R.id.nav_expandable_sections) {
 			fragment = FragmentExpandableSections.newInstance(1);
 		} else if (id == R.id.nav_share) {

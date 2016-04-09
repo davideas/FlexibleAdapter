@@ -11,6 +11,7 @@ import java.util.List;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractHeaderItem;
+import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -75,14 +76,16 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
 			Log.i(this.getClass().getSimpleName(), "HeaderItem Payload " + payloads);
 		} else {
 			holder.mTitle.setText(getTitle());
 		}
-		AbstractExampleItem item = (AbstractExampleItem) adapter.getSectionableOf(this);
-		String subTitle = "Attached to " + (item != null ? item.getTitle() : "none");
+		List<ISectionable> sectionableList = adapter.getSectionItems(this);
+		String subTitle = (sectionableList.isEmpty() ? "Empty section" :
+				sectionableList.size() + " section items");
 		holder.mSubtitle.setText(subTitle);
 	}
 

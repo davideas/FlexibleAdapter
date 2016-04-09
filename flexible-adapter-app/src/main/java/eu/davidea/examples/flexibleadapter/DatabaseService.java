@@ -67,7 +67,7 @@ public class DatabaseService {
 		}
 	}
 
-	public void createExpandableLevelDatabase() {
+	public void createExpandableMultiLevelDatabase() {
 		HeaderItem header = null;
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
@@ -95,11 +95,8 @@ public class DatabaseService {
 	 * Creates a normal item with a Header linked.
 	 */
 	public static SimpleItem newSimpleItem(int i, HeaderItem header) {
-		SimpleItem item;
-		header.setSubtitle("Attached to Simple Item " + i);
-		item = new SimpleItem("I" + i, header);
+		SimpleItem item = new SimpleItem("I" + i, header);
 		item.setTitle("Simple Item " + i);
-		item.setSubtitle("Subtitle " + i);
 		return item;
 	}
 
@@ -109,13 +106,11 @@ public class DatabaseService {
 	 */
 	public static ExpandableItem newExpandableItem(int i, HeaderItem header) {
 		//Items are expandable because they implements IExpandable
-		ExpandableItem expandableItem;
-		header.setSubtitle("Attached to Expandable Item " + i);
-		expandableItem = new ExpandableItem("E" + i, header);
+		ExpandableItem expandableItem = new ExpandableItem("E" + i, header);
 		expandableItem.setTitle("Expandable Item " + i);
 		//SubItems are not expandable by default, but they might be if extends/implements IExpandable
 		for (int j = 1; j <= SUB_ITEMS; j++) {
-			SubItem subItem = new SubItem(expandableItem.getId() + "S" + j);
+			SubItem subItem = new SubItem(expandableItem.getId() + "-SB" + j);
 			subItem.setTitle("Sub Item " + j);
 			expandableItem.addSubItem(subItem);
 		}
@@ -127,11 +122,11 @@ public class DatabaseService {
 	 * The subItems will have linked its parent as Header!
 	 */
 	private ExpandableHeaderItem newExpandableSectionItem(int i) {
-		ExpandableHeaderItem expandableItem = new ExpandableHeaderItem("E" + i);
+		ExpandableHeaderItem expandableItem = new ExpandableHeaderItem("EH" + i);
 		expandableItem.setTitle("Expandable Header " + i);
 		for (int j = 1; j <= SUB_ITEMS; j++) {
-			SubItem subItem = new SubItem(expandableItem.getId() + "S" + j);
-			subItem.setTitle("Sub Item " + j + " in expandable section");
+			SubItem subItem = new SubItem(expandableItem.getId() + "-SB" + j);
+			subItem.setTitle("Sub Item " + j);
 			//In this case the Header is the same parent: ExpandableHeaderItem instance
 			subItem.setHeader(expandableItem);
 			expandableItem.addSubItem(subItem);
@@ -141,19 +136,19 @@ public class DatabaseService {
 
 	/*
 	 * Creates a special expandable item which has another level of expandable.
-	 * <p>IMPORTANT: Give different IDs to each child.</p>
+	 * <p>IMPORTANT: Give different IDs to each child and override getExpansionLevel().</p>
 	 */
 	private ExpandableLevel0Item newExpandableLevelItem(int i) {
-		//ExpandableLevel0Item is an expandable with Level 0
-		ExpandableLevel0Item expandableItem = new ExpandableLevel0Item("E" + i);
+		//ExpandableLevel0Item is an expandable with Level=0
+		ExpandableLevel0Item expandableItem = new ExpandableLevel0Item("EH" + i);
 		expandableItem.setTitle("Expandable Header Two-Levels " + i);
 		for (int j = 1; j <= SUB_ITEMS; j++) {
-			//ExpandableLevel1Item is an expandable as well with Level 1
-			ExpandableLevel1Item expSubItem = new ExpandableLevel1Item(expandableItem.getId() + "SA" + j);
+			//ExpandableLevel1Item is an expandable as well with Level=1
+			ExpandableLevel1Item expSubItem = new ExpandableLevel1Item(expandableItem.getId() + "-EL" + j);
 			expSubItem.setTitle("Expandable Sub Item " + j);
 			for (int k = 1; k <= 3; k++) {
-				SubItem subItem = new SubItem(expandableItem.getId() + expSubItem.getId() + "SB" + k);
-				subItem.setTitle("Sub Sub Item " + k);
+				SubItem subItem = new SubItem(expandableItem.getId() + expSubItem.getId() + "-SB" + k);
+				subItem.setTitle("Simple Sub Item " + k);
 				expSubItem.addSubItem(subItem);
 			}
 			expandableItem.addSubItem(expSubItem);

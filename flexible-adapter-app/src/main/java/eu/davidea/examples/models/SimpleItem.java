@@ -66,10 +66,18 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
+		//Subtitle
+		if (adapter.isExpandable(this)) {
+			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems");
+		} else {
+			setSubtitle("Subtitle " + getId());
+		}
+		setSubtitle(getSubtitle() + " - Header: " + (getHeader() != null ? getHeader().getId() : "No"));
+
 		if (adapter.isExpandable(this) && payloads.size() > 0){
 			Log.i(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
-			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems");
 			if (adapter.hasSearchText()) {
 				Utils.highlightText(holder.itemView.getContext(), holder.mSubtitle,
 						getSubtitle(), adapter.getSearchText(), R.color.colorAccent_light);
@@ -97,8 +105,6 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 
 			//In case of searchText matches with Title or with an SimpleItem's field
 			// this will be highlighted
-			if (adapter.isExpandable(this))
-				setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems");
 			if (adapter.hasSearchText()) {
 				Utils.highlightText(holder.itemView.getContext(), holder.mTitle,
 						getTitle(), adapter.getSearchText(), R.color.colorAccent_light);

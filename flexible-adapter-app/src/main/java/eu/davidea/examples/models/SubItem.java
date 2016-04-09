@@ -57,13 +57,6 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ChildViewHolder holder, int position, List payloads) {
-		//This "if-else" is just an example of what you can do with item animation
-		if (adapter.isSelected(position)) {
-			adapter.animateView(holder.itemView, position, true);
-		} else {
-			adapter.animateView(holder.itemView, position, false);
-		}
-
 		//In case of searchText matches with Title or with an SimpleItem's field
 		// this will be highlighted
 		if (adapter.hasSearchText()) {
@@ -71,6 +64,13 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
 					getTitle(), adapter.getSearchText(), R.color.colorAccent_light);
 		} else {
 			holder.mTitle.setText(getTitle());
+		}
+
+		//This "if-else" is just an example of what you can do with item animation
+		if (adapter.isSelected(position)) {
+			adapter.animateView(holder.itemView, position, true);
+		} else {
+			adapter.animateView(holder.itemView, position, false);
 		}
 	}
 
