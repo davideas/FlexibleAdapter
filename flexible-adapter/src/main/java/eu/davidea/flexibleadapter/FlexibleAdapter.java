@@ -523,6 +523,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the list of the orphan headers collected until this moment
 	 * @see #setRemoveOrphanHeaders(boolean)
 	 */
+	@NonNull
 	public List<IHeader> getOrphanHeaders() {
 		return mOrphanHeaders;
 	}
@@ -563,6 +564,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return list non-null with all the header items.
 	 */
+	@NonNull
 	public List<IHeader> getHeaderItems() {
 		List<IHeader> headers = new ArrayList<IHeader>();
 		for (T item : mItems) {
@@ -762,8 +764,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Provides all the items that belongs to the section represented by the specified header.
 	 *
 	 * @param header the header that represents the section
-	 * @return list of all items in the specified section.
+	 * @return NonNull list of all items in the specified section.
 	 */
+	@NonNull
 	public List<ISectionable> getSectionItems(@NonNull IHeader header) {
 		List<ISectionable> sectionItems = new ArrayList<ISectionable>();
 		int startPosition = getGlobalPositionOf(header);
@@ -829,7 +832,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private void resetHiddenStatus() {
 		for (T item : mItems) {
 			IHeader header = getHeaderOf(item);
-			if (header != null && !isExpandable((T)header))
+			if (header != null && !isExpandable((T) header))
 				header.setHidden(true);
 		}
 	}
@@ -1175,6 +1178,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getRelativePositionOf(IFlexible)
 	 * @see #getExpandedItems()
 	 */
+	@NonNull
 	public List<T> getSiblingsOf(@NonNull T child) {
 		return getExpandableList(getExpandableOf(child));
 	}
@@ -1199,6 +1203,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getSiblingsOf(IFlexible)
 	 * @see #getExpandedPositions()
 	 */
+	@NonNull
 	public List<T> getExpandedItems() {
 		List<T> expandedItems = new ArrayList<T>();
 		for (T item : mItems) {
@@ -1215,6 +1220,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getSiblingsOf(IFlexible)
 	 * @see #getExpandedItems()
 	 */
+	@NonNull
 	public List<Integer> getExpandedPositions() {
 		List<Integer> expandedPositions = new ArrayList<Integer>();
 		for (int i = 0; i < mItems.size() - 1; i++) {
@@ -1349,7 +1355,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>All Expandable subItem, that are expanded, are recursively collapsed.</p>
 	 *
 	 * @param position the position of the item to collapse
-	 * @param level all the levels to collapse
+	 * @param level    all the levels to collapse
 	 * @return the number of subItems collapsed
 	 * @see #collapse(int)
 	 */
@@ -1699,6 +1705,82 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Notify the parent about the change if requested
 		if (payload != null) notifyItemChanged(parentPosition, payload);
 		return added;
+	}
+
+	/**
+	 * Adds and shows an empty section to the top (position = 0).
+	 *
+	 * @see #addSection(IHeader, IHeader)
+	 */
+	public void addSection(@NonNull IHeader header) {
+		addSection(header, null);
+	}
+
+	/**
+	 * Adds and shows an empty section.
+	 * <p>The new section is a {@link IHeader} item and the position is calculated from an
+	 * existent header reference:
+	 * <br/>- To add section to the top, set {@code refHeader} to null;
+	 * <br/>- To add section in the middle, set {@code refHeader} to the previous section;
+	 * <br/>- To add section to the bottom, set {@code refHeader} to your last header/section or
+	 * use the method {@code addItems(itemCount, items)} (header will be automatically shown).</p>
+	 *
+	 * @param header    the section header item to add
+	 * @param refHeader optional reference section item
+	 */
+	public void addSection(@NonNull IHeader header, @Nullable IHeader refHeader) {
+		int position = 0;
+		if (refHeader != null) {
+			int headerPosition = getGlobalPositionOf(refHeader);
+			List<ISectionable> refSectionItems = getSectionItems(refHeader);
+			if (!refSectionItems.isEmpty()) {
+				position = headerPosition + refSectionItems.size() + 1;
+			}
+		}
+		header.setHidden(false);
+		addItem(position, (T) header);
+	}
+
+	/**
+	 * Adds a new item in a section when the relative position is <b>unknown</b>.
+	 * <p>The header can be a {@code IExpandable} type or {@code IHeader} type.</p>
+	 *
+	 * @param item       the item to add
+	 * @param header     the section receiving the new item
+	 * @param comparator the criteria to sort the sectionItems used to extract the correct position
+	 *                   of the new item
+	 * @see #addItemToSection(ISectionable, IHeader, int)
+	 */
+	public void addItemToSection(@NonNull ISectionable item, @NonNull IHeader header,
+								 @NonNull Comparator comparator) {
+		List<ISectionable> sectionItems = getSectionItems(header);
+		sectionItems.add(item);
+		//Sort the list for new position
+		Collections.sort(sectionItems, comparator);
+		//Get the new position
+		int index = sectionItems.indexOf(item);
+		addItemToSection(item, header, index);
+	}
+
+	/**
+	 * Adds a new item in a section when the relative position is <b>known</b>.
+	 * <p>The header can be a {@code IExpandable} type or {@code IHeader} type.</p>
+	 *
+	 * @param item   the item to add
+	 * @param header the section receiving the new item
+	 * @param index  the known relative position where to add the new item into the section
+	 * @see #addItemToSection(ISectionable, IHeader, Comparator)
+	 */
+	public void addItemToSection(@NonNull ISectionable item, @NonNull IHeader header,
+								 @IntRange(from = 0) int index) {
+		int headerPosition = getGlobalPositionOf(header);
+		if (index >= 0 && headerPosition >= 0) {
+			item.setHeader(header);
+			if (isExpandable((T) header))
+				addSubItem(headerPosition, index, (T) item, false, true);
+			else
+				addItem(headerPosition + 1 + index, (T) item);
+		}
 	}
 
 	/*----------------------*/
@@ -2097,6 +2179,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * @return the list of deleted items
 	 */
+	@NonNull
 	public List<T> getDeletedItems() {
 		List<T> deletedItems = new ArrayList<T>();
 		for (RestoreInfo restoreInfo : mRestoreList) {
@@ -2137,6 +2220,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param expandable the parent item
 	 * @return the list of deleted children
 	 */
+	@NonNull
 	public List<T> getDeletedChildren(IExpandable expandable) {
 		List<T> deletedChild = new ArrayList<T>();
 		for (RestoreInfo restoreInfo : mRestoreList) {
@@ -2154,6 +2238,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return a non null list of the original children minus the deleted children if some are
 	 * pending removal.
 	 */
+	@NonNull
 	public List<T> getCurrentChildren(@NonNull IExpandable expandable) {
 		//Check item and subItems existence
 		if (expandable == null || !hasSubItems(expandable))
@@ -2753,6 +2838,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param expandable the parent item
 	 * @return the list of the subItems not hidden
 	 */
+	@NonNull
 	private List<T> getExpandableList(IExpandable expandable) {
 		List<T> subItems = new ArrayList<T>();
 		if (expandable != null && hasSubItems(expandable)) {

@@ -32,8 +32,9 @@ android {
 }
 
 dependencies {
-	compile "eu.davidea:flipview:1.1.1"
 	compile project (":flexible-adapter")
+	compile "eu.davidea:flipview:1.1.1"
+
 	compile supportDependencies.appcompat
 	compile (supportDependencies.design) {
 		exclude module: "support-v4"
@@ -43,7 +44,7 @@ dependencies {
 		exclude module: "support-v4";
 		exclude module: "support-annotations"
 	}
-	compile("com.mikepenz:materialize:0.8.7@aar") {
-		transitive = true
-	}
+//	compile("com.mikepenz:materialize:0.8.7@aar") {
+//		transitive = true
+//	}
 }

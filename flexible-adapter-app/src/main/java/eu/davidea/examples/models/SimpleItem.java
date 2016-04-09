@@ -74,7 +74,7 @@ public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
 		} else {
 			setSubtitle("Subtitle " + getId());
 		}
-		setSubtitle(getSubtitle() + " - Header: " + (getHeader() != null ? getHeader().getId() : "No"));
+		setSubtitle(getSubtitle() + (getHeader() != null ? " - Header: " + getHeader().getId() : ""));
 
 		if (adapter.isExpandable(this) && payloads.size() > 0){
 			Log.i(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);

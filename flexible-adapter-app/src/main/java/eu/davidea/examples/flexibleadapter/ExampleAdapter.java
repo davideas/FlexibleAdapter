@@ -50,6 +50,12 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		addUserLearnedSelection(true);
 	}
 
+	/*
+	 * HEADER/FOOTER VIEW
+	 * This method show how to add Header/Footer View as it was for ListView.
+	 * The secret is the position! 0 for Header; itemCount for Footer ;-)
+	 * The view is represented by a custom Item type to better represent any dynamic content.
+	 */
 	public void addUserLearnedSelection(boolean scrollToPosition) {
 		if (!DatabaseService.userLearnedSelection && !hasSearchText() && !(getItem(0) instanceof ULSItem)) {
 			//Define Example View
