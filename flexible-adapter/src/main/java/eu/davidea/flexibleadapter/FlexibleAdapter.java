@@ -3043,25 +3043,15 @@ public class FlexibleAdapter<T extends IFlexible>
 				refPosition = getGlobalPositionOf(filterRefItem != null ? filterRefItem : refItem);
 			}
 			T item = getItem(refPosition);
-			//Assert the children are collapsed
 			if (isChild && isExpandable(item)) {
-				//TODO: refPosition += countExpandedSiblings((IExpandable) item);
+				//Assert the expandable children are collapsed
+				recursiveCollapse(getCurrentChildren((IExpandable) item), 0);
 			} else if (isExpanded(item) && !isChild) {
 				refPosition += getExpandableList((IExpandable) item).size() + 1;
+			} else {
+				refPosition++;
 			}
 			return refPosition;
-		}
-
-		private int countExpandedSiblings(IExpandable expandable) {
-			List<T> children = getCurrentChildren(expandable);
-			int count = 0;
-			for (T child : children) {
-				if (!child.isHidden() && isExpanded(child)) {
-					count += ((IExpandable) child).getSubItems().size();
-					countExpandedSiblings((IExpandable) child);
-				}
-			}
-			return count;
 		}
 
 		public void clearFilterRef() {
