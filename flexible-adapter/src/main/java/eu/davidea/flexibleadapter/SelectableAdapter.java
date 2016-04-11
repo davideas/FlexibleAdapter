@@ -43,7 +43,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @since 03/05/2015 Created
  * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
  */
-@SuppressWarnings({"unused", "Convert2Diamond", "unchecked"})
+@SuppressWarnings({"unused", "Convert2Diamond", "unchecked", "ConstantConditions"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
 		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener {
 
@@ -382,14 +382,16 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
 	 * for previous version, the default value is used.
 	 *
-	 * @param fastScroller instance of {@link FastScroller}
-	 * @param accentColor  the default value color if the accentColor cannot be fetched
+	 * @param fastScroller        instance of {@link FastScroller}
+	 * @param accentColor         the default value color if the accentColor cannot be fetched
 	 * @param stateChangeListener the listener to monitor when fast scrolling state changes
 	 */
 	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor,
 								FastScroller.OnScrollStateChangeListener stateChangeListener) {
 		if (mRecyclerView == null) {
-			throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter is added to the RecyclerView.");
+			throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter has been added to the RecyclerView.");
+		} else if (fastScroller == null) {
+			throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
 		}
 		mFastScroller = fastScroller;
 		mFastScroller.setRecyclerView(mRecyclerView);
