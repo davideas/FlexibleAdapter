@@ -1,18 +1,20 @@
-package eu.davidea.examples.flexibleadapter;
+package eu.davidea.examples.flexibleadapter.services;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.davidea.examples.models.AbstractExampleItem;
-import eu.davidea.examples.models.ExpandableHeaderItem;
-import eu.davidea.examples.models.ExpandableItem;
-import eu.davidea.examples.models.ExpandableLevel0Item;
-import eu.davidea.examples.models.ExpandableLevel1Item;
-import eu.davidea.examples.models.HeaderItem;
-import eu.davidea.examples.models.SimpleItem;
-import eu.davidea.examples.models.SubItem;
+import eu.davidea.examples.flexibleadapter.R;
+import eu.davidea.examples.flexibleadapter.models.AbstractModelItem;
+import eu.davidea.examples.flexibleadapter.models.ExpandableHeaderItem;
+import eu.davidea.examples.flexibleadapter.models.ExpandableItem;
+import eu.davidea.examples.flexibleadapter.models.ExpandableLevel0Item;
+import eu.davidea.examples.flexibleadapter.models.ExpandableLevel1Item;
+import eu.davidea.examples.flexibleadapter.models.HeaderItem;
+import eu.davidea.examples.flexibleadapter.models.OverallItem;
+import eu.davidea.examples.flexibleadapter.models.SimpleItem;
+import eu.davidea.examples.flexibleadapter.models.SubItem;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
@@ -47,14 +49,21 @@ public class DatabaseService {
 	/* EXAMPLE DATABASE CREATION */
 	/*---------------------------*/
 
-	public void createOverallDatabase() {
-		HeaderItem header = null;
+	public void createOverallItemsDatabase() {
+		int i = 0;
+		mItems.add(new OverallItem(i++, R.string.animators)
+				.withDescription(R.string.animators_description)
+				.withIcon(R.drawable.ic_playlist_play_grey600_24dp));
+		mItems.add(new OverallItem(i++, R.string.selection_mode)
+				.withDescription(R.string.selection_mode_description)
+				.withIcon(R.drawable.ic_select_all_grey600_24dp));
+		//TODO: Finish the Overall Items
+	}
+
+	public void createAnimatorsDatabase() {
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
-			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i) : header;
-			mItems.add(i % 3 == 0 ?
-					newExpandableItem(i + 1, header) :
-					newSimpleItem(i + 1, header));
+			mItems.add(newSimpleItem(i + 1, null));
 		}
 	}
 
@@ -184,7 +193,7 @@ public class DatabaseService {
 			((ExpandableHeaderItem) parent).removeSubItem(child);
 	}
 
-	public void addItem(int position, AbstractExampleItem item) {
+	public void addItem(int position, AbstractModelItem item) {
 		if (position < mItems.size())
 			mItems.add(position, item);
 		else

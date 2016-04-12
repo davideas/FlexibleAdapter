@@ -1,4 +1,4 @@
-package eu.davidea.examples.models;
+package eu.davidea.examples.flexibleadapter.models;
 
 import android.content.Context;
 import android.util.Log;
@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
+import eu.davidea.examples.flexibleadapter.models.ExpandableLevel1Item.L1ViewHolder;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flipview.FlipView;
@@ -19,12 +20,12 @@ import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
  * This is an experiment to evaluate how a Section with header can also be expanded/collapsed.
- * <p>Here, it still benefits of the common fields declared in AbstractExampleItem.</p>
+ * <p>Here, it still benefits of the common fields declared in AbstractModelItem.</p>
  * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
  */
 public class ExpandableLevel1Item
-		extends AbstractExampleItem<ExpandableLevel1Item.ViewHolder>
-		implements IExpandable<ExpandableLevel1Item.ViewHolder, SubItem> {
+		extends AbstractModelItem<L1ViewHolder>
+		implements IExpandable<L1ViewHolder, SubItem> {
 
 	private static final long serialVersionUID = -1882711111814491060L;
 
@@ -94,12 +95,12 @@ public class ExpandableLevel1Item
 	}
 
 	@Override
-	public ViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public L1ViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new L1ViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
 	@Override
-	public void bindViewHolder(final FlexibleAdapter adapter, ViewHolder holder, int position, List payloads) {
+	public void bindViewHolder(final FlexibleAdapter adapter, L1ViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
 			Log.i(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads);
 		} else {
@@ -133,14 +134,14 @@ public class ExpandableLevel1Item
 	 * Complex data labels may need more than one view per item, and
 	 * you provide access to all the views for a data item in a view holder.
 	 */
-	public static class ViewHolder extends ExpandableViewHolder {
+	public static class L1ViewHolder extends ExpandableViewHolder {
 
 		public TextView mTitle;
 		public TextView mSubtitle;
 		public FlipView mFlipView;
 		public Context mContext;
 
-		public ViewHolder(View view, FlexibleAdapter adapter) {
+		public L1ViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			this.mContext = view.getContext();
 			mTitle = (TextView) view.findViewById(R.id.title);
@@ -154,6 +155,10 @@ public class ExpandableLevel1Item
 					toggleActivation();
 				}
 			});
+
+			View handleView = view.findViewById(R.id.row_handle);
+			if (handleView != null)
+				handleView.setVisibility(View.GONE);
 		}
 
 		@Override

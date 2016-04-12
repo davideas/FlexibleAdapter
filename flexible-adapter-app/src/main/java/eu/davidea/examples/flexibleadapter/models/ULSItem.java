@@ -1,4 +1,4 @@
-package eu.davidea.examples.models;
+package eu.davidea.examples.flexibleadapter.models;
 
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import eu.davidea.examples.flexibleadapter.DatabaseService;
 import eu.davidea.examples.flexibleadapter.R;
+import eu.davidea.examples.flexibleadapter.services.DatabaseService;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -20,7 +20,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).</p>
  */
-public class ULSItem extends AbstractExampleItem<ULSItem.ExampleViewHolder> {
+public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
 
 	private static final long serialVersionUID = -5041296095060813327L;
 

@@ -1,4 +1,4 @@
-package eu.davidea.examples.models;
+package eu.davidea.examples.flexibleadapter.models;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +21,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
+public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
 		implements ISectionable<SubItem.ChildViewHolder, IHeader>, IFilterable {
 
 	private static final long serialVersionUID = 2519281529221244210L;
@@ -64,6 +64,10 @@ public class SubItem extends AbstractExampleItem<SubItem.ChildViewHolder>
 					getTitle(), adapter.getSearchText(), R.color.colorAccent_light);
 		} else {
 			holder.mTitle.setText(getTitle());
+		}
+
+		if (getHeader() != null) {
+			setSubtitle("Header " + getHeader().toString());
 		}
 
 		//This "if-else" is just an example of what you can do with item animation

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	xmlns:card_view="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/label_card"
+	android:layout_width="match_parent"
+	android:layout_height="@dimen/label_height"
+	android:foreground="?android:attr/selectableItemBackground"
+	card_view:cardUseCompatPadding="true"
+	card_view:cardElevation="2dp"
+	card_view:cardCornerRadius="1dp">
+
+	<ImageView
+		android:id="@+id/label_background"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:paddingLeft="@dimen/label_height"
+		android:paddingStart="@dimen/label_height"
+		android:paddingTop="30dp"
+		android:alpha="0.1"
+		android:scaleType="fitCenter"
+		tools:src="@drawable/ic_playlist_play_grey600_24dp"/>
+
+	<LinearLayout
+		android:id="@+id/name_container"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_marginLeft="@dimen/margin_left_small"
+		android:layout_marginStart="@dimen/margin_left_small"
+		android:layout_marginRight="@dimen/margin_right_small"
+		android:layout_marginEnd="@dimen/margin_right_small"
+		android:layout_marginTop="@dimen/margin_top"
+		android:layout_marginBottom="@dimen/margin_bottom"
+		android:gravity="center"
+		android:orientation="vertical">
+
+		<TextView
+			android:id="@+id/name"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:ellipsize="end"
+			android:maxLines="2"
+			android:textAppearance="@style/TextAppearance.AppCompat.Title"
+			tools:text="@string/animators"/>
+
+		<TextView
+			android:id="@+id/subtitle"
+			android:layout_marginTop="2dp"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:ellipsize="end"
+			android:maxLines="4"
+			android:textAppearance="@style/TextAppearance.AppCompat.Small"
+			tools:text="@string/animators_description"/>
+
+	</LinearLayout>
+
+</android.support.v7.widget.CardView>

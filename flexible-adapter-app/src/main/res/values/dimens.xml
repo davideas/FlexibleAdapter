@@ -5,6 +5,7 @@
 	<dimen name="margin_top">16dp</dimen>
 	<dimen name="margin_bottom">16dp</dimen>
 	<dimen name="margin_left">16dp</dimen>
+	<dimen name="margin_left_small">8dp</dimen>
 	<dimen name="margin_right">16dp</dimen>
 	<dimen name="margin_right_small">8dp</dimen>
 	<dimen name="margin_right_handle">22dp</dimen>
@@ -15,6 +16,7 @@
 	<dimen name="butterbar_height">3dp</dimen>
 	<dimen name="toolbar_height">56dp</dimen>
 
+	<dimen name="label_height">150dp</dimen>
 	<dimen name="dialog_padding_vertical">24dp</dimen>
 	<dimen name="dialog_padding_horizontal">24dp</dimen>
 	<dimen name="text_margin">16dp</dimen>
@@ -23,4 +25,5 @@
 	<dimen name="nav_header_vertical_spacing">16dp</dimen>
 	<dimen name="nav_header_height">160dp</dimen>
 	<dimen name="nav_drawer_max_width">300dp</dimen>
+
 </resources>

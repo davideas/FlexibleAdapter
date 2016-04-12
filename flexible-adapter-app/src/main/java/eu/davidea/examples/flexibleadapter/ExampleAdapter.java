@@ -10,12 +10,13 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.davidea.examples.models.ULSItem;
+import eu.davidea.examples.flexibleadapter.models.ULSItem;
+import eu.davidea.examples.flexibleadapter.services.DatabaseService;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 
 /**
- * NOTE: AbstractExampleItem is for example purpose only. I wanted to have in common
+ * NOTE: AbstractModelItem is for example purpose only. I wanted to have in common
  * some Fields and Layout.
  * You, having different Layout for each item type, would use IFlexible or AbstractFlexibleItem
  * as base item to extend this Adapter.

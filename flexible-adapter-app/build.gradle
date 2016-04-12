@@ -36,6 +36,7 @@ dependencies {
 	compile "eu.davidea:flipview:1.1.1"
 
 	compile supportDependencies.appcompat
+	compile supportDependencies.cardview
 	compile (supportDependencies.design) {
 		exclude module: "support-v4"
 		exclude module: "support-annotations"

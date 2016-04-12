@@ -5,17 +5,13 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.flexibleadapter.common.DividerItemDecoration;
-import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
-import eu.davidea.flipview.FlipView;
-import eu.davidea.utils.Utils;
+import eu.davidea.examples.flexibleadapter.services.DatabaseService;
 
 /**
  * A fragment representing a list of Items.
@@ -25,18 +21,14 @@ import eu.davidea.utils.Utils;
  */
 public class FragmentOverall extends Fragment {
 
-	// TODO: Customize parameters
-	private int mColumnCount = 1;
+	private int mColumnCount = 2;
 
-	// TODO: Customize parameter argument names
-	private static final String ARG_COLUMN_COUNT = "column-count";
+	private static final String ARG_COLUMN_COUNT = "column_count";
 
 	private OnListFragmentInteractionListener mListener;
 	private RecyclerView mRecyclerView;
 	private ExampleAdapter mAdapter;
 
-	// TODO: Customize parameter initialization
-	@SuppressWarnings("unused")
 	public static FragmentOverall newInstance(int columnCount) {
 		FragmentOverall fragment = new FragmentOverall();
 		Bundle args = new Bundle();
@@ -70,31 +62,23 @@ public class FragmentOverall extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//Settings for FlipView
-		FlipView.resetLayoutAnimationDelay(true, 1000L);
-
-		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createOverallDatabase();
+		//Create overall items and Initialize RecyclerView
+		DatabaseService.getInstance().createOverallItemsDatabase();
 		initializeRecyclerView(savedInstanceState);
-
-		//Settings for FlipView
-		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
+		//TODO: Create a new Adapter for Overall Items labels only
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAutoCollapseOnExpand(false);
-		mAdapter.setAutoScrollOnExpand(true);
-		mAdapter.setRemoveOrphanHeaders(false);
-		mAdapter.setUnlinkAllItemsOnRemoveHeaders(false);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
-		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+		mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
+		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 			@Override
 			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
@@ -102,18 +86,6 @@ public class FragmentOverall extends Fragment {
 				return true;
 			}
 		});
-		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider));
-
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
-				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
-		//Experimenting NEW features (v5.0.0)
-		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
-		mAdapter.setSwipeEnabled(true);//Enable swipe items
-		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
-		//Add sample item on the top (not belongs to the library)
-		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView, mAdapter);

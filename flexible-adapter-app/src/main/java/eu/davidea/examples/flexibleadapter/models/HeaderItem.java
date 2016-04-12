@@ -1,4 +1,4 @@
-package eu.davidea.examples.models;
+package eu.davidea.examples.flexibleadapter.models;
 
 import android.util.Log;
 import android.view.LayoutInflater;

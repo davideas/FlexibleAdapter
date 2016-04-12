@@ -24,7 +24,7 @@ import eu.davidea.utils.Utils;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class FragmentExpandableMultiLevel extends Fragment {
+public class FragmentAnimators extends Fragment {
 
 	// TODO: Customize parameters
 	private int mColumnCount = 1;
@@ -38,8 +38,8 @@ public class FragmentExpandableMultiLevel extends Fragment {
 
 	// TODO: Customize parameter initialization
 	@SuppressWarnings("unused")
-	public static FragmentExpandableMultiLevel newInstance(int columnCount) {
-		FragmentExpandableMultiLevel fragment = new FragmentExpandableMultiLevel();
+	public static FragmentAnimators newInstance(int columnCount) {
+		FragmentAnimators fragment = new FragmentAnimators();
 		Bundle args = new Bundle();
 		args.putInt(ARG_COLUMN_COUNT, columnCount);
 		fragment.setArguments(args);
@@ -50,7 +50,7 @@ public class FragmentExpandableMultiLevel extends Fragment {
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
 	 */
-	public FragmentExpandableMultiLevel() {
+	public FragmentAnimators() {
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class FragmentExpandableMultiLevel extends Fragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createExpandableMultiLevelDatabase();
+		DatabaseService.getInstance().createAnimatorsDatabase();
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -89,9 +89,9 @@ public class FragmentExpandableMultiLevel extends Fragment {
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
 		mAdapter.setAutoCollapseOnExpand(false);
-		mAdapter.setMinCollapsibleLevel(1);//Auto-collapse only items with level >= 1 (avoid to collapse also sections!)
 		mAdapter.setAutoScrollOnExpand(true);
 		mAdapter.setRemoveOrphanHeaders(false);
+		mAdapter.setUnlinkAllItemsOnRemoveHeaders(false);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
@@ -99,7 +99,7 @@ public class FragmentExpandableMultiLevel extends Fragment {
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 			@Override
 			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!!
+				//NOTE: This allows to receive Payload objects when notifyItemChanged is called by the Adapter!!!
 				return true;
 			}
 		});

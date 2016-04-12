@@ -1,4 +1,4 @@
-package eu.davidea.examples.models;
+package eu.davidea.examples.flexibleadapter.models;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -6,66 +6,91 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
+import eu.davidea.examples.flexibleadapter.models.ExpandableHeaderItem.ExpandableHeaderViewHolder;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.items.AbstractExpandableHeaderItem;
+import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
- * This is an another example (not used in the demo) of how a Section with header can also be
- * expanded/collapsed.<br/>
- * The new object AbstractExpandableHeaderItem is an AbstractExpandableItem that implements IHeader.
+ * This is an experiment to evaluate how a Section with header can also be expanded/collapsed.
+ * <p>Here, it still benefits of the common fields declared in AbstractModelItem.</p>
  * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
  */
-public class ExpandableHeaderItemExample
-		extends AbstractExpandableHeaderItem<ExpandableHeaderItemExample.ExpandableHeaderViewHolder, SubItem>
-		implements Serializable {
+public class ExpandableHeaderItem
+		extends AbstractModelItem<ExpandableHeaderViewHolder>
+		implements IExpandable<ExpandableHeaderViewHolder, SubItem>,
+		IHeader<ExpandableHeaderViewHolder> {
 
 	private static final long serialVersionUID = -1882711111814491060L;
 
-	private String id;
-	private String title;
-	private String subtitle;
+	/* Flags for FlexibleAdapter */
+	private boolean mExpanded = false;
 
-	public ExpandableHeaderItemExample(String id) {
-		super();//Call super to auto-configure the section status as shown, expanded, not selectable
-		this.id = id;
+	/* subItems list */
+	private List<SubItem> mSubItems;
+
+
+	public ExpandableHeaderItem(String id) {
+		super(id);
+		//We start with header shown and expanded
+		setHidden(false);
+		setExpanded(true);
+		//NOT selectable (otherwise ActionMode will be activated on long click)!
+		setSelectable(false);
 	}
 
 	@Override
-	public boolean equals(Object inObject) {
-		if (inObject instanceof ExpandableHeaderItemExample) {
-			ExpandableHeaderItemExample inItem = (ExpandableHeaderItemExample) inObject;
-			return this.id.equals(inItem.id);
+	public boolean isExpanded() {
+		return mExpanded;
+	}
+
+	@Override
+	public void setExpanded(boolean expanded) {
+		mExpanded = expanded;
+	}
+
+	@Override
+	public int getExpansionLevel() {
+		return 0;
+	}
+
+	@Override
+	public List<SubItem> getSubItems() {
+		return mSubItems;
+	}
+
+	public final boolean hasSubItems() {
+		return mSubItems!= null && mSubItems.size() > 0;
+	}
+
+	public boolean removeSubItem(SubItem item) {
+		return item != null && mSubItems.remove(item);
+	}
+
+	public boolean removeSubItem(int position) {
+		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
+			mSubItems.remove(position);
+			return true;
 		}
 		return false;
 	}
 
-	public String getId() {
-		return id;
+	public void addSubItem(SubItem subItem) {
+		if (mSubItems == null)
+			mSubItems = new ArrayList<SubItem>();
+		mSubItems.add(subItem);
 	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getSubtitle() {
-		return subtitle;
-	}
-
-	public void setSubtitle(String subtitle) {
-		this.subtitle = subtitle;
+	public void addSubItem(int position, SubItem subItem) {
+		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
+			mSubItems.add(position, subItem);
+		} else
+			addSubItem(subItem);
 	}
 
 	@Override

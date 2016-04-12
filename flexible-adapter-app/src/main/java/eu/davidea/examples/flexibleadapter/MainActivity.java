@@ -33,12 +33,13 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import eu.davidea.examples.models.AbstractExampleItem;
-import eu.davidea.examples.models.ExpandableItem;
-import eu.davidea.examples.models.ExpandableLevel1Item;
-import eu.davidea.examples.models.HeaderItem;
-import eu.davidea.examples.models.SimpleItem;
-import eu.davidea.examples.models.SubItem;
+import eu.davidea.examples.flexibleadapter.models.AbstractModelItem;
+import eu.davidea.examples.flexibleadapter.models.ExpandableItem;
+import eu.davidea.examples.flexibleadapter.models.ExpandableLevel1Item;
+import eu.davidea.examples.flexibleadapter.models.HeaderItem;
+import eu.davidea.examples.flexibleadapter.models.SimpleItem;
+import eu.davidea.examples.flexibleadapter.models.SubItem;
+import eu.davidea.examples.flexibleadapter.services.DatabaseService;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
@@ -160,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements
 		FlexibleAdapter.enableLogs(true);
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.recycler_view_container,
-				FragmentOverall.newInstance(1)).commit();
+				FragmentAnimators.newInstance(1)).commit();
 
 //		mAdapter = new ExampleAdapter(this);
 //		//Experimenting NEW features (v5.0.0)
@@ -246,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements
 
 				for (int position = 0; position <= mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1; position++) {
 					//Every 3 positions I want to create an expandable
-					AbstractExampleItem item = (position % 3 == 0 ?
+					AbstractModelItem item = (position % 3 == 0 ?
 							DatabaseService.newExpandableItem(position, null) :
 							DatabaseService.newSimpleItem(position, null));
 					//Add only if we don't have it
@@ -291,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements
 		//Handle navigation view item clicks
 		int id = item.getItemId();
 		if (id == R.id.nav_overall) {
-			fragment = FragmentOverall.newInstance(1);
+			fragment = FragmentAnimators.newInstance(1);
 		} else if (id == R.id.nav_headers_and_sections) {
 
 		} else if (id == R.id.nav_selection_modes) {
@@ -375,15 +376,19 @@ public class MainActivity extends AppCompatActivity implements
 		}
 
 		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
-		headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
-		MenuItem headersSticky = menu.findItem(R.id.action_sticky_headers);
-		if (mAdapter.areHeadersShown()) {
-			headersSticky.setVisible(true);
-			headersSticky.setTitle(mAdapter.areHeadersSticky() ? R.string.scroll_headers : R.string.sticky_headers);
-		} else {
-			headersSticky.setVisible(false);
+		if (headersMenuItem != null) {
+			headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
 		}
 
+		MenuItem headersSticky = menu.findItem(R.id.action_sticky_headers);
+		if (headersSticky != null) {
+			if (mAdapter.areHeadersShown()) {
+				headersSticky.setVisible(true);
+				headersSticky.setTitle(mAdapter.areHeadersSticky() ? R.string.scroll_headers : R.string.sticky_headers);
+			} else {
+				headersSticky.setVisible(false);
+			}
+		}
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -406,7 +411,6 @@ public class MainActivity extends AppCompatActivity implements
 					.alpha(0f).setDuration(100)
 					.start();
 		} else {
-
 			//mFab.setVisibility(View.VISIBLE);
 			ViewCompat.animate(mFab)
 					.scaleX(1f).scaleY(1f)
@@ -544,7 +548,7 @@ public class MainActivity extends AppCompatActivity implements
 				assert abstractItem != null;
 				if (!(abstractItem instanceof ExpandableItem) && !(abstractItem instanceof IHeader) &&
 						!(abstractItem instanceof ExpandableLevel1Item)) {
-					//TODO FOR YOU: call your custom Action, for example mCallback.onItemSelected(item.getId());
+					//TODO FOR YOU: call your custom Action
 					String title = extractTitleFrom(abstractItem);
 					EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
 				}
@@ -616,8 +620,8 @@ public class MainActivity extends AppCompatActivity implements
 	public void onTitleModified(int position, String newTitle) {
 		AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
 		assert abstractItem != null;
-		if (abstractItem instanceof AbstractExampleItem) {
-			AbstractExampleItem exampleItem = (AbstractExampleItem) abstractItem;
+		if (abstractItem instanceof AbstractModelItem) {
+			AbstractModelItem exampleItem = (AbstractModelItem) abstractItem;
 			exampleItem.setTitle(newTitle);
 		} else if (abstractItem instanceof HeaderItem) {
 			HeaderItem headerItem = (HeaderItem) abstractItem;
@@ -845,8 +849,8 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private String extractTitleFrom(AbstractFlexibleItem abstractItem) {
-		if (abstractItem instanceof AbstractExampleItem) {
-			AbstractExampleItem exampleItem = (AbstractExampleItem) abstractItem;
+		if (abstractItem instanceof AbstractModelItem) {
+			AbstractModelItem exampleItem = (AbstractModelItem) abstractItem;
 			String title = exampleItem.getTitle();
 			if (exampleItem instanceof ExpandableItem) {
 				ExpandableItem expandableItem = (ExpandableItem) abstractItem;

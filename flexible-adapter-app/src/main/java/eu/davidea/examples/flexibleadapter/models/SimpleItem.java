@@ -1,4 +1,4 @@
-package eu.davidea.examples.models;
+package eu.davidea.examples.flexibleadapter.models;
 
 import android.content.Context;
 import android.util.Log;
@@ -26,7 +26,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SimpleItem extends AbstractExampleItem<SimpleItem.ParentViewHolder>
+public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 		implements ISectionable<SimpleItem.ParentViewHolder, HeaderItem>, IFilterable, Serializable {
 
 	private static final long serialVersionUID = -6882745111884490060L;

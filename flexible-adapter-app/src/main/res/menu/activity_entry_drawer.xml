@@ -7,7 +7,7 @@
 			android:id="@+id/nav_overall"
 			android:checked="true"
 			android:icon="@drawable/ic_view_headline_grey600_24dp"
-			android:title="@string/overall"/>
+			android:title="@string/animators"/>
 		<item
 			android:id="@+id/nav_selection_modes"
 			android:enabled="false"

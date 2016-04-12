@@ -44,8 +44,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 <br/>See the License for the specific language governing permissions and
 limitations under the License.
 ]]></string>
+	<!-- Actions -->
 	<string name="action_search">Search...</string>
-	<string name="undo">Undo</string>
+	<string name="action_settings">Settings</string>
 	<string name="linear_layout">Linear Layout</string>
 	<string name="grid_layout">Grid Layout</string>
 	<string name="reverse_scrolling">Reverse scrolling</string>
@@ -58,19 +59,35 @@ limitations under the License.
 	<string name="hide_headers">Hide Headers</string>
 	<string name="sticky_headers">Sticky Headers</string>
 	<string name="scroll_headers">Scroll Headers</string>
-	<string name="title_activity_entry">EntryActivity</string>
+	<string name="undo">Undo</string>
 
+	<!-- Extras -->
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
 
-	<string name="action_settings">Settings</string>
-
 	<!-- Menu Drawers -->
-	<string name="overall">Overall</string>
+	<string name="animators">Animators</string>
+	<string name="animators_description">Adapter Animation in combination with Item Animation</string>
+
 	<string name="selection_mode">Selection modes</string>
+	<string name="selection_mode_description">Modes: IDLE, SINGLE, MULTI</string>
+
+	<string name="instagram_header">Instagram headers</string>
+	<string name="instagram_header_description">1 (sticky) header for each item</string>
+
 	<string name="headers_sections">Headers and Sections</string>
+	<string name="headers_sections_description">1 (sticky) header for each section</string>
+
 	<string name="expandable">Expandable</string>
+	<string name="expandable_description">List with expandable items</string>
+
 	<string name="multi_level_expandable">Expandable Multi-Level</string>
+	<string name="multi_level_description">Example of 2 levels of expandable</string>
+
 	<string name="expandable_sections">Expandable Sections</string>
+	<string name="expandable_sections_description">Sections with (sticky) headers that can expand/collapse</string>
+
+	<string name="model_holders">Expandable Sections</string>
+	<string name="model_holders_description">Sections with (sticky) headers that can expand/collapse</string>
 
 </resources>

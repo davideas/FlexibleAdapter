@@ -1,4 +1,4 @@
-package eu.davidea.examples.models;
+package eu.davidea.examples.flexibleadapter.models;
 
 import android.support.v7.widget.RecyclerView;
 
@@ -9,8 +9,10 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 /**
  * This class will benefit of the already implemented methods (getter and setters) in
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem}.
+ *
+ * It is used as Base item for all example models.
  */
-public abstract class AbstractExampleItem<VH extends RecyclerView.ViewHolder>
+public abstract class AbstractModelItem<VH extends RecyclerView.ViewHolder>
 		extends AbstractFlexibleItem<VH>
 		implements Serializable {
 
@@ -20,14 +22,14 @@ public abstract class AbstractExampleItem<VH extends RecyclerView.ViewHolder>
 	private String title;
 	private String subtitle;
 
-	public AbstractExampleItem(String id) {
+	public AbstractModelItem(String id) {
 		this.id = id;
 	}
 
 	@Override
 	public boolean equals(Object inObject) {
-		if (inObject instanceof AbstractExampleItem) {
-			AbstractExampleItem inItem = (AbstractExampleItem) inObject;
+		if (inObject instanceof AbstractModelItem) {
+			AbstractModelItem inItem = (AbstractModelItem) inObject;
 			return this.id.equals(inItem.id);
 		}
 		return false;
