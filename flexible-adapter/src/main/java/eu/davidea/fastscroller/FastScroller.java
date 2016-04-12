@@ -303,6 +303,11 @@ public class FastScroller extends FrameLayout {
 	}
 
 	public interface OnScrollStateChangeListener {
+		/**
+		 * Called when scrolling state changes.
+		 *
+		 * @param scrolling true if the user is actively scrolling, false when idle
+		 */
 		void onFastScrollerStateChange(boolean scrolling);
 	}
 
