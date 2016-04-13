@@ -1,5 +1,7 @@
 package eu.davidea.examples.flexibleadapter.services;
 
+import android.content.res.Resources;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,14 +51,35 @@ public class DatabaseService {
 	/* EXAMPLE DATABASE CREATION */
 	/*---------------------------*/
 
-	public void createOverallItemsDatabase() {
-		int i = 0;
-		mItems.add(new OverallItem(i++, R.string.animators)
-				.withDescription(R.string.animators_description)
-				.withIcon(R.drawable.ic_playlist_play_grey600_24dp));
-		mItems.add(new OverallItem(i++, R.string.selection_mode)
-				.withDescription(R.string.selection_mode_description)
-				.withIcon(R.drawable.ic_select_all_grey600_24dp));
+	public void createOverallItemsDatabase(Resources resources) {
+		mItems.clear();
+		mItems.add(new OverallItem(R.id.nav_animators, resources.getString(R.string.animators))
+				.withDescription(resources.getString(R.string.animators_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_playlist_play_grey600_24dp)));
+
+		mItems.add(new OverallItem(R.id.nav_selection_modes, resources.getString(R.string.selection_mode))
+				.withDescription(resources.getString(R.string.selection_mode_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_select_all_grey600_24dp))
+				.withEnabled(false));
+
+		mItems.add(new OverallItem(R.id.nav_headers_and_sections, resources.getString(R.string.headers_sections))
+				.withDescription(resources.getString(R.string.headers_sections_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_view_headline_grey600_24dp))
+				.withEnabled(false));
+
+		mItems.add(new OverallItem(R.id.nav_expandable, resources.getString(R.string.expandable))
+				.withDescription(resources.getString(R.string.expandable_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_view_headline_grey600_24dp))
+				.withEnabled(false));
+
+		mItems.add(new OverallItem(R.id.nav_multi_level_expandable, resources.getString(R.string.multi_level_expandable))
+				.withDescription(resources.getString(R.string.multi_level_expandable_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_view_headline_grey600_24dp)));
+
+		mItems.add(new OverallItem(R.id.nav_expandable_sections, resources.getString(R.string.expandable_sections))
+				.withDescription(resources.getString(R.string.expandable_sections_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_view_headline_grey600_24dp)));
+
 		//TODO: Finish the Overall Items
 	}
 

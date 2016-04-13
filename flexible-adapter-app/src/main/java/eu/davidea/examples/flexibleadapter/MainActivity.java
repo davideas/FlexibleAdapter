@@ -37,6 +37,7 @@ import eu.davidea.examples.flexibleadapter.models.AbstractModelItem;
 import eu.davidea.examples.flexibleadapter.models.ExpandableItem;
 import eu.davidea.examples.flexibleadapter.models.ExpandableLevel1Item;
 import eu.davidea.examples.flexibleadapter.models.HeaderItem;
+import eu.davidea.examples.flexibleadapter.models.OverallItem;
 import eu.davidea.examples.flexibleadapter.models.SimpleItem;
 import eu.davidea.examples.flexibleadapter.models.SubItem;
 import eu.davidea.examples.flexibleadapter.services.DatabaseService;
@@ -45,6 +46,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.utils.Utils;
@@ -61,6 +63,11 @@ public class MainActivity extends AppCompatActivity implements
 	public static final String TAG = MainActivity.class.getSimpleName();
 
 	/**
+	 * Bundle key representing the Active Fragment
+	 */
+	private static final String STATE_ACTIVE_FRAGMENT = "active_fragment";
+
+	/**
 	 * The serialization (saved instance state) Bundle key representing the
 	 * activated item position. Only used on tablets.
 	 */
@@ -75,12 +82,14 @@ public class MainActivity extends AppCompatActivity implements
 	 * RecyclerView and related objects
 	 */
 	private RecyclerView mRecyclerView;
-	private ExampleAdapter mAdapter;
+	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
 	private ActionMode mActionMode;
 	private Snackbar mSnackBar;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private Toolbar mToolbar;
 	private DrawerLayout mDrawer;
+	private NavigationView mNavigationView;
+	private Fragment mFragment;
 	private SearchView mSearchView;
 	private final Handler mSwipeHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
@@ -108,14 +117,14 @@ public class MainActivity extends AppCompatActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		Log.d(TAG, "onCreate");
+		FlexibleAdapter.enableLogs(true);
 
-		//Adapter & RecyclerView
-		initializeRecyclerView(savedInstanceState);
-		//SwipeToRefresh, Toolbar, Drawer & FAB
-		//initializeSwipeToRefresh();
+		//Initialize Toolbar, Drawer & FAB
 		initializeToolbar();
 		initializeDrawer();
 		initializeFab();
+		//Initialize Fragment containing Adapter & RecyclerView
+		initializeFragment(savedInstanceState);
 
 		//With FlexibleAdapter v5.0.0 we don't need to call this function anymore
 		//It is automatically called if Activity implements FlexibleAdapter.OnUpdateListener
@@ -138,8 +147,8 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		Log.v(TAG, "onSaveInstanceState start!");
-
 		mAdapter.onSaveInstanceState(outState);
+		getFragmentManager().putFragment(outState, STATE_ACTIVE_FRAGMENT, mFragment);
 
 		if (mActivatedPosition != AdapterView.INVALID_POSITION) {
 			//Serialize and persist the activated item position.
@@ -150,48 +159,23 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onAdapterChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView, ExampleAdapter adapter) {
+	public void onAdapterChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView) {
 		mRecyclerView = recyclerView;
-		mAdapter = adapter;
+		mAdapter = (FlexibleAdapter) recyclerView.getAdapter();
 		mSwipeRefreshLayout = swipeRefreshLayout;
 		initializeSwipeToRefresh();
 	}
 
-	private void initializeRecyclerView(Bundle savedInstanceState) {
-		FlexibleAdapter.enableLogs(true);
+	private void initializeFragment(Bundle savedInstanceState) {
+		if (savedInstanceState != null) {
+			mFragment = getFragmentManager().getFragment(savedInstanceState, STATE_ACTIVE_FRAGMENT);
+		}
+		if (mFragment == null) {
+			mFragment = FragmentOverall.newInstance(2);
+		}
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.recycler_view_container,
-				FragmentAnimators.newInstance(1)).commit();
-
-//		mAdapter = new ExampleAdapter(this);
-//		//Experimenting NEW features (v5.0.0)
-//		mAdapter.setAnimationOnScrolling(true);
-//		mAdapter.setAnimationOnReverseScrolling(true);
-//		mAdapter.setAutoCollapseOnExpand(false);
-//		mAdapter.setAutoScrollOnExpand(true);
-//		mAdapter.setRemoveOrphanHeaders(false);
-//		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-//		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-//		mRecyclerView.setAdapter(mAdapter);
-//		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-//		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
-//			@Override
-//			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-//				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!!
-//				return true;
-//			}
-//		});
-//		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-//		mRecyclerView.addItemDecoration(new DividerItemDecoration(this, R.drawable.divider));
-//
-//		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-//		mAdapter.setFastScroller((FastScroller) findViewById(R.id.fast_scroller), Utils.getColorAccent(this), this);
-//		//Experimenting NEW features (v5.0.0)
-//		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
-//		mAdapter.setSwipeEnabled(true);//Enable swipe items
-//		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
-//		//Add sample item on the top (not belongs to the library)
-//		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+				mFragment).commit();
 	}
 
 	private void initializeSwipeToRefresh() {
@@ -228,11 +212,12 @@ public class MainActivity extends AppCompatActivity implements
 		mDrawer.addDrawerListener(toggle);
 		toggle.syncState();
 
-		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-		navigationView.setNavigationItemSelectedListener(this);
+		mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+		mNavigationView.setNavigationItemSelectedListener(this);
+		//TODO: select the correct item after the rotation
 
 		//Version
-		TextView appVersion = (TextView) navigationView.getHeaderView(0).findViewById(R.id.app_version);
+		TextView appVersion = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.app_version);
 		appVersion.setText(getString(R.string.about_version,
 				Utils.getVersionName(this),
 				Utils.getVersionCode(this)));
@@ -288,11 +273,12 @@ public class MainActivity extends AppCompatActivity implements
 	@SuppressWarnings("StatementWithEmptyBody")
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item) {
-		Fragment fragment = null;
 		//Handle navigation view item clicks
 		int id = item.getItemId();
 		if (id == R.id.nav_overall) {
-			fragment = FragmentAnimators.newInstance(1);
+			mFragment = FragmentOverall.newInstance(2);
+		} else if (id == R.id.nav_animators) {
+			mFragment = FragmentAnimators.newInstance(1);
 		} else if (id == R.id.nav_headers_and_sections) {
 
 		} else if (id == R.id.nav_selection_modes) {
@@ -300,16 +286,16 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_expandable) {
 
 		} else if (id == R.id.nav_multi_level_expandable) {
-			fragment = FragmentExpandableMultiLevel.newInstance(1);
+			mFragment = FragmentExpandableMultiLevel.newInstance(1);
 		} else if (id == R.id.nav_expandable_sections) {
-			fragment = FragmentExpandableSections.newInstance(1);
+			mFragment = FragmentExpandableSections.newInstance(1);
 		} else if (id == R.id.nav_share) {
 
 		} else if (id == R.id.nav_send) {
 
 		}
 		// Insert the fragment by replacing any existing fragment
-		if (fragment != null) {
+		if (mFragment != null) {
 			//Highlight the selected item has been done by NavigationView
 			item.setChecked(true);
 			//THIS IS VERY IMPORTANT. Because you are going to inflate a new RecyclerView, its
@@ -320,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements
 			mAdapter.onDetachedFromRecyclerView(mRecyclerView);
 			//Inflate the new Fragment with the new RecyclerView and a new Adapter
 			FragmentManager fragmentManager = getFragmentManager();
-			fragmentManager.beginTransaction().replace(R.id.recycler_view_container, fragment).commit();
+			fragmentManager.beginTransaction().replace(R.id.recycler_view_container, mFragment).commit();
 			//Close drawer
 			mDrawer.closeDrawer(GravityCompat.START);
 			mToolbar.setSubtitle(item.getTitle());
@@ -444,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements
 				item.setIcon(R.drawable.ic_view_grid_white_24dp);
 				item.setTitle(R.string.grid_layout);
 			} else {
-				GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+				GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
 				gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 					@Override
 					public int getSpanSize(int position) {
@@ -536,6 +522,14 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onItemClick(int position) {
+		IFlexible flexibleItem = mAdapter.getItem(position);
+		if (flexibleItem instanceof OverallItem) {
+			OverallItem overallItem = (OverallItem) flexibleItem;
+			MenuItem menuItem = mNavigationView.getMenu().findItem(overallItem.getId());
+			onNavigationItemSelected(menuItem);
+			return false;
+		}
+
 		if (mActionMode != null && position != RecyclerView.NO_POSITION) {
 			toggleSelection(position);
 			return true;
@@ -544,12 +538,12 @@ public class MainActivity extends AppCompatActivity implements
 			// that an item has been selected.
 			if (mAdapter.getItemCount() > 0) {
 				if (position != mActivatedPosition) setActivatedPosition(position);
-				AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
-				assert abstractItem != null;
-				if (!(abstractItem instanceof ExpandableItem) && !(abstractItem instanceof IHeader) &&
-						!(abstractItem instanceof ExpandableLevel1Item)) {
+
+				assert flexibleItem != null;
+				if (!(flexibleItem instanceof ExpandableItem) && !(flexibleItem instanceof IHeader) &&
+						!(flexibleItem instanceof ExpandableLevel1Item)) {
 					//TODO FOR YOU: call your custom Action
-					String title = extractTitleFrom(abstractItem);
+					String title = extractTitleFrom(flexibleItem);
 					EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
 				}
 			}
@@ -573,8 +567,8 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemMove(int fromPosition, int toPosition) {
-		AbstractFlexibleItem fromItem = mAdapter.getItem(fromPosition);
-		AbstractFlexibleItem toItem = mAdapter.getItem(toPosition);
+		IFlexible fromItem = mAdapter.getItem(fromPosition);
+		IFlexible toItem = mAdapter.getItem(toPosition);
 		//Don't swap if a Header is involved!!!
 		if (fromItem instanceof ISectionable || toItem instanceof ISectionable) {
 			return;
@@ -587,7 +581,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemSwipe(int position, int direction) {
-		AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
+		IFlexible abstractItem = mAdapter.getItem(position);
 		assert abstractItem != null;
 		//Experimenting NEW feature
 		if (abstractItem.isSelectable())
@@ -848,19 +842,19 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	private String extractTitleFrom(AbstractFlexibleItem abstractItem) {
-		if (abstractItem instanceof AbstractModelItem) {
-			AbstractModelItem exampleItem = (AbstractModelItem) abstractItem;
+	private String extractTitleFrom(IFlexible flexibleItem) {
+		if (flexibleItem instanceof AbstractModelItem) {
+			AbstractModelItem exampleItem = (AbstractModelItem) flexibleItem;
 			String title = exampleItem.getTitle();
 			if (exampleItem instanceof ExpandableItem) {
-				ExpandableItem expandableItem = (ExpandableItem) abstractItem;
+				ExpandableItem expandableItem = (ExpandableItem) flexibleItem;
 				if (expandableItem.getSubItems() != null) {
 					title += "(+" + expandableItem.getSubItems().size() + ")";
 				}
 			}
 			return title;
-		} else if (abstractItem instanceof HeaderItem) {
-			HeaderItem headerItem = (HeaderItem) abstractItem;
+		} else if (flexibleItem instanceof HeaderItem) {
+			HeaderItem headerItem = (HeaderItem) flexibleItem;
 			return headerItem.getTitle();
 		}
 		//We already covered all situations with instanceof

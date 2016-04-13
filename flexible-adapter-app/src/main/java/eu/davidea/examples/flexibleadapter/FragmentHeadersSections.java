@@ -70,11 +70,17 @@ public class FragmentHeadersSections extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
+		//Create New Database and Initialize RecyclerView
+		//DatabaseService.getInstance().createExpandableSectionsDatabase();
+
 		initializeRecyclerView(savedInstanceState);
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
+		//TODO: Working in progress! See FragmentExpandableSections
+
+
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
@@ -107,7 +113,7 @@ public class FragmentHeadersSections extends Fragment {
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView, mAdapter);
+		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
 	}
 
 	@Override

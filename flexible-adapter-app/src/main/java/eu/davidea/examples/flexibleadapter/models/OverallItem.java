@@ -1,42 +1,51 @@
 package eu.davidea.examples.flexibleadapter.models;
 
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StringRes;
-import android.support.v7.widget.RecyclerView;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.List;
 
 import eu.davidea.examples.flexibleadapter.R;
+import eu.davidea.examples.flexibleadapter.models.OverallItem.LabelViewHolder;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Displays Overall example items as label in CardView
+ * Displays Overall example items as label in CardView.
  *
  * @author Davide Steduto
  * @since 12/04/2016
  */
-public class OverallItem extends AbstractFlexibleItem {
+public class OverallItem extends AbstractFlexibleItem<LabelViewHolder> {
 
 	private int id;
-	private int titleResId;
-	private int descriptionResId;
-	private int iconResId;
+	private String title;
+	private String description;
+	private Drawable icon;
 
-	public OverallItem(int id, @StringRes int titleResId) {
+	public OverallItem(int id, String title) {
 		this.id = id;
-		this.titleResId = titleResId;
+		this.title = title;
+		setSelectable(false);
 	}
 
-	public OverallItem withDescription(@StringRes int descriptionResId) {
-		this.descriptionResId = descriptionResId;
+	public OverallItem withDescription(String description) {
+		this.description = description;
 		return this;
 	}
 
-	public OverallItem withIcon(@DrawableRes int iconResId) {
-		this.iconResId = iconResId;
+	public OverallItem withIcon(Drawable icon) {
+		this.icon = icon;
+		return this;
+	}
+
+	public OverallItem withEnabled(boolean enabled) {
+		setEnabled(enabled);
 		return this;
 	}
 
@@ -53,23 +62,78 @@ public class OverallItem extends AbstractFlexibleItem {
 		return id;
 	}
 
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Drawable getIcon() {
+		return icon;
+	}
+
+	public void setIcon(Drawable icon) {
+		this.icon = icon;
+	}
+
 	@Override
 	public int getLayoutRes() {
 		return R.layout.recycler_label;
 	}
 
 	@Override
-	public RecyclerView.ViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		//TODO: createViewHolder
-		return super.createViewHolder(adapter, inflater, parent);
+	public LabelViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new LabelViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, RecyclerView.ViewHolder holder, int position, List payloads) {
-		//TODO: bindViewHolder
-		super.bindViewHolder(adapter, holder, position, payloads);
+	public void bindViewHolder(FlexibleAdapter adapter, LabelViewHolder holder, int position, List payloads) {
+		if (title != null) {
+			holder.mTitle.setText(title);
+			//Appear disabled if item is disabled
+			holder.mTitle.setEnabled(isEnabled());
+		}
+		if (description != null) {
+			holder.mSubtitle.setText(description);
+			holder.mSubtitle.setEnabled(isEnabled());
+		}
+		if (icon != null) {
+			holder.mIcon.setImageDrawable(icon);
+		}
+
+		adapter.animateView(holder.itemView, position, adapter.isSelected(position));
 	}
 
-	//TODO: ViewHolder
+	public static class LabelViewHolder extends FlexibleViewHolder {
+
+		public TextView mTitle;
+		public TextView mSubtitle;
+		public ImageView mIcon;
+
+		public LabelViewHolder(View view, FlexibleAdapter adapter) {
+			super(view, adapter);
+			mTitle = (TextView) view.findViewById(R.id.title);
+			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
+			mIcon = (ImageView) view.findViewById(R.id.label_background);
+		}
+	}
 
 }

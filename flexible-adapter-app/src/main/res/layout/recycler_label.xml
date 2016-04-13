@@ -14,9 +14,8 @@
 		android:id="@+id/label_background"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:paddingLeft="@dimen/label_height"
-		android:paddingStart="@dimen/label_height"
-		android:paddingTop="30dp"
+		android:paddingTop="10dp"
+		android:paddingBottom="10dp"
 		android:alpha="0.1"
 		android:scaleType="fitCenter"
 		tools:src="@drawable/ic_playlist_play_grey600_24dp"/>
@@ -35,11 +34,12 @@
 		android:orientation="vertical">
 
 		<TextView
-			android:id="@+id/name"
+			android:id="@+id/title"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:gravity="center"
 			android:ellipsize="end"
+			android:lines="2"
 			android:maxLines="2"
 			android:textAppearance="@style/TextAppearance.AppCompat.Title"
 			tools:text="@string/animators"/>
@@ -51,7 +51,7 @@
 			android:layout_height="wrap_content"
 			android:gravity="center"
 			android:ellipsize="end"
-			android:maxLines="4"
+			android:maxLines="3"
 			android:textAppearance="@style/TextAppearance.AppCompat.Small"
 			tools:text="@string/animators_description"/>
 

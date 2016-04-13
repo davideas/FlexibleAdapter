@@ -15,6 +15,6 @@ import android.support.v7.widget.RecyclerView;
  */
 public interface OnListFragmentInteractionListener {
 
-	void onAdapterChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView, ExampleAdapter adapter);
+	void onAdapterChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView);
 
 }

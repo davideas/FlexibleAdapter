@@ -66,11 +66,13 @@ limitations under the License.
 	<string name="navigation_drawer_close">Close navigation drawer</string>
 
 	<!-- Menu Drawers -->
+	<string name="overall">Overall</string>
+
 	<string name="animators">Animators</string>
 	<string name="animators_description">Adapter Animation in combination with Item Animation</string>
 
 	<string name="selection_mode">Selection modes</string>
-	<string name="selection_mode_description">Modes: IDLE, SINGLE, MULTI</string>
+	<string name="selection_mode_description">IDLE, SINGLE, MULTI</string>
 
 	<string name="instagram_header">Instagram headers</string>
 	<string name="instagram_header_description">1 (sticky) header for each item</string>
@@ -82,7 +84,7 @@ limitations under the License.
 	<string name="expandable_description">List with expandable items</string>
 
 	<string name="multi_level_expandable">Expandable Multi-Level</string>
-	<string name="multi_level_description">Example of 2 levels of expandable</string>
+	<string name="multi_level_expandable_description">Example of 2 levels of expandable</string>
 
 	<string name="expandable_sections">Expandable Sections</string>
 	<string name="expandable_sections_description">Sections with (sticky) headers that can expand/collapse</string>

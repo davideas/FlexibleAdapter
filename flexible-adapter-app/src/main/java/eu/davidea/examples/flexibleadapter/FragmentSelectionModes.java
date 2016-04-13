@@ -75,6 +75,9 @@ public class FragmentSelectionModes extends Fragment {
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
+		//TODO: Working in progress!
+
+
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
@@ -107,7 +110,7 @@ public class FragmentSelectionModes extends Fragment {
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView, mAdapter);
+		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
 	}
 
 	@Override

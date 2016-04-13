@@ -27,7 +27,7 @@ public class FragmentOverall extends Fragment {
 
 	private OnListFragmentInteractionListener mListener;
 	private RecyclerView mRecyclerView;
-	private ExampleAdapter mAdapter;
+	private OverallAdapter mAdapter;
 
 	public static FragmentOverall newInstance(int columnCount) {
 		FragmentOverall fragment = new FragmentOverall();
@@ -63,19 +63,18 @@ public class FragmentOverall extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		//Create overall items and Initialize RecyclerView
-		DatabaseService.getInstance().createOverallItemsDatabase();
+		DatabaseService.getInstance().createOverallItemsDatabase(getActivity().getResources());
 		initializeRecyclerView(savedInstanceState);
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//TODO: Create a new Adapter for Overall Items labels only
-		mAdapter = new ExampleAdapter(getActivity());
+		mAdapter = new OverallAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
-		mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+		mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mColumnCount));
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
@@ -88,7 +87,7 @@ public class FragmentOverall extends Fragment {
 		});
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView, mAdapter);
+		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
 	}
 
 	@Override
