@@ -345,7 +345,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 		if (mMaxChildViews < mRecyclerView.getChildCount())
 			mMaxChildViews = mRecyclerView.getChildCount();
 
-		if (numberOfItemsOnScreen < numberOfAnimatedItems || //Normal Forward scrolling after max itemOnScreen is reached
+		if (numberOfItemsOnScreen == 0 || numberOfItemsOnScreen < numberOfAnimatedItems || //Normal Forward scrolling after max itemOnScreen is reached
 				(firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews) || //Reverse scrolling
 				(position > mMaxChildViews && firstVisiblePosition == -1 && mRecyclerView.getChildCount() == 0)) { //Reverse scrolling and click on FastScroller
 			delay = mStepDelay;
