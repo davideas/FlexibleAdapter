@@ -57,9 +57,14 @@ public class DatabaseService {
 				.withDescription(resources.getString(R.string.animators_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_playlist_play_grey600_24dp)));
 
-		mItems.add(new OverallItem(R.id.nav_selection_modes, resources.getString(R.string.selection_mode))
-				.withDescription(resources.getString(R.string.selection_mode_description))
+		mItems.add(new OverallItem(R.id.nav_selection_modes, resources.getString(R.string.selection_modes))
+				.withDescription(resources.getString(R.string.selection_modes_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_select_all_grey600_24dp))
+				.withEnabled(false));
+
+		mItems.add(new OverallItem(R.id.nav_instagram_headers, resources.getString(R.string.instagram_header))
+				.withDescription(resources.getString(R.string.instagram_header_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_instagram_grey600_24dp))
 				.withEnabled(false));
 
 		mItems.add(new OverallItem(R.id.nav_headers_and_sections, resources.getString(R.string.headers_sections))
@@ -69,18 +74,16 @@ public class DatabaseService {
 
 		mItems.add(new OverallItem(R.id.nav_expandable, resources.getString(R.string.expandable))
 				.withDescription(resources.getString(R.string.expandable_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_view_headline_grey600_24dp))
+				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp))
 				.withEnabled(false));
 
 		mItems.add(new OverallItem(R.id.nav_multi_level_expandable, resources.getString(R.string.multi_level_expandable))
 				.withDescription(resources.getString(R.string.multi_level_expandable_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_view_headline_grey600_24dp)));
+				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));
 
 		mItems.add(new OverallItem(R.id.nav_expandable_sections, resources.getString(R.string.expandable_sections))
 				.withDescription(resources.getString(R.string.expandable_sections_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_view_headline_grey600_24dp)));
-
-		//TODO: Finish the Overall Items
+				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));
 	}
 
 	public void createAnimatorsDatabase() {

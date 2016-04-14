@@ -279,6 +279,8 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentOverall.newInstance(2);
 		} else if (id == R.id.nav_animators) {
 			mFragment = FragmentAnimators.newInstance(1);
+		} else if (id == R.id.nav_instagram_headers) {
+
 		} else if (id == R.id.nav_headers_and_sections) {
 
 		} else if (id == R.id.nav_selection_modes) {
@@ -289,9 +291,16 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentExpandableMultiLevel.newInstance(1);
 		} else if (id == R.id.nav_expandable_sections) {
 			mFragment = FragmentExpandableSections.newInstance(1);
-		} else if (id == R.id.nav_share) {
-
-		} else if (id == R.id.nav_send) {
+		} else if (id == R.id.nav_about) {
+			MessageDialog.newInstance(
+					R.drawable.ic_info_grey600_24dp,
+					getString(R.string.about_title),
+					getString(R.string.about_body,
+							Utils.getVersionName(this),
+							Utils.getVersionCode(this)))
+					.show(getFragmentManager(), MessageDialog.TAG);
+			return true;
+		} else if (id == R.id.nav_github) {
 
 		}
 		// Insert the fragment by replacing any existing fragment
@@ -415,16 +424,7 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
-		if (id == R.id.action_about) {
-			MessageDialog.newInstance(
-					R.drawable.ic_info_grey600_24dp,
-					getString(R.string.about_title),
-					getString(R.string.about_body,
-							Utils.getVersionName(this),
-							Utils.getVersionCode(this)))
-					.show(getFragmentManager(), MessageDialog.TAG);
-			return true;
-		} else if (id == R.id.action_list_type) {
+		if (id == R.id.action_list_type) {
 			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 				mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this));
 				item.setIcon(R.drawable.ic_view_grid_white_24dp);
