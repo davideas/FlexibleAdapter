@@ -64,22 +64,22 @@
 	<string name="expandable_sections">Expandable Sections</string>
 	<string name="expandable_sections_description">Sections with (sticky) headers that can expand/collapse</string>
 
-	<!--<string name="model_holders">Item Model Holder</string>-->
-	<!--<string name="model_holders_description">A representation of FlexibleItems holding the model object (check the code).</string>-->
+	<string name="model_holders">Item Model Holder</string>
+	<string name="model_holders_description">A representation of FlexibleItems holding the model object (check the code).</string>
 
-	<!--<string name="draggable">Draggable</string>-->
-	<!--<string name="draggable_description">Drag and Move</string>-->
+	<string name="draggable">Draggable</string>
+	<string name="draggable_description">Drag and Move</string>
 
-	<!--<string name="draggable_expandable">Draggable with Expandable</string>-->
-	<!--<string name="draggable_expandable_description">Drag and Move</string>&lt;!&ndash; TODO: with Draggable Coherence (DC) &ndash;&gt;-->
+	<string name="draggable_expandable">Draggable with Expandable</string>
+	<string name="draggable_expandable_description">Drag and Move</string><!-- TODO: with Draggable Coherence (DC) -->
 
-	<!--<string name="swipeable">Swipeable</string>-->
-	<!--<string name="swipeable_description">Swipeable items with Swipe-To-Delete</string>&lt;!&ndash; TODO: Custom-2nd-View &ndash;&gt;-->
+	<string name="swipeable">Swipeable</string>
+	<string name="swipeable_description">Swipeable items with Swipe-To-Delete</string><!-- TODO: Custom-2nd-View -->
 
-	<!--<string name="horizontal">Horizontal Linear Layout</string>-->
+	<string name="horizontal">Horizontal Linear Layout</string>
 	<!--<string name="horizontal_description"></string>-->
 
-	<!--<string name="staggered">Staggered Layout</string>-->
+	<string name="staggered">Staggered Layout</string>
 	<!--<string name="staggered_description"></string>-->
 
 	<!-- About -->

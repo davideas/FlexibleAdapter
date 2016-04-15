@@ -1,4 +1,4 @@
-package eu.davidea.examples.flexibleadapter;
+package eu.davidea.examples.flexibleadapter.fragments;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +13,7 @@ import android.support.v7.widget.RecyclerView;
  * "http://developer.android.com/training/basics/fragments/communicating.html"
  * >Communicating with Other Fragments</a> for more information.
  */
-public interface OnListFragmentInteractionListener {
+public interface OnFragmentInteractionListener {
 
 	void onAdapterChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView);
 

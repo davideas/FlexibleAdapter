@@ -29,10 +29,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import eu.davidea.examples.flexibleadapter.fragments.FragmentAnimators;
+import eu.davidea.examples.flexibleadapter.fragments.FragmentExpandableMultiLevel;
+import eu.davidea.examples.flexibleadapter.fragments.FragmentExpandableSections;
+import eu.davidea.examples.flexibleadapter.fragments.FragmentOverall;
+import eu.davidea.examples.flexibleadapter.fragments.OnFragmentInteractionListener;
 import eu.davidea.examples.flexibleadapter.models.AbstractModelItem;
 import eu.davidea.examples.flexibleadapter.models.ExpandableItem;
 import eu.davidea.examples.flexibleadapter.models.ExpandableLevel1Item;
@@ -48,9 +52,9 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
-import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.utils.Utils;
 
+@SuppressWarnings("ConstantConditions")
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener, SearchView.OnQueryTextListener,
 		FlexibleAdapter.OnUpdateListener, FlexibleAdapter.OnDeleteCompleteListener,
@@ -58,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements
 		FlexibleAdapter.OnItemMoveListener, FlexibleAdapter.OnItemSwipeListener,
 		FastScroller.OnScrollStateChangeListener,
 		NavigationView.OnNavigationItemSelectedListener,
-		OnListFragmentInteractionListener {
+		OnFragmentInteractionListener {
 
 	public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -68,15 +72,9 @@ public class MainActivity extends AppCompatActivity implements
 	private static final String STATE_ACTIVE_FRAGMENT = "active_fragment";
 
 	/**
-	 * The serialization (saved instance state) Bundle key representing the
-	 * activated item position. Only used on tablets.
+	 * FAB
 	 */
-	private static final String STATE_ACTIVATED_POSITION = "activated_position";
-
-	/**
-	 * The current activated item position.
-	 */
-	private int mActivatedPosition = RecyclerView.NO_POSITION;
+	private FloatingActionButton mFab;
 
 	/**
 	 * RecyclerView and related objects
@@ -107,10 +105,7 @@ public class MainActivity extends AppCompatActivity implements
 			}
 		}
 	});
-	/**
-	 * FAB
-	 */
-	private FloatingActionButton mFab;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -138,9 +133,6 @@ public class MainActivity extends AppCompatActivity implements
 				mActionMode = startSupportActionMode(this);
 				setContextTitle(mAdapter.getSelectedItemCount());
 			}
-			//Previously serialized activated item position
-			if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
-				setSelection(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 		}
 	}
 
@@ -149,12 +141,6 @@ public class MainActivity extends AppCompatActivity implements
 		Log.v(TAG, "onSaveInstanceState start!");
 		mAdapter.onSaveInstanceState(outState);
 		getFragmentManager().putFragment(outState, STATE_ACTIVE_FRAGMENT, mFragment);
-
-		if (mActivatedPosition != AdapterView.INVALID_POSITION) {
-			//Serialize and persist the activated item position.
-			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
-			Log.d(TAG, STATE_ACTIVATED_POSITION + "=" + mActivatedPosition);
-		}
 		super.onSaveInstanceState(outState);
 	}
 
@@ -501,25 +487,6 @@ public class MainActivity extends AppCompatActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 
-	//TODO: Include setActivatedPosition in the library?
-	public void setSelection(final int position) {
-		if (mAdapter.getMode() == FlexibleAdapter.MODE_SINGLE) {
-			Log.v(TAG, "setSelection called!");
-			setActivatedPosition(position);
-			mRecyclerView.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					mRecyclerView.smoothScrollToPosition(position);
-				}
-			}, 1000L);
-		}
-	}
-
-	private void setActivatedPosition(int position) {
-		Log.d(TAG, "ItemList New mActivatedPosition=" + position);
-		mActivatedPosition = position;
-	}
-
 	@Override
 	public boolean onItemClick(int position) {
 		IFlexible flexibleItem = mAdapter.getItem(position);
@@ -537,9 +504,6 @@ public class MainActivity extends AppCompatActivity implements
 			//Notify the active callbacks (ie. the activity, if the fragment is attached to one)
 			// that an item has been selected.
 			if (mAdapter.getItemCount() > 0) {
-				if (position != mActivatedPosition) setActivatedPosition(position);
-
-				assert flexibleItem != null;
 				if (!(flexibleItem instanceof ExpandableItem) && !(flexibleItem instanceof IHeader) &&
 						!(flexibleItem instanceof ExpandableLevel1Item)) {
 					//TODO FOR YOU: call your custom Action
@@ -570,9 +534,9 @@ public class MainActivity extends AppCompatActivity implements
 		IFlexible fromItem = mAdapter.getItem(fromPosition);
 		IFlexible toItem = mAdapter.getItem(toPosition);
 		//Don't swap if a Header is involved!!!
-		if (fromItem instanceof ISectionable || toItem instanceof ISectionable) {
-			return;
-		}
+//		if (fromItem instanceof ISectionable || toItem instanceof ISectionable) {
+//			return;
+//		}
 		//FIXME: this doesn't work with all types of items (of course)..... we need to implement some custom logic
 //		DatabaseService.getInstance().swapItem(
 //				DatabaseService.getInstance().getListById().indexOf(fromItem),

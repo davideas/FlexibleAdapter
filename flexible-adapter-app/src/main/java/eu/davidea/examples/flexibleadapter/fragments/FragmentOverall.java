@@ -1,33 +1,31 @@
-package eu.davidea.examples.flexibleadapter;
+package eu.davidea.examples.flexibleadapter.fragments;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.Menu;
+import android.view.MenuInflater;
 
+import eu.davidea.examples.flexibleadapter.OverallAdapter;
+import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.examples.flexibleadapter.services.DatabaseService;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * A fragment representing a list of Examples for FlexibleAdapter displayed with GridLayout.
+ * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class FragmentOverall extends Fragment {
+public class FragmentOverall extends AbstractFragment {
 
-	private int mColumnCount = 2;
+	public static final String TAG = FragmentOverall.class.getSimpleName();
 
-	private static final String ARG_COLUMN_COUNT = "column_count";
-
-	private OnListFragmentInteractionListener mListener;
-	private RecyclerView mRecyclerView;
+	/**
+	 * Custom implementation of FlexibleAdapter
+	 */
 	private OverallAdapter mAdapter;
+
 
 	public static FragmentOverall newInstance(int columnCount) {
 		FragmentOverall fragment = new FragmentOverall();
@@ -42,21 +40,6 @@ public class FragmentOverall extends Fragment {
 	 * fragment (e.g. upon screen orientation changes).
 	 */
 	public FragmentOverall() {
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		if (getArguments() != null) {
-			mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-		}
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_recycler_view, container, false);
 	}
 
 	@Override
@@ -91,21 +74,8 @@ public class FragmentOverall extends Fragment {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		if (activity instanceof OnListFragmentInteractionListener) {
-			mListener = (OnListFragmentInteractionListener) activity;
-		} else {
-			throw new RuntimeException(activity.toString()
-					+ " must implement OnListFragmentInteractionListener");
-		}
-	}
-
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		mListener = null;
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 }

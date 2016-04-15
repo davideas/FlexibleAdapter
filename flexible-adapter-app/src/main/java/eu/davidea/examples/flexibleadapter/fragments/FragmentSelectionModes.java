@@ -1,40 +1,50 @@
-package eu.davidea.examples.flexibleadapter;
+package eu.davidea.examples.flexibleadapter.fragments;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.util.Log;
+import android.widget.AdapterView;
 
+import eu.davidea.examples.flexibleadapter.ExampleAdapter;
+import eu.davidea.examples.flexibleadapter.MainActivity;
+import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.utils.Utils;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class FragmentSelectionModes extends Fragment {
+public class FragmentSelectionModes extends AbstractFragment
+	implements FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
 
-	// TODO: Customize parameters
-	private int mColumnCount = 1;
+	public static final String TAG = FragmentSelectionModes.class.getSimpleName();
 
-	// TODO: Customize parameter argument names
-	private static final String ARG_COLUMN_COUNT = "column-count";
+	/**
+	 * The serialization (saved instance state) Bundle key representing the
+	 * activated item position. Only used on tablets.
+	 */
+	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
-	private OnListFragmentInteractionListener mListener;
-	private RecyclerView mRecyclerView;
+	/**
+	 * The current activated item position.
+	 */
+	private int mActivatedPosition = RecyclerView.NO_POSITION;
+
+	/**
+	 * Custom implementation of FlexibleAdapter
+	 */
 	private ExampleAdapter mAdapter;
 
-	// TODO: Customize parameter initialization
+
 	@SuppressWarnings("unused")
 	public static FragmentSelectionModes newInstance(int columnCount) {
 		FragmentSelectionModes fragment = new FragmentSelectionModes();
@@ -55,15 +65,11 @@ public class FragmentSelectionModes extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (getArguments() != null) {
-			mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+		if (savedInstanceState != null) {
+			//Previously serialized activated item position
+			if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
+				setSelection(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 		}
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_recycler_view, container, false);
 	}
 
 	@Override
@@ -113,22 +119,62 @@ public class FragmentSelectionModes extends Fragment {
 		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
 	}
 
-	@Override
-	@SuppressWarnings("deprecation")
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		if (activity instanceof OnListFragmentInteractionListener) {
-			mListener = (OnListFragmentInteractionListener) activity;
-		} else {
-			throw new RuntimeException(activity.toString()
-					+ " must implement OnListFragmentInteractionListener");
+	//TODO: Include setActivatedPosition in the library?
+	public void setSelection(final int position) {
+		if (mAdapter.getMode() == FlexibleAdapter.MODE_SINGLE) {
+			Log.v(TAG, "setSelection called!");
+			setActivatedPosition(position);
+			mRecyclerView.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mRecyclerView.smoothScrollToPosition(position);
+				}
+			}, 1000L);
 		}
 	}
 
+	private void setActivatedPosition(int position) {
+		Log.d(TAG, "ItemList New mActivatedPosition=" + position);
+		mActivatedPosition = position;
+	}
+
+	/**
+	 * Called when single tap occurs.
+	 * <p>Delegates the click event to the listener and checks if selection MODE if
+	 * SINGLE or MULTI is enabled in order to activate the ItemView.</p>
+	 * For Expandable Views it will toggle the Expansion if configured so.
+	 *
+	 * @param position the adapter position of the item clicked
+	 * @return true if the click should activate the ItemView, false for no change.
+	 */
 	@Override
-	public void onDetach() {
-		super.onDetach();
-		mListener = null;
+	public boolean onItemClick(int position) {
+		if (position != mActivatedPosition) setActivatedPosition(position);
+		return true;
+	}
+
+	/**
+	 * Called when long tap occurs.
+	 * <p>This method always calls
+	 * {@link FlexibleViewHolder#toggleActivation}
+	 * after listener event is consumed in order to activate the ItemView.</p>
+	 * For Expandable Views it will collapse the View if configured so.
+	 *
+	 * @param position the adapter position of the item clicked
+	 */
+	@Override
+	public void onItemLongClick(int position) {
+
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		if (mActivatedPosition != AdapterView.INVALID_POSITION) {
+			//Serialize and persist the activated item position.
+			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+			Log.d(TAG, STATE_ACTIVATED_POSITION + "=" + mActivatedPosition);
+		}
+		super.onSaveInstanceState(outState);
 	}
 
 }
