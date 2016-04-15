@@ -84,6 +84,11 @@ public class DatabaseService {
 		mItems.add(new OverallItem(R.id.nav_expandable_sections, resources.getString(R.string.expandable_sections))
 				.withDescription(resources.getString(R.string.expandable_sections_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));
+
+		mItems.add(new OverallItem(R.id.nav_model_holders, resources.getString(R.string.model_holders))
+				.withDescription(resources.getString(R.string.model_holders_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_select_inverse_grey600_24dp))
+				.withEnabled(false));
 	}
 
 	public void createAnimatorsDatabase() {

@@ -25,7 +25,7 @@
 		<item
 			android:id="@+id/nav_headers_and_sections"
 			android:enabled="false"
-			android:icon="@drawable/ic_view_headline_grey600_24dp"
+			android:icon="@drawable/ic_sections_grey600_24dp"
 			android:title="@string/headers_sections"/>
 		<item
 			android:id="@+id/nav_expandable"
@@ -40,6 +40,37 @@
 			android:id="@+id/nav_expandable_sections"
 			android:icon="@drawable/ic_expandable_grey_600_24dp"
 			android:title="@string/expandable_sections"/>
+		<item
+			android:id="@+id/nav_model_holders"
+			android:enabled="false"
+			android:icon="@drawable/ic_select_inverse_grey600_24dp"
+			android:title="@string/expandable_sections"/>
+		<item
+			android:id="@+id/nav_draggable"
+			android:enabled="false"
+			android:icon="@drawable/ic_swap_vert_grey600_24dp"
+			android:title="@string/expandable_sections"/>
+		<item
+			android:id="@+id/nav_draggable_expandable"
+			android:enabled="false"
+			android:icon="@drawable/ic_swap_vert_grey600_24dp"
+			android:title="@string/expandable_sections"/>
+		<item
+			android:id="@+id/nav_swipeable"
+			android:enabled="false"
+			android:icon="@drawable/ic_swap_horiz_grey600_24dp"
+			android:title="@string/expandable_sections"/>
+		<item
+			android:id="@+id/nav_horizontal"
+			android:enabled="false"
+			android:icon="@drawable/ic_view_column_grey600_24dp"
+			android:title="@string/expandable_sections"/>
+		<item
+			android:id="@+id/nav_staggered"
+			android:enabled="false"
+			android:icon="@drawable/ic_dashboard_grey600_24dp"
+			android:title="@string/expandable_sections"/>
+
 	</group>
 
 	<item android:title="Options">
