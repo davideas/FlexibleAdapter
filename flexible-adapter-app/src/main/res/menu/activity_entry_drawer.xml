@@ -18,16 +18,6 @@
 			android:icon="@drawable/ic_select_all_grey600_24dp"
 			android:title="@string/selection_modes"/>
 		<item
-			android:id="@+id/nav_instagram_headers"
-			android:enabled="false"
-			android:icon="@drawable/ic_instagram_grey600_24dp"
-			android:title="@string/instagram_header"/>
-		<item
-			android:id="@+id/nav_headers_and_sections"
-			android:enabled="false"
-			android:icon="@drawable/ic_sections_grey600_24dp"
-			android:title="@string/headers_sections"/>
-		<item
 			android:id="@+id/nav_expandable"
 			android:enabled="false"
 			android:icon="@drawable/ic_expandable_grey_600_24dp"
@@ -40,6 +30,16 @@
 			android:id="@+id/nav_expandable_sections"
 			android:icon="@drawable/ic_expandable_grey_600_24dp"
 			android:title="@string/expandable_sections"/>
+		<item
+			android:id="@+id/nav_headers_and_sections"
+			android:enabled="false"
+			android:icon="@drawable/ic_sections_grey600_24dp"
+			android:title="@string/headers_sections"/>
+		<item
+			android:id="@+id/nav_instagram_headers"
+			android:enabled="false"
+			android:icon="@drawable/ic_instagram_grey600_24dp"
+			android:title="@string/instagram_headers"/>
 		<item
 			android:id="@+id/nav_model_holders"
 			android:enabled="false"
@@ -60,34 +60,38 @@
 			android:enabled="false"
 			android:icon="@drawable/ic_swap_horiz_grey600_24dp"
 			android:title="@string/swipeable"/>
-		<item
-			android:id="@+id/nav_horizontal"
-			android:enabled="false"
-			android:icon="@drawable/ic_view_column_grey600_24dp"
-			android:title="@string/horizontal"/>
-		<item
-			android:id="@+id/nav_staggered"
-			android:enabled="false"
-			android:icon="@drawable/ic_dashboard_grey600_24dp"
-			android:title="@string/staggered"/>
+
+		<item android:title="@string/special_layouts">
+			<menu>
+				<item
+					android:id="@+id/nav_horizontal"
+					android:enabled="false"
+					android:icon="@drawable/ic_view_column_grey600_24dp"
+					android:title="@string/horizontal"/>
+				<item
+					android:id="@+id/nav_staggered"
+					android:enabled="false"
+					android:icon="@drawable/ic_dashboard_grey600_24dp"
+					android:title="@string/staggered"/>
+			</menu>
+		</item>
 
 	</group>
 
-	<item android:title="Options">
-		<menu>
-			<item
-				android:id="@+id/nav_switch"
-				android:enabled="false"
-				android:title="Grid Layout"
-				app:actionLayout="@layout/action_view_switch"/>
-		</menu>
-	</item>
+	<!--<item android:title="Options">-->
+		<!--<menu>-->
+			<!--<item-->
+				<!--android:id="@+id/nav_switch"-->
+				<!--android:enabled="false"-->
+				<!--android:title="Grid Layout"-->
+				<!--app:actionLayout="@layout/action_view_switch"/>-->
+		<!--</menu>-->
+	<!--</item>-->
 
 	<item android:title="@string/about_title">
 		<menu>
 			<item
 				android:id="@+id/nav_about"
-				android:enabled="false"
 				android:icon="@drawable/ic_info_grey600_24dp"
 				android:title="@string/about_title"/>
 			<item

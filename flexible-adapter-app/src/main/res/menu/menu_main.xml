@@ -11,10 +11,10 @@
 		  android:animateLayoutChanges="true"
 		  app:actionViewClass="android.support.v7.widget.SearchView"/>
 
-	<item android:id="@+id/action_list_type"
-	      android:title="@string/grid_layout"
-	      android:icon="@drawable/ic_view_grid_white_24dp"
-	      app:showAsAction="always"/>
+	<!--<item android:id="@+id/action_list_type"-->
+	      <!--android:title="@string/grid_layout"-->
+	      <!--android:icon="@drawable/ic_view_grid_white_24dp"-->
+	      <!--app:showAsAction="always"/>-->
 
 	<item android:id="@+id/action_reverse"
 	      android:title="@string/forward_scrolling"

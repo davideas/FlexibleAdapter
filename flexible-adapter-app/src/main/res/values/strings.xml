@@ -41,19 +41,13 @@
 
 	<!-- Menu Drawers -->
 	<string name="overall">Overall</string>
-	<!--<string name="overall_description"></string>-->
+	<!--<string name="overall_description">Examples may have options where available to enable/disable: (1) Filter (2) FastScroller (3) Grid Layout (4) Sticky Headers</string>-->
 
 	<string name="animators">Animators</string>
 	<string name="animators_description">Adapter Animation</string><!-- TODO: in combination with Item Animation -->
 
 	<string name="selection_modes">Selection modes</string>
 	<string name="selection_modes_description">IDLE, SINGLE, MULTI</string>
-
-	<string name="instagram_header">Instagram headers</string>
-	<string name="instagram_header_description">1 (sticky) clickable header for each item</string>
-
-	<string name="headers_sections">Headers and Sections</string>
-	<string name="headers_sections_description">1 (sticky) header for each section</string>
 
 	<string name="expandable">Expandable</string>
 	<string name="expandable_description">List with expandable items with Selection Coherence (SC) and Filter (F)</string>
@@ -63,6 +57,12 @@
 
 	<string name="expandable_sections">Expandable Sections</string>
 	<string name="expandable_sections_description">Sections with (sticky) headers that can expand/collapse</string>
+
+	<string name="headers_sections">Headers and Sections</string>
+	<string name="headers_sections_description">1 (sticky) header for each section</string>
+
+	<string name="instagram_headers">Instagram headers</string>
+	<string name="instagram_headers_description">1 (sticky) clickable header for each item</string>
 
 	<string name="model_holders">Item Model Holder</string>
 	<string name="model_holders_description">A representation of FlexibleItems holding the model object (check the code).</string>
@@ -76,9 +76,9 @@
 	<string name="swipeable">Swipeable</string>
 	<string name="swipeable_description">Swipeable items with Swipe-To-Delete</string><!-- TODO: Custom-2nd-View -->
 
-	<string name="horizontal">Horizontal Linear Layout</string>
+	<string name="special_layouts">Special Layouts</string>
+	<string name="horizontal">Horizontal Layout</string>
 	<!--<string name="horizontal_description"></string>-->
-
 	<string name="staggered">Staggered Layout</string>
 	<!--<string name="staggered_description"></string>-->
 
