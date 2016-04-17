@@ -14,6 +14,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -82,10 +83,16 @@ public class FastScroller extends FrameLayout {
 		setClipChildren(false);
 	}
 
-	public void setRecyclerView(RecyclerView recyclerView) {
+	public void setRecyclerView(final RecyclerView recyclerView) {
 		this.recyclerView = recyclerView;
 		this.recyclerView.addOnScrollListener(onScrollListener);
-		this.layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+		this.recyclerView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
+			@Override
+			public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+				Log.d("FastScroller", "onLayoutChange");
+				layoutManager = (LinearLayoutManager) FastScroller.this.recyclerView.getLayoutManager();
+			}
+		});
 
 		if (recyclerView.getAdapter() instanceof  BubbleTextCreator)
 			this.bubbleTextCreator = (BubbleTextCreator) recyclerView.getAdapter();
