@@ -89,7 +89,7 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 		holder.mSubtitle.setText(subTitle);
 	}
 
-	public static class HeaderViewHolder extends FlexibleViewHolder {
+	static class HeaderViewHolder extends FlexibleViewHolder {
 
 		public TextView mTitle;
 		public TextView mSubtitle;

@@ -3,6 +3,7 @@ package eu.davidea.examples.flexibleadapter.fragments;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -119,6 +120,27 @@ public class FragmentSelectionModes extends AbstractFragment
 		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
 	}
 
+	@Override
+	protected GridLayoutManager createNewGridLayoutManager() {
+		GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), mColumnCount);
+		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+			@Override
+			public int getSpanSize(int position) {
+				//NOTE: If you use simple integer to identify the ViewType,
+				//here, you should use them and not Layout integers
+				switch (mAdapter.getItemViewType(position)) {
+					case R.layout.recycler_uls_row:
+					case R.layout.recycler_header_row:
+					case R.layout.recycler_expandable_row:
+						return mColumnCount;
+					default:
+						return 1;
+				}
+			}
+		});
+		return gridLayoutManager;
+	}
+
 	//TODO: Include setActivatedPosition in the library?
 	public void setSelection(final int position) {
 		if (mAdapter.getMode() == FlexibleAdapter.MODE_SINGLE) {
@@ -164,7 +186,7 @@ public class FragmentSelectionModes extends AbstractFragment
 	 */
 	@Override
 	public void onItemLongClick(int position) {
-
+		//TODO: Handling ActionMode
 	}
 
 	@Override

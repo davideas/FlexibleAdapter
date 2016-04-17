@@ -3,8 +3,13 @@ package eu.davidea.examples.flexibleadapter.fragments;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import eu.davidea.examples.flexibleadapter.ExampleAdapter;
 import eu.davidea.examples.flexibleadapter.MainActivity;
@@ -62,10 +67,6 @@ public class FragmentAnimators  extends AbstractFragment {
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAutoCollapseOnExpand(false);
-		mAdapter.setAutoScrollOnExpand(true);
-		mAdapter.setRemoveOrphanHeaders(false);
-		mAdapter.setUnlinkAllItemsOnRemoveHeaders(false);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
@@ -87,11 +88,54 @@ public class FragmentAnimators  extends AbstractFragment {
 		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
 		mAdapter.setSwipeEnabled(true);//Enable swipe items
 		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
+		//mAdapter.enableStickyHeaders();//Headers are sticky
 		//Add sample item on the top (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
+	}
+
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		Log.v(TAG, "onCreateOptionsMenu called!");
+		inflater.inflate(R.menu.menu_animators, menu);
+		mListener.initSearchView(menu);
+	}
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		Log.v(TAG, "onPrepareOptionsMenu called!");
+
+		MenuItem gridMenuItem = menu.findItem(R.id.action_list_type);
+		if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+			gridMenuItem.setIcon(R.drawable.ic_view_agenda_white_24dp);
+			gridMenuItem.setTitle(R.string.linear_layout);
+		} else {
+			gridMenuItem.setIcon(R.drawable.ic_view_grid_white_24dp);
+			gridMenuItem.setTitle(R.string.grid_layout);
+		}
+	}
+
+	@Override
+	protected GridLayoutManager createNewGridLayoutManager() {
+		GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), mColumnCount);
+		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+			@Override
+			public int getSpanSize(int position) {
+				//NOTE: If you use simple integer to identify the ViewType,
+				//here, you should use them and not Layout integers
+				switch (mAdapter.getItemViewType(position)) {
+					case R.layout.recycler_uls_row:
+						return mColumnCount;
+					default:
+						return 1;
+				}
+			}
+		});
+		return gridLayoutManager;
 	}
 
 }

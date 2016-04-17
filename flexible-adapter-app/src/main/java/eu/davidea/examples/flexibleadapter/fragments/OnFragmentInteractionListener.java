@@ -2,6 +2,7 @@ package eu.davidea.examples.flexibleadapter.fragments;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 
 /**
  * This interface must be implemented by activities that contain this
@@ -16,5 +17,7 @@ import android.support.v7.widget.RecyclerView;
 public interface OnFragmentInteractionListener {
 
 	void onAdapterChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView);
+
+	void initSearchView(final Menu menu);
 
 }

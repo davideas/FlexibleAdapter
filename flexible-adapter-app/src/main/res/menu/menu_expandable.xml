@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	tools:context="eu.davidea.examples.flexibleadapter.MainActivity">
+
+	<!-- Search, should appear as action button -->
+	<item android:id="@+id/action_search"
+	      android:title="@string/action_search"
+	      android:icon="@drawable/ic_action_search"
+	      app:showAsAction="collapseActionView|always"
+	      android:animateLayoutChanges="true"
+	      app:actionViewClass="android.support.v7.widget.SearchView"/>
+
+	<item android:id="@+id/action_list_type"
+	      android:title="@string/grid_layout"
+	      android:icon="@drawable/ic_view_grid_white_24dp"
+	      app:showAsAction="always"/>
+
+	<item android:id="@+id/action_auto_collapse"
+	      android:title="@string/auto_collapse"
+	      app:showAsAction="never"/>
+
+	<item android:id="@+id/action_expand_collapse_all"
+	      android:title="@string/expand_all"
+	      app:showAsAction="never"/>
+
+</menu>

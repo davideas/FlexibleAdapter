@@ -1,16 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout
+<FrameLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/swipeRefreshLayout"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:enabled="false">
+	android:layout_height="match_parent">
 
-	<android.support.v7.widget.RecyclerView
-		android:id="@+id/recycler_view"
+	<android.support.v4.widget.SwipeRefreshLayout
+		android:id="@+id/swipeRefreshLayout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		tools:listitem="@layout/recycler_expandable_row"/>
+		android:enabled="false">
 
-</android.support.v4.widget.SwipeRefreshLayout>
+		<android.support.v7.widget.RecyclerView
+			android:id="@+id/recycler_view"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			tools:listitem="@layout/recycler_expandable_row"/>
+
+	</android.support.v4.widget.SwipeRefreshLayout>
+
+		<!-- Needed by FlexibleAdapter for headers to be sticky.
+			 This little layout is included in the library -->
+	<include layout="@layout/sticky_header_layout"/>
+
+	<include layout="@layout/empty_view"/>
+
+	<!--<include layout="@layout/progress_bar"/>-->
+
+	<include layout="@layout/fast_scroller"/>
+
+</FrameLayout>

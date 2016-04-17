@@ -51,7 +51,7 @@ public class DatabaseService {
 	/* EXAMPLE DATABASE CREATION */
 	/*---------------------------*/
 
-	public void createOverallItemsDatabase(Resources resources) {
+	public void createOverallDatabase(Resources resources) {
 		mItems.clear();
 		mItems.add(new OverallItem(R.id.nav_animators, resources.getString(R.string.animators))
 				.withDescription(resources.getString(R.string.animators_description))
@@ -203,7 +203,7 @@ public class DatabaseService {
 	/**
 	 * @return Always a copy of the original list.
 	 */
-	public List<AbstractFlexibleItem> getListById() {
+	public List<AbstractFlexibleItem> getDatabaseList() {
 		//Return a copy of the DB: we will perform some tricky code on this list.
 		return new ArrayList<AbstractFlexibleItem>(mItems);
 	}

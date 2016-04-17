@@ -3,12 +3,15 @@ package eu.davidea.examples.flexibleadapter.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import eu.davidea.examples.flexibleadapter.R;
+import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 
 /**
  * @author Davide Steduto
@@ -16,12 +19,12 @@ import eu.davidea.examples.flexibleadapter.R;
  */
 public abstract class AbstractFragment extends Fragment {
 
+	public static final String TAG = AbstractFragment.class.getSimpleName();
 	protected static final String ARG_COLUMN_COUNT = "column_count";
 
 	protected OnFragmentInteractionListener mListener;
 	protected int mColumnCount = 2;
 	protected RecyclerView mRecyclerView;
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -58,5 +61,24 @@ public abstract class AbstractFragment extends Fragment {
 		super.onDetach();
 		mListener = null;
 	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == R.id.action_list_type) {
+			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+				mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity()));
+				item.setIcon(R.drawable.ic_view_grid_white_24dp);
+				item.setTitle(R.string.grid_layout);
+			} else {
+				mRecyclerView.setLayoutManager(createNewGridLayoutManager());
+				item.setIcon(R.drawable.ic_view_agenda_white_24dp);
+				item.setTitle(R.string.linear_layout);
+			}
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	protected abstract GridLayoutManager createNewGridLayoutManager();
 
 }

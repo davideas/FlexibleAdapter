@@ -88,7 +88,7 @@ public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
 	 * Complex data labels may need more than one view per item, and
 	 * you provide access to all the views for a data item in a view holder.
 	 */
-	public static final class ChildViewHolder extends FlexibleViewHolder {
+	static final class ChildViewHolder extends FlexibleViewHolder {
 
 		public ImageView mHandleView;
 		public TextView mTitle;

@@ -3,8 +3,12 @@ package eu.davidea.examples.flexibleadapter.fragments;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 
 import eu.davidea.examples.flexibleadapter.ExampleAdapter;
 import eu.davidea.examples.flexibleadapter.MainActivity;
@@ -27,8 +31,6 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 
 	private ExampleAdapter mAdapter;
 
-	// TODO: Customize parameter initialization
-	@SuppressWarnings("unused")
 	public static FragmentExpandableMultiLevel newInstance(int columnCount) {
 		FragmentExpandableMultiLevel fragment = new FragmentExpandableMultiLevel();
 		Bundle args = new Bundle();
@@ -94,6 +96,36 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
+	}
+
+	@Override
+	protected GridLayoutManager createNewGridLayoutManager() {
+		GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), mColumnCount);
+		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+			@Override
+			public int getSpanSize(int position) {
+				//NOTE: If you use simple integer to identify the ViewType,
+				//here, you should use them and not Layout integers
+				switch (mAdapter.getItemViewType(position)) {
+					case R.layout.recycler_uls_row:
+					case R.layout.recycler_header_row:
+					case R.layout.recycler_expandable_row:
+						return mColumnCount;
+					default:
+						return 1;
+				}
+			}
+		});
+		return gridLayoutManager;
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		Log.v(TAG, "onCreateOptionsMenu called!");
+		inflater.inflate(R.menu.menu_sections, menu);
+		mListener.initSearchView(menu);
+		//TODO: Implement Filterable in the item interfaces
 	}
 
 }

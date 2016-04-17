@@ -9,6 +9,5 @@
 	android:layout_alignBottom="@+id/swipeRefreshLayout"
 	android:layout_alignParentEnd="true"
 	android:layout_alignParentRight="true"
-	android:layout_marginTop="?attr/actionBarSize"
 	android:visibility="gone"
 	tools:visibility="visible"/>

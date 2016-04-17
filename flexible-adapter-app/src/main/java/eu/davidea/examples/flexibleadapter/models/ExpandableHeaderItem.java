@@ -110,7 +110,8 @@ public class ExpandableHeaderItem
 		} else {
 			holder.mTitle.setText(getTitle());
 		}
-		setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
+		setSubtitle(String.valueOf(adapter.getCurrentChildren(this).size()) +
+				" subItems (" + (isExpanded() ? "expanded" : "collapsed") + ")");
 		holder.mSubtitle.setText(getSubtitle());
 	}
 
@@ -119,7 +120,7 @@ public class ExpandableHeaderItem
 	 * Complex data labels may need more than one view per item, and
 	 * you provide access to all the views for a data item in a view holder.
 	 */
-	public static class ExpandableHeaderViewHolder extends ExpandableViewHolder {
+	static class ExpandableHeaderViewHolder extends ExpandableViewHolder {
 
 		public TextView mTitle;
 		public TextView mSubtitle;
@@ -132,8 +133,23 @@ public class ExpandableHeaderItem
 
 		@Override
 		protected boolean isViewExpandableOnClick() {
-			return true;
+			return true;//true by default
 		}
+
+		@Override
+		protected void expandView(int position) {
+			super.expandView(position);
+			//Let's notify the item has been expanded
+			if (mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
+		}
+
+		@Override
+		protected void collapseView(int position) {
+			super.collapseView(position);
+			//Let's notify the item has been collapsed
+			if (!mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
+		}
+
 	}
 
 	@Override

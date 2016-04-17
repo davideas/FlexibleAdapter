@@ -32,7 +32,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 
 	public ExampleAdapter(Activity activity) {
-		super(DatabaseService.getInstance().getListById(), activity);
+		super(DatabaseService.getInstance().getDatabaseList(), activity);
 		mContext = activity;
 
 		//NEW! We have highlighted text while filtering, so let's enable this feature
@@ -234,7 +234,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		List<Animator> animators = new ArrayList<Animator>();
 		if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 			//GridLayout
-			if (position % 2 != 0)
+			if (position % 2 == 0)
 				addSlideInFromRightAnimator(animators, itemView, 0.5f);
 			else
 				addSlideInFromLeftAnimator(animators, itemView, 0.5f);

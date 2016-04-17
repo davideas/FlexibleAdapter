@@ -21,24 +21,10 @@
 
 	<!-- Main Content -->
 	<RelativeLayout
+		android:id="@+id/recycler_view_container"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-		<FrameLayout
-			android:id="@+id/recycler_view_container"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"/>
-
-		<!-- Needed by FlexibleAdapter for headers to be sticky.
-		     This little layout is included in the library -->
-		<include layout="@layout/sticky_header_layout"/>
-
-		<include layout="@layout/empty_view"/>
-
-		<!--<include layout="@layout/progress_bar"/>-->
-
-	</RelativeLayout>
+		app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 	<android.support.design.widget.FloatingActionButton
 		android:id="@+id/fab"
@@ -50,7 +36,5 @@
 		android:src="@drawable/fab_add"
 		app:layout_behavior="eu.davidea.utils.ScrollAwareFABBehavior"
 		app:borderWidth="0dp"/>
-
-	<include layout="@layout/fast_scroller"/>
 
 </android.support.design.widget.CoordinatorLayout>

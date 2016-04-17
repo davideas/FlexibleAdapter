@@ -122,7 +122,7 @@ public class OverallItem extends AbstractFlexibleItem<LabelViewHolder> {
 		adapter.animateView(holder.itemView, position, adapter.isSelected(position));
 	}
 
-	public static class LabelViewHolder extends FlexibleViewHolder {
+	static class LabelViewHolder extends FlexibleViewHolder {
 
 		public TextView mTitle;
 		public TextView mSubtitle;

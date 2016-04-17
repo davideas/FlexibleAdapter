@@ -61,7 +61,7 @@ public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
 	/**
 	 * Used for UserLearnsSelection.
 	 */
-	public static class ExampleViewHolder extends FlexibleViewHolder {
+	static class ExampleViewHolder extends FlexibleViewHolder {
 
 		public ImageView mImageView;
 		public TextView mTitle;

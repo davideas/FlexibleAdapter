@@ -133,7 +133,7 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 	/**
 	 * This ViewHolder is expandable and collapsible.
 	 */
-	public static final class ParentViewHolder extends ExpandableViewHolder {
+	static final class ParentViewHolder extends ExpandableViewHolder {
 
 		public FlipView mFlipView;
 		public TextView mTitle;

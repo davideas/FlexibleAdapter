@@ -7,11 +7,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.animation.DecelerateInterpolator;
 
 import eu.davidea.examples.flexibleadapter.OverallAdapter;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.examples.flexibleadapter.services.DatabaseService;
-import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 
 /**
  * A fragment representing a list of Examples for FlexibleAdapter displayed with GridLayout.
@@ -47,7 +47,7 @@ public class FragmentOverall extends AbstractFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		//Create overall items and Initialize RecyclerView
-		DatabaseService.getInstance().createOverallItemsDatabase(getActivity().getResources());
+		DatabaseService.getInstance().createOverallDatabase(getActivity().getResources());
 		initializeRecyclerView(savedInstanceState);
 	}
 
@@ -56,7 +56,10 @@ public class FragmentOverall extends AbstractFragment {
 		mAdapter = new OverallAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
-		mAdapter.setAnimationOnReverseScrolling(true);
+		mAdapter.setAnimationOnReverseScrolling(false);
+		mAdapter.setAnimationInterpolator(new DecelerateInterpolator());
+		mAdapter.setAnimationInitialDelay(500L);
+		mAdapter.setAnimationDelay(150L);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewGridLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
@@ -67,7 +70,8 @@ public class FragmentOverall extends AbstractFragment {
 		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
 	}
 
-	private GridLayoutManager createNewGridLayoutManager() {
+	@Override
+	protected GridLayoutManager createNewGridLayoutManager() {
 		GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), mColumnCount);
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
@@ -86,8 +90,8 @@ public class FragmentOverall extends AbstractFragment {
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.menu_overall, menu);
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	@Override
@@ -102,23 +106,6 @@ public class FragmentOverall extends AbstractFragment {
 			gridMenuItem.setIcon(R.drawable.ic_view_grid_white_24dp);
 			gridMenuItem.setTitle(R.string.grid_layout);
 		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.action_list_type) {
-			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-				mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity()));
-				item.setIcon(R.drawable.ic_view_grid_white_24dp);
-				item.setTitle(R.string.grid_layout);
-			} else {
-				mRecyclerView.setLayoutManager(createNewGridLayoutManager());
-				item.setIcon(R.drawable.ic_view_agenda_white_24dp);
-				item.setTitle(R.string.linear_layout);
-			}
-		}
-		return super.onOptionsItemSelected(item);
 	}
 
 }

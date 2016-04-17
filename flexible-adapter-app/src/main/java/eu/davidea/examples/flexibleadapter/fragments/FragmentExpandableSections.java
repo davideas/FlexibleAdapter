@@ -3,8 +3,13 @@ package eu.davidea.examples.flexibleadapter.fragments;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import eu.davidea.examples.flexibleadapter.ExampleAdapter;
 import eu.davidea.examples.flexibleadapter.MainActivity;
@@ -27,8 +32,6 @@ public class FragmentExpandableSections extends AbstractFragment {
 
 	private ExampleAdapter mAdapter;
 
-	// TODO: Customize parameter initialization
-	@SuppressWarnings("unused")
 	public static FragmentExpandableSections newInstance(int columnCount) {
 		FragmentExpandableSections fragment = new FragmentExpandableSections();
 		Bundle args = new Bundle();
@@ -89,12 +92,61 @@ public class FragmentExpandableSections extends AbstractFragment {
 		mAdapter.setSwipeEnabled(true);//Enable swipe items
 		//Show Headers at startUp! (not necessary if Headers are also Expandable)
 		//mAdapter.setDisplayHeadersAtStartUp(true);
-
 		//Add sample item on the top (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
+	}
+
+	@Override
+	protected GridLayoutManager createNewGridLayoutManager() {
+		GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), mColumnCount);
+		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+			@Override
+			public int getSpanSize(int position) {
+				//NOTE: If you use simple integer to identify the ViewType,
+				//here, you should use them and not Layout integers
+				switch (mAdapter.getItemViewType(position)) {
+					case R.layout.recycler_uls_row:
+					case R.layout.recycler_header_row:
+					case R.layout.recycler_expandable_row:
+						return mColumnCount;
+					default:
+						return 1;
+				}
+			}
+		});
+		return gridLayoutManager;
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		Log.v(TAG, "onCreateOptionsMenu called!");
+		inflater.inflate(R.menu.menu_sections, menu);
+		mListener.initSearchView(menu);
+	}
+
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+
+		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
+		if (headersMenuItem != null) {
+			headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
+		}
+
+		MenuItem headersSticky = menu.findItem(R.id.action_sticky_headers);
+		if (headersSticky != null) {
+			if (mAdapter.areHeadersShown()) {
+				headersSticky.setVisible(true);
+				headersSticky.setTitle(mAdapter.areHeadersSticky() ? R.string.scroll_headers : R.string.sticky_headers);
+			} else {
+				headersSticky.setVisible(false);
+			}
+		}
 	}
 
 }

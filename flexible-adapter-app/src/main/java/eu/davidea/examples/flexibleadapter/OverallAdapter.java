@@ -23,7 +23,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	private static final String TAG = OverallAdapter.class.getSimpleName();
 
 	public OverallAdapter(Activity activity) {
-		super(DatabaseService.getInstance().getListById(), activity);
+		super(DatabaseService.getInstance().getDatabaseList(), activity);
 	}
 
 	/**

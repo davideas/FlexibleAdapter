@@ -19,7 +19,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -47,7 +46,6 @@ import eu.davidea.examples.flexibleadapter.models.SubItem;
 import eu.davidea.examples.flexibleadapter.services.DatabaseService;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
@@ -158,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements
 		}
 		if (mFragment == null) {
 			mFragment = FragmentOverall.newInstance(2);
+			mToolbar.setSubtitle(getString(R.string.overall));
 		}
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.recycler_view_container,
@@ -175,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements
 		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				mAdapter.updateDataSet(DatabaseService.getInstance().getListById());
+				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList());
 				mSwipeRefreshLayout.setEnabled(false);
 				mSwipeHandler.sendEmptyMessageDelayed(0, 1000L);
 				destroyActionModeIfCan();
@@ -222,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements
 							DatabaseService.newExpandableItem(position, null) :
 							DatabaseService.newSimpleItem(position, null));
 					//Add only if we don't have it
-					if (!DatabaseService.getInstance().getListById().contains(item)) {
+					if (!DatabaseService.getInstance().getDatabaseList().contains(item)) {
 						DatabaseService.getInstance().addItem(position, item);//This is the original list
 						//For my example, the adapter position must be adjusted according to
 						//all child and headers currently visible
@@ -264,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements
 		if (id == R.id.nav_overall) {
 			mFragment = FragmentOverall.newInstance(2);
 		} else if (id == R.id.nav_animators) {
-			mFragment = FragmentAnimators.newInstance(1);
+			mFragment = FragmentAnimators.newInstance(2);
 		} else if (id == R.id.nav_instagram_headers) {
 
 		} else if (id == R.id.nav_headers_and_sections) {
@@ -274,9 +273,9 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_expandable) {
 
 		} else if (id == R.id.nav_multi_level_expandable) {
-			mFragment = FragmentExpandableMultiLevel.newInstance(1);
+			mFragment = FragmentExpandableMultiLevel.newInstance(2);
 		} else if (id == R.id.nav_expandable_sections) {
-			mFragment = FragmentExpandableSections.newInstance(1);
+			mFragment = FragmentExpandableSections.newInstance(2);
 		} else if (id == R.id.nav_about) {
 			MessageDialog.newInstance(
 					R.drawable.ic_info_grey600_24dp,
@@ -296,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements
 			//THIS IS VERY IMPORTANT. Because you are going to inflate a new RecyclerView, its
 			//Adapter will be null, therefore the following method cannot be called automatically!
 			//If your StickyHeaderContainer is in the main view, you must call this method to clean
-			//the previous sticky view. Alternatively you can move the include of StickyHeaderLayout
+			//the previous sticky view. Alternatively you can move the <include> of StickyHeaderLayout
 			//in the Fragment view.
 			mAdapter.onDetachedFromRecyclerView(mRecyclerView);
 			//Inflate the new Fragment with the new RecyclerView and a new Adapter
@@ -311,66 +310,71 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		Log.v(TAG, "onCreateOptionsMenu called!");
-		getMenuInflater().inflate(R.menu.menu_main, menu);
-		initSearchView(menu);
-		return true;
-	}
-
-	private void initSearchView(final Menu menu) {
-		//Associate searchable configuration with the SearchView
-		Log.d(TAG, "onCreateOptionsMenu setup SearchView!");
-		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-		MenuItemCompat.setOnActionExpandListener(
-				menu.findItem(R.id.action_search), new MenuItemCompat.OnActionExpandListener() {
-					@Override
-					public boolean onMenuItemActionExpand(MenuItem item) {
-						menu.findItem(R.id.action_list_type).setVisible(false);
-						return true;
-					}
-
-					@Override
-					public boolean onMenuItemActionCollapse(MenuItem item) {
-						menu.findItem(R.id.action_list_type).setVisible(true);
-						return true;
-					}
-				});
-		mSearchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-		mSearchView.setInputType(InputType.TYPE_TEXT_VARIATION_FILTER);
-		mSearchView.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_FULLSCREEN);
-		mSearchView.setQueryHint(getString(R.string.action_search));
-		mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-		mSearchView.setOnQueryTextListener(this);
-	}
-
-	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		Log.v(TAG, "onPrepareOptionsMenu called!");
-		//Has searchText?
-		if (!mAdapter.hasSearchText()) {
-			Log.d(TAG, "onPrepareOptionsMenu Clearing SearchView!");
-			mSearchView.setIconified(true);// This also clears the text in SearchView widget
-		} else {
-			mSearchView.setQuery(mAdapter.getSearchText(), false);
-			mSearchView.setIconified(false);
-		}
 
-		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
-		if (headersMenuItem != null) {
-			headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
-		}
-
-		MenuItem headersSticky = menu.findItem(R.id.action_sticky_headers);
-		if (headersSticky != null) {
-			if (mAdapter.areHeadersShown()) {
-				headersSticky.setVisible(true);
-				headersSticky.setTitle(mAdapter.areHeadersSticky() ? R.string.scroll_headers : R.string.sticky_headers);
+		if (mSearchView != null) {
+			//Has searchText?
+			if (!mAdapter.hasSearchText()) {
+				Log.d(TAG, "onPrepareOptionsMenu Clearing SearchView!");
+				mSearchView.setIconified(true);// This also clears the text in SearchView widget
 			} else {
-				headersSticky.setVisible(false);
+				mSearchView.setQuery(mAdapter.getSearchText(), false);
+				mSearchView.setIconified(false);
 			}
 		}
 		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override
+	public void initSearchView(final Menu menu) {
+		//Associate searchable configuration with the SearchView
+		Log.d(TAG, "onCreateOptionsMenu setup SearchView!");
+		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+		MenuItem searchItem = menu.findItem(R.id.action_search);
+		if (searchItem != null) {
+			MenuItemCompat.setOnActionExpandListener(
+					searchItem, new MenuItemCompat.OnActionExpandListener() {
+						@Override
+						public boolean onMenuItemActionExpand(MenuItem item) {
+							MenuItem listTypeItem = menu.findItem(R.id.action_list_type);
+							if (listTypeItem != null)
+								listTypeItem.setVisible(false);
+
+							ViewCompat.animate(mFab)
+									.scaleX(0f).scaleY(0f)
+									.alpha(0f).setDuration(100)
+									.start();
+
+							return true;
+						}
+
+						@Override
+						public boolean onMenuItemActionCollapse(MenuItem item) {
+							MenuItem listTypeItem = menu.findItem(R.id.action_list_type);
+							if (listTypeItem != null)
+								listTypeItem.setVisible(true);
+
+							mFab.postDelayed(new Runnable() {
+								@Override
+								public void run() {
+									ViewCompat.animate(mFab)
+											.scaleX(1f).scaleY(1f)
+											.alpha(1f).setDuration(100)
+											.start();
+								}
+							}, 400L);
+
+							return true;
+						}
+					});
+			mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+			mSearchView.setInputType(InputType.TYPE_TEXT_VARIATION_FILTER);
+			mSearchView.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_FULLSCREEN);
+			mSearchView.setQueryHint(getString(R.string.action_search));
+			mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+			mSearchView.setOnQueryTextListener(this);
+		}
 	}
 
 	@Override
@@ -380,24 +384,10 @@ public class MainActivity extends AppCompatActivity implements
 			mAdapter.setSearchText(newText);
 			//Fill and Filter mItems with your custom list and automatically animate the changes
 			//Watch out! The original list must be a copy
-			mAdapter.filterItems(DatabaseService.getInstance().getListById(), 450L);
+			mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), 450L);
 		}
 		//Disable SwipeRefresh if search is active!!
 		mSwipeRefreshLayout.setEnabled(!mAdapter.hasSearchText());
-
-		if (mAdapter.hasSearchText()) {
-			//mFab.setVisibility(View.GONE);
-			ViewCompat.animate(mFab)
-					.scaleX(0f).scaleY(0f)
-					.alpha(0f).setDuration(100)
-					.start();
-		} else {
-			//mFab.setVisibility(View.VISIBLE);
-			ViewCompat.animate(mFab)
-					.scaleX(1f).scaleY(1f)
-					.alpha(1f).setDuration(100)
-					.start();
-		}
 		return true;
 	}
 
@@ -410,33 +400,7 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
-		if (id == R.id.action_list_type) {
-			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-				mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(this));
-				item.setIcon(R.drawable.ic_view_grid_white_24dp);
-				item.setTitle(R.string.grid_layout);
-			} else {
-				GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-				gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-					@Override
-					public int getSpanSize(int position) {
-						//NOTE: If you use simple integer to identify the ViewType,
-						//here, you should use them and not Layout integers
-						switch (mAdapter.getItemViewType(position)) {
-							case R.layout.recycler_uls_row:
-							case R.layout.recycler_header_row:
-							case R.layout.recycler_expandable_row:
-								return 3;
-							default:
-								return 1;
-						}
-					}
-				});
-				mRecyclerView.setLayoutManager(gridLayoutManager);
-				item.setIcon(R.drawable.ic_view_agenda_white_24dp);
-				item.setTitle(R.string.linear_layout);
-			}
-		} else if (id == R.id.action_reverse) {
+		if (id == R.id.action_reverse) {
 			if (mAdapter.isAnimationOnReverseScrolling()) {
 				mAdapter.setAnimationOnReverseScrolling(false);
 				item.setIcon(R.drawable.ic_sort_white_24dp);
@@ -539,8 +503,8 @@ public class MainActivity extends AppCompatActivity implements
 //		}
 		//FIXME: this doesn't work with all types of items (of course)..... we need to implement some custom logic
 //		DatabaseService.getInstance().swapItem(
-//				DatabaseService.getInstance().getListById().indexOf(fromItem),
-//				DatabaseService.getInstance().getListById().indexOf(toItem));
+//				DatabaseService.getInstance().getDatabaseList().indexOf(fromItem),
+//				DatabaseService.getInstance().getDatabaseList().indexOf(toItem));
 	}
 
 	@Override

@@ -134,7 +134,7 @@ public class ExpandableLevel1Item
 	 * Complex data labels may need more than one view per item, and
 	 * you provide access to all the views for a data item in a view holder.
 	 */
-	public static class L1ViewHolder extends ExpandableViewHolder {
+	static class L1ViewHolder extends ExpandableViewHolder {
 
 		public TextView mTitle;
 		public TextView mSubtitle;

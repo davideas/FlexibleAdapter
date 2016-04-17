@@ -37,8 +37,6 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * draggable, swipeable, etc...) used by an Adapter, to be independent by another Adapter.
  * For instance an item can be Shown and Expanded in a RV, while in the other RV can be Hidden or
  * Not Expanded!</p>
- *
- * Note: This object is not used in the demo.
  */
 public class FlexibleItemHolderExample<Model> extends AbstractSectionableItem<FlexibleItemHolderExample.ViewHolder, HeaderItem>
 		implements IFilterable, IHolder<Model> {
