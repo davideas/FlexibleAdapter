@@ -85,7 +85,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
 				R.drawable.divider,
-				Utils.dpToPx(getActivity(), 24f)));
+				Utils.dpToPx(getActivity(), 0f)));//Increase to add gap between sections (Works only with LinearLayout!)
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),

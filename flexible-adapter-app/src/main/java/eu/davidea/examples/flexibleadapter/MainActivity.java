@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_multi_level_expandable) {
 			mFragment = FragmentExpandableMultiLevel.newInstance(2);
 		} else if (id == R.id.nav_expandable_sections) {
-			mFragment = FragmentExpandableSections.newInstance(2);
+			mFragment = FragmentExpandableSections.newInstance(3);
 		} else if (id == R.id.nav_about) {
 			MessageDialog.newInstance(
 					R.drawable.ic_info_grey600_24dp,
@@ -420,10 +420,12 @@ public class MainActivity extends AppCompatActivity implements
 			}
 		} else if (id == R.id.action_expand_collapse_all) {
 			if (item.getTitle().equals(getString(R.string.expand_all))) {
-				mAdapter.expandAll();
+				int total = mAdapter.expandAll();
+				Toast.makeText(this, "Expanded " + total + " items", Toast.LENGTH_SHORT).show();
 				item.setTitle(R.string.collapse_all);
 			} else {
-				mAdapter.collapseAll();
+				int total = mAdapter.collapseAll();
+				Toast.makeText(this, "Collapsed " + total + " items", Toast.LENGTH_SHORT).show();
 				item.setTitle(R.string.expand_all);
 			}
 		} else if (id == R.id.action_show_hide_headers) {
