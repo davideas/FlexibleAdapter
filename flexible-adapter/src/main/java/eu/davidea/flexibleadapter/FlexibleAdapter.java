@@ -2822,7 +2822,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			int scrollBy = Math.min(scrollMax, scrollMin);
 			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 				int spanCount = ((GridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount();
-				scrollBy = scrollBy / spanCount + spanCount;
+				scrollBy = scrollBy % spanCount + spanCount;
 			}
 			int scrollTo = firstVisibleItem + scrollBy;
 			if (DEBUG)
