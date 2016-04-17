@@ -244,15 +244,16 @@ public class FastScroller extends FrameLayout {
 			else
 				proportion = y / (float) height;
 			int targetPos = getValueInRange(0, itemCount - 1, (int) (proportion * (float) itemCount));
-			String bubbleText = bubbleTextCreator.onCreateBubbleText(targetPos);
 			layoutManager.scrollToPositionWithOffset(targetPos, 0);
-			if (bubble != null)
-			    if (bubbleText != null) {
-                    bubble.setVisibility(View.VISIBLE);
-                } else {
-                    bubble.setVisibility(View.GONE);
-                }
-				bubble.setText(bubbleText);
+			if (bubble != null) {
+				String bubbleText = bubbleTextCreator.onCreateBubbleText(targetPos);
+				if (bubbleText != null) {
+					bubble.setVisibility(View.VISIBLE);
+					bubble.setText(bubbleText);
+				} else {
+					bubble.setVisibility(View.GONE);
+				}
+			}
 		}
 	}
 
