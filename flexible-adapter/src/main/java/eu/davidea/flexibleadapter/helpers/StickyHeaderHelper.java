@@ -85,6 +85,11 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 	}
 
+	public boolean hasStickyHeaderTranslated(int position) {
+		RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(position);
+		return vh != null && (vh.itemView.getX() < 0 || vh.itemView.getY() < 0);
+	}
+
 	private void initStickyHeadersHolder() {
 		//Initialize Holder Layout and show sticky header if exists already
 		mStickyHolderLayout = mAdapter.getStickySectionHeadersHolder();
@@ -134,7 +139,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 			mHeaderPosition = headerPosition;
 			RecyclerView.ViewHolder holder = getHeaderViewHolder(headerPosition);
 			if (mStickyHeaderViewHolder != holder) {
-				if (FlexibleAdapter.DEBUG) Log.v(TAG, "swapHeader newPosition=" + headerPosition);
+				if (FlexibleAdapter.DEBUG) Log.v(TAG, "swapHeader newPosition=" + mHeaderPosition);
 				swapHeader(holder);
 			}
 		} else if (updateHeaderContent && mStickyHeaderViewHolder != null) {

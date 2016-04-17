@@ -1214,8 +1214,9 @@ public class FlexibleAdapter<T extends IFlexible>
 				" expanded " + expandable.isExpanded() + " ExpandedItems=" + getExpandedPositions());
 
 		int subItemsCount = 0;
-		if (!expandable.isExpanded() && (!parentSelected || expandable.getExpansionLevel() <= selectedLevel)
-				&& hasSubItems(expandable)) {
+		if (!expandable.isExpanded() && hasSubItems(expandable)
+				&& (!parentSelected || expandable.getExpansionLevel() <= selectedLevel)
+				&& (mStickyHeaderHelper == null || !mStickyHeaderHelper.hasStickyHeaderTranslated(position))) {
 
 			//Collapse others expandable if configured so
 			//Skipped when expanding all is requested
@@ -1244,7 +1245,7 @@ public class FlexibleAdapter<T extends IFlexible>
 						return true;
 					}
 				});
-				animatorHandler.sendMessageDelayed(Message.obtain(mHandler), 150L);
+				animatorHandler.sendMessageDelayed(Message.obtain(mHandler), !headersSticky ? 150L: 300L);
 			}
 
 			//Expand!
