@@ -2,7 +2,7 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Stable version v4.2 of 2015.12.16 - NEW! dev branch in beta: v5.0.0-b5 (usable library!)
+###### A pattern for every RecyclerView - Stable _light_ version v4.2 of 2015.12.16 - NEW! dev branch in beta: v5.0.0-b5 (usable library!)
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -12,17 +12,17 @@ The FlexibleAdapter helps developers to simplify this process without to worry a
 This library is configurable and it guides the developers (thanks to quality comments on the methods) to create a better user experience and now, even more with the new ViewHolders and new actions.
 
 #### Main functionalities (New features might still change)
-* Simple item selection with ripple effect.
-* SINGLE & MULTI selection mode.
+* Simple item selection with ripple effect, Single & Multi selection mode.
 * Restore deleted items (undo delete), **NEW** works with Expandable items too!
-* Customizable ItemDecoration and FastScroller, **NEW** now in the library.
+* FastScroller, **NEW** now in the library and with GridLayout support.
+* Customizable ItemDecoration.
 * SearchFilter with Spannable text, **NEW** now items are animated. Works with sub items too!
 * Add and Remove items with custom animations.
-* **NEW!** Predefined ViewHolders.
-* **NEW!** Expandable items with <u>selection coherence</u>.
 * **NEW!** Adapter Animations with custom configuration based on adapter position and beyond.
+* **NEW!** Predefined ViewHolders.
+* **NEW!** Expandable items with <u>selection coherence</u>, multi-level expansion.
 * **NEW!** Drag&Drop and Swipe actions with <u>selection coherence</u>.
-* **NEW!** Headers/Sections with automatic re-linkage and with sticky behaviour fully clickable!
+* **NEW!** Headers/Sections with sticky behaviour fully clickable, collapsible, automatic linkage!
 * **NEW!** Auto mapping ViewTypes with Item interfaces.
 * **NEW!** 1 simple constructor for all events.
 
