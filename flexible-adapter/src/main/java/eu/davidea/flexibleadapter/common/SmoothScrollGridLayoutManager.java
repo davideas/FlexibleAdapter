@@ -16,22 +16,22 @@
 package eu.davidea.flexibleadapter.common;
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 /**
- * Optimized implementation of LinearLayoutManager to SmoothScroll to a Top position.
+ * Optimized implementation of GridLayoutManager to SmoothScroll to a Top position.
  */
-public class SmoothScrollLinearLayoutManager extends LinearLayoutManager {
+public class SmoothScrollGridLayoutManager extends GridLayoutManager {
 
 	private RecyclerView.SmoothScroller mSmoothScroller;
 
-	public SmoothScrollLinearLayoutManager(Context context) {
-		this(context, VERTICAL, false);
+	public SmoothScrollGridLayoutManager(Context context, int spanCount) {
+		this(context, spanCount, VERTICAL, false);
 	}
 
-	public SmoothScrollLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
-		super(context, orientation, reverseLayout);
+	public SmoothScrollGridLayoutManager(Context context, int spanCount, int orientation, boolean reverseLayout) {
+		super(context, spanCount, orientation, reverseLayout);
 		mSmoothScroller = new TopSnappedSmoothScroller(context, this);
 	}
 
