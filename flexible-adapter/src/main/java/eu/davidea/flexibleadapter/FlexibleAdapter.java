@@ -197,6 +197,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                  <br/>- {@link OnItemLongClickListener}
 	 *                  <br/>- {@link OnItemMoveListener}
 	 *                  <br/>- {@link OnItemSwipeListener}
+	 *                  <br/>- {@link OnStickyHeaderChangeListener}
 	 */
 	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listeners) {
 		mItems = Collections.synchronizedList(items);
@@ -253,8 +254,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		multiRange = true;
 		while (position < mItems.size()) {
 			T item = getItem(position);
-			//Map the view type if not done yet
-			//mapViewTypeFrom(item);
 			if (isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
 				if (expandable.isExpanded()) {
@@ -1269,8 +1268,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			subItemsCount = subItems.size();
 			//Save expanded state
 			expandable.setExpanded(true);
-			//Map all the view types if not done yet
-			//mapViewTypesFrom(subItems);
 
 			//Automatically scroll the current expandable item to show as much children as possible
 			if (scrollOnExpand && !expandAll) {
@@ -1554,8 +1551,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		} else {
 			mItems.addAll(items);
 		}
-		//Map all the view types if not done yet
-		//mapViewTypesFrom(items);
 		//Notify range addition
 		notifyItemRangeInserted(position, items.size());
 
@@ -2352,8 +2347,6 @@ public class FlexibleAdapter<T extends IFlexible>
 								for (T subItem : subItems) {
 									if (!subItem.isHidden()) filteredSubItems.add(subItem);
 								}
-								//Map the view types if not done yet
-								//mapViewTypesFrom(filteredSubItems);
 								values.addAll(filteredSubItems);
 								newOriginalPosition += filteredSubItems.size();
 							}
@@ -2730,19 +2723,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*-----------------*/
 	/* PRIVATE METHODS */
 	/*-----------------*/
-
-	/**
-	 * Internal mapper to remember and add all ViewTypes for the Items.
-	 *
-	 * @param items list of items to map
-	 */
-	private void mapViewTypesFrom(Iterable<T> items) {
-		if (items != null) {
-			for (T item : items) {
-				mapViewTypeFrom(item);
-			}
-		}
-	}
 
 	/**
 	 * Internal mapper to remember and add all types for the RecyclerView.

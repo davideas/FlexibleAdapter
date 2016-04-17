@@ -130,6 +130,7 @@ public class FastScroller extends FrameLayout {
 	 * @param handleResId Drawable resource for the Handle
 	 */
 	public void setViewsToUse(@LayoutRes int layoutResId, @IdRes int bubbleResId, @IdRes int handleResId) {
+		if (bubble != null) return;//Already inflated
 		LayoutInflater inflater = LayoutInflater.from(getContext());
 		inflater.inflate(layoutResId, this, true);
 		bubble = (TextView) findViewById(bubbleResId);

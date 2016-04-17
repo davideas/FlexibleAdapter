@@ -85,7 +85,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 	private boolean isReverseEnabled = false, shouldAnimate = true,
 			isFastScroll = false, isInitialize = false;
 
-	private long mInitialDelay = 500L,
+	private long mInitialDelay = 0L,
 			mStepDelay = 100L,
 			mDuration = 300L;
 
@@ -253,7 +253,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 //			);
 
 		if (shouldAnimate && !isFastScroll && !mAnimatorNotifierObserver.isPositionNotified() &&
-				(isReverseEnabled || position > mLastAnimatedPosition)) {
+				(isReverseEnabled || position > mLastAnimatedPosition || (position == 0 && mRecyclerView.getChildCount() == 0))) {
 
 			//Cancel animation is necessary when fling
 			cancelExistingAnimation(itemView);
@@ -348,12 +348,20 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 		if (numberOfItemsOnScreen == 0 || numberOfItemsOnScreen < numberOfAnimatedItems || //Normal Forward scrolling after max itemOnScreen is reached
 				(firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews) || //Reverse scrolling
 				(position > mMaxChildViews && firstVisiblePosition == -1 && mRecyclerView.getChildCount() == 0)) { //Reverse scrolling and click on FastScroller
-			delay = mStepDelay;
-			mInitialDelay = 0L;
 
+			//Base delay is step delay
+			delay = mStepDelay;
+			if (numberOfItemsOnScreen <= 1) {
+				//When RecyclerView is initially loading no items are present
+				//Use InitialDelay only for the first item
+				delay += mInitialDelay;
+			} else {
+				//Reset InitialDelay only when first item is already animated
+				mInitialDelay = 0L;
+			}
 			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 				int numColumns = ((GridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount();
-				delay = mStepDelay * (position % numColumns);
+				delay = mInitialDelay + mStepDelay * (position % numColumns);
 			}
 
 		} else {//forward scrolling before max itemOnScreen is reached
