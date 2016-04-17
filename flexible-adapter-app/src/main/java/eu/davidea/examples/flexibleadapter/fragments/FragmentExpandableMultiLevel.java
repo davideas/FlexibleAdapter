@@ -16,6 +16,7 @@ import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.examples.flexibleadapter.services.DatabaseService;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
+import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
@@ -100,7 +101,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 
 	@Override
 	protected GridLayoutManager createNewGridLayoutManager() {
-		GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), mColumnCount);
+		GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {

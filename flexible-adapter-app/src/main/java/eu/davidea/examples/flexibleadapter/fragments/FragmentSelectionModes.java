@@ -15,6 +15,7 @@ import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
+import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -122,7 +123,7 @@ public class FragmentSelectionModes extends AbstractFragment
 
 	@Override
 	protected GridLayoutManager createNewGridLayoutManager() {
-		GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), mColumnCount);
+		GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {
@@ -130,8 +131,6 @@ public class FragmentSelectionModes extends AbstractFragment
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
 					case R.layout.recycler_uls_row:
-					case R.layout.recycler_header_row:
-					case R.layout.recycler_expandable_row:
 						return mColumnCount;
 					default:
 						return 1;

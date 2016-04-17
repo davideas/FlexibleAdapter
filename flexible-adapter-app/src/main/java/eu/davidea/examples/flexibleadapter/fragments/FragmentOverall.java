@@ -12,6 +12,7 @@ import android.view.animation.DecelerateInterpolator;
 import eu.davidea.examples.flexibleadapter.OverallAdapter;
 import eu.davidea.examples.flexibleadapter.R;
 import eu.davidea.examples.flexibleadapter.services.DatabaseService;
+import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 
 /**
  * A fragment representing a list of Examples for FlexibleAdapter displayed with GridLayout.
@@ -61,9 +62,10 @@ public class FragmentOverall extends AbstractFragment {
 		mAdapter.setAnimationInitialDelay(500L);
 		mAdapter.setAnimationDelay(150L);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+		mRecyclerView.setItemViewCacheSize(0);//Setting ViewCache to 0 (default=2) will animate items better while scrolling down+up with LinearLayout
 		mRecyclerView.setLayoutManager(createNewGridLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
-		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
+		mRecyclerView.setHasFixedSize(true);//Size of RV will not change
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
@@ -72,7 +74,7 @@ public class FragmentOverall extends AbstractFragment {
 
 	@Override
 	protected GridLayoutManager createNewGridLayoutManager() {
-		GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), mColumnCount);
+		GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {
