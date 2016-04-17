@@ -29,7 +29,7 @@ import android.widget.FrameLayout;
  * A sticky header decoration for RecyclerView, to use only with
  * {@link FlexibleAdapterSections}.
  */
-public class StickySectionHeaderManager extends OnScrollListener {
+class StickySectionHeaderManager extends OnScrollListener {
 
 	private RecyclerView mRecyclerView;
 	private FrameLayout mStickyHolder;

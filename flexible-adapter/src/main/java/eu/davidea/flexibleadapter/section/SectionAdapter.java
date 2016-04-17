@@ -1,6 +1,6 @@
 package eu.davidea.flexibleadapter.section;
 
-public interface SectionAdapter {
+interface SectionAdapter {
 
 	int getSectionCount();
 

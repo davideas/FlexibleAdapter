@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 
 import java.util.Arrays;
 
-public class SectionPositionTranslator {
+class SectionPositionTranslator {
 
 	private static final int ALLOCATE_UNIT = 256;
 	private static final long FLAG_EXPANDED = 0x0000000080000000L;

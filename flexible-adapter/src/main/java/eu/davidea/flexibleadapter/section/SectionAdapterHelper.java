@@ -3,7 +3,7 @@ package eu.davidea.flexibleadapter.section;
 
 import android.support.v7.widget.RecyclerView;
 
-public class SectionAdapterHelper {
+class SectionAdapterHelper {
 
 	public static final long NO_SECTION_POSITION = 0xffffffffffffffffl;
 

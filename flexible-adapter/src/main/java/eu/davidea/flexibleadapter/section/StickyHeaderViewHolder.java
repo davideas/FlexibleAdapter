@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.widget.FrameLayout;
 
-public class StickyHeaderViewHolder extends RecyclerView.ViewHolder {
+class StickyHeaderViewHolder extends RecyclerView.ViewHolder {
 
 	public RecyclerView.ViewHolder realItemHolder;
 	public FrameLayout layout;

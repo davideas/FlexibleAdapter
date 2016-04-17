@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.widget.FrameLayout;
 
-public class HeaderViewHolder extends RecyclerView.ViewHolder {
+class HeaderViewHolder extends RecyclerView.ViewHolder {
 
 	public FrameLayout layout;
 
