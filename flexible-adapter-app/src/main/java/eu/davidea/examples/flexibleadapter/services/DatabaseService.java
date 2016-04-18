@@ -47,10 +47,14 @@ public class DatabaseService {
 		return mInstance;
 	}
 
-	/*---------------------------*/
-	/* EXAMPLE DATABASE CREATION */
-	/*---------------------------*/
+	/*-------------------*/
+	/* DATABASE CREATION */
+	/*-------------------*/
 
+	/*
+	 * List of CardView as entry list, showing the functionality of the library.
+	 * It also shows how adapter animation can be configured.
+	 */
 	public void createOverallDatabase(Resources resources) {
 		mItems.clear();
 		mItems.add(new OverallItem(R.id.nav_animators, resources.getString(R.string.animators))
@@ -77,8 +81,7 @@ public class DatabaseService {
 
 		mItems.add(new OverallItem(R.id.nav_headers_and_sections, resources.getString(R.string.headers_sections))
 				.withDescription(resources.getString(R.string.headers_sections_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_sections_grey600_24dp))
-				.withEnabled(false));
+				.withIcon(resources.getDrawable(R.drawable.ic_sections_grey600_24dp)));
 
 		mItems.add(new OverallItem(R.id.nav_instagram_headers, resources.getString(R.string.instagram_headers))
 				.withDescription(resources.getString(R.string.instagram_headers_description))
@@ -91,6 +94,9 @@ public class DatabaseService {
 				.withEnabled(false));
 	}
 
+	/*
+	 * List of simple items TODO: showing different types of animations
+	 */
 	public void createAnimatorsDatabase() {
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
@@ -98,21 +104,35 @@ public class DatabaseService {
 		}
 	}
 
+	/*
+	 * List of expandable items (headers/sections) with SubItems with Header attached.
+	 */
 	public void createExpandableSectionsDatabase() {
-		HeaderItem header = null;
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
-			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i) : header;
-			mItems.add(newExpandableSectionItem(i + 1));//With level 0
+			mItems.add(newExpandableSectionItem(i + 1));//With expansion level 0
 		}
 	}
 
+	/*
+	 * List of headers (level 0) with expandable SubItems (level 1) with SubItems.
+	 */
 	public void createExpandableMultiLevelDatabase() {
+		mItems.clear();
+		for (int i = 0; i < ITEMS; i++) {
+			mItems.add(newExpandableLevelItem(i + 1));//With expansion level 1
+		}
+	}
+
+	/*
+	 * List of Simple Items with Header attached. Only Simple Items will be added to the list.
+	 */
+	public void createHeadersSectionsDatabase() {
 		HeaderItem header = null;
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
 			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i) : header;
-			mItems.add(newExpandableLevelItem(i + 1));//With level 1
+			mItems.add(newSimpleItem(i + 1, header));
 		}
 	}
 

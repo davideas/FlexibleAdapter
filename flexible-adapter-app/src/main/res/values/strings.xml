@@ -59,7 +59,7 @@
 	<string name="expandable_sections_description">Sections with (sticky) headers that can expand/collapse</string>
 
 	<string name="headers_sections">Headers and Sections</string>
-	<string name="headers_sections_description">1 (sticky) header for each section</string>
+	<string name="headers_sections_description">1 (sticky) header for each section, dragged items with auto-linkage</string>
 
 	<string name="instagram_headers">Instagram headers</string>
 	<string name="instagram_headers_description">1 (sticky) clickable header for each item</string>

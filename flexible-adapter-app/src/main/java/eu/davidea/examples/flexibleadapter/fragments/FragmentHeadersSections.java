@@ -14,10 +14,12 @@ import android.view.MenuItem;
 import eu.davidea.examples.flexibleadapter.ExampleAdapter;
 import eu.davidea.examples.flexibleadapter.MainActivity;
 import eu.davidea.examples.flexibleadapter.R;
+import eu.davidea.examples.flexibleadapter.services.DatabaseService;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
+import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 
 /**
@@ -49,24 +51,23 @@ public class FragmentHeadersSections extends AbstractFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		//Settings for FlipView
+		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		//DatabaseService.getInstance().createExpandableSectionsDatabase();
-
+		DatabaseService.getInstance().createHeadersSectionsDatabase();
 		initializeRecyclerView(savedInstanceState);
+
+		//Settings for FlipView
+		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//TODO: Working in progress! See FragmentExpandableSections
-
-
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAutoCollapseOnExpand(false);
-		mAdapter.setAutoScrollOnExpand(true);
 		mAdapter.setRemoveOrphanHeaders(false);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -85,11 +86,10 @@ public class FragmentHeadersSections extends AbstractFragment {
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
-		//Experimenting NEW features (v5.0.0)
-		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
-		mAdapter.setSwipeEnabled(true);//Enable swipe items
+		mAdapter.setLongPressDragEnabled(true);
 		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
-		//Add sample item on the top (not belongs to the library)
+		mAdapter.enableStickyHeaders();
+		//Add sample item on the top (HeaderView) (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
@@ -107,7 +107,6 @@ public class FragmentHeadersSections extends AbstractFragment {
 				switch (mAdapter.getItemViewType(position)) {
 					case R.layout.recycler_uls_row:
 					case R.layout.recycler_header_row:
-					case R.layout.recycler_expandable_row:
 						return mColumnCount;
 					default:
 						return 1;

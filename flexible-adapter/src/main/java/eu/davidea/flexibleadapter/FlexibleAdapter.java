@@ -859,6 +859,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		boolean linked = false;
 		if (item != null && item instanceof ISectionable) {
 			ISectionable sectionable = (ISectionable) item;
+			//TODO: don't unlink if header is the same
 			unlinkHeaderFrom((T) sectionable, payload);
 			if (DEBUG) Log.v(TAG, "Link header " + header + " to " + sectionable);
 			sectionable.setHeader(header);
@@ -2595,12 +2596,14 @@ public class FlexibleAdapter<T extends IFlexible>
 				if (fromPosition < toPosition) {
 					//Dragging down fromHeader
 					oldPosition = toPosition + 1;
-					unlinkHeaderFrom(getItem(oldPosition), true);
+					//unlinkHeaderFrom(getItem(oldPosition), true);
+					//TODO: Auto-linkage for all items with new header
 					linkHeaderTo(getItem(oldPosition), (IHeader) fromItem, true);
 				} else {
 					//Dragging up fromHeader
 					oldPosition = fromPosition + 1;
-					unlinkHeaderFrom(getItem(oldPosition), true);
+					//unlinkHeaderFrom(getItem(oldPosition), true);
+					//TODO: Auto-linkage for all items with new header
 					linkHeaderTo(getItem(oldPosition), (IHeader) toItem, true);
 				}
 			} else if (toItem instanceof IHeader) {
@@ -2610,7 +2613,8 @@ public class FlexibleAdapter<T extends IFlexible>
 				newPosition = fromPosition < toPosition ? toPosition : fromPosition + 1;
 				//Swap header linkage
 				if (DEBUG) Log.d(TAG, "NewPosition " + getItem(newPosition));
-				unlinkHeaderFrom(getItem(oldPosition), true);
+				//unlinkHeaderFrom(getItem(oldPosition), true);
+				//TODO: Auto-linkage old item with the first header to its top
 				linkHeaderTo(getItem(newPosition), (IHeader) toItem, true);
 				if (getItem(fromPosition - 2) instanceof IHeader) {
 					//Another Header receives the toItem
@@ -2622,7 +2626,8 @@ public class FlexibleAdapter<T extends IFlexible>
 				oldPosition = fromPosition < toPosition ? fromPosition : fromPosition + 1;
 				newPosition = fromPosition < toPosition ? toPosition + 1 : fromPosition;
 				//Swap header linkage
-				unlinkHeaderFrom(getItem(oldPosition), true);
+				//unlinkHeaderFrom(getItem(oldPosition), true);
+				//TODO: Auto-linkage old item with the first header to its top
 				linkHeaderTo(getItem(newPosition), (IHeader) fromItem, true);
 			} else {
 				//A Header receives the toItem
@@ -2630,7 +2635,8 @@ public class FlexibleAdapter<T extends IFlexible>
 				oldPosition = fromPosition < toPosition ? toPosition : fromPosition;
 				newPosition = fromPosition < toPosition ? fromPosition : toPosition;
 				//Swap header linkage
-				IHeader header = unlinkHeaderFrom(getItem(oldPosition), true);
+				//IHeader header = unlinkHeaderFrom(getItem(oldPosition), true);
+				IHeader header = getHeaderOf(getItem(oldPosition));
 				if (header != null)
 					linkHeaderTo(getItem(newPosition), header, true);
 			}

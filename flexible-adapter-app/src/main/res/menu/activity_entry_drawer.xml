@@ -32,7 +32,6 @@
 			android:title="@string/expandable_sections"/>
 		<item
 			android:id="@+id/nav_headers_and_sections"
-			android:enabled="false"
 			android:icon="@drawable/ic_sections_grey600_24dp"
 			android:title="@string/headers_sections"/>
 		<item

@@ -34,6 +34,7 @@ import android.widget.Toast;
 import eu.davidea.examples.flexibleadapter.fragments.FragmentAnimators;
 import eu.davidea.examples.flexibleadapter.fragments.FragmentExpandableMultiLevel;
 import eu.davidea.examples.flexibleadapter.fragments.FragmentExpandableSections;
+import eu.davidea.examples.flexibleadapter.fragments.FragmentHeadersSections;
 import eu.davidea.examples.flexibleadapter.fragments.FragmentOverall;
 import eu.davidea.examples.flexibleadapter.fragments.OnFragmentInteractionListener;
 import eu.davidea.examples.flexibleadapter.models.AbstractModelItem;
@@ -267,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_instagram_headers) {
 
 		} else if (id == R.id.nav_headers_and_sections) {
-
+			mFragment = FragmentHeadersSections.newInstance(2);
 		} else if (id == R.id.nav_selection_modes) {
 
 		} else if (id == R.id.nav_expandable) {
