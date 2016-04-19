@@ -124,7 +124,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		Log.v(TAG, "onCreateOptionsMenu called!");
-		inflater.inflate(R.menu.menu_sections, menu);
+		inflater.inflate(R.menu.menu_expandable, menu);
 		mListener.initSearchView(menu);
 		//TODO: Implement Filterable in the item interfaces
 	}

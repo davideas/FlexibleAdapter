@@ -200,8 +200,8 @@ public class DatabaseService {
 	 */
 	private ExpandableLevel0Item newExpandableLevelItem(int i) {
 		//ExpandableLevel0Item is an expandable with Level=0
-		ExpandableLevel0Item expandableItem = new ExpandableLevel0Item("EH" + i);
-		expandableItem.setTitle("Expandable Header Two-Levels " + i);
+		ExpandableLevel0Item expandableItem = new ExpandableLevel0Item("EI" + i);
+		expandableItem.setTitle("Expandable Two-Levels " + i);
 		for (int j = 1; j <= SUB_ITEMS; j++) {
 			//ExpandableLevel1Item is an expandable as well with Level=1
 			ExpandableLevel1Item expSubItem = new ExpandableLevel1Item(expandableItem.getId() + "-EL" + j);
