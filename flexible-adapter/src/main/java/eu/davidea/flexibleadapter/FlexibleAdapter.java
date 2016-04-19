@@ -1692,10 +1692,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void addSection(@NonNull IHeader header, @Nullable IHeader refHeader) {
 		int position = 0;
 		if (refHeader != null) {
-			int headerPosition = getGlobalPositionOf(refHeader);
+			position = getGlobalPositionOf(refHeader) + 1;
 			List<ISectionable> refSectionItems = getSectionItems(refHeader);
 			if (!refSectionItems.isEmpty()) {
-				position = headerPosition + refSectionItems.size() + 1;
+				position += refSectionItems.size();
 			}
 		}
 		header.setHidden(false);
