@@ -1,6 +1,5 @@
 package eu.davidea.examples.flexibleadapter;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
@@ -31,6 +30,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import eu.davidea.examples.flexibleadapter.fragments.AbstractFragment;
 import eu.davidea.examples.flexibleadapter.fragments.FragmentAnimators;
 import eu.davidea.examples.flexibleadapter.fragments.FragmentExpandableMultiLevel;
 import eu.davidea.examples.flexibleadapter.fragments.FragmentExpandableSections;
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
 	private Toolbar mToolbar;
 	private DrawerLayout mDrawer;
 	private NavigationView mNavigationView;
-	private Fragment mFragment;
+	private AbstractFragment mFragment;
 	private SearchView mSearchView;
 	private final Handler mSwipeHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	private void initializeFragment(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
-			mFragment = getFragmentManager().getFragment(savedInstanceState, STATE_ACTIVE_FRAGMENT);
+			mFragment = (AbstractFragment) getFragmentManager().getFragment(savedInstanceState, STATE_ACTIVE_FRAGMENT);
 		}
 		if (mFragment == null) {
 			mFragment = FragmentOverall.newInstance(2);

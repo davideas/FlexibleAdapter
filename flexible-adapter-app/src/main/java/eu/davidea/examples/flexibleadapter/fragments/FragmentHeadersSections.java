@@ -31,7 +31,11 @@ public class FragmentHeadersSections extends AbstractFragment {
 
 	public static final String TAG = FragmentHeadersSections.class.getSimpleName();
 
+	/**
+	 * Custom implementation of FlexibleAdapter
+	 */
 	private ExampleAdapter mAdapter;
+
 
 	public static FragmentHeadersSections newInstance(int columnCount) {
 		FragmentHeadersSections fragment = new FragmentHeadersSections();

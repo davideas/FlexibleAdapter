@@ -562,14 +562,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Retrieves all the header items.
 	 *
-	 * @return list non-null with all the header items.
+	 * @return non-null list with all the header items
 	 */
 	@NonNull
 	public List<IHeader> getHeaderItems() {
 		List<IHeader> headers = new ArrayList<IHeader>();
 		for (T item : mItems) {
 			IHeader header = getHeaderOf(item);
-			if (header != null) headers.add(header);
+			if (header != null && !headers.contains(header))
+				headers.add(header);
 		}
 		return headers;
 	}
@@ -1705,10 +1706,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void addSection(@NonNull IHeader header, @Nullable IHeader refHeader) {
 		int position = 0;
 		if (refHeader != null) {
-			int headerPosition = getGlobalPositionOf(refHeader);
+			position = getGlobalPositionOf(refHeader) + 1;
 			List<ISectionable> refSectionItems = getSectionItems(refHeader);
 			if (!refSectionItems.isEmpty()) {
-				position = headerPosition + refSectionItems.size() + 1;
+				position += refSectionItems.size();
 			}
 		}
 		header.setHidden(false);
