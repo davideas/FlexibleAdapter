@@ -140,7 +140,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Used to save deleted items and to recover them (Undo).
 	 */
 	private List<RestoreInfo> mRestoreList;
-	private boolean restoreSelection = false, multiRange = false, unlinkOnRemoveHeader = true,
+	private boolean restoreSelection = false, multiRange = false, unlinkOnRemoveHeader = false,
 			removeOrphanHeaders = false, permanentDelete = false, adjustSelected = true;
 
 	/* ViewTypes */
@@ -1947,6 +1947,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				List<ISectionable> sectionableList = getSectionItems((IHeader) item);
 				for (ISectionable sectionable : sectionableList) {
 					sectionable.setHeader(null);
+					if (payload != null) notifyItemChanged(getGlobalPositionOf(sectionable), payload);
 				}
 			}
 			//Remove item from internal list
@@ -2083,6 +2084,15 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 			//Item is again visible
 			restoreInfo.item.setHidden(false);
+
+			//Restore header linkage
+			if (unlinkOnRemoveHeader && isHeader(restoreInfo.item)) {
+				header = (IHeader) restoreInfo.item;
+				List<ISectionable> items = getSectionItems(header, true);
+				for (ISectionable sectionable : items) {
+					linkHeaderTo((T) sectionable, header, restoreInfo.payload);
+				}
+			}
 		}
 		//Restore selection if requested, before emptyBin
 		if (restoreSelection && !mRestoreList.isEmpty()) {

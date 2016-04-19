@@ -87,6 +87,8 @@ public class FragmentHeadersSections extends AbstractFragment {
 		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		mAdapter.setLongPressDragEnabled(true);
+		mAdapter.setSwipeEnabled(true);
+		mAdapter.setUnlinkAllItemsOnRemoveHeaders(true);
 		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
 		mAdapter.enableStickyHeaders();
 		//Add sample item on the top (HeaderView) (not belongs to the library)
