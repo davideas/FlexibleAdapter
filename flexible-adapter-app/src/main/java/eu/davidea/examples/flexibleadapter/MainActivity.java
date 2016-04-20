@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -37,6 +38,7 @@ import eu.davidea.examples.flexibleadapter.fragments.FragmentExpandableMultiLeve
 import eu.davidea.examples.flexibleadapter.fragments.FragmentExpandableSections;
 import eu.davidea.examples.flexibleadapter.fragments.FragmentHeadersSections;
 import eu.davidea.examples.flexibleadapter.fragments.FragmentOverall;
+import eu.davidea.examples.flexibleadapter.fragments.MessageDialogFragment;
 import eu.davidea.examples.flexibleadapter.fragments.OnFragmentInteractionListener;
 import eu.davidea.examples.flexibleadapter.models.AbstractModelItem;
 import eu.davidea.examples.flexibleadapter.models.ExpandableItem;
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements
 		initializeToolbar();
 		initializeDrawer();
 		initializeFab();
-		initializeBottomSheet();
+		//initializeBottomSheet();
 		//Initialize Fragment containing Adapter & RecyclerView
 		initializeFragment(savedInstanceState);
 
@@ -195,6 +197,18 @@ public class MainActivity extends AppCompatActivity implements
 
 	private void initializeBottomSheet() {
 		mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
+		mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+			@Override
+			public void onStateChanged(@NonNull View bottomSheet, int newState) {
+				if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+					mBottomSheetBehavior.setPeekHeight(0);
+				}
+			}
+
+			@Override
+			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+			}
+		});
 	}
 
 	@SuppressWarnings("ConstantConditions")
@@ -221,32 +235,35 @@ public class MainActivity extends AppCompatActivity implements
 		mFab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				destroyActionModeIfCan();
+//				destroyActionModeIfCan();
 
-				mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//				mBottomSheetBehavior.setPeekHeight(300);
+//				mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-				for (int position = 0; position <= mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1; position++) {
-					//Every 3 positions I want to create an expandable
-					AbstractModelItem item = (position % 3 == 0 ?
-							DatabaseService.newExpandableItem(position, null) :
-							DatabaseService.newSimpleItem(position, null));
-					//Add only if we don't have it
-					if (!DatabaseService.getInstance().getDatabaseList().contains(item)) {
-						DatabaseService.getInstance().addItem(position, item);//This is the original list
-						//For my example, the adapter position must be adjusted according to
-						//all child and headers currently visible
-						int adapterPos = position + mAdapter.getItemCountOfTypes(
-								R.layout.recycler_uls_row,
-								R.layout.recycler_expandable_row,
-								R.layout.recycler_child_row,
-								R.layout.recycler_header_row);
-						//Adapter's list is a copy, to animate the item you must call addItem on the new position
-						mAdapter.addItem(adapterPos, item);
-						Toast.makeText(MainActivity.this, "Added New " + item.getTitle(), Toast.LENGTH_SHORT).show();
-						mRecyclerView.smoothScrollToPosition(adapterPos);
-						break;
-					}
-				}
+				mFragment.showBottomSheet();
+
+//				for (int position = 0; position <= mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1; position++) {
+//					//Every 3 positions I want to create an expandable
+//					AbstractModelItem item = (position % 3 == 0 ?
+//							DatabaseService.newExpandableItem(position, null) :
+//							DatabaseService.newSimpleItem(position, null));
+//					//Add only if we don't have it
+//					if (!DatabaseService.getInstance().getDatabaseList().contains(item)) {
+//						DatabaseService.getInstance().addItem(position, item);//This is the original list
+//						//For my example, the adapter position must be adjusted according to
+//						//all child and headers currently visible
+//						int adapterPos = position + mAdapter.getItemCountOfTypes(
+//								R.layout.recycler_uls_row,
+//								R.layout.recycler_expandable_row,
+//								R.layout.recycler_child_row,
+//								R.layout.recycler_header_row);
+//						//Adapter's list is a copy, to animate the item you must call addItem on the new position
+//						mAdapter.addItem(adapterPos, item);
+//						Toast.makeText(MainActivity.this, "Added New " + item.getTitle(), Toast.LENGTH_SHORT).show();
+//						mRecyclerView.smoothScrollToPosition(adapterPos);
+//						break;
+//					}
+//				}
 			}
 		});
 	}
@@ -287,13 +304,13 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_expandable_sections) {
 			mFragment = FragmentExpandableSections.newInstance(3);
 		} else if (id == R.id.nav_about) {
-			MessageDialog.newInstance(
+			MessageDialogFragment.newInstance(
 					R.drawable.ic_info_grey600_24dp,
 					getString(R.string.about_title),
 					getString(R.string.about_body,
 							Utils.getVersionName(this),
 							Utils.getVersionCode(this)))
-					.show(getFragmentManager(), MessageDialog.TAG);
+					.show(getFragmentManager(), MessageDialogFragment.TAG);
 			return true;
 		} else if (id == R.id.nav_github) {
 

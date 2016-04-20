@@ -3,6 +3,7 @@ package eu.davidea.examples.flexibleadapter.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -81,8 +82,9 @@ public abstract class AbstractFragment extends Fragment {
 
 	protected abstract GridLayoutManager createNewGridLayoutManager();
 
-	public void addAdapterItem() {
-		//nothing by default
+	public void showBottomSheet() {
+		BottomSheetDialogFragment bottomSheetDialogFragment = BottomSheetDialogFragment.newInstance(R.layout.bottom_sheet_headers_sections);
+		bottomSheetDialogFragment.show( ((AppCompatActivity) getActivity()).getSupportFragmentManager(), BottomSheetDialogFragment.TAG );
 	}
 
 }

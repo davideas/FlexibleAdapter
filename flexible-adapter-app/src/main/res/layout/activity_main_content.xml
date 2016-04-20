@@ -26,11 +26,11 @@
 		android:layout_height="match_parent"
 		app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-	<!-- Adding any other scroll view, with BottomSheetBehavior -->
+	<!-- Bottom Sheet -->
 	<android.support.v4.widget.NestedScrollView
 		android:id="@+id/bottom_sheet"
 		android:layout_width="match_parent"
-		android:layout_height="0dp"
+		android:layout_height="match_parent"
 		app:behavior_peekHeight="@dimen/bottom_sheet_peek"
 		app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>
 
