@@ -81,4 +81,8 @@ public abstract class AbstractFragment extends Fragment {
 
 	protected abstract GridLayoutManager createNewGridLayoutManager();
 
+	public void addAdapterItem() {
+		//nothing by default
+	}
+
 }

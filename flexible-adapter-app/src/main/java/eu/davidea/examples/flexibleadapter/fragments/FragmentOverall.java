@@ -69,7 +69,7 @@ public class FragmentOverall extends AbstractFragment {
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView);
 	}
 
 	@Override

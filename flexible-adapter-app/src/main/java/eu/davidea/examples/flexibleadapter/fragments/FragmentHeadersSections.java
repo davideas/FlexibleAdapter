@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
 import eu.davidea.examples.flexibleadapter.ExampleAdapter;
 import eu.davidea.examples.flexibleadapter.MainActivity;
@@ -99,7 +100,16 @@ public class FragmentHeadersSections extends AbstractFragment {
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView);
+
+		//Inflate the bottom sheet for Headers and Sections to customize the addItem
+		inflateBottomSheet();
+	}
+
+	private void inflateBottomSheet() {
+		getActivity().getLayoutInflater().inflate(R.layout.bottom_sheet_headers_sections,
+				(ViewGroup) getActivity().findViewById(R.id.bottom_sheet));
+		//TODO: add listeners to the custom views
 	}
 
 	@Override

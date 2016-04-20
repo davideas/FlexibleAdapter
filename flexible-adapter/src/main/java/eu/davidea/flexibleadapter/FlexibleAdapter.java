@@ -733,11 +733,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		return getSectionItems(header, false);
 	}
 
-	private List<ISectionable> getSectionItems(@NonNull IHeader header, boolean nextHeader) {
+	private List<ISectionable> getSectionItems(@NonNull IHeader header, boolean untilNextHeader) {
 		List<ISectionable> sectionItems = new ArrayList<ISectionable>();
 		int startPosition = getGlobalPositionOf(header);
 		T item = getItem(++startPosition);
-		while (hasSameHeader(item, header) || (nextHeader && !isHeader(item))) {
+		while (hasSameHeader(item, header) || (untilNextHeader && !isHeader(item))) {
 			sectionItems.add((ISectionable) item);
 			item = getItem(++startPosition);
 		}

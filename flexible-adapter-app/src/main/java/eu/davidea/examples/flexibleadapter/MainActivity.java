@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -53,7 +54,7 @@ import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.utils.Utils;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "unchecked"})
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener, SearchView.OnQueryTextListener,
 		FlexibleAdapter.OnUpdateListener, FlexibleAdapter.OnDeleteCompleteListener,
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements
 	private ActionMode mActionMode;
 	private Snackbar mSnackBar;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
+	private BottomSheetBehavior mBottomSheetBehavior;
 	private Toolbar mToolbar;
 	private DrawerLayout mDrawer;
 	private NavigationView mNavigationView;
@@ -113,10 +115,11 @@ public class MainActivity extends AppCompatActivity implements
 		Log.d(TAG, "onCreate");
 		FlexibleAdapter.enableLogs(true);
 
-		//Initialize Toolbar, Drawer & FAB
+		//Initialize Toolbar, Drawer, FAB & BottomSheet
 		initializeToolbar();
 		initializeDrawer();
 		initializeFab();
+		initializeBottomSheet();
 		//Initialize Fragment containing Adapter & RecyclerView
 		initializeFragment(savedInstanceState);
 
@@ -144,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onAdapterChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView) {
+	public void onFragmentChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView) {
 		mRecyclerView = recyclerView;
 		mAdapter = (FlexibleAdapter) recyclerView.getAdapter();
 		mSwipeRefreshLayout = swipeRefreshLayout;
@@ -190,6 +193,10 @@ public class MainActivity extends AppCompatActivity implements
 		setSupportActionBar(mToolbar);
 	}
 
+	private void initializeBottomSheet() {
+		mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
+	}
+
 	@SuppressWarnings("ConstantConditions")
 	private void initializeDrawer() {
 		mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -215,6 +222,8 @@ public class MainActivity extends AppCompatActivity implements
 			@Override
 			public void onClick(View v) {
 				destroyActionModeIfCan();
+
+				mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
 				for (int position = 0; position <= mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1; position++) {
 					//Every 3 positions I want to create an expandable
@@ -498,8 +507,8 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemMove(int fromPosition, int toPosition) {
-		IFlexible fromItem = mAdapter.getItem(fromPosition);
-		IFlexible toItem = mAdapter.getItem(toPosition);
+//		IFlexible fromItem = mAdapter.getItem(fromPosition);
+//		IFlexible toItem = mAdapter.getItem(toPosition);
 		//Don't swap if a Header is involved!!!
 //		if (fromItem instanceof ISectionable || toItem instanceof ISectionable) {
 //			return;
@@ -631,7 +640,7 @@ public class MainActivity extends AppCompatActivity implements
 					//SubItem
 					SubItem subItem = (SubItem) adapterItem;
 					IExpandable expandable = mAdapter.getExpandableOf(subItem);
-					DatabaseService.getInstance().removeSubItem((ExpandableItem) expandable, subItem);
+					DatabaseService.getInstance().removeSubItem(expandable, subItem);
 					Log.d(TAG, "Confirm removed " + subItem.getTitle());
 				} else if (adapterItem instanceof SimpleItem) {
 					//SimpleItem or ExpandableItem(extends SimpleItem)

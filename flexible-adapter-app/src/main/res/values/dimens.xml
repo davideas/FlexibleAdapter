@@ -15,6 +15,7 @@
 	<dimen name="fab_margin">16dp</dimen>
 	<dimen name="butterbar_height">3dp</dimen>
 	<dimen name="toolbar_height">56dp</dimen>
+	<dimen name="bottom_sheet_peek">318</dimen>
 
 	<dimen name="label_height">150dp</dimen>
 	<dimen name="dialog_padding_vertical">24dp</dimen>

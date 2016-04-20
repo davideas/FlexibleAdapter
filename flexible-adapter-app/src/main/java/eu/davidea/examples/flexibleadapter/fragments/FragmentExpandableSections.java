@@ -99,7 +99,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		mListener.onAdapterChange(swipeRefreshLayout, mRecyclerView);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView);
 	}
 
 	@Override

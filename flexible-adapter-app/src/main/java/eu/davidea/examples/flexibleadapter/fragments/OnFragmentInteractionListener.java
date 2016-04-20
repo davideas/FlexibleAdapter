@@ -16,7 +16,7 @@ import android.view.Menu;
  */
 public interface OnFragmentInteractionListener {
 
-	void onAdapterChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView);
+	void onFragmentChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView);
 
 	void initSearchView(final Menu menu);
 
