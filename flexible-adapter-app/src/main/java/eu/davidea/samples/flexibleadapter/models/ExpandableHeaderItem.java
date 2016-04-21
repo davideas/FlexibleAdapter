@@ -9,11 +9,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem.ExpandableHeaderViewHolder;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IHeader;
+import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem.ExpandableHeaderViewHolder;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
@@ -95,7 +95,7 @@ public class ExpandableHeaderItem
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_header_row;
+		return R.layout.recycler_expandable_header_row;
 	}
 
 	@Override

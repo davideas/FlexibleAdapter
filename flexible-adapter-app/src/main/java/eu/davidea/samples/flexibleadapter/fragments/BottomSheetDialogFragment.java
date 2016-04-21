@@ -16,12 +16,14 @@ import android.widget.Button;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
 
+import eu.davidea.common.SimpleOnTouchListener;
 import eu.davidea.samples.flexibleadapter.R;
 
 /**
  * @author Davide Steduto
  * @since 20/04/2016
  */
+@SuppressWarnings({"ConstantConditions", "unchecked"})
 public class BottomSheetDialogFragment extends android.support.design.widget.BottomSheetDialogFragment
 		implements View.OnClickListener, AdapterView.OnItemClickListener {
 
@@ -29,9 +31,11 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
 	public static final String ARG_LAYOUT = "layout";
 
 	private BottomSheetDialog mBottomSheetDialog;
-	private ArrayAdapter mAdapter;
-	private ListPopupWindow mPopup;
-	private int mReferencePosition = -1, mChildPosition = -1;
+	private ArrayAdapter mAdapterItemType;
+	private ArrayAdapter mAdapterReference;
+	private ListPopupWindow mPopupItemType;
+	private ListPopupWindow mPopupReference;
+	private int mItemType = 0, mReferencePosition = -1, mChildPosition = 0;
 
 	public BottomSheetDialogFragment() {
 	}
@@ -76,42 +80,62 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		mBottomSheetDialog = new BottomSheetDialog(getActivity(), R.style.AppTheme_BottomSheetDialog);
 		mBottomSheetDialog.setContentView(getArguments().getInt(ARG_LAYOUT));
-		View buttonList = mBottomSheetDialog.findViewById(R.id.dialog_select_reference_button);
-		buttonList.setOnClickListener(this);
-		View fab = mBottomSheetDialog.findViewById(R.id.fab);
-		fab.setOnClickListener(this);
-		createPopUp();
+		mBottomSheetDialog.findViewById(R.id.select_item_type).setOnClickListener(this);
+		mBottomSheetDialog.findViewById(R.id.select_item_type).setOnTouchListener(new SimpleOnTouchListener(getContext()));
+		mBottomSheetDialog.findViewById(R.id.select_reference_button).setOnClickListener(this);
+		mBottomSheetDialog.findViewById(R.id.select_reference_button).setOnTouchListener(new SimpleOnTouchListener(getContext()));
+		mBottomSheetDialog.findViewById(R.id.fab).setOnClickListener(this);
+		createPopUps();
 		return mBottomSheetDialog;
 	}
 
-	private void createPopUp() {
+	private void createPopUps() {
 		//Create the Adapter
-		if (mAdapter == null)
-			mAdapter = new ArrayAdapter(getContext(), R.layout.reference_row, getListener().getReferenceList());
+		if (mAdapterReference == null) {
+			mAdapterItemType = new ArrayAdapter(getContext(), R.layout.reference_row, new String[]{"Simple Item", "Expandable", "Expandable Section", "Section"});
+			mAdapterReference = new ArrayAdapter(getContext(), R.layout.reference_row, getListener().getReferenceList());
+		}
+		//Setting up the popups
+		Log.d(TAG, "Setting up the Popups");
+		//Item Type
+		mPopupItemType = new ListPopupWindow(getContext());
+		mPopupItemType.setAnchorView(mBottomSheetDialog.findViewById(R.id.select_item_type));
+		mPopupItemType.setModal(true);
+		mPopupItemType.setInputMethodMode(ListPopupWindow.INPUT_METHOD_NOT_NEEDED);
+		mPopupItemType.setAnimationStyle(android.R.style.Animation_Dialog);
+		mPopupItemType.setAdapter(mAdapterItemType);
+		mPopupItemType.setVerticalOffset(-100);
 
-		//Setting up the popup
-		Log.d(TAG, "Setting up the Popup");
-		mPopup = new ListPopupWindow(getContext());
-		mPopup.setAnchorView(mBottomSheetDialog.findViewById(R.id.dialog_select_reference_button));
-		mPopup.setModal(true);
-		mPopup.setInputMethodMode(ListPopupWindow.INPUT_METHOD_NOT_NEEDED);
-		mPopup.setAnimationStyle(android.R.style.Animation_Dialog);
-		mPopup.setAdapter(mAdapter);
-		if (mAdapter.getCount() > 6)
-			mPopup.setHeight(getResources().getDimensionPixelSize(R.dimen.popup_max_height));
-
+		//Header Reference
+		mPopupReference = new ListPopupWindow(getContext());
+		mPopupReference.setAnchorView(mBottomSheetDialog.findViewById(R.id.select_reference_button));
+		mPopupReference.setModal(true);
+		mPopupReference.setInputMethodMode(ListPopupWindow.INPUT_METHOD_NOT_NEEDED);
+		mPopupReference.setAnimationStyle(android.R.style.Animation_Dialog);
+		mPopupReference.setAdapter(mAdapterReference);
+		mPopupReference.setVerticalOffset(-100);
+		if (mAdapterReference.getCount() > 6)
+			mPopupReference.setHeight(getResources().getDimensionPixelSize(R.dimen.popup_max_height));
 	}
 
 
 	@Override
 	public void onClick(View view) {
 		if (view.getId() == R.id.fab) {
-			getListener().onParameterSelected(mReferencePosition, mChildPosition);
+			getListener().onParameterSelected(mItemType, mReferencePosition, mChildPosition);
 			dismiss();
-		} else {
-			mPopup.show();
-			ListView listView = mPopup.getListView();
-			listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+		} else if (view.getId() == R.id.select_item_type) {
+			mPopupItemType.show();
+			ListView listView = mPopupItemType.getListView();
+			listView.setTag(R.id.select_item_type);
+			listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+			listView.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
+			listView.setOnItemClickListener(this);
+		} else if (view.getId() == R.id.select_reference_button) {
+			mPopupReference.show();
+			ListView listView = mPopupReference.getListView();
+			listView.setTag(R.id.select_reference_button);
+			listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 			listView.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
 			listView.setOnItemClickListener(this);
 		}
@@ -120,11 +144,17 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		ListView listView = (ListView) parent;
-		Button buttonList = (Button) mBottomSheetDialog.findViewById(R.id.dialog_select_reference_button);
-		buttonList.setText(listView.getItemAtPosition(position).toString());
-		mReferencePosition = getListener().getReferenceList().indexOf(listView.getItemAtPosition(position));
-		Log.d(TAG, "Header position = " + mReferencePosition);
-		mPopup.dismiss();
+		if (listView.getTag().equals(R.id.select_item_type)) {
+			Button buttonList = (Button) mBottomSheetDialog.findViewById(R.id.select_item_type);
+			buttonList.setText(listView.getItemAtPosition(position).toString());
+			mItemType = position;
+			mPopupItemType.dismiss();
+		} else if (listView.getTag().equals(R.id.select_reference_button)) {
+			Button buttonList = (Button) mBottomSheetDialog.findViewById(R.id.select_reference_button);
+			buttonList.setText(listView.getItemAtPosition(position).toString());
+			mReferencePosition = getListener().getReferenceList().indexOf(listView.getItemAtPosition(position));
+			mPopupReference.dismiss();
+		}
 	}
 
 }

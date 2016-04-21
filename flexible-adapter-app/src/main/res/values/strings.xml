@@ -21,6 +21,7 @@
 	<string name="hide_headers">Hide Headers</string>
 	<string name="sticky_headers">Sticky Headers</string>
 	<string name="scroll_headers">Scroll Headers</string>
+	<string name="create_new_item">Create new Item</string>
 	<string name="undo">Undo</string>
 
 	<!-- User Learns Selection -->
@@ -38,6 +39,8 @@
 	<string name="err_no_edit">Nothing to modify</string>
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
+	<string name="select_item_type">"Select Item Type                     "</string>
+	<string name="select_section_reference">"Select Section Reference             "</string>
 
 	<!-- Menu Drawers -->
 	<string name="overall">Overall</string>
@@ -111,6 +114,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 <br/>See the License for the specific language governing permissions and
 limitations under the License.
 ]]></string>
-	<string name="section_reference">"Section reference             "</string>
 
 </resources>

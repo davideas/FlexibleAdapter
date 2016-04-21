@@ -113,6 +113,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 				switch (mAdapter.getItemViewType(position)) {
 					case R.layout.recycler_uls_row:
 					case R.layout.recycler_header_row:
+					case R.layout.recycler_expandable_header_row:
 					case R.layout.recycler_expandable_row:
 						return mColumnCount;
 					default:

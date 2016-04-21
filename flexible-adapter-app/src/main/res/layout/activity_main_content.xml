@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
-	android:id="@+id/main_view"
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/main_view"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:fitsSystemWindows="true"
@@ -11,6 +11,7 @@
 
 	<!-- Toolbar -->
 	<android.support.design.widget.AppBarLayout
+		android:id="@+id/app_bar"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:theme="@style/AppTheme.AppBarOverlay">
@@ -27,13 +28,19 @@
 		app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 	<!-- Bottom Sheet -->
-	<android.support.v4.widget.NestedScrollView
-		android:id="@+id/bottom_sheet"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		app:behavior_peekHeight="@dimen/bottom_sheet_peek"
-		app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>
+	<!--<FrameLayout-->
+		<!--android:id="@+id/bottom_sheet"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="match_parent"-->
+		<!--app:behavior_hideable="true"-->
+		<!--app:behavior_peekHeight="56dp"-->
+		<!--app:layout_behavior="@string/bottom_sheet_behavior">-->
 
+		<!--<include layout="@layout/bottom_sheet_headers_sections"/>-->
+
+	<!--</FrameLayout>-->
+
+	<!-- FAB -->
 	<android.support.design.widget.FloatingActionButton
 		android:id="@+id/fab"
 		android:layout_width="wrap_content"

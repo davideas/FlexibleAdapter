@@ -32,6 +32,12 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.IFlexible;
+import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.fragments.AbstractFragment;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentAnimators;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableMultiLevel;
@@ -48,12 +54,6 @@ import eu.davidea.samples.flexibleadapter.models.OverallItem;
 import eu.davidea.samples.flexibleadapter.models.SimpleItem;
 import eu.davidea.samples.flexibleadapter.models.SubItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.flexibleadapter.items.IExpandable;
-import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.utils.Utils;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements
 		initializeToolbar();
 		initializeDrawer();
 		initializeFab();
-		//initializeBottomSheet();
+//		initializeBottomSheet();
 		//Initialize Fragment containing Adapter & RecyclerView
 		initializeFragment(savedInstanceState);
 
@@ -195,23 +195,6 @@ public class MainActivity extends AppCompatActivity implements
 		setSupportActionBar(mToolbar);
 	}
 
-	private void initializeBottomSheet() {
-		mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
-		mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-			@Override
-			public void onStateChanged(@NonNull View bottomSheet, int newState) {
-				if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-					mBottomSheetBehavior.setPeekHeight(0);
-				}
-			}
-
-			@Override
-			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-			}
-		});
-	}
-
-	@SuppressWarnings("ConstantConditions")
 	private void initializeDrawer() {
 		mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -228,6 +211,22 @@ public class MainActivity extends AppCompatActivity implements
 		appVersion.setText(getString(R.string.about_version,
 				Utils.getVersionName(this),
 				Utils.getVersionCode(this)));
+	}
+
+	private void initializeBottomSheet() {
+		mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
+		mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+			@Override
+			public void onStateChanged(@NonNull View bottomSheet, int newState) {
+				if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+					mBottomSheetBehavior.setPeekHeight(56);
+				}
+			}
+
+			@Override
+			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+			}
+		});
 	}
 
 	private void initializeFab() {

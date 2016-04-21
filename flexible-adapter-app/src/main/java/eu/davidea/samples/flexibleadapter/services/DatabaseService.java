@@ -164,9 +164,9 @@ public class DatabaseService {
 	 * Creates a normal expandable item with some subItems.
 	 * The expandable has a Header linked.
 	 */
-	public static ExpandableItem newExpandableItem(int i, HeaderItem header) {
+	public static ExpandableItem newExpandableItem(int i, IHeader header) {
 		//Items are expandable because they implements IExpandable
-		ExpandableItem expandableItem = new ExpandableItem("E" + i, header);
+		ExpandableItem expandableItem = new ExpandableItem("E" + i, (HeaderItem) header);
 		expandableItem.setTitle("Expandable Item " + i);
 		//SubItems are not expandable by default, but they might be if extends/implements IExpandable
 		for (int j = 1; j <= SUB_ITEMS; j++) {
@@ -181,7 +181,7 @@ public class DatabaseService {
 	 * Creates a special expandable item which is also a Header.
 	 * The subItems will have linked its parent as Header!
 	 */
-	private ExpandableHeaderItem newExpandableSectionItem(int i) {
+	public static ExpandableHeaderItem newExpandableSectionItem(int i) {
 		ExpandableHeaderItem expandableItem = new ExpandableHeaderItem("EH" + i);
 		expandableItem.setTitle("Expandable Header " + i);
 		for (int j = 1; j <= SUB_ITEMS; j++) {
