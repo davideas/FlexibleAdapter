@@ -2,6 +2,7 @@ package eu.davidea.examples.flexibleadapter.fragments;
 
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,14 +12,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import java.util.List;
+
 import eu.davidea.examples.flexibleadapter.ExampleAdapter;
 import eu.davidea.examples.flexibleadapter.MainActivity;
 import eu.davidea.examples.flexibleadapter.R;
+import eu.davidea.examples.flexibleadapter.models.SimpleItem;
 import eu.davidea.examples.flexibleadapter.services.DatabaseService;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
+import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 
@@ -27,7 +32,8 @@ import eu.davidea.utils.Utils;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class FragmentHeadersSections extends AbstractFragment {
+public class FragmentHeadersSections extends AbstractFragment
+		implements OnParameterSelectedListener {
 
 	public static final String TAG = FragmentHeadersSections.class.getSimpleName();
 
@@ -103,9 +109,34 @@ public class FragmentHeadersSections extends AbstractFragment {
 	}
 
 	@Override
-	public void showBottomSheet() {
-		super.showBottomSheet();
-		//TODO: add listeners to the custom views
+	public void addItem() {
+		BottomSheetDialogFragment bottomSheetDialogFragment = BottomSheetDialogFragment.newInstance(R.layout.bottom_sheet_headers_sections, this);
+		bottomSheetDialogFragment.show( ((AppCompatActivity) getActivity()).getSupportFragmentManager(), BottomSheetDialogFragment.TAG );
+	}
+
+	@Override
+	public void onParameterSelected(int referencePosition, int childPosition) {
+		if (referencePosition < 0) return;
+		int adapterPos = 0;
+		if (childPosition < 0) {
+			int id = mAdapter.getItemCountOfTypes(R.layout.recycler_header_row) + 1;
+			IHeader referenceHeader = getReferenceList().get(referencePosition);
+			IHeader header = DatabaseService.newHeader(id);
+			mAdapter.addSection(header, referenceHeader);
+			adapterPos = mAdapter.getGlobalPositionOf(header);
+		} else {
+			int id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1;
+			IHeader referenceHeader = getReferenceList().get(referencePosition);
+			SimpleItem item = DatabaseService.newSimpleItem(id, referenceHeader);
+			mAdapter.addItemToSection(item, referenceHeader, childPosition);
+			adapterPos = mAdapter.getGlobalPositionOf(item);
+		}
+		mRecyclerView.smoothScrollToPosition(adapterPos);
+	}
+
+	@Override
+	public List<IHeader> getReferenceList() {
+		return mAdapter.getHeaderItems();
 	}
 
 	@Override

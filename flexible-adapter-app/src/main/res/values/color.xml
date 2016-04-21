@@ -2,9 +2,9 @@
 <resources>
 
 	<!-- Light Theme -->
-	<color name="colorPrimary_light">#673AB7</color><!-- Deep Purple 500 -->
-	<color name="colorPrimaryDark_light">#512DA8</color><!-- Deep Purple 700 -->
-	<color name="colorAccent_light">#FF4081</color><!-- Pink A200 -->
+	<color name="colorPrimary_light">#673ab7</color><!-- Deep Purple 500 -->
+	<color name="colorPrimaryDark_light">#512da8</color><!-- Deep Purple 700 -->
+	<color name="colorAccent_light">#ff4081</color><!-- Pink A200 -->
 	<color name="colorAccentDark_light">#c51162</color><!-- Pink A700: for statusBar in actionMode -->
 	<color name="colorPrimaryText_light">#de000000</color>
 

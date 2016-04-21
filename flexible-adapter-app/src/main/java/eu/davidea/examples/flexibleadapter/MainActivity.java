@@ -1,6 +1,5 @@
 package eu.davidea.examples.flexibleadapter;
 
-import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
@@ -12,6 +11,7 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements
 	public void onSaveInstanceState(Bundle outState) {
 		Log.v(TAG, "onSaveInstanceState start!");
 		mAdapter.onSaveInstanceState(outState);
-		getFragmentManager().putFragment(outState, STATE_ACTIVE_FRAGMENT, mFragment);
+		getSupportFragmentManager().putFragment(outState, STATE_ACTIVE_FRAGMENT, mFragment);
 		super.onSaveInstanceState(outState);
 	}
 
@@ -158,13 +158,13 @@ public class MainActivity extends AppCompatActivity implements
 
 	private void initializeFragment(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
-			mFragment = (AbstractFragment) getFragmentManager().getFragment(savedInstanceState, STATE_ACTIVE_FRAGMENT);
+			mFragment = (AbstractFragment) getSupportFragmentManager().getFragment(savedInstanceState, STATE_ACTIVE_FRAGMENT);
 		}
 		if (mFragment == null) {
 			mFragment = FragmentOverall.newInstance(2);
 			mToolbar.setSubtitle(getString(R.string.overall));
 		}
-		FragmentManager fragmentManager = getFragmentManager();
+		FragmentManager fragmentManager = getSupportFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.recycler_view_container,
 				mFragment).commit();
 	}
@@ -235,12 +235,12 @@ public class MainActivity extends AppCompatActivity implements
 		mFab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-//				destroyActionModeIfCan();
+				destroyActionModeIfCan();
 
 //				mBottomSheetBehavior.setPeekHeight(300);
 //				mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-				mFragment.showBottomSheet();
+				mFragment.addItem();
 
 //				for (int position = 0; position <= mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1; position++) {
 //					//Every 3 positions I want to create an expandable
@@ -266,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements
 //				}
 			}
 		});
+		hideFab();
 	}
 
 	@Override
@@ -326,11 +327,17 @@ public class MainActivity extends AppCompatActivity implements
 			//in the Fragment view.
 			mAdapter.onDetachedFromRecyclerView(mRecyclerView);
 			//Inflate the new Fragment with the new RecyclerView and a new Adapter
-			FragmentManager fragmentManager = getFragmentManager();
+			FragmentManager fragmentManager = getSupportFragmentManager();
 			fragmentManager.beginTransaction().replace(R.id.recycler_view_container, mFragment).commit();
 			//Close drawer
 			mDrawer.closeDrawer(GravityCompat.START);
 			mToolbar.setSubtitle(item.getTitle());
+
+			if (mFab != null) {
+				if (mFragment instanceof FragmentOverall) hideFab();
+				else showFab();
+			}
+
 			return true;
 		}
 		return false;
@@ -368,11 +375,7 @@ public class MainActivity extends AppCompatActivity implements
 							if (listTypeItem != null)
 								listTypeItem.setVisible(false);
 
-							ViewCompat.animate(mFab)
-									.scaleX(0f).scaleY(0f)
-									.alpha(0f).setDuration(100)
-									.start();
-
+							hideFab();
 							return true;
 						}
 
@@ -382,16 +385,7 @@ public class MainActivity extends AppCompatActivity implements
 							if (listTypeItem != null)
 								listTypeItem.setVisible(true);
 
-							mFab.postDelayed(new Runnable() {
-								@Override
-								public void run() {
-									ViewCompat.animate(mFab)
-											.scaleX(1f).scaleY(1f)
-											.alpha(1f).setDuration(100)
-											.start();
-								}
-							}, 400L);
-
+							showFab();
 							return true;
 						}
 					});
@@ -402,6 +396,21 @@ public class MainActivity extends AppCompatActivity implements
 			mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 			mSearchView.setOnQueryTextListener(this);
 		}
+	}
+
+	private void hideFab() {
+		ViewCompat.animate(mFab)
+				.scaleX(0f).scaleY(0f)
+				.alpha(0f).setDuration(100)
+				.start();
+	}
+
+	private void showFab() {
+		ViewCompat.animate(mFab)
+				.scaleX(1f).scaleY(1f)
+				.alpha(1f).setDuration(100)
+				.setStartDelay(400L)
+				.start();
 	}
 
 	@Override

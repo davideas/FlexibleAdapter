@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:background="@color/cardview_light_background"
-              android:orientation="vertical"
-              android:padding="@dimen/activity_horizontal_margin">
+			  android:layout_width="match_parent"
+			  android:layout_height="wrap_content"
+			  xmlns:app="http://schemas.android.com/apk/res-auto"
+			  android:background="@color/cardview_light_background"
+			  android:orientation="vertical"
+			  android:padding="@dimen/activity_horizontal_margin">
 
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -14,15 +15,15 @@
 		<TextView
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_weight="2"
 			android:layout_gravity="center_vertical"
+			android:layout_weight="1"
 			android:text="Item type"/>
 
 		<RadioGroup
-			android:layout_width="0dp"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:layout_weight="2">
+			android:layout_gravity="right"
+			android:orientation="horizontal">
 
 			<RadioButton
 				android:layout_width="wrap_content"
@@ -32,7 +33,7 @@
 			<RadioButton
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="Item"/>
+				android:text="Simple item"/>
 
 		</RadioGroup>
 
@@ -47,8 +48,32 @@
 		<TextView
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_weight="5"
-			android:text="After"/>
+			android:layout_gravity="center_vertical"
+			android:layout_weight="1"
+			android:text="Position in the list"/>
+
+		<RadioGroup
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="end"
+			android:orientation="horizontal">
+
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Top"/>
+
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Middle"/>
+
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Bottom"/>
+
+		</RadioGroup>
 
 	</LinearLayout>
 
@@ -61,9 +86,71 @@
 		<TextView
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_weight="5"
-			android:text="Item position"/>
+			android:layout_gravity="center_vertical"
+			android:layout_weight="1"
+			android:text="After"/>
+
+		<Button
+			android:id="@+id/dialog_select_reference_button"
+			style="@style/AppTheme.SpinnerButtonStyle"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:focusableInTouchMode="true"
+			android:hint="@string/section_reference"
+			android:minHeight="@dimen/popup_button_min_height"
+			android:singleLine="true"
+			android:textAppearance="?android:textAppearanceSmall"
+			android:textStyle="bold"/>
 
 	</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="@dimen/activity_vertical_margin"
+		android:orientation="horizontal">
+
+		<TextView
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="1"
+			android:text="Relative position"/>
+
+		<RadioGroup
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="right"
+			android:orientation="horizontal">
+
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Top"/>
+
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Middle"/>
+
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Bottom"/>
+
+		</RadioGroup>
+
+	</LinearLayout>
+
+	<android.support.design.widget.FloatingActionButton
+		android:id="@+id/fab"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_margin="@dimen/fab_margin"
+		android:clickable="true"
+		android:src="@drawable/fab_add"
+		app:borderWidth="0dp"/>
 
 </LinearLayout>

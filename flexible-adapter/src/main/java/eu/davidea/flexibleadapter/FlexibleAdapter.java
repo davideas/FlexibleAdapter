@@ -1698,7 +1698,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>- To add section to the top, set {@code refHeader} to null;
 	 * <br/>- To add section in the middle, set {@code refHeader} to the previous section;
 	 * <br/>- To add section to the bottom, set {@code refHeader} to your last header/section or
-	 * use the method {@code addItems(itemCount, items)} (header will be automatically shown).</p>
+	 * use the method {@code addItem(position=itemCount, header)}.</p>
 	 *
 	 * @param header    the section header item to add
 	 * @param refHeader optional reference section item

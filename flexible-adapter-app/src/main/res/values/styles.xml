@@ -35,4 +35,27 @@
 
 	<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
+	<style name="AppTheme.AlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+		<item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+		<item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+		<item name="android:windowContentOverlay">@null</item>
+		<item name="colorControlActivated">@color/colorAccent_light</item>
+		<item name="colorAccent">@color/colorAccent_light</item>
+		<item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
+		<item name="colorPrimary">@color/colorPrimary_light</item>
+	</style>
+
+	<style name="AppTheme.BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+		<item name="colorControlActivated">@color/colorAccent_light</item>
+		<item name="colorAccent">@color/colorAccent_light</item>
+		<item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
+		<item name="colorPrimary">@color/colorPrimary_light</item>
+	</style>
+
+	<style name="AppTheme.SpinnerButtonStyle" parent="Widget.AppCompat.Spinner.Underlined">
+		<item name="android:textStyle">bold</item>
+		<item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+		<item name="android:gravity">start|center_vertical</item>
+	</style>
+
 </resources>

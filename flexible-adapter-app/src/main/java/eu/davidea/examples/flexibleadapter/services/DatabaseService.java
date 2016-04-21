@@ -20,6 +20,7 @@ import eu.davidea.examples.flexibleadapter.models.SubItem;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
+import eu.davidea.flexibleadapter.items.IHeader;
 
 /**
  * Created by Davide Steduto on 23/11/2015.
@@ -131,7 +132,7 @@ public class DatabaseService {
 		HeaderItem header = null;
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
-			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i) : header;
+			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i * HEADERS/ITEMS + 1) : header;
 			mItems.add(newSimpleItem(i + 1, header));
 		}
 	}
@@ -144,7 +145,6 @@ public class DatabaseService {
 	 * Create a Header item for normal items.
 	 */
 	public static HeaderItem newHeader(int i) {
-		i = i * HEADERS/ITEMS + 1;
 		HeaderItem header = new HeaderItem("H" + i);
 		header.setTitle("Header " + i);
 		//header is hidden and un-selectable by default!
@@ -154,8 +154,8 @@ public class DatabaseService {
 	/*
 	 * Creates a normal item with a Header linked.
 	 */
-	public static SimpleItem newSimpleItem(int i, HeaderItem header) {
-		SimpleItem item = new SimpleItem("I" + i, header);
+	public static SimpleItem newSimpleItem(int i, IHeader header) {
+		SimpleItem item = new SimpleItem("I" + i, (HeaderItem) header);
 		item.setTitle("Simple Item " + i);
 		return item;
 	}

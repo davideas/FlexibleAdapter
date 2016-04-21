@@ -15,6 +15,8 @@
 	<dimen name="fab_margin">16dp</dimen>
 	<dimen name="butterbar_height">3dp</dimen>
 	<dimen name="toolbar_height">56dp</dimen>
+	<dimen name="popup_button_min_height">33dp</dimen>
+	<dimen name="popup_max_height">290dp</dimen>
 	<dimen name="bottom_sheet_peek">318dp</dimen>
 
 	<dimen name="label_height">150dp</dimen>

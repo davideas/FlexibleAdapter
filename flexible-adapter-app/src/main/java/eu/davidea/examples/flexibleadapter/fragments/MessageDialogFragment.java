@@ -67,7 +67,7 @@ public class MessageDialogFragment extends DialogFragment {
 		messageView.setMovementMethod(LinkMovementMethod.getInstance());
 		messageView.setText(Html.fromHtml(getArguments().getString(ARG_MESSAGE)));
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());//), R.style.AppTheme_AlertDialog);
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_AlertDialog);
 		builder.setTitle(getArguments().getString(ARG_TITLE))
 				.setIcon(getArguments().getInt(ARG_ICON))
 				.setView(dialogView)
