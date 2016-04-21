@@ -568,9 +568,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	public List<IHeader> getHeaderItems() {
 		List<IHeader> headers = new ArrayList<IHeader>();
 		for (T item : mItems) {
-			IHeader header = getHeaderOf(item);
-			if (header != null && !headers.contains(header))
-				headers.add(header);
+			if (isHeader(item))
+				headers.add((IHeader) item);
 		}
 		return headers;
 	}
@@ -730,14 +729,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@NonNull
 	public List<ISectionable> getSectionItems(@NonNull IHeader header) {
-		return getSectionItems(header, false);
-	}
-
-	private List<ISectionable> getSectionItems(@NonNull IHeader header, boolean untilNextHeader) {
 		List<ISectionable> sectionItems = new ArrayList<ISectionable>();
 		int startPosition = getGlobalPositionOf(header);
 		T item = getItem(++startPosition);
-		while (item != null && (hasSameHeader(item, header) || (untilNextHeader && !isHeader(item)))) {
+		while (item != null && !isHeader(item)) {
 			sectionItems.add((ISectionable) item);
 			item = getItem(++startPosition);
 		}
@@ -2089,7 +2084,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Restore header linkage
 			if (unlinkOnRemoveHeader && isHeader(restoreInfo.item)) {
 				header = (IHeader) restoreInfo.item;
-				List<ISectionable> items = getSectionItems(header, true);
+				List<ISectionable> items = getSectionItems(header);
 				for (ISectionable sectionable : items) {
 					linkHeaderTo((T) sectionable, header, restoreInfo.payload);
 				}
@@ -2631,7 +2626,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					//Dragging down fromHeader
 					//Auto-linkage all section-items with new header
 					IHeader header = (IHeader) fromItem;
-					List<ISectionable> items = getSectionItems(header, true);
+					List<ISectionable> items = getSectionItems(header);
 					for (ISectionable sectionable : items) {
 						linkHeaderTo((T) sectionable, header, true);
 					}
@@ -2639,7 +2634,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					//Dragging up fromHeader
 					//Auto-linkage all section-items with new header
 					IHeader header = (IHeader) toItem;
-					List<ISectionable> items = getSectionItems(header, true);
+					List<ISectionable> items = getSectionItems(header);
 					for (ISectionable sectionable : items) {
 						linkHeaderTo((T) sectionable, header, true);
 					}
