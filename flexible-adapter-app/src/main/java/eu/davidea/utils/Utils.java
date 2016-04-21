@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import eu.davidea.examples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.R;
 
 public final class Utils {
 
