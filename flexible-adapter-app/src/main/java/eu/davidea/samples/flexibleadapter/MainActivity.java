@@ -256,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements
 	@SuppressWarnings("StatementWithEmptyBody")
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item) {
+		hideFab();
 		//Handle navigation view item clicks
 		int id = item.getItemId();
 		if (id == R.id.nav_overall) {
@@ -266,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements
 
 		} else if (id == R.id.nav_headers_and_sections) {
 			mFragment = FragmentHeadersSections.newInstance(2);
+			showFab();
 		} else if (id == R.id.nav_selection_modes) {
 
 		} else if (id == R.id.nav_expandable) {
@@ -303,7 +305,6 @@ public class MainActivity extends AppCompatActivity implements
 			mDrawer.closeDrawer(GravityCompat.START);
 			mToolbar.setSubtitle(item.getTitle());
 
-			hideFab();
 			return true;
 		}
 		return false;
