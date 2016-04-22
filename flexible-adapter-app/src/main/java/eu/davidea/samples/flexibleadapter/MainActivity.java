@@ -247,14 +247,9 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onFastScrollerStateChange(boolean scrolling) {
 		if (scrolling) {
-			mFab.hide();
+			hideFab();
 		} else {
-			mFab.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					mFab.show();
-				}
-			}, 200L);
+			showFab();
 		}
 	}
 
@@ -308,12 +303,7 @@ public class MainActivity extends AppCompatActivity implements
 			mDrawer.closeDrawer(GravityCompat.START);
 			mToolbar.setSubtitle(item.getTitle());
 
-			if (mFab != null) {
-				if (mFragment instanceof FragmentOverall || mFragment instanceof FragmentEndlessScrolling) {
-					hideFab();
-				} else showFab();
-			}
-
+			hideFab();
 			return true;
 		}
 		return false;
@@ -382,7 +372,10 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private void showFab() {
-		ViewCompat.animate(mFab)
+		if (!(mFragment instanceof FragmentOverall) &&
+				!(mFragment instanceof FragmentEndlessScrolling) &&
+				!(mFragment instanceof FragmentExpandableMultiLevel))
+			ViewCompat.animate(mFab)
 				.scaleX(1f).scaleY(1f)
 				.alpha(1f).setDuration(100)
 				.setStartDelay(400L)
