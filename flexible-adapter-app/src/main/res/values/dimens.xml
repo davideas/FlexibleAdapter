@@ -13,7 +13,7 @@
 	<dimen name="icon_height">40dp</dimen>
 	<dimen name="icon_touchable_component_mini">40dp</dimen>
 	<dimen name="fab_margin">16dp</dimen>
-	<dimen name="butterbar_height">3dp</dimen>
+	<dimen name="butterbar_height">8dp</dimen>
 	<dimen name="toolbar_height">56dp</dimen>
 	<dimen name="popup_button_min_height">48dp</dimen>
 	<dimen name="popup_max_height">290dp</dimen>

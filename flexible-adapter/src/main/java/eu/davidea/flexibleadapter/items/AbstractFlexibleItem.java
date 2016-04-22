@@ -47,10 +47,8 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	/**
 	 * You <b>must</b> implement this method to compare items Identifiers.
 	 * <p>Adapter needs this method to distinguish them and pick up correct items.</p>
-	 *
 	 * See <a href="http://developer.android.com/reference/java/lang/Object.html#writing_equals">Writing a correct
 	 * {@code equals} method</a> to implement your own {@code equals} method.
-	 *
 	 * <p>The general contract for the {@code equals} and {@link
 	 * #hashCode()} methods is that if {@code equals} returns {@code true} for
 	 * any two objects, then {@code hashCode()} must return the same value for

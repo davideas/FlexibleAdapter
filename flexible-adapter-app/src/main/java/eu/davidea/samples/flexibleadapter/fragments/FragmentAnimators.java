@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,15 +12,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import eu.davidea.samples.flexibleadapter.ExampleAdapter;
-import eu.davidea.samples.flexibleadapter.MainActivity;
-import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.services.DatabaseService;
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
+import eu.davidea.samples.flexibleadapter.ExampleAdapter;
+import eu.davidea.samples.flexibleadapter.MainActivity;
+import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.models.ProgressItem;
+import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
 /**
@@ -27,7 +34,8 @@ import eu.davidea.utils.Utils;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class FragmentAnimators  extends AbstractFragment {
+public class FragmentAnimators extends AbstractFragment
+		implements FlexibleAdapter.EndlessScrollListener<AbstractFlexibleItem> {
 
 	public static final String TAG = FragmentAnimators.class.getSimpleName();
 
@@ -95,8 +103,31 @@ public class FragmentAnimators  extends AbstractFragment {
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView);
+
+		mAdapter.setEndlessScrollListener(this, new ProgressItem());
 	}
 
+	/**
+	 * Loads more data.
+	 */
+	@Override
+	public void onLoadMore() {
+		Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				//Add new items or notify no more to load
+				List<AbstractFlexibleItem> newItems = new ArrayList<AbstractFlexibleItem>(2);
+				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row);
+				newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + 1, null));
+				newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + 2, null));
+				newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + 3, null));
+				if (newItems != null && newItems.size() > 0) {
+					mAdapter.addItems(mAdapter.getItemCount() - 1, newItems);
+				}
+			}
+		}, 5000);
+	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -130,6 +161,7 @@ public class FragmentAnimators  extends AbstractFragment {
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
 					case R.layout.recycler_uls_row:
+					case R.layout.progress_bar:
 						return mColumnCount;
 					default:
 						return 1;

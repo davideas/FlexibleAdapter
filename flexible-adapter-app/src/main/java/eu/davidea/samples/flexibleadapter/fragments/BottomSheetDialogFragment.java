@@ -84,7 +84,7 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
 		mBottomSheetDialog.findViewById(R.id.select_item_type).setOnTouchListener(new SimpleOnTouchListener(getContext()));
 		mBottomSheetDialog.findViewById(R.id.select_reference_button).setOnClickListener(this);
 		mBottomSheetDialog.findViewById(R.id.select_reference_button).setOnTouchListener(new SimpleOnTouchListener(getContext()));
-		mBottomSheetDialog.findViewById(R.id.fab).setOnClickListener(this);
+		mBottomSheetDialog.findViewById(R.id.new_item).setOnClickListener(this);
 		createPopUps();
 		return mBottomSheetDialog;
 	}
@@ -121,7 +121,7 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
 
 	@Override
 	public void onClick(View view) {
-		if (view.getId() == R.id.fab) {
+		if (view.getId() == R.id.new_item) {
 			getListener().onParameterSelected(mItemType, mReferencePosition, mChildPosition);
 			dismiss();
 		} else if (view.getId() == R.id.select_item_type) {

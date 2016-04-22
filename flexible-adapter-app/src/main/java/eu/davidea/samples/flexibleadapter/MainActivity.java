@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		Log.v(TAG, "onSaveInstanceState start!");
+		Log.v(TAG, "onSaveInstanceState!");
 		mAdapter.onSaveInstanceState(outState);
 		getSupportFragmentManager().putFragment(outState, STATE_ACTIVE_FRAGMENT, mFragment);
 		super.onSaveInstanceState(outState);

@@ -22,6 +22,17 @@
 			android:layout_centerVertical="true"
 			android:text="@string/create_new_item"/>
 
+		<ImageView
+			android:id="@+id/new_item"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_alignParentEnd="true"
+			android:clickable="true"
+			android:padding="12dp"
+			android:contentDescription="@null"
+			android:src="@drawable/ic_done_grey600_24dp"/>
+
 	</RelativeLayout>
 
 	<TextView
@@ -40,8 +51,7 @@
 		android:hint="@string/select_item_type"
 		android:minHeight="@dimen/popup_button_min_height"
 		android:singleLine="true"
-		android:textAppearance="?attr/textAppearanceLargePopupMenu"
-		android:textStyle="bold"/>
+		android:textAppearance="?attr/textAppearanceLargePopupMenu"/>
 
 	<TextView
 		android:layout_width="wrap_content"
@@ -59,22 +69,6 @@
 		android:hint="@string/select_section_reference"
 		android:minHeight="@dimen/popup_button_min_height"
 		android:singleLine="true"
-		android:textAppearance="?android:textAppearanceLargePopupMenu"
-		android:textStyle="bold"/>
-
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="?attr/listPreferredItemHeightSmall"
-		android:gravity="center_vertical"
-		android:text="Relative position"/>
-
-	<android.support.design.widget.FloatingActionButton
-		android:id="@+id/fab"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center"
-		android:clickable="true"
-		android:src="@drawable/fab_add"
-		app:borderWidth="0dp"/>
+		android:textAppearance="?android:textAppearanceLargePopupMenu"/>
 
 </LinearLayout>

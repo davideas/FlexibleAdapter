@@ -29,6 +29,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -163,6 +164,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	private ItemTouchHelperCallback mItemTouchHelperCallback;
 	private ItemTouchHelper mItemTouchHelper;
 
+	/* EndlessScroll */
+	private int mEndlessScrollThreshold = 1;
+	private boolean mLoading = false;
+
 	/* Listeners */
 	protected OnUpdateListener mUpdateListener;
 	public OnItemClickListener mItemClickListener;
@@ -170,6 +175,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	protected OnItemMoveListener mItemMoveListener;
 	protected OnItemSwipeListener mItemSwipeListener;
 	protected OnStickyHeaderChangeListener mStickyHeaderChangeListener;
+	protected EndlessScrollListener mEndlessScrollListener;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -223,6 +229,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			mItemSwipeListener = (OnItemSwipeListener) listeners;
 		if (listeners instanceof OnStickyHeaderChangeListener)
 			mStickyHeaderChangeListener = (OnStickyHeaderChangeListener) listeners;
+		if (listeners instanceof EndlessScrollListener)
+			mEndlessScrollListener = (EndlessScrollListener) listeners;
 
 		//Get notified when items are inserted or removed (it adjusts selected positions)
 		registerAdapterDataObserver(new AdapterDataObserver());
@@ -1035,6 +1043,52 @@ public class FlexibleAdapter<T extends IFlexible>
 				item.bindViewHolder(this, holder, position, payloads);
 			}
 		}
+
+		//Endless Scroll
+		if (mEndlessScrollListener != null && position == getItemCount() - mEndlessScrollThreshold) {
+			onLoadMore();
+		}
+	}
+
+	/*------------------------*/
+	/* ENDLESS SCROLL METHODS */
+	/*------------------------*/
+
+	public void setEndlessScrollListener(@NonNull EndlessScrollListener endlessScrollListener,
+										 @NonNull T progressItem) {
+		this.mEndlessScrollListener = endlessScrollListener;
+		setEndlessScrollThreshold(mEndlessScrollThreshold);
+		addItem(getItemCount(), progressItem);
+	}
+
+	/**
+	 * Set the visible threshold number of items to trigger automatic loading more items.
+	 *
+	 * @param endlessScrollThreshold number of items to trigger loading more items.
+	 */
+	public void setEndlessScrollThreshold(@IntRange(from = 1) int endlessScrollThreshold) {
+		//Increase visible threshold based on number of columns
+		if (mRecyclerView != null) {
+			RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
+			if (layoutManager instanceof GridLayoutManager) {
+				endlessScrollThreshold = endlessScrollThreshold * ((GridLayoutManager) layoutManager).getSpanCount();
+			} else if (layoutManager instanceof StaggeredGridLayoutManager) {
+				endlessScrollThreshold = endlessScrollThreshold * ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
+			}
+		}
+		this.mEndlessScrollThreshold = endlessScrollThreshold;
+	}
+
+	private void onLoadMore() {
+		if (!mLoading) {
+			mLoading = true;
+			T item = getItem(getItemCount());
+			int lastPosition = getGlobalPositionOf(item);
+			mEndlessScrollListener.onLoadMore();
+			removeItem(lastPosition);
+			addItem(getItemCount(), item);
+			mLoading = false;
+		}
 	}
 
 	/*--------------------*/
@@ -1255,7 +1309,7 @@ public class FlexibleAdapter<T extends IFlexible>
 						return true;
 					}
 				});
-				animatorHandler.sendMessageDelayed(Message.obtain(mHandler), !headersSticky ? 150L: 300L);
+				animatorHandler.sendMessageDelayed(Message.obtain(mHandler), !headersSticky ? 150L : 300L);
 			}
 
 			//Expand!
@@ -1943,7 +1997,8 @@ public class FlexibleAdapter<T extends IFlexible>
 				List<ISectionable> sectionableList = getSectionItems((IHeader) item);
 				for (ISectionable sectionable : sectionableList) {
 					sectionable.setHeader(null);
-					if (payload != null) notifyItemChanged(getGlobalPositionOf(sectionable), payload);
+					if (payload != null)
+						notifyItemChanged(getGlobalPositionOf(sectionable), payload);
 				}
 			}
 			//Remove item from internal list
@@ -3042,6 +3097,23 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * @param sectionIndex the position of header
 		 */
 		void onStickyHeaderChange(int sectionIndex);
+	}
+
+	/**
+	 * @since 22/04/2016
+	 */
+	public interface EndlessScrollListener<T> {
+		/**
+		 * Loads more data.
+		 *
+		 * @return the list of new items to add
+		 */
+		void onLoadMore();
+
+		/**
+		 * Called when last loading event has no more items to add.
+		 */
+//		void noMoreToLoad();
 	}
 
 	/**
