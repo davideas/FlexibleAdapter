@@ -14,8 +14,8 @@ import eu.davidea.samples.flexibleadapter.models.ProgressItem.ProgressViewHolder
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Created by steduda on 22/04/2016.
- * Project FlexibleAdapter.
+ * @author Davide Steduto
+ * @since 22/04/2016
  */
 public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 
@@ -36,7 +36,13 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ProgressViewHolder holder, int position, List payloads) {
-		holder.progressBar.setVisibility(View.VISIBLE);
+		if (payloads.size() == 0) {
+			//Show loading animation
+			holder.progressBar.setVisibility(View.VISIBLE);
+		} else {
+			//Show error reason or communicate "no more to load"
+			holder.progressBar.setVisibility(View.INVISIBLE);
+		}
 	}
 
 	public static class ProgressViewHolder extends FlexibleViewHolder {

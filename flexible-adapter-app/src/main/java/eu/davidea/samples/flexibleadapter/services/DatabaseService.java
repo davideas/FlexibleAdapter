@@ -58,8 +58,8 @@ public class DatabaseService {
 	 */
 	public void createOverallDatabase(Resources resources) {
 		mItems.clear();
-		mItems.add(new OverallItem(R.id.nav_animators, resources.getString(R.string.animators))
-				.withDescription(resources.getString(R.string.animators_description))
+		mItems.add(new OverallItem(R.id.nav_endless_scrolling, resources.getString(R.string.endless_scrolling))
+				.withDescription(resources.getString(R.string.endless_scrolling_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_playlist_play_grey600_24dp)));
 
 		mItems.add(new OverallItem(R.id.nav_selection_modes, resources.getString(R.string.selection_modes))
@@ -98,7 +98,7 @@ public class DatabaseService {
 	/*
 	 * List of simple items TODO: showing different types of animations
 	 */
-	public void createAnimatorsDatabase() {
+	public void createEndlessDatabase() {
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
 			mItems.add(newSimpleItem(i + 1, null));

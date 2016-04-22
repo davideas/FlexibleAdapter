@@ -120,6 +120,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>You can override this Handler, but you must keep the "What" already used:
 	 * <br/>0 = filterItems delay
 	 * <br/>1 = deleteConfirmed when Undo timeout is over</p>
+	 * <br/>2 = reset flag to load more items</p>
 	 */
 	protected Handler mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
@@ -131,6 +132,9 @@ public class FlexibleAdapter<T extends IFlexible>
 					OnDeleteCompleteListener listener = (OnDeleteCompleteListener) message.obj;
 					if (listener != null) listener.onDeleteConfirmed();
 					emptyBin();
+					return true;
+				case 2: //onLoadMore
+					resetOnLoadMore();
 					return true;
 			}
 			return false;
@@ -442,7 +446,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * You can override this method to define your own concept of "Empty". This method is never
 	 * called internally.
-	 * <p>Default value is the result of {@link #getItemCount()}.</p>
+	 * <p>Default value is the result of {@code getItemCount() == 0}.</p>
 	 *
 	 * @return true if the list is empty, false otherwise
 	 * @see #getItemCount()
@@ -1045,61 +1049,95 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 
 		//Endless Scroll
-		if (mEndlessScrollListener != null && position == getItemCount() - mEndlessScrollThreshold) {
-			onLoadMore();
-		}
+		onLoadMore(position);
 	}
 
 	/*------------------------*/
 	/* ENDLESS SCROLL METHODS */
 	/*------------------------*/
 
+	/**
+	 * Sets the callback to load more items asynchronously.
+	 *
+	 * @param endlessScrollListener the callback to invoke the asynchronous loading
+	 * @param progressItem          the item representing the progress bar
+	 */
 	public void setEndlessScrollListener(@NonNull EndlessScrollListener endlessScrollListener,
 										 @NonNull T progressItem) {
-		this.mEndlessScrollListener = endlessScrollListener;
-		setEndlessScrollThreshold(mEndlessScrollThreshold);
-		addItem(getItemCount(), progressItem);
+		if (endlessScrollListener != null) {
+			this.mEndlessScrollListener = endlessScrollListener;
+			setEndlessScrollThreshold(mEndlessScrollThreshold);
+			progressItem.setEnabled(false);
+			addItem(getItemCount(), progressItem);
+		}
 	}
 
 	/**
-	 * Set the visible threshold number of items to trigger automatic loading more items.
+	 * Sets the minimum number of items still to bind to start the automatic loading.
+	 * <p>Default value is 1.</p>
 	 *
-	 * @param endlessScrollThreshold number of items to trigger loading more items.
+	 * @param thresholdItems minimum number of unbound items to start loading more items
 	 */
-	public void setEndlessScrollThreshold(@IntRange(from = 1) int endlessScrollThreshold) {
+	public void setEndlessScrollThreshold(@IntRange(from = 1) int thresholdItems) {
 		//Increase visible threshold based on number of columns
 		if (mRecyclerView != null) {
 			RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
 			if (layoutManager instanceof GridLayoutManager) {
-				endlessScrollThreshold = endlessScrollThreshold * ((GridLayoutManager) layoutManager).getSpanCount();
+				thresholdItems = thresholdItems * ((GridLayoutManager) layoutManager).getSpanCount();
 			} else if (layoutManager instanceof StaggeredGridLayoutManager) {
-				endlessScrollThreshold = endlessScrollThreshold * ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
+				thresholdItems = thresholdItems * ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
 			}
 		}
-		this.mEndlessScrollThreshold = endlessScrollThreshold;
+		this.mEndlessScrollThreshold = thresholdItems;
 	}
 
-	private void onLoadMore() {
-		if (!mLoading) {
-			mLoading = true;
-			T item = getItem(getItemCount());
-			int lastPosition = getGlobalPositionOf(item);
-			mEndlessScrollListener.onLoadMore();
-			removeItem(lastPosition);
-			addItem(getItemCount(), item);
-			mLoading = false;
+	protected void onLoadMore(int position) {
+		if (mEndlessScrollListener != null && position == getItemCount() - mEndlessScrollThreshold) {
+			if (DEBUG) Log.d(TAG, "onLoadMore Loading? " + mLoading);
+			if (!mLoading) {
+				mLoading = true;
+				if (DEBUG) Log.d(TAG, "onLoadMore invoked!");
+				mRecyclerView.post(new Runnable() {
+					@Override
+					public void run() {
+						mEndlessScrollListener.onLoadMore();
+					}
+				});
+			}
 		}
+	}
+
+	/**
+	 * To call when more items are successfully loaded.
+	 *
+	 * @param newItems the list of the new items
+	 */
+	public void onLoadMoreComplete(@Nullable List<T> newItems) {
+		if (newItems != null && newItems.size() > 0) {
+			if (DEBUG) Log.d(TAG, "onLoadMore Complete adding " + newItems.size() + " new Items!");
+			addItems(getItemCount() - 1, newItems);
+			resetOnLoadMore();
+		} else {
+			noMoreLoad();
+		}
+	}
+
+	public void resetOnLoadMore() {
+		mLoading = false;
+	}
+
+	/**
+	 * Called when no more items are loaded.
+	 */
+	private void noMoreLoad() {
+		if (DEBUG) Log.d(TAG, "onLoadMore noMoreLoad!");
+		notifyItemChanged(getItemCount() - 1, true);
+		mHandler.sendEmptyMessageDelayed(2, 200L);
 	}
 
 	/*--------------------*/
 	/* EXPANDABLE METHODS */
 	/*--------------------*/
-
-	//FIXME: Expanded children: find a way to Not animate items from custom ItemAnimator!!!
-	// (ItemAnimators should work in conjunction with AnimatorViewHolder???)
-	//TODO: Customize children animations (don't use animateAdd or animateRemove from custom ItemAnimator)
-	//TODO: Check if multiple types of sub items are already supported (in theory yes)
-	//TODO: Add new feature (Load More)
 
 	/**
 	 * Automatically collapse all previous expanded parents before expand the clicked parent.
@@ -1113,7 +1151,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Automatically scroll the clicked expandable item to the first visible position.<br/>
-	 * Default disabled.
+	 * Default value is disabled.
 	 * <p>This works ONLY in combination with {@link SmoothScrollLinearLayoutManager}.
 	 * GridLayout is still NOT supported.</p>
 	 *
@@ -2564,7 +2602,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Returns whether ItemTouchHelper should start a drag and drop operation if an item is
 	 * long pressed.<p>
-	 * Default value returns false.
+	 * Default value is false.
 	 *
 	 * @return true if ItemTouchHelper should start dragging an item when it is long pressed,
 	 * false otherwise. Default value is false.
@@ -2612,7 +2650,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Returns whether ItemTouchHelper should start a swipe operation if a pointer is swiped
 	 * over the View.
-	 * <p>Default value returns false.</p>
+	 * <p>Default value is false.</p>
 	 *
 	 * @return true if ItemTouchHelper should start swiping an item when user swipes a pointer
 	 * over the View, false otherwise. Default value is false.
@@ -3109,11 +3147,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * @return the list of new items to add
 		 */
 		void onLoadMore();
-
-		/**
-		 * Called when last loading event has no more items to add.
-		 */
-//		void noMoreToLoad();
 	}
 
 	/**

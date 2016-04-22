@@ -9,9 +9,9 @@
 			android:icon="@drawable/ic_view_grid_grey600_24dp"
 			android:title="@string/overall"/>
 		<item
-			android:id="@+id/nav_animators"
+			android:id="@+id/nav_endless_scrolling"
 			android:icon="@drawable/ic_playlist_play_grey600_24dp"
-			android:title="@string/animators"/>
+			android:title="@string/endless_scrolling"/>
 		<item
 			android:id="@+id/nav_selection_modes"
 			android:enabled="false"

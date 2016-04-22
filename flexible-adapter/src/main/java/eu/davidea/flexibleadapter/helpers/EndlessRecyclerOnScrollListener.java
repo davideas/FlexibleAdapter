@@ -7,6 +7,8 @@ import android.view.View;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 /**
+ * This class is not used. Adopted different approach.
+ *
  * https://github.com/codepath/android_guides/wiki/Endless-Scrolling-with-AdapterViews
  * https://guides.codepath.com/android/Endless-Scrolling-with-AdapterViews-and-RecyclerView
  * https://gist.github.com/ssinss/e06f12ef66c51252563e

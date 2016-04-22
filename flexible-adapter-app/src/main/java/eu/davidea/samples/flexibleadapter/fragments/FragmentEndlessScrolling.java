@@ -2,6 +2,7 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
@@ -34,15 +36,16 @@ import eu.davidea.utils.Utils;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class FragmentAnimators extends AbstractFragment
+@SuppressWarnings("ConstantConditions")
+public class FragmentEndlessScrolling extends AbstractFragment
 		implements FlexibleAdapter.EndlessScrollListener<AbstractFlexibleItem> {
 
-	public static final String TAG = FragmentAnimators.class.getSimpleName();
+	public static final String TAG = FragmentEndlessScrolling.class.getSimpleName();
 
 	private ExampleAdapter mAdapter;
 
-	public static FragmentAnimators newInstance(int columnCount) {
-		FragmentAnimators fragment = new FragmentAnimators();
+	public static FragmentEndlessScrolling newInstance(int columnCount) {
+		FragmentEndlessScrolling fragment = new FragmentEndlessScrolling();
 		Bundle args = new Bundle();
 		args.putInt(ARG_COLUMN_COUNT, columnCount);
 		fragment.setArguments(args);
@@ -53,7 +56,7 @@ public class FragmentAnimators extends AbstractFragment
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
 	 */
-	public FragmentAnimators() {
+	public FragmentEndlessScrolling() {
 	}
 
 	@Override
@@ -63,7 +66,7 @@ public class FragmentAnimators extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createAnimatorsDatabase();
+		DatabaseService.getInstance().createEndlessDatabase();
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -104,6 +107,7 @@ public class FragmentAnimators extends AbstractFragment
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView);
 
+		//EndlessScrollListener - OnLoadMore (v5.0.0)
 		mAdapter.setEndlessScrollListener(this, new ProgressItem());
 	}
 
@@ -112,21 +116,30 @@ public class FragmentAnimators extends AbstractFragment
 	 */
 	@Override
 	public void onLoadMore() {
-		Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
+		//Simulating asynchronous call
+		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				//Add new items or notify no more to load
 				List<AbstractFlexibleItem> newItems = new ArrayList<AbstractFlexibleItem>(2);
+
+				//Simulating success/failure
+				int count = new Random().nextInt(3);
 				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row);
-				newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + 1, null));
-				newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + 2, null));
-				newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + 3, null));
-				if (newItems != null && newItems.size() > 0) {
-					mAdapter.addItems(mAdapter.getItemCount() - 1, newItems);
+				for (int i = 1; i <= count; i++) {
+					newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
 				}
+
+				//Callback the Adapter to notify the change
+				//Items will be added to the end of the list
+				mAdapter.onLoadMoreComplete(newItems);
+
+				//Notify user
+				String message = (newItems.size() > 0 ?
+						"Simulated: " + newItems.size() + " new items arrived :-)" :
+						"Simulated: No more items to load :-(");
+				Snackbar.make(getView(), message, Snackbar.LENGTH_SHORT).show();
 			}
-		}, 5000);
+		}, 3000);
 	}
 
 	@Override

@@ -243,6 +243,9 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 	 */
 	public final void animateView(final View itemView, int position, boolean isSelected) {
 		//FIXME: first completed visible item on rotation gets high delay
+		//FIXME: Expanded children: find a way to Not animate items from custom ItemAnimator!!!
+		// (ItemAnimators should work in conjunction with AnimatorViewHolder???)
+		//TODO: Customize children animations (don't use animateAdd or animateRemove from custom ItemAnimator)
 
 //		if (DEBUG)
 //			Log.v(TAG, "shouldAnimate=" + shouldAnimate

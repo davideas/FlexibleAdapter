@@ -42,7 +42,7 @@
 			android:lines="2"
 			android:maxLines="2"
 			android:textAppearance="@style/TextAppearance.AppCompat.Title"
-			tools:text="@string/animators"/>
+			tools:text="@string/endless_scrolling"/>
 
 		<TextView
 			android:id="@+id/subtitle"
@@ -53,7 +53,7 @@
 			android:ellipsize="end"
 			android:maxLines="3"
 			android:textAppearance="@style/TextAppearance.AppCompat.Small"
-			tools:text="@string/animators_description"/>
+			tools:text="@string/endless_scrolling_description"/>
 
 	</LinearLayout>
 

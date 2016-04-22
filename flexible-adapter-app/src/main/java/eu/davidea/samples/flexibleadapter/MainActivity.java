@@ -39,7 +39,7 @@ import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.fragments.AbstractFragment;
-import eu.davidea.samples.flexibleadapter.fragments.FragmentAnimators;
+import eu.davidea.samples.flexibleadapter.fragments.FragmentEndlessScrolling;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableMultiLevel;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableSections;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentHeadersSections;
@@ -235,36 +235,12 @@ public class MainActivity extends AppCompatActivity implements
 			@Override
 			public void onClick(View v) {
 				destroyActionModeIfCan();
-
 //				mBottomSheetBehavior.setPeekHeight(300);
 //				mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
 				mFragment.addItem();
-
-//				for (int position = 0; position <= mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1; position++) {
-//					//Every 3 positions I want to create an expandable
-//					AbstractModelItem item = (position % 3 == 0 ?
-//							DatabaseService.newExpandableItem(position, null) :
-//							DatabaseService.newSimpleItem(position, null));
-//					//Add only if we don't have it
-//					if (!DatabaseService.getInstance().getDatabaseList().contains(item)) {
-//						DatabaseService.getInstance().addItem(position, item);//This is the original list
-//						//For my example, the adapter position must be adjusted according to
-//						//all child and headers currently visible
-//						int adapterPos = position + mAdapter.getItemCountOfTypes(
-//								R.layout.recycler_uls_row,
-//								R.layout.recycler_expandable_row,
-//								R.layout.recycler_child_row,
-//								R.layout.recycler_header_row);
-//						//Adapter's list is a copy, to animate the item you must call addItem on the new position
-//						mAdapter.addItem(adapterPos, item);
-//						Toast.makeText(MainActivity.this, "Added New " + item.getTitle(), Toast.LENGTH_SHORT).show();
-//						mRecyclerView.smoothScrollToPosition(adapterPos);
-//						break;
-//					}
-//				}
 			}
 		});
+		//No Fab on 1st fragment
 		hideFab();
 	}
 
@@ -289,8 +265,8 @@ public class MainActivity extends AppCompatActivity implements
 		int id = item.getItemId();
 		if (id == R.id.nav_overall) {
 			mFragment = FragmentOverall.newInstance(2);
-		} else if (id == R.id.nav_animators) {
-			mFragment = FragmentAnimators.newInstance(2);
+		} else if (id == R.id.nav_endless_scrolling) {
+			mFragment = FragmentEndlessScrolling.newInstance(2);
 		} else if (id == R.id.nav_instagram_headers) {
 
 		} else if (id == R.id.nav_headers_and_sections) {
@@ -333,8 +309,9 @@ public class MainActivity extends AppCompatActivity implements
 			mToolbar.setSubtitle(item.getTitle());
 
 			if (mFab != null) {
-				if (mFragment instanceof FragmentOverall) hideFab();
-				else showFab();
+				if (mFragment instanceof FragmentOverall || mFragment instanceof FragmentEndlessScrolling) {
+					hideFab();
+				} else showFab();
 			}
 
 			return true;

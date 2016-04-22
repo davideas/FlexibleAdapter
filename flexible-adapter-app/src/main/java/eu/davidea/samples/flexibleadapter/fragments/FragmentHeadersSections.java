@@ -148,7 +148,16 @@ public class FragmentHeadersSections extends AbstractFragment
 				mAdapter.addItemToSection(sectionable, referenceHeader, childPosition);
 				scrollTo = mAdapter.getGlobalPositionOf(referenceHeader);
 		}
-		mRecyclerView.smoothScrollToPosition(scrollTo);
+
+		//With Sticky Headers enabled, this seems necessary to give
+		// time at the RV to be in correct state before scrolling
+		final int scrollToFinal = scrollTo;
+		mRecyclerView.post(new Runnable() {
+			@Override
+			public void run() {
+				mRecyclerView.smoothScrollToPosition(scrollToFinal);
+			}
+		});
 	}
 
 	@Override
