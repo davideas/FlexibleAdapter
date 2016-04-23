@@ -36,13 +36,7 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ProgressViewHolder holder, int position, List payloads) {
-		if (payloads.size() == 0) {
-			//Show loading animation
-//			holder.progressBar.setVisibility(View.VISIBLE);
-		} else {
-			//Show error reason or communicate "no more to load"
-//			holder.progressBar.setVisibility(View.INVISIBLE);
-		}
+		//nothing to bind
 	}
 
 	public static class ProgressViewHolder extends FlexibleViewHolder {

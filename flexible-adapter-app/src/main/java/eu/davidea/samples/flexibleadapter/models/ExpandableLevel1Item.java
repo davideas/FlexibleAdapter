@@ -84,7 +84,7 @@ public class ExpandableLevel1Item
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_expandable_row;
+		return R.layout.recycler_expandable_item;
 	}
 
 	@Override

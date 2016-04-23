@@ -67,7 +67,7 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_header_row;
+		return R.layout.recycler_header_item;
 	}
 
 	@Override

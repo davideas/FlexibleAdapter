@@ -95,7 +95,7 @@ public class ExpandableHeaderItem
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_expandable_header_row;
+		return R.layout.recycler_expandable_header_item;
 	}
 
 	@Override

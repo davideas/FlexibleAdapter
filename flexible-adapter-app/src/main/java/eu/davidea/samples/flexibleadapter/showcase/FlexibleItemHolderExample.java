@@ -64,7 +64,7 @@ public class FlexibleItemHolderExample<Model> extends AbstractSectionableItem<Fl
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_expandable_row;
+		return R.layout.recycler_expandable_item;
 	}
 
 	@Override

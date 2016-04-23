@@ -124,26 +124,26 @@ public class FragmentHeadersSections extends AbstractFragment
 				" childPosition=" + childPosition);
 		switch (itemType) {
 			case 1: //Expandable
-				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1;
+				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item) + 1;
 				ISectionable sectionableExpandable = DatabaseService.newExpandableItem(id, referenceHeader);
 				mAdapter.addItemToSection(sectionableExpandable, referenceHeader, childPosition);
 				scrollTo = mAdapter.getGlobalPositionOf(referenceHeader);
 				break;
 			case 2: //Expandable Header
-				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_header_row) + 1;
+				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_header_item) + 1;
 				ExpandableHeaderItem expandableHeader = DatabaseService.newExpandableSectionItem(id);
 				expandableHeader.setExpanded(false);
 				mAdapter.addSection(expandableHeader, referenceHeader);
 				scrollTo = mAdapter.getGlobalPositionOf(expandableHeader);
 				break;
 			case 3: //Header
-				id = mAdapter.getItemCountOfTypes(R.layout.recycler_header_row) + 1;
+				id = mAdapter.getItemCountOfTypes(R.layout.recycler_header_item) + 1;
 				IHeader header = DatabaseService.newHeader(id);
 				mAdapter.addSection(header, referenceHeader);
 				scrollTo = mAdapter.getGlobalPositionOf(header);
 				break;
 			default: //case 0 = Simple Item
-				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row) + 1;
+				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item) + 1;
 				ISectionable sectionable = DatabaseService.newSimpleItem(id, referenceHeader);
 				mAdapter.addItemToSection(sectionable, referenceHeader, childPosition);
 				scrollTo = mAdapter.getGlobalPositionOf(referenceHeader);
@@ -174,9 +174,9 @@ public class FragmentHeadersSections extends AbstractFragment
 				//NOTE: If you use simple integer to identify the ViewType,
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_uls_row:
-					case R.layout.recycler_header_row:
-					case R.layout.recycler_expandable_header_row:
+					case R.layout.recycler_uls_item:
+					case R.layout.recycler_header_item:
+					case R.layout.recycler_expandable_header_item:
 						return mColumnCount;
 					default:
 						return 1;

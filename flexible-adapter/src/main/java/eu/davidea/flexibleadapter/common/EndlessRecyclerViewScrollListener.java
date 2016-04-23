@@ -1,4 +1,4 @@
-package eu.davidea.flexibleadapter.helpers;
+package eu.davidea.flexibleadapter.common;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -88,8 +88,8 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
 		// threshold should reflect how many total columns there are too
 		if (!loading && lastVisibleItemPosition + visibleThreshold > totalItemCount) {
 			currentPage++;
-			onLoadMore(currentPage, totalItemCount);
 			loading = true;
+			onLoadMore(currentPage, totalItemCount);
 		}
 	}
 

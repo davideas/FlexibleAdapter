@@ -51,9 +51,9 @@ import java.util.List;
  * @since 10/01/2016 Created
  * <br/>30/01/2016 Class now extends {@link SelectableAdapter}
  */
-public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
+public abstract class AnimatorAdapter extends SelectableAdapter {
 
-	protected static final String TAG = FlexibleAnimatorAdapter.class.getSimpleName();
+	protected static final String TAG = AnimatorAdapter.class.getSimpleName();
 
 	private Interpolator mInterpolator = new LinearInterpolator();
 	private AnimatorAdapterDataObserver mAnimatorNotifierObserver;
@@ -96,7 +96,7 @@ public abstract class FlexibleAnimatorAdapter extends SelectableAdapter {
 	/**
 	 * Simple Constructor for Animator Adapter.
 	 */
-	public FlexibleAnimatorAdapter() {
+	public AnimatorAdapter() {
 		super();
 
 		//Get notified when an item is changed (should skip animation)

@@ -40,7 +40,7 @@ public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_uls_row;
+		return R.layout.recycler_uls_item;
 	}
 
 	@Override

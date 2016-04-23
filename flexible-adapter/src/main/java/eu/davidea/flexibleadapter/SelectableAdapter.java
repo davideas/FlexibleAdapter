@@ -35,11 +35,11 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 /**
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
  * <p>Also it manages the FastScroller.</p>
- * This class is extended by {@link FlexibleAnimatorAdapter}.
+ * This class is extended by {@link AnimatorAdapter}.
  *
  * @author Davide Steduto
  * @see FlexibleAdapter
- * @see FlexibleAnimatorAdapter
+ * @see AnimatorAdapter
  * @since 03/05/2015 Created
  * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
  */

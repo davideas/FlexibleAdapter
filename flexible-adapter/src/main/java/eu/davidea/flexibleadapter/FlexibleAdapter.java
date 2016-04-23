@@ -73,7 +73,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * selectable nor draggable, and information in them are in read only mode or are action buttons.</p>
  *
  * @author Davide Steduto
- * @see FlexibleAnimatorAdapter
+ * @see AnimatorAdapter
  * @see SelectableAdapter
  * @see IFlexible
  * @see FlexibleViewHolder
@@ -81,7 +81,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @since 03/05/2015 Created
  * <br/>16/01/2016 Expandable items
  * <br/>24/01/2016 Drag&Drop, Swipe
- * <br/>30/01/2016 Class now extends {@link FlexibleAnimatorAdapter} that extends {@link SelectableAdapter}
+ * <br/>30/01/2016 Class now extends {@link AnimatorAdapter} that extends {@link SelectableAdapter}
  * <br/>02/02/2016 New code reorganization, new item interfaces and full refactoring
  * <br/>08/02/2016 Headers/Sections
  * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
@@ -90,7 +90,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  */
 @SuppressWarnings({"unused", "Range", "Convert2Diamond", "ConstantConditions", "unchecked"})
 public class FlexibleAdapter<T extends IFlexible>
-		extends FlexibleAnimatorAdapter
+		extends AnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
 
 	private static final String TAG = FlexibleAdapter.class.getSimpleName();

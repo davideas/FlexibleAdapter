@@ -96,7 +96,7 @@ public class OverallItem extends AbstractFlexibleItem<LabelViewHolder> {
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_label;
+		return R.layout.recycler_label_item;
 	}
 
 	@Override

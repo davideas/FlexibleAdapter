@@ -135,7 +135,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 				//Simulating success/failure
 				int count = new Random().nextInt(7);
-				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row);
+				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item);
 				for (int i = 1; i <= count; i++) {
 					newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
 				}
@@ -188,7 +188,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				//NOTE: If you use simple integer to identify the ViewType,
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_uls_row:
+					case R.layout.recycler_uls_item:
 					case R.layout.progress_item:
 						return mColumnCount;
 					default:

@@ -111,10 +111,10 @@ public class FragmentExpandableSections extends AbstractFragment {
 				//NOTE: If you use simple integer to identify the ViewType,
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_uls_row:
-					case R.layout.recycler_header_row:
-					case R.layout.recycler_expandable_header_row:
-					case R.layout.recycler_expandable_row:
+					case R.layout.recycler_uls_item:
+					case R.layout.recycler_header_item:
+					case R.layout.recycler_expandable_header_item:
+					case R.layout.recycler_expandable_item:
 						return mColumnCount;
 					default:
 						return 1;

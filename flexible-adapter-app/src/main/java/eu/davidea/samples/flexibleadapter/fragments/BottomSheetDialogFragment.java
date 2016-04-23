@@ -92,8 +92,8 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
 	private void createPopUps() {
 		//Create the Adapter
 		if (mAdapterReference == null) {
-			mAdapterItemType = new ArrayAdapter(getContext(), R.layout.reference_row, new String[]{"Simple Item", "Expandable", "Expandable Section", "Section"});
-			mAdapterReference = new ArrayAdapter(getContext(), R.layout.reference_row, getListener().getReferenceList());
+			mAdapterItemType = new ArrayAdapter(getContext(), R.layout.reference_spinner_item, new String[]{"Simple Item", "Expandable", "Expandable Section", "Section"});
+			mAdapterReference = new ArrayAdapter(getContext(), R.layout.reference_spinner_item, getListener().getReferenceList());
 		}
 		//Setting up the popups
 		Log.d(TAG, "Setting up the Popups");
