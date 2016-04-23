@@ -2,7 +2,6 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,6 +109,16 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 		//EndlessScrollListener - OnLoadMore (v5.0.0)
 		mAdapter.setEndlessScrollListener(this, new ProgressItem());
+		mAdapter.setEndlessScrollThreshold(1);//Default=1
+
+//		mAdapter.addItem(mAdapter.getItemCount(), new ProgressItem());
+//		mRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(mRecyclerView.getLayoutManager()) {
+//			@Override
+//			public void onLoadMore(int page, int totalItemsCount) {
+//				Log.d(TAG, "onLoadMore page=" + page);
+//				FragmentEndlessScrolling.this.onLoadMore();
+//			}
+//		});
 	}
 
 	/**
@@ -116,14 +126,15 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	 */
 	@Override
 	public void onLoadMore() {
+		Log.i(TAG, "onLoadMore invoked!");
 		//Simulating asynchronous call
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				List<AbstractFlexibleItem> newItems = new ArrayList<AbstractFlexibleItem>(2);
+				final List<AbstractFlexibleItem> newItems = new ArrayList<AbstractFlexibleItem>(2);
 
 				//Simulating success/failure
-				int count = new Random().nextInt(3);
+				int count = new Random().nextInt(7);
 				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_row);
 				for (int i = 1; i <= count; i++) {
 					newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
@@ -132,12 +143,16 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				//Callback the Adapter to notify the change
 				//Items will be added to the end of the list
 				mAdapter.onLoadMoreComplete(newItems);
+//				if (newItems.size() == 0) {
+//					mAdapter.removeItem(mAdapter.getItemCount() - 1);
+//				}
+//				mAdapter.addItems(mAdapter.getItemCount() - 1, newItems);
 
 				//Notify user
 				String message = (newItems.size() > 0 ?
 						"Simulated: " + newItems.size() + " new items arrived :-)" :
 						"Simulated: No more items to load :-(");
-				Snackbar.make(getView(), message, Snackbar.LENGTH_SHORT).show();
+				Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
 			}
 		}, 3000);
 	}
@@ -174,7 +189,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
 					case R.layout.recycler_uls_row:
-					case R.layout.progress_bar:
+					case R.layout.progress_item:
 						return mColumnCount;
 					default:
 						return 1;

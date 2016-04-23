@@ -86,6 +86,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>08/02/2016 Headers/Sections
  * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
  * <br/>20/02/2016 Sticky headers
+ * <br/>22/04/2016 Endless Scrolling
  */
 @SuppressWarnings({"unused", "Range", "Convert2Diamond", "ConstantConditions", "unchecked"})
 public class FlexibleAdapter<T extends IFlexible>
@@ -171,6 +172,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* EndlessScroll */
 	private int mEndlessScrollThreshold = 1;
 	private boolean mLoading = false;
+	private T mProgressItem;
 
 	/* Listeners */
 	protected OnUpdateListener mUpdateListener;
@@ -233,8 +235,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			mItemSwipeListener = (OnItemSwipeListener) listeners;
 		if (listeners instanceof OnStickyHeaderChangeListener)
 			mStickyHeaderChangeListener = (OnStickyHeaderChangeListener) listeners;
-		if (listeners instanceof EndlessScrollListener)
-			mEndlessScrollListener = (EndlessScrollListener) listeners;
 
 		//Get notified when items are inserted or removed (it adjusts selected positions)
 		registerAdapterDataObserver(new AdapterDataObserver());
@@ -1065,10 +1065,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void setEndlessScrollListener(@NonNull EndlessScrollListener endlessScrollListener,
 										 @NonNull T progressItem) {
 		if (endlessScrollListener != null) {
-			this.mEndlessScrollListener = endlessScrollListener;
+			mEndlessScrollListener = endlessScrollListener;
 			setEndlessScrollThreshold(mEndlessScrollThreshold);
 			progressItem.setEnabled(false);
-			addItem(getItemCount(), progressItem);
+			mProgressItem = progressItem;
 		}
 	}
 
@@ -1081,25 +1081,22 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void setEndlessScrollThreshold(@IntRange(from = 1) int thresholdItems) {
 		//Increase visible threshold based on number of columns
 		if (mRecyclerView != null) {
-			RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
-			if (layoutManager instanceof GridLayoutManager) {
-				thresholdItems = thresholdItems * ((GridLayoutManager) layoutManager).getSpanCount();
-			} else if (layoutManager instanceof StaggeredGridLayoutManager) {
-				thresholdItems = thresholdItems * ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
-			}
+			int spanCount = getSpanCount(mRecyclerView.getLayoutManager());
+			thresholdItems = thresholdItems * spanCount;
 		}
-		this.mEndlessScrollThreshold = thresholdItems;
+		mEndlessScrollThreshold = thresholdItems;
 	}
 
-	protected void onLoadMore(int position) {
-		if (mEndlessScrollListener != null && position == getItemCount() - mEndlessScrollThreshold) {
-			if (DEBUG) Log.d(TAG, "onLoadMore Loading? " + mLoading);
+	private void onLoadMore(int position) {
+		if (mEndlessScrollListener != null && getGlobalPositionOf(mProgressItem) <  0
+				&& position >= getItemCount() - mEndlessScrollThreshold) {
 			if (!mLoading) {
 				mLoading = true;
-				if (DEBUG) Log.d(TAG, "onLoadMore invoked!");
 				mRecyclerView.post(new Runnable() {
 					@Override
 					public void run() {
+						mItems.add(mProgressItem);
+						notifyItemInserted(getItemCount());
 						mEndlessScrollListener.onLoadMore();
 					}
 				});
@@ -1113,17 +1110,18 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param newItems the list of the new items
 	 */
 	public void onLoadMoreComplete(@Nullable List<T> newItems) {
+		int progressPosition = getGlobalPositionOf(mProgressItem);
+		if (progressPosition >= 0) {
+			mItems.remove(mProgressItem);
+			notifyItemRemoved(progressPosition);
+		}
 		if (newItems != null && newItems.size() > 0) {
 			if (DEBUG) Log.d(TAG, "onLoadMore Complete adding " + newItems.size() + " new Items!");
-			addItems(getItemCount() - 1, newItems);
-			resetOnLoadMore();
+			addItems(getItemCount(), newItems);
+			mHandler.sendEmptyMessageDelayed(2, 200L);
 		} else {
 			noMoreLoad();
 		}
-	}
-
-	public void resetOnLoadMore() {
-		mLoading = false;
 	}
 
 	/**
@@ -1133,6 +1131,10 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (DEBUG) Log.d(TAG, "onLoadMore noMoreLoad!");
 		notifyItemChanged(getItemCount() - 1, true);
 		mHandler.sendEmptyMessageDelayed(2, 200L);
+	}
+
+	private void resetOnLoadMore() {
+		mLoading = false;
 	}
 
 	/*--------------------*/
@@ -1559,7 +1561,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (addItem(position, item) && scrollToPosition) {
+				if (addItem(position, item) && scrollToPosition && mRecyclerView != null) {
 					mRecyclerView.scrollToPosition(
 							Math.min(Math.max(0, position), getItemCount() - 1));
 				}
@@ -2945,8 +2947,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			int scrollMax = position - firstVisibleItem;
 			int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
 			int scrollBy = Math.min(scrollMax, scrollMin);
-			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-				int spanCount = ((GridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount();
+			int spanCount = getSpanCount(mRecyclerView.getLayoutManager());
+			if (spanCount > 1) {
 				scrollBy = scrollBy % spanCount + spanCount;
 			}
 			int scrollTo = firstVisibleItem + scrollBy;
@@ -2956,6 +2958,15 @@ public class FlexibleAdapter<T extends IFlexible>
 		} else if (position < firstVisibleItem) {
 			mRecyclerView.smoothScrollToPosition(position);
 		}
+	}
+
+	private static int getSpanCount(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof GridLayoutManager) {
+			return ((GridLayoutManager) layoutManager).getSpanCount();
+		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
+		}
+		return 1;
 	}
 
 	private void adjustSelected(int startPosition, int itemCount) {

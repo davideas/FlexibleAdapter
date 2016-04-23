@@ -8,6 +8,13 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
+
+	private boolean enabled;
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	public ScrollAwareFABBehavior(Context context, AttributeSet attrs) {
 		super();
 	}
@@ -25,6 +32,7 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
 							   final View target, final int dxConsumed, final int dyConsumed,
 							   final int dxUnconsumed, final int dyUnconsumed) {
 		super.onNestedScroll(coordinatorLayout, fab, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
+		if (!enabled) return;
 		if (dyConsumed > 0 && fab.getVisibility() == View.VISIBLE) {
 			// User scrolled down and the FAB is currently visible -> hide the FAB
 			fab.hide();

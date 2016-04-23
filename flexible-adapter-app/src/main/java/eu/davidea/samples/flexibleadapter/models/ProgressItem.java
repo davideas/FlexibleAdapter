@@ -3,12 +3,12 @@ package eu.davidea.samples.flexibleadapter.models;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.samples.flexibleadapter.ProgressBar;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.ProgressItem.ProgressViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -26,7 +26,7 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.progress_bar;
+		return R.layout.progress_item;
 	}
 
 	@Override
@@ -38,10 +38,10 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 	public void bindViewHolder(FlexibleAdapter adapter, ProgressViewHolder holder, int position, List payloads) {
 		if (payloads.size() == 0) {
 			//Show loading animation
-			holder.progressBar.setVisibility(View.VISIBLE);
+//			holder.progressBar.setVisibility(View.VISIBLE);
 		} else {
 			//Show error reason or communicate "no more to load"
-			holder.progressBar.setVisibility(View.INVISIBLE);
+//			holder.progressBar.setVisibility(View.INVISIBLE);
 		}
 	}
 

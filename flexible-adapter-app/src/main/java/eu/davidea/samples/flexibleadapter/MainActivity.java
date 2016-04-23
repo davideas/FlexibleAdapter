@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -54,6 +55,7 @@ import eu.davidea.samples.flexibleadapter.models.OverallItem;
 import eu.davidea.samples.flexibleadapter.models.SimpleItem;
 import eu.davidea.samples.flexibleadapter.models.SubItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
+import eu.davidea.utils.ScrollAwareFABBehavior;
 import eu.davidea.utils.Utils;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
@@ -257,6 +259,10 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item) {
 		hideFab();
+		CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mFab.getLayoutParams();
+		ScrollAwareFABBehavior fabBehavior = ((ScrollAwareFABBehavior) layoutParams.getBehavior());
+		fabBehavior.setEnabled(false);
+
 		//Handle navigation view item clicks
 		int id = item.getItemId();
 		if (id == R.id.nav_overall) {
@@ -268,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_headers_and_sections) {
 			mFragment = FragmentHeadersSections.newInstance(2);
 			showFab();
+			fabBehavior.setEnabled(true);
 		} else if (id == R.id.nav_selection_modes) {
 
 		} else if (id == R.id.nav_expandable) {
@@ -373,9 +380,7 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private void showFab() {
-		if (!(mFragment instanceof FragmentOverall) &&
-				!(mFragment instanceof FragmentEndlessScrolling) &&
-				!(mFragment instanceof FragmentExpandableMultiLevel))
+		if (mFragment instanceof FragmentHeadersSections)
 			ViewCompat.animate(mFab)
 				.scaleX(1f).scaleY(1f)
 				.alpha(1f).setDuration(100)
