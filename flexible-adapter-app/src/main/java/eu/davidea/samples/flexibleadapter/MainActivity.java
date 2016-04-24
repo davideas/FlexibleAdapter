@@ -24,6 +24,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -35,6 +36,7 @@ import android.widget.Toast;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
@@ -455,6 +457,14 @@ public class MainActivity extends AppCompatActivity implements
 				mAdapter.enableStickyHeaders();
 				item.setTitle(R.string.scroll_headers);
 			}
+		} else if (id == R.id.action_swipe) {
+			if (mAdapter.isFullSwipe()) {
+				mAdapter.setSwipeEnabled(true);
+				item.setTitle(R.string.partial_swipe);
+			} else {
+				mAdapter.setSwipeEnabled(true, 165);
+				item.setTitle(R.string.full_swipe);
+			}
 		}
 
 		//TODO: Show difference between MODE_IDLE, MODE_SINGLE
@@ -521,34 +531,57 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onItemSwipe(int position, int direction) {
-		IFlexible abstractItem = mAdapter.getItem(position);
-		assert abstractItem != null;
-		//Experimenting NEW feature
-		if (abstractItem.isSelectable())
-			mAdapter.setRestoreSelectionOnUndo(false);
+	public void onItemSwipe(int position, int direction, int swipeStatus) {
+		Log.i(TAG, "onItemSwipe position=" + position +
+				" direction=" + (direction == ItemTouchHelper.LEFT ? "LEFT" : "RIGHT") +
+				" swipeStatus=" + (swipeStatus == ItemTouchHelperCallback.PARTIAL_SWIPE ? "PARTIAL_SWIPE" : "FULL_SWIPE"));
 
-		//TODO: Create Undo Helper with SnackBar?
-		StringBuilder message = new StringBuilder();
-		message.append(extractTitleFrom(abstractItem))
-				.append(" ").append(getString(R.string.action_deleted));
-		//noinspection ResourceType
-		mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)
-				.setAction(R.string.undo, new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						mAdapter.restoreDeletedItems();
-					}
-				});
-		mSnackBar.show();
-		mAdapter.removeItem(position, true);
-		logOrphanHeaders();
-		mAdapter.startUndoTimer(5000L + 200L, this);
-		//Handle ActionMode title
-		if (mAdapter.getSelectedItemCount() == 0)
-			destroyActionModeIfCan();
-		else
-			setContextTitle(mAdapter.getSelectedItemCount());
+		//Option 1 FULL_SWIPE: Direct action
+		//Do something based on direction when item has been swiped:
+		//   A) select the item;
+		//   B) remove the item with normal Undo;
+		//   C) update item, set "read" if an email etc.
+
+		//Option 2 FULL_SWIPE: Delayed action
+		//Show action button and start a new Handler:
+		//   A) on time out do something based on direction;
+		//   B) on button clicked, cancel the Handler and close/animate back the front view
+
+		//Option 3 TODO: PARTIAL_SWIPE: Custom multiple view actions
+		//Do nothing: handle the click listeners on custom views
+		//and close/animate back the front view.
+
+		//Here, option 1B) is implemented (currently disabled)
+		boolean removeOnFullSwipe = false;
+		if (swipeStatus == ItemTouchHelperCallback.FULL_SWIPE && removeOnFullSwipe) {
+			IFlexible abstractItem = mAdapter.getItem(position);
+			assert abstractItem != null;
+			//Experimenting NEW feature
+			if (abstractItem.isSelectable())
+				mAdapter.setRestoreSelectionOnUndo(false);
+
+			//TODO: Create Undo Helper with SnackBar?
+			StringBuilder message = new StringBuilder();
+			message.append(extractTitleFrom(abstractItem))
+					.append(" ").append(getString(R.string.action_deleted));
+			//noinspection ResourceType
+			mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)
+					.setAction(R.string.undo, new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							mAdapter.restoreDeletedItems();
+						}
+					});
+			mSnackBar.show();
+			mAdapter.removeItem(position, true);
+			logOrphanHeaders();
+			mAdapter.startUndoTimer(5000L + 200L, this);
+			//Handle ActionMode title
+			if (mAdapter.getSelectedItemCount() == 0)
+				destroyActionModeIfCan();
+			else
+				setContextTitle(mAdapter.getSelectedItemCount());
+		}
 	}
 
 	@Override

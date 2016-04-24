@@ -140,6 +140,9 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 		public TextView mSubtitle;
 		public ImageView mHandleView;
 		public Context mContext;
+		private View frontView;
+		private View rearLeftView;
+		private View rearRightView;
 
 		public ParentViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
@@ -157,6 +160,10 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 			});
 			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
 			setDragHandleView(mHandleView);
+
+			frontView = view.findViewById(R.id.front_view);
+			rearLeftView = view.findViewById(R.id.rear_left_view);
+			rearRightView = view.findViewById(R.id.rear_right_view);
 		}
 
 		@Override
@@ -180,7 +187,27 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 
 		@Override
 		public float getActivationElevation() {
-			return Utils.dpToPx(itemView.getContext(), 4f);
+			return Utils.dpToPx(itemView.getContext(), 0f);
+		}
+
+		@Override
+		protected boolean shouldActivateViewWhileSwiping() {
+			return false;
+		}
+
+		@Override
+		public View getFrontView() {
+			return frontView;
+		}
+
+		@Override
+		public View getRearLeftView() {
+			return rearLeftView;
+		}
+
+		@Override
+		public View getRearRightView() {
+			return rearRightView;
 		}
 	}
 

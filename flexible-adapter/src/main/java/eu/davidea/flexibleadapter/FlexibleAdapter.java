@@ -65,12 +65,11 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * filtering, adding, removing, moving and animating an item.</p>
  * With version 5.0.0, this Adapter supports a set of standard methods for Headers/Sections to
  * expand and collapse an Expandable item, to Drag&Drop and Swipe any item.
- * <p><b>NOTE:</b>This Adapter supports Expandable of Expandable, but selection and restoration
- * don't work well in conjunction of multi level expansion. You should not enable functionalities
- * like: ActionMode, Undo, Drag and CollapseOnExpand in that case. Better to change approach in
- * favor of a better and clearer design/layout: Open the list of the subItem in a new Activity...
- * <br/>Instead, this extra level of expansion is useful in situations where those items are not
- * selectable nor draggable, and information in them are in read only mode or are action buttons.</p>
+ * <p><b>NOTE:</b> This Adapter supports multi level of Expandable. Do not enable functionalities
+ * like: Drag&Drop. Something might not work as expected, so better to change approach in
+ * favor of a clearer design/layout: Open the sub list in a new Activity/Fragment...
+ * <br/>Instead, this extra level of expansion is useful in situations where information is in
+ * read only mode or with action buttons.</p>
  *
  * @author Davide Steduto
  * @see AnimatorAdapter
@@ -87,6 +86,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
  * <br/>20/02/2016 Sticky headers
  * <br/>22/04/2016 Endless Scrolling
+ * <br/>24/04/2016 FULL and PARTIAL Swipe
  */
 @SuppressWarnings({"unused", "Range", "Convert2Diamond", "ConstantConditions", "unchecked"})
 public class FlexibleAdapter<T extends IFlexible>
@@ -165,7 +165,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			childSelected = false, parentSelected = false;
 
 	/* Drag&Drop and Swipe helpers */
-	private boolean longPressDragEnabled = false, handleDragEnabled = true, swipeEnabled = false;
+	private boolean longPressDragEnabled = false, handleDragEnabled = true, mSwipeEnabled = false;
 	private ItemTouchHelperCallback mItemTouchHelperCallback;
 	private ItemTouchHelper mItemTouchHelper;
 
@@ -1088,7 +1088,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	private void onLoadMore(int position) {
-		if (mEndlessScrollListener != null && getGlobalPositionOf(mProgressItem) <  0
+		if (mEndlessScrollListener != null && getGlobalPositionOf(mProgressItem) < 0
 				&& position >= getItemCount() - mEndlessScrollThreshold) {
 			if (!mLoading) {
 				mLoading = true;
@@ -2661,16 +2661,34 @@ public class FlexibleAdapter<T extends IFlexible>
 		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.isItemViewSwipeEnabled();
 	}
 
+	public final boolean isFullSwipe() {
+		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.getSwipeMaxMarginPx() > 0;
+	}
+
 	/**
-	 * Enable the Swipe of the items
+	 * Enable the Full Swipe of the items.
 	 * <p>Default value is false.</p>
 	 *
 	 * @param swipeEnabled true to activate, false otherwise
+	 * @see #setSwipeEnabled(boolean, int)
 	 */
 	public final void setSwipeEnabled(boolean swipeEnabled) {
+		setSwipeEnabled(swipeEnabled, 0);
+	}
+
+	/**
+	 * Enable the Partial or Full Swipe of the items depending by the specified margin.
+	 * <p>Default value is false and Full Swipe.</p>
+	 *
+	 * @param swipeEnabled true to activate, false otherwise
+	 * @param dp           max margin for a partial swipe (in dpi)
+	 * @see #setSwipeEnabled(boolean)
+	 */
+	public final void setSwipeEnabled(boolean swipeEnabled, int dp) {
 		initializeItemTouchHelper();
-		this.swipeEnabled = swipeEnabled;
+		mSwipeEnabled = swipeEnabled;
 		mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
+		mItemTouchHelperCallback.setSwipeMaxMarginDp(mRecyclerView.getContext(), dp);
 	}
 
 	/**
@@ -2793,10 +2811,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	@CallSuper
-	public void onItemSwiped(int position, int direction) {
+	public void onItemSwiped(int position, int direction, int swipeStatus) {
 		//Delegate actions to the user
 		if (mItemSwipeListener != null) {
-			mItemSwipeListener.onItemSwipe(position, direction);
+			mItemSwipeListener.onItemSwipe(position, direction, swipeStatus);
 		}
 	}
 
@@ -3124,16 +3142,25 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * @since 26/01/2016
+	 * @since 26/01/2016 Created
+	 * <br/>24/04/2016 Swipe Statuses
 	 */
 	public interface OnItemSwipeListener {
 		/**
 		 * Called when swiping ended its animation and Item is not visible anymore.
 		 *
-		 * @param position  the position of the item swiped
-		 * @param direction the direction to which the ViewHolder is swiped
+		 * @param position    the position of the item swiped
+		 * @param direction   the direction to which the ViewHolder is swiped, one of:
+		 *                    {@link ItemTouchHelper#LEFT},
+		 *                    {@link ItemTouchHelper#RIGHT},
+		 *                    {@link ItemTouchHelper#UP},
+		 *                    {@link ItemTouchHelper#DOWN},
+		 * @param swipeStatus the status of the swipe, one of:
+		 *                    {@link ItemTouchHelperCallback#IDLE},
+		 *                    {@link ItemTouchHelperCallback#PARTIAL_SWIPE},
+		 *                    {@link ItemTouchHelperCallback#FULL_SWIPE}
 		 */
-		void onItemSwipe(int position, int direction);
+		void onItemSwipe(int position, int direction, @ItemTouchHelperCallback.SwipeStatus int swipeStatus);
 	}
 
 	/**
@@ -3151,11 +3178,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * @since 22/04/2016
 	 */
-	public interface EndlessScrollListener<T> {
+	public interface EndlessScrollListener {
 		/**
 		 * Loads more data.
-		 *
-		 * @return the list of new items to add
 		 */
 		void onLoadMore();
 	}

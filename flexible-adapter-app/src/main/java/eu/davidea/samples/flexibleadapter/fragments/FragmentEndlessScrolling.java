@@ -38,7 +38,7 @@ import eu.davidea.utils.Utils;
  */
 @SuppressWarnings("ConstantConditions")
 public class FragmentEndlessScrolling extends AbstractFragment
-		implements FlexibleAdapter.EndlessScrollListener<AbstractFlexibleItem> {
+		implements FlexibleAdapter.EndlessScrollListener {
 
 	public static final String TAG = FragmentEndlessScrolling.class.getSimpleName();
 
@@ -98,7 +98,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
-		mAdapter.setSwipeEnabled(true);//Enable swipe items
+		mAdapter.setSwipeEnabled(true, 165);//Enable swipe items (PARTIAL_SWIPE is enabled if dpi are set)
 		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
 		//mAdapter.enableStickyHeaders();//Headers are sticky
 		//Add sample item on the top (not belongs to the library)
@@ -161,7 +161,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		Log.v(TAG, "onCreateOptionsMenu called!");
-		inflater.inflate(R.menu.menu_animators, menu);
+		inflater.inflate(R.menu.menu_endless, menu);
 		mListener.initSearchView(menu);
 	}
 

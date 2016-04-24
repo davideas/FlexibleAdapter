@@ -56,6 +56,9 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	private boolean mLongClickSkipped = false;
 	private boolean alreadySelected = false;
 
+	@ItemTouchHelperCallback.SwipeStatus
+	private int mSwipeStatus = ItemTouchHelperCallback.IDLE;
+
 	/*--------------*/
 	/* CONSTRUCTORS */
 	/*--------------*/
@@ -284,6 +287,32 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		//Reset internal action state ready for next action
 		mLongClickSkipped = false;
 		mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
+	}
+
+	@ItemTouchHelperCallback.SwipeStatus
+	@Override
+	public final int getSwipeStatus() {
+		return mSwipeStatus;
+	}
+
+	@Override
+	public void setSwipeStatus(@ItemTouchHelperCallback.SwipeStatus int swipeStatus) {
+		mSwipeStatus = swipeStatus;
+	}
+
+	@Override
+	public View getFrontView() {
+		return itemView;
+	}
+
+	@Override
+	public View getRearLeftView() {
+		return null;
+	}
+
+	@Override
+	public View getRearRightView() {
+		return null;
 	}
 
 	/**

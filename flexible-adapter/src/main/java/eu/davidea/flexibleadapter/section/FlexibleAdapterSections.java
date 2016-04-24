@@ -966,10 +966,10 @@ abstract class FlexibleAdapterSections extends AnimatorAdapter
 	 */
 	@Override
 	@CallSuper
-	public void onItemSwiped(int position, int direction) {
+	public void onItemSwiped(int position, int direction, int swipeStatus) {
 		// Delegate actions to the user
 		if (mItemSwipeListener != null) {
-			mItemSwipeListener.onItemSwipe(position, direction);
+			mItemSwipeListener.onItemSwipe(position, direction, swipeStatus);
 		}
 	}
 
@@ -1293,7 +1293,7 @@ abstract class FlexibleAdapterSections extends AnimatorAdapter
 		 * @param position  the position of the item swiped
 		 * @param direction the direction to which the ViewHolder is swiped
 		 */
-		void onItemSwipe(int position, int direction);
+		void onItemSwipe(int position, int direction, int swipeStatus);
 	}
 
 	/**
