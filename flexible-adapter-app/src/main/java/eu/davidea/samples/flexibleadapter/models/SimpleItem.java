@@ -143,8 +143,6 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 		private View frontView;
 		private View rearLeftView;
 		private View rearRightView;
-		private ImageView leftImage;
-		private ImageView rightImage;
 
 		public ParentViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
@@ -166,20 +164,6 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 			this.frontView = view.findViewById(R.id.front_view);
 			this.rearLeftView = view.findViewById(R.id.rear_left_view);
 			this.rearRightView = view.findViewById(R.id.rear_right_view);
-			this.leftImage = (ImageView) view.findViewById(R.id.left_image);
-			this.leftImage.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Toast.makeText(mContext, "Archive position " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
-				}
-			});
-			this.rightImage = (ImageView) view.findViewById(R.id.right_image);
-			this.rightImage.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Toast.makeText(mContext, "Delete position " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
-				}
-			});
 		}
 
 		@Override

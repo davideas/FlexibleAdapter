@@ -165,7 +165,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			childSelected = false, parentSelected = false;
 
 	/* Drag&Drop and Swipe helpers */
-	private boolean longPressDragEnabled = false, handleDragEnabled = true, mSwipeEnabled = false;
+	private boolean handleDragEnabled = true;
 	private ItemTouchHelperCallback mItemTouchHelperCallback;
 	private ItemTouchHelper mItemTouchHelper;
 
@@ -2624,7 +2624,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public final void setLongPressDragEnabled(boolean longPressDragEnabled) {
 		initializeItemTouchHelper();
-		this.longPressDragEnabled = longPressDragEnabled;
 		mItemTouchHelperCallback.setLongPressDragEnabled(longPressDragEnabled);
 	}
 
@@ -2661,34 +2660,15 @@ public class FlexibleAdapter<T extends IFlexible>
 		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.isItemViewSwipeEnabled();
 	}
 
-	public final boolean isFullSwipe() {
-		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.getSwipeMaxMarginPx() > 0;
-	}
-
 	/**
 	 * Enable the Full Swipe of the items.
 	 * <p>Default value is false.</p>
 	 *
 	 * @param swipeEnabled true to activate, false otherwise
-	 * @see #setSwipeEnabled(boolean, int)
 	 */
 	public final void setSwipeEnabled(boolean swipeEnabled) {
-		setSwipeEnabled(swipeEnabled, 0);
-	}
-
-	/**
-	 * Enable the Partial or Full Swipe of the items depending by the specified margin.
-	 * <p>Default value is false and Full Swipe.</p>
-	 *
-	 * @param swipeEnabled true to activate, false otherwise
-	 * @param dp           max margin for a partial swipe (in dpi)
-	 * @see #setSwipeEnabled(boolean)
-	 */
-	public final void setSwipeEnabled(boolean swipeEnabled, int dp) {
 		initializeItemTouchHelper();
-		mSwipeEnabled = swipeEnabled;
 		mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
-		mItemTouchHelperCallback.setSwipeMaxMarginDp(mRecyclerView.getContext(), dp);
 	}
 
 	/**
@@ -2811,10 +2791,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	@CallSuper
-	public void onItemSwiped(int position, int direction, int swipeStatus) {
+	public void onItemSwiped(int position, int direction) {
 		//Delegate actions to the user
 		if (mItemSwipeListener != null) {
-			mItemSwipeListener.onItemSwipe(position, direction, swipeStatus);
+			mItemSwipeListener.onItemSwipe(position, direction);
 		}
 	}
 
@@ -3155,12 +3135,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		 *                    {@link ItemTouchHelper#RIGHT},
 		 *                    {@link ItemTouchHelper#UP},
 		 *                    {@link ItemTouchHelper#DOWN},
-		 * @param swipeStatus the status of the swipe, one of:
-		 *                    {@link ItemTouchHelperCallback#IDLE},
-		 *                    {@link ItemTouchHelperCallback#PARTIAL_SWIPE},
-		 *                    {@link ItemTouchHelperCallback#FULL_SWIPE}
 		 */
-		void onItemSwipe(int position, int direction, @ItemTouchHelperCallback.SwipeStatus int swipeStatus);
+		void onItemSwipe(int position, int direction);
 	}
 
 	/**

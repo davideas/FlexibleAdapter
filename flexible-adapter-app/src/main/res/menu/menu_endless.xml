@@ -21,9 +21,4 @@
 	      android:icon="@drawable/ic_sort_descending_white_24dp"
 	      app:showAsAction="never"/>
 
-	<item android:id="@+id/action_swipe"
-	      android:title="@string/full_swipe"
-	      android:icon="@drawable/ic_swap_horiz_grey600_24dp"
-	      app:showAsAction="never"/>
-
 </menu>

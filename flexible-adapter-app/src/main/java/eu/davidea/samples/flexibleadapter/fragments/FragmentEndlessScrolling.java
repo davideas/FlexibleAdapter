@@ -98,7 +98,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
-		mAdapter.setSwipeEnabled(true, 165);//Enable swipe items (PARTIAL_SWIPE is enabled if dpi are set)
+		mAdapter.setSwipeEnabled(true);//Enable swipe items
 		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
 		//mAdapter.enableStickyHeaders();//Headers are sticky
 		//Add sample item on the top (not belongs to the library)

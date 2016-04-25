@@ -56,9 +56,6 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	private boolean mLongClickSkipped = false;
 	private boolean alreadySelected = false;
 
-	@ItemTouchHelperCallback.SwipeStatus
-	private int mSwipeStatus = ItemTouchHelperCallback.IDLE;
-
 	/*--------------*/
 	/* CONSTRUCTORS */
 	/*--------------*/
@@ -278,7 +275,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 			Log.v(TAG, "onItemReleased position=" + position + " mode=" + mAdapter.getMode() +
 					" actionState=" + (mActionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
 		//Be sure to keep selection if MODE_MULTI and shouldAddSelectionInActionMode is active
-		if (!alreadySelected && shouldAddSelectionInActionMode()) {
+		if (!alreadySelected && !shouldAddSelectionInActionMode()) {
 			mAdapter.toggleSelection(position);
 			if (itemView.isActivated()) {
 				toggleActivation();
@@ -287,17 +284,6 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		//Reset internal action state ready for next action
 		mLongClickSkipped = false;
 		mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
-	}
-
-	@ItemTouchHelperCallback.SwipeStatus
-	@Override
-	public final int getSwipeStatus() {
-		return mSwipeStatus;
-	}
-
-	@Override
-	public void setSwipeStatus(@ItemTouchHelperCallback.SwipeStatus int swipeStatus) {
-		mSwipeStatus = swipeStatus;
 	}
 
 	@Override
@@ -322,7 +308,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * of StickyHeaders use case.</p>
 	 *
 	 * @return the Adapter position result of {@link #getAdapterPosition()} OR the backup position
-	 *         preset and known, if the previous result was {@link RecyclerView#NO_POSITION}.
+	 * preset and known, if the previous result was {@link RecyclerView#NO_POSITION}.
 	 * @see #setBackupPosition(int)
 	 */
 	public int getFlexibleAdapterPosition() {
