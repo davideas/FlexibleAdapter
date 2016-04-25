@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016 Davide Steduto
  * Copyright (C) 2015 Dift.co
  * http://dift.co
  *
@@ -20,7 +21,6 @@ import android.animation.Animator;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 
@@ -30,24 +30,25 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
+import eu.davidea.flexibleadapter.FlexibleAdapter;
+
 public class ItemSwipeHelper {
 
 	private static final int SWIPE_ANIMATION_DURATION = 300;
 	private static final int RESET_ANIMATION_DURATION = 500;
 	private static final int REVEAL_THRESHOLD = 50;
 	private static final int SWIPE_THRESHOLD_WIDTH_RATIO = 5;
-	private static final int LONG_PRESS_TIME = 500; // 500 is the standard long press time
 
 	private static final int INVALID_POINTER_ID = -1;
 	private int activePointerId = INVALID_POINTER_ID;
 
 	private RecyclerView recyclerView;
-	private SwipeListener swipeListener;
+	private FlexibleAdapter.OnItemSwipeListener swipeListener;
 	private View touchedView;
-	private ViewHolder touchedViewHolder;
+	private ItemTouchHelperCallback.ViewHolderCallback touchedViewHolder;
 	private View frontView;
-	private View revealLeftView;
-	private View revealRightView;
+	private View rearLeftView;
+	private View rearRightView;
 
 	private float frontViewX;
 	private float frontViewW;
@@ -65,21 +66,19 @@ public class ItemSwipeHelper {
 	private Queue<Integer> swipeQueue = new LinkedList<>();
 
 
-	/**
-	 * Constructor
-	 **/
+	/*--------------*/
+	/* CONSTRUCTORS */
+	/*--------------*/
 
-	public ItemSwipeHelper(RecyclerView recyclerView, SwipeListener swipeListener) {
+	public ItemSwipeHelper(RecyclerView recyclerView, FlexibleAdapter.OnItemSwipeListener swipeListener) {
 		this.recyclerView = recyclerView;
 		this.swipeListener = swipeListener;
-
 		init();
 	}
 
-
-	/**
-	 * Private methods
-	 **/
+	/*-----------------*/
+	/* PRIVATE METHODS */
+	/*-----------------*/
 
 	private void init() {
 		recyclerView.setOnTouchListener(new View.OnTouchListener() {
@@ -122,7 +121,6 @@ public class ItemSwipeHelper {
 							final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
 							activePointerId = ev.getPointerId(newPointerIndex);
 						}
-
 						break;
 					}
 
@@ -142,18 +140,15 @@ public class ItemSwipeHelper {
 						} else {
 							revealLeft();
 						}
-
 						break;
 					}
 
 					case MotionEvent.ACTION_CANCEL: {
 						activePointerId = INVALID_POINTER_ID;
 						resolveState();
-
 						break;
 					}
 				}
-
 				return false;
 			}
 		});
@@ -173,20 +168,23 @@ public class ItemSwipeHelper {
 			return;
 		}
 
-		initViewForItem((ViewHolder) recyclerView.getChildViewHolder(touchedView));
+		initViewForItem(recyclerView.getChildViewHolder(touchedView));
 	}
 
 	private void resolveItem(int adapterPosition) {
-		initViewForItem((ViewHolder) recyclerView.findViewHolderForAdapterPosition(adapterPosition));
+		initViewForItem(recyclerView.findViewHolderForAdapterPosition(adapterPosition));
 	}
 
-	private void initViewForItem(ViewHolder viewHolder) {
-		touchedViewHolder = viewHolder;
-		frontView = viewHolder.getFront();
-		revealLeftView = viewHolder.getRevealLeft();
-		revealRightView = viewHolder.getRevealRight();
-		frontViewX = frontView.getX();
-		frontViewW = frontView.getWidth();
+	private void initViewForItem(RecyclerView.ViewHolder viewHolder) {
+		if (viewHolder instanceof ItemTouchHelperCallback.ViewHolderCallback) {
+			ItemTouchHelperCallback.ViewHolderCallback viewHolderCallback = (ItemTouchHelperCallback.ViewHolderCallback) viewHolder;
+			touchedViewHolder = viewHolderCallback;
+			frontView = viewHolderCallback.getFrontView();
+			rearLeftView = viewHolderCallback.getRearLeftView();
+			rearRightView = viewHolderCallback.getRearRightView();
+			frontViewX = frontView.getX();
+			frontViewW = frontView.getWidth();
+		}
 	}
 
 	private boolean shouldMove(float dx) {
@@ -195,9 +193,9 @@ public class ItemSwipeHelper {
 		}
 
 		if (dx > 0) {
-			return revealRightView != null && Math.abs(dx) > REVEAL_THRESHOLD;
+			return rearRightView != null && Math.abs(dx) > REVEAL_THRESHOLD;
 		} else {
-			return revealLeftView != null && Math.abs(dx) > REVEAL_THRESHOLD;
+			return rearLeftView != null && Math.abs(dx) > REVEAL_THRESHOLD;
 		}
 	}
 
@@ -230,22 +228,18 @@ public class ItemSwipeHelper {
 	}
 
 	private void hideLeftRevealView() {
-		if (revealLeftView != null) {
-			revealLeftView.setVisibility(View.GONE);
+		if (rearLeftView != null) {
+			rearLeftView.setVisibility(View.GONE);
 		}
 	}
 
 	private void hideRightRevealView() {
-		if (revealRightView != null) {
-			revealRightView.setVisibility(View.GONE);
+		if (rearRightView != null) {
+			rearRightView.setVisibility(View.GONE);
 		}
 	}
 
 	private void resetPosition() {
-		if (frontView == null) {
-			return;
-		}
-
 		final View animated = touchedView;
 		frontView.animate()
 				.setDuration(RESET_ANIMATION_DURATION)
@@ -285,18 +279,6 @@ public class ItemSwipeHelper {
 		} else if (frontViewLastX < frontViewX - frontViewW / SWIPE_THRESHOLD_WIDTH_RATIO) {
 			swipeLeft();
 		} else {
-			float diffX = Math.abs(downX - upX);
-			float diffY = Math.abs(downY - upY);
-
-			if (diffX <= 5 && diffY <= 5) {
-				int pressTime = (int) (upTime - downTime);
-				if (pressTime > LONG_PRESS_TIME) {
-					swipeListener.onLongClick(touchedViewHolder.getItemData());
-				} else {
-					swipeListener.onClick(touchedViewHolder.getItemData());
-				}
-			}
-
 			resetPosition();
 		}
 
@@ -307,37 +289,36 @@ public class ItemSwipeHelper {
 		if (frontView == null) {
 			return;
 		}
-
-		final View animated = touchedView;
 		frontView.animate()
 				.setDuration(SWIPE_ANIMATION_DURATION)
 				.setInterpolator(new AccelerateInterpolator())
 				.setListener(new Animator.AnimatorListener() {
 					@Override
 					public void onAnimationStart(Animator animation) {
-						runningAnimationsOn.add(animated);
+						runningAnimationsOn.add(touchedView);
 					}
 
 					@Override
 					public void onAnimationEnd(Animator animation) {
-						runningAnimationsOn.remove(animated);
-						if (swipeListener.swipeRight(touchedViewHolder.getItemData())) {
-							resetPosition();
-						} else {
-							if (!checkQueue()) {
-								hideLeftRevealView();
-							}
-						}
+						int position = recyclerView.getChildAdapterPosition(touchedView);
+						runningAnimationsOn.remove(touchedView);
+//						if (swipeListener.onItemSwipe(position, ItemTouchHelper.RIGHT)) {
+//							resetPosition();
+//						} else {
+//							if (!checkQueue()) {
+//								hideLeftRevealView();
+//							}
+//						}
 					}
 
 					@Override
 					public void onAnimationCancel(Animator animation) {
-						runningAnimationsOn.remove(animated);
+						runningAnimationsOn.remove(touchedView);
 					}
 
 					@Override
 					public void onAnimationRepeat(Animator animation) {
-						runningAnimationsOn.add(animated);
+						runningAnimationsOn.add(touchedView);
 					}
 				}).x(frontViewX + frontViewW);
 	}
@@ -347,65 +328,61 @@ public class ItemSwipeHelper {
 			return;
 		}
 
-		final View animated = touchedView;
 		frontView.animate()
 				.setDuration(SWIPE_ANIMATION_DURATION)
 				.setInterpolator(new AccelerateInterpolator())
 				.setListener(new Animator.AnimatorListener() {
 					@Override
 					public void onAnimationStart(Animator animation) {
-						runningAnimationsOn.add(animated);
+						runningAnimationsOn.add(touchedView);
 					}
 
 					@Override
 					public void onAnimationEnd(Animator animation) {
-						runningAnimationsOn.remove(animated);
-						if (swipeListener.swipeLeft(touchedViewHolder.getItemData())) {
-							resetPosition();
-						} else {
-							if (!checkQueue()) {
-								hideRightRevealView();
-							}
-						}
+						int position = recyclerView.getChildAdapterPosition(touchedView);
+						runningAnimationsOn.remove(touchedView);
+//						if (swipeListener.onItemSwipe(position, ItemTouchHelper.LEFT)) {
+//							resetPosition();
+//						} else {
+//							if (!checkQueue()) {
+//								hideRightRevealView();
+//							}
+//						}
 					}
 
 					@Override
 					public void onAnimationCancel(Animator animation) {
-						runningAnimationsOn.remove(animated);
+						runningAnimationsOn.remove(touchedView);
 					}
 
 					@Override
 					public void onAnimationRepeat(Animator animation) {
-						runningAnimationsOn.add(animated);
+						runningAnimationsOn.add(touchedView);
 					}
 				}).x(frontViewX - frontViewW);
-
 	}
 
 	private void revealRight() {
-		if (revealLeftView != null) {
-			revealLeftView.setVisibility(View.GONE);
+		if (rearLeftView != null) {
+			rearLeftView.setVisibility(View.GONE);
 		}
-
-		if (revealRightView != null) {
-			revealRightView.setVisibility(View.VISIBLE);
+		if (rearRightView != null) {
+			rearRightView.setVisibility(View.VISIBLE);
 		}
 	}
 
 	private void revealLeft() {
-		if (revealRightView != null) {
-			revealRightView.setVisibility(View.GONE);
+		if (rearRightView != null) {
+			rearRightView.setVisibility(View.GONE);
 		}
-
-		if (revealLeftView != null) {
-			revealLeftView.setVisibility(View.VISIBLE);
+		if (rearLeftView != null) {
+			rearLeftView.setVisibility(View.VISIBLE);
 		}
 	}
 
-
-	/**
-	 * Exposed methods
-	 **/
+	/*-----------------*/
+	/* EXPOSED METHODS */
+	/*-----------------*/
 
 	public void swipeLeft(int position) {
 		// workaround in case a swipe call while dragging
@@ -427,102 +404,6 @@ public class ItemSwipeHelper {
 		resolveItem(position);
 		revealRight();
 		swipeRight();
-	}
-
-
-	/**
-	 * Public interfaces & classes
-	 */
-
-	public interface SwipeListener<T extends Object> {
-		boolean swipeLeft(T itemData);
-
-		boolean swipeRight(T itemData);
-
-		void onClick(T itemData);
-
-		void onLongClick(T itemData);
-	}
-
-	public interface IViewHolder<T extends Object> {
-		View getFront();
-
-		View getRevealLeft();
-
-		View getRevealRight();
-
-		<T extends Object> T getItemData();
-	}
-
-	public static abstract class ViewHolder<T extends Object>
-			extends RecyclerView.ViewHolder implements IViewHolder {
-
-		public T data;
-		public View front;
-		public View revealLeft;
-		public View revealRight;
-
-		public ViewHolder(View v) {
-			super(v);
-
-			ViewGroup vg = (ViewGroup) v;
-			front = vg.findViewWithTag("front");
-			revealLeft = vg.findViewWithTag("reveal-left");
-			revealRight = vg.findViewWithTag("reveal-right");
-
-			int childCount = vg.getChildCount();
-			if (front == null) {
-				if (childCount < 1) {
-					throw new RuntimeException("You must provide a view with tag='front'");
-				} else {
-					front = vg.getChildAt(childCount - 1);
-				}
-			}
-
-			if (revealLeft == null || revealRight == null) {
-				if (childCount < 2) {
-					throw new RuntimeException("You must provide at least one reveal view.");
-				} else {
-					// set next to last as revealLeft view only if no revealRight was found
-					if (revealLeft == null && revealRight == null) {
-						revealLeft = vg.getChildAt(childCount - 2);
-					}
-
-					// if there are enough children assume the revealRight
-					int i = childCount - 3;
-					if (revealRight == null && i > -1) {
-						revealRight = vg.getChildAt(i);
-					}
-				}
-			}
-
-			if (revealLeft != null) {
-				revealLeft.setVisibility(View.GONE);
-			}
-			if (revealRight != null) {
-				revealRight.setVisibility(View.GONE);
-			}
-		}
-
-		@Override
-		public View getFront() {
-			return front;
-		}
-
-		@Override
-		public View getRevealLeft() {
-			return revealLeft;
-		}
-
-		@Override
-		public View getRevealRight() {
-			return revealRight;
-		}
-
-		@Override
-		public T getItemData() {
-			return data;
-		}
 	}
 
 }
