@@ -289,32 +289,47 @@ public class ItemTouchHelperCallback extends Callback {
 			ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
 			View frontView = viewHolderCallback.getFrontView();
 
-			//Orientation
+			//Orientation independent
 			float dragAmount = dX;
 			if (dY != 0) dragAmount = dY;
 
-			if (mMargin > 0) {
-				if (FlexibleAdapter.DEBUG)
-					Log.d(TAG, "onChildDraw before dragAmount=" + dragAmount + " oldAmount=" + oldAmount + " frontView(X)=" + frontView.getTranslationX() + " isCurrentlyActive=" + isCurrentlyActive);
+			if (FlexibleAdapter.DEBUG)
+				Log.d(TAG, "onChildDraw start dragAmount=" + dragAmount + " oldAmount=" + oldAmount + " frontView(X)=" + frontView.getTranslationX());
 
-				//Adjust back swiping starting from last margin
-				boolean stillSwiping = false;
-				if (Math.abs(dragAmount) > oldAmount || Math.abs(dragAmount) < mMargin) {
+			if (dragAmount == oldAmount && dragAmount == frontView.getRight())
+				return;
+
+			if (mMargin > 0) { //PARTIAL SWIPE
+				//Figure out swipe for opening/closing
+				boolean opening = false;
+				if (Math.abs(dragAmount) >= oldAmount || Math.abs(dragAmount) < mMargin) {
 					oldAmount = Math.abs(dragAmount);
-					stillSwiping = true;
+					opening = true;
 				}
-
-				if (!stillSwiping && isCurrentlyActive) {
+				if (FlexibleAdapter.DEBUG)
+					Log.d(TAG, "onChildDraw  part opening=" + opening + " isCurrentlyActive=" + isCurrentlyActive);
+				//Manage closing
+				if (!opening) {
 					float delta = frontView.getRight() - Math.abs(dragAmount);
 					dragAmount = Math.max(0, mMargin - delta) * (dragAmount >= 0 ? 1 : -1);
+					if (FlexibleAdapter.DEBUG) Log.d(TAG, "onChildDraw  *new dragAmount=" + dragAmount + " delta=" + delta);
+
+					if (Math.abs(frontView.getTranslationX()) == 0) {
+						if (FlexibleAdapter.DEBUG) Log.d(TAG, "onChildDraw reset dragAmount=0");
+						dragAmount = 0;
+					} else if (Math.abs(frontView.getTranslationX()) < mMargin) {
+						dragAmount = frontView.getTranslationX();
+					}
+					//Use high Threshold on closing, so minimal swipe amount will still align the itemView.dX with frontView.dX
 					mTempThreshold = 0.9f;
-					Log.d(TAG, "onChildDraw new dragAmount=" + dragAmount + " delta=" + delta);
-				} else if (!isCurrentlyActive && Math.abs(frontView.getTranslationX()) < mMargin / 3) {
-					dragAmount = 0;
 				}
+			} else if (Math.abs(frontView.getTranslationX()) > Math.abs(dragAmount)) { //FULL SWIPE
+				if (FlexibleAdapter.DEBUG)
+					Log.d(TAG, "onChildDraw  full isCurrentlyActive=" + isCurrentlyActive);
+				mTempThreshold = 0.9f;
 			}
 
-			//Is Left or Right View? Set margins!
+			//Manage opening - Is Left or Right View? Set margins!
 			int swipingDirection = 0;//0 is for frontView
 			if (dragAmount > 0) {
 				swipingDirection = ItemTouchHelper.RIGHT;
@@ -330,22 +345,22 @@ public class ItemTouchHelperCallback extends Callback {
 
 			//Set SwipeStatus
 			String log;
-			if (Math.abs(dragAmount) > mMargin) {
+			if (Math.abs(dragAmount) == 0) {
+				viewHolderCallback.setSwipeStatus(IDLE);
+				log = "IDLE";
+			} else if (Math.abs(dragAmount) > mMargin) {
 				viewHolderCallback.setSwipeStatus(FULL_SWIPE);
 				log = "FULL_SWIPE";
 			} else if (Math.abs(dragAmount) == mMargin) {
 				viewHolderCallback.setSwipeStatus(PARTIAL_SWIPE);
 				log = "PARTIAL_SWIPE";
-			} else if (Math.abs(dragAmount) == 0) {
-				viewHolderCallback.setSwipeStatus(IDLE);
-				log = "IDLE";
 			} else {
 				viewHolderCallback.setSwipeStatus(SWIPING);
 				log = "SWIPING";
 			}
 
 			if (FlexibleAdapter.DEBUG)
-				Log.d(TAG, "onChildDraw after dragAmount=" + dragAmount + " swipeStatus=" + log);
+				Log.d(TAG, "onChildDraw   end dragAmount=" + dragAmount + " swipeStatus=" + log + " mTempThreshold=" + mTempThreshold);
 
 			//Update visibility for RearViews
 			setLayoutVisibility(viewHolderCallback, swipingDirection);
@@ -429,6 +444,12 @@ public class ItemTouchHelperCallback extends Callback {
 		void onItemSwiped(int position, int direction, @SwipeStatus int swipeStatus);
 	}
 
+	@Retention(SOURCE)
+	@Target({METHOD, PARAMETER, FIELD, LOCAL_VARIABLE})
+	@IntDef({IDLE, SWIPING, PARTIAL_SWIPE, FULL_SWIPE})
+	public @interface SwipeStatus {
+	}
+
 	/**
 	 * Internal Interface for ViewHolder to notify of relevant callbacks from {@link Callback}.
 	 * <br/>This listener, is to intend as a further way to display How a ViewHolder will display
@@ -490,12 +511,6 @@ public class ItemTouchHelperCallback extends Callback {
 		 * @return the item Front View
 		 */
 		View getRearRightView();
-	}
-
-	@Retention(SOURCE)
-	@Target({METHOD, PARAMETER, FIELD, LOCAL_VARIABLE})
-	@IntDef({IDLE, SWIPING, PARTIAL_SWIPE, FULL_SWIPE})
-	public @interface SwipeStatus {
 	}
 
 }

@@ -534,7 +534,7 @@ public class MainActivity extends AppCompatActivity implements
 	public void onItemSwipe(int position, int direction, int swipeStatus) {
 		Log.i(TAG, "onItemSwipe position=" + position +
 				" direction=" + (direction == ItemTouchHelper.LEFT ? "LEFT" : "RIGHT") +
-				" swipeStatus=" + (swipeStatus == ItemTouchHelperCallback.PARTIAL_SWIPE ? "PARTIAL_SWIPE" : "FULL_SWIPE"));
+				" swipeStatus=" + (swipeStatus == ItemTouchHelperCallback.PARTIAL_SWIPE ? "PARTIAL_SWIPE" : (swipeStatus == ItemTouchHelperCallback.IDLE ? "IDLE" : "FULL_SWIPE")) );
 
 		//Option 1 FULL_SWIPE: Direct action
 		//Do something based on direction when item has been swiped:

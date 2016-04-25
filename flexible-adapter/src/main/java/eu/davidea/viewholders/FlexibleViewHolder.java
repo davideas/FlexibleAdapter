@@ -193,13 +193,13 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 
 	/**
 	 * Allows to activate the itemView when Swipe event occurs.
-	 * <p>This method returns always true; Extend with "return false" to Not expand or collapse
+	 * <p>This method returns always false; Extend with "return true" to Not expand or collapse
 	 * this ItemView onClick events.</p>
 	 *
-	 * @return always true, if not overridden
+	 * @return always false, if not overridden
 	 */
 	protected boolean shouldActivateViewWhileSwiping() {
-		return true;
+		return false;
 	}
 
 	/**
@@ -278,7 +278,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 			Log.v(TAG, "onItemReleased position=" + position + " mode=" + mAdapter.getMode() +
 					" actionState=" + (mActionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
 		//Be sure to keep selection if MODE_MULTI and shouldAddSelectionInActionMode is active
-		if (!alreadySelected) {
+		if (!alreadySelected && shouldAddSelectionInActionMode()) {
 			mAdapter.toggleSelection(position);
 			if (itemView.isActivated()) {
 				toggleActivation();
