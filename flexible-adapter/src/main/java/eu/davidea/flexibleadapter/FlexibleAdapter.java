@@ -2410,12 +2410,21 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (hasSearchText()) {
 			int newOriginalPosition = -1;
 			for (T item : unfilteredItems) {
+				//Check header first
+				T header = (T) getHeaderOf(item);
+				if (header != null && filterObject(header, getSearchText())
+						&& !values.contains(getHeaderOf(item))) {
+					values.add(header);
+				}
 				if (filterExpandableObject(item, getSearchText())) {
 					RestoreInfo restoreInfo = getPendingRemovedItem(item);
 					if (restoreInfo != null) {
 						//If found point to the new reference while filtering
 						restoreInfo.filterRefItem = ++newOriginalPosition < values.size() ? values.get(newOriginalPosition) : null;
 					} else {
+						if (hasHeader(item) && !values.contains(getHeaderOf(item))) {
+							values.add((T) getHeaderOf(item));
+						}
 						values.add(item);
 						newOriginalPosition++;
 						if (isExpandable(item)) {

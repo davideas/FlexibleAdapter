@@ -10,6 +10,7 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractHeaderItem;
+import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -19,7 +20,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <p>A Section should not contain others Sections!</p>
  * Headers are not Sectionable!
  */
-public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> {
+public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> implements IFilterable {
 
 	private static final long serialVersionUID = -7408637077727563374L;
 
@@ -87,6 +88,11 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 		String subTitle = (sectionableList.isEmpty() ? "Empty section" :
 				sectionableList.size() + " section items");
 		holder.mSubtitle.setText(subTitle);
+	}
+
+	@Override
+	public boolean filter(String constraint) {
+		return getTitle() != null && getTitle().toLowerCase().trim().contains(constraint);
 	}
 
 	static class HeaderViewHolder extends FlexibleViewHolder {
