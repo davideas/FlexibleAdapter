@@ -89,35 +89,11 @@
 		android:layout_height="match_parent"
 		android:paddingBottom="@dimen/margin_bottom"
 		android:paddingTop="@dimen/margin_top"
-		android:background="@color/material_color_orange_500"
-		android:visibility="gone">
-
-		<ImageView
-			android:id="@+id/left_image"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentLeft="true"
-			android:layout_alignParentStart="true"
-			android:layout_centerInParent="true"
-			android:layout_marginEnd="@dimen/margin_right_handle"
-			android:layout_marginLeft="@dimen/margin_left"
-			android:layout_marginRight="@dimen/margin_right_handle"
-			android:layout_marginStart="@dimen/margin_left"
-			android:background="@drawable/ic_archive_white_24dp"/>
-
-	</RelativeLayout>
-
-	<RelativeLayout
-		android:id="@+id/rear_right_view"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:paddingBottom="@dimen/margin_bottom"
-		android:paddingTop="@dimen/margin_top"
 		android:background="@color/material_color_red_600"
 		android:visibility="gone">
 
 		<ImageView
-			android:id="@+id/right_image"
+			android:id="@+id/left_image"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_alignParentEnd="true"
@@ -128,6 +104,30 @@
 			android:layout_marginRight="@dimen/margin_right_handle"
 			android:layout_marginStart="@dimen/margin_left"
 			android:background="@drawable/ic_action_delete"/>
+
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:id="@+id/rear_rightview"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:paddingBottom="@dimen/margin_bottom"
+		android:paddingTop="@dimen/margin_top"
+		android:background="@color/material_color_orange_500"
+		android:visibility="gone">
+
+		<ImageView
+			android:id="@+id/right_image"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentStart="true"
+			android:layout_centerInParent="true"
+			android:layout_marginEnd="@dimen/margin_right_handle"
+			android:layout_marginLeft="@dimen/margin_left"
+			android:layout_marginRight="@dimen/margin_right_handle"
+			android:layout_marginStart="@dimen/margin_left"
+			android:background="@drawable/ic_archive_white_24dp"/>
 
 	</RelativeLayout>
 

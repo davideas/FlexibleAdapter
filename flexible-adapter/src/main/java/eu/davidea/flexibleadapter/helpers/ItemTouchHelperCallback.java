@@ -237,12 +237,12 @@ public class ItemTouchHelperCallback extends Callback {
 			float dragAmount = dX;
 			if (dY != 0) dragAmount = dY;
 
-			//Manage opening - Is Left or Right View? Set margins!
-			int swipingDirection = 0;//0 is for frontView
+			//Manage opening - Is Left or Right View?
+			int swipingDirection = 0;//0 is to reset the frontView
 			if (dragAmount > 0) {
-				swipingDirection = ItemTouchHelper.RIGHT;
+				swipingDirection = ItemTouchHelper.RIGHT;//DOWN
 			} else if (dragAmount < 0) {
-				swipingDirection = ItemTouchHelper.LEFT;
+				swipingDirection = ItemTouchHelper.LEFT;//TOP
 			}
 
 			//Update visibility for RearViews - Convert to custom VH
@@ -255,24 +255,6 @@ public class ItemTouchHelperCallback extends Callback {
 		} else {
 			super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-								float dX, float dY, int actionState, boolean isCurrentlyActive) {
-//		if (FlexibleAdapter.DEBUG) Log.d(TAG, "onChildDrawOver dX=" + dX + " dY=" + dY);
-//
-//		if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE &&
-//				viewHolder instanceof ViewHolderCallback) {
-//			ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
-//			View frontView = viewHolderCallback.getFrontView();
-//			getDefaultUIUtil().onDrawOver(c, recyclerView, frontView, dX, dY, actionState, isCurrentlyActive);
-//		} else {
-//			super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-//		}
 	}
 
 	private static void setLayoutVisibility(ViewHolderCallback viewHolderCallback, int swipeDirection) {
@@ -289,7 +271,7 @@ public class ItemTouchHelperCallback extends Callback {
 	/*------------------*/
 
 	/**
-	 * Internal Interface for Adapter to listen for a move or swipe dismissal event
+	 * Internal interface for Adapter to listen for a move or swipe dismissal event
 	 * from a {@link ItemTouchHelperCallback}.
 	 *
 	 * @since 23/01/2016

@@ -221,6 +221,14 @@ public class FlexibleAdapter<T extends IFlexible>
 		//This works also after a screen rotation
 		initializeItems();
 
+		//Create listeners instances
+		initializeListeners(listeners);
+
+		//Get notified when items are inserted or removed (it adjusts selected positions)
+		registerAdapterDataObserver(new AdapterDataObserver());
+	}
+
+	public void initializeListeners(@Nullable Object listeners) {
 		if (listeners instanceof OnUpdateListener) {
 			mUpdateListener = (OnUpdateListener) listeners;
 			mUpdateListener.onUpdateEmptyView(mItems.size());
@@ -235,9 +243,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			mItemSwipeListener = (OnItemSwipeListener) listeners;
 		if (listeners instanceof OnStickyHeaderChangeListener)
 			mStickyHeaderChangeListener = (OnStickyHeaderChangeListener) listeners;
-
-		//Get notified when items are inserted or removed (it adjusts selected positions)
-		registerAdapterDataObserver(new AdapterDataObserver());
 	}
 
 	@Override

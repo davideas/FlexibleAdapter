@@ -502,6 +502,9 @@ public class MainActivity extends AppCompatActivity implements
 		toggleSelection(position);
 	}
 
+//	/**
+//	 * Not yet analyzed
+//	 */
 //	@Override
 //	public boolean shouldMoveItem(int fromPosition, int toPosition) {
 //		return true;
@@ -528,8 +531,7 @@ public class MainActivity extends AppCompatActivity implements
 
 		//Option 1 FULL_SWIPE: Direct action
 		//Do something based on direction when item has been swiped:
-		//   A) select the item;
-		//   B) remove the item with normal Undo;
+		//   A) remove the item with normal Undo;
 		//   C) update item, set "read" if an email etc.
 
 		//Option 2 FULL_SWIPE: Delayed action
@@ -537,34 +539,36 @@ public class MainActivity extends AppCompatActivity implements
 		//   A) on time out do something based on direction;
 		//   B) on button clicked, cancel the Handler and close/animate back the front view
 
-		//Here, option 1B) is implemented (currently disabled)
-		IFlexible abstractItem = mAdapter.getItem(position);
-		assert abstractItem != null;
-		//Experimenting NEW feature
-		if (abstractItem.isSelectable())
-			mAdapter.setRestoreSelectionOnUndo(false);
+		//Here, option 1A) is implemented (currently disabled)
+		if (direction == ItemTouchHelper.RIGHT) {
+			IFlexible abstractItem = mAdapter.getItem(position);
+			assert abstractItem != null;
+			//Experimenting NEW feature
+			if (abstractItem.isSelectable())
+				mAdapter.setRestoreSelectionOnUndo(false);
 
-		//TODO: Create Undo Helper with SnackBar?
-		StringBuilder message = new StringBuilder();
-		message.append(extractTitleFrom(abstractItem))
-				.append(" ").append(getString(R.string.action_deleted));
-		//noinspection ResourceType
-		mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)
-				.setAction(R.string.undo, new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						mAdapter.restoreDeletedItems();
-					}
-				});
-		mSnackBar.show();
-		mAdapter.removeItem(position, true);
-		logOrphanHeaders();
-		mAdapter.startUndoTimer(5000L + 200L, this);
-		//Handle ActionMode title
-		if (mAdapter.getSelectedItemCount() == 0)
-			destroyActionModeIfCan();
-		else
-			setContextTitle(mAdapter.getSelectedItemCount());
+			//TODO: Create Undo Helper with SnackBar?
+			StringBuilder message = new StringBuilder();
+			message.append(extractTitleFrom(abstractItem))
+					.append(" ").append(getString(R.string.action_deleted));
+			//noinspection ResourceType
+			mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)
+					.setAction(R.string.undo, new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							mAdapter.restoreDeletedItems();
+						}
+					});
+			mSnackBar.show();
+			mAdapter.removeItem(position, true);
+			logOrphanHeaders();
+			mAdapter.startUndoTimer(5000L + 200L, this);
+			//Handle ActionMode title
+			if (mAdapter.getSelectedItemCount() == 0)
+				destroyActionModeIfCan();
+			else
+				setContextTitle(mAdapter.getSelectedItemCount());
+		}
 	}
 
 	@Override
