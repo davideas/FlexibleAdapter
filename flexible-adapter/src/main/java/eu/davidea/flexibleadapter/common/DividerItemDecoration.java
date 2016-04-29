@@ -5,7 +5,9 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,7 +27,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	};
 
 	/**
-	 * Default divider will be used
+	 * Default divider will be used.
 	 */
 	public DividerItemDecoration(Context context) {
 		final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
@@ -34,42 +36,52 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	}
 
 	/**
-	 * Custom divider will be used
+	 * Custom divider will be used.
 	 */
 	public DividerItemDecoration(Context context, int resId) {
 		this(context, resId, 0);
 	}
 
 	/**
-	 * Custom gap between sections
+	 * No divider with gap between section (in dpi).
 	 */
-	public DividerItemDecoration(Context context, int resId, @IntRange(from = 0) float gapWidth) {
-		mDivider = ContextCompat.getDrawable(context, resId);
-		setSectionGapWidth((int) gapWidth);
+	public DividerItemDecoration(Context context, float gapWidth) {
+		this(context, -1, gapWidth);
+	}
+
+	/**
+	 * Custom gap between sections (in dpi).
+	 */
+	public DividerItemDecoration(@NonNull Context context, @DrawableRes int resId,
+								 @IntRange(from = 0) float gapWidth) {
+		if (resId > 0) mDivider = ContextCompat.getDrawable(context, resId);
+		setSectionGapWidth((int) (context.getResources().getDisplayMetrics().density * gapWidth));
 	}
 
 	@Override
 	public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-		int left = parent.getPaddingLeft();
-		int right = parent.getWidth() - parent.getPaddingRight();
+		if (mDivider != null) {
+			int left = parent.getPaddingLeft();
+			int right = parent.getWidth() - parent.getPaddingRight();
 
-		int childCount = parent.getChildCount();
-		for (int i = 0; i < childCount; i++) {
-			View child = parent.getChildAt(i);
+			int childCount = parent.getChildCount();
+			for (int i = 0; i < childCount; i++) {
+				View child = parent.getChildAt(i);
 
-			RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
+				RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
 
-			int top = child.getBottom() + params.bottomMargin +
-					Math.round(ViewCompat.getTranslationY(child));
-			int bottom = top + mDivider.getIntrinsicHeight();
+				int top = child.getBottom() + params.bottomMargin +
+						Math.round(ViewCompat.getTranslationY(child));
+				int bottom = top + mDivider.getIntrinsicHeight();
 
-			mDivider.setBounds(left, top, right, bottom);
-			mDivider.draw(c);
+				mDivider.setBounds(left, top, right, bottom);
+				mDivider.draw(c);
+			}
 		}
 	}
 
 	/**
-	 * @param gapWidth width of the gap between sections, in pixel. Must be positive
+	 * @param gapWidth width of the gap between sections, in pixel. Must be positive.
 	 */
 	public void setSectionGapWidth(@IntRange(from = 0) int gapWidth) {
 		if (gapWidth < 0) {
