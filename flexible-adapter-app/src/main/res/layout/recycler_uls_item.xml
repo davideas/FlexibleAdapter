@@ -30,8 +30,8 @@
 		android:layout_alignParentRight="true"
 		android:layout_alignParentEnd="true"
 		android:layout_centerInParent="true"
-		android:layout_marginRight="@dimen/margin_right_small"
-		android:layout_marginEnd="@dimen/margin_right_small">
+		android:layout_marginRight="@dimen/margin_small"
+		android:layout_marginEnd="@dimen/margin_small">
 
 		<ImageView
 			android:id="@+id/dismiss_icon"

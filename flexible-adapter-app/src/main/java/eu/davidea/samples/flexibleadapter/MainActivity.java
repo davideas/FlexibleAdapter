@@ -45,6 +45,7 @@ import eu.davidea.samples.flexibleadapter.fragments.FragmentEndlessScrolling;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableMultiLevel;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableSections;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentHeadersSections;
+import eu.davidea.samples.flexibleadapter.fragments.FragmentInstagramHeaders;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentOverall;
 import eu.davidea.samples.flexibleadapter.fragments.MessageDialogFragment;
 import eu.davidea.samples.flexibleadapter.fragments.OnFragmentInteractionListener;
@@ -52,6 +53,7 @@ import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableLevel1Item;
 import eu.davidea.samples.flexibleadapter.models.HeaderItem;
+import eu.davidea.samples.flexibleadapter.models.InstagramItem;
 import eu.davidea.samples.flexibleadapter.models.OverallItem;
 import eu.davidea.samples.flexibleadapter.models.SimpleItem;
 import eu.davidea.samples.flexibleadapter.models.SubItem;
@@ -271,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_endless_scrolling) {
 			mFragment = FragmentEndlessScrolling.newInstance(2);
 		} else if (id == R.id.nav_instagram_headers) {
-
+			mFragment = FragmentInstagramHeaders.newInstance();
 		} else if (id == R.id.nav_headers_and_sections) {
 			mFragment = FragmentHeadersSections.newInstance(2);
 			showFab();
@@ -483,6 +485,7 @@ public class MainActivity extends AppCompatActivity implements
 			// that an item has been selected.
 			if (mAdapter.getItemCount() > 0) {
 				if (!(flexibleItem instanceof ExpandableItem) && !(flexibleItem instanceof IHeader) &&
+						!(flexibleItem instanceof InstagramItem) &&
 						!(flexibleItem instanceof ExpandableLevel1Item)) {
 					//TODO FOR YOU: call your custom Action
 					String title = extractTitleFrom(flexibleItem);

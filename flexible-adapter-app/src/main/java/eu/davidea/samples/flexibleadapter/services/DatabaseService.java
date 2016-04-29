@@ -14,6 +14,8 @@ import eu.davidea.samples.flexibleadapter.models.ExpandableItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableLevel0Item;
 import eu.davidea.samples.flexibleadapter.models.ExpandableLevel1Item;
 import eu.davidea.samples.flexibleadapter.models.HeaderItem;
+import eu.davidea.samples.flexibleadapter.models.InstagramHeaderItem;
+import eu.davidea.samples.flexibleadapter.models.InstagramItem;
 import eu.davidea.samples.flexibleadapter.models.OverallItem;
 import eu.davidea.samples.flexibleadapter.models.SimpleItem;
 import eu.davidea.samples.flexibleadapter.models.SubItem;
@@ -86,8 +88,7 @@ public class DatabaseService {
 
 		mItems.add(new OverallItem(R.id.nav_instagram_headers, resources.getString(R.string.instagram_headers))
 				.withDescription(resources.getString(R.string.instagram_headers_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_instagram_grey600_24dp))
-				.withEnabled(false));
+				.withIcon(resources.getDrawable(R.drawable.ic_instagram_grey600_24dp)));
 
 		mItems.add(new OverallItem(R.id.nav_model_holders, resources.getString(R.string.model_holders))
 				.withDescription(resources.getString(R.string.model_holders_description))
@@ -134,6 +135,13 @@ public class DatabaseService {
 		for (int i = 0; i < ITEMS; i++) {
 			header = i % (ITEMS/HEADERS) == 0 ? newHeader(i * HEADERS/ITEMS + 1) : header;
 			mItems.add(newSimpleItem(i + 1, header));
+		}
+	}
+
+	public void createInstagramHeadersDatabase() {
+		mItems.clear();
+		for (int i = 0; i < 5; i++) {
+			mItems.add(newInstagramItem(i + 1));
 		}
 	}
 
@@ -214,6 +222,18 @@ public class DatabaseService {
 			expandableItem.addSubItem(expSubItem);
 		}
 		return expandableItem;
+	}
+
+	/*
+ 	 * Creates a similar instagram item with a Header linked.
+ 	 */
+	public static InstagramItem newInstagramItem(int i) {
+		InstagramHeaderItem header = new InstagramHeaderItem("H" + i);
+		String place = InstagramRandomData.getRandomPlace();
+		return new InstagramItem("I" + i, header)
+				.withName(InstagramRandomData.getRandomName())
+				.withPlace(place)
+				.withImageUrl(InstagramRandomData.getImageUrl(place));
 	}
 
 	/*-----------------------*/

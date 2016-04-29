@@ -45,6 +45,10 @@ dependencies {
 		exclude module: "support-v4";
 		exclude module: "support-annotations"
 	}
+
+	//https://github.com/bumptech/glide
+	compile 'com.github.bumptech.glide:glide:3.7.0'
+
 //	compile("com.mikepenz:materialize:0.8.7@aar") {
 //		transitive = true
 //	}
