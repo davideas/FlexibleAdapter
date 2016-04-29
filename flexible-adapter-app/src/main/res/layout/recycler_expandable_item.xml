@@ -108,7 +108,7 @@
 	</RelativeLayout>
 
 	<RelativeLayout
-		android:id="@+id/rear_rightview"
+		android:id="@+id/rear_right_view"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:paddingBottom="@dimen/margin_bottom"

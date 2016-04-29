@@ -73,7 +73,12 @@ public class StickyHeaderHelper extends OnScrollListener {
 		mRecyclerView = parent;
 		if (mRecyclerView != null) {
 			mRecyclerView.addOnScrollListener(this);
-			initStickyHeadersHolder();
+			mRecyclerView.post(new Runnable() {
+				@Override
+				public void run() {
+					initStickyHeadersHolder();
+				}
+			});
 		}
 	}
 
