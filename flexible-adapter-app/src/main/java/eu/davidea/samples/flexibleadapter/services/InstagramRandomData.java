@@ -68,7 +68,10 @@ public class InstagramRandomData {
 			"Al Jowf, Saudi Arabia",
 			"Kumarina, Australia",
 			"Ayamonte, Spain",
-			"Haerbin, China"
+			"Haerbin, China",
+			"Venice, Italy",
+			"Seaweed Farms, Nusa Lembongan, Indonesia",
+			"The Palm Jumeirah, Dubai, United Arab Emirates"
 	};
 
 	public static final String[] urls = {
@@ -96,7 +99,10 @@ public class InstagramRandomData {
 			"http://www.thisiscolossal.com/wp-content/uploads/2015/08/google-4.jpg",
 			"http://www.thisiscolossal.com/wp-content/uploads/2015/08/google-8.jpg",
 			"http://www.thisiscolossal.com/wp-content/uploads/2015/08/google-1.jpg",
-			"http://www.thisiscolossal.com/wp-content/uploads/2015/08/google-9.jpg"
+			"http://www.thisiscolossal.com/wp-content/uploads/2015/08/google-9.jpg",
+			"http://twistedsifter.files.wordpress.com/2014/06/venice-italy-from-above-aerial-satellite.jpg?w=400&h=225",
+			"http://twistedsifter.files.wordpress.com/2014/06/seaweed-farm-indonesia-from-above-aerial-satellite.jpg?w=400&h=225",
+			"http://twistedsifter.files.wordpress.com/2014/06/the-palm-jumeirah-dubai-uae-from-above-aerial-satellite.jpg?w=400&h=218"
 	};
 
 }
