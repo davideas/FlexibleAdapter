@@ -11,7 +11,6 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -536,15 +535,14 @@ public class MainActivity extends AppCompatActivity implements
 		Log.i(TAG, "onItemSwipe position=" + position +
 				" direction=" + (direction == ItemTouchHelper.LEFT ? "LEFT" : "RIGHT"));
 
-		//Option 1 FULL_SWIPE: Direct action
+		//Option 1 FULL_SWIPE: Direct action no Undo Action
 		//Do something based on direction when item has been swiped:
 		//   A) update item, set "read" if an email etc.
-		//   B) remove the item with normal Undo;
+		//   B) remove the item;
 
-		//Option 2 FULL_SWIPE: Delayed action
+		//Option 2 FULL_SWIPE: Delayed action with Undo Action
 		//Show action button and start a new Handler:
 		//   A) on time out do something based on direction;
-		//   B) on button clicked, cancel the Handler and close/animate back the front view
 
 		//Create list for single position (only in onItemSwipe)
 		List<Integer> positions = new ArrayList<Integer>(1);
@@ -558,37 +556,56 @@ public class MainActivity extends AppCompatActivity implements
 			mAdapter.setRestoreSelectionOnUndo(false);
 
 		//Perform different actions
-		if (direction == ItemTouchHelper.LEFT) {//Here, option 1A) is implemented
-			message.append(getString(R.string.action_archived));
-			new UndoHelper(mAdapter, this) {
-				@Override
-				public void onShown(Snackbar snackbar) {
-					//This is an override of the method to avoid default early item deletion.
-					//Ask to the user what to do with a custom dialog, on option chosen,
-					//remove the item from Adapter list as usual.
-				}
-			}.withPayload(true)
-			.remove(positions, UndoHelper.ACTION_UPDATE,
-					findViewById(R.id.main_view), message,
-					getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
+		//Here, option 2A) is implemented
+		if (direction == ItemTouchHelper.LEFT) {
 			mSwipedPosition = position;
+			message.append(getString(R.string.action_archived));
+			new UndoHelper(mAdapter, this)
+					.withPayload(true)
+					.withAction(UndoHelper.ACTION_UPDATE, new UndoHelper.OnActionListener() {
+						@Override
+						public boolean onPreAction() {
+							//Return true to avoid default early item deletion.
+							//Ask to the user what to do with a custom dialog. On option chosen,
+							//remove the item from Adapter list as usual.
+							return true;
+						}
 
-		} else if (direction == ItemTouchHelper.RIGHT) {//Here, option 1B) is implemented
+						@Override
+						public void onPostAction() {
+							//Nothing
+						}
+					})
+					.remove(positions,
+							findViewById(R.id.main_view), message,
+							getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
+
+		} else if (direction == ItemTouchHelper.RIGHT) {
 			message.append(getString(R.string.action_deleted));
 			new UndoHelper(mAdapter, this)
 					.withPayload(true)
-					.remove(positions, UndoHelper.ACTION_REMOVE,
+					.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.OnActionListener() {
+						@Override
+						public boolean onPreAction() {
+							//Don't consume the event
+							return false;
+						}
+
+						@Override
+						public void onPostAction() {
+							logOrphanHeaders();
+							//Handle ActionMode title
+							if (mAdapter.getSelectedItemCount() == 0)
+								destroyActionModeIfCan();
+							else
+								setContextTitle(mAdapter.getSelectedItemCount());
+						}
+					})
+					.remove(positions,
 							findViewById(R.id.main_view), message,
 							getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
 
 		}
-
-		logOrphanHeaders();
-		//Handle ActionMode title
-		if (mAdapter.getSelectedItemCount() == 0)
-			destroyActionModeIfCan();
-		else
-			setContextTitle(mAdapter.getSelectedItemCount());
 	}
 
 	@Override
@@ -608,8 +625,8 @@ public class MainActivity extends AppCompatActivity implements
 	/**
 	 * Handling RecyclerView when empty.
 	 * <br/><br/>
-	 * <b>Note:</b> The order how the 3 Views (RecyclerView, EmptyView, FastScroller)
-	 * are placed in the Layout is important!
+	 * <b>Note:</b> The order, how the 3 Views (RecyclerView, EmptyView, FastScroller)
+	 * are placed in the Layout, is important!
 	 */
 	@Override
 	public void onUpdateEmptyView(int size) {
@@ -679,7 +696,7 @@ public class MainActivity extends AppCompatActivity implements
 			mRefreshHandler.sendEmptyMessage(0);
 			//Check also selection restoration
 			if (mAdapter.isRestoreWithSelection() && mAdapter.getSelectedItemCount() > 0) {
-				mActionMode = startSupportActionMode(MainActivity.this);
+				mActionMode = startSupportActionMode(this);
 				setContextTitle(mAdapter.getSelectedItemCount());
 			}
 		}
@@ -749,7 +766,9 @@ public class MainActivity extends AppCompatActivity implements
 			case R.id.action_select_all:
 				mAdapter.selectAll();
 				setContextTitle(mAdapter.getSelectedItemCount());
-				return true;
+				//We don't consume the event
+				return false;
+
 			case R.id.action_delete:
 				//Build message before delete, for the SnackBar
 				StringBuilder message = new StringBuilder();
@@ -766,18 +785,30 @@ public class MainActivity extends AppCompatActivity implements
 				//New Undo Helper
 				new UndoHelper(mAdapter, this)
 						.withPayload(true)
-						.remove(mAdapter.getSelectedPositions(), UndoHelper.ACTION_REMOVE,
+						.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.OnActionListener() {
+							@Override
+							public boolean onPreAction() {
+								//Don't consume the event
+								return false;
+							}
+
+							@Override
+							public void onPostAction() {
+								//Disable SwipeRefresh
+								mRefreshHandler.sendEmptyMessage(1);
+								mRefreshHandler.sendEmptyMessageDelayed(0, 20000);
+								//Finish the action mode
+								mActionMode.finish();
+								logOrphanHeaders();
+							}
+						})
+						.remove(mAdapter.getSelectedPositions(),
 								findViewById(R.id.main_view), message,
 								getString(R.string.undo), 20000);
 
-				//Disable SwipeRefresh
-				mRefreshHandler.sendEmptyMessage(1);
-				mRefreshHandler.sendEmptyMessageDelayed(0, 20000);
-				//
-				mActionMode.finish();
-
-				logOrphanHeaders();
+				//We consume the event
 				return true;
+
 			default:
 				return false;
 		}

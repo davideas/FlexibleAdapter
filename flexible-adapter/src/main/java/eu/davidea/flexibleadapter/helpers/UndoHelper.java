@@ -57,11 +57,13 @@ public class UndoHelper extends Snackbar.Callback {
 	}
 
 	@Action
-	private int mAction;
-	private FlexibleAdapter mAdapter;
+	private int mAction = ACTION_REMOVE;
 	private List<Integer> mPositions = null;
 	private Object mPayload = null;
+	private FlexibleAdapter mAdapter;
+	private OnActionListener mActionListener;
 	private OnUndoListener mUndoListener;
+
 
 	/**
 	 * Basic constructor.
@@ -88,38 +90,50 @@ public class UndoHelper extends Snackbar.Callback {
 	}
 
 	/**
-	 * As {@link #remove(List, int, View, CharSequence, CharSequence, int)} but with String
+	 * By default {@link UndoHelper#ACTION_REMOVE} is performed.
+	 *
+	 * @param action         the action, one of {@link UndoHelper#ACTION_REMOVE}, {@link UndoHelper#ACTION_UPDATE}
+	 * @param actionListener the listener for the custom action to perform before the deletion
+	 * @return this
+	 */
+	public UndoHelper withAction(@Action int action, @NonNull OnActionListener actionListener) {
+		this.mAction = action;
+		this.mActionListener = actionListener;
+		return this;
+	}
+
+	/**
+	 * As {@link #remove(List, View, CharSequence, CharSequence, int)} but with String
 	 * resources instead of CharSequence.
 	 */
-	public Snackbar remove(List<Integer> positions, @Action int action, @NonNull View mainView,
+	public Snackbar remove(List<Integer> positions, @NonNull View mainView,
 						   @StringRes int messageStringResId, @StringRes int actionStringResId,
 						   @IntRange(from = 0) int undoTime) {
 		Context context = mainView.getContext();
-		return remove(positions, action, mainView, context.getString(messageStringResId),
+		return remove(positions, mainView, context.getString(messageStringResId),
 				context.getString(actionStringResId), undoTime);
 	}
 
 	/**
-	 * Performs the delete action on the specified positions and display a SnackBar to Undo
-	 * the operation. To customize the UPDATE event, please override the
-	 * {@link #onShown(Snackbar)} method.
+	 * Performs the action on the specified positions and displays a SnackBar to Undo
+	 * the operation. To customize the UPDATE event, please set a custom listener with
+	 * {@link #withAction(int, OnActionListener)} method.
 	 * <p>By default the DELETE action will be performed.</p>
 	 *
 	 * @param positions  the position to delete or update
-	 * @param action     the action, one of {@link UndoHelper#ACTION_REMOVE}, {@link UndoHelper#ACTION_UPDATE}
 	 * @param mainView   the view to find a parent from
 	 * @param message    the text to show. Can be formatted text
 	 * @param actionText the action text to display
 	 * @param undoTime   How long to display the message. Either {@link Snackbar#LENGTH_SHORT} or
 	 *                   {@link Snackbar#LENGTH_LONG} or any custom Integer.
 	 * @return The SnackBar instance to be customized again
-	 * @see #remove(List, int, View, int, int, int)
+	 * @see #remove(List, View, int, int, int)
 	 */
-	public Snackbar remove(List<Integer> positions, @Action int action, @NonNull View mainView,
+	@SuppressWarnings("WrongConstant")
+	public Snackbar remove(List<Integer> positions, @NonNull View mainView,
 						   CharSequence message, CharSequence actionText,
 						   @IntRange(from = 0) int undoTime) {
 		this.mPositions = positions;
-		this.mAction = action;
 		Snackbar snackbar;
 		if (!mAdapter.isPermanentDelete()) {
 			snackbar = Snackbar.make(mainView, message, undoTime + 400)//More time due to the animation
@@ -162,18 +176,36 @@ public class UndoHelper extends Snackbar.Callback {
 	}
 
 	/**
-	 * Override to customize the UPDATE action.
-	 * <p>By default, it performs the DELETE action.</p>
 	 * {@inheritDoc}
-	 *
-	 * @param snackbar the SnackBar produced
 	 */
 	@Override
 	public void onShown(Snackbar snackbar) {
-		//Remove selected items from Adapter list after message is shown
-		mAdapter.removeItems(mPositions, mPayload);
+		boolean consumed = false;
+		//Perform the action before deletion
+		if (mActionListener != null) consumed = mActionListener.onPreAction();
+		//Remove selected items from Adapter list after SnackBar is shown
+		if (!consumed) mAdapter.removeItems(mPositions, mPayload);
+		//Perform the action after the deletion
+		if (mActionListener != null) mActionListener.onPostAction();
+		//Here, we can notify the callback only in case of permanent deletion
 		if (mAdapter.isPermanentDelete() && mUndoListener != null)
 			mUndoListener.onDeleteConfirmed(mAction);
+	}
+
+	public interface OnActionListener {
+		/**
+		 * Performs the custom action before item deletion.
+		 *
+		 * @return true if action has been consumed and should stop the deletion, false to
+		 * continue with the deletion
+		 */
+		boolean onPreAction();
+
+		/**
+		 * Performs custom action After items deletion. Useful to finish the action mode and perform
+		 * secondary custom actions.
+		 */
+		void onPostAction();
 	}
 
 	/**

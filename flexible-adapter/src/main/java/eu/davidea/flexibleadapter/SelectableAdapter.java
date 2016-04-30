@@ -16,11 +16,14 @@
 package eu.davidea.flexibleadapter;
 
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,15 +53,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
 	public static boolean DEBUG = false;
 
-	//TODO: Change MODE from int to Enum and EnumSet??
-//	public enum Mode {//beta test
-//		IDLE, SINGLE, MULTI, DRAG, SWIPE
-//	}
-	/**
-	 * Contains type of animators already added
-	 */
-//	private EnumSet<Mode> mode = EnumSet.of(Mode.IDLE);
-
 	/**
 	 * Adapter will not keep track of selections
 	 */
@@ -71,10 +65,14 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * Multi selection will be activated
 	 */
 	public static final int MODE_MULTI = 2;
+
 	/**
-	 * Mode to use when dragging or swiping
+	 * @hide
 	 */
-	//public static final int MODE_DRAG_SWIPE = 4;
+	@IntDef({MODE_IDLE, MODE_SINGLE, MODE_MULTI})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface Mode {
+	}
 
 	//TODO: Evaluate TreeSet instead of ArrayList for mSelectedPositions, TreeSet is a sortedList
 	private ArrayList<Integer> mSelectedPositions;
@@ -134,17 +132,18 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	/**
-	 * Sets the mode of the selection, MODE_SINGLE is the default:
+	 * Sets the mode of the selection:
 	 * <ul>
+	 * <li>{@link #MODE_IDLE} Default. Configures the adapter so that no item can be selected;
 	 * <li>{@link #MODE_SINGLE} configures the adapter to react at the single tap over an item
 	 * (previous selection is cleared automatically);
 	 * <li>{@link #MODE_MULTI} configures the adapter to save the position to the list of the
 	 * selected items.
 	 * </ul>
 	 *
-	 * @param mode MODE_SINGLE or MODE_MULTI
+	 * @param mode one of {@link #MODE_IDLE}, {@link #MODE_SINGLE}, {@link #MODE_MULTI}
 	 */
-	public void setMode(int mode) {
+	public void setMode(@Mode int mode) {
 		this.mMode = mode;
 		mLastItemInActionMode = (mode == MODE_IDLE);
 	}
@@ -153,9 +152,11 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * The current selection mode of the Adapter.
 	 *
 	 * @return current mode
+	 * @see #MODE_IDLE
 	 * @see #MODE_SINGLE
 	 * @see #MODE_MULTI
 	 */
+	@Mode
 	public int getMode() {
 		return mMode;
 	}
@@ -190,17 +191,17 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @return true if the item is selected, false otherwise.
 	 */
 	public boolean isSelected(int position) {
-		return mSelectedPositions.contains(Integer.valueOf(position));
+		return mSelectedPositions.contains(position);
 	}
 
 	public abstract boolean isSelectable(int position);
 
 	/**
-	 * Toggles the selection status of the item at a given position.<br/>
-	 * The behaviour depends on the selection mode previously set with {@link #setMode(int)}.
-	 * <p>The Activated State of the ItemView is automatically set in
-	 * {@link FlexibleViewHolder#toggleActivation()} called in {@code onClick} event</p>
-	 * <b>Usage:</b>
+	 * Toggles the selection status of the item at a given position.
+	 * <p>The behaviour depends on the selection mode previously set with {@link #setMode(int)}.</p>
+	 * The Activated State of the ItemView is automatically set in
+	 * {@link FlexibleViewHolder#toggleActivation()} called in {@code onClick} event
+	 * <p><b>Usage:</b>
 	 * <ul>
 	 * <li>If you don't want any item to be selected/activated at all, just don't call this method.</li>
 	 * <li>To have actually the item visually selected you need to add a custom <i>Selector Drawable</i>
@@ -209,7 +210,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * in the style.xml (note: prefix <i>?android:attr</i> <u>doesn't</u> work).</li>
 	 * <li>In <i>bindViewHolder</i>, adjust the selection status:
 	 * <i>holder.itemView.setActivated(isSelected(position));</i></li>
-	 * </ul>
+	 * </ul></p>
 	 *
 	 * @param position Position of the item to toggle the selection status for.
 	 */
