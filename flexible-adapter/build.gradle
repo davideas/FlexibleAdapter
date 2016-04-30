@@ -20,6 +20,7 @@ android {
 
 dependencies {
 	compile supportDependencies.recyclerview
+	compile supportDependencies.design
 }
 
 //apply from: '../maven-install.gradle'

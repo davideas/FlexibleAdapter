@@ -5,6 +5,7 @@
 	<string name="action_selected_one">selected</string>
 	<string name="action_selected_many">selected</string>
 	<string name="action_deleted">Deleted</string>
+	<string name="action_archived">Archived</string>
 
 	<!-- Actions -->
 	<string name="action_search">Search...</string>

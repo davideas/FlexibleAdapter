@@ -34,8 +34,12 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.UndoHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
@@ -64,7 +68,7 @@ import eu.davidea.utils.Utils;
 @SuppressWarnings({"ConstantConditions", "unchecked"})
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener, SearchView.OnQueryTextListener,
-		FlexibleAdapter.OnUpdateListener, FlexibleAdapter.OnDeleteCompleteListener,
+		FlexibleAdapter.OnUpdateListener, UndoHelper.OnUndoListener,
 		FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener,
 		FlexibleAdapter.OnItemMoveListener, FlexibleAdapter.OnItemSwipeListener,
 		FastScroller.OnScrollStateChangeListener,
@@ -89,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements
 	private RecyclerView mRecyclerView;
 	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
 	private ActionMode mActionMode;
-	private Snackbar mSnackBar;
+	private int mSwipedPosition = RecyclerView.NO_POSITION;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private BottomSheetBehavior mBottomSheetBehavior;
 	private Toolbar mToolbar;
@@ -97,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements
 	private NavigationView mNavigationView;
 	private AbstractFragment mFragment;
 	private SearchView mSearchView;
-	private final Handler mSwipeHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+	private final Handler mRefreshHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
 			switch (message.what) {
 				case 0: //Stop
@@ -187,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements
 			public void onRefresh() {
 				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList());
 				mSwipeRefreshLayout.setEnabled(false);
-				mSwipeHandler.sendEmptyMessageDelayed(0, 1000L);
+				mRefreshHandler.sendEmptyMessageDelayed(0, 1000L);
 				destroyActionModeIfCan();
 			}
 		});
@@ -385,10 +389,10 @@ public class MainActivity extends AppCompatActivity implements
 	private void showFab() {
 		if (mFragment instanceof FragmentHeadersSections)
 			ViewCompat.animate(mFab)
-				.scaleX(1f).scaleY(1f)
-				.alpha(1f).setDuration(100)
-				.setStartDelay(400L)
-				.start();
+					.scaleX(1f).scaleY(1f)
+					.alpha(1f).setDuration(100)
+					.setStartDelay(400L)
+					.start();
 	}
 
 	@Override
@@ -528,52 +532,63 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onItemSwipe(int position, int direction) {
+	public void onItemSwipe(final int position, int direction) {
 		Log.i(TAG, "onItemSwipe position=" + position +
 				" direction=" + (direction == ItemTouchHelper.LEFT ? "LEFT" : "RIGHT"));
 
 		//Option 1 FULL_SWIPE: Direct action
 		//Do something based on direction when item has been swiped:
-		//   A) remove the item with normal Undo;
-		//   C) update item, set "read" if an email etc.
+		//   A) update item, set "read" if an email etc.
+		//   B) remove the item with normal Undo;
 
 		//Option 2 FULL_SWIPE: Delayed action
 		//Show action button and start a new Handler:
 		//   A) on time out do something based on direction;
 		//   B) on button clicked, cancel the Handler and close/animate back the front view
 
-		//Here, option 1) is implemented
-		if (direction == ItemTouchHelper.LEFT) {
-			//Archive the item here!
-		} else if (direction == ItemTouchHelper.RIGHT) {
-			IFlexible abstractItem = mAdapter.getItem(position);
-			assert abstractItem != null;
-			//Experimenting NEW feature
-			if (abstractItem.isSelectable())
-				mAdapter.setRestoreSelectionOnUndo(false);
+		//Create list for single position (only in onItemSwipe)
+		List<Integer> positions = new ArrayList<Integer>(1);
+		positions.add(position);
+		//Build the message
+		IFlexible abstractItem = mAdapter.getItem(position);
+		StringBuilder message = new StringBuilder();
+		message.append(extractTitleFrom(abstractItem)).append(" ");
+		//Experimenting NEW feature
+		if (abstractItem.isSelectable())
+			mAdapter.setRestoreSelectionOnUndo(false);
 
-			//TODO: Create Undo Helper with SnackBar?
-			StringBuilder message = new StringBuilder();
-			message.append(extractTitleFrom(abstractItem))
-					.append(" ").append(getString(R.string.action_deleted));
-			//noinspection ResourceType
-			mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, 7000)
-					.setAction(R.string.undo, new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							mAdapter.restoreDeletedItems();
-						}
-					});
-			mSnackBar.show();
-			mAdapter.removeItem(position, true);
-			logOrphanHeaders();
-			mAdapter.startUndoTimer(5000L + 200L, this);
-			//Handle ActionMode title
-			if (mAdapter.getSelectedItemCount() == 0)
-				destroyActionModeIfCan();
-			else
-				setContextTitle(mAdapter.getSelectedItemCount());
+		//Perform different actions
+		if (direction == ItemTouchHelper.LEFT) {//Here, option 1A) is implemented
+			message.append(getString(R.string.action_archived));
+			new UndoHelper(mAdapter, this) {
+				@Override
+				public void onShown(Snackbar snackbar) {
+					//This is an override of the method to avoid default early item deletion.
+					//Ask to the user what to do with a custom dialog, on option chosen,
+					//remove the item from Adapter list as usual.
+				}
+			}.withPayload(true)
+			.remove(positions, UndoHelper.ACTION_UPDATE,
+					findViewById(R.id.main_view), message,
+					getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
+			mSwipedPosition = position;
+
+		} else if (direction == ItemTouchHelper.RIGHT) {//Here, option 1B) is implemented
+			message.append(getString(R.string.action_deleted));
+			new UndoHelper(mAdapter, this)
+					.withPayload(true)
+					.remove(positions, UndoHelper.ACTION_REMOVE,
+							findViewById(R.id.main_view), message,
+							getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
+
 		}
+
+		logOrphanHeaders();
+		//Handle ActionMode title
+		if (mAdapter.getSelectedItemCount() == 0)
+			destroyActionModeIfCan();
+		else
+			setContextTitle(mAdapter.getSelectedItemCount());
 	}
 
 	@Override
@@ -642,10 +657,40 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onDeleteConfirmed() {
-		mSwipeHandler.sendEmptyMessage(0);
+	public void onUndoConfirmed(int action) {
+		if (action == UndoHelper.ACTION_UPDATE) {
+			//FIXME: Adjust click animation on swiped item
+//			final RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForLayoutPosition(mSwipedPosition);
+//			if (holder instanceof ItemTouchHelperCallback.ViewHolderCallback) {
+//				final View view = ((ItemTouchHelperCallback.ViewHolderCallback) holder).getFrontView();
+//				Animator animator = ObjectAnimator.ofFloat(view, "translationX", view.getTranslationX(), 0);
+//				animator.addListener(new SimpleAnimatorListener() {
+//					@Override
+//					public void onAnimationCancel(Animator animation) {
+//						view.setTranslationX(0);
+//					}
+//				});
+//				animator.start();
+//			}
+		} else if (action == UndoHelper.ACTION_REMOVE) {
+			//Custom action is restore deleted items
+			mAdapter.restoreDeletedItems();
+			//Enable SwipeRefresh
+			mRefreshHandler.sendEmptyMessage(0);
+			//Check also selection restoration
+			if (mAdapter.isRestoreWithSelection() && mAdapter.getSelectedItemCount() > 0) {
+				mActionMode = startSupportActionMode(MainActivity.this);
+				setContextTitle(mAdapter.getSelectedItemCount());
+			}
+		}
+	}
+
+	@Override
+	public void onDeleteConfirmed(int action) {
+		//Enable SwipeRefresh
+		mRefreshHandler.sendEmptyMessage(0);
+		//Removing items from Database. Example:
 		for (AbstractFlexibleItem adapterItem : mAdapter.getDeletedItems()) {
-			//Removing items from Database. Example:
 			try {
 				//NEW! You can take advantage of AutoMap and differentiate logic by viewType using "switch" statement
 				switch (adapterItem.getLayoutRes()) {
@@ -715,37 +760,23 @@ public class MainActivity extends AppCompatActivity implements
 						message.append(", ");
 				}
 
-				//SnackBar for Undo
-				//noinspection ResourceType
-				int undoTime = 20000;
-				//noinspection ResourceType
-				mSnackBar = Snackbar.make(findViewById(R.id.main_view), message, undoTime)
-						.setAction(R.string.undo, new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								mAdapter.restoreDeletedItems();
-								mSwipeHandler.sendEmptyMessage(0);
-								if (mAdapter.isRestoreWithSelection() && mAdapter.getSelectedItemCount() > 0) {
-									mActionMode = startSupportActionMode(MainActivity.this);
-									setContextTitle(mAdapter.getSelectedItemCount());
-								}
-							}
-						});
-				mSnackBar.show();
-
-				//Remove selected items from Adapter list after message is shown
-				//MY Payload is a Boolean(true), you can pass what ever you want!
-				mAdapter.removeItems(mAdapter.getSelectedPositions(), true);
-				logOrphanHeaders();
-				//+200: Using SnackBar, user can still click on the action button while bar is dismissing for a fraction of time
-				mAdapter.startUndoTimer(undoTime + 200L, this);
-
-				mSwipeHandler.sendEmptyMessage(1);
-				mSwipeHandler.sendEmptyMessageDelayed(0, undoTime);
-
 				//Experimenting NEW feature
 				mAdapter.setRestoreSelectionOnUndo(true);
+
+				//New Undo Helper
+				new UndoHelper(mAdapter, this)
+						.withPayload(true)
+						.remove(mAdapter.getSelectedPositions(), UndoHelper.ACTION_REMOVE,
+								findViewById(R.id.main_view), message,
+								getString(R.string.undo), 20000);
+
+				//Disable SwipeRefresh
+				mRefreshHandler.sendEmptyMessage(1);
+				mRefreshHandler.sendEmptyMessageDelayed(0, 20000);
+				//
 				mActionMode.finish();
+
+				logOrphanHeaders();
 				return true;
 			default:
 				return false;

@@ -137,7 +137,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN &&
 				mAdapter.isHandleDragEnabled()) {
 			//Start Drag!
-			mAdapter.getItemTouchHelper().startDrag(FlexibleViewHolder.this);
+			mAdapter.getItemTouchHelper().startDrag(this);
 		}
 		return false;
 	}

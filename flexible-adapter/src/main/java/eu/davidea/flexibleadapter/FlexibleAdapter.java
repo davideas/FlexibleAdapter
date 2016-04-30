@@ -2271,18 +2271,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * @return a list with the global positions of all deleted items
-	 */
-//	public List<Integer> getDeletedPositions() {
-//		List<Integer> deletedItems = new ArrayList<Integer>();
-//		for (RestoreInfo restoreInfo : mRestoreList) {
-//			if (!deletedItems.contains(restoreInfo.refPosition))
-//				deletedItems.add(restoreInfo.refPosition);
-//		}
-//		return deletedItems;
-//	}
-
-	/**
 	 * Retrieves the expandable of the deleted child.
 	 *
 	 * @param child the deleted child
