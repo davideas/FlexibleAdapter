@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="?android:attr/listPreferredItemHeightSmall">
@@ -13,7 +14,6 @@
 
 		<eu.davidea.flipview.FlipView
 			android:id="@+id/instagram_account_image"
-			xmlns:app="http://schemas.android.com/apk/res-auto"
 			android:layout_width="@dimen/icon_circular_width"
 			android:layout_height="@dimen/icon_circular_height"
 			android:layout_alignParentLeft="true"
@@ -21,13 +21,10 @@
 			android:layout_centerInParent="true"
 			android:layout_marginLeft="@dimen/margin_left"
 			android:layout_marginStart="@dimen/margin_left"
-			android:clickable="true"
-			app:animationDuration="170"
-			app:checked="false"
-			app:enableInitialAnimation="true"
+			android:clickable="false"
+			app:enableInitialAnimation="false"
 			app:frontBackgroundColor="@color/colorPrimary_light"
-			app:frontImage="@drawable/ic_account_circle_white_24dp"
-			app:rearBackgroundColor="@color/colorAccent_light"/>
+			app:frontImage="@drawable/ic_account_circle_white_24dp"/>
 
 		<ImageView
 			android:id="@+id/row_handle"

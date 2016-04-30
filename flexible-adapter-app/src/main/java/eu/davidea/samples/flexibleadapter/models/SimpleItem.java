@@ -192,7 +192,12 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 
 		@Override
 		protected boolean shouldActivateViewWhileSwiping() {
-			return false;
+			return false;//default=false
+		}
+
+		@Override
+		protected boolean shouldAddSelectionInActionMode() {
+			return false;//default=false
 		}
 
 		@Override

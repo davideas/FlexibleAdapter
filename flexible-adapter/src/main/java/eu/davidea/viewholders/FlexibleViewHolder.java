@@ -176,6 +176,8 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		itemView.setActivated(mAdapter.isSelected(getFlexibleAdapterPosition()));
 		if (itemView.isActivated() && getActivationElevation() > 0)
 			ViewCompat.setElevation(itemView, getActivationElevation());
+		else if (getActivationElevation() > 0)//Leave unaltered the default elevation
+			ViewCompat.setElevation(itemView, 0);
 	}
 
 	/**
@@ -275,10 +277,21 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 			Log.v(TAG, "onItemReleased position=" + position + " mode=" + mAdapter.getMode() +
 					" actionState=" + (mActionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
 		//Be sure to keep selection if MODE_MULTI and shouldAddSelectionInActionMode is active
-		if (!alreadySelected && !shouldAddSelectionInActionMode()) {
-			mAdapter.toggleSelection(position);
-			if (itemView.isActivated()) {
+		if (!alreadySelected) {
+			if (shouldAddSelectionInActionMode() &&
+					mAdapter.getMode() == SelectableAdapter.MODE_MULTI) {
+				mAdapter.mItemLongClickListener.onItemLongClick(position);
+				if (mAdapter.isSelected(position)) {
+					toggleActivation();
+				}
+			} else if (shouldActivateViewWhileSwiping() && itemView.isActivated()) {
+				mAdapter.toggleSelection(position);
 				toggleActivation();
+			} else if (mActionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+				mAdapter.toggleSelection(position);
+				if (itemView.isActivated()) {
+					toggleActivation();
+				}
 			}
 		}
 		//Reset internal action state ready for next action

@@ -1037,10 +1037,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		//When user scrolls, this line binds the correct selection status
 		holder.itemView.setActivated(isSelected(position));
 		//Bind the correct view elevation
-		if (holder.itemView.isActivated() && holder instanceof FlexibleViewHolder) {
+		if (holder instanceof FlexibleViewHolder) {
 			FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
-			if (flexHolder.getActivationElevation() > 0)
+			if (holder.itemView.isActivated() && flexHolder.getActivationElevation() > 0)
 				ViewCompat.setElevation(flexHolder.itemView, flexHolder.getActivationElevation());
+			else if (flexHolder.getActivationElevation() > 0)//Leave unaltered the default elevation
+				ViewCompat.setElevation(flexHolder.itemView, 0);
 		}
 		if (!autoMap) {
 			super.onBindViewHolder(holder, position, payloads);

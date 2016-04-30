@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	xmlns:tools="http://schemas.android.com/tools"
 	android:orientation="vertical">
 
 	<ImageView
 		android:id="@+id/instagram_image"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="280dp"
 		android:adjustViewBounds="true"
 		android:scaleType="fitXY"
 		tools:src="@drawable/ic_favorite_border_grey_600_24dp"/>
@@ -20,17 +21,30 @@
 		android:layout_margin="@dimen/margin_small"
 		android:orientation="horizontal">
 
-		<ImageView
+		<eu.davidea.flipview.FlipView
 			android:id="@+id/instagram_image_like"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_marginEnd="@dimen/margin_small"
 			android:layout_marginRight="@dimen/margin_small"
-			android:src="@drawable/ic_favorite_border_grey_600_24dp"/>
+			android:clickable="true"
+			android:inAnimation="@anim/scale_up"
+			android:outAnimation="@anim/scale_down"
+			app:animationDuration="300"
+			app:checked="false"
+			app:enableInitialAnimation="true"
+			app:frontBackgroundColor="@android:color/transparent"
+			app:frontImage="@drawable/ic_favorite_border_grey_600_24dp"
+			app:rearBackgroundColor="@android:color/transparent"
+			app:rearImage="@drawable/ic_favorite_red700_24dp"
+			app:rearImageAnimationDelay="100"
+			app:rearImageAnimationDuration="200"/>
 
 		<ImageView
 			android:id="@+id/instagram_image_comment"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_marginEnd="@dimen/margin_small"
 			android:layout_marginRight="@dimen/margin_small"
 			android:src="@drawable/ic_comment_grey600_24dp"/>
 
@@ -46,6 +60,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="@dimen/margin_small"
+		android:layout_marginStart="@dimen/margin_small"
 		android:gravity="center_vertical"
 		android:orientation="horizontal">
 
@@ -53,6 +68,7 @@
 			android:id="@+id/instagram_image_likes"
 			android:layout_width="10dp"
 			android:layout_height="10dp"
+			android:layout_marginEnd="@dimen/margin_small"
 			android:layout_marginRight="@dimen/margin_small"
 			android:src="@drawable/ic_favorite_red700_24dp"/>
 

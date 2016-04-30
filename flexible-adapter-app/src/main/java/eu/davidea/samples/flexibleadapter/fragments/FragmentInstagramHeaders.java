@@ -8,9 +8,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -66,7 +63,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		FlipView.stopLayoutAnimation();
 	}
 
-	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
+	@SuppressWarnings({"ConstantConditions", "NullableProblems", "unchecked"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		mAdapter = new FlexibleAdapter<AbstractFlexibleItem>(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		//Experimenting NEW features (v5.0.0)
@@ -83,13 +80,14 @@ public class FragmentInstagramHeaders extends AbstractFragment
 				return true;
 			}
 		});
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 48f));
+		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 0, 24));
 		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
 		mAdapter.enableStickyHeaders();
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView);
 
+		//Endless scroll with 1 item threshold
 		mAdapter.setEndlessScrollListener(this, new ProgressItem());
 		mAdapter.setEndlessScrollThreshold(1);//Default=1
 	}
@@ -102,6 +100,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		Log.i(TAG, "onLoadMore invoked!");
 		//Simulating asynchronous call
 		new Handler().postDelayed(new Runnable() {
+			@SuppressWarnings("unchecked")
 			@Override
 			public void run() {
 				final List<AbstractFlexibleItem> newItems = new ArrayList<AbstractFlexibleItem>(3);
@@ -117,40 +116,10 @@ public class FragmentInstagramHeaders extends AbstractFragment
 				mAdapter.onLoadMoreComplete(newItems);
 
 				//Notify user
-				String message = (newItems.size() > 0 ?
-						newItems.size() + " new items arrived :-)" :
-						"No more items to load :-(");
+				String message = "Fetched " + newItems.size() + " new items";
 				Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
 			}
-		}, 2500);
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		Log.v(TAG, "onCreateOptionsMenu called!");
-		inflater.inflate(R.menu.menu_sections, menu);
-		mListener.initSearchView(menu);
-	}
-
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
-		super.onPrepareOptionsMenu(menu);
-
-		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
-		if (headersMenuItem != null) {
-			headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
-		}
-
-		MenuItem headersSticky = menu.findItem(R.id.action_sticky_headers);
-		if (headersSticky != null) {
-			if (mAdapter.areHeadersShown()) {
-				headersSticky.setVisible(true);
-				headersSticky.setTitle(mAdapter.areHeadersSticky() ? R.string.scroll_headers : R.string.sticky_headers);
-			} else {
-				headersSticky.setVisible(false);
-			}
-		}
+		}, 2000);
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter.models;
 
 import android.graphics.drawable.Drawable;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,7 +113,7 @@ public class OverallItem extends AbstractFlexibleItem<LabelViewHolder> {
 			holder.mTitle.setEnabled(isEnabled());
 		}
 		if (description != null) {
-			holder.mSubtitle.setText(description);
+			holder.mSubtitle.setText(Html.fromHtml(description));
 			holder.mSubtitle.setEnabled(isEnabled());
 		}
 		if (icon != null) {

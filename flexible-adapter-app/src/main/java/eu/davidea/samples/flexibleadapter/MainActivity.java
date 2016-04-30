@@ -542,8 +542,10 @@ public class MainActivity extends AppCompatActivity implements
 		//   A) on time out do something based on direction;
 		//   B) on button clicked, cancel the Handler and close/animate back the front view
 
-		//Here, option 1A) is implemented (currently disabled)
-		if (direction == ItemTouchHelper.RIGHT) {
+		//Here, option 1) is implemented
+		if (direction == ItemTouchHelper.LEFT) {
+			//Archive the item here!
+		} else if (direction == ItemTouchHelper.RIGHT) {
 			IFlexible abstractItem = mAdapter.getItem(position);
 			assert abstractItem != null;
 			//Experimenting NEW feature

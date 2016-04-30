@@ -3,8 +3,7 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
-	android:layout_height="?android:attr/listPreferredItemHeightLarge"
-	android:background="?attr/selectableItemBackground">
+	android:layout_height="?android:attr/listPreferredItemHeightLarge">
 
 	<RelativeLayout
 		android:id="@+id/front_view"
@@ -12,7 +11,7 @@
 		android:layout_height="match_parent"
 		android:paddingBottom="@dimen/margin_bottom"
 		android:paddingTop="@dimen/margin_top"
-		android:background="@android:color/white">
+		android:background="@drawable/selector_item_white">
 
 		<eu.davidea.flipview.FlipView
 			android:id="@+id/image"
@@ -43,7 +42,7 @@
 			android:layout_marginLeft="@dimen/margin_left"
 			android:layout_marginRight="@dimen/margin_right_handle"
 			android:layout_marginStart="@dimen/margin_left"
-			android:background="@drawable/ic_drag_vertical_grey600_24dp"/>
+			android:src="@drawable/ic_drag_vertical_grey600_24dp"/>
 
 		<LinearLayout
 			android:id="@+id/title_container"
@@ -87,8 +86,6 @@
 		android:id="@+id/rear_left_view"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:paddingBottom="@dimen/margin_bottom"
-		android:paddingTop="@dimen/margin_top"
 		android:background="@color/material_color_red_600"
 		android:visibility="gone">
 
@@ -96,14 +93,12 @@
 			android:id="@+id/left_image"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_alignParentEnd="true"
-			android:layout_alignParentRight="true"
-			android:layout_centerInParent="true"
-			android:layout_marginEnd="@dimen/margin_right_handle"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentStart="true"
+			android:layout_centerVertical="true"
 			android:layout_marginLeft="@dimen/margin_left"
-			android:layout_marginRight="@dimen/margin_right_handle"
 			android:layout_marginStart="@dimen/margin_left"
-			android:background="@drawable/ic_action_delete"/>
+			android:src="@drawable/ic_action_delete"/>
 
 	</RelativeLayout>
 
@@ -111,8 +106,6 @@
 		android:id="@+id/rear_right_view"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:paddingBottom="@dimen/margin_bottom"
-		android:paddingTop="@dimen/margin_top"
 		android:background="@color/material_color_orange_500"
 		android:visibility="gone">
 
@@ -120,14 +113,12 @@
 			android:id="@+id/right_image"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_alignParentLeft="true"
-			android:layout_alignParentStart="true"
-			android:layout_centerInParent="true"
+			android:layout_alignParentRight="true"
+			android:layout_alignParentEnd="true"
+			android:layout_centerVertical="true"
 			android:layout_marginEnd="@dimen/margin_right_handle"
-			android:layout_marginLeft="@dimen/margin_left"
 			android:layout_marginRight="@dimen/margin_right_handle"
-			android:layout_marginStart="@dimen/margin_left"
-			android:background="@drawable/ic_archive_white_24dp"/>
+			android:src="@drawable/ic_archive_white_24dp"/>
 
 	</RelativeLayout>
 

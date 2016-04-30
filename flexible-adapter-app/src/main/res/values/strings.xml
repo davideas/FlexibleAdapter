@@ -66,7 +66,7 @@
 	<string name="headers_sections_description">1 (sticky) header for each section, dragged items with auto-linkage</string>
 
 	<string name="instagram_headers">Instagram headers</string>
-	<string name="instagram_headers_description">1 (sticky) clickable header for each item (Internet is requested)</string>
+	<string name="instagram_headers_description"><![CDATA[1 (sticky) clickable header for each item. <b>Internet is required.</b>]]></string>
 
 	<string name="model_holders">Item Model Holder</string>
 	<string name="model_holders_description">A representation of FlexibleItems holding the model object (check the code).</string>

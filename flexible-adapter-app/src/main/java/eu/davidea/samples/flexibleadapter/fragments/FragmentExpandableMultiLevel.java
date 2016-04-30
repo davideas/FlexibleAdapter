@@ -10,15 +10,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 
+import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
+import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
+import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.flexibleadapter.common.DividerItemDecoration;
-import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
-import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
-import eu.davidea.flipview.FlipView;
 import eu.davidea.utils.Utils;
 
 /**
@@ -83,7 +82,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 			}
 		});
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider));
+		//mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider));
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
