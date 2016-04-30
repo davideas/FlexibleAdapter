@@ -27,7 +27,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	};
 
 	/**
-	 * Default divider will be used.
+	 * Default Android divider will be used.
 	 */
 	public DividerItemDecoration(Context context) {
 		final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
@@ -43,17 +43,10 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	}
 
 	/**
-	 * No divider with gap between section (in dpi).
-	 */
-	public DividerItemDecoration(Context context, float gapWidth) {
-		this(context, -1, gapWidth);
-	}
-
-	/**
-	 * Custom gap between sections (in dpi).
+	 * Custom divider with gap between sections (in dpi).
 	 */
 	public DividerItemDecoration(@NonNull Context context, @DrawableRes int resId,
-								 @IntRange(from = 0) float gapWidth) {
+								 @IntRange(from = 0) int gapWidth) {
 		if (resId > 0) mDivider = ContextCompat.getDrawable(context, resId);
 		setSectionGapWidth((int) (context.getResources().getDisplayMetrics().density * gapWidth));
 	}
@@ -72,7 +65,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 				int top = child.getBottom() + params.bottomMargin +
 						Math.round(ViewCompat.getTranslationY(child));
-				int bottom = top + mDivider.getIntrinsicHeight();
+				int bottom = top + mDivider.getIntrinsicHeight() + 1;
 
 				mDivider.setBounds(left, top, right, bottom);
 				mDivider.draw(c);
@@ -99,7 +92,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 			//Only ISectionable items can finish with a gap and only if next item is a IHeader item
 			if (flexibleAdapter.getItem(position) instanceof ISectionable &&
-					flexibleAdapter.isHeader(flexibleAdapter.getItem(position + 1))) {
+					(flexibleAdapter.isHeader(flexibleAdapter.getItem(position + 1)) ||
+							position >= parent.getAdapter().getItemCount() - 1) ) {
 
 				int orientation = ((LinearLayoutManager) parent.getLayoutManager()).getOrientation();
 				if (orientation == RecyclerView.VERTICAL) {
