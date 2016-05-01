@@ -88,7 +88,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * and continue
 	 */
 	public boolean onClick(int position) {
-		if (mActionMode != null && position != RecyclerView.NO_POSITION) {
+		if (position != RecyclerView.NO_POSITION) {
 			toggleSelection(position);
 			return true;
 		}
@@ -121,9 +121,11 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * @param position position of the item to toggle the selection state
 	 */
 	public void toggleSelection(int position) {
-		if (position >= 0)
+		if (position >= 0 && (mAdapter.getMode() == SelectableAdapter.MODE_SINGLE ||
+				mAdapter.getMode() == SelectableAdapter.MODE_MULTI)) {
 			mAdapter.toggleSelection(position);
-
+		}
+		//If MODE_SINGLE is active then ActionMode can be null
 		if (mActionMode == null) return;
 
 		int count = mAdapter.getSelectedItemCount();
@@ -156,7 +158,8 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * @param activity the current Activity
 	 */
 	public void restoreSelection(AppCompatActivity activity) {
-		if (mAdapter.getSelectedItemCount() > 0) {
+		if ((defaultMode == SelectableAdapter.MODE_IDLE && mAdapter.getSelectedItemCount() > 0) ||
+				(defaultMode == SelectableAdapter.MODE_SINGLE && mAdapter.getSelectedItemCount() > 1)) {
 			onLongClick(activity, -1);
 		}
 	}

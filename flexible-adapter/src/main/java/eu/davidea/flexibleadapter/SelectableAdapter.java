@@ -144,6 +144,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @param mode one of {@link #MODE_IDLE}, {@link #MODE_SINGLE}, {@link #MODE_MULTI}
 	 */
 	public void setMode(@Mode int mode) {
+		if (mMode == MODE_SINGLE && mode == MODE_IDLE)
+			clearSelection();
 		this.mMode = mode;
 		mLastItemInActionMode = (mode == MODE_IDLE);
 	}
@@ -336,6 +338,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		mSelectedPositions = savedInstanceState.getIntegerArrayList(TAG);
+		Log.d(TAG, "restore selection " + mSelectedPositions);
 	}
 
 	/*---------------*/
