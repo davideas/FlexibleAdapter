@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="?android:attr/listPreferredItemHeight"
+	android:paddingTop="@dimen/margin_top"
+	android:paddingBottom="@dimen/margin_bottom"
+	android:background="?attr/selectableItemBackground">
+
+	<ImageView
+		android:id="@+id/row_handle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="@dimen/margin_left"
+		android:layout_marginStart="@dimen/margin_left"
+		android:background="@drawable/ic_drag_vertical_grey600_24dp"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentStart="true"
+		android:layout_centerInParent="true"/>
+
+	<LinearLayout
+		android:id="@+id/title_container"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="@dimen/margin_left"
+		android:layout_marginStart="@dimen/margin_left"
+		android:layout_marginRight="@dimen/margin_right"
+		android:layout_marginEnd="@dimen/margin_right"
+		android:layout_toRightOf="@id/row_handle"
+		android:layout_toEndOf="@id/row_handle"
+		android:layout_centerInParent="true"
+		android:orientation="vertical">
+		
+		<TextView
+			android:id="@+id/title"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:ellipsize="end"
+			android:maxLines="1"
+			android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+			android:textColor="?primaryTextSelector"
+			tools:text="Title"/>
+
+	</LinearLayout>
+
+</RelativeLayout>

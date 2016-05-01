@@ -1,48 +1,32 @@
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+	android:id="@+id/drawer_layout"
+	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	android:id="@+id/main_view"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context="eu.davidea.examples.flexibleadapter.example.MainActivity">
+	android:fitsSystemWindows="true"
+	tools:openDrawer="start">
 
-	<android.support.v4.widget.SwipeRefreshLayout
-		android:id="@+id/swipeRefreshLayout"
-		android:layout_width="match_parent"
+	<include layout="@layout/activity_main_content"/>
+
+	<android.support.design.widget.NavigationView
+		android:id="@+id/nav_view"
+		android:layout_width="@dimen/nav_drawer_max_width"
 		android:layout_height="match_parent"
-		android:enabled="false">
+		android:layout_gravity="start"
+		android:fitsSystemWindows="true"
+		app:headerLayout="@layout/nav_header"
+		app:menu="@menu/activity_entry_drawer">
 
-		<android.support.v7.widget.RecyclerView
-			android:id="@+id/recycler_view"
+		<android.support.v7.widget.Toolbar
+			android:id="@+id/nav_toolbar"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent" />
+			android:layout_height="?attr/actionBarSize"
+			android:background="@drawable/side_nav_bar"
+			android:layout_gravity="bottom"/>
 
-	</android.support.v4.widget.SwipeRefreshLayout>
+	</android.support.design.widget.NavigationView>
 
-	<include layout="@layout/empty_view"/>
-
-	<eu.davidea.examples.fastscroller.FastScroller
-		android:id="@+id/fast_scroller"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:layout_centerHorizontal="true"
-		android:layout_alignTop="@+id/swipeRefreshLayout"
-		android:layout_alignBottom="@+id/swipeRefreshLayout"
-		android:layout_alignParentEnd="true"
-		android:layout_alignParentRight="true"
-		android:visibility="gone"
-		tools:visibility="visible"/>
-
-	<include layout="@layout/progress_bar"/>
-
-	<android.support.design.widget.FloatingActionButton
-		android:id="@+id/fab"
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:layout_gravity="end|bottom"
-		android:layout_margin="@dimen/fab_margin"
-		android:clickable="true"
-		android:src="@drawable/fab_add"
-		app:borderWidth="0dp"/>
-
-</android.support.design.widget.CoordinatorLayout>
+</android.support.v4.widget.DrawerLayout>

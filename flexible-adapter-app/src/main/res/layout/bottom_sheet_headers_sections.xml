@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/bottom_sheet"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:background="@color/cardview_light_background"
+	android:orientation="vertical"
+	android:paddingBottom="@dimen/activity_vertical_margin"
+	android:paddingLeft="@dimen/activity_horizontal_margin"
+	android:paddingRight="@dimen/activity_horizontal_margin">
+
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="?attr/actionBarSize">
+
+		<TextView
+			style="@style/TextAppearance.AppCompat.Medium"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:text="@string/create_new_item"/>
+
+		<ImageView
+			android:id="@+id/new_item"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_alignParentEnd="true"
+			android:clickable="true"
+			android:padding="12dp"
+			android:contentDescription="@null"
+			android:src="@drawable/ic_done_grey600_24dp"/>
+
+	</RelativeLayout>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="?attr/listPreferredItemHeightSmall"
+		android:gravity="center_vertical"
+		android:text="Item type"/>
+
+	<Button
+		android:id="@+id/select_item_type"
+		style="@style/AppTheme.SpinnerButtonStyle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_vertical"
+		android:focusableInTouchMode="true"
+		android:hint="@string/select_item_type"
+		android:minHeight="@dimen/popup_button_min_height"
+		android:singleLine="true"
+		android:textAppearance="?attr/textAppearanceLargePopupMenu"/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="?attr/listPreferredItemHeightSmall"
+		android:gravity="center_vertical"
+		android:text="Position in the list, after"/>
+
+	<Button
+		android:id="@+id/select_reference_button"
+		style="@style/AppTheme.SpinnerButtonStyle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_vertical"
+		android:focusableInTouchMode="true"
+		android:hint="@string/select_section_reference"
+		android:minHeight="@dimen/popup_button_min_height"
+		android:singleLine="true"
+		android:textAppearance="?android:textAppearanceLargePopupMenu"/>
+
+</LinearLayout>

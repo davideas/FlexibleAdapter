@@ -1,0 +1,94 @@
+apply plugin: 'com.jfrog.bintray'
+
+version = libraryVersion
+
+task clean(type: Delete) {
+	delete rootProject.buildDir
+}
+
+task sourcesJar(type: Jar) {
+	from android.sourceSets.main.java.srcDirs
+	classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+	source = android.sourceSets.main.java.srcDirs
+	classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.getDestinationDir()
+}
+
+artifacts {
+	archives javadocJar
+	archives sourcesJar
+}
+
+def getRepositoryUsername() {
+	return getProperties().get('bintray.user')
+}
+
+def getRepositoryPassphrase() {
+	return getProperties().get('bintray.gpg.password')
+}
+
+def getApiKey() {
+	return getProperties().get("bintray.apikey")
+}
+
+bintray {
+	user = getRepositoryUsername()
+	key = getApiKey()
+
+	configurations = ['archives']
+	pkg {
+		repo = bintrayRepo
+		name = bintrayName
+		desc = libraryDescription
+		websiteUrl = siteUrl
+		licenses = allLicenses
+		vcsUrl = gitUrl
+		labels = ['android', 'recyclerview', 'adapter', 'selection', 'actionmode', 'ripple', 'search', 'itemanimator', 'undo', 'viewholder', 'filter', 'filtering', 'item', 'item animator', 'animator animation', 'expand', 'expandable', 'collapse', 'collapsible', 'section', 'sticky', 'header category', 'drag', 'draggable', 'swipe', 'swipeable', 'fastscroll', 'fastscroller']
+		publish = true
+		publicDownloadNumbers = true
+		//noinspection GroovyAssignabilityCheck
+		version {
+			name = libraryVersion
+			desc = libraryDescription
+			vcsTag = libraryVersion
+			gpg {
+				sign = true //Determines whether to GPG sign the files. The default is false
+				passphrase = getRepositoryPassphrase()
+				//Optional. The passphrase for GPG signing'
+			}
+		}
+	}
+}
+
+apply plugin: 'com.jfrog.artifactory'
+
+artifactory {
+	contextUrl = 'http://localhost:8081/artifactory'
+	publish {
+		repository {
+			// The Artifactory repository key to publish to
+			repoKey = 'libs-release-local'
+
+			username = getProperties().get('bintray.user')
+			password = getProperties().get('bintray.gpg.password')
+		}
+		//noinspection GroovyAssignabilityCheck
+		defaults {
+			// Tell the Artifactory Plugin which artifacts should be published to Artifactory.
+			//publications('aar')
+			publishArtifacts = true
+
+			// Properties to be attached to the published artifacts.
+			//properties = ['qa.level': 'basic', 'dev.team': 'core']
+			// Publish generated POM files to Artifactory (true by default)
+			publishPom = true
+		}
+	}
+}

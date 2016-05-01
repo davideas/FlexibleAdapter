@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/main_view"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fitsSystemWindows="true"
+	tools:context="eu.davidea.samples.flexibleadapter.MainActivity">
+
+	<!-- Toolbar -->
+	<android.support.design.widget.AppBarLayout
+		android:id="@+id/app_bar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:theme="@style/AppTheme.AppBarOverlay">
+
+		<include layout="@layout/toolbar"/>
+
+	</android.support.design.widget.AppBarLayout>
+
+	<!-- Main Content -->
+	<RelativeLayout
+		android:id="@+id/recycler_view_container"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+	<!-- Bottom Sheet -->
+	<!--<FrameLayout-->
+		<!--android:id="@+id/bottom_sheet"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="match_parent"-->
+		<!--app:behavior_hideable="true"-->
+		<!--app:behavior_peekHeight="56dp"-->
+		<!--app:layout_behavior="@string/bottom_sheet_behavior">-->
+
+		<!--<include layout="@layout/bottom_sheet_headers_sections"/>-->
+
+	<!--</FrameLayout>-->
+
+	<!-- FAB -->
+	<android.support.design.widget.FloatingActionButton
+		android:id="@+id/fab"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="end|bottom"
+		android:layout_margin="@dimen/fab_margin"
+		android:clickable="true"
+		android:src="@drawable/fab_add"
+		app:borderWidth="0dp"
+		app:layout_behavior="eu.davidea.utils.ScrollAwareFABBehavior"/>
+
+</android.support.design.widget.CoordinatorLayout>

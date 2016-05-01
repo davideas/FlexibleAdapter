@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	tools:context="eu.davidea.samples.flexibleadapter.MainActivity">
+
+	<item android:id="@+id/action_list_type"
+	      android:title="@string/grid_layout"
+	      android:icon="@drawable/ic_view_grid_white_24dp"
+	      app:showAsAction="always"/>
+
+</menu>

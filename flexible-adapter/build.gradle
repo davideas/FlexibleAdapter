@@ -20,7 +20,10 @@ android {
 
 dependencies {
 	compile supportDependencies.recyclerview
+	compile supportDependencies.design
 }
 
-apply from: '../install.gradle'
-apply from: '../bintray.gradle'
+//apply from: '../maven-install.gradle'
+//apply from: '../maven-publish.gradle'
+//apply from: '../jfrog-bintray-publish.gradle'
+//apply from: '../jfrog-artifactory-publish.gradle'

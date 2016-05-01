@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: "com.android.application"
 
 android {
 	compileSdkVersion targetSdk
@@ -10,25 +10,46 @@ android {
 		targetSdkVersion targetSdk
 		versionCode libraryCode
 		versionName libraryVersion + libraryDate
+
+		applicationVariants.all { variant ->
+			variant.outputs.each { output ->
+				def file = output.outputFile
+				def fileName = "flexible-adapter-v" + libraryVersion + "-c" + versionCode + ".apk"
+				output.outputFile = new File(file.parentFile, fileName)
+			}
+		}
 	}
 	buildTypes {
-		release {
+		debug {
+			versionNameSuffix " build"
 			minifyEnabled false
-			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+		release {
+			zipAlignEnabled true
+			minifyEnabled false
 		}
 	}
 }
 
 dependencies {
-	//compile 'eu.davidea:flexible-adapter:4.0.1@aar'
 	compile project (":flexible-adapter")
+	compile "eu.davidea:flipview:1.1.1"
+
 	compile supportDependencies.appcompat
+	compile supportDependencies.cardview
 	compile (supportDependencies.design) {
-		exclude module: 'support-v4'
-		exclude module: 'support-annotations'
+		exclude module: "support-v4"
+		exclude module: "support-annotations"
 	}
 	compile (supportDependencies.recyclerview) {
-		exclude module: 'support-v4';
-		exclude module: 'support-annotations'
+		exclude module: "support-v4";
+		exclude module: "support-annotations"
 	}
+
+	//https://github.com/bumptech/glide
+	compile 'com.github.bumptech.glide:glide:3.7.0'
+
+//	compile("com.mikepenz:materialize:0.8.7@aar") {
+//		transitive = true
+//	}
 }

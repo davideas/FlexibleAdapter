@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="?android:attr/listPreferredItemHeightSmall">
+
+	<RelativeLayout
+		android:id="@+id/front_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@android:color/white">
+
+		<eu.davidea.flipview.FlipView
+			android:id="@+id/instagram_account_image"
+			android:layout_width="@dimen/icon_circular_width"
+			android:layout_height="@dimen/icon_circular_height"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentStart="true"
+			android:layout_centerInParent="true"
+			android:layout_marginLeft="@dimen/margin_left"
+			android:layout_marginStart="@dimen/margin_left"
+			android:clickable="false"
+			app:enableInitialAnimation="false"
+			app:frontBackgroundColor="@color/colorPrimary_light"
+			app:frontImage="@drawable/ic_account_circle_white_24dp"/>
+
+		<ImageView
+			android:id="@+id/row_handle"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentEnd="true"
+			android:layout_alignParentRight="true"
+			android:layout_centerInParent="true"
+			android:layout_marginEnd="@dimen/margin_right"
+			android:layout_marginLeft="@dimen/margin_left"
+			android:layout_marginRight="@dimen/margin_right"
+			android:layout_marginStart="@dimen/margin_left"
+			android:background="@drawable/ic_expand_more_grey600_24dp"/>
+
+		<LinearLayout
+			android:id="@+id/title_container"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_centerInParent="true"
+			android:layout_marginLeft="@dimen/margin_left"
+			android:layout_marginStart="@dimen/margin_left"
+			android:layout_toEndOf="@id/instagram_account_image"
+			android:layout_toLeftOf="@id/row_handle"
+			android:layout_toRightOf="@id/instagram_account_image"
+			android:layout_toStartOf="@id/row_handle"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/instagram_account_title"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:ellipsize="end"
+				android:maxLines="1"
+				android:textAppearance="@style/TextAppearance.AppCompat"
+				android:textColor="?primaryTextSelector"
+				tools:text="Name"/>
+
+			<TextView
+				android:id="@+id/instagram_place_subtitle"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="2dp"
+				android:ellipsize="end"
+				android:maxLines="1"
+				android:textAppearance="@style/TextAppearance.AppCompat.Small"
+				android:textColor="?primaryTextSelector"
+				tools:text="Place"/>
+
+		</LinearLayout>
+
+	</RelativeLayout>
+
+</FrameLayout>

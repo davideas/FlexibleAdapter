@@ -4,7 +4,7 @@
 
 	<item android:id="@+id/action_select_all"
 		android:title="@string/action_select_all"
-		android:icon="@drawable/abc_ic_menu_selectall_mtrl_alpha"
+		android:icon="@drawable/ic_select_all_white_24dp"
 		app:showAsAction="always"/>
 
 	<item android:id="@+id/action_delete"

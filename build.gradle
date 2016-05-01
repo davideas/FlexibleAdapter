@@ -1,55 +1,60 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 ext {
 	//Author
-	developerId = 'davideas'
-	developerName = 'Davide Steduto'
-	developerEmail = 'dave.dna@gmail.com'
+	developerId = "davideas"
+	developerName = "Davide Steduto"
+	developerEmail = "dave.dna@gmail.com"
 
 	//Library
-	libraryCode = 10
-	libraryVersion = '4.2.0'
-	libraryDate = " of 2015.12.16"
-	libraryDescription = 'A pattern for every RecyclerView'
-	libraryName = 'FlexibleAdapter'
+	libraryCode = 16
+	libraryVersion = "5.0.0-b6"
+	libraryDate = " of 2016.05.01"
+	libraryDescription = "1 Adapter for SelectionMode, ViewHolders, Filter, FastScroller, Animations, Undo, Headers, Expandable, Draggable, Swipeable :-)"
+	libraryName = "FlexibleAdapter"
+	packageExt = "aar"
 
 	//Library Repository
-	bintrayRepo = 'maven'
-	bintrayName = 'flexible-adapter'
-	publishedGroupId = 'eu.davidea'
+	bintrayRepo = "maven"
+	bintrayName = "flexible-adapter"
+	publishedGroupId = "eu.davidea"
 	artifact = bintrayName
-	siteUrl = 'https://github.com/davideas/FlexibleAdapter'
-	gitUrl = 'https://github.com/davideas/FlexibleAdapter.git'
+	siteUrl = "https://github.com/davideas/FlexibleAdapter"
+	gitUrl = "https://github.com/davideas/FlexibleAdapter.git"
 
 	//Support and Build tools version
 	minSdk = 14
 	targetSdk = 23
-	buildTools = '23.0.2'
-	supportLibrary = '23.1.1'
+	buildTools = "23.0.3"
+	supportLib = "23.3.0"
 
 	//Support Libraries dependencies
 	supportDependencies = [
-			design       : "com.android.support:design:${supportLibrary}",
-			recyclerview : "com.android.support:recyclerview-v7:${supportLibrary}",
-			cardview     : "com.android.support:cardview-v7:${supportLibrary}",
-			appcompat    : "com.android.support:appcompat-v7:${supportLibrary}",
-			customtabs   : "com.android.support:customtabs:${supportLibrary}",
-			support      : "com.android.support:support-v13:${supportLibrary}'",
-			annotations  : "com.android.support:support-annotations:${supportLibrary}"
+		design       : "com.android.support:design:${supportLib}",
+		recyclerview : "com.android.support:recyclerview-v7:${supportLib}",
+		cardview     : "com.android.support:cardview-v7:${supportLib}",
+		appcompat    : "com.android.support:appcompat-v7:${supportLib}",
+		customtabs   : "com.android.support:customtabs:${supportLib}",
+		support      : "com.android.support:support-v13:${supportLib}",
+		annotations  : "com.android.support:support-annotations:${supportLib}"
 	]
 
-	licenseName = 'The Apache Software License, Version 2.0'
-	licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+	licenseName = "The Apache Software License, Version 2.0"
+	licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
 	allLicenses = ["Apache-2.0"]
+	licenseDist = "repo"
 }
 
 buildscript {
 	repositories {
 		jcenter()
+		maven {url = "https://oss.sonatype.org/content/repositories/snapshots/" }
 	}
+
 	dependencies {
-		classpath 'com.android.tools.build:gradle:1.5.0'
-		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
-		classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
+		classpath 'com.android.tools.build:gradle:2.1.0'
+		classpath "com.github.dcendents:android-maven-gradle-plugin:1.3"
+		classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6"
+		classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1"
 		// NOTE: Do not place your application dependencies here; they belong
 		// in the individual module build.gradle files
 	}
@@ -58,10 +63,7 @@ buildscript {
 allprojects {
 	repositories {
 		jcenter()
-		maven { url "http://dl.bintray.com/davideas/maven" }
+		maven {url = "http://dl.bintray.com/davideas/maven" }
+		maven {url = "https://oss.sonatype.org/content/repositories/snapshots/" }
 	}
-}
-
-task clean(type: Delete) {
-	delete rootProject.buildDir
 }
