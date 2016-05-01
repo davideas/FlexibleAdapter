@@ -6,10 +6,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -37,6 +37,7 @@ import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.helpers.ActionModeHelper;
 import eu.davidea.flexibleadapter.helpers.UndoHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
@@ -50,6 +51,7 @@ import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableSections;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentHeadersSections;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentInstagramHeaders;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentOverall;
+import eu.davidea.samples.flexibleadapter.fragments.FragmentSelectionModes;
 import eu.davidea.samples.flexibleadapter.fragments.MessageDialogFragment;
 import eu.davidea.samples.flexibleadapter.fragments.OnFragmentInteractionListener;
 import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
@@ -94,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements
 	private ActionModeHelper mActionModeHelper;
 	private int mSwipedPosition = RecyclerView.NO_POSITION;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
-	private BottomSheetBehavior mBottomSheetBehavior;
 	private Toolbar mToolbar;
 	private DrawerLayout mDrawer;
 	private NavigationView mNavigationView;
@@ -135,13 +136,6 @@ public class MainActivity extends AppCompatActivity implements
 		//With FlexibleAdapter v5.0.0 we don't need to call this function anymore
 		//It is automatically called if Activity implements FlexibleAdapter.OnUpdateListener
 		//updateEmptyView();
-
-		//Restore previous state
-		if (savedInstanceState != null && mAdapter != null) {
-			//Selection
-			mAdapter.onRestoreInstanceState(savedInstanceState);
-			mActionModeHelper.restoreSelection(this);
-		}
 	}
 
 	@Override
@@ -153,15 +147,26 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	@Override
-	public void onFragmentChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView) {
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		//Restore previous state
+		if (savedInstanceState != null && mAdapter != null) {
+			//Selection
+			mAdapter.onRestoreInstanceState(savedInstanceState);
+			mActionModeHelper.restoreSelection(this);
+		}
+	}
+
+	@Override
+	public void onFragmentChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView, int mode) {
 		mRecyclerView = recyclerView;
 		mAdapter = (FlexibleAdapter) recyclerView.getAdapter();
 		mSwipeRefreshLayout = swipeRefreshLayout;
 		initializeSwipeToRefresh();
-		initializeActionModeHelper();
+		initializeActionModeHelper(mode);
 	}
 
-	private void initializeActionModeHelper() {
+	private void initializeActionModeHelper(int mode) {
 		mActionModeHelper = new ActionModeHelper(mAdapter, R.menu.menu_item_list_context, this) {
 			@Override
 			public void updateContextTitle(int count) {
@@ -171,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements
 							getString(R.string.action_selected_many, count));
 				}
 			}
-		};
+		}.withDefaultMode(mode);
 	}
 
 	private void initializeFragment(Bundle savedInstanceState) {
@@ -222,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements
 
 		mNavigationView = (NavigationView) findViewById(R.id.nav_view);
 		mNavigationView.setNavigationItemSelectedListener(this);
-		//TODO: select the correct item after the rotation
 
 		//Version
 		TextView appVersion = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.app_version);
@@ -237,8 +241,6 @@ public class MainActivity extends AppCompatActivity implements
 			@Override
 			public void onClick(View v) {
 				mActionModeHelper.destroyActionModeIfCan();
-//				mBottomSheetBehavior.setPeekHeight(300);
-//				mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 				mFragment.addItem();
 			}
 		});
@@ -276,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements
 			showFab();
 			fabBehavior.setEnabled(true);
 		} else if (id == R.id.nav_selection_modes) {
-
+			mFragment = FragmentSelectionModes.newInstance(2);
 		} else if (id == R.id.nav_expandable) {
 
 		} else if (id == R.id.nav_multi_level_expandable) {
@@ -311,7 +313,6 @@ public class MainActivity extends AppCompatActivity implements
 			//Close drawer
 			mDrawer.closeDrawer(GravityCompat.START);
 			mToolbar.setSubtitle(item.getTitle());
-
 			return true;
 		}
 		return false;
@@ -348,7 +349,6 @@ public class MainActivity extends AppCompatActivity implements
 							MenuItem listTypeItem = menu.findItem(R.id.action_list_type);
 							if (listTypeItem != null)
 								listTypeItem.setVisible(false);
-
 							hideFab();
 							return true;
 						}
@@ -358,7 +358,6 @@ public class MainActivity extends AppCompatActivity implements
 							MenuItem listTypeItem = menu.findItem(R.id.action_list_type);
 							if (listTypeItem != null)
 								listTypeItem.setVisible(true);
-
 							showFab();
 							return true;
 						}
@@ -416,18 +415,22 @@ public class MainActivity extends AppCompatActivity implements
 				mAdapter.setAnimationOnReverseScrolling(false);
 				item.setIcon(R.drawable.ic_sort_white_24dp);
 				item.setTitle(R.string.reverse_scrolling);
+				Snackbar.make(findViewById(R.id.main_view), "Reverse Scrolling Animation is disabled", Snackbar.LENGTH_SHORT).show();
 			} else {
 				mAdapter.setAnimationOnReverseScrolling(true);
 				item.setIcon(R.drawable.ic_sort_descending_white_24dp);
 				item.setTitle(R.string.forward_scrolling);
+				Snackbar.make(findViewById(R.id.main_view), "Reverse Scrolling Animation is enabled", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_auto_collapse) {
 			if (item.getTitle().equals(getString(R.string.auto_collapse))) {
 				mAdapter.setAutoCollapseOnExpand(true);
 				item.setTitle(R.string.keep_expanded);
+				Snackbar.make(findViewById(R.id.main_view), "Auto-Collapse is enabled", Snackbar.LENGTH_SHORT).show();
 			} else {
 				mAdapter.setAutoCollapseOnExpand(false);
 				item.setTitle(R.string.auto_collapse);
+				Snackbar.make(findViewById(R.id.main_view), "Auto-Collapse is disabled", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_expand_collapse_all) {
 			if (item.getTitle().equals(getString(R.string.expand_all))) {
@@ -451,13 +454,27 @@ public class MainActivity extends AppCompatActivity implements
 			if (mAdapter.areHeadersSticky()) {
 				mAdapter.disableStickyHeaders();
 				item.setTitle(R.string.sticky_headers);
+				Snackbar.make(findViewById(R.id.main_view), "Sticky headers disabled", Snackbar.LENGTH_SHORT).show();
 			} else {
 				mAdapter.enableStickyHeaders();
 				item.setTitle(R.string.scroll_headers);
+				Snackbar.make(findViewById(R.id.main_view), "Sticky headers enabled", Snackbar.LENGTH_SHORT).show();
+			}
+		} else if (id == R.id.action_selection_mode) {
+			if (mAdapter.getMode() == SelectableAdapter.MODE_IDLE) {
+				mAdapter.setMode(SelectableAdapter.MODE_SINGLE);
+				mActionModeHelper.withDefaultMode(SelectableAdapter.MODE_SINGLE);
+				item.setIcon(R.drawable.ic_select_off_white_24dp);
+				item.setTitle(R.string.mode_idle);
+				Snackbar.make(findViewById(R.id.main_view), "Selection MODE_SINGLE is enabled", Snackbar.LENGTH_SHORT).show();
+			} else {
+				mAdapter.setMode(SelectableAdapter.MODE_IDLE);
+				mActionModeHelper.withDefaultMode(SelectableAdapter.MODE_IDLE);
+				item.setIcon(R.drawable.ic_select_white_24dp);
+				item.setTitle(R.string.mode_single);
+				Snackbar.make(findViewById(R.id.main_view), "Selection MODE_IDLE is enabled", Snackbar.LENGTH_SHORT).show();
 			}
 		}
-
-		//TODO: Show difference between MODE_IDLE, MODE_SINGLE
 		//TODO: Add toggle for mAdapter.toggleFastScroller();
 		//TODO: Add dialog configuration settings
 

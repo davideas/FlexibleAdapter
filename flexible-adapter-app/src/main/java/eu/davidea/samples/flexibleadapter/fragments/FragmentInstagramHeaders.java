@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
@@ -85,7 +86,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		mAdapter.enableStickyHeaders();
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//Endless scroll with 1 item threshold
 		mAdapter.setEndlessScrollListener(this, new ProgressItem());

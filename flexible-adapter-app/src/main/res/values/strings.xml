@@ -23,6 +23,8 @@
 	<string name="sticky_headers">Sticky Headers</string>
 	<string name="scroll_headers">Scroll Headers</string>
 	<string name="create_new_item">Create new Item</string>
+	<string name="mode_idle">Mode Idle</string>
+	<string name="mode_single">Mode Single</string>
 	<string name="undo">Undo</string>
 
 	<!-- User Learns Selection -->
@@ -48,38 +50,29 @@
 	<string name="overall">Overall</string>
 	<!--<string name="overall_description">Examples may have options where available to enable/disable: (1) Filter (2) FastScroller (3) Grid Layout (4) Sticky Headers</string>-->
 
-	<string name="endless_scrolling">EndlessScrolling</string>
-	<string name="endless_scrolling_description">EndlessScrolling with Adapter Animation</string><!-- TODO: in combination with Item Animation -->
-
 	<string name="selection_modes">Selection modes</string>
-	<string name="selection_modes_description">IDLE, SINGLE, MULTI</string>
+	<string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper (AH) + UndoHelper (UH)</string>
+
+	<string name="endless_scrolling">EndlessScrolling</string>
+	<string name="endless_scrolling_description">EndlessScrolling + Adapter Animation + Swipe-To-Delete w/rear-views + (AH) + (UH)</string><!-- TODO: in combination with Item Animation -->
 
 	<string name="expandable">Expandable</string>
-	<string name="expandable_description">List with expandable items with Selection Coherence (SC) and Filter (F)</string>
+	<string name="expandable_description">List with expandable items + Selection Coherence (SC) + Filter (F) + (AH) + (UH)</string>
 
 	<string name="multi_level_expandable">Expandable Multi-Level</string>
-	<string name="multi_level_expandable_description">Example of 2 levels of expandable (with SC)</string>
+	<string name="multi_level_expandable_description">2 levels of expandable + (SC) + Swipeable &amp; Draggable items + (AH) + (UH)</string>
 
 	<string name="expandable_sections">Expandable Sections</string>
-	<string name="expandable_sections_description">Sections with (sticky) headers that can expand/collapse</string>
+	<string name="expandable_sections_description">Sections with (sticky) headers that can expand/collapse + Drag items + (F)</string>
 
 	<string name="headers_sections">Headers and Sections</string>
-	<string name="headers_sections_description">1 (sticky) header for each section, dragged items with auto-linkage</string>
+	<string name="headers_sections_description">Clickable sticky headers for sections + Drag items with Auto-Linkage + (F)</string>
 
 	<string name="instagram_headers">Instagram headers</string>
-	<string name="instagram_headers_description"><![CDATA[1 (sticky) clickable header for each item. <b>Internet is required.</b>]]></string>
+	<string name="instagram_headers_description"><![CDATA[1 sticky header for each item + EndlessScrolling.<br/><font color="#ff4081"><b>Internet is required.</b></font>]]></string>
 
 	<string name="model_holders">Item Model Holder</string>
-	<string name="model_holders_description">A representation of FlexibleItems holding the model object (check the code).</string>
-
-	<string name="draggable">Draggable</string>
-	<string name="draggable_description">Drag and Move</string>
-
-	<string name="draggable_expandable">Draggable with Expandable</string>
-	<string name="draggable_expandable_description">Drag and Move</string><!-- TODO: with Draggable Coherence (DC) -->
-
-	<string name="swipeable">Swipeable</string>
-	<string name="swipeable_description">Swipeable items with Swipe-To-Delete</string><!-- TODO: Custom-2nd-View -->
+	<string name="model_holders_description"><![CDATA[A representation of Items holding the model object.<br/><font color="#ff4081"><b>Check the code!</b></font>]]></string>
 
 	<string name="special_layouts">Special Layouts</string>
 	<string name="horizontal">Horizontal Layout</string>

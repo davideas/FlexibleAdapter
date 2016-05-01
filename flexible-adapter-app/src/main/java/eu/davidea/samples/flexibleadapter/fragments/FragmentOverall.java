@@ -1,14 +1,17 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.animation.DecelerateInterpolator;
 
+import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.samples.flexibleadapter.OverallAdapter;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -63,13 +66,20 @@ public class FragmentOverall extends AbstractFragment {
 		mAdapter.setAnimationDelay(150L);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setItemViewCacheSize(0);//Setting ViewCache to 0 (default=2) will animate items better while scrolling down+up with LinearLayout
-		mRecyclerView.setLayoutManager(createNewGridLayoutManager());
+		mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(mColumnCount, StaggeredGridLayoutManager.VERTICAL));
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true);//Size of RV will not change
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
+		mAdapter.setLongPressDragEnabled(true);
+		mRecyclerView.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				Snackbar.make(getView(), "Long press drag is enabled", Snackbar.LENGTH_SHORT).show();
+			}
+		}, 1500L);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 	}
 
 	@Override

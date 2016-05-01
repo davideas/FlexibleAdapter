@@ -4,6 +4,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 
+import eu.davidea.flexibleadapter.SelectableAdapter;
+
 /**
  * This interface must be implemented by activities that contain this
  * fragment to allow an interaction in this fragment to be communicated
@@ -16,7 +18,8 @@ import android.view.Menu;
  */
 public interface OnFragmentInteractionListener {
 
-	void onFragmentChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView);
+	void onFragmentChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView,
+						  @SelectableAdapter.Mode int mode);
 
 	void initSearchView(final Menu menu);
 

@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
@@ -105,7 +106,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 	}
 
 	@Override
@@ -197,6 +198,9 @@ public class FragmentHeadersSections extends AbstractFragment
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
+
+		menu.findItem(R.id.action_auto_collapse).setVisible(false);
+		menu.findItem(R.id.action_expand_collapse_all).setVisible(false);
 
 		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
 		if (headersMenuItem != null) {

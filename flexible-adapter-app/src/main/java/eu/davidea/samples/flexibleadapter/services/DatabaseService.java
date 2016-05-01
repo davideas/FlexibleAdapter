@@ -60,14 +60,13 @@ public class DatabaseService {
 	 */
 	public void createOverallDatabase(Resources resources) {
 		mItems.clear();
+		mItems.add(new OverallItem(R.id.nav_selection_modes, resources.getString(R.string.selection_modes))
+				.withDescription(resources.getString(R.string.selection_modes_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_select_all_grey600_24dp)));
+
 		mItems.add(new OverallItem(R.id.nav_endless_scrolling, resources.getString(R.string.endless_scrolling))
 				.withDescription(resources.getString(R.string.endless_scrolling_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_playlist_play_grey600_24dp)));
-
-		mItems.add(new OverallItem(R.id.nav_selection_modes, resources.getString(R.string.selection_modes))
-				.withDescription(resources.getString(R.string.selection_modes_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_select_all_grey600_24dp))
-				.withEnabled(false));
 
 		mItems.add(new OverallItem(R.id.nav_expandable, resources.getString(R.string.expandable))
 				.withDescription(resources.getString(R.string.expandable_description))

@@ -1,14 +1,19 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.AdapterView;
 
+import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
@@ -17,6 +22,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
+import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -77,22 +83,25 @@ public class FragmentSelectionModes extends AbstractFragment
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		//Settings for FlipView
+		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
+		//Create New Database and Initialize RecyclerView
+		DatabaseService.getInstance().createEndlessDatabase();
 		initializeRecyclerView(savedInstanceState);
+
+		//Settings for FlipView
+		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//TODO: Working in progress!
-
-
 		mAdapter = new ExampleAdapter(getActivity());
+		mAdapter.setMode(SelectableAdapter.MODE_SINGLE);
+
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAutoCollapseOnExpand(false);
-		mAdapter.setAutoScrollOnExpand(true);
-		mAdapter.setRemoveOrphanHeaders(false);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
@@ -106,19 +115,18 @@ public class FragmentSelectionModes extends AbstractFragment
 		});
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider));
-
+		mRecyclerView.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				Snackbar.make(getView(), "Selection MODE_SINGLE is enabled", Snackbar.LENGTH_SHORT).show();
+			}
+		}, 1500L);
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
-		//Experimenting NEW features (v5.0.0)
-		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
-		mAdapter.setSwipeEnabled(true);//Enable swipe items
-		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
-		//Add sample item on the top (not belongs to the library)
-		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_SINGLE);
 	}
 
 	@Override
@@ -196,6 +204,12 @@ public class FragmentSelectionModes extends AbstractFragment
 			Log.d(TAG, STATE_ACTIVATED_POSITION + "=" + mActivatedPosition);
 		}
 		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.menu_selection_modes, menu);
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 }

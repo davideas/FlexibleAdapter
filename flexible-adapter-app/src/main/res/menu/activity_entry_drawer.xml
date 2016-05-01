@@ -9,14 +9,13 @@
 			android:icon="@drawable/ic_view_grid_grey600_24dp"
 			android:title="@string/overall"/>
 		<item
+			android:id="@+id/nav_selection_modes"
+			android:icon="@drawable/ic_select_all_grey600_24dp"
+			android:title="@string/selection_modes"/>
+		<item
 			android:id="@+id/nav_endless_scrolling"
 			android:icon="@drawable/ic_playlist_play_grey600_24dp"
 			android:title="@string/endless_scrolling"/>
-		<item
-			android:id="@+id/nav_selection_modes"
-			android:enabled="false"
-			android:icon="@drawable/ic_select_all_grey600_24dp"
-			android:title="@string/selection_modes"/>
 		<item
 			android:id="@+id/nav_expandable"
 			android:enabled="false"
@@ -43,21 +42,6 @@
 			android:enabled="false"
 			android:icon="@drawable/ic_select_inverse_grey600_24dp"
 			android:title="@string/model_holders"/>
-		<item
-			android:id="@+id/nav_draggable"
-			android:enabled="false"
-			android:icon="@drawable/ic_swap_vert_grey600_24dp"
-			android:title="@string/draggable"/>
-		<item
-			android:id="@+id/nav_draggable_expandable"
-			android:enabled="false"
-			android:icon="@drawable/ic_swap_vert_grey600_24dp"
-			android:title="@string/draggable_expandable"/>
-		<item
-			android:id="@+id/nav_swipeable"
-			android:enabled="false"
-			android:icon="@drawable/ic_swap_horiz_grey600_24dp"
-			android:title="@string/swipeable"/>
 
 		<item android:title="@string/special_layouts">
 			<menu>
