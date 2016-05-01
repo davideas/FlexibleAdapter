@@ -28,6 +28,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -298,9 +299,17 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * Reset stepDelay.
 	 */
 	private long calculateAnimationDelay1(int position) {
-
-		int lastVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
-		int firstVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+		RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
+		int lastVisiblePosition, firstVisiblePosition;
+		if (layoutManager instanceof LinearLayoutManager) {
+			LinearLayoutManager linearLayout = (LinearLayoutManager) layoutManager;
+			lastVisiblePosition = linearLayout.findLastCompletelyVisibleItemPosition();
+			firstVisiblePosition = linearLayout.findFirstCompletelyVisibleItemPosition();
+		} else {
+			StaggeredGridLayoutManager staggeredGridLayout = (StaggeredGridLayoutManager) layoutManager;
+			lastVisiblePosition = staggeredGridLayout.findLastCompletelyVisibleItemPositions(null)[0];
+			firstVisiblePosition =  staggeredGridLayout.findFirstCompletelyVisibleItemPositions(null)[0];
+		}
 
 		//Use always the max child count reached
 		if (mMaxChildViews < mRecyclerView.getChildCount())
@@ -334,9 +343,17 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 */
 	private long calculateAnimationDelay2(int position) {
 		long delay;
-
-		int lastVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
-		int firstVisiblePosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+		RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
+		int lastVisiblePosition, firstVisiblePosition;
+		if (layoutManager instanceof LinearLayoutManager) {
+			LinearLayoutManager linearLayout = (LinearLayoutManager) layoutManager;
+			lastVisiblePosition = linearLayout.findLastCompletelyVisibleItemPosition();
+			firstVisiblePosition = linearLayout.findFirstCompletelyVisibleItemPosition();
+		} else {
+			StaggeredGridLayoutManager staggeredGridLayout = (StaggeredGridLayoutManager) layoutManager;
+			lastVisiblePosition = staggeredGridLayout.findLastCompletelyVisibleItemPositions(null)[0];
+			firstVisiblePosition =  staggeredGridLayout.findFirstCompletelyVisibleItemPositions(null)[0];
+		}
 
 		if (mLastAnimatedPosition > lastVisiblePosition)
 			lastVisiblePosition = mLastAnimatedPosition;
