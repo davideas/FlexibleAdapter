@@ -30,6 +30,8 @@ import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 
 /**
+ * Helper to coordinates the MULTI selection with FlexibleAdapter.
+ *
  * @author Davide Steduto
  * @since 30/04/2016
  */

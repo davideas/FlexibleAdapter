@@ -30,6 +30,8 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 /**
+ * Helper to simplify the Undo operation with FlexibleAdapter.
+ *
  * @author Davide Steduto
  * @since 30/04/2016
  */
@@ -82,7 +84,7 @@ public class UndoHelper extends Snackbar.Callback {
 	 * @param payload any non-null user object to notify the parent (the payload will be
 	 *                therefore passed to the bind method of the parent ViewHolder),
 	 *                pass null to <u>not</u> notify the parent
-	 * @return this
+	 * @return this object, so it can be chained
 	 */
 	public UndoHelper withPayload(Object payload) {
 		this.mPayload = payload;
@@ -94,7 +96,7 @@ public class UndoHelper extends Snackbar.Callback {
 	 *
 	 * @param action         the action, one of {@link UndoHelper#ACTION_REMOVE}, {@link UndoHelper#ACTION_UPDATE}
 	 * @param actionListener the listener for the custom action to perform before the deletion
-	 * @return this
+	 * @return this object, so it can be chained
 	 */
 	public UndoHelper withAction(@Action int action, @NonNull OnActionListener actionListener) {
 		this.mAction = action;
