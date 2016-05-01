@@ -2,7 +2,9 @@
 
 # FlexibleAdapter
 
-###### A pattern for every RecyclerView - Stable _light_ version v4.2 of 2015.12.16 - NEW! dev branch in beta: v5.0.0-b6 of 2016.05.01 (usable library!)
+###### A pattern for every RecyclerView
+- Stable _light_ version 4.2 of 2015.12.16
+- NEW! version 5.0.0-b6 of 2016.05.01 (usable library!)
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -37,13 +39,20 @@ Some simple functionalities have been implemented thanks to the some Blogs (see 
 * Item interfaces and predefined ViewHolders complete the whole library giving more actions to the items and configuration options to the developers and the end user.
 
 # Screenshots
-![GridView & Secondary Functionalities](/screenshots/gridview_secondary_functionalities.png)
-![Search screen](/screenshots/search.png)
-![Undo Screen](/screenshots/undo.png)
+![Drag Grid & Overall](/screenshots/drag_grid_overall.png)
+![Secondary Functionalities](/screenshots/secondary_functionalities.png)
+![Drag Linear](/screenshots/drag_linear.png)
+
+![Multi Selection & SC](/screenshots/multi_selection_sc.png)
+![Search](/screenshots/search_sections.png)
+![Undo](/screenshots/undo_single_selection.png)
+
+![swipe-to-dismiss1](/screenshots/swipe-to-dismiss1.png)
+![swipe-to-dismiss2](/screenshots/swipe-to-dismiss2.png)
+![StickyHeaders & EndlessScrolling](/screenshots/sticky_headers.png)
+
 ![Adapter Animations](/screenshots/adapter_animations.png)
-![StickyHeaders & Header Linkage & Restore items](/screenshots/stickyheaders_headerlinkage_restoreitems.png)
-![StickyHeaders & Expandable items](/screenshots/stickyheaders_expandableitems.png)
-![Multi Selection](/screenshots/multi_selection.png)
+![Dynamic Sections](/screenshots/dynamic_sections.png)
 
 # Setup
 ```
