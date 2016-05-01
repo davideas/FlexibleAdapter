@@ -2122,6 +2122,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Returns the current configuration to restore selections on Undo.
 	 *
 	 * @return true if selection will be restored, false otherwise
+	 * @see #setRestoreSelectionOnUndo(boolean)
 	 */
 	public boolean isRestoreWithSelection() {
 		return restoreSelection;
@@ -2133,7 +2134,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>To use in combination with {@code ActionMode} in order to not disable it.</p>
 	 * Default value is false.
 	 *
-	 * @param restoreSelection true to have restored items still selected, false to empty selections.
+	 * @param restoreSelection true to have restored items still selected, false to empty selections
 	 */
 	public void setRestoreSelectionOnUndo(boolean restoreSelection) {
 		this.restoreSelection = restoreSelection;

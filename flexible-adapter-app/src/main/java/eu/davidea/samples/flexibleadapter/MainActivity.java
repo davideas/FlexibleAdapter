@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -38,6 +37,7 @@ import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.ActionModeHelper;
 import eu.davidea.flexibleadapter.helpers.UndoHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements
 	 */
 	private RecyclerView mRecyclerView;
 	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
-	private ActionMode mActionMode;
+	private ActionModeHelper mActionModeHelper;
 	private int mSwipedPosition = RecyclerView.NO_POSITION;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private BottomSheetBehavior mBottomSheetBehavior;
@@ -129,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements
 		initializeToolbar();
 		initializeDrawer();
 		initializeFab();
-//		initializeBottomSheet();
 		//Initialize Fragment containing Adapter & RecyclerView
 		initializeFragment(savedInstanceState);
 
@@ -141,10 +140,7 @@ public class MainActivity extends AppCompatActivity implements
 		if (savedInstanceState != null && mAdapter != null) {
 			//Selection
 			mAdapter.onRestoreInstanceState(savedInstanceState);
-			if (mAdapter.getSelectedItemCount() > 0) {
-				mActionMode = startSupportActionMode(this);
-				setContextTitle(mAdapter.getSelectedItemCount());
-			}
+			mActionModeHelper.restoreSelection(this);
 		}
 	}
 
@@ -162,6 +158,20 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter = (FlexibleAdapter) recyclerView.getAdapter();
 		mSwipeRefreshLayout = swipeRefreshLayout;
 		initializeSwipeToRefresh();
+		initializeActionModeHelper();
+	}
+
+	private void initializeActionModeHelper() {
+		mActionModeHelper = new ActionModeHelper(mAdapter, R.menu.menu_item_list_context, this) {
+			@Override
+			public void updateContextTitle(int count) {
+				if (mActionMode != null) {//You can use the internal ActionMode instance
+					mActionMode.setTitle(count == 1 ?
+							getString(R.string.action_selected_one, count) :
+							getString(R.string.action_selected_many, count));
+				}
+			}
+		};
 	}
 
 	private void initializeFragment(Bundle savedInstanceState) {
@@ -191,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements
 				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList());
 				mSwipeRefreshLayout.setEnabled(false);
 				mRefreshHandler.sendEmptyMessageDelayed(0, 1000L);
-				destroyActionModeIfCan();
+				mActionModeHelper.destroyActionModeIfCan();
 			}
 		});
 	}
@@ -221,28 +231,12 @@ public class MainActivity extends AppCompatActivity implements
 				Utils.getVersionCode(this)));
 	}
 
-	private void initializeBottomSheet() {
-		mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
-		mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-			@Override
-			public void onStateChanged(@NonNull View bottomSheet, int newState) {
-				if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-					mBottomSheetBehavior.setPeekHeight(56);
-				}
-			}
-
-			@Override
-			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-			}
-		});
-	}
-
 	private void initializeFab() {
 		mFab = (FloatingActionButton) findViewById(R.id.fab);
 		mFab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				destroyActionModeIfCan();
+				mActionModeHelper.destroyActionModeIfCan();
 //				mBottomSheetBehavior.setPeekHeight(300);
 //				mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 				mFragment.addItem();
@@ -480,9 +474,8 @@ public class MainActivity extends AppCompatActivity implements
 			return false;
 		}
 
-		if (mActionMode != null && position != RecyclerView.NO_POSITION) {
-			toggleSelection(position);
-			return true;
+		if (mActionModeHelper != null && position != RecyclerView.NO_POSITION) {
+			return mActionModeHelper.onClick(position);
 		} else {
 			//Notify the active callbacks (ie. the activity, if the fragment is attached to one)
 			// that an item has been selected.
@@ -501,11 +494,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemLongClick(int position) {
-		if (mActionMode == null) {
-			Log.d(TAG, "onItemLongClick actionMode activated!");
-			mActionMode = startSupportActionMode(this);
-		}
-		toggleSelection(position);
+		mActionModeHelper.onLongClick(this, position);
 	}
 
 //	/**
@@ -596,9 +585,9 @@ public class MainActivity extends AppCompatActivity implements
 							logOrphanHeaders();
 							//Handle ActionMode title
 							if (mAdapter.getSelectedItemCount() == 0)
-								destroyActionModeIfCan();
+								mActionModeHelper.destroyActionModeIfCan();
 							else
-								setContextTitle(mAdapter.getSelectedItemCount());
+								mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
 						}
 					})
 					.remove(positions,
@@ -643,36 +632,6 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	/**
-	 * Toggle the selection state of an item.
-	 * <p>If the item was the last one in the selection and is unselected, the selection is stopped.
-	 * Note that the selection must already be started (actionMode must not be null).</p>
-	 *
-	 * @param position Position of the item to toggle the selection state
-	 */
-	private void toggleSelection(int position) {
-		mAdapter.toggleSelection(position);
-		if (mActionMode == null) return;
-
-		int count = mAdapter.getSelectedItemCount();
-		if (count == 0) {
-			Log.d(TAG, "toggleSelection finish the actionMode");
-			mActionMode.finish();
-		} else {
-			Log.d(TAG, "toggleSelection update title after selection count=" + count);
-			setContextTitle(count);
-			mActionMode.invalidate();
-		}
-	}
-
-	private void setContextTitle(int count) {
-		if (mActionMode != null) {
-			mActionMode.setTitle(String.valueOf(count) + " " + (count == 1 ?
-					getString(R.string.action_selected_one) :
-					getString(R.string.action_selected_many)));
-		}
-	}
-
 	@Override
 	public void onUndoConfirmed(int action) {
 		if (action == UndoHelper.ACTION_UPDATE) {
@@ -695,9 +654,8 @@ public class MainActivity extends AppCompatActivity implements
 			//Enable SwipeRefresh
 			mRefreshHandler.sendEmptyMessage(0);
 			//Check also selection restoration
-			if (mAdapter.isRestoreWithSelection() && mAdapter.getSelectedItemCount() > 0) {
-				mActionMode = startSupportActionMode(this);
-				setContextTitle(mAdapter.getSelectedItemCount());
+			if (mAdapter.isRestoreWithSelection()) {
+				mActionModeHelper.restoreSelection(this);
 			}
 		}
 	}
@@ -741,11 +699,6 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-		//Inflate the correct Menu
-		int menuId = R.menu.menu_item_list_context;
-		mode.getMenuInflater().inflate(menuId, menu);
-		//Activate the ActionMode Multi
-		mAdapter.setMode(ExampleAdapter.MODE_MULTI);
 		if (Utils.hasMarshmallow()) {
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorAccentDark_light, this.getTheme()));
 		} else if (Utils.hasLollipop()) {
@@ -765,9 +718,9 @@ public class MainActivity extends AppCompatActivity implements
 		switch (item.getItemId()) {
 			case R.id.action_select_all:
 				mAdapter.selectAll();
-				setContextTitle(mAdapter.getSelectedItemCount());
-				//We don't consume the event
-				return false;
+				mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
+				//We consume the event
+				return true;
 
 			case R.id.action_delete:
 				//Build message before delete, for the SnackBar
@@ -798,7 +751,7 @@ public class MainActivity extends AppCompatActivity implements
 								mRefreshHandler.sendEmptyMessage(1);
 								mRefreshHandler.sendEmptyMessageDelayed(0, 20000);
 								//Finish the action mode
-								mActionMode.finish();
+								mActionModeHelper.destroyActionModeIfCan();
 								logOrphanHeaders();
 							}
 						})
@@ -810,18 +763,13 @@ public class MainActivity extends AppCompatActivity implements
 				return true;
 
 			default:
+				//If an item is not implemented we don't consume the event, so we finish the ActionMode
 				return false;
 		}
 	}
 
 	@Override
 	public void onDestroyActionMode(ActionMode mode) {
-		Log.v(TAG, "onDestroyActionMode called!");
-		//With FlexibleAdapter v5.0.0 you should use MODE_IDLE if you don't want
-		//single selection still visible.
-		mAdapter.setMode(FlexibleAdapter.MODE_IDLE);
-		mAdapter.clearSelection();
-		mActionMode = null;
 		if (Utils.hasMarshmallow()) {
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark_light, this.getTheme()));
 		} else if (Utils.hasLollipop()) {
@@ -838,7 +786,7 @@ public class MainActivity extends AppCompatActivity implements
 			return;
 		}
 		//If ActionMode is active, back key closes it
-		if (destroyActionModeIfCan()) return;
+		if (mActionModeHelper.destroyActionModeIfCan()) return;
 		//If SearchView is visible, back key cancels search and iconify it
 		if (mSearchView != null && !mSearchView.isIconified()) {
 			mSearchView.setIconified(true);
@@ -847,19 +795,6 @@ public class MainActivity extends AppCompatActivity implements
 		//Close the App
 		DatabaseService.onDestroy();
 		super.onBackPressed();
-	}
-
-	/**
-	 * Utility method called from MainActivity on BackPressed
-	 *
-	 * @return true if ActionMode was active (in case it is also terminated), false otherwise
-	 */
-	private boolean destroyActionModeIfCan() {
-		if (mActionMode != null) {
-			mActionMode.finish();
-			return true;
-		}
-		return false;
 	}
 
 	private void logOrphanHeaders() {

@@ -226,8 +226,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 			mSelectedPositions.add(position);
 		}
 		if (DEBUG) Log.v(TAG, "toggleSelection " + (index != -1 ? "removed" : "added") +
-				" selection on position " + position +
-				", current selection " + mSelectedPositions);
+				" on position " + position + ", current " + mSelectedPositions);
 	}
 
 	/**
