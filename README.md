@@ -3,8 +3,8 @@
 # FlexibleAdapter
 
 ###### A pattern for every RecyclerView
-- Stable _light_ version 4.2 of 2015.12.16
-- NEW! version 5.0.0-b6 of 2016.05.01 (usable library!)
+- Stable _light_ version: 4.2 built on 2015.12.16
+- NEW! Beta version: 5.0.0-b6 built on 2016.05.01 (usable library!)
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -22,8 +22,8 @@ This library is configurable and it guides the developers (thanks to quality com
 * Add and Remove items with custom animations.
 * **NEW!** Adapter Animations with custom configuration based on adapter position and beyond.
 * **NEW!** Predefined ViewHolders.
-* **NEW!** Expandable items with <u>selection coherence</u>, multi-level expansion.
-* **NEW!** Drag&Drop and Swipe-To-Dismiss, with rear views, with <u>selection coherence</u>.
+* **NEW!** Expandable items with <u>Selection Coherence</u>, multi-level expansion.
+* **NEW!** Drag&Drop and Swipe-To-Dismiss with Leave-Behind pattern, with <u>Selection Coherence</u>.
 * **NEW!** Headers/Sections with sticky behaviour fully clickable, collapsible, automatic linkage!
 * **NEW!** Auto mapping ViewTypes with Item interfaces.
 * **NEW!** 1 simple constructor for all events.
@@ -41,15 +41,15 @@ Some simple functionalities have been implemented thanks to the some Blogs (see 
 # Screenshots
 ![Drag Grid & Overall](/screenshots/drag_grid_overall.png)
 ![Secondary Functionalities](/screenshots/secondary_functionalities.png)
-![Drag Linear](/screenshots/drag_linear.png)
+![StickyHeaders & EndlessScrolling](/screenshots/sticky_headers.png)
 
 ![Multi Selection & SC](/screenshots/multi_selection_sc.png)
 ![Search](/screenshots/search_sections.png)
 ![Undo](/screenshots/undo_single_selection.png)
 
+![Drag Linear](/screenshots/drag_linear.png)
 ![swipe-to-dismiss1](/screenshots/swipe-to-dismiss1.png)
 ![swipe-to-dismiss2](/screenshots/swipe-to-dismiss2.png)
-![StickyHeaders & EndlessScrolling](/screenshots/sticky_headers.png)
 
 ![Adapter Animations](/screenshots/adapter_animations.png)
 ![Dynamic Sections](/screenshots/dynamic_sections.png)
@@ -136,40 +136,10 @@ _Demo App_
 - Enabled FragmentSelectionModes example.
 - Enabled Instagram example with Endless Scroll with Glide lib.
 
-###### v5.0.0-b5 - 2016.04.04
-_Refactor_
-- Constructor of `AbstractSectionableItem` now accepts the `IHeader` interface.
-- `setHeader(header)` in `ISectionable` interface is changed to **void** method.
-- Renamed method `Utils.setHighlightText()` to `Utils.highlightText()`.
-- `StickyHeaderDecoration` is now deprecated, as consequence `enableStickyHeaders(maxCachedHeaders)` is also deprecated: use `enableStickyHeaders()`.
-
-_Improvements_
-- Headers are clickable when sticky! Thanks to @farfromrefug. StickyHeaders can now benefit of the existing click listeners in `FlexibleViewHolder` [See #41]. Pay attention at the method `getStickySectionHeadersHolder()`.
-- `IHeader` item can be combined with `IExpandable` item to make a section expandable with header.
-- Adding items with new headers, headers are also shown.
-- Added `AbstractExpandableHeaderItem`. 
-- Added a new Wiki page about how to implement sections with sticky headers and expandable sections. Direct link: [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections).
-- Added new methods _getItemCountOfTypesUntil(), removeItemsOfType(), hasNewSearchText()_.
-- Multiple code improvements with **SonarQube** tool, thanks to @georgekankava.
-
-_Fixes_
-- Fixed NPE in `isEnabled(position)` when position is unknown.
-- Fixed header linkage when deleting/restore items with header. _It's important now that all sectionable items must initialize the own header at startup_.
-- Bug fixing on SearchView and FilterMethods.
-- Fixed view activation elevation [See #38].
-- Fixed adapter item animation at startup.
-
-_Demo App_
-- New example app supporting multiple fragments [See #19].
-- Added an example of `FlexibleItemHolder` to use simultaneously the same _modelData_ object in multiple RecyclerView/Adapters.
-- Adapted code for Expandable Sections with headers. Enabled demo option for `FragmentExpandableSections`.
-- Demo app has more clear DatabaseService. It shows how to create item interfaces.
-- FlipView animation for Fragments.
-- Unfortunately the demo app has a _known_ bug on FastScroller when changing Fragment, but FastScroller is planned to be changed.
-
 ###### Old releases
 See [releases](https://github.com/davideas/FlexibleAdapter/releases) for old versions.
 
+v5.0.0-b5 - 2016.04.04 | 
 v5.0.0-b4 - 2016.02.21 | v5.0.0-b3 - 2016.02.08 |
 v5.0.0-b2 - 2016.01.31 | v5.0.0-b1 - 2016.01.03 |
 v4.2.0 - 2015.12.12 | v4.1.0 - 2015.11.29 |
