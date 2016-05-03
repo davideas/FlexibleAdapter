@@ -21,13 +21,13 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.HeaderItem;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IHolder;
-import eu.davidea.viewholders.ExpandableViewHolder;
+import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.models.HeaderItem;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * In case you need to display the same modelData in multiple RecyclerViews managed by different
@@ -84,10 +84,7 @@ public class FlexibleItemHolderExample<Model> extends AbstractSectionableItem<Fl
 		return true;
 	}
 
-	/**
-	 * This ViewHolder is expandable and collapsible.
-	 */
-	public static final class ViewHolder extends ExpandableViewHolder {
+	public static final class ViewHolder extends FlexibleViewHolder {
 
 		public ViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
