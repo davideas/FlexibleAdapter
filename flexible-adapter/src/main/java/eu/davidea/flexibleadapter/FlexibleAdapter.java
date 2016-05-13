@@ -3031,7 +3031,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			mOldSearchText = savedInstanceState.getString(EXTRA_SEARCH_OLD);
 			//Restore headers shown status
 			headersShown = savedInstanceState.getBoolean(EXTRA_HEADERS);
-			if (headersShown) showAllHeaders();
+			if (!headersShown) hideAllHeaders();
 		}
 	}
 
