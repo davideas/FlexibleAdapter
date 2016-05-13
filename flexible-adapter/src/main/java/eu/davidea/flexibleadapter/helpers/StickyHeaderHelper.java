@@ -195,16 +195,21 @@ public class StickyHeaderHelper extends OnScrollListener {
 		mStickyHeaderViewHolder.itemView.setTranslationY(headerOffsetY);
 	}
 
-	private void swapHeader(RecyclerView.ViewHolder newHeader) {
-		if (mStickyHeaderViewHolder != null) {
-			resetHeader(mStickyHeaderViewHolder);
-		}
-		mStickyHeaderViewHolder = newHeader;
-		if (mStickyHeaderViewHolder != null) {
-			mStickyHeaderViewHolder.setIsRecyclable(false);
-			ensureHeaderParent();
-		}
-		onStickyHeaderChange(mHeaderPosition);
+	private void swapHeader(final RecyclerView.ViewHolder newHeader) {
+		mRecyclerView.post(new Runnable() {
+			@Override
+			public void run() {
+				if (mStickyHeaderViewHolder != null) {
+					resetHeader(mStickyHeaderViewHolder);
+				}
+				mStickyHeaderViewHolder = newHeader;
+				if (mStickyHeaderViewHolder != null) {
+					mStickyHeaderViewHolder.setIsRecyclable(false);
+					ensureHeaderParent();
+				}
+				onStickyHeaderChange(mHeaderPosition);
+			}
+		});
 	}
 
 	public void clearHeader() {
@@ -284,6 +289,10 @@ public class StickyHeaderHelper extends OnScrollListener {
 		//Reset transformation on removed header
 		view.setTranslationX(0);
 		view.setTranslationY(0);
+		//Restore LayoutParams
+		view.setLayoutParams(new RecyclerView.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT));
 		header.setIsRecyclable(true);
 	}
 
