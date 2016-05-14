@@ -37,8 +37,7 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 
 	/* Item flags recognized by the FlexibleAdapter */
 	protected boolean mEnabled = true, mHidden = false,
-			mSelectable = true, mSelected = false,
-			mDraggable = false, mSwipeable = false;
+			mSelectable = true,	mDraggable = false, mSwipeable = false;
 
 	/*---------------*/
 	/* BASIC METHODS */
@@ -122,16 +121,6 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	/*---------------------*/
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/
-
-//	/**
-//	 * Wrapper of {#getLayoutRes()}.
-//	 * <p>It DOESN'T belongs to the {@link IFlexible} interface!!</p>
-//	 *
-//	 * @return the layout resourceId as viewType
-//	 */
-//	public int getViewType() {
-//		return getLayoutRes();
-//	}
 
 	@Override
 	public int getLayoutRes() {

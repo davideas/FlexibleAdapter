@@ -33,6 +33,7 @@ public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
 
 	public SubItem(String id) {
 		super(id);
+		setDraggable(true);
 	}
 
 	@Override

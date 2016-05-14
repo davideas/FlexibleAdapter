@@ -28,6 +28,7 @@ import android.view.View;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
+import eu.davidea.flexibleadapter.items.IFlexible;
 
 /**
  * Helper Class that implements:
@@ -297,6 +298,18 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		//Reset internal action state ready for next action
 		mLongClickSkipped = false;
 		mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
+	}
+
+	@Override
+	public boolean isDraggable() {
+		IFlexible item = mAdapter.getItem(getFlexibleAdapterPosition());
+		return item != null && item.isDraggable();
+	}
+
+	@Override
+	public boolean isSwipeable() {
+		IFlexible item = mAdapter.getItem(getFlexibleAdapterPosition());
+		return item != null && item.isSwipeable();
 	}
 
 	@Override

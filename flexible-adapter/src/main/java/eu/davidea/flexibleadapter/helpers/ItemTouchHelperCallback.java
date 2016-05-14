@@ -186,6 +186,12 @@ public class ItemTouchHelperCallback extends Callback {
 			dragFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 			swipeFlags = mSwipeFlags > 0 ? mSwipeFlags : ItemTouchHelper.UP | ItemTouchHelper.DOWN;
 		}
+		//Disallow item swiping or dragging
+		if (viewHolder instanceof ViewHolderCallback) {
+			ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
+			if (!viewHolderCallback.isDraggable()) dragFlags = 0;
+			if (!viewHolderCallback.isSwipeable()) swipeFlags = 0;
+		}
 		return makeMovementFlags(dragFlags, swipeFlags);
 	}
 
@@ -343,6 +349,16 @@ public class ItemTouchHelperCallback extends Callback {
 		 * @param position the position of the item released
 		 */
 		void onItemReleased(int position);
+
+		/**
+		 * @return true if the view is draggable, false otherwise
+		 */
+		boolean isDraggable();
+
+		/**
+		 * @return true if the view is swipeable, false otherwise
+		 */
+		boolean isSwipeable();
 
 		/**
 		 * On Swipe, override to return the Front View.

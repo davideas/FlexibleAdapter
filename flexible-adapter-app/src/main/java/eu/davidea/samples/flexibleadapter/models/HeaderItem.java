@@ -31,6 +31,7 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 	public HeaderItem(String id) {
 		super();
 		this.id = id;
+		setDraggable(true);
 	}
 
 	@Override

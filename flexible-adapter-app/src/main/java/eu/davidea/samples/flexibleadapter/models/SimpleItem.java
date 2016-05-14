@@ -38,10 +38,12 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 
 	public SimpleItem(String id) {
 		super(id);
+		setDraggable(true);
+		setSwipeable(true);
 	}
 
 	public SimpleItem(String id, HeaderItem header) {
-		super(id);
+		this(id);
 		this.header = header;
 	}
 
