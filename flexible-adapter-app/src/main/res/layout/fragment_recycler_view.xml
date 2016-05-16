@@ -11,22 +11,34 @@
 		android:layout_height="match_parent"
 		android:enabled="false">
 
-		<android.support.v7.widget.RecyclerView
-			android:id="@+id/recycler_view"
+		<!-- This FrameLayout is needed ONLY IF sticky headers are used, in order to
+			 display the refresh circle on the top of sticky_header_layout -->
+		<FrameLayout
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			tools:listitem="@layout/recycler_expandable_item"/>
+			android:layout_height="match_parent">
+
+			<android.support.v7.widget.RecyclerView
+				android:id="@+id/recycler_view"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				tools:listitem="@layout/recycler_expandable_item"/>
+
+			<!-- Needed by FlexibleAdapter for headers to be sticky.
+				 This little layout is included in the library -->
+			<include layout="@layout/sticky_header_layout"/>
+
+		</FrameLayout>
 
 	</android.support.v4.widget.SwipeRefreshLayout>
 
-		<!-- Needed by FlexibleAdapter for headers to be sticky.
-			 This little layout is included in the library -->
-	<include layout="@layout/sticky_header_layout"/>
-
+	<!-- Custom EmptyView for RV when empty-->
 	<include layout="@layout/empty_view"/>
 
+	<!-- Custom ProgressBar (at the moment not used) -->
 	<!--<include layout="@layout/progress_bar"/>-->
 
+	<!-- FastScroller Layout must be at the end of ViewHierarchy
+		in order to be displayed at the top of every views -->
 	<include layout="@layout/fast_scroller"/>
 
 </FrameLayout>
