@@ -12,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
@@ -95,7 +96,13 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 					(flexibleAdapter.isHeader(flexibleAdapter.getItem(position + 1)) ||
 							position >= parent.getAdapter().getItemCount() - 1) ) {
 
-				int orientation = ((LinearLayoutManager) parent.getLayoutManager()).getOrientation();
+				int orientation;
+				RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
+				if (layoutManager instanceof LinearLayoutManager) {
+					orientation = ((LinearLayoutManager) layoutManager).getOrientation();
+				} else {
+					orientation = ((StaggeredGridLayoutManager) layoutManager).getOrientation();
+				}
 				if (orientation == RecyclerView.VERTICAL) {
 					outRect.set(0, 0, 0, mGapWidth);
 				} else {

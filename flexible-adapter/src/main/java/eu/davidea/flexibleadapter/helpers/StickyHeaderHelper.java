@@ -191,25 +191,20 @@ public class StickyHeaderHelper extends OnScrollListener {
 		if (Utils.hasLollipop())
 			mStickyHeaderViewHolder.itemView.setElevation(0f);
 		//Apply translation
-		mStickyHeaderViewHolder.itemView.setTranslationX(headerOffsetX);
-		mStickyHeaderViewHolder.itemView.setTranslationY(headerOffsetY);
+		mStickyHolderLayout.setTranslationX(headerOffsetX);
+		mStickyHolderLayout.setTranslationY(headerOffsetY);
 	}
 
-	private void swapHeader(final RecyclerView.ViewHolder newHeader) {
-		mRecyclerView.post(new Runnable() {
-			@Override
-			public void run() {
-				if (mStickyHeaderViewHolder != null) {
-					resetHeader(mStickyHeaderViewHolder);
-				}
-				mStickyHeaderViewHolder = newHeader;
-				if (mStickyHeaderViewHolder != null) {
-					mStickyHeaderViewHolder.setIsRecyclable(false);
-					ensureHeaderParent();
-				}
-				onStickyHeaderChange(mHeaderPosition);
+	private void swapHeader(RecyclerView.ViewHolder newHeader) {
+			if (mStickyHeaderViewHolder != null) {
+				resetHeader(mStickyHeaderViewHolder);
 			}
-		});
+			mStickyHeaderViewHolder = newHeader;
+			if (mStickyHeaderViewHolder != null) {
+				mStickyHeaderViewHolder.setIsRecyclable(false);
+				ensureHeaderParent();
+			}
+			onStickyHeaderChange(mHeaderPosition);
 	}
 
 	public void clearHeader() {

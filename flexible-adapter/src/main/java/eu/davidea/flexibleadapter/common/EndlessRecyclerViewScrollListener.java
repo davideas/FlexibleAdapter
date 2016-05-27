@@ -12,7 +12,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
  * http://stackoverflow.com/questions/26543131/how-to-implement-endless-list-with-recyclerview/26561717#26561717
  * https://github.com/dominicthomas/FlikrGridRecyclerView/blob/master/app/src/main/java/com/android/domji84/mcgridview/adapters/GridItemAdapter.java
  */
-public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
+abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
 
 	// The minimum amount of items to have below your current scroll position
 	// before loading more.

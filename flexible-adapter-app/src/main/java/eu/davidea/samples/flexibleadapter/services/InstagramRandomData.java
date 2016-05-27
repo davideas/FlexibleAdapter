@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * @author Davide Stexuto
+ * @author Davide Steduto
  * @since 29/04/2016
  */
 public class InstagramRandomData {

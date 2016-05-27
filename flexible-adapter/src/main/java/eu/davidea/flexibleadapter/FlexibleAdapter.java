@@ -2597,13 +2597,23 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Used by {@link FlexibleViewHolder#onTouch(View, MotionEvent)}
-	 * to start Drag when HandleView is touched.
+	 * to start Drag or Swipe when HandleView is touched.
 	 *
 	 * @return the ItemTouchHelper instance already initialized.
 	 */
 	public final ItemTouchHelper getItemTouchHelper() {
 		initializeItemTouchHelper();
 		return mItemTouchHelper;
+	}
+
+	/**
+	 * Returns the customization of the ItemTouchHelper.
+	 *
+	 * @return the ItemTouchHelperCallback instance already initialized.
+	 */
+	public final ItemTouchHelperCallback getItemTouchHelperCallback() {
+		initializeItemTouchHelper();
+		return mItemTouchHelperCallback;
 	}
 
 	/**
@@ -3151,7 +3161,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		/**
 		 * Called when the current sticky header changed.
 		 *
-		 * @param sectionIndex the position of header
+		 * @param sectionIndex the position of header, -1 if no header is sticky
 		 */
 		void onStickyHeaderChange(int sectionIndex);
 	}

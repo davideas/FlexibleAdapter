@@ -327,6 +327,10 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		return null;
 	}
 
+	/*------------------------*/
+	/* STICKY HEADER POSITION */
+	/*------------------------*/
+
 	/**
 	 * Overcomes the situation of returning an unknown position (-1) of ViewHolders created out of
 	 * the LayoutManager (ex. StickyHeaders).
