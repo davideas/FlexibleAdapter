@@ -194,6 +194,22 @@ public class UndoHelper extends Snackbar.Callback {
 			mUndoListener.onDeleteConfirmed(mAction);
 	}
 
+	/**
+	 * Basic implementation of {@link OnActionListener} interface.
+	 * <p>Override the methods as your convenience.</p>
+	 */
+	public static class SimpleActionListener implements OnActionListener {
+		@Override
+		public boolean onPreAction() {
+			return false;
+		}
+
+		@Override
+		public void onPostAction() {
+
+		}
+	}
+
 	public interface OnActionListener {
 		/**
 		 * Performs the custom action before item deletion.

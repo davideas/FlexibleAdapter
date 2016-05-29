@@ -544,11 +544,11 @@ public class MainActivity extends AppCompatActivity implements
 		//Option 1 FULL_SWIPE: Direct action no Undo Action
 		//Do something based on direction when item has been swiped:
 		//   A) update item, set "read" if an email etc.
-		//   B) remove the item;
+		//   B) remove the item from the adapter;
 
 		//Option 2 FULL_SWIPE: Delayed action with Undo Action
 		//Show action button and start a new Handler:
-		//   A) on time out do something based on direction;
+		//   A) on time out do something based on direction (open dialog with options);
 
 		//Create list for single position (only in onItemSwipe)
 		List<Integer> positions = new ArrayList<Integer>(1);
@@ -567,36 +567,25 @@ public class MainActivity extends AppCompatActivity implements
 			mSwipedPosition = position;
 			message.append(getString(R.string.action_archived));
 			new UndoHelper(mAdapter, this)
-					.withPayload(true)
-					.withAction(UndoHelper.ACTION_UPDATE, new UndoHelper.OnActionListener() {
+					.withPayload(true)//You can pass any custom object (in this case Boolean is enough)
+					.withAction(UndoHelper.ACTION_UPDATE, new UndoHelper.SimpleActionListener() {
 						@Override
 						public boolean onPreAction() {
-							//Return true to avoid default early item deletion.
-							//Ask to the user what to do with a custom dialog. On option chosen,
+							//Return true to avoid default immediate deletion.
+							//Ask to the user what to do, open a custom dialog. On option chosen,
 							//remove the item from Adapter list as usual.
 							return true;
 						}
-
-						@Override
-						public void onPostAction() {
-							//Nothing
-						}
 					})
-					.remove(positions,
-							findViewById(R.id.main_view), message,
+					.remove(positions, findViewById(R.id.main_view), message,
 							getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
 
+		//Here, option 1B) is implemented
 		} else if (direction == ItemTouchHelper.RIGHT) {
 			message.append(getString(R.string.action_deleted));
 			new UndoHelper(mAdapter, this)
-					.withPayload(true)
-					.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.OnActionListener() {
-						@Override
-						public boolean onPreAction() {
-							//Don't consume the event
-							return false;
-						}
-
+					.withPayload(true)//You can pass any custom object (in this case Boolean is enough)
+					.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.SimpleActionListener() {
 						@Override
 						public void onPostAction() {
 							logOrphanHeaders();
@@ -607,10 +596,8 @@ public class MainActivity extends AppCompatActivity implements
 								mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
 						}
 					})
-					.remove(positions,
-							findViewById(R.id.main_view), message,
+					.remove(positions, findViewById(R.id.main_view), message,
 							getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
-
 		}
 	}
 
@@ -759,6 +746,7 @@ public class MainActivity extends AppCompatActivity implements
 							@Override
 							public boolean onPreAction() {
 								//Don't consume the event
+								//OR use UndoHelper.SimpleActionListener and Override only onPostAction()
 								return false;
 							}
 
