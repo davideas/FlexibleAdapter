@@ -1845,9 +1845,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void addItemToSection(@NonNull ISectionable item, @NonNull IHeader header,
 								 @IntRange(from = 0) int index) {
 		int headerPosition = getGlobalPositionOf(header);
-		if (index >= 0 && headerPosition >= 0) {
+		if (index >= 0) {
 			item.setHeader(header);
-			if (isExpandable((T) header))
+			if (headerPosition >= 0 && isExpandable((T) header))
 				addSubItem(headerPosition, index, (T) item, false, true);
 			else
 				addItem(headerPosition + 1 + index, (T) item);
@@ -2018,10 +2018,11 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		//Handle header linkage
 		IHeader header = getHeaderOf(getItem(positionStart));
-		if (header != null) {
+		int headerPosition = getGlobalPositionOf(header);
+		if (header != null && headerPosition >= 0) {
 			//The header does not represents a group anymore, add it to the Orphan list
 			addToOrphanListIfNeeded(header, positionStart, itemCount);
-			notifyItemChanged(getGlobalPositionOf(header), payload);
+			notifyItemChanged(headerPosition, payload);
 		}
 
 		int parentPosition = -1;
@@ -2067,7 +2068,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Remove orphan headers
 		if (removeOrphanHeaders) {
 			for (IHeader orphanHeader : mOrphanHeaders) {
-				int headerPosition = getGlobalPositionOf(orphanHeader);
+				headerPosition = getGlobalPositionOf(orphanHeader);
 				if (headerPosition >= 0) {
 					if (DEBUG) Log.d(TAG, "Removing orphan header " + orphanHeader);
 					createRestoreItemInfo(headerPosition, (T) orphanHeader, payload);
@@ -2090,7 +2091,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeAllSelectedItems(Object)
 	 */
 	public void removeAllSelectedItems() {
-		this.removeItems(getSelectedPositions(), null);
+		removeAllSelectedItems(null);
 	}
 
 	/**
@@ -2202,7 +2203,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 			for (RestoreInfo restoreInfo : mRestoreList) {
 				if (restoreInfo.item.isSelectable()) {
-					getSelectedPositions().add(getGlobalPositionOf(restoreInfo.item));
+					addSelection(getGlobalPositionOf(restoreInfo.item));
 				}
 			}
 			if (DEBUG) Log.v(TAG, "Selected positions after restore " + getSelectedPositions());
@@ -2989,9 +2990,11 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (position >= startPosition) {
 				if (DEBUG)
 					Log.v(TAG, "Adjust Selected position " + position + " to " + Math.max(position + itemCount, startPosition));
-				selectedPositions.set(
-						selectedPositions.indexOf(position),
-						Math.max(position + itemCount, startPosition));
+				removeSelection(position);
+				addSelection(Math.max(position + itemCount, startPosition));
+//				selectedPositions.set(
+//						selectedPositions.indexOf(position),
+//						Math.max(position + itemCount, startPosition));
 				adjusted = true;
 			}
 		}
@@ -3144,12 +3147,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		/**
 		 * Called when swiping ended its animation and Item is not visible anymore.
 		 *
-		 * @param position    the position of the item swiped
-		 * @param direction   the direction to which the ViewHolder is swiped, one of:
-		 *                    {@link ItemTouchHelper#LEFT},
-		 *                    {@link ItemTouchHelper#RIGHT},
-		 *                    {@link ItemTouchHelper#UP},
-		 *                    {@link ItemTouchHelper#DOWN},
+		 * @param position  the position of the item swiped
+		 * @param direction the direction to which the ViewHolder is swiped, one of:
+		 *                  {@link ItemTouchHelper#LEFT},
+		 *                  {@link ItemTouchHelper#RIGHT},
+		 *                  {@link ItemTouchHelper#UP},
+		 *                  {@link ItemTouchHelper#DOWN},
 		 */
 		void onItemSwipe(int position, int direction);
 	}

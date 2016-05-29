@@ -26,10 +26,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.utils.Utils;
@@ -74,8 +74,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	public @interface Mode {
 	}
 
-	//TODO: Evaluate TreeSet instead of ArrayList for mSelectedPositions, TreeSet is a sortedList
-	private ArrayList<Integer> mSelectedPositions;
+	private Set<Integer> mSelectedPositions;
 	private int mMode;
 	protected RecyclerView mRecyclerView;
 	protected FastScroller mFastScroller;
@@ -97,7 +96,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	/*--------------*/
 
 	public SelectableAdapter() {
-		mSelectedPositions = new ArrayList<Integer>();
+		mSelectedPositions = new HashSet<Integer>();
 		mMode = MODE_IDLE;
 	}
 
@@ -221,14 +220,23 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		if (mMode == MODE_SINGLE)
 			clearSelection();
 
-		int index = mSelectedPositions.indexOf(position);
-		if (index != -1) {
-			mSelectedPositions.remove(index);
+		//int index = mSelectedPositions.indexOf(position);
+		boolean contains = mSelectedPositions.contains(position);
+		if (contains) {
+			mSelectedPositions.remove(position);
 		} else {
 			mSelectedPositions.add(position);
 		}
-		if (DEBUG) Log.v(TAG, "toggleSelection " + (index != -1 ? "removed" : "added") +
+		if (DEBUG) Log.v(TAG, "toggleSelection " + (contains ? "removed" : "added") +
 				" on position " + position + ", current " + mSelectedPositions);
+	}
+
+	void addSelection(int position) {
+		mSelectedPositions.add(position);
+	}
+
+	void removeSelection(int position) {
+		mSelectedPositions.remove(position);
 	}
 
 	/**
@@ -241,7 +249,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		mSelectAll = true;
 		List<Integer> viewTypesToSelect = Arrays.asList(viewTypes);
 		if (DEBUG) Log.v(TAG, "selectAll ViewTypes to include " + viewTypesToSelect);
-		mSelectedPositions = new ArrayList<Integer>(getItemCount());
+		//mSelectedPositions = new ArrayList<Integer>(getItemCount());
 		int positionStart = 0, itemCount = 0;
 		for (int i = 0; i < getItemCount(); i++) {
 			if (isSelectable(i) &&
@@ -269,12 +277,12 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * <b>Note 2:</b> This method use java.util.Iterator to avoid java.util.ConcurrentModificationException.
 	 */
 	public void clearSelection() {
-		Collections.sort(mSelectedPositions, new Comparator<Integer>() {
-			@Override
-			public int compare(Integer lhs, Integer rhs) {
-				return lhs - rhs;
-			}
-		});
+//		Collections.sort(mSelectedPositions, new Comparator<Integer>() {
+//			@Override
+//			public int compare(Integer lhs, Integer rhs) {
+//				return lhs - rhs;
+//			}
+//		});
 		if (DEBUG) Log.v(TAG, "clearSelection " + mSelectedPositions);
 		Iterator<Integer> iterator = mSelectedPositions.iterator();
 		int positionStart = 0, itemCount = 0;
@@ -310,13 +318,24 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	/**
-	 * Indicates the list of selected items.
+	 * Retrieves the list of selected items.
 	 *
 	 * @return List of selected items ids
 	 */
 	public List<Integer> getSelectedPositions() {
-		return mSelectedPositions;
+		return new ArrayList<Integer>(mSelectedPositions);
 	}
+
+	/**
+	 * Sorts and retrieves the list of selected items.
+	 * <p><b>To call once!</b> Then call {@link #getSelectedPositions()}.</p>
+	 *
+	 * @return Ordered list of selected items ids
+	 */
+//	public List<Integer> getSortedSelectedPositions() {
+//		Collections.sort(mSelectedPositions);
+//		return mSelectedPositions;
+//	}
 
 	/*----------------*/
 	/* INSTANCE STATE */
@@ -328,7 +347,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @param outState Current state
 	 */
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putIntegerArrayList(TAG, mSelectedPositions);
+		outState.putIntegerArrayList(TAG, new ArrayList<Integer>(mSelectedPositions));
 	}
 
 	/**
@@ -337,7 +356,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @param savedInstanceState Previous state
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		mSelectedPositions = savedInstanceState.getIntegerArrayList(TAG);
+		mSelectedPositions.addAll(savedInstanceState.getIntegerArrayList(TAG));
 		Log.d(TAG, "restore selection " + mSelectedPositions);
 	}
 
