@@ -45,6 +45,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @see AnimatorAdapter
  * @since 03/05/2015 Created
  * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
+ * <br/>29/05/2016 Use of HashSet instead of ArrayList
  */
 @SuppressWarnings({"unused", "Convert2Diamond", "unchecked", "ConstantConditions"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
@@ -67,7 +68,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	public static final int MODE_MULTI = 2;
 
 	/**
-	 * @hide
+	 * Annotation interface for selection modes.
 	 */
 	@IntDef({MODE_IDLE, MODE_SINGLE, MODE_MULTI})
 	@Retention(RetentionPolicy.SOURCE)
@@ -223,20 +224,20 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		//int index = mSelectedPositions.indexOf(position);
 		boolean contains = mSelectedPositions.contains(position);
 		if (contains) {
-			mSelectedPositions.remove(position);
+			removeSelection(position);
 		} else {
-			mSelectedPositions.add(position);
+			addSelection(position);
 		}
 		if (DEBUG) Log.v(TAG, "toggleSelection " + (contains ? "removed" : "added") +
 				" on position " + position + ", current " + mSelectedPositions);
 	}
 
-	void addSelection(int position) {
-		mSelectedPositions.add(position);
+	public boolean addSelection(int position) {
+		return mSelectedPositions.add(position);
 	}
 
-	void removeSelection(int position) {
-		mSelectedPositions.remove(position);
+	public boolean removeSelection(int position) {
+		return mSelectedPositions.remove(position);
 	}
 
 	/**
@@ -259,7 +260,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 			} else {
 				//Optimization for ItemRangeChanged
 				if (positionStart + itemCount == i) {
-					handleSelection(positionStart, itemCount);
+					notifySelectionChanged(positionStart, itemCount);
 					itemCount = 0;
 					positionStart = i;
 				}
@@ -267,7 +268,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		}
 		if (DEBUG)
 			Log.v(TAG, "selectAll notifyItemRangeChanged from positionStart=" + positionStart + " itemCount=" + getItemCount());
-		handleSelection(positionStart, getItemCount());
+		notifySelectionChanged(positionStart, getItemCount());
 	}
 
 	/**
@@ -295,16 +296,16 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 				itemCount++;
 			} else {
 				//Notify previous items in range
-				handleSelection(positionStart, itemCount);
+				notifySelectionChanged(positionStart, itemCount);
 				positionStart = position;
 				itemCount = 1;
 			}
 		}
 		//Notify remaining items in range
-		handleSelection(positionStart, itemCount);
+		notifySelectionChanged(positionStart, itemCount);
 	}
 
-	private void handleSelection(int positionStart, int itemCount) {
+	private void notifySelectionChanged(int positionStart, int itemCount) {
 		if (itemCount > 0) notifyItemRangeChanged(positionStart, itemCount);
 	}
 
@@ -319,12 +320,23 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	/**
 	 * Retrieves the list of selected items.
+	 * <p>The list is sorted.</p>
 	 *
-	 * @return List of selected items ids
+	 * @return A copied List of selected items ids from the Set
 	 */
 	public List<Integer> getSelectedPositions() {
 		return new ArrayList<Integer>(mSelectedPositions);
 	}
+
+	/**
+	 * Retrieves the set of selected items.
+	 * <p>The set is sorted.</p>
+	 *
+	 * @return Set of selected items ids
+	 */
+//	public Set<Integer> getSelectedPositionsAsSet() {
+//		return mSelectedPositions;
+//	}
 
 	/**
 	 * Sorts and retrieves the list of selected items.
