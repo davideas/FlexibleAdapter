@@ -35,7 +35,7 @@ import java.util.Locale;
 public final class Utils {
 
 	public static final int INVALID_COLOR = -1;
-	private static int colorAccent = INVALID_COLOR;
+	public static int colorAccent = INVALID_COLOR;
 
 	/**
 	 * API 21
