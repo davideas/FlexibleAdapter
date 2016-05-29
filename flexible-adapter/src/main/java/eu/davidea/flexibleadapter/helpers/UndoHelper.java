@@ -51,7 +51,7 @@ public class UndoHelper extends Snackbar.Callback {
 	public static final int ACTION_UPDATE = 1;
 
 	/**
-	 * @hide
+	 * Annotation interface for Undo actions.
 	 */
 	@IntDef({ACTION_REMOVE, ACTION_UPDATE})
 	@Retention(RetentionPolicy.SOURCE)

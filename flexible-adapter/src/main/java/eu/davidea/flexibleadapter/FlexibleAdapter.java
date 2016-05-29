@@ -3015,14 +3015,14 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Save selection state
 			super.onSaveInstanceState(outState);
 			//Save selection coherence
-			outState.putBoolean(EXTRA_CHILD, childSelected);
-			outState.putBoolean(EXTRA_PARENT, parentSelected);
-			outState.putInt(EXTRA_LEVEL, selectedLevel);
+			outState.putBoolean(EXTRA_CHILD, this.childSelected);
+			outState.putBoolean(EXTRA_PARENT, this.parentSelected);
+			outState.putInt(EXTRA_LEVEL, this.selectedLevel);
 			//Current filter
-			outState.putString(EXTRA_SEARCH, mSearchText);
-			outState.putString(EXTRA_SEARCH_OLD, mOldSearchText);
+			outState.putString(EXTRA_SEARCH, this.mSearchText);
+			outState.putString(EXTRA_SEARCH_OLD, this.mOldSearchText);
 			//Save headers shown status
-			outState.putBoolean(EXTRA_HEADERS, headersShown);
+			outState.putBoolean(EXTRA_HEADERS, this.headersShown);
 		}
 	}
 
@@ -3033,18 +3033,22 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
+			//Restore headers shown status
+			boolean headersShown = savedInstanceState.getBoolean(EXTRA_HEADERS);
+			if (!headersShown)
+				hideAllHeaders();
+			else if (headersShown && !this.headersShown)
+				showAllHeaders();
+			this.headersShown = headersShown;
 			//Restore selection state
 			super.onRestoreInstanceState(savedInstanceState);
 			//Restore selection coherence
-			parentSelected = savedInstanceState.getBoolean(EXTRA_PARENT);
-			childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
-			selectedLevel = savedInstanceState.getInt(EXTRA_LEVEL);
+			this.parentSelected = savedInstanceState.getBoolean(EXTRA_PARENT);
+			this.childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
+			this.selectedLevel = savedInstanceState.getInt(EXTRA_LEVEL);
 			//Current filter
-			mSearchText = savedInstanceState.getString(EXTRA_SEARCH);
-			mOldSearchText = savedInstanceState.getString(EXTRA_SEARCH_OLD);
-			//Restore headers shown status
-			headersShown = savedInstanceState.getBoolean(EXTRA_HEADERS);
-			if (!headersShown) hideAllHeaders();
+			this.mSearchText = savedInstanceState.getString(EXTRA_SEARCH);
+			this.mOldSearchText = savedInstanceState.getString(EXTRA_SEARCH_OLD);
 		}
 	}
 
