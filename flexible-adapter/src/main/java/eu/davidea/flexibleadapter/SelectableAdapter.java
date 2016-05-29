@@ -26,10 +26,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.utils.Utils;
@@ -45,7 +45,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @see AnimatorAdapter
  * @since 03/05/2015 Created
  * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
- * <br/>29/05/2016 Use of HashSet instead of ArrayList
+ * <br/>29/05/2016 Use of TreeSet instead of ArrayList
  */
 @SuppressWarnings({"unused", "Convert2Diamond", "unchecked", "ConstantConditions"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
@@ -97,7 +97,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	/*--------------*/
 
 	public SelectableAdapter() {
-		mSelectedPositions = new HashSet<Integer>();
+		mSelectedPositions = new TreeSet<Integer>();
 		mMode = MODE_IDLE;
 	}
 
