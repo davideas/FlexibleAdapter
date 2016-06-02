@@ -24,6 +24,8 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
@@ -56,6 +58,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	protected int mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
 	private boolean mLongClickSkipped = false;
 	private boolean alreadySelected = false;
+	public View stickyView;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -68,10 +71,16 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * @param adapter Adapter instance of type {@link FlexibleAdapter}
 	 */
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter) {
-		super(view);
+		super(new FrameLayout(view.getContext()));
+		itemView.setLayoutParams(new FrameLayout.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				view.getLayoutParams().height));
+		stickyView = view;
+		((ViewGroup) itemView).addView(stickyView);
+
 		this.mAdapter = adapter;
-		this.itemView.setOnClickListener(this);
-		this.itemView.setOnLongClickListener(this);
+		this.stickyView.setOnClickListener(this);
+		this.stickyView.setOnLongClickListener(this);
 	}
 
 	/*--------------------------------*/

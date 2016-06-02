@@ -491,7 +491,8 @@ public class MainActivity extends AppCompatActivity implements
 			return false;
 		}
 
-		if (mActionModeHelper != null && position != RecyclerView.NO_POSITION) {
+		//TODO: Add method for ActionModeHelper to know if ActionMode is active or use MODE_MULTI?
+		if (mAdapter.getMode() == SelectableAdapter.MODE_MULTI && mActionModeHelper != null) {
 			return mActionModeHelper.onClick(position);
 		} else {
 			//Notify the active callbacks (ie. the activity, if the fragment is attached to one)

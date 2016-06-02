@@ -1326,8 +1326,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		int subItemsCount = 0;
 		if (!expandable.isExpanded() && hasSubItems(expandable)
-				&& (!parentSelected || expandable.getExpansionLevel() <= selectedLevel)
-				&& (mStickyHeaderHelper == null || !mStickyHeaderHelper.hasStickyHeaderTranslated(position))) {
+				&& (!parentSelected || expandable.getExpansionLevel() <= selectedLevel)) {
 
 			//Collapse others expandable if configured so
 			//Skipped when expanding all is requested
