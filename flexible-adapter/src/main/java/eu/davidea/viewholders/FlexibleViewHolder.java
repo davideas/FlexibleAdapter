@@ -73,10 +73,10 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter) {
 		super(new FrameLayout(view.getContext()));
 		itemView.setLayoutParams(new FrameLayout.LayoutParams(
-				ViewGroup.LayoutParams.WRAP_CONTENT,
+				view.getLayoutParams().width,
 				view.getLayoutParams().height));
 		stickyView = view;
-		((ViewGroup) itemView).addView(stickyView);
+		((ViewGroup) itemView).addView(stickyView);//Add View after setLayoutParams
 
 		this.mAdapter = adapter;
 		this.stickyView.setOnClickListener(this);

@@ -532,7 +532,7 @@ public class MainActivity extends AppCompatActivity implements
 //			return;
 //		}
 		//FIXME: this doesn't work with all types of items (of course)..... we need to implement some custom logic
-//		DatabaseService.getInstance().swapItem(
+//		DatabaseService.getInstance().swapItems(
 //				DatabaseService.getInstance().getDatabaseList().indexOf(fromItem),
 //				DatabaseService.getInstance().getDatabaseList().indexOf(toItem));
 	}

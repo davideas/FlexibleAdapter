@@ -311,8 +311,8 @@ public class ItemTouchHelperCallback extends Callback {
 		 * <p>Implementations should decide to call or not {@link Adapter#notifyItemRemoved(int)}
 		 * after adjusting the underlying data to reflect this removal.</p>
 		 *
-		 * @param position    the position of the item dismissed
-		 * @param direction   the direction to which the ViewHolder is swiped
+		 * @param position  the position of the item dismissed
+		 * @param direction the direction to which the ViewHolder is swiped
 		 */
 		void onItemSwiped(int position, int direction);
 	}

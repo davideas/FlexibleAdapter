@@ -1437,7 +1437,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		IExpandable expandable = (IExpandable) item;
 		if (DEBUG)
-			Log.v(TAG, "Request to Collapse on position " + position + " ExpandedItems=" + getExpandedPositions());
+			Log.v(TAG, "Request to Collapse on position " + position +
+					" expanded " + expandable.isExpanded() + " ExpandedItems=" + getExpandedPositions());
 
 		int subItemsCount = 0, recursiveCount = 0;
 		if (expandable.isExpanded() &&
@@ -2687,6 +2688,25 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Removes the item placed at position {@code fromPosition} and adds it to the position
+	 * {@code toPosition}.
+	 * <p>Selection of moved element is preserved.</p>
+	 *
+	 * @param fromPosition previous position of the item.
+	 * @param toPosition   new position of the item.
+	 */
+	public void moveItem(int fromPosition, int toPosition) {
+		if (DEBUG)
+			Log.v(TAG, "moveItem fromPosition=" + fromPosition + " toPosition=" + toPosition);
+		if ((isSelected(fromPosition))) {
+			removeSelection(fromPosition);
+			addSelection(toPosition);
+		}
+		addItem(toPosition, mItems.remove(fromPosition));
+		notifyItemMoved(fromPosition, toPosition);
+	}
+
+	/**
 	 * Swaps the elements of list list at indices fromPosition and toPosition and notify the change.
 	 * <p>Selection of swiped elements is automatically updated.</p>
 	 *
@@ -2694,16 +2714,16 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param toPosition   new position of the item.
 	 */
 	@CallSuper
-	public void moveItem(int fromPosition, int toPosition) {
+	public void swapItems(int fromPosition, int toPosition) {
 		if (fromPosition < 0 || fromPosition >= getItemCount() ||
 				toPosition < 0 || toPosition >= getItemCount()) {
 			return;
 		}
 		if (DEBUG) {
-			Log.v(TAG, "moveItem from=" +
+			Log.v(TAG, "swapItems from=" +
 					fromPosition + "[" + (isSelected(fromPosition) ? "selected" : "unselected") + "] to=" +
 					toPosition + "[" + (isSelected(toPosition) ? "selected" : "unselected") + "]");
-			Log.v(TAG, "moveItem beforeSwap fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
+			Log.v(TAG, "swapItems beforeSwap fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
 		}
 
 		//TODO: Allow child to be moved into another parent, update the 2 parents, optionally: 1) collapse the new parent 2) expand it 3) leave as it is
@@ -2720,7 +2740,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 		notifyItemMoved(fromPosition, toPosition);
 		if (DEBUG) {
-			Log.v(TAG, "moveItem afterSwap fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
+			Log.v(TAG, "swapItems afterSwap fromItem=" + getItem(fromPosition) + " toItem=" + getItem(toPosition));
 		}
 
 		//Header swap linkage
@@ -2793,7 +2813,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	@Override
 	@CallSuper
 	public boolean onItemMove(int fromPosition, int toPosition) {
-		moveItem(fromPosition, toPosition);
+		swapItems(fromPosition, toPosition);
 		//After the swap, delegate further actions to the user
 		if (mItemMoveListener != null) {
 			mItemMoveListener.onItemMove(fromPosition, toPosition);
