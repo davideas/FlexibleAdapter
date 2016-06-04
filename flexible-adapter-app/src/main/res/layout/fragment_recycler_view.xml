@@ -12,24 +12,32 @@
 		android:enabled="false">
 
 		<!-- This FrameLayout is needed ONLY IF sticky headers are used, in order to
-			 display the refresh circle on the top of sticky_header_layout -->
-		<FrameLayout
+			 display the refresh circle on the top of sticky_header_layout.
+			 UNFORTUNATELY this is NOT compatible with Dragging feature. -->
+		<!--<FrameLayout-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="match_parent">-->
+
+		<android.support.v7.widget.RecyclerView
+			android:id="@+id/recycler_view"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent">
+			android:layout_height="match_parent"
+			tools:listitem="@layout/recycler_expandable_item"/>
 
-			<android.support.v7.widget.RecyclerView
-				android:id="@+id/recycler_view"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				tools:listitem="@layout/recycler_expandable_item"/>
+		<!-- Needed by FlexibleAdapter for headers to be sticky.
+			 Insert here the layout if you DON'T have Dragging use case.
+			 This little layout is included in the library. -->
+		<!--<include layout="@layout/sticky_header_layout"/>-->
 
-			<!-- Needed by FlexibleAdapter for headers to be sticky.
-				 This little layout is included in the library -->
-			<include layout="@layout/sticky_header_layout"/>
-
-		</FrameLayout>
+		<!--</FrameLayout>-->
 
 	</android.support.v4.widget.SwipeRefreshLayout>
+
+	<!-- Needed by FlexibleAdapter for headers to be sticky.
+		 Insert here the layout if you HAVE Dragging use case.
+		 SwipeRefresh will unfortunately appear below the sticky header.
+		 This little layout is included in the library. -->
+	<include layout="@layout/sticky_header_layout"/>
 
 	<!-- Custom EmptyView for RV when empty-->
 	<include layout="@layout/empty_view"/>
