@@ -110,8 +110,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/*-----------------------*/
 
 	/**
-	 *
-	 * @param initialize true to notify this Adapter that
+	 * @param initialize true to notify this Adapter that initialization is started and so
+	 *                   animate items, false to inform that initialization is complete
 	 */
 	void setInitialize(boolean initialize) {
 		isInitialize = initialize;
@@ -132,7 +132,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * <p>The delay is added on top of the previous delay.</p>
 	 * Default value is 100ms.
 	 *
-	 * @param delay Any positive delay
+	 * @param delay any positive delay
 	 */
 	public void setAnimationDelay(@IntRange(from = 0) long delay) {
 		mStepDelay = delay;
@@ -308,7 +308,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		} else {
 			StaggeredGridLayoutManager staggeredGridLayout = (StaggeredGridLayoutManager) layoutManager;
 			lastVisiblePosition = staggeredGridLayout.findLastCompletelyVisibleItemPositions(null)[0];
-			firstVisiblePosition =  staggeredGridLayout.findFirstCompletelyVisibleItemPositions(null)[0];
+			firstVisiblePosition = staggeredGridLayout.findFirstCompletelyVisibleItemPositions(null)[0];
 		}
 
 		//Use always the max child count reached
@@ -352,7 +352,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		} else {
 			StaggeredGridLayoutManager staggeredGridLayout = (StaggeredGridLayoutManager) layoutManager;
 			lastVisiblePosition = staggeredGridLayout.findLastCompletelyVisibleItemPositions(null)[0];
-			firstVisiblePosition =  staggeredGridLayout.findFirstCompletelyVisibleItemPositions(null)[0];
+			firstVisiblePosition = staggeredGridLayout.findFirstCompletelyVisibleItemPositions(null)[0];
 		}
 
 		if (mLastAnimatedPosition > lastVisiblePosition)

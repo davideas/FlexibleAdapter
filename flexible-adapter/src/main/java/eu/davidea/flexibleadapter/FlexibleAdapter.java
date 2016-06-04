@@ -1463,7 +1463,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 
 			if (DEBUG)
-				Log.v(TAG, "Collapsed " + subItemsCount + " subItems on position=" + position + " ExpandedItems=" + getExpandedPositions());
+				Log.v(TAG, "Collapsed " + subItemsCount + " subItems on position " + position + " ExpandedItems=" + getExpandedPositions());
 		}
 		return subItemsCount + recursiveCount;
 	}
@@ -2573,23 +2573,25 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Find out all added items and animate them.
+	 * Find out all added items and animate them, update also existent positions with newItems.
 	 */
 	protected void applyAndAnimateAdditions(List<T> from, List<T> newItems) {
-		int out = 0;
+		int in = 0;
 		for (int i = 0, count = newItems.size(); i < count; i++) {
 			final T item = newItems.get(i);
 			if (!from.contains(item)) {
-				if (DEBUG) Log.v(TAG, "animateAdditions  add position=" + i + " item=" + item);
-				from.add(i, item);
+				if (DEBUG) Log.v(TAG, "animateAdditions    add position=" + i + " item=" + item);
+				if (i < from.size()) from.add(i, item);
+				else from.add(item);
 				notifyItemInserted(i);
+				in++;
 			} else if (mNotifyChangeOfUnfilteredItems) {
-				out++;
+				from.set(i, item);
 				notifyItemChanged(i, mNotifyChangeOfUnfilteredItems);
-				if (DEBUG) Log.v(TAG, "animateAdditions keep position=" + i + " item=" + item);
+				if (DEBUG) Log.v(TAG, "animateAdditions update position=" + i + " item=" + item);
 			}
 		}
-		if (DEBUG) Log.v(TAG, "animateAdditions total out=" + out + " in=" + newItems.size());
+		if (DEBUG) Log.v(TAG, "animateAdditions total new=" + in + " size=" + newItems.size());
 	}
 
 	/*---------------*/
