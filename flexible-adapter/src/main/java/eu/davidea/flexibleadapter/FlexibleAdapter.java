@@ -497,9 +497,29 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	public int calculatePositionFor(@NonNull Object item, @NonNull Comparator comparator) {
+		//Header is visible
+		if (item instanceof ISectionable) {
+			IHeader header = ((ISectionable) item).getHeader();
+			if (header != null && !header.isHidden()) {
+				List sortedList = getSectionItems(header);
+				sortedList.add(item);
+				Collections.sort(sortedList, comparator);
+				int fix = mItems.indexOf(item) < getGlobalPositionOf(header) ? 0 : 1;
+				int result = getGlobalPositionOf(header) + sortedList.indexOf(item) + fix;
+				if (DEBUG) {
+					Log.d(TAG, "Calculated finalPosition=" + result +
+							" sectionPosition=" + getGlobalPositionOf(header) +
+							" positionInSection=" + sortedList.indexOf(item) + " fix=" + fix);
+				}
+				return result;
+			}
+		}
+		//All other cases
 		List sortedList = new ArrayList(mItems);
-		sortedList.add(item);
+		if (!sortedList.contains(item)) sortedList.add(item);
 		Collections.sort(sortedList, comparator);
+		if (DEBUG)
+			Log.d(TAG, "Calculated position " + Math.max(0, sortedList.indexOf(item)));
 		return Math.max(0, sortedList.indexOf(item));
 	}
 
@@ -2074,9 +2094,14 @@ public class FlexibleAdapter<T extends IFlexible>
 					parentPosition = createRestoreSubItemInfo(parent, item, payload);
 				}
 			}
+			//Restore hidden status for section headers
+			if (isHeader(item)) {
+				header = (IHeader) item;
+				header.setHidden(true);
+			}
 			//If item is a Header, remove linkage from ALL Sectionable items if exist
 			if (unlinkOnRemoveHeader && isHeader(item)) {
-				List<ISectionable> sectionableList = getSectionItems((IHeader) item);
+				List<ISectionable> sectionableList = getSectionItems(header);
 				for (ISectionable sectionable : sectionableList) {
 					sectionable.setHeader(null);
 					if (payload != null)
@@ -2583,8 +2608,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public List<T> animateTo(List<T> models) {
 		applyAndAnimateRemovals(mItems, models);
-		applyAndAnimateAdditions(mItems, models);
 		applyAndAnimateMovedItems(mItems, models);
+		applyAndAnimateAdditions(mItems, models);
 		return mItems;
 	}
 
@@ -2746,9 +2771,23 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param fromPosition previous position of the item
 	 * @param toPosition   new position of the item
-	 * @param notifyChange allows to display new content status of the item once moved
+	 * @see #moveItem(int, int, Object)
 	 */
-	public void moveItem(int fromPosition, int toPosition, boolean notifyChange) {
+	public void moveItem(int fromPosition, int toPosition) {
+		moveItem(fromPosition, toPosition, null);
+	}
+
+	/**
+	 * Moves the item placed at position {@code fromPosition} to the position
+	 * {@code toPosition}.
+	 * <br/>- Selection of moved element is preserved.
+	 * <br/>- If item is an expandable, it is collapsed and then expanded at the new position.
+	 *
+	 * @param fromPosition previous position of the item
+	 * @param toPosition   new position of the item
+	 * @param payload      allows to update the content of the item just moved
+	 */
+	public void moveItem(int fromPosition, int toPosition, @Nullable Object payload) {
 		if (DEBUG)
 			Log.v(TAG, "moveItem fromPosition=" + fromPosition + " toPosition=" + toPosition);
 		//Preserve selection
@@ -2765,7 +2804,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (toPosition < getItemCount()) mItems.add(toPosition, item);
 		else mItems.add(item);
 		notifyItemMoved(fromPosition, toPosition);
-		if (notifyChange) notifyItemChanged(toPosition, true);
+		if (payload != null) notifyItemChanged(toPosition, payload);
 		//Eventually display the new Header
 		if (headersShown) {
 			showHeaderOf(toPosition, item);
