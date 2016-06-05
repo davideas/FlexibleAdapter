@@ -749,7 +749,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		List<ISectionable> sectionItems = new ArrayList<ISectionable>();
 		int startPosition = getGlobalPositionOf(header);
 		T item = getItem(++startPosition);
-		while (item != null && !isHeader(item)) {
+		while (item != null && !isHeader(item) && item instanceof ISectionable) {
 			sectionItems.add((ISectionable) item);
 			item = getItem(++startPosition);
 		}
@@ -1071,7 +1071,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void setEndlessScrollListener(@NonNull EndlessScrollListener endlessScrollListener,
 										 @NonNull T progressItem) {
-		if (endlessScrollListener != null) {
+		if (endlessScrollListener != null && progressItem != null) {
 			mEndlessScrollListener = endlessScrollListener;
 			setEndlessScrollThreshold(mEndlessScrollThreshold);
 			progressItem.setEnabled(false);
@@ -1113,8 +1113,9 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * To call when more items are successfully loaded.
+	 * <p>When no more to load, pass empty list or null to hide the progressItem.</p>
 	 *
-	 * @param newItems the list of the new items
+	 * @param newItems the list of the new items, can be empty or null
 	 */
 	public void onLoadMoreComplete(@Nullable List<T> newItems) {
 		int progressPosition = getGlobalPositionOf(mProgressItem);
@@ -1123,8 +1124,19 @@ public class FlexibleAdapter<T extends IFlexible>
 			notifyItemRemoved(progressPosition);
 		}
 		if (newItems != null && newItems.size() > 0) {
-			if (DEBUG) Log.d(TAG, "onLoadMore Complete adding " + newItems.size() + " new Items!");
+			if (DEBUG)
+				Log.d(TAG, "onLoadMore Performing adding " + newItems.size() + " new Items!");
+			multiRange = true;
 			addItems(getItemCount(), newItems);
+			//Initialize item with expansion status
+			for (T item : newItems) {
+				if (isExpanded(item)) {
+					IExpandable expandable = (IExpandable) item;
+					addAllSubItemsFrom(getGlobalPositionOf(item), expandable, false, null);
+				}
+			}
+			multiRange = false;
+			//Reset OnLoadMore delayed
 			mHandler.sendEmptyMessageDelayed(2, 200L);
 		} else {
 			noMoreLoad();
@@ -1355,7 +1367,7 @@ public class FlexibleAdapter<T extends IFlexible>
 						return true;
 					}
 				});
-				animatorHandler.sendMessageDelayed(Message.obtain(mHandler), !headersSticky ? 150L : 300L);
+				animatorHandler.sendMessageDelayed(Message.obtain(mHandler), 150L);
 			}
 
 			//Expand!
@@ -1569,7 +1581,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			@Override
 			public void run() {
 				if (addItem(position, item) && scrollToPosition && mRecyclerView != null) {
-					mRecyclerView.scrollToPosition(
+					mRecyclerView.smoothScrollToPosition(
 							Math.min(Math.max(0, position), getItemCount() - 1));
 				}
 			}
@@ -2427,8 +2439,8 @@ public class FlexibleAdapter<T extends IFlexible>
 						if (isExpandable(item)) {
 							IExpandable expandable = (IExpandable) item;
 							if (expandable.isExpanded()) {
-								List<T> filteredSubItems = new ArrayList<T>();
 								//Add subItems if not hidden by filterObject()
+								List<T> filteredSubItems = new ArrayList<T>();
 								List<T> subItems = expandable.getSubItems();
 								for (T subItem : subItems) {
 									if (!subItem.isHidden()) filteredSubItems.add(subItem);
@@ -2538,7 +2550,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Animate from the current list to the another.
+	 * Animate from the current list to another.
 	 * <p>Used by the filter.</p>
 	 * Unchanged items will be notified if {@code mNotifyChangeOfUnfilteredItems} is set true, and
 	 * payload will be set as a Boolean.
@@ -2690,9 +2702,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Removes the item placed at position {@code fromPosition} and adds it to the position
+	 * Moves the item placed at position {@code fromPosition} to the position
 	 * {@code toPosition}.
-	 * <p>Selection of moved element is preserved.</p>
+	 * <br/>- Selection of moved element is preserved.
+	 * <br/>- If item is an expandable, it is collapsed and then expanded at the new position.
 	 *
 	 * @param fromPosition previous position of the item.
 	 * @param toPosition   new position of the item.
@@ -2704,8 +2717,19 @@ public class FlexibleAdapter<T extends IFlexible>
 			removeSelection(fromPosition);
 			addSelection(toPosition);
 		}
-		addItem(toPosition, mItems.remove(fromPosition));
+		T item = mItems.get(fromPosition);
+		//Collapse expandable to move also subItems
+		boolean expanded = isExpanded(item);
+		if (expanded) collapse(toPosition);
+		//Move item
+		mItems.remove(fromPosition);
+		mItems.add(toPosition, item);
 		notifyItemMoved(fromPosition, toPosition);
+		//Eventually display the new Header
+		if (headersShown) {
+			showHeaderOf(toPosition, item);
+		}
+		if (expanded) expand(toPosition);
 	}
 
 	/**
@@ -3166,7 +3190,6 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * @since 26/01/2016 Created
-	 * <br/>24/04/2016 Swipe Statuses
 	 */
 	public interface OnItemSwipeListener {
 		/**
