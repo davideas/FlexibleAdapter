@@ -24,6 +24,7 @@ import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
@@ -132,22 +133,24 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				final List<AbstractFlexibleItem> newItems = new ArrayList<AbstractFlexibleItem>(2);
+				final List<AbstractFlexibleItem> newItems = new ArrayList<AbstractFlexibleItem>();
 
 				//Simulating success/failure
-				int count = new Random().nextInt(7);
+				int count = new Random().nextInt(5);
 				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item);
 				for (int i = 1; i <= count; i++) {
-					newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
+					if (i % 2 != 0) {
+						newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
+					} else {
+						newItems.add(DatabaseService.newExpandableItem(totalItemsOfType + i, null));
+						((IExpandable) newItems.get(i - 1)).setExpanded(true);
+					}
 				}
 
-				//Callback the Adapter to notify the change
-				//Items will be added to the end of the list
+				//Callback the Adapter to notify the change:
+				//- New items will be added to the end of the list
+				//- When list is null or empty, ProgressItem will be hidden
 				mAdapter.onLoadMoreComplete(newItems);
-//				if (newItems.size() == 0) {
-//					mAdapter.removeItem(mAdapter.getItemCount() - 1);
-//				}
-//				mAdapter.addItems(mAdapter.getItemCount() - 1, newItems);
 
 				//Notify user
 				String message = (newItems.size() > 0 ?

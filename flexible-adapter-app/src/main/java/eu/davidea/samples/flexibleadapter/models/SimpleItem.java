@@ -189,7 +189,7 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 
 		@Override
 		public float getActivationElevation() {
-			return Utils.dpToPx(itemView.getContext(), 0f);
+			return Utils.dpToPx(itemView.getContext(), 4f);
 		}
 
 		@Override

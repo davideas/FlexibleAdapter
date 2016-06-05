@@ -5,8 +5,11 @@ import android.content.res.Resources;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.IFlexible;
+import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem;
@@ -19,10 +22,6 @@ import eu.davidea.samples.flexibleadapter.models.InstagramItem;
 import eu.davidea.samples.flexibleadapter.models.OverallItem;
 import eu.davidea.samples.flexibleadapter.models.SimpleItem;
 import eu.davidea.samples.flexibleadapter.models.SubItem;
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.flexibleadapter.items.IExpandable;
-import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.flexibleadapter.items.IHeader;
 
 /**
  * Created by Davide Steduto on 23/11/2015.
@@ -31,8 +30,7 @@ import eu.davidea.flexibleadapter.items.IHeader;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 90, SUB_ITEMS = 6, HEADERS = 30;
-	private static AtomicInteger atomicInteger = new AtomicInteger(0);
+	private static final int ITEMS = 90, SUB_ITEMS = 4, HEADERS = 30;
 
 	//TODO FOR YOU: Use userLearnedSelection from settings
 	public static boolean userLearnedSelection = false;

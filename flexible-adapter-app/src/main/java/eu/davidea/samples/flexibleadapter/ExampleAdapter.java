@@ -63,7 +63,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			final ULSItem item = new ULSItem("ULS");
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			addItemWithDelay(0, item, 1700L, scrollToPosition);
+			addItemWithDelay(0, item, 1500L, scrollToPosition);
 		}
 	}
 

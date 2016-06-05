@@ -1,13 +1,11 @@
 package eu.davidea.common;
 
 import android.animation.Animator;
-import android.text.TextWatcher;
 
 /**
- * {@link TextWatcher} implementation that does nothing by default
+ * {@link Animator.AnimatorListener} implementation that does nothing by default
  */
 public abstract class SimpleAnimatorListener implements Animator.AnimatorListener {
-
 
 	@Override
 	public void onAnimationStart(Animator animation) {

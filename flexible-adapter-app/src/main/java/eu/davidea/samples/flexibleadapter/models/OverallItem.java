@@ -33,6 +33,8 @@ public class OverallItem extends AbstractFlexibleItem<LabelViewHolder> {
 		this.id = id;
 		this.title = title;
 		setSelectable(false);
+		//Allow dragging
+		setDraggable(true);
 	}
 
 	public OverallItem withDescription(String description) {
