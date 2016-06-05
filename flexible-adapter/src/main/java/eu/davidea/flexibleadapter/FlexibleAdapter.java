@@ -370,11 +370,29 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * This method will refresh the entire DataSet content.
+	 * <p>Items changes will not be animated.</p>
 	 *
 	 * @param items the new data set
+	 * @see #updateDataSet(List, boolean)
 	 */
 	public void updateDataSet(List<T> items) {
-		animateTo(items);
+		updateDataSet(items, false);
+	}
+
+	/**
+	 * This method will refresh the entire DataSet content.
+	 * <p>Optionally all items can be animated, performance can be affected on big list.</p>
+	 *
+	 * @param items   the new data set
+	 * @param animate true to animate the changes, false for a quick update
+	 */
+	public void updateDataSet(List<T> items, boolean animate) {
+		if (animate) {
+			animateTo(items);
+		} else {
+			mItems = new ArrayList<>(items);
+			notifyDataSetChanged();
+		}
 		expandItemsAtStartUp();
 		showAllHeaders();
 	}
@@ -476,6 +494,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public boolean contains(@NonNull T item) {
 		return item != null && mItems != null && mItems.contains(item);
+	}
+
+	public int calculatePositionFor(@NonNull Object item, @NonNull Comparator comparator) {
+		List sortedList = new ArrayList(mItems);
+		sortedList.add(item);
+		Collections.sort(sortedList, comparator);
+		return Math.max(0, sortedList.indexOf(item));
 	}
 
 	/*--------------------------*/
@@ -2559,6 +2584,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public List<T> animateTo(List<T> models) {
 		applyAndAnimateRemovals(mItems, models);
 		applyAndAnimateAdditions(mItems, models);
+		applyAndAnimateMovedItems(mItems, models);
 		return mItems;
 	}
 
@@ -2601,6 +2627,20 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 		}
 		if (DEBUG) Log.v(TAG, "animateAdditions total new=" + in + " size=" + newItems.size());
+	}
+
+	/**
+	 * Find out all moved items and animate them.
+	 */
+	protected void applyAndAnimateMovedItems(List<T> from, List<T> newItems) {
+		for (int toPosition = newItems.size() - 1; toPosition >= 0; toPosition--) {
+			final T item = newItems.get(toPosition);
+			final int fromPosition = from.indexOf(item);
+			if (fromPosition >= 0 && fromPosition != toPosition) {
+				from.add(toPosition, from.remove(fromPosition));
+				notifyItemMoved(fromPosition, toPosition);
+			}
+		}
 	}
 
 	/*---------------*/
@@ -2704,28 +2744,32 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>- Selection of moved element is preserved.
 	 * <br/>- If item is an expandable, it is collapsed and then expanded at the new position.
 	 *
-	 * @param fromPosition previous position of the item.
-	 * @param toPosition   new position of the item.
+	 * @param fromPosition previous position of the item
+	 * @param toPosition   new position of the item
+	 * @param notifyChange allows to display new content status of the item once moved
 	 */
-	public void moveItem(int fromPosition, int toPosition) {
+	public void moveItem(int fromPosition, int toPosition, boolean notifyChange) {
 		if (DEBUG)
 			Log.v(TAG, "moveItem fromPosition=" + fromPosition + " toPosition=" + toPosition);
+		//Preserve selection
 		if ((isSelected(fromPosition))) {
 			removeSelection(fromPosition);
 			addSelection(toPosition);
 		}
 		T item = mItems.get(fromPosition);
-		//Collapse expandable to move also subItems
+		//Preserve expanded status and Collapse expandable
 		boolean expanded = isExpanded(item);
 		if (expanded) collapse(toPosition);
-		//Move item
+		//Move item!
 		mItems.remove(fromPosition);
 		mItems.add(toPosition, item);
 		notifyItemMoved(fromPosition, toPosition);
+		if (notifyChange) notifyItemChanged(toPosition, true);
 		//Eventually display the new Header
 		if (headersShown) {
 			showHeaderOf(toPosition, item);
 		}
+		//Restore original expanded status
 		if (expanded) expand(toPosition);
 	}
 
