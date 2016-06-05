@@ -2762,7 +2762,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (expanded) collapse(toPosition);
 		//Move item!
 		mItems.remove(fromPosition);
-		mItems.add(toPosition, item);
+		if (toPosition < getItemCount()) mItems.add(toPosition, item);
+		else mItems.add(item);
 		notifyItemMoved(fromPosition, toPosition);
 		if (notifyChange) notifyItemChanged(toPosition, true);
 		//Eventually display the new Header
