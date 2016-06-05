@@ -65,6 +65,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
+		mAdapter.expandItemsAtStartUp();
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
 		mAdapter.setAutoCollapseOnExpand(false);

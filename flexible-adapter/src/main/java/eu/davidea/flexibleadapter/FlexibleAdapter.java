@@ -217,10 +217,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		mRestoreList = new ArrayList<RestoreInfo>();
 		mOrphanHeaders = new ArrayList<IHeader>();
 
-		//Expand initial items
-		//This works also after a screen rotation
-		initializeItems();
-
 		//Create listeners instances
 		initializeListeners(listeners);
 
@@ -264,9 +260,10 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Maps and expands items that are initially configured to be shown as expanded.
-	 * <p>This method is also called after a screen rotation.</p>
+	 * <p>This method has to be called during creation of the Activity, useful also after a
+	 * screen rotation.</p>
 	 */
-	protected void initializeItems() {
+	public void expandItemsAtStartUp() {
 		int position = 0;
 		setInitialize(true);
 		multiRange = true;
@@ -378,7 +375,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void updateDataSet(List<T> items) {
 		animateTo(items);
-		initializeItems();
+		expandItemsAtStartUp();
 		showAllHeaders();
 	}
 
@@ -3249,7 +3246,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		/* Triggered by notifyDataSetChanged() */
 		@Override
 		public void onChanged() {
-			initializeItems();
+			expandItemsAtStartUp();
 			updateOrClearHeader();
 		}
 
