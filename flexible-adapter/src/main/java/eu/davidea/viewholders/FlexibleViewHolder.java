@@ -24,7 +24,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
@@ -43,6 +42,7 @@ import eu.davidea.flexibleadapter.items.IFlexible;
  * @since 03/01/2016 Created
  * <br/>23/01/2016 ItemTouch with Drag&Drop, Swipe
  * <br/>26/01/2016 Constructor revisited
+ * <br/>04/06/2016 Added StickyHeader flag
  */
 public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		implements View.OnClickListener, View.OnLongClickListener,
@@ -58,7 +58,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	protected int mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
 	private boolean mLongClickSkipped = false;
 	private boolean alreadySelected = false;
-	public View stickyView;
+	private View contentView;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -71,16 +71,33 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * @param adapter Adapter instance of type {@link FlexibleAdapter}
 	 */
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter) {
-		super(new FrameLayout(view.getContext()));
-		itemView.setLayoutParams(new FrameLayout.LayoutParams(
-				view.getLayoutParams().width,
-				view.getLayoutParams().height));
-		stickyView = view;
-		((ViewGroup) itemView).addView(stickyView);//Add View after setLayoutParams
+		this(view, adapter, false);
+	}
 
+	/**
+	 * Constructor to configure the sticky behaviour of a view.
+	 * <p><b>Note:</b> StickyHeader works only if the item has been declared of type
+	 * {@link eu.davidea.flexibleadapter.items.IHeader}.</p>
+	 *
+	 * @param view         The {@link View} being hosted in this ViewHolder
+	 * @param adapter      Adapter instance of type {@link FlexibleAdapter}
+	 * @param stickyHeader true if the View can be a Sticky Header, false
+	 */
+	public FlexibleViewHolder(View view, FlexibleAdapter adapter, boolean stickyHeader) {
+		super(stickyHeader ? new FrameLayout(view.getContext()): view);
 		this.mAdapter = adapter;
-		this.stickyView.setOnClickListener(this);
-		this.stickyView.setOnLongClickListener(this);
+		if (stickyHeader) {
+			itemView.setLayoutParams(new FrameLayout.LayoutParams(
+					view.getLayoutParams().width,
+					view.getLayoutParams().height));
+			contentView = view;
+			((FrameLayout) itemView).addView(contentView);//Add View after setLayoutParams
+			contentView.setOnClickListener(this);
+			contentView.setOnLongClickListener(this);
+		} else {
+			itemView.setOnClickListener(this);
+			itemView.setOnLongClickListener(this);
+		}
 	}
 
 	/*--------------------------------*/
@@ -336,10 +353,17 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 		return null;
 	}
 
-	/*------------------------*/
-	/* STICKY HEADER POSITION */
-	/*------------------------*/
+	/*---------------*/
+	/* STICKY HEADER */
+	/*---------------*/
 
+	public View getContentView() {
+		return contentView != null ? contentView : itemView;
+	}
+
+	public boolean isStickyHeader() {
+		return contentView != null;
+	}
 	/**
 	 * Overcomes the situation of returning an unknown position (-1) of ViewHolders created out of
 	 * the LayoutManager (ex. StickyHeaders).

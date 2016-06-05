@@ -124,7 +124,7 @@ public class ExpandableLevel0Item
 		public TextView mSubtitle;
 
 		public L0ViewHolder(View view, FlexibleAdapter adapter) {
-			super(view, adapter);
+			super(view, adapter, true);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 		}

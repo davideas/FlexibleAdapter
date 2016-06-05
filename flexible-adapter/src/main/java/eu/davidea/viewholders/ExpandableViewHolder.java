@@ -22,7 +22,6 @@ import android.view.View.OnLongClickListener;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 
-
 /**
  * ViewHolder for a Expandable Items. Holds callbacks which can be used to trigger expansion events.
  * <p>This class extends {@link FlexibleViewHolder}, which means it will benefit of all implemented
@@ -33,24 +32,22 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  */
 public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
-	protected final FlexibleAdapter mAdapter;
-//	private boolean mLongPressEnabled = false;
-
 	/*--------------*/
 	/* CONSTRUCTORS */
 	/*--------------*/
 
 	/**
-	 * Default constructor with no ClickListener or TouchListener.
-	 * <p><b>Note:</b> using this constructor, click events on the entire View will not have
-	 * any effect.</p>
+	 * Default constructor.
 	 *
 	 * @param view    The {@link View} being hosted in this ViewHolder
 	 * @param adapter Adapter instance of type {@link FlexibleAdapter}
 	 */
 	public ExpandableViewHolder(View view, FlexibleAdapter adapter) {
 		super(view, adapter);
-		mAdapter = adapter;
+	}
+
+	public ExpandableViewHolder(View view, FlexibleAdapter adapter, boolean stickyHeader) {
+		super(view, adapter, stickyHeader);
 	}
 
 	/*--------------*/

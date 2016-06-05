@@ -91,7 +91,7 @@ public class InstagramHeaderItem extends AbstractHeaderItem<InstagramHeaderItem.
 		public TextView mSubtitle;
 
 		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
-			super(view, adapter);
+			super(view, adapter, true);
 			mAccountImage = (FlipView) view.findViewById(R.id.instagram_account_image);
 			mAccountImage.setOnClickListener(new View.OnClickListener() {
 				@Override

@@ -102,7 +102,7 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 		public TextView mSubtitle;
 
 		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
-			super(view, adapter);
+			super(view, adapter, true);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 			mTitle.setOnClickListener(new View.OnClickListener() {
