@@ -31,6 +31,8 @@ public class ExpandableLevel1Item
 
 	public ExpandableLevel1Item(String id) {
 		super(id);
+		setDraggable(true);
+		setSwipeable(true);
 	}
 
 	@Override

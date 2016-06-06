@@ -2998,10 +2998,20 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void onActionStateChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+		if (mItemMoveListener != null)
+			mItemMoveListener.onActionStateChanged(viewHolder, actionState);
+		else if (mItemSwipeListener != null) {
+			mItemSwipeListener.onActionStateChanged(viewHolder, actionState);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
-//		if (mItemMoveListener != null) {
-//			return mItemMoveListener.shouldMoveItem(fromPosition, toPosition);
-//		}
+		//Always allow swapping
 		return true;
 	}
 
@@ -3312,9 +3322,26 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * @since 06/06/2016 Created
+	 */
+	public interface OnActionStateListener {
+		/**
+		 * Called when the {@link ItemTouchHelper} first registers an item as being moved or swiped
+		 * or when has been released.
+		 * <p>Override this method to receive touch events with its state.</p>
+		 *
+		 * @param viewHolder  the viewHolder touched
+		 * @param actionState one of {@link ItemTouchHelper#ACTION_STATE_SWIPE} or
+		 *                    {@link ItemTouchHelper#ACTION_STATE_DRAG} or
+		 *                    {@link ItemTouchHelper#ACTION_STATE_IDLE}.
+		 */
+		void onActionStateChanged(RecyclerView.ViewHolder viewHolder, int actionState);
+	}
+
+	/**
 	 * @since 26/01/2016
 	 */
-	public interface OnItemMoveListener {
+	public interface OnItemMoveListener extends OnActionStateListener {
 		/**
 		 * Called when the item would like to be swapped.
 		 * <p>Delegate this permission to the user.</p>
@@ -3343,7 +3370,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * @since 26/01/2016 Created
 	 */
-	public interface OnItemSwipeListener {
+	public interface OnItemSwipeListener extends OnActionStateListener {
 		/**
 		 * Called when swiping ended its animation and Item is not visible anymore.
 		 *

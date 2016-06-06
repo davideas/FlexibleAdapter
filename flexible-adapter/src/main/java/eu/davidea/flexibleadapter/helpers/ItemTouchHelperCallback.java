@@ -200,6 +200,8 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+		//Notify the callback about the new event
+		mItemTouchCallback.onActionStateChanged(viewHolder, actionState);
 		//We only want the active item to change
 		if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
 			if (viewHolder instanceof ViewHolderCallback) {
@@ -286,11 +288,23 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	public interface AdapterCallback {
 		/**
-		 * Evaluate if positions are compatible for moving.
+		 * Called when the {@link ItemTouchHelper} first registers an item as being moved or swiped
+		 * or when has been released.
+		 * <p>Override this method to receive touch events with its state.</p>
+		 *
+		 * @param viewHolder  the viewHolder touched
+		 * @param actionState one of {@link ItemTouchHelper#ACTION_STATE_SWIPE} or
+		 *                    {@link ItemTouchHelper#ACTION_STATE_DRAG} or
+		 *                    {@link ItemTouchHelper#ACTION_STATE_IDLE}.
+		 */
+		void onActionStateChanged(RecyclerView.ViewHolder viewHolder, int actionState);
+
+		/**
+		 * Evaluate if positions are compatible for swapping.
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
-		 * @return true if the item is allowed to moved to the new adapter position
+		 * @return true if the from-item is allowed to swap with the to-item
 		 */
 		boolean shouldMove(int fromPosition, int toPosition);
 
@@ -302,7 +316,7 @@ public class ItemTouchHelperCallback extends Callback {
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
-		 * @return true if the item was moved to the new adapter position
+		 * @return true if the from-item has been swapped with the to-item
 		 */
 		boolean onItemMove(int fromPosition, int toPosition);
 

@@ -519,6 +519,11 @@ public class MainActivity extends AppCompatActivity implements
 //	}
 
 	@Override
+	public void onActionStateChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+		mSwipeRefreshLayout.setEnabled(actionState == ItemTouchHelper.ACTION_STATE_IDLE);
+	}
+
+	@Override
 	public void onItemMove(int fromPosition, int toPosition) {
 //		IFlexible fromItem = mAdapter.getItem(fromPosition);
 //		IFlexible toItem = mAdapter.getItem(toPosition);
