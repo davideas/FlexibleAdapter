@@ -394,7 +394,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			notifyDataSetChanged();
 		}
 		expandItemsAtStartUp();
-		showAllHeaders();
+		if (headersShown) showAllHeaders();
 	}
 
 	/**
@@ -443,7 +443,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Provides the number of items currently displayed of one or more certain types until
 	 * the specified position.
-	 * <p>Useful to retrieve the correct position where to insert the new items.</p>
 	 *
 	 * @param position  the position limit where to stop counting (included)
 	 * @param viewTypes the viewTypes to count
@@ -466,7 +465,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * You can override this method to define your own concept of "Empty". This method is never
 	 * called internally.
-	 * <p>Default value is the result of {@code getItemCount() == 0}.</p>
 	 *
 	 * @return true if the list is empty, false otherwise
 	 * @see #getItemCount()
@@ -2637,7 +2635,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	protected void applyAndAnimateAdditions(List<T> from, List<T> newItems) {
 		int in = 0;
-		for (int i = 0, count = newItems.size(); i < count; i++) {
+		for (int i = 0; i < newItems.size(); i++) {
 			final T item = newItems.get(i);
 			if (!from.contains(item)) {
 				if (DEBUG) Log.v(TAG, "animateAdditions    add position=" + i + " item=" + item);
@@ -2662,7 +2660,10 @@ public class FlexibleAdapter<T extends IFlexible>
 			final T item = newItems.get(toPosition);
 			final int fromPosition = from.indexOf(item);
 			if (fromPosition >= 0 && fromPosition != toPosition) {
-				from.add(toPosition, from.remove(fromPosition));
+				Log.d(TAG, "animateMoved fromPosition=" + fromPosition + " toPosition=" + toPosition);
+				T movedItem = from.remove(fromPosition);
+				if (toPosition < from.size()) from.add(toPosition, movedItem);
+				else from.add(movedItem);
 				notifyItemMoved(fromPosition, toPosition);
 			}
 		}
@@ -3330,7 +3331,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		/* Triggered by notifyDataSetChanged() */
 		@Override
 		public void onChanged() {
-			expandItemsAtStartUp();
 			updateOrClearHeader();
 		}
 
