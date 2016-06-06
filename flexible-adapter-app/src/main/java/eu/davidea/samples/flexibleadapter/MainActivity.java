@@ -201,7 +201,8 @@ public class MainActivity extends AppCompatActivity implements
 		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList());
+				//Passing true as parameter we always animate the changes between the old and the new data set
+				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), true);
 				mSwipeRefreshLayout.setEnabled(false);
 				mRefreshHandler.sendEmptyMessageDelayed(0, 1000L);
 				mActionModeHelper.destroyActionModeIfCan();

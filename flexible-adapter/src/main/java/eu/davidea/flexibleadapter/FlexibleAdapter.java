@@ -45,8 +45,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
+import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.helpers.StickyHeaderHelper;
 import eu.davidea.flexibleadapter.items.IExpandable;
@@ -158,6 +158,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/* Filter */
 	private String mSearchText = "", mOldSearchText = "";
+	private List<IExpandable> mExpandedFilterFlags;
 	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
 
 	/* Expandable flags */
@@ -1551,7 +1552,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		return subItemsCount + recursiveCount;
 	}
 
-	@SuppressWarnings("Range")
 	private int recursiveCollapse(List<T> subItems, int level) {
 		int collapsed = 0;
 		for (int i = subItems.size() - 1; i >= 0; i--) {
@@ -2525,20 +2525,7 @@ public class FlexibleAdapter<T extends IFlexible>
 							values.add((T) getHeaderOf(item));
 						}
 						values.add(item);
-						newOriginalPosition++;
-						if (isExpandable(item)) {
-							IExpandable expandable = (IExpandable) item;
-							if (expandable.isExpanded()) {
-								//Add subItems if not hidden by filterObject()
-								List<T> filteredSubItems = new ArrayList<T>();
-								List<T> subItems = expandable.getSubItems();
-								for (T subItem : subItems) {
-									if (!subItem.isHidden()) filteredSubItems.add(subItem);
-								}
-								values.addAll(filteredSubItems);
-								newOriginalPosition += filteredSubItems.size();
-							}
-						}
+						newOriginalPosition += 1 + addFilteredSubItems(values, item);
 					}
 				}
 			}
@@ -2551,6 +2538,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					//Find the real reference
 					restoreInfo.refItem = values.get(Math.max(0, values.indexOf(restoreInfo.item) - 1));
 				}
+				//Deleted items not yet committed should not appear
 				values.removeAll(getDeletedItems());
 			}
 			resetFilterFlags(values);
@@ -2598,6 +2586,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		boolean filtered = false;
 		if (isExpandable(item)) {
 			IExpandable expandable = (IExpandable) item;
+			//Save which expandable was originally expanded before filtering it out
+			if (expandable.isExpanded()) {
+				if (mExpandedFilterFlags == null)
+					mExpandedFilterFlags = new ArrayList<IExpandable>();
+				mExpandedFilterFlags.add(expandable);
+			}
 			expandable.setExpanded(false);
 			//Children scan filter
 			for (T subItem : getCurrentChildren(expandable)) {
@@ -2640,6 +2634,55 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Adds to the final list also the filtered subItems.
+	 */
+	private int addFilteredSubItems(List<T> values, T item) {
+		if (isExpandable(item)) {
+			IExpandable expandable = (IExpandable) item;
+			if (hasSubItems(expandable)) {
+				//Add subItems if not hidden by filterObject()
+				List<T> filteredSubItems = new ArrayList<T>();
+				List<T> subItems = expandable.getSubItems();
+				for (T subItem : subItems) {
+					if (!subItem.isHidden()) filteredSubItems.add(subItem);
+				}
+				values.addAll(filteredSubItems);
+				return filteredSubItems.size();
+			}
+		}
+		return 0;
+	}
+
+	/**
+	 * Clears flags after searchText is cleared out for Expandable items and sub items.
+	 */
+	private void resetFilterFlags(List<T> items) {
+		//Reset flags for all items!
+		for (int i = 0; i < items.size(); i++) {
+			T item = items.get(i);
+			if (isExpandable(item)) {
+				IExpandable expandable = (IExpandable) item;
+				expandable.setExpanded(mExpandedFilterFlags.contains(expandable));
+				if (hasSubItems(expandable)) {
+					List<T> subItems = expandable.getSubItems();
+					int count = 1;
+					for (T subItem : subItems) {
+						subItem.setHidden(false);
+						if (expandable.isExpanded()) {
+							int position = items.indexOf(item) + count;
+							if (position < items.size()) items.add(position, subItem);
+							else items.add(subItem);
+							count++;
+							i++;
+						}
+					}
+				}
+			}
+		}
+		mExpandedFilterFlags = null;
+	}
+
+	/**
 	 * Animate from the current list to another.
 	 * <p>Used by the filter.</p>
 	 * Unchanged items will be notified if {@code mNotifyChangeOfUnfilteredItems} is set true, and
@@ -2651,8 +2694,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public List<T> animateTo(List<T> models) {
 		applyAndAnimateRemovals(mItems, models);
-		applyAndAnimateMovedItems(mItems, models);
 		applyAndAnimateAdditions(mItems, models);
+		applyAndAnimateMovedItems(mItems, models);
 		return mItems;
 	}
 
@@ -2663,16 +2706,18 @@ public class FlexibleAdapter<T extends IFlexible>
 		int out = 0;
 		for (int i = from.size() - 1; i >= 0; i--) {
 			final T item = from.get(i);
-			if (!newItems.contains(item)) {
+			if (!newItems.contains(item) && (!isHeader(item) || (isHeader(item) && headersShown))) {
 				if (DEBUG) Log.v(TAG, "animateRemovals remove position=" + i + " item=" + item);
 				from.remove(i);
 				notifyItemRemoved(i);
 				out++;
-			} else {
+			} else if (mNotifyChangeOfUnfilteredItems) {
+				from.set(i, item);
+				notifyItemChanged(i, mNotifyChangeOfUnfilteredItems);
 				if (DEBUG) Log.v(TAG, "animateRemovals   keep position=" + i + " item=" + item);
 			}
 		}
-		if (DEBUG) Log.v(TAG, "animateRemovals total out=" + out + " in=" + newItems.size());
+		if (DEBUG) Log.v(TAG, "animateRemovals total out=" + out + " size=" + newItems.size());
 	}
 
 	/**
@@ -2683,15 +2728,10 @@ public class FlexibleAdapter<T extends IFlexible>
 		for (int i = 0; i < newItems.size(); i++) {
 			final T item = newItems.get(i);
 			if (!from.contains(item)) {
-				if (DEBUG) Log.v(TAG, "animateAdditions    add position=" + i + " item=" + item);
-				if (i < from.size()) from.add(i, item);
-				else from.add(item);
-				notifyItemInserted(i);
+				if (DEBUG) Log.v(TAG, "animateAdditions   add position=" + i + " item=" + item);
+				from.add(item);//We add always at the end to animate moved items at the missing position
+				notifyItemInserted(from.size());
 				in++;
-			} else if (mNotifyChangeOfUnfilteredItems) {
-				from.set(i, item);
-				notifyItemChanged(i, mNotifyChangeOfUnfilteredItems);
-				if (DEBUG) Log.v(TAG, "animateAdditions update position=" + i + " item=" + item);
 			}
 		}
 		if (DEBUG) Log.v(TAG, "animateAdditions total new=" + in + " size=" + newItems.size());
@@ -2705,7 +2745,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			final T item = newItems.get(toPosition);
 			final int fromPosition = from.indexOf(item);
 			if (fromPosition >= 0 && fromPosition != toPosition) {
-				Log.d(TAG, "animateMoved fromPosition=" + fromPosition + " toPosition=" + toPosition);
+				if (DEBUG)
+					Log.v(TAG, "animateMoved fromPosition=" + fromPosition + " toPosition=" + toPosition);
 				T movedItem = from.remove(fromPosition);
 				if (toPosition < from.size()) from.add(toPosition, movedItem);
 				else from.add(movedItem);
@@ -2872,7 +2913,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param fromPosition previous position of the item.
 	 * @param toPosition   new position of the item.
 	 */
-	@CallSuper
 	public void swapItems(int fromPosition, int toPosition) {
 		if (fromPosition < 0 || fromPosition >= getItemCount() ||
 				toPosition < 0 || toPosition >= getItemCount()) {
@@ -3003,9 +3043,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
-	/*-----------------*/
-	/* PRIVATE METHODS */
-	/*-----------------*/
+	/*------------------------*/
+	/* OTHERS PRIVATE METHODS */
+	/*------------------------*/
 
 	/**
 	 * Internal mapper to remember and add all types for the RecyclerView.
@@ -3028,23 +3068,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private T getViewTypeInstance(int viewType) {
 		return mTypeInstances.get(viewType);
-	}
-
-	/**
-	 * Clears flags after searchText is cleared out for Expandable items and sub items.
-	 */
-	private void resetFilterFlags(List<T> items) {
-		//Reset flags for all items!
-		for (T item : items) {
-			if (isExpandable(item)) {
-				IExpandable expandable = (IExpandable) item;
-				expandable.setExpanded(false);
-				List<T> subItems = expandable.getSubItems();
-				for (T subItem : subItems) {
-					subItem.setHidden(false);
-				}
-			}
-		}
 	}
 
 	/**
@@ -3170,9 +3193,6 @@ public class FlexibleAdapter<T extends IFlexible>
 					Log.v(TAG, "Adjust Selected position " + position + " to " + Math.max(position + itemCount, startPosition));
 				removeSelection(position);
 				addSelection(Math.max(position + itemCount, startPosition));
-//				selectedPositions.set(
-//						selectedPositions.indexOf(position),
-//						Math.max(position + itemCount, startPosition));
 				adjusted = true;
 			}
 		}

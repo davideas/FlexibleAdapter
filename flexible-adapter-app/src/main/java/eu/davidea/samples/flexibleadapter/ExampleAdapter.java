@@ -41,8 +41,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	}
 
 	@Override
-	public void updateDataSet(List<AbstractFlexibleItem> items) {
-		super.updateDataSet(items);
+	public void updateDataSet(List<AbstractFlexibleItem> items, boolean animate) {
+		super.updateDataSet(items, animate);
 		//Overwrite the list and fully notify the change
 		//Watch out! The original list must a copy
 		//TODO: We may create calls like removeAll, addAll or refreshList in order to animate changes
