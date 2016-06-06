@@ -270,8 +270,10 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Maps and expands items that are initially configured to be shown as expanded.
-	 * <p>This method has to be called during the creation of the Activity/Fragment, useful also
-	 * after a screen rotation.</p>
+	 * <p>This method should be called during the creation of the Activity/Fragment, useful also
+	 * after a screen rotation.
+	 * <br/>It is also called after DataSet is updated.</p>
+	 * <b>Note: </b>Only items at level 0 are automatically expanded, ignored all sub-levels.
 	 *
 	 * @return this adapter so the call can be chained
 	 */
@@ -281,12 +283,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		multiRange = true;
 		while (position < mItems.size()) {
 			T item = getItem(position);
-			if (isExpandable(item)) {
-				IExpandable expandable = (IExpandable) item;
-				if (expandable.isExpanded()) {
-					if (DEBUG) Log.v(TAG, "Initially expand item on position " + position);
-					position += addAllSubItemsFrom(position, expandable, false, null);
-				}
+			if (isExpanded(item)) {
+				position += expand(position, false, true);
 				if (!headersShown && isHeader(item) && !item.isHidden())
 					headersShown = true;
 			}
@@ -382,23 +380,29 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*--------------*/
 
 	/**
-	 * This method will refresh the entire DataSet content.
-	 * <p>Items changes will not be animated.</p>
+	 * Convenience method of {@link #updateDataSet(List, boolean)}.
+	 * <p>In this case changes will NOT be animated: {@link #notifyDataSetChanged()} will be invoked.</p>
 	 *
 	 * @param items the new data set
 	 * @see #updateDataSet(List, boolean)
 	 */
+	@CallSuper
 	public void updateDataSet(List<T> items) {
 		updateDataSet(items, false);
 	}
 
 	/**
 	 * This method will refresh the entire DataSet content.
-	 * <p>Optionally all items can be animated, performance can be affected on big list.</p>
+	 * <p>Optionally all changes can be animated, performance can be affected on big list.<br/>Pass
+	 * {@code animate=false} to invoke {@link #notifyDataSetChanged()} without any animations.</p>
+	 * This methods calls {@link #expandItemsAtStartUp()} and {@link #showAllHeaders()} if headers
+	 * are shown.
 	 *
 	 * @param items   the new data set
-	 * @param animate true to animate the changes, false for a quick update
+	 * @param animate true to animate the changes, false for a quick refresh
+	 * @see #updateDataSet(List)
 	 */
+	@CallSuper
 	public void updateDataSet(List<T> items, boolean animate) {
 		if (animate) {
 			animateTo(items);
@@ -998,13 +1002,13 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (!mOrphanHeaders.contains(header) && !isHeaderShared(header, positionStart, itemCount)) {
 			mOrphanHeaders.add(header);
 			if (DEBUG)
-				Log.d(TAG, "Added to orphan list [" + mOrphanHeaders.size() + "] Header " + header);
+				Log.v(TAG, "Added to orphan list [" + mOrphanHeaders.size() + "] Header " + header);
 		}
 	}
 
 	private void removeFromOrphanList(IHeader header) {
 		if (mOrphanHeaders.remove(header) && DEBUG)
-			Log.d(TAG, "Removed from orphan list [" + mOrphanHeaders.size() + "] Header " + header);
+			Log.v(TAG, "Removed from orphan list [" + mOrphanHeaders.size() + "] Header " + header);
 	}
 
 	private boolean isHeaderShared(IHeader header, int positionStart, int itemCount) {
@@ -1200,17 +1204,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 		if (newItems != null && newItems.size() > 0) {
 			if (DEBUG)
-				Log.d(TAG, "onLoadMore Performing adding " + newItems.size() + " new Items!");
-			multiRange = true;
+				Log.v(TAG, "onLoadMore performing adding " + newItems.size() + " new Items!");
 			addItems(getItemCount(), newItems);
-			//Initialize item with expansion status
-			for (T item : newItems) {
-				if (isExpanded(item)) {
-					IExpandable expandable = (IExpandable) item;
-					addAllSubItemsFrom(getGlobalPositionOf(item), expandable, false, null);
-				}
-			}
-			multiRange = false;
 			//Reset OnLoadMore delayed
 			mHandler.sendEmptyMessageDelayed(2, 200L);
 		} else {
@@ -1222,7 +1217,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Called when no more items are loaded.
 	 */
 	private void noMoreLoad() {
-		if (DEBUG) Log.d(TAG, "onLoadMore noMoreLoad!");
+		if (DEBUG) Log.v(TAG, "onLoadMore noMoreLoad!");
 		notifyItemChanged(getItemCount() - 1, true);
 		mHandler.sendEmptyMessageDelayed(2, 200L);
 	}
@@ -1412,19 +1407,19 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the number of subItems expanded
 	 */
 	public int expand(@IntRange(from = 0) int position) {
-		return expand(position, false);
+		return expand(position, false, false);
 	}
 
-	private int expand(int position, boolean expandAll) {
+	private int expand(int position, boolean expandAll, boolean init) {
 		T item = getItem(position);
 		if (!isExpandable(item)) return 0;
 
 		IExpandable expandable = (IExpandable) item;
-		if (DEBUG) Log.v(TAG, "Request to Expand on position " + position +
+		if (DEBUG && !init) Log.v(TAG, "Request to Expand on position " + position +
 				" expanded " + expandable.isExpanded() + " ExpandedItems=" + getExpandedPositions());
 
 		int subItemsCount = 0;
-		if (!expandable.isExpanded() && hasSubItems(expandable)
+		if (init || !expandable.isExpanded() && hasSubItems(expandable)
 				&& (!parentSelected || expandable.getExpansionLevel() <= selectedLevel)) {
 
 			//Collapse others expandable if configured so
@@ -1444,7 +1439,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			expandable.setExpanded(true);
 
 			//Automatically scroll the current expandable item to show as much children as possible
-			if (scrollOnExpand && !expandAll) {
+			if (!init && scrollOnExpand && !expandAll) {
 				//Must be delayed to give time at RecyclerView to recalculate positions
 				//after an automatic collapse
 				final int pos = position, count = subItemsCount;
@@ -1460,15 +1455,17 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Expand!
 			notifyItemRangeInserted(position + 1, subItemsCount);
 			//Show also the headers of the subItems
-			if (headersShown) {
+			if (!init && headersShown) {
 				int count = 0;
 				for (T subItem : subItems) {
 					if (showHeaderOf(position + (++count), subItem)) count++;
 				}
 			}
-
-			if (DEBUG)
-				Log.v(TAG, "Expanded " + subItemsCount + " subItems on position=" + position + " ExpandedItems=" + getExpandedPositions());
+			if (DEBUG) {
+				Log.v(TAG, (init ? "Initially expanded " : "Expanded ") +
+						subItemsCount + " subItems on position=" + position +
+						(init ? "" : " ExpandedItems=" + getExpandedPositions()));
+			}
 		}
 		return subItemsCount;
 	}
@@ -1498,7 +1495,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			T item = getItem(i);
 			if (isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
-				if (expandable.getExpansionLevel() <= level && expand(i, true) > 0) {
+				if (expandable.getExpansionLevel() <= level && expand(i, true, false) > 0) {
 					expanded++;
 				}
 			}
@@ -2158,7 +2155,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			for (IHeader orphanHeader : mOrphanHeaders) {
 				headerPosition = getGlobalPositionOf(orphanHeader);
 				if (headerPosition >= 0) {
-					if (DEBUG) Log.d(TAG, "Removing orphan header " + orphanHeader);
+					if (DEBUG) Log.v(TAG, "Removing orphan header " + orphanHeader);
 					createRestoreItemInfo(headerPosition, (T) orphanHeader, payload);
 					mItems.remove(headerPosition);
 					notifyItemRemoved(headerPosition);
@@ -2662,17 +2659,19 @@ public class FlexibleAdapter<T extends IFlexible>
 			T item = items.get(i);
 			if (isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
+				//Reset expanded flag
 				expandable.setExpanded(mExpandedFilterFlags.contains(expandable));
 				if (hasSubItems(expandable)) {
 					List<T> subItems = expandable.getSubItems();
-					int count = 1;
-					for (T subItem : subItems) {
+					for (int k = 0; k < subItems.size(); k++) {
+						T subItem = subItems.get(k);
+						//Reset subItem hidden flag
 						subItem.setHidden(false);
+						//Show subItems for expanded items
 						if (expandable.isExpanded()) {
-							int position = items.indexOf(item) + count;
+							int position = items.indexOf(item) + (k + 1);
 							if (position < items.size()) items.add(position, subItem);
 							else items.add(subItem);
-							count++;
 							i++;
 						}
 					}
@@ -2728,7 +2727,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		for (int i = 0; i < newItems.size(); i++) {
 			final T item = newItems.get(i);
 			if (!from.contains(item)) {
-				if (DEBUG) Log.v(TAG, "animateAdditions   add position=" + i + " item=" + item);
+				if (DEBUG) Log.v(TAG, "animateAdditions    add position=" + i + " item=" + item);
 				from.add(item);//We add always at the end to animate moved items at the missing position
 				notifyItemInserted(from.size());
 				in++;
