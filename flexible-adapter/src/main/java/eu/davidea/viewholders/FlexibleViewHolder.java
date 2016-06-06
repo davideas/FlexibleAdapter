@@ -84,14 +84,13 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 * @param stickyHeader true if the View can be a Sticky Header, false
 	 */
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter, boolean stickyHeader) {
-		super(stickyHeader ? new FrameLayout(view.getContext()): view);
+		super(stickyHeader ? new FrameLayout(view.getContext()) : view);
 		this.mAdapter = adapter;
 		if (stickyHeader) {
-			itemView.setLayoutParams(new FrameLayout.LayoutParams(
-					view.getLayoutParams().width,
-					view.getLayoutParams().height));
+			itemView.setLayoutParams(mAdapter.getRecyclerView().getLayoutManager()
+					.generateLayoutParams(view.getLayoutParams()));
+			((FrameLayout) itemView).addView(view);//Add View after setLayoutParams
 			contentView = view;
-			((FrameLayout) itemView).addView(contentView);//Add View after setLayoutParams
 			contentView.setOnClickListener(this);
 			contentView.setOnLongClickListener(this);
 		} else {
@@ -364,6 +363,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	public boolean isStickyHeader() {
 		return contentView != null;
 	}
+
 	/**
 	 * Overcomes the situation of returning an unknown position (-1) of ViewHolders created out of
 	 * the LayoutManager (ex. StickyHeaders).

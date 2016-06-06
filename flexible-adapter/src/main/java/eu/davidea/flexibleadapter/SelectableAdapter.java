@@ -131,6 +131,10 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		mRecyclerView = null;
 	}
 
+	public RecyclerView getRecyclerView() {
+		return mRecyclerView;
+	}
+
 	/**
 	 * Sets the mode of the selection:
 	 * <ul>
@@ -232,10 +236,23 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 				" on position " + position + ", current " + mSelectedPositions);
 	}
 
+	/**
+	 * Adds the selection status for the given position without notifying the change.
+	 *
+	 * @param position Position of the item to add the selection status for.
+	 * @return true if the set is modified, false otherwise or position is not currently selectable
+	 * @see #isSelectable(int)
+	 */
 	public boolean addSelection(int position) {
-		return mSelectedPositions.add(position);
+		return isSelectable(position) && mSelectedPositions.add(position);
 	}
 
+	/**
+	 * Removes the selection status for the given position without notifying the change.
+	 *
+	 * @param position Position of the item to remove the selection status for.
+	 * @return true if the set is modified, false otherwise
+	 */
 	public boolean removeSelection(int position) {
 		return mSelectedPositions.remove(position);
 	}
