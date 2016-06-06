@@ -231,7 +231,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>This method is automatically called from the Constructor.</p>
 	 *
 	 * @param listeners the object(s) instance(s) of any listener
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter initializeListeners(@Nullable Object listeners) {
 		if (listeners instanceof OnUpdateListener) {
@@ -275,7 +275,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>It is also called after DataSet is updated.</p>
 	 * <b>Note: </b>Only items at level 0 are automatically expanded, ignored all sub-levels.
 	 *
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter expandItemsAtStartUp() {
 		int position = 0;
@@ -562,7 +562,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Default value is false.</p>
 	 *
 	 * @param displayHeaders true to display them, false to keep them hidden
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter setDisplayHeadersAtStartUp(boolean displayHeaders) {
 		setInitialize(true);
@@ -585,7 +585,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Default value is false.</p>
 	 *
 	 * @param removeOrphanHeaders true to remove the header during the remove items
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 * @see #getOrphanHeaders()
 	 */
 	public FlexibleAdapter setRemoveOrphanHeaders(boolean removeOrphanHeaders) {
@@ -599,7 +599,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param unlinkOnRemoveHeader true to unlink also all items with the just deleted header,
 	 *                             false otherwise
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter setUnlinkAllItemsOnRemoveHeaders(boolean unlinkOnRemoveHeader) {
 		this.unlinkOnRemoveHeader = unlinkOnRemoveHeader;
@@ -625,7 +625,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param item   the item that holds the header
 	 * @param header the header item
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter linkHeaderTo(@NonNull T item, @NonNull IHeader header) {
 		linkHeaderTo(item, header, null);
@@ -686,7 +686,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * moved nor deleted.
 	 * <br/>- Content and linkage are automatically updated.
 	 *
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 * @see #getStickySectionHeadersHolder()
 	 */
 	public FlexibleAdapter enableStickyHeaders() {
@@ -1143,7 +1143,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param endlessScrollListener the callback to invoke the asynchronous loading
 	 * @param progressItem          the item representing the progress bar
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter setEndlessScrollListener(@NonNull EndlessScrollListener endlessScrollListener,
 													@NonNull T progressItem) {
@@ -1161,7 +1161,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Default value is 1.</p>
 	 *
 	 * @param thresholdItems minimum number of unbound items to start loading more items
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter setEndlessScrollThreshold(@IntRange(from = 1) int thresholdItems) {
 		//Increase visible threshold based on number of columns
@@ -1235,7 +1235,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Default value is disabled.</p>
 	 *
 	 * @param collapseOnExpand true to collapse others items, false to just expand the current
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter setAutoCollapseOnExpand(boolean collapseOnExpand) {
 		this.collapseOnExpand = collapseOnExpand;
@@ -1249,7 +1249,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * {@link SmoothScrollGridLayoutManager}.</p>
 	 *
 	 * @param scrollOnExpand true to enable automatic scroll, false to disable
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter setAutoScrollOnExpand(boolean scrollOnExpand) {
 		this.scrollOnExpand = scrollOnExpand;
@@ -1281,7 +1281,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Default value is {@link #minCollapsibleLevel} (All levels including 0).</p>
 	 *
 	 * @param minCollapsibleLevel the minimum level to auto-collapse sub expandable items
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter setMinCollapsibleLevel(int minCollapsibleLevel) {
 		this.minCollapsibleLevel = minCollapsibleLevel;
@@ -1939,12 +1939,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*----------------------*/
 
 	/**
-	 * Removes an item from internal list and notify the change.
-	 * <p>The item is retained for an eventual Undo.</p>
-	 * This method delegates the removal to removeRange.
+	 * Convenience method of {@link #removeItem(int, Object)} providing a null payload.
 	 *
 	 * @param position the position of item to remove
-	 * @see #removeRange(int, int, Object)
+	 * @see #removeItems(List)
+	 * @see #removeItemsOfType(Integer...)
+	 * @see #removeRange(int, int)
+	 * @see #removeAllSelectedItems()
+	 * @see #removeItem(int, Object)
 	 */
 	public void removeItem(@IntRange(from = 0) int position) {
 		this.removeItem(position, null);
@@ -1959,7 +1961,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param payload  any non-null user object to notify the parent (the payload will be
 	 *                 therefore passed to the bind method of the parent ViewHolder),
 	 *                 pass null to <u>not</u> notify the parent
+	 * @see #removeItems(List, Object)
 	 * @see #removeRange(int, int, Object)
+	 * @see #removeAllSelectedItems(Object)
+	 * @see #removeItem(int)
 	 */
 	public void removeItem(@IntRange(from = 0) int position, @Nullable Object payload) {
 		//Request to collapse after the notification of remove range
@@ -1970,11 +1975,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Same as {@link #removeItems(List, Object)}, but in this case the parent will not be
-	 * notified about the change, if a child is removed.
-	 * <p>This method delegates the removal to removeRange.</p>
+	 * Convenience method of {@link #removeItems(List, Object)} providing a null payload.
 	 *
-	 * @see #removeRange(int, int, Object)
+	 * @see #removeItem(int)
+	 * @see #removeItemsOfType(Integer...)
+	 * @see #removeRange(int, int)
+	 * @see #removeAllSelectedItems()
+	 * @see #removeItems(List, Object)
 	 */
 	public void removeItems(@NonNull List<Integer> selectedPositions) {
 		this.removeItems(selectedPositions, null);
@@ -1991,7 +1998,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param payload           any non-null user object to notify the parent (the payload will be
 	 *                          therefore passed to the bind method of the parent ViewHolder),
 	 *                          pass null to <u>not</u> notify the parent
+	 * @see #removeItem(int, Object)
 	 * @see #removeRange(int, int, Object)
+	 * @see #removeAllSelectedItems(Object)
+	 * @see #removeItems(List)
 	 */
 	public void removeItems(@NonNull List<Integer> selectedPositions, @Nullable Object payload) {
 		if (DEBUG)
@@ -2039,6 +2049,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Selectively removes all items of the type provided as parameter.
 	 *
 	 * @param viewTypes the viewTypes to remove
+	 * @see #removeItem(int, Object)
+	 * @see #removeItems(List)
+	 * @see #removeAllSelectedItems()
 	 */
 	public void removeItemsOfType(Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
@@ -2055,6 +2068,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Same as {@link #removeRange(int, int, Object)}, but in this case the parent will not be
 	 * notified about the change, if children are removed.
+	 *
+	 * @see #removeItem(int, Object)
+	 * @see #removeItems(List)
+	 * @see #removeItemsOfType(Integer...)
+	 * @see #removeAllSelectedItems()
+	 * @see #removeRange(int, int, Object)
 	 */
 	public void removeRange(@IntRange(from = 0) int positionStart,
 							@IntRange(from = 0) int itemCount) {
@@ -2080,10 +2099,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                      pass null to <u>not</u> notify the parent
 	 * @see #removeItem(int, Object)
 	 * @see #removeItems(List, Object)
-	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
-	 * @see #restoreDeletedItems()
-	 * @see #setRestoreSelectionOnUndo(boolean)
+	 * @see #removeRange(int, int)
+	 * @see #removeAllSelectedItems(Object)
+	 * @see #setPermanentDelete(boolean)
 	 * @see #setRemoveOrphanHeaders(boolean)
+	 * @see #setRestoreSelectionOnUndo(boolean)
+	 * @see #getDeletedItems()
+	 * @see #getDeletedChildren(IExpandable)
+	 * @see #restoreDeletedItems()
+	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
 	 * @see #emptyBin()
 	 */
 	public void removeRange(@IntRange(from = 0) int positionStart,
@@ -2173,6 +2197,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Convenience method to remove all Items that are currently selected.
 	 * <p>Parent will not be notified about the change, if a child is removed.</p>
 	 *
+	 * @see #removeItem(int)
+	 * @see #removeItems(List)
+	 * @see #removeRange(int, int)
+	 * @see #removeItemsOfType(Integer...)
 	 * @see #removeAllSelectedItems(Object)
 	 */
 	public void removeAllSelectedItems() {
@@ -2187,6 +2215,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param payload any non-null user object to notify the parent (the payload will be
 	 *                therefore passed to the bind method of the parent ViewHolder),
 	 *                pass null to <u>not</u> notify the parent
+	 * @see #removeItem(int, Object)
+	 * @see #removeItems(List, Object)
+	 * @see #removeRange(int, int, Object)
+	 * @see #removeAllSelectedItems()
 	 */
 	public void removeAllSelectedItems(@Nullable Object payload) {
 		this.removeItems(getSelectedPositions(), payload);
@@ -2206,7 +2238,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Default value is false (use the Undo mechanism).</p>
 	 *
 	 * @param permanentDelete true to delete item forever, false to use the cache for Undo feature
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter setPermanentDelete(boolean permanentDelete) {
 		this.permanentDelete = permanentDelete;
@@ -2230,7 +2262,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Default value is false (selection is NOT restored).
 	 *
 	 * @param restoreSelection true to have restored items still selected, false to empty selections
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter setRestoreSelectionOnUndo(boolean restoreSelection) {
 		this.restoreSelection = restoreSelection;
@@ -2454,7 +2486,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)} while filtering,
 	 *                     false otherwise
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public final FlexibleAdapter setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
 		this.mNotifyChangeOfUnfilteredItems = notifyChange;
@@ -2799,7 +2831,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Default value is false.
 	 *
 	 * @param longPressDragEnabled true to activate, false otherwise
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public final FlexibleAdapter setLongPressDragEnabled(boolean longPressDragEnabled) {
 		initializeItemTouchHelper();
@@ -2823,7 +2855,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Default value is true.</p>
 	 *
 	 * @param handleDragEnabled true to activate, false otherwise
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public FlexibleAdapter setHandleDragEnabled(boolean handleDragEnabled) {
 		this.handleDragEnabled = handleDragEnabled;
@@ -2847,7 +2879,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Default value is false.</p>
 	 *
 	 * @param swipeEnabled true to activate, false otherwise
-	 * @return this adapter so the call can be chained
+	 * @return this Adapter, so the call can be chained
 	 */
 	public final FlexibleAdapter setSwipeEnabled(boolean swipeEnabled) {
 		initializeItemTouchHelper();
