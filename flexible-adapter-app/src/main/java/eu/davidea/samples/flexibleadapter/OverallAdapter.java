@@ -37,13 +37,16 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public void showLayoutInfo(boolean scrollToPosition) {
 		if (!hasSearchText()) {
 			//Define Example View
-			final LayoutItem item = new LayoutItem("LAY");
-			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager)
+			final LayoutItem item = new LayoutItem("LAY-L");
+			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+				item.setId("LAY-S");
 				item.setTitle(mRecyclerView.getContext().getString(R.string.staggered_layout));
-			else if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager)
+			} else if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+				item.setId("LAY-G");
 				item.setTitle(mRecyclerView.getContext().getString(R.string.grid_layout));
-			else
+			} else {
 				item.setTitle(mRecyclerView.getContext().getString(R.string.linear_layout));
+			}
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
 			addItemWithDelay(0, item, 1000L, scrollToPosition);
 			removeItemWithDelay( item, 2000L);

@@ -2,7 +2,6 @@ package eu.davidea.samples.flexibleadapter;
 
 import android.animation.Animator;
 import android.app.Activity;
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -11,11 +10,11 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.models.LayoutItem;
 import eu.davidea.samples.flexibleadapter.models.ULSItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 
 /**
  * NOTE: AbstractModelItem is for example purpose only. I wanted to have in common
@@ -30,12 +29,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public static final int CHILD_VIEW_TYPE = 0;
 	public static final int EXAMPLE_VIEW_TYPE = 1;
 
-	private Context mContext;//this should not be necessary for view holders
-
-
 	public ExampleAdapter(Activity activity) {
 		super(DatabaseService.getInstance().getDatabaseList(), activity);
-		mContext = activity;
 
 		//NEW! We have highlighted text while filtering, so let's enable this feature
 		//to be consistent with the active filter
@@ -66,14 +61,14 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			final LayoutItem item = new LayoutItem("LAY-L");
 			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
 				item.setId("LAY-S");
-				item.setTitle(mContext.getString(R.string.staggered_layout));
+				item.setTitle(mRecyclerView.getContext().getString(R.string.staggered_layout));
 			} else if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 				item.setId("LAY-G");
-				item.setTitle(mContext.getString(R.string.grid_layout));
+				item.setTitle(mRecyclerView.getContext().getString(R.string.grid_layout));
 			} else {
-				item.setTitle(mContext.getString(R.string.linear_layout));
+				item.setTitle(mRecyclerView.getContext().getString(R.string.linear_layout));
 			}
-			item.setSubtitle(mContext.getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
+			item.setSubtitle(mRecyclerView.getContext().getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
 			addItemWithDelay((getItem(0) instanceof ULSItem ? 1 : 0), item, 100L, (!(getItem(0) instanceof ULSItem) && scrollToPosition));
 			removeItemWithDelay(item, 2000L);
 		}
@@ -89,8 +84,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		if (!DatabaseService.userLearnedSelection && !hasSearchText() && !(getItem(0) instanceof ULSItem)) {
 			//Define Example View
 			final ULSItem item = new ULSItem("ULS");
-			item.setTitle(mContext.getString(R.string.uls_title));
-			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
+			item.setTitle(mRecyclerView.getContext().getString(R.string.uls_title));
+			item.setSubtitle(mRecyclerView.getContext().getString(R.string.uls_subtitle));
 			addItemWithDelay(0, item, 1400L, scrollToPosition);
 		}
 	}

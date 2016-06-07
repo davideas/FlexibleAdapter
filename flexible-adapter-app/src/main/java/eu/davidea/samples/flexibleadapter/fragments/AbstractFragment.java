@@ -109,7 +109,7 @@ public abstract class AbstractFragment extends Fragment {
 			public void run() {
 				item.setEnabled(true);
 			}
-		}, 2500L);
+		}, 2000L);
 		//default implementation does nothing
 	}
 
