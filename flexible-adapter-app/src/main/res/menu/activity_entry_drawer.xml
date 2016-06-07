@@ -54,7 +54,7 @@
 					android:id="@+id/nav_staggered"
 					android:enabled="false"
 					android:icon="@drawable/ic_dashboard_grey600_24dp"
-					android:title="@string/staggered"/>
+					android:title="@string/staggered_layout"/>
 			</menu>
 		</item>
 

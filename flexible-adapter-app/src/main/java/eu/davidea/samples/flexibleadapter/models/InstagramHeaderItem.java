@@ -1,5 +1,6 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -91,7 +92,7 @@ public class InstagramHeaderItem extends AbstractHeaderItem<InstagramHeaderItem.
 		public TextView mSubtitle;
 
 		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
-			super(view, adapter, true);
+			super(view, adapter, true);//True for sticky
 			mAccountImage = (FlipView) view.findViewById(R.id.instagram_account_image);
 			mAccountImage.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -107,6 +108,11 @@ public class InstagramHeaderItem extends AbstractHeaderItem<InstagramHeaderItem.
 					Log.d("InstagramHeaderItem", "Registered internal click on Header SubTitleTextView! " + mSubtitle.getText() + " position=" + getFlexibleAdapterPosition());
 				}
 			});
+
+			//Support for StaggeredGridLayoutManager
+			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
+				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
+			}
 		}
 	}
 

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="?android:attr/listPreferredItemHeight"
+	android:background="@color/material_color_indigo_50"
+	android:gravity="center_vertical"
+	android:orientation="vertical">
+
+	<TextView
+		android:id="@+id/title"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="@dimen/margin_left"
+		android:layout_marginStart="@dimen/margin_left"
+		android:layout_marginRight="@dimen/margin_right"
+		android:layout_marginEnd="@dimen/margin_right"
+		android:ellipsize="marquee"
+		android:marqueeRepeatLimit="1"
+		android:singleLine="true"
+		android:textAppearance="@style/TextAppearance.AppCompat.Button"
+		android:textColor="?primaryTextSelector"
+		tools:text="@string/staggered_layout"/>
+
+	<TextView
+		android:id="@+id/subtitle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="2dp"
+		android:layout_marginLeft="@dimen/margin_left"
+		android:layout_marginStart="@dimen/margin_left"
+		android:layout_marginRight="@dimen/margin_right"
+		android:layout_marginEnd="@dimen/margin_right"
+		android:ellipsize="end"
+		android:maxLines="1"
+		android:textAppearance="@style/TextAppearance.AppCompat.Small"
+		android:textColor="?primaryTextSelector"
+		tools:text="@string/columns"/>
+
+</LinearLayout>

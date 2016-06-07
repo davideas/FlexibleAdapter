@@ -10,18 +10,19 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.AdapterView;
 
+import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.common.DividerItemDecoration;
+import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
+import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.common.DividerItemDecoration;
-import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
-import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -114,7 +115,7 @@ public class FragmentSelectionModes extends AbstractFragment
 			}
 		});
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider));
+		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider).setDrawOver(true));
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -127,6 +128,15 @@ public class FragmentSelectionModes extends AbstractFragment
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_SINGLE);
+
+		//Add sample HeaderView items on the top (not belongs to the library)
+		mAdapter.showLayoutInfo(savedInstanceState == null);
+	}
+
+	@Override
+	public void showNewLayoutInfo(MenuItem item) {
+		super.showNewLayoutInfo(item);
+		mAdapter.showLayoutInfo(true);
 	}
 
 	@Override
@@ -138,6 +148,7 @@ public class FragmentSelectionModes extends AbstractFragment
 				//NOTE: If you use simple integer to identify the ViewType,
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
+					case R.layout.recycler_layout_item:
 					case R.layout.recycler_uls_item:
 						return mColumnCount;
 					default:

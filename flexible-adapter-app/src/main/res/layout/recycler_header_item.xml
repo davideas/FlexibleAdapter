@@ -39,4 +39,17 @@
 
 	</LinearLayout>
 
+	<ImageView
+		android:id="@+id/row_handle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentRight="true"
+		android:layout_centerInParent="true"
+		android:layout_marginEnd="@dimen/margin_right_handle"
+		android:layout_marginLeft="@dimen/margin_left"
+		android:layout_marginRight="@dimen/margin_right_handle"
+		android:layout_marginStart="@dimen/margin_left"
+		android:src="@drawable/ic_drag_handle_white_24dp"/>
+
 </RelativeLayout>

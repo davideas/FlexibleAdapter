@@ -1,31 +1,31 @@
 package eu.davidea.samples.flexibleadapter.models;
 
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
-import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Item dedicated only for User Learns Selection view (located always at position 0 in the Adapter).
+ * Item dedicated to display the status of the Layout currently displayed (located always at
+ * position 0 in the Adapter).
+ *
  * <p>If you don't have many fields in common better to extend directly from
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).</p>
  */
-public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
+public class LayoutItem extends AbstractModelItem<LayoutItem.ExampleViewHolder> {
 
 	private static final long serialVersionUID = -5041296095060813327L;
 
-	public ULSItem(String id) {
+	public LayoutItem(String id) {
 		super(id);
 	}
 
@@ -41,7 +41,7 @@ public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_uls_item;
+		return R.layout.recycler_layout_item;
 	}
 
 	@Override
@@ -51,11 +51,9 @@ public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ExampleViewHolder holder, int position, List payloads) {
-		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
-		holder.itemView.setActivated(true);
 		holder.mTitle.setSelected(true);//For marquee
-		holder.mTitle.setText(Html.fromHtml(getTitle()));
-		holder.mSubtitle.setText(Html.fromHtml(getSubtitle()));
+		holder.mTitle.setText(getTitle());
+		holder.mSubtitle.setText(getSubtitle());
 		adapter.animateView(holder.itemView, position, false);
 	}
 
@@ -64,37 +62,24 @@ public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
 	 */
 	static class ExampleViewHolder extends FlexibleViewHolder {
 
-		public ImageView mImageView;
 		public TextView mTitle;
 		public TextView mSubtitle;
-		public ImageView mDismissIcon;
 
 		public ExampleViewHolder(View view, FlexibleAdapter adapter) {
-			super(view, adapter);
+			super(view, adapter, true);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-			mImageView = (ImageView) view.findViewById(R.id.image);
-			mDismissIcon = (ImageView) view.findViewById(R.id.dismiss_icon);
-			mDismissIcon.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					//TODO FOR YOU: Save the boolean into Settings!
-					DatabaseService.userLearnedSelection = true;
-					mAdapter.setPermanentDelete(true);
-					mAdapter.removeItem(0);
-					mAdapter.setPermanentDelete(false);
-				}
-			});
 
 			//Support for StaggeredGridLayoutManager
 			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
 				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
+				Log.d("LayoutItem", "LayoutItem configured fullSpan for StaggeredGridLayout");
 			}
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "ULSItem[" + super.toString() + "]";
+		return "LayoutItem[" + super.toString() + "]";
 	}
 }

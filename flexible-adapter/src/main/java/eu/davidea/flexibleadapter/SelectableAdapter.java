@@ -18,7 +18,9 @@ package eu.davidea.flexibleadapter;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 
@@ -133,6 +135,15 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	public RecyclerView getRecyclerView() {
 		return mRecyclerView;
+	}
+
+	public static int getSpanCount(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof GridLayoutManager) {
+			return ((GridLayoutManager) layoutManager).getSpanCount();
+		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
+		}
+		return 1;
 	}
 
 	/**

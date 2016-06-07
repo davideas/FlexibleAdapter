@@ -31,6 +31,7 @@ public class DatabaseService {
 
 	private static DatabaseService mInstance;
 	private static final int ITEMS = 90, SUB_ITEMS = 4, HEADERS = 30;
+	private int databaseType;
 
 	//TODO FOR YOU: Use userLearnedSelection from settings
 	public static boolean userLearnedSelection = false;
@@ -52,11 +53,16 @@ public class DatabaseService {
 	/* DATABASE CREATION */
 	/*-------------------*/
 
+	public int getDatabaseType() {
+		return databaseType;
+	}
+
 	/*
 	 * List of CardView as entry list, showing the functionality of the library.
 	 * It also shows how adapter animation can be configured.
 	 */
 	public void createOverallDatabase(Resources resources) {
+		databaseType = 0;
 		mItems.clear();
 		mItems.add(new OverallItem(R.id.nav_selection_modes, resources.getString(R.string.selection_modes))
 				.withDescription(resources.getString(R.string.selection_modes_description))
@@ -97,6 +103,7 @@ public class DatabaseService {
 	 * List of simple items TODO: showing different types of animations
 	 */
 	public void createEndlessDatabase() {
+		databaseType = 1;
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
 			mItems.add(newSimpleItem(i + 1, null));
@@ -107,6 +114,7 @@ public class DatabaseService {
 	 * List of expandable items (headers/sections) with SubItems with Header attached.
 	 */
 	public void createExpandableSectionsDatabase() {
+		databaseType = 2;
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
 			mItems.add(newExpandableSectionItem(i + 1));//With expansion level 0
@@ -117,6 +125,7 @@ public class DatabaseService {
 	 * List of headers (level 0) with expandable SubItems (level 1) with SubItems.
 	 */
 	public void createExpandableMultiLevelDatabase() {
+		databaseType = 3;
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
 			mItems.add(newExpandableLevelItem(i + 1));//With expansion level 1
@@ -127,6 +136,7 @@ public class DatabaseService {
 	 * List of Simple Items with Header attached. Only Simple Items will be added to the list.
 	 */
 	public void createHeadersSectionsDatabase() {
+		databaseType = 4;
 		HeaderItem header = null;
 		mItems.clear();
 		for (int i = 0; i < ITEMS; i++) {
@@ -136,6 +146,7 @@ public class DatabaseService {
 	}
 
 	public void createInstagramHeadersDatabase() {
+		databaseType = 5;
 		mItems.clear();
 		for (int i = 0; i < 5; i++) {
 			mItems.add(newInstagramItem(i + 1));

@@ -1,19 +1,22 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.ExpandableLevel0Item.L0ViewHolder;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IHeader;
+import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.models.ExpandableLevel0Item.L0ViewHolder;
+import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
@@ -122,11 +125,24 @@ public class ExpandableLevel0Item
 
 		public TextView mTitle;
 		public TextView mSubtitle;
+		public ImageView mHandleView;
 
 		public L0ViewHolder(View view, FlexibleAdapter adapter) {
-			super(view, adapter, true);
+			super(view, adapter, true);//True for sticky
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
+			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
+			if (adapter.isHandleDragEnabled() && DatabaseService.getInstance().getDatabaseType() == 2) {
+				this.mHandleView.setVisibility(View.VISIBLE);
+				setDragHandleView(mHandleView);
+			} else {
+				this.mHandleView.setVisibility(View.GONE);
+			}
+
+			//Support for StaggeredGridLayoutManager
+			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
+				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
+			}
 		}
 
 		@Override

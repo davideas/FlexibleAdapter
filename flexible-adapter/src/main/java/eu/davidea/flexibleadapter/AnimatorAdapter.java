@@ -122,9 +122,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * <p>Default value is 0ms.</p>
 	 *
 	 * @param initialDelay any non negative delay
+	 * @return this AnimatorAdapter, so the call can be chained
 	 */
-	public void setAnimationInitialDelay(long initialDelay) {
+	public AnimatorAdapter setAnimationInitialDelay(long initialDelay) {
 		mInitialDelay = initialDelay;
+		return this;
 	}
 
 	/**
@@ -133,9 +135,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * Default value is 100ms.
 	 *
 	 * @param delay any positive delay
+	 * @return this AnimatorAdapter, so the call can be chained
 	 */
-	public void setAnimationDelay(@IntRange(from = 0) long delay) {
+	public AnimatorAdapter setAnimationDelay(@IntRange(from = 0) long delay) {
 		mStepDelay = delay;
+		return this;
 	}
 
 	/**
@@ -143,9 +147,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * <p>Default value is 300ms.</p>
 	 *
 	 * @param duration any positive time
+	 * @return this AnimatorAdapter, so the call can be chained
 	 */
-	public void setAnimationDuration(@IntRange(from = 1) long duration) {
+	public AnimatorAdapter setAnimationDuration(@IntRange(from = 1) long duration) {
 		mDuration = duration;
+		return this;
 	}
 
 	/**
@@ -153,9 +159,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * <p>Default value is {@link LinearInterpolator}.</p>
 	 *
 	 * @param interpolator any valid non null interpolator
+	 * @return this AnimatorAdapter, so the call can be chained
 	 */
-	public void setAnimationInterpolator(@NonNull Interpolator interpolator) {
+	public AnimatorAdapter setAnimationInterpolator(@NonNull Interpolator interpolator) {
 		mInterpolator = interpolator;
+		return this;
 	}
 
 	/**
@@ -175,9 +183,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 *
 	 * @param enabled true to enable item animation, false to disable them all.
 	 * @see #setAnimationOnReverseScrolling(boolean)
+	 * @return this AnimatorAdapter, so the call can be chained
 	 */
-	public void setAnimationOnScrolling(boolean enabled) {
+	public AnimatorAdapter setAnimationOnScrolling(boolean enabled) {
 		shouldAnimate = enabled;
+		return this;
 	}
 
 	public boolean isAnimationOnScrollingEnabled() {
@@ -190,9 +200,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 *
 	 * @param enabled false to animate items only forward, true to also reverse animate
 	 * @see #setAnimationOnScrolling(boolean)
+	 * @return this AnimatorAdapter, so the call can be chained
 	 */
-	public void setAnimationOnReverseScrolling(boolean enabled) {
+	public AnimatorAdapter setAnimationOnReverseScrolling(boolean enabled) {
 		isReverseEnabled = enabled;
+		return this;
 	}
 
 	public boolean isAnimationOnReverseScrolling() {

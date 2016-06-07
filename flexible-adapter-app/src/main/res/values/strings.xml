@@ -12,6 +12,8 @@
 	<string name="action_settings">Settings</string>
 	<string name="linear_layout">Linear Layout</string>
 	<string name="grid_layout">Grid Layout</string>
+	<string name="staggered_layout">Staggered Layout</string>
+	<string name="columns">%1$s column(s)</string>
 	<string name="reverse_scrolling">Reverse scrolling</string>
 	<string name="forward_scrolling">Forward scrolling</string>
 	<string name="auto_collapse">Auto collapse</string>
@@ -77,7 +79,6 @@
 	<string name="special_layouts">Special Layouts</string>
 	<string name="horizontal">Horizontal Layout</string>
 	<!--<string name="horizontal_description"></string>-->
-	<string name="staggered">Staggered Layout</string>
 	<!--<string name="staggered_description"></string>-->
 
 	<!-- About -->

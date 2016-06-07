@@ -98,7 +98,12 @@ public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
 			super(view, adapter);
 			this.mTitle = (TextView) view.findViewById(R.id.title);
 			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
-			setDragHandleView(mHandleView);
+			if (adapter.isHandleDragEnabled()) {
+				this.mHandleView.setVisibility(View.VISIBLE);
+				setDragHandleView(mHandleView);
+			} else {
+				this.mHandleView.setVisibility(View.GONE);
+			}
 		}
 
 		@Override

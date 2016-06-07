@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.SelectableAdapter;
@@ -65,13 +66,13 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.expandItemsAtStartUp();
-		mAdapter.setAnimationOnScrolling(true);
-		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAutoCollapseOnExpand(false);
-		mAdapter.setMinCollapsibleLevel(1);//Auto-collapse only items with level >= 1 (avoid to collapse also sections!)
-		mAdapter.setAutoScrollOnExpand(true);
-		mAdapter.setRemoveOrphanHeaders(false);
+		mAdapter.expandItemsAtStartUp()
+				.setAutoCollapseOnExpand(false)
+				.setMinCollapsibleLevel(1)//Auto-collapse only items with level >= 1 (avoid to collapse also sections!)
+				.setAutoScrollOnExpand(true)
+				.setRemoveOrphanHeaders(false)
+				.setAnimationOnScrolling(true)
+				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
@@ -90,14 +91,23 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
-		mAdapter.setSwipeEnabled(true);//Enable swipe items
-		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
-		//Add sample item on the top (not belongs to the library)
-		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		mAdapter.setLongPressDragEnabled(true)//Enable long press to drag items
+				.setHandleDragEnabled(true)//Enable handle drag
+				.setSwipeEnabled(true)//Enable swipe items
+				.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
+
+		//Add sample HeaderView items on the top (not belongs to the library)
+		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		mAdapter.showLayoutInfo(savedInstanceState == null);
+	}
+
+	@Override
+	public void showNewLayoutInfo(MenuItem item) {
+		super.showNewLayoutInfo(item);
+		mAdapter.showLayoutInfo(true);
 	}
 
 	@Override
@@ -109,6 +119,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 				//NOTE: If you use simple integer to identify the ViewType,
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
+					case R.layout.recycler_layout_item:
 					case R.layout.recycler_uls_item:
 					case R.layout.recycler_header_item:
 					case R.layout.recycler_expandable_header_item:

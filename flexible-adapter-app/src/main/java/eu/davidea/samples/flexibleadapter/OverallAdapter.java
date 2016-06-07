@@ -3,14 +3,16 @@ package eu.davidea.samples.flexibleadapter;
 import android.animation.Animator;
 import android.app.Activity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.samples.flexibleadapter.models.LayoutItem;
+import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 /**
  * NOTE: AbstractModelItem is for example purpose only. I wanted to have in common
@@ -24,6 +26,28 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	public OverallAdapter(Activity activity) {
 		super(DatabaseService.getInstance().getDatabaseList(), activity);
+	}
+
+	/*
+	 * HEADER/FOOTER VIEW
+	 * This method show how to add Header/Footer View as it was for ListView.
+	 * The secret is the position! 0 for Header; itemCount for Footer ;-)
+	 * The view is represented by a custom Item type to better represent any dynamic content.
+	 */
+	public void showLayoutInfo(boolean scrollToPosition) {
+		if (!hasSearchText()) {
+			//Define Example View
+			final LayoutItem item = new LayoutItem("LAY");
+			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager)
+				item.setTitle(mRecyclerView.getContext().getString(R.string.staggered_layout));
+			else if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager)
+				item.setTitle(mRecyclerView.getContext().getString(R.string.grid_layout));
+			else
+				item.setTitle(mRecyclerView.getContext().getString(R.string.linear_layout));
+			item.setSubtitle(mRecyclerView.getContext().getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
+			addItemWithDelay(0, item, 1000L, scrollToPosition);
+			removeItemWithDelay( item, 2000L);
+		}
 	}
 
 	/**

@@ -5,11 +5,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.davidea.samples.flexibleadapter.models.LayoutItem;
 import eu.davidea.samples.flexibleadapter.models.ULSItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
@@ -48,11 +50,37 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		//TODO: We may create calls like removeAll, addAll or refreshList in order to animate changes
 
 		//Add example view
+		showLayoutInfo(true);
 		addUserLearnedSelection(true);
 	}
 
 	/*
 	 * HEADER/FOOTER VIEW
+	 * This method show how to add Header/Footer View as it was for ListView.
+	 * The secret is the position! 0 for Header; itemCount for Footer ;-)
+	 * The view is represented by a custom Item type to better represent any dynamic content.
+	 */
+	public void showLayoutInfo(boolean scrollToPosition) {
+		if (!hasSearchText()) {
+			//Define Example View
+			final LayoutItem item = new LayoutItem("LAY-L");
+			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+				item.setId("LAY-S");
+				item.setTitle(mContext.getString(R.string.staggered_layout));
+			} else if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+				item.setId("LAY-G");
+				item.setTitle(mContext.getString(R.string.grid_layout));
+			} else {
+				item.setTitle(mContext.getString(R.string.linear_layout));
+			}
+			item.setSubtitle(mContext.getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
+			addItemWithDelay((getItem(0) instanceof ULSItem ? 1 : 0), item, 100L, (!(getItem(0) instanceof ULSItem) && scrollToPosition));
+			removeItemWithDelay(item, 2000L);
+		}
+	}
+
+	/*
+	 * ANOTHER HEADER/FOOTER VIEW
 	 * This method show how to add Header/Footer View as it was for ListView.
 	 * The secret is the position! 0 for Header; itemCount for Footer ;-)
 	 * The view is represented by a custom Item type to better represent any dynamic content.
@@ -63,7 +91,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			final ULSItem item = new ULSItem("ULS");
 			item.setTitle(mContext.getString(R.string.uls_title));
 			item.setSubtitle(mContext.getString(R.string.uls_subtitle));
-			addItemWithDelay(0, item, 1500L, scrollToPosition);
+			addItemWithDelay(0, item, 1400L, scrollToPosition);
 		}
 	}
 
@@ -71,6 +99,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public synchronized void filterItems(@NonNull List<AbstractFlexibleItem> unfilteredItems) {
 		super.filterItems(unfilteredItems);
 		addUserLearnedSelection(false);
+		showLayoutInfo(false);
 	}
 
 	@Override
@@ -241,8 +270,11 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		} else {
 			//LinearLayout
 			switch (getItemViewType(position)) {
-				case R.layout.recycler_child_item:
+				case R.layout.recycler_layout_item:
 				case R.layout.recycler_uls_item:
+					addSlideInFromTopAnimator(animators, itemView);
+					break;
+				case R.layout.recycler_child_item:
 				case EXAMPLE_VIEW_TYPE:
 					addScaleInAnimator(animators, itemView, 0.0f);
 					break;

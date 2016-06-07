@@ -1,9 +1,11 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -100,9 +102,10 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 
 		public TextView mTitle;
 		public TextView mSubtitle;
+		public ImageView mHandleView;
 
 		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
-			super(view, adapter, true);
+			super(view, adapter, true);//True for sticky
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 			mTitle.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +114,18 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 					Log.d("HeaderTitle", "Registered internal click on Header TitleTextView! " + mTitle.getText() + " position=" + getFlexibleAdapterPosition());
 				}
 			});
+			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
+			if (adapter.isHandleDragEnabled()) {
+				this.mHandleView.setVisibility(View.VISIBLE);
+				setDragHandleView(mHandleView);
+			} else {
+				this.mHandleView.setVisibility(View.GONE);
+			}
+
+			//Support for StaggeredGridLayoutManager
+			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
+				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
+			}
 		}
 	}
 

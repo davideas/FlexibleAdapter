@@ -66,7 +66,7 @@ public class FragmentOverall extends AbstractFragment {
 		mAdapter.setAnimationDelay(150L);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setItemViewCacheSize(0);//Setting ViewCache to 0 (default=2) will animate items better while scrolling down+up with LinearLayout
-		mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(mColumnCount, StaggeredGridLayoutManager.VERTICAL));
+		mRecyclerView.setLayoutManager(createNewGridLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true);//Size of RV will not change
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
@@ -80,6 +80,15 @@ public class FragmentOverall extends AbstractFragment {
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
+
+		//Add sample HeaderView items on the top (not belongs to the library)
+		mAdapter.showLayoutInfo(savedInstanceState == null);
+	}
+
+	@Override
+	public void showNewLayoutInfo(MenuItem item) {
+		super.showNewLayoutInfo(item);
+		mAdapter.showLayoutInfo(true);
 	}
 
 	@Override
@@ -91,7 +100,8 @@ public class FragmentOverall extends AbstractFragment {
 				//NOTE: If you use simple integer to identify the ViewType,
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
-					//TODO: Header View span = 2
+					case R.layout.recycler_layout_item:
+						return mColumnCount;
 					default:
 						return 1;
 				}
@@ -111,9 +121,12 @@ public class FragmentOverall extends AbstractFragment {
 		super.onPrepareOptionsMenu(menu);
 
 		MenuItem gridMenuItem = menu.findItem(R.id.action_list_type);
-		if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+		if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
 			gridMenuItem.setIcon(R.drawable.ic_view_agenda_white_24dp);
 			gridMenuItem.setTitle(R.string.linear_layout);
+		} else if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+			gridMenuItem.setIcon(R.drawable.ic_dashboard_white_24dp);
+			gridMenuItem.setTitle(R.string.staggered_layout);
 		} else {
 			gridMenuItem.setIcon(R.drawable.ic_view_grid_white_24dp);
 			gridMenuItem.setTitle(R.string.grid_layout);

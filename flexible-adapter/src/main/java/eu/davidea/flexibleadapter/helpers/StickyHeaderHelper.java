@@ -18,8 +18,10 @@ package eu.davidea.flexibleadapter.helpers;
 import android.animation.Animator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -184,6 +186,8 @@ public class StickyHeaderHelper extends OnScrollListener {
 		int nextChildHeaderPosition = 1;
 		if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 			nextChildHeaderPosition = ((GridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount();
+		} else if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+			nextChildHeaderPosition = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount();
 		}
 		//Search for the position where the next header item is found and take the new offset
 		for (int i = nextChildHeaderPosition; i > 0; i--) {
@@ -192,7 +196,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 				int adapterPos = mRecyclerView.getChildAdapterPosition(nextChild);
 				int nextHeaderPosition = getHeaderPosition(adapterPos);
 				if (mHeaderPosition != nextHeaderPosition) {
-					if (getOrientation(mRecyclerView) == LinearLayoutManager.HORIZONTAL) {
+					if (getOrientation(mRecyclerView) == OrientationHelper.HORIZONTAL) {
 						if (nextChild.getLeft() > 0) {
 							int headerWidth = mStickyHeaderViewHolder.getContentView().getMeasuredWidth();
 							headerOffsetX = Math.min(nextChild.getLeft() - headerWidth, 0);
@@ -213,6 +217,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		//Apply translation
 		mStickyHolderLayout.setTranslationX(headerOffsetX);
 		mStickyHolderLayout.setTranslationY(headerOffsetY);
+		Log.v(TAG, "TranslationX=" + headerOffsetX + " TranslationY=" + headerOffsetY);
 	}
 
 	private void swapHeader(FlexibleViewHolder newHeader) {
@@ -275,7 +280,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 			//Calculate width and height
 			int widthSpec;
 			int heightSpec;
-			if (getOrientation(mRecyclerView) == LinearLayoutManager.VERTICAL) {
+			if (getOrientation(mRecyclerView) == OrientationHelper.VERTICAL) {
 				widthSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getWidth(), View.MeasureSpec.EXACTLY);
 				heightSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getHeight(), View.MeasureSpec.UNSPECIFIED);
 			} else {
@@ -326,8 +331,10 @@ public class StickyHeaderHelper extends OnScrollListener {
 		RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
 		if (layoutManager instanceof LinearLayoutManager) {
 			return ((LinearLayoutManager) layoutManager).getOrientation();
+		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).getOrientation();
 		}
-		return LinearLayoutManager.HORIZONTAL;
+		return OrientationHelper.HORIZONTAL;
 	}
 
 }

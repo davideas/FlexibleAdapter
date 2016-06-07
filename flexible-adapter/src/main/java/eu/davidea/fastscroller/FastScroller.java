@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -46,7 +47,7 @@ public class FastScroller extends FrameLayout {
 	private boolean isInitialized = false;
 	private ObjectAnimator currentAnimator;
 	private RecyclerView recyclerView;
-	private LinearLayoutManager layoutManager;
+	private RecyclerView.LayoutManager layoutManager;
 	private BubbleTextCreator bubbleTextCreator;
 	private List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<OnScrollStateChangeListener>();
 
@@ -88,7 +89,7 @@ public class FastScroller extends FrameLayout {
 		this.recyclerView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
 			@Override
 			public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-				layoutManager = (LinearLayoutManager) FastScroller.this.recyclerView.getLayoutManager();
+				layoutManager = FastScroller.this.recyclerView.getLayoutManager();
 			}
 		});
 
@@ -236,15 +237,23 @@ public class FastScroller extends FrameLayout {
 	private void setRecyclerViewPosition(float y) {
 		if (recyclerView != null) {
 			int itemCount = recyclerView.getAdapter().getItemCount();
+			//Calculate proportion
 			float proportion;
-			if (handle.getY() == 0)
+			if (handle.getY() == 0) {
 				proportion = 0f;
-			else if (handle.getY() + handle.getHeight() >= height - TRACK_SNAP_RANGE)
+			} else if (handle.getY() + handle.getHeight() >= height - TRACK_SNAP_RANGE) {
 				proportion = 1f;
-			else
+			} else {
 				proportion = y / (float) height;
+			}
 			int targetPos = getValueInRange(0, itemCount - 1, (int) (proportion * (float) itemCount));
-			layoutManager.scrollToPositionWithOffset(targetPos, 0);
+			//Scroll To Position based on LayoutManager
+			if (layoutManager instanceof StaggeredGridLayoutManager) {
+				((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(targetPos, 0);
+			} else {
+				((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(targetPos, 0);
+			}
+			//Update bubbleText
 			if (bubble != null) {
 				String bubbleText = bubbleTextCreator.onCreateBubbleText(targetPos);
 				if (bubbleText != null) {

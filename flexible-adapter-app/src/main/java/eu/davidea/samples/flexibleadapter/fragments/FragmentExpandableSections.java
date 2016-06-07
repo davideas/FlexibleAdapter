@@ -11,16 +11,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import eu.davidea.flexibleadapter.SelectableAdapter;
-import eu.davidea.samples.flexibleadapter.ExampleAdapter;
-import eu.davidea.samples.flexibleadapter.MainActivity;
-import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flipview.FlipView;
+import eu.davidea.samples.flexibleadapter.ExampleAdapter;
+import eu.davidea.samples.flexibleadapter.MainActivity;
+import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
 /**
@@ -67,12 +67,12 @@ public class FragmentExpandableSections extends AbstractFragment {
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.expandItemsAtStartUp();
-		mAdapter.setAnimationOnScrolling(true);
-		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAutoCollapseOnExpand(false);
-		mAdapter.setAutoScrollOnExpand(true);
-		mAdapter.setRemoveOrphanHeaders(false);
+		mAdapter.expandItemsAtStartUp()
+				.setAutoCollapseOnExpand(false)
+				.setAutoScrollOnExpand(true)
+				.setRemoveOrphanHeaders(false)
+				.setAnimationOnScrolling(true)
+				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
 		mRecyclerView.setAdapter(mAdapter);
@@ -92,14 +92,22 @@ public class FragmentExpandableSections extends AbstractFragment {
 		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
-		//Show Headers at startUp! (not necessary if Headers are also Expandable)
-		//mAdapter.setDisplayHeadersAtStartUp(true);
-		//Add sample item on the top (not belongs to the library)
-		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		mAdapter.setLongPressDragEnabled(true)//Enable long press to drag items
+				.setHandleDragEnabled(true);//Enable handle drag
+				//.setDisplayHeadersAtStartUp(true);//Show Headers at startUp! (not necessary if Headers are also Expandable)
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
+
+		//Add sample HeaderView items on the top (not belongs to the library)
+		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		mAdapter.showLayoutInfo(savedInstanceState == null);
+	}
+
+	@Override
+	public void showNewLayoutInfo(MenuItem item) {
+		super.showNewLayoutInfo(item);
+		mAdapter.showLayoutInfo(true);
 	}
 
 	@Override
@@ -111,6 +119,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 				//NOTE: If you use simple integer to identify the ViewType,
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
+					case R.layout.recycler_layout_item:
 					case R.layout.recycler_uls_item:
 					case R.layout.recycler_header_item:
 					case R.layout.recycler_expandable_header_item:
@@ -131,7 +140,6 @@ public class FragmentExpandableSections extends AbstractFragment {
 		inflater.inflate(R.menu.menu_sections, menu);
 		mListener.initSearchView(menu);
 	}
-
 
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {

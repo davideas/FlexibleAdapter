@@ -161,7 +161,12 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 				}
 			});
 			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
-			setDragHandleView(mHandleView);
+			if (adapter.isHandleDragEnabled()) {
+				this.mHandleView.setVisibility(View.VISIBLE);
+				setDragHandleView(mHandleView);
+			} else {
+				this.mHandleView.setVisibility(View.GONE);
+			}
 
 			this.frontView = view.findViewById(R.id.front_view);
 			this.rearLeftView = view.findViewById(R.id.rear_left_view);

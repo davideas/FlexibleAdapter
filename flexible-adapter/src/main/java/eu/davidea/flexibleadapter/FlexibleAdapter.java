@@ -26,7 +26,6 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -167,7 +166,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			childSelected = false, parentSelected = false;
 
 	/* Drag&Drop and Swipe helpers */
-	private boolean handleDragEnabled = true;
+	private boolean handleDragEnabled = false;
 	private ItemTouchHelperCallback mItemTouchHelperCallback;
 	private ItemTouchHelper mItemTouchHelper;
 
@@ -1939,6 +1938,26 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*----------------------*/
 
 	/**
+	 * Removes the given Item after the given delay.
+	 *
+	 * @param item  the item to add
+	 * @param delay a non negative delay
+	 * @see #removeItem(int)
+	 * @see #removeItems(List)
+	 * @see #removeItemsOfType(Integer...)
+	 * @see #removeRange(int, int)
+	 * @see #removeAllSelectedItems()
+	 */
+	public void removeItemWithDelay(@NonNull final T item, @IntRange(from = 0) long delay) {
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				removeItem(getGlobalPositionOf(item));
+			}
+		}, delay);
+	}
+
+	/**
 	 * Convenience method of {@link #removeItem(int, Object)} providing a null payload.
 	 *
 	 * @param position the position of item to remove
@@ -1946,6 +1965,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeItemsOfType(Integer...)
 	 * @see #removeRange(int, int)
 	 * @see #removeAllSelectedItems()
+	 * @see #removeItemWithDelay(IFlexible, long)
 	 * @see #removeItem(int, Object)
 	 */
 	public void removeItem(@IntRange(from = 0) int position) {
@@ -2852,7 +2872,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Enable/Disable the drag with handle.
-	 * <p>Default value is true.</p>
+	 * <p>Default value is false.</p>
 	 *
 	 * @param handleDragEnabled true to activate, false otherwise
 	 * @return this Adapter, so the call can be chained
@@ -3194,8 +3214,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	private void autoScroll(int position, int subItemsCount) {
-		int firstVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-		int lastVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
+		int firstVisibleItem, lastVisibleItem;
+		if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+			firstVisibleItem = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPositions(null)[0];
+			lastVisibleItem = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPositions(null)[0];
+		} else {
+			firstVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+			lastVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
+		}
 		int itemsToShow = position + subItemsCount - lastVisibleItem;
 		if (DEBUG)
 			Log.v(TAG, "autoScroll itemsToShow=" + itemsToShow + " firstVisibleItem=" + firstVisibleItem + " lastVisibleItem=" + lastVisibleItem + " RvChildCount=" + mRecyclerView.getChildCount());
@@ -3214,15 +3240,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		} else if (position < firstVisibleItem) {
 			mRecyclerView.smoothScrollToPosition(position);
 		}
-	}
-
-	private static int getSpanCount(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof GridLayoutManager) {
-			return ((GridLayoutManager) layoutManager).getSpanCount();
-		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
-		}
-		return 1;
 	}
 
 	private void adjustSelected(int startPosition, int itemCount) {
