@@ -58,8 +58,12 @@ public class FlexibleItemHolderExample<Model> extends AbstractSectionableItem<Fl
 
 	@Override
 	public boolean equals(Object o) {
-		//TODO FOR YOU: What is equals for you?
-		return this == o;//basic implementation
+		//TODO FOR YOU: Implement the equals() also for the custom Model object
+		if (o instanceof FlexibleItemHolderExample) {
+			FlexibleItemHolderExample inItem = (FlexibleItemHolderExample) o;
+			return modelData.equals(inItem.getModel());
+		}
+		return false;
 	}
 
 	@Override
@@ -74,12 +78,13 @@ public class FlexibleItemHolderExample<Model> extends AbstractSectionableItem<Fl
 
 	@Override
 	public void bindViewHolder(final FlexibleAdapter adapter, ViewHolder holder, int position, List payloads) {
-		//TODO FOR YOU: Bind your VH
+		//TODO FOR YOU: Bind your VH, data comes from your Model object, so modelData always call a getter method
+		//holder.titleTextView.setText(modelData.getTitle());
 	}
 
 	@Override
 	public boolean filter(String constraint) {
-		//TODO FOR YOU: Customize your filter logic
+		//TODO FOR YOU: Customize your filter logic, filtering is done on Model object data such as getTitle()
 		//return modelData.getTitle().equals(constraint);
 		return true;
 	}
