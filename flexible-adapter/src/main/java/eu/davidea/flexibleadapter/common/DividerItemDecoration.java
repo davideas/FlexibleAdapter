@@ -22,6 +22,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 	private Drawable mDivider;
 	private int mGapWidth;
+	private boolean mDrawOver = false;
 
 	private static final int[] ATTRS = new int[]{
 			android.R.attr.listDivider
@@ -38,6 +39,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 	/**
 	 * Custom divider will be used.
+	 * <p>By default, divider will be drawn underneath the item.</p>
 	 */
 	public DividerItemDecoration(Context context, int resId) {
 		this(context, resId, 0);
@@ -52,25 +54,52 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 		setSectionGapWidth((int) (context.getResources().getDisplayMetrics().density * gapWidth));
 	}
 
+	/**
+	 * Changes the mode to draw the divider.
+	 * <p>- When {@code false}, any content will be drawn before the item views are drawn, and will
+	 * thus appear <i>underneath</i> the views.
+	 * <br/>- When {@code true}, any content will be drawn after the item views are drawn, and will
+	 * thus  appear <i>over</i> the views.</p>
+	 * Default value is false (drawn underneath).
+	 *
+	 * @param mDrawOver true to draw after the item has been added, false to draw underneath the item
+	 * @return this Divider, so the call can be chained
+	 */
+	public DividerItemDecoration setDrawOver(boolean mDrawOver) {
+		this.mDrawOver = mDrawOver;
+		return this;
+	}
+
 	@Override
 	public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-		if (mDivider != null) {
-			int left = parent.getPaddingLeft();
-			int right = parent.getWidth() - parent.getPaddingRight();
+		if (mDivider != null && !mDrawOver) {
+			draw(c, parent, state);
+		}
+	}
 
-			int childCount = parent.getChildCount();
-			for (int i = 0; i < childCount; i++) {
-				View child = parent.getChildAt(i);
+	@Override
+	public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+		if (mDivider != null && mDrawOver) {
+			draw(c, parent, state);
+		}
+	}
 
-				RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
+	private void draw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+		int left = parent.getPaddingLeft();
+		int right = parent.getWidth() - parent.getPaddingRight();
 
-				int top = child.getBottom() + params.bottomMargin +
-						Math.round(ViewCompat.getTranslationY(child));
-				int bottom = top + mDivider.getIntrinsicHeight() + 1;
+		int childCount = parent.getChildCount();
+		for (int i = 0; i < childCount; i++) {
+			View child = parent.getChildAt(i);
 
-				mDivider.setBounds(left, top, right, bottom);
-				mDivider.draw(c);
-			}
+			RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
+
+			int top = child.getBottom() + params.bottomMargin +
+					Math.round(ViewCompat.getTranslationY(child));
+			int bottom = top + mDivider.getIntrinsicHeight() + 1;
+
+			mDivider.setBounds(left, top, right, bottom);
+			mDivider.draw(c);
 		}
 	}
 
@@ -79,7 +108,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 */
 	public void setSectionGapWidth(@IntRange(from = 0) int gapWidth) {
 		if (gapWidth < 0) {
-			throw new IllegalArgumentException("invalid width");
+			throw new IllegalArgumentException("Invalid section gap width [<0]: " + gapWidth);
 		}
 		mGapWidth = gapWidth;
 	}
