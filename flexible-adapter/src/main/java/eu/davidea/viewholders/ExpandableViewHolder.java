@@ -46,6 +46,15 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 		super(view, adapter);
 	}
 
+	/**
+	 * Constructor to configure the sticky behaviour of a view.
+	 * <p><b>Note:</b> StickyHeader works only if the item has been declared of type
+	 * {@link eu.davidea.flexibleadapter.items.IHeader}.</p>
+	 *
+	 * @param view         The {@link View} being hosted in this ViewHolder
+	 * @param adapter      Adapter instance of type {@link FlexibleAdapter}
+	 * @param stickyHeader true if the View can be a Sticky Header, false otherwise
+	 */
 	public ExpandableViewHolder(View view, FlexibleAdapter adapter, boolean stickyHeader) {
 		super(view, adapter, stickyHeader);
 	}

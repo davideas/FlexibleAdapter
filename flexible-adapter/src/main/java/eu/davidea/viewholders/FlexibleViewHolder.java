@@ -81,7 +81,7 @@ public abstract class FlexibleViewHolder extends RecyclerView.ViewHolder
 	 *
 	 * @param view         The {@link View} being hosted in this ViewHolder
 	 * @param adapter      Adapter instance of type {@link FlexibleAdapter}
-	 * @param stickyHeader true if the View can be a Sticky Header, false
+	 * @param stickyHeader true if the View can be a Sticky Header, false otherwise
 	 */
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter, boolean stickyHeader) {
 		super(stickyHeader ? new FrameLayout(view.getContext()) : view);
