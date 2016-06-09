@@ -126,6 +126,12 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	 */
 	@Override
 	public void onLoadMore() {
+		//We don't want load more items when searching into the current Collection!
+		//Alternatively, for a special filter, if we want load more items when filter is active, the
+		// new items that arrive from remote, should be already filtered, before adding them to the Adapter!
+		if (mAdapter.hasSearchText()) {
+			mAdapter.onLoadMoreComplete(null);
+		}
 		Log.i(TAG, "onLoadMore invoked!");
 		//Simulating asynchronous call
 		new Handler().postDelayed(new Runnable() {
