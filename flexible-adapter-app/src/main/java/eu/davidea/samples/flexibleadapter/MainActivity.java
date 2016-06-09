@@ -327,8 +327,11 @@ public class MainActivity extends AppCompatActivity implements
 				Log.d(TAG, "onPrepareOptionsMenu Clearing SearchView!");
 				mSearchView.setIconified(true);// This also clears the text in SearchView widget
 			} else {
-				mSearchView.setQuery(mAdapter.getSearchText(), false);
-				mSearchView.setIconified(false);
+				//Necessary after the restoreInstanceState
+				menu.findItem(R.id.action_search).expandActionView();//must be called first
+				//mSearchView.setIconified(false);//this is not necessary
+				mSearchView.clearFocus();//Optionally the keyboard can be closed
+				mSearchView.setQuery(mAdapter.getSearchText(), false);//This restores the text, must be after the expandActionView
 			}
 		}
 		return super.onPrepareOptionsMenu(menu);

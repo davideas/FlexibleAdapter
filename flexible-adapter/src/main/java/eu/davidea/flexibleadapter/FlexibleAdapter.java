@@ -99,7 +99,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	private static final String EXTRA_HEADERS = TAG + "_headersShown";
 	private static final String EXTRA_LEVEL = TAG + "_selectedLevel";
 	private static final String EXTRA_SEARCH = TAG + "_searchText";
-	private static final String EXTRA_SEARCH_OLD = TAG + "_searchTextOld";
 	public static final int EXPANDABLE_VIEW_TYPE = -1;
 	public static final int SECTION_VIEW_TYPE = -2;
 	public static final long UNDO_TIMEOUT = 5000L;
@@ -3276,9 +3275,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			outState.putBoolean(EXTRA_CHILD, this.childSelected);
 			outState.putBoolean(EXTRA_PARENT, this.parentSelected);
 			outState.putInt(EXTRA_LEVEL, this.selectedLevel);
-			//Current filter
+			//Current filter. Old text is not saved otherwise animateTo() cannot be called
 			outState.putString(EXTRA_SEARCH, this.mSearchText);
-			outState.putString(EXTRA_SEARCH_OLD, this.mOldSearchText);
 			//Save headers shown status
 			outState.putBoolean(EXTRA_HEADERS, this.headersShown);
 		}
@@ -3304,9 +3302,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			this.parentSelected = savedInstanceState.getBoolean(EXTRA_PARENT);
 			this.childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
 			this.selectedLevel = savedInstanceState.getInt(EXTRA_LEVEL);
-			//Current filter
+			//Current filter (old text must not be saved)
 			this.mSearchText = savedInstanceState.getString(EXTRA_SEARCH);
-			this.mOldSearchText = savedInstanceState.getString(EXTRA_SEARCH_OLD);
 		}
 	}
 
