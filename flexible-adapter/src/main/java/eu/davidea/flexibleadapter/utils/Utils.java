@@ -60,7 +60,7 @@ public final class Utils {
 	public static void highlightText(Context context, TextView textView,
 									 String originalText, String constraint, int defColor) {
 		Spannable spanText = Spannable.Factory.getInstance().newSpannable(originalText);
-		int i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint);
+		int i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()));
 		if (i != -1) {
 			spanText.setSpan(new ForegroundColorSpan(fetchAccentColor(context, defColor)), i,
 					i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
