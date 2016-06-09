@@ -48,7 +48,7 @@ public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_child_item;
+		return R.layout.recycler_sub_item;
 	}
 
 	@Override

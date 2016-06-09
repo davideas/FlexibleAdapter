@@ -9,7 +9,7 @@
 	<color name="colorPrimaryText_light">#de000000</color>
 
 	<!-- Common colors -->
-	<color name="list_choice_normal_bg_light">#ffff</color>
+	<color name="list_choice_normal_bg_light">#fffafafa</color>
 	<color name="list_choice_pressed_bg_light">#fccc</color>
 
 </resources>

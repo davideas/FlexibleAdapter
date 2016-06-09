@@ -91,7 +91,6 @@ public class StickyHeaderHelper extends OnScrollListener {
 			mStickyHolderLayout.animate().setListener(new Animator.AnimatorListener() {
 				@Override
 				public void onAnimationStart(Animator animation) {
-
 				}
 
 				@Override
@@ -101,12 +100,10 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 				@Override
 				public void onAnimationCancel(Animator animation) {
-
 				}
 
 				@Override
 				public void onAnimationRepeat(Animator animation) {
-
 				}
 			});
 			mStickyHolderLayout.animate().alpha(0).start();
@@ -121,9 +118,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		//Initialize Holder Layout and show sticky header if exists already
 		mStickyHolderLayout = mAdapter.getStickySectionHeadersHolder();
 		if (mStickyHolderLayout != null) {
-			if (mStickyHolderLayout.getLayoutParams() == null) {
-				mStickyHolderLayout.setLayoutParams(getDefaultLayoutParams());
-			}
+			mStickyHolderLayout.setClipToPadding(false);
 			mStickyHolderLayout.setAlpha(0);
 			updateOrClearHeader(false);
 			mStickyHolderLayout.animate().alpha(1).start();
@@ -150,15 +145,6 @@ public class StickyHeaderHelper extends OnScrollListener {
 		} else {
 			clearHeader();
 		}
-	}
-
-	private void ensureHeaderParent() {
-		final View view = mStickyHeaderViewHolder.getContentView();
-		ViewGroup.LayoutParams params = mStickyHolderLayout.getLayoutParams();
-		params.width = view.getMeasuredWidth();
-		params.height = view.getMeasuredHeight();
-		removeViewFromParent(view);
-		mStickyHolderLayout.addView(view);
 	}
 
 	private void updateHeader(int headerPosition, boolean updateHeaderContent) {
@@ -198,13 +184,13 @@ public class StickyHeaderHelper extends OnScrollListener {
 				if (mHeaderPosition != nextHeaderPosition) {
 					if (getOrientation(mRecyclerView) == OrientationHelper.HORIZONTAL) {
 						if (nextChild.getLeft() > 0) {
-							int headerWidth = mStickyHeaderViewHolder.getContentView().getMeasuredWidth();
+							int headerWidth = mStickyHolderLayout.getMeasuredWidth();
 							headerOffsetX = Math.min(nextChild.getLeft() - headerWidth, 0);
 							if (headerOffsetX < 0) break;
 						}
 					} else {
 						if (nextChild.getTop() > 0) {
-							int headerHeight = mStickyHeaderViewHolder.getContentView().getMeasuredHeight();
+							int headerHeight = mStickyHolderLayout.getMeasuredHeight();
 							headerOffsetY = Math.min(nextChild.getTop() - headerHeight, 0);
 							if (headerOffsetY < 0) break;
 						}
@@ -217,19 +203,29 @@ public class StickyHeaderHelper extends OnScrollListener {
 		//Apply translation
 		mStickyHolderLayout.setTranslationX(headerOffsetX);
 		mStickyHolderLayout.setTranslationY(headerOffsetY);
-		Log.v(TAG, "TranslationX=" + headerOffsetX + " TranslationY=" + headerOffsetY);
+		//Log.v(TAG, "TranslationX=" + headerOffsetX + " TranslationY=" + headerOffsetY);
 	}
 
 	private void swapHeader(FlexibleViewHolder newHeader) {
-			if (mStickyHeaderViewHolder != null) {
-				resetHeader(mStickyHeaderViewHolder);
-			}
-			mStickyHeaderViewHolder = newHeader;
-			if (mStickyHeaderViewHolder != null) {
-				mStickyHeaderViewHolder.setIsRecyclable(false);
-				ensureHeaderParent();
-			}
-			onStickyHeaderChange(mHeaderPosition);
+		if (mStickyHeaderViewHolder != null) {
+			resetHeader(mStickyHeaderViewHolder);
+		}
+		mStickyHeaderViewHolder = newHeader;
+		if (mStickyHeaderViewHolder != null) {
+			mStickyHeaderViewHolder.setIsRecyclable(false);
+			ensureHeaderParent();
+		}
+		onStickyHeaderChange(mHeaderPosition);
+	}
+
+	private void ensureHeaderParent() {
+		final View view = mStickyHeaderViewHolder.getContentView();
+		FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mStickyHolderLayout.getLayoutParams();
+		params.width = view.getMeasuredWidth();
+		params.height = view.getMeasuredHeight();
+		removeViewFromParent(view);
+		mStickyHolderLayout.setClipToPadding(false);
+		mStickyHolderLayout.addView(view);
 	}
 
 	public void clearHeader() {
@@ -319,12 +315,6 @@ public class StickyHeaderHelper extends OnScrollListener {
 		if (parent instanceof ViewGroup) {
 			((ViewGroup) parent).removeView(view);
 		}
-	}
-
-	private static ViewGroup.LayoutParams getDefaultLayoutParams() {
-		return new FrameLayout.LayoutParams(
-				ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
 	}
 
 	private static int getOrientation(RecyclerView recyclerView) {

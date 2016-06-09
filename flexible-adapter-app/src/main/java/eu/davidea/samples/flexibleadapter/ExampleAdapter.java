@@ -39,10 +39,12 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	@Override
 	public void updateDataSet(List<AbstractFlexibleItem> items, boolean animate) {
-		super.updateDataSet(items, animate);
-		//Overwrite the list and fully notify the change
+		//NOTE: To have views/items not changed, set them into "items" before passing the final
+		// list to the Adapter, also pass animate=true in order to not delete those items.
+
+		//Overwrite the list and fully notify the change, pass false to not animate changes.
 		//Watch out! The original list must a copy
-		//TODO: We may create calls like removeAll, addAll or refreshList in order to animate changes
+		super.updateDataSet(items, animate);
 
 		//Add example view
 		showLayoutInfo(true);
@@ -70,7 +72,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
 			addItemWithDelay((getItem(0) instanceof ULSItem ? 1 : 0), item, 100L, (!(getItem(0) instanceof ULSItem) && scrollToPosition));
-			removeItemWithDelay(item, 2000L);
+			removeItemWithDelay(item, 2000L, true);
 		}
 	}
 
@@ -269,7 +271,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 				case R.layout.recycler_uls_item:
 					addSlideInFromTopAnimator(animators, itemView);
 					break;
-				case R.layout.recycler_child_item:
+				case R.layout.recycler_sub_item:
 				case EXAMPLE_VIEW_TYPE:
 					addScaleInAnimator(animators, itemView, 0.0f);
 					break;

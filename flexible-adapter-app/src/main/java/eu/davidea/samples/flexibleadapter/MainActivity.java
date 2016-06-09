@@ -674,7 +674,7 @@ public class MainActivity extends AppCompatActivity implements
 			try {
 				//NEW! You can take advantage of AutoMap and differentiate logic by viewType using "switch" statement
 				switch (adapterItem.getLayoutRes()) {
-					case R.layout.recycler_child_item:
+					case R.layout.recycler_sub_item:
 						SubItem subItem = (SubItem) adapterItem;
 						DatabaseService.getInstance().removeSubItem(mAdapter.getExpandableOfDeletedChild(subItem), subItem);
 						Log.d(TAG, "Confirm removed " + subItem.getTitle());

@@ -48,8 +48,8 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 				item.setTitle(mRecyclerView.getContext().getString(R.string.linear_layout));
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
-			addItemWithDelay(0, item, 1000L, scrollToPosition);
-			removeItemWithDelay( item, 2000L);
+			addItemWithDelay(0, item, 100L, scrollToPosition);
+			removeItemWithDelay(item, 2000L, true);
 		}
 	}
 
