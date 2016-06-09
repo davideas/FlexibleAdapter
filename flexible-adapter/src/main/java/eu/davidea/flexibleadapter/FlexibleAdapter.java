@@ -723,11 +723,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * android:layout_width="match_parent"
 	 * android:layout_height="match_parent"/&gt;</pre>
 	 * <pre>&lt;include layout="@layout/sticky_header_layout"/&gt;</pre></p>
-	 * The ViewGroup must have {@code @+id/sticky_header_container}.
 	 * <p><b>OR</b></p>
-	 * Implement this method to return a ViewGroup.
+	 * Implement this method to return an already inflated ViewGroup.
+	 * <br/>The ViewGroup <u>must</u> have {@code android:id="@+id/sticky_header_container"}.
 	 *
-	 * @return ViewGroup layout that will hold the sticky headers ItemViews
+	 * @return ViewGroup layout that will hold the sticky header ItemViews
 	 */
 	public ViewGroup getStickySectionHeadersHolder() {
 		return (ViewGroup) ((Activity) mRecyclerView.getContext()).findViewById(R.id.sticky_header_container);
@@ -1439,16 +1439,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 			//Automatically scroll the current expandable item to show as much children as possible
 			if (!init && scrollOnExpand && !expandAll) {
-				//Must be delayed to give time at RecyclerView to recalculate positions
-				//after an automatic collapse
-				final int pos = position, count = subItemsCount;
-				Handler animatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
-					public boolean handleMessage(Message message) {
-						autoScroll(pos, count);
-						return true;
-					}
-				});
-				animatorHandler.sendMessageDelayed(Message.obtain(mHandler), 150L);
+				autoScrollWithDelay(position, subItemsCount, 150L);
 			}
 
 			//Expand!
@@ -1942,17 +1933,22 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param item  the item to add
 	 * @param delay a non negative delay
+	 * @param permanent true to permanently delete the item, false otherwise
 	 * @see #removeItem(int)
 	 * @see #removeItems(List)
 	 * @see #removeItemsOfType(Integer...)
 	 * @see #removeRange(int, int)
 	 * @see #removeAllSelectedItems()
 	 */
-	public void removeItemWithDelay(@NonNull final T item, @IntRange(from = 0) long delay) {
+	public void removeItemWithDelay(@NonNull final T item, @IntRange(from = 0) long delay,
+									final boolean permanent) {
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
+				boolean tempPermanent = permanentDelete;
+				if (permanent) permanentDelete = true;
 				removeItem(getGlobalPositionOf(item));
+				permanentDelete = tempPermanent;
 			}
 		}, delay);
 	}
@@ -1965,7 +1961,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeItemsOfType(Integer...)
 	 * @see #removeRange(int, int)
 	 * @see #removeAllSelectedItems()
-	 * @see #removeItemWithDelay(IFlexible, long)
+	 * @see #removeItemWithDelay(IFlexible, long, boolean)
 	 * @see #removeItem(int, Object)
 	 */
 	public void removeItem(@IntRange(from = 0) int position) {
@@ -3213,33 +3209,39 @@ public class FlexibleAdapter<T extends IFlexible>
 		return false;
 	}
 
-	private void autoScroll(int position, int subItemsCount) {
-		int firstVisibleItem, lastVisibleItem;
-		if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-			firstVisibleItem = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPositions(null)[0];
-			lastVisibleItem = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPositions(null)[0];
-		} else {
-			firstVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-			lastVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
-		}
-		int itemsToShow = position + subItemsCount - lastVisibleItem;
-		if (DEBUG)
-			Log.v(TAG, "autoScroll itemsToShow=" + itemsToShow + " firstVisibleItem=" + firstVisibleItem + " lastVisibleItem=" + lastVisibleItem + " RvChildCount=" + mRecyclerView.getChildCount());
-		if (itemsToShow > 0) {
-			int scrollMax = position - firstVisibleItem;
-			int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
-			int scrollBy = Math.min(scrollMax, scrollMin);
-			int spanCount = getSpanCount(mRecyclerView.getLayoutManager());
-			if (spanCount > 1) {
-				scrollBy = scrollBy % spanCount + spanCount;
+	private void autoScrollWithDelay(final int position, final int subItemsCount, final long delay) {
+		//Must be delayed to give time at RecyclerView to recalculate positions after an automatic collapse
+		new Handler(Looper.getMainLooper(), new Handler.Callback() {
+			public boolean handleMessage(Message message) {
+				int firstVisibleItem, lastVisibleItem;
+				if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+					firstVisibleItem = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPositions(null)[0];
+					lastVisibleItem = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPositions(null)[0];
+				} else {
+					firstVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+					lastVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
+				}
+				int itemsToShow = position + subItemsCount - lastVisibleItem;
+				if (DEBUG)
+					Log.v(TAG, "autoScroll itemsToShow=" + itemsToShow + " firstVisibleItem=" + firstVisibleItem + " lastVisibleItem=" + lastVisibleItem + " RvChildCount=" + mRecyclerView.getChildCount());
+				if (itemsToShow > 0) {
+					int scrollMax = position - firstVisibleItem;
+					int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
+					int scrollBy = Math.min(scrollMax, scrollMin);
+					int spanCount = getSpanCount(mRecyclerView.getLayoutManager());
+					if (spanCount > 1) {
+						scrollBy = scrollBy % spanCount + spanCount;
+					}
+					int scrollTo = firstVisibleItem + scrollBy;
+					if (DEBUG)
+						Log.v(TAG, "autoScroll scrollMin=" + scrollMin + " scrollMax=" + scrollMax + " scrollBy=" + scrollBy + " scrollTo=" + scrollTo);
+					mRecyclerView.smoothScrollToPosition(scrollTo);
+				} else if (position < firstVisibleItem) {
+					mRecyclerView.smoothScrollToPosition(position);
+				}
+				return true;
 			}
-			int scrollTo = firstVisibleItem + scrollBy;
-			if (DEBUG)
-				Log.v(TAG, "autoScroll scrollMin=" + scrollMin + " scrollMax=" + scrollMax + " scrollBy=" + scrollBy + " scrollTo=" + scrollTo);
-			mRecyclerView.smoothScrollToPosition(scrollTo);
-		} else if (position < firstVisibleItem) {
-			mRecyclerView.smoothScrollToPosition(position);
-		}
+		}).sendMessageDelayed(Message.obtain(mHandler), delay);
 	}
 
 	private void adjustSelected(int startPosition, int itemCount) {
