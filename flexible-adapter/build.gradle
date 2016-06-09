@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.jakewharton.hugo'
 
 android {
 	compileSdkVersion targetSdk
@@ -23,7 +24,7 @@ dependencies {
 	compile supportDependencies.design
 }
 
-apply from: '../maven-install.gradle'
-apply from: '../maven-publish.gradle'
+//apply from: '../maven-install.gradle'
+//apply from: '../maven-publish.gradle'
 //apply from: '../jfrog-bintray-publish.gradle'
 //apply from: '../jfrog-artifactory-publish.gradle'
