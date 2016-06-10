@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.FrameLayout;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnStickyHeaderChangeListener;
@@ -220,7 +219,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 	private void ensureHeaderParent() {
 		final View view = mStickyHeaderViewHolder.getContentView();
-		FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mStickyHolderLayout.getLayoutParams();
+		ViewGroup.LayoutParams params = mStickyHolderLayout.getLayoutParams();
 		params.width = view.getMeasuredWidth();
 		params.height = view.getMeasuredHeight();
 		removeViewFromParent(view);
