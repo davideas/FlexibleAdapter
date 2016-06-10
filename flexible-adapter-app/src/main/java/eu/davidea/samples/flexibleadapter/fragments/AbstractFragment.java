@@ -2,6 +2,7 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -102,6 +103,7 @@ public abstract class AbstractFragment extends Fragment {
 		//default implementation does nothing
 	}
 
+	@CallSuper
 	public void showNewLayoutInfo(final MenuItem item) {
 		item.setEnabled(false);
 		mRecyclerView.postDelayed(new Runnable() {

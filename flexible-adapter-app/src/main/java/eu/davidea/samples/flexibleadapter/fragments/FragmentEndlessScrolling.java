@@ -23,7 +23,6 @@ import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
@@ -78,7 +77,8 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setHandleDragEnabled(true)
+		mAdapter.setAutoScrollOnExpand(true)
+				.setHandleDragEnabled(true)
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
@@ -131,6 +131,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		// new items that arrive from remote, should be already filtered, before adding them to the Adapter!
 		if (mAdapter.hasSearchText()) {
 			mAdapter.onLoadMoreComplete(null);
+			return;
 		}
 		Log.i(TAG, "onLoadMore invoked!");
 		//Simulating asynchronous call
@@ -147,7 +148,6 @@ public class FragmentEndlessScrolling extends AbstractFragment
 						newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
 					} else {
 						newItems.add(DatabaseService.newExpandableItem(totalItemsOfType + i, null));
-						((IExpandable) newItems.get(i - 1)).setExpanded(true);
 					}
 				}
 
@@ -155,6 +155,19 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				//- New items will be added to the end of the list
 				//- When list is null or empty, ProgressItem will be hidden
 				mAdapter.onLoadMoreComplete(newItems);
+				DatabaseService.getInstance().addAll(newItems);
+
+				//Expand all Expandable items: Not Expandable items are automatically skipped/ignored!
+				for (AbstractFlexibleItem item : newItems) {
+					//Simple expansion is performed:
+					// - Automatic scroll is performed
+					//mAdapter.expand(item);
+
+					//Initialization is performed:
+					// - Expanded status is ignored(WARNING: possible subItem duplication)
+					// - Automatic scroll is skipped
+					mAdapter.expand(item, true);
+				}
 
 				//Notify user
 				String message = (newItems.size() > 0 ?

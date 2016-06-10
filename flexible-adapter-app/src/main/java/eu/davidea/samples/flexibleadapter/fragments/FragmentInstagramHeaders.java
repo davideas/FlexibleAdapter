@@ -64,7 +64,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		FlipView.stopLayoutAnimation();
 	}
 
-	@SuppressWarnings({"ConstantConditions", "NullableProblems", "unchecked"})
+	@SuppressWarnings({"ConstantConditions", "unchecked"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		mAdapter = new FlexibleAdapter<AbstractFlexibleItem>(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		//Experimenting NEW features (v5.0.0)
@@ -82,15 +82,14 @@ public class FragmentInstagramHeaders extends AbstractFragment
 			}
 		});
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 0, 24));
-		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
-		mAdapter.enableStickyHeaders();
+		mAdapter.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!
+				.enableStickyHeaders()//Make headers sticky
+				//Endless scroll with 1 item threshold
+				.setEndlessScrollListener(this, new ProgressItem())
+				.setEndlessScrollThreshold(1);//Default=1
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
-
-		//Endless scroll with 1 item threshold
-		mAdapter.setEndlessScrollListener(this, new ProgressItem());
-		mAdapter.setEndlessScrollThreshold(1);//Default=1
 	}
 
 	/**

@@ -55,6 +55,12 @@ public class LayoutItem extends AbstractModelItem<LayoutItem.ExampleViewHolder> 
 		holder.mTitle.setText(getTitle());
 		holder.mSubtitle.setText(getSubtitle());
 		adapter.animateView(holder.itemView, position, false);
+
+		//Support for StaggeredGridLayoutManager
+		if (holder.itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
+			((StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams()).setFullSpan(true);
+			Log.d("LayoutItem", "LayoutItem configured fullSpan for StaggeredGridLayout");
+		}
 	}
 
 	/**
@@ -69,12 +75,6 @@ public class LayoutItem extends AbstractModelItem<LayoutItem.ExampleViewHolder> 
 			super(view, adapter, true);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-
-			//Support for StaggeredGridLayoutManager
-			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
-				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
-				Log.d("LayoutItem", "LayoutItem configured fullSpan for StaggeredGridLayout");
-			}
 		}
 	}
 

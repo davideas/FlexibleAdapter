@@ -329,9 +329,10 @@ public class MainActivity extends AppCompatActivity implements
 			} else {
 				//Necessary after the restoreInstanceState
 				menu.findItem(R.id.action_search).expandActionView();//must be called first
-				//mSearchView.setIconified(false);//this is not necessary
+				//This restores the text, must be after the expandActionView()
+				mSearchView.setQuery(mAdapter.getSearchText(), false);//submit = false!!!
 				mSearchView.clearFocus();//Optionally the keyboard can be closed
-				mSearchView.setQuery(mAdapter.getSearchText(), false);//This restores the text, must be after the expandActionView
+				//mSearchView.setIconified(false);//This is not necessary
 			}
 		}
 		return super.onPrepareOptionsMenu(menu);

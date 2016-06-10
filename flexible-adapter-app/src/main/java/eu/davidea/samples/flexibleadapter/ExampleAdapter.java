@@ -29,6 +29,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public static final int CHILD_VIEW_TYPE = 0;
 	public static final int EXAMPLE_VIEW_TYPE = 1;
 
+	private AbstractFlexibleItem mUseCaseItem;
+
 	public ExampleAdapter(Activity activity) {
 		super(DatabaseService.getInstance().getDatabaseList(), activity);
 
@@ -72,7 +74,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
 			addItemWithDelay((getItem(0) instanceof ULSItem ? 1 : 0), item, 100L, (!(getItem(0) instanceof ULSItem) && scrollToPosition));
-			removeItemWithDelay(item, 2000L, true);
+			removeItemWithDelay(item, 2000L, true, true);
 		}
 	}
 

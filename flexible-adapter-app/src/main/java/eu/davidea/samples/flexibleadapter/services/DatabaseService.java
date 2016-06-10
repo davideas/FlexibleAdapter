@@ -272,6 +272,10 @@ public class DatabaseService {
 			((ExpandableHeaderItem) parent).removeSubItem(child);
 	}
 
+	public void addAll(List<AbstractFlexibleItem> newItems) {
+		mItems.addAll(newItems);
+	}
+
 	public void addItem(int position, AbstractModelItem item) {
 		if (position < mItems.size())
 			mItems.add(position, item);
