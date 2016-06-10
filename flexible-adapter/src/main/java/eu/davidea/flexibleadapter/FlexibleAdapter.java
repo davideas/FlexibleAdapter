@@ -1460,10 +1460,11 @@ public class FlexibleAdapter<T extends IFlexible>
 			return 0;
 		}
 		if (DEBUG && !init) {
-			Log.v(TAG, "Request to Expand on position " + position +
-					" expanded " + expandable.isExpanded() + " ExpandedItems=" + getExpandedPositions());
+			Log.v(TAG, "Request to Expand on position=" + position +
+					" expanded=" + expandable.isExpanded() +
+					" anyParentSelected=" + parentSelected +
+					" ExpandedItems=" + getExpandedPositions());
 		}
-
 		int subItemsCount = 0;
 		if (init || !expandable.isExpanded() &&
 				(!parentSelected || expandable.getExpansionLevel() <= selectedLevel)) {
@@ -1555,10 +1556,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (!isExpandable(item)) return 0;
 
 		IExpandable expandable = (IExpandable) item;
-		if (DEBUG)
-			Log.v(TAG, "Request to Collapse on position " + position +
-					" expanded " + expandable.isExpanded() + " ExpandedItems=" + getExpandedPositions());
-
+		if (DEBUG) {
+			Log.v(TAG, "Request to Collapse on position=" + position +
+					" expanded=" + expandable.isExpanded() +
+					" hasSubItemsSelected=" + hasSubItemsSelected(expandable) +
+					" ExpandedItems=" + getExpandedPositions());
+		}
 		int subItemsCount = 0, recursiveCount = 0;
 		if (expandable.isExpanded() &&
 				(!hasSubItemsSelected(expandable) || getPendingRemovedItem(item) != null)) {
@@ -1741,6 +1744,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (DEBUG) Log.v(TAG, "addItems on position=" + position + " itemCount=" + items.size());
 
 		//Insert Items
+		int initialCount = getItemCount();
 		if (position < mItems.size()) {
 			mItems.addAll(position, items);
 		} else {
@@ -1757,7 +1761,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			recursive = false;
 		}
 		//Call listener to update EmptyView
-		if (!recursive && mUpdateListener != null && !multiRange)
+		if (!recursive && mUpdateListener != null && !multiRange && initialCount == 0 && getItemCount() > 0)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 		return true;
 	}
@@ -2253,7 +2257,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 
 		//Update empty view
-		if (mUpdateListener != null && !multiRange && initialCount != getItemCount())
+		if (mUpdateListener != null && !multiRange && initialCount > 0 && getItemCount() == 0)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
@@ -2416,7 +2420,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		//Call listener to update EmptyView
 		multiRange = false;
-		if (mUpdateListener != null && initialCount != getItemCount())
+		if (mUpdateListener != null && initialCount == 0 && getItemCount() > 0)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 
 		emptyBin();
@@ -2674,7 +2678,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		filtering = false;
 
 		//Call listener to update EmptyView
-		if (mUpdateListener != null && initialCount != getItemCount())
+		if (mUpdateListener != null &&
+				(initialCount == 0 && getItemCount() > 0) ||
+				(initialCount > 0 && getItemCount() == 0))
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
