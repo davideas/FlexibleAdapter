@@ -21,6 +21,8 @@ import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -57,8 +59,10 @@ public final class Utils {
 	 * @param defColor     the default color in case accentColor is not found
 	 * @see #fetchAccentColor(Context, int)
 	 */
-	public static void highlightText(Context context, TextView textView,
-									 String originalText, String constraint, int defColor) {
+	public static void highlightText(@NonNull Context context, @NonNull TextView textView,
+									 String originalText, String constraint, @ColorInt int defColor) {
+		if (originalText == null) originalText = "";
+		if (constraint == null) constraint = "";
 		Spannable spanText = Spannable.Factory.getInstance().newSpannable(originalText);
 		int i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()));
 		if (i != -1) {
