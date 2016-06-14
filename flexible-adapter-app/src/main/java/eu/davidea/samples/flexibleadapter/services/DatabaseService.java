@@ -188,12 +188,18 @@ public class DatabaseService {
 
 	protected void createMergedItems() {
 		//Simulating merged items
-		mergeItem((StaggeredItem) mItems.get(1), (StaggeredItem) mItems.remove(2));
-		mergeItem((StaggeredItem) mItems.get(4), (StaggeredItem) mItems.remove(5));
-		mergeItem((StaggeredItem) mItems.get(4), (StaggeredItem) mItems.remove(9));
-		mergeItem((StaggeredItem) mItems.get(8), (StaggeredItem) mItems.remove(9));
-		mergeItem((StaggeredItem) mItems.get(8), (StaggeredItem) mItems.remove(9));
-		mergeItem((StaggeredItem) mItems.get(8), (StaggeredItem) mItems.remove(10));
+		if (mItems.size() > 2)
+			mergeItem((StaggeredItem) mItems.get(1), (StaggeredItem) mItems.remove(2));
+		if (mItems.size() > 5)
+			mergeItem((StaggeredItem) mItems.get(4), (StaggeredItem) mItems.remove(5));
+		if (mItems.size() > 7)
+			mergeItem((StaggeredItem) mItems.get(4), (StaggeredItem) mItems.remove(7));
+		if (mItems.size() > 8)
+			mergeItem((StaggeredItem) mItems.get(7), (StaggeredItem) mItems.remove(8));
+		if (mItems.size() > 8)
+			mergeItem((StaggeredItem) mItems.get(7), (StaggeredItem) mItems.remove(8));
+		if (mItems.size() > 9)
+			mergeItem((StaggeredItem) mItems.get(7), (StaggeredItem) mItems.remove(9));
 	}
 
 	/*---------------*/
@@ -384,8 +390,8 @@ public class DatabaseService {
 		for (AbstractFlexibleItem item : mItems) {
 			if (item instanceof StaggeredItem) {
 				StaggeredItem staggeredItem = (StaggeredItem) item;
-				staggeredItem.setStatus(StaggeredItemStatus.A);
-				staggeredItem.setHeader(headers.get(StaggeredItemStatus.A));
+				staggeredItem.setStatus(StaggeredItemStatus.C);
+				staggeredItem.setHeader(headers.get(StaggeredItemStatus.C));
 				mergedItems.addAll(staggeredItem.splitAllItems());
 			}
 		}
@@ -394,8 +400,7 @@ public class DatabaseService {
 		}
 		mItems.addAll(mergedItems);
 		Collections.sort(mItems, new ItemComparatorById());
-		if (mItems.size() > 20)
-			createMergedItems();
+		createMergedItems();
 	}
 
 	public void mergeItem(StaggeredItem mainItem, StaggeredItem itemToMerge) {

@@ -482,6 +482,8 @@ public class MainActivity extends AppCompatActivity implements
 				item.setTitle(R.string.mode_single);
 				Snackbar.make(findViewById(R.id.main_view), "Selection MODE_IDLE is enabled", Snackbar.LENGTH_SHORT).show();
 			}
+		} else if (id == R.id.action_reset || id == R.id.action_delete) {
+			showFab();
 		}
 		//TODO: Add toggle for mAdapter.toggleFastScroller();
 		//TODO: Add dialog configuration settings
