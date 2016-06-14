@@ -402,15 +402,21 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #updateDataSet(List)
 	 */
 	@CallSuper
-	public void updateDataSet(List<T> items, boolean animate) {
+	public void updateDataSet(@Nullable List<T> items, boolean animate) {
 		if (animate) {
 			animateTo(items);
 		} else {
-			mItems = new ArrayList<>(items);
+			if (items == null) mItems = new ArrayList<>();
+			else mItems = new ArrayList<>(items);
 			notifyDataSetChanged();
 		}
-		expandItemsAtStartUp();
-		if (headersShown) showAllHeaders();
+		//Check if Data Set is empty
+		if (mUpdateListener != null && getItemCount() == 0) {
+			mUpdateListener.onUpdateEmptyView(0);
+		} else {
+			expandItemsAtStartUp();
+			if (headersShown) showAllHeaders();
+		}
 	}
 
 	/**
@@ -512,14 +518,18 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * New method to extract the new position where the item should lay.
-	 * <p><b>Note: </b>The Comparator should be customized to support of the kind of items
-	 * this Adapter is displaying.</p>
+	 * <p><b>Note: </b>The Comparator should be customized to support <u>all</u> the types of items
+	 * this Adapter is displaying or a ClassCastException will be raised.</p>
+	 * If Comparator is {@code null} the returned position is 0.
 	 *
-	 * @param item       the item to insert
+	 * @param item       the item to evaluate the insertion
 	 * @param comparator the Comparator object with the logic to sort the list
 	 * @return the position resulted from sorting with the provided Comparator
 	 */
-	public int calculatePositionFor(@NonNull Object item, @NonNull Comparator comparator) {
+	public int calculatePositionFor(@NonNull Object item, @Nullable Comparator comparator) {
+		//There's nothing to compare
+		if (comparator == null) return 0;
+
 		//Header is visible
 		if (item instanceof ISectionable) {
 			IHeader header = ((ISectionable) item).getHeader();
@@ -530,9 +540,9 @@ public class FlexibleAdapter<T extends IFlexible>
 				int fix = mItems.indexOf(item) < getGlobalPositionOf(header) ? 0 : 1;
 				int result = getGlobalPositionOf(header) + sortedList.indexOf(item) + fix;
 				if (DEBUG) {
-					Log.d(TAG, "Calculated finalPosition=" + result +
+					Log.v(TAG, "Calculated finalPosition=" + result +
 							" sectionPosition=" + getGlobalPositionOf(header) +
-							" positionInSection=" + sortedList.indexOf(item) + " fix=" + fix);
+							" relativePosition=" + sortedList.indexOf(item) + " fix=" + fix);
 				}
 				return result;
 			}
@@ -541,7 +551,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		List sortedList = new ArrayList(mItems);
 		if (!sortedList.contains(item)) sortedList.add(item);
 		Collections.sort(sortedList, comparator);
-		if (DEBUG) Log.d(TAG, "Calculated position " + Math.max(0, sortedList.indexOf(item)));
+		if (DEBUG)
+			Log.v(TAG, "Calculated position " + Math.max(0, sortedList.indexOf(item)) + " for item=" + item);
 		return Math.max(0, sortedList.indexOf(item));
 	}
 
@@ -900,7 +911,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Check header existence
 		if (header == null || getPendingRemovedItem(item) != null) return false;
 		if (header.isHidden()) {
-			if (DEBUG) Log.v(TAG, "Showing header at position " + position + "=" + header);
+			if (DEBUG) Log.v(TAG, "Showing header at position " + position + " header=" + header);
 			header.setHidden(false);
 			return addItem(position, (T) header);
 		}
@@ -921,7 +932,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	private boolean hideHeader(int position, IHeader header) {
 		if (position >= 0) {
-			if (DEBUG) Log.v(TAG, "Hiding header at position " + position + "=" + header);
+			if (DEBUG) Log.v(TAG, "Hiding header at position " + position + " header=" + header);
 			header.setHidden(true);
 			//Remove and notify removals
 			mItems.remove(position);
@@ -1904,24 +1915,20 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Adds and shows an empty section to the top (position = 0).
 	 *
-	 * @see #addSection(IHeader, IHeader)
+	 * @return the calculated position for the new item
+	 * @see #addSection(IHeader, Comparator)
 	 */
-	public void addSection(@NonNull IHeader header) {
-		addSection(header, null);
+	public int addSection(@NonNull IHeader header) {
+		return addSection(header, (Comparator) null);
 	}
 
 	/**
-	 * Adds and shows an empty section.
-	 * <p>The new section is a {@link IHeader} item and the position is calculated from an
-	 * existent header reference:
-	 * <br/>- To add section to the top, set {@code refHeader} to null;
-	 * <br/>- To add section in the middle, set {@code refHeader} to the previous section;
-	 * <br/>- To add section to the bottom, set {@code refHeader} to your last header/section or
-	 * use the method {@code addItem(position=itemCount, header)}.</p>
-	 *
-	 * @param header    the section header item to add
-	 * @param refHeader optional reference section item
+	 * @deprecated For a correct positioning of a new Section, use {@link #addSection(IHeader, Comparator)}
+	 * instead. This method doesn't perform any sort, so if the refHeader is unknown, the Header
+	 * is always inserted at the top, which doesn't cover all use cases.
+	 * <p>This method will be deleted with next pre-release.</p>
 	 */
+	@Deprecated
 	public void addSection(@NonNull IHeader header, @Nullable IHeader refHeader) {
 		int position = 0;
 		if (refHeader != null) {
@@ -1935,24 +1942,53 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Adds and shows an empty section.
+	 * <p>The new section is a {@link IHeader} item and the position is calculated after sorting
+	 * the Data Set.
+	 * <br/>- To add Sections to the <b>top</b>, set null the Comparator object or simply call
+	 * {@link #addSection(IHeader)};
+	 * <br/>- To add Sections to the <b>bottom</b> or in the <b>middle</b>, implement a Comparator
+	 * object able to support <u>all</u> the item types this Adapter is displaying or a
+	 * ClassCastException will be raised.
+	 *
+	 * @param header     the section header item to add
+	 * @param comparator the criteria to sort the Data Set used to extract the correct position
+	 *                   of the new header
+	 * @return the calculated position for the new item
+	 */
+	public int addSection(@NonNull IHeader header, @Nullable Comparator comparator) {
+		int position = calculatePositionFor(header, comparator);
+		addItem(position, (T) header);
+		return position;
+	}
+
+	/**
 	 * Adds a new item in a section when the relative position is <b>unknown</b>.
 	 * <p>The header can be a {@code IExpandable} type or {@code IHeader} type.</p>
+	 * The Comparator object must support <u>all</u> the item types this Adapter is displaying or
+	 * a ClassCastException will be raised.
 	 *
-	 * @param item       the item to add
-	 * @param header     the section receiving the new item
-	 * @param comparator the criteria to sort the sectionItems used to extract the correct position
-	 *                   of the new item
+	 * @param sectionable the item to add
+	 * @param header      the section receiving the new item
+	 * @param comparator  the criteria to sort the sectionItems used to extract the correct position
+	 *                    of the new item in the section
+	 * @return the calculated final position for the new item
 	 * @see #addItemToSection(ISectionable, IHeader, int)
 	 */
-	public void addItemToSection(@NonNull ISectionable item, @NonNull IHeader header,
+	public int addItemToSection(@NonNull ISectionable sectionable, @NonNull IHeader header,
 								 @NonNull Comparator comparator) {
-		List<ISectionable> sectionItems = getSectionItems(header);
-		sectionItems.add(item);
-		//Sort the list for new position
-		Collections.sort(sectionItems, comparator);
-		//Get the new position
-		int index = sectionItems.indexOf(item);
-		addItemToSection(item, header, index);
+		int index;
+		if (header != null && !header.isHidden()) {
+			List<ISectionable> sectionItems = getSectionItems(header);
+			sectionItems.add(sectionable);
+			//Sort the list for new position
+			Collections.sort(sectionItems, comparator);
+			//Get the new position
+			index = sectionItems.indexOf(sectionable);
+		} else {
+			index = calculatePositionFor(sectionable, comparator);
+		}
+		return addItemToSection(sectionable, header, index);
 	}
 
 	/**
@@ -1962,10 +1998,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param item   the item to add
 	 * @param header the section receiving the new item
 	 * @param index  the known relative position where to add the new item into the section
+	 * @return the calculated final position for the new item
 	 * @see #addItemToSection(ISectionable, IHeader, Comparator)
 	 */
-	public void addItemToSection(@NonNull ISectionable item, @NonNull IHeader header,
-								 @IntRange(from = 0) int index) {
+	public int addItemToSection(@NonNull ISectionable item, @NonNull IHeader header,
+								@IntRange(from = 0) int index) {
+		if (DEBUG) Log.v(TAG, "addItemToSection relativePosition=" + index);
 		int headerPosition = getGlobalPositionOf(header);
 		if (index >= 0) {
 			item.setHeader(header);
@@ -1974,6 +2012,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			else
 				addItem(headerPosition + 1 + index, (T) item);
 		}
+		//return the position
+		return getGlobalPositionOf(item);
 	}
 
 	/*----------------------*/
@@ -2691,7 +2731,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>If the provided item is not an expandable it will be filtered as usual by
 	 * {@link #filterObject(T, String)}.</p>
 	 *
-	 * @param item       the object with subItems to be inspected
+	 * @param item the object with subItems to be inspected
 	 * @return true, if the object should be in the filteredResult, false otherwise
 	 */
 	private boolean filterExpandableObject(T item) {
@@ -2808,7 +2848,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the cleaned up item list. make sure to set your new list to this one
 	 * @see #setNotifyChangeOfUnfilteredItems(boolean)
 	 */
-	public List<T> animateTo(List<T> models) {
+	public List<T> animateTo(@Nullable List<T> models) {
+		if (models == null) models = new ArrayList<T>();
 		applyAndAnimateRemovals(mItems, models);
 		applyAndAnimateAdditions(mItems, models);
 		applyAndAnimateMovedItems(mItems, models);
