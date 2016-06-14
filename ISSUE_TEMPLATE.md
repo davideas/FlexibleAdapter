@@ -10,4 +10,4 @@ Please check off the following points BEFORE submitting a new issue / asking sup
 - [ ] Simply Erase all this text and ask your question;
 
 3) To have your App added to the list
-- [ ] Simply Erase all this text and provide your app's name.
+- [ ] Simply Erase all this text and provide your app's name and link.
