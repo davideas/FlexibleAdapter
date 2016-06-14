@@ -1,5 +1,6 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,12 +9,12 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -56,13 +57,15 @@ public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
 		return new ChildViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ChildViewHolder holder, int position, List payloads) {
 		//In case of searchText matches with Title or with an SimpleItem's field
 		// this will be highlighted
 		if (adapter.hasSearchText()) {
-			Utils.highlightText(holder.itemView.getContext(), holder.mTitle,
-					getTitle(), adapter.getSearchText(), R.color.colorAccent_light);
+			Context context = holder.itemView.getContext();
+			Utils.highlightText(context, holder.mTitle, getTitle(), adapter.getSearchText(),
+					context.getResources().getColor(R.color.colorAccent_light));
 		} else {
 			holder.mTitle.setText(getTitle());
 		}
@@ -108,7 +111,7 @@ public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
 
 		@Override
 		public float getActivationElevation() {
-			return Utils.dpToPx(itemView.getContext(), 4f);
+			return eu.davidea.utils.Utils.dpToPx(itemView.getContext(), 4f);
 		}
 	}
 

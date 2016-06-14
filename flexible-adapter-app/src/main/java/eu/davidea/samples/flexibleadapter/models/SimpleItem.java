@@ -12,13 +12,13 @@ import android.widget.Toast;
 import java.io.Serializable;
 import java.util.List;
 
-import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.flipview.FlipView;
+import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
@@ -194,7 +194,7 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 
 		@Override
 		public float getActivationElevation() {
-			return Utils.dpToPx(itemView.getContext(), 4f);
+			return eu.davidea.utils.Utils.dpToPx(itemView.getContext(), 4f);
 		}
 
 		@Override

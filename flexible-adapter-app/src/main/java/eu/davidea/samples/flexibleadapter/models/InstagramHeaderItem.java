@@ -15,12 +15,7 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
-/**
- *
- */
 public class InstagramHeaderItem extends AbstractHeaderItem<InstagramHeaderItem.HeaderViewHolder> {
-
-	private static final long serialVersionUID = -7408637077727563374L;
 
 	private String id;
 	private String title;

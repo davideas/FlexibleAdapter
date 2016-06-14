@@ -6,8 +6,11 @@
 	<string name="action_selected_many">%1$s selected</string>
 	<string name="action_deleted">Deleted</string>
 	<string name="action_archived">Archived</string>
+	<string name="action_merge">Merge</string>
+	<string name="action_split">Split</string>
 
 	<!-- Actions -->
+	<string name="action_reset">Reset</string>
 	<string name="action_search">Search...</string>
 	<string name="action_settings">Settings</string>
 	<string name="linear_layout">Linear Layout</string>
@@ -47,6 +50,12 @@
 	<string name="select_item_type">"Select Item Type                     "</string>
 	<string name="select_section_reference">"Select Section Reference             "</string>
 	<string name="likes">%1$s likes</string>
+	<string name="merged_with">Merged with%1$s</string><!--No space between!-->
+	<string name="status_a">STATUS A</string>
+	<string name="status_b">STATUS B</string>
+	<string name="status_c">STATUS C</string>
+	<string name="status_d">STATUS D</string>
+	<string name="status_e">STATUS E</string>
 
 	<!-- Menu Drawers -->
 	<string name="overall">Overall</string>
@@ -79,7 +88,7 @@
 	<string name="special_layouts">Special Layouts</string>
 	<string name="horizontal">Horizontal Layout</string>
 	<!--<string name="horizontal_description"></string>-->
-	<!--<string name="staggered_description"></string>-->
+	<string name="staggered_description">Cards with (Sticky) headers disposed in Staggered Layout, dynamic background, insertion and sorting</string>
 
 	<!-- About -->
 	<string name="app_name">Flexible Adapter</string>

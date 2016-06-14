@@ -52,6 +52,7 @@ import eu.davidea.samples.flexibleadapter.fragments.FragmentHeadersSections;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentInstagramHeaders;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentOverall;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentSelectionModes;
+import eu.davidea.samples.flexibleadapter.fragments.FragmentStaggeredLayout;
 import eu.davidea.samples.flexibleadapter.fragments.MessageDialogFragment;
 import eu.davidea.samples.flexibleadapter.fragments.OnFragmentInteractionListener;
 import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
@@ -59,6 +60,7 @@ import eu.davidea.samples.flexibleadapter.models.ExpandableItem;
 import eu.davidea.samples.flexibleadapter.models.HeaderItem;
 import eu.davidea.samples.flexibleadapter.models.OverallItem;
 import eu.davidea.samples.flexibleadapter.models.SimpleItem;
+import eu.davidea.samples.flexibleadapter.models.StaggeredItem;
 import eu.davidea.samples.flexibleadapter.models.SubItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.ScrollAwareFABBehavior;
@@ -92,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements
 	private RecyclerView mRecyclerView;
 	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
 	private ActionModeHelper mActionModeHelper;
-	private int mSwipedPosition = RecyclerView.NO_POSITION;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private Toolbar mToolbar;
 	private DrawerLayout mDrawer;
@@ -165,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private void initializeActionModeHelper(int mode) {
-		mActionModeHelper = new ActionModeHelper(mAdapter, R.menu.menu_item_list_context, this) {
+		mActionModeHelper = new ActionModeHelper(mAdapter, mFragment.getContextMenuResId(), this) {
 			@Override
 			public void updateContextTitle(int count) {
 				if (mActionMode != null) {//You can use the internal ActionMode instance
@@ -240,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements
 			@Override
 			public void onClick(View v) {
 				mActionModeHelper.destroyActionModeIfCan();
-				mFragment.addItem();
+				mFragment.performFabAction();
 			}
 		});
 		//No Fab on 1st fragment
@@ -284,6 +285,10 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentExpandableMultiLevel.newInstance(2);
 		} else if (id == R.id.nav_expandable_sections) {
 			mFragment = FragmentExpandableSections.newInstance(3);
+		} else if (id == R.id.nav_staggered) {
+			mFragment = FragmentStaggeredLayout.newInstance(2);
+			showFab();
+			fabBehavior.setEnabled(true);
 		} else if (id == R.id.nav_about) {
 			MessageDialogFragment.newInstance(
 					R.drawable.ic_info_grey600_24dp,
@@ -382,11 +387,11 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private void showFab() {
-		if (mFragment instanceof FragmentHeadersSections)
+		if (mFragment instanceof FragmentHeadersSections || mFragment instanceof FragmentStaggeredLayout)
 			ViewCompat.animate(mFab)
 					.scaleX(1f).scaleY(1f)
 					.alpha(1f).setDuration(100)
-					.setStartDelay(400L)
+					.setStartDelay(300L)
 					.start();
 	}
 
@@ -569,7 +574,6 @@ public class MainActivity extends AppCompatActivity implements
 		//Perform different actions
 		//Here, option 2A) is implemented
 		if (direction == ItemTouchHelper.LEFT) {
-			mSwipedPosition = position;
 			message.append(getString(R.string.action_archived));
 			new UndoHelper(mAdapter, this)
 					.withPayload(true)//You can pass any custom object (in this case Boolean is enough)
@@ -770,6 +774,51 @@ public class MainActivity extends AppCompatActivity implements
 								getString(R.string.undo), 20000);
 
 				//We consume the event
+				return true;
+
+			case R.id.action_merge:
+				if (mAdapter.getSelectedItemCount() > 1) {
+					//Selected positions are sorted by default, we take the first item of the set
+					int mainPosition = mAdapter.getSelectedPositions().get(0);
+					mAdapter.removeSelection(mainPosition);
+					StaggeredItem mainItem = (StaggeredItem) mAdapter.getItem(mainPosition);
+					for (Integer position : mAdapter.getSelectedPositions()) {
+						//Merge item - Save the modification in the memory for next refresh
+						DatabaseService.getInstance().mergeItem(mainItem, (StaggeredItem) mAdapter.getItem(position));
+					}
+					//Remove merged item from the list
+					mAdapter.removeAllSelectedItems();
+					//Keep selection on mainItem & Skip default notification by calling addSelection
+					mAdapter.addSelection(mainPosition);
+					//Custom notification to bind again (ripple only)
+					mAdapter.notifyItemChanged(mainPosition, "blink");
+					//New title for context
+					mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
+				}
+				//We consume always the event, never finish the ActionMode
+				return true;
+
+			case R.id.action_split:
+				if (mAdapter.getSelectedItemCount() == 1) {
+					StaggeredItem mainItem = (StaggeredItem) mAdapter.getItem(mAdapter.getSelectedPositions().get(0));
+					if (mainItem.getMergedItems() != null) {
+						List<StaggeredItem> itemsToSplit = new ArrayList<>(mainItem.getMergedItems());
+						for (StaggeredItem itemToSplit : itemsToSplit) {
+							//Split item - Save the modification in the memory for next refresh
+							DatabaseService.getInstance().splitItem(mainItem, itemToSplit);
+							//We know the section object, so we can insert directly the item at the right position
+							//The calculated position is then returned
+							int position = mAdapter.addItemToSection(itemToSplit, mainItem.getHeader(), new DatabaseService.ItemComparatorById());
+							mAdapter.toggleSelection(position);//Execute default notification
+							mAdapter.notifyItemChanged(position, "blink");
+						}
+						//Custom notification to bind again (ripple only)
+						mAdapter.notifyItemChanged(mAdapter.getGlobalPositionOf(mainItem), "blink");
+						//New title for context
+						mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
+					}
+				}
+				//We consume always the event, never finish the ActionMode
 				return true;
 
 			default:

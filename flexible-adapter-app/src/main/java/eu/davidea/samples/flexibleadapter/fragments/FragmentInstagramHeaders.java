@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
@@ -16,7 +15,6 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
-import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
@@ -66,12 +64,12 @@ public class FragmentInstagramHeaders extends AbstractFragment
 
 	@SuppressWarnings({"ConstantConditions", "unchecked"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		mAdapter = new FlexibleAdapter<AbstractFlexibleItem>(DatabaseService.getInstance().getDatabaseList(), getActivity());
+		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
 		mAdapter.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
-		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {

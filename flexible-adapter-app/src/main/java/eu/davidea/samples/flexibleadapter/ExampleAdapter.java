@@ -30,6 +30,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public static final int EXAMPLE_VIEW_TYPE = 1;
 
 	private AbstractFlexibleItem mUseCaseItem;
+	private int positionOld = -1;
 
 	public ExampleAdapter(Activity activity) {
 		super(DatabaseService.getInstance().getDatabaseList(), activity);
@@ -60,7 +61,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 * The view is represented by a custom Item type to better represent any dynamic content.
 	 */
 	public void showLayoutInfo(boolean scrollToPosition) {
-		if (!hasSearchText()) {
+		if (!hasSearchText() && !isEmpty()) {
 			//Define Example View
 			final LayoutItem item = new LayoutItem("LAY-L");
 			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
@@ -269,6 +270,13 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		} else {
 			//LinearLayout
 			switch (getItemViewType(position)) {
+				case R.layout.recycler_staggered_item:
+					if (position < positionOld) //inverted to have items animated up-side-down
+						addSlideInFromBottomAnimator(animators, itemView);
+					else
+						addSlideInFromTopAnimator(animators, itemView);
+					break;
+				case R.layout.recycler_staggered_header_item:
 				case R.layout.recycler_layout_item:
 				case R.layout.recycler_uls_item:
 					addSlideInFromTopAnimator(animators, itemView);
@@ -285,6 +293,9 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 					break;
 			}
 		}
+
+		if (position != positionOld)
+			positionOld = position;
 
 		//Alpha Animator is automatically added
 		return animators;

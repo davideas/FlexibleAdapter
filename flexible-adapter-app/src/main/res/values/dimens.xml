@@ -20,6 +20,8 @@
 	<dimen name="popup_max_height">290dp</dimen>
 	<dimen name="bottom_sheet_peek">312dp</dimen>
 
+	<dimen name="card_height">60dp</dimen>
+	<dimen name="card_extra_height">15dp</dimen>
 	<dimen name="label_height">150dp</dimen>
 	<dimen name="dialog_padding_vertical">24dp</dimen>
 	<dimen name="dialog_padding_horizontal">24dp</dimen>

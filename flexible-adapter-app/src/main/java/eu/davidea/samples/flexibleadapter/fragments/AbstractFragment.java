@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.samples.flexibleadapter.R;
 
@@ -93,14 +94,21 @@ public abstract class AbstractFragment extends Fragment {
 		return new SmoothScrollLinearLayoutManager(getActivity());
 	}
 
-	protected abstract GridLayoutManager createNewGridLayoutManager();
+	protected GridLayoutManager createNewGridLayoutManager() {
+		return new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
+	}
 
 	protected StaggeredGridLayoutManager createNewStaggeredGridLayoutManager() {
 		return new StaggeredGridLayoutManager(mColumnCount, StaggeredGridLayoutManager.VERTICAL);
 	}
 
-	public void addItem() {
+	public void performFabAction() {
 		//default implementation does nothing
+	}
+
+	public int getContextMenuResId() {
+		//default Menu Context is returned
+		return R.menu.menu_context;
 	}
 
 	@CallSuper
@@ -112,7 +120,6 @@ public abstract class AbstractFragment extends Fragment {
 				item.setEnabled(true);
 			}
 		}, 2000L);
-		//default implementation does nothing
 	}
 
 }

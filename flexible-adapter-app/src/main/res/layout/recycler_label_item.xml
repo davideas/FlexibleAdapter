@@ -4,7 +4,7 @@
 	xmlns:card_view="http://schemas.android.com/apk/res-auto"
 	android:id="@+id/label_card"
 	android:layout_width="match_parent"
-	android:layout_height="@dimen/label_height"
+	android:layout_height="wrap_content"
 	android:foreground="?android:attr/selectableItemBackground"
 	card_view:cardUseCompatPadding="true"
 	card_view:cardElevation="2dp"
@@ -51,7 +51,7 @@
 			android:layout_height="wrap_content"
 			android:gravity="center"
 			android:ellipsize="end"
-			android:maxLines="3"
+			android:maxLines="4"
 			android:textAppearance="@style/TextAppearance.AppCompat.Small"
 			tools:text="@string/endless_scrolling_description"/>
 

@@ -18,9 +18,6 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
-/**
- *
- */
 public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHolder, InstagramHeaderItem> {
 
 	private String id;
