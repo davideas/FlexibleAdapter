@@ -109,9 +109,9 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 	}
 
-	public int getCurrentStickyHeaderPosition() {
-		return mHeaderPosition;
-	}
+//	public int getCurrentStickyHeaderPosition() {
+//		return mHeaderPosition;
+//	}
 
 	private void initStickyHeadersHolder() {
 		//Initialize Holder Layout and show sticky header if exists already
