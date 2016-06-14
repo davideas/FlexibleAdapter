@@ -9,5 +9,5 @@ Please check off the following points BEFORE submitting a new issue / asking sup
 2) For questions / new feature / improvement
 - [ ] Simply Erase all this text and ask your question;
 
-3) To have your app added to the list
+3) To have your App added to the list
 - [ ] Simply Erase all this text and provide your app's name.
