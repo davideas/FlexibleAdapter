@@ -1356,7 +1356,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@NonNull
 	public List<T> getSiblingsOf(@NonNull T child) {
-		return getExpandableList(getExpandableOf(child));
+		IExpandable expandable = getExpandableOf(child);
+		return expandable != null ? expandable.getSubItems() : new ArrayList<>();
 	}
 
 	/**
