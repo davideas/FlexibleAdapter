@@ -169,6 +169,10 @@ public class StickyHeaderHelper extends OnScrollListener {
 			final View nextChild = mRecyclerView.getChildAt(i);
 			if (nextChild != null) {
 				int adapterPos = mRecyclerView.getChildAdapterPosition(nextChild);
+				if (!mAdapter.isHeader(adapterPos) &&
+						nextChild.getHeight() < mStickyHeaderViewHolder.itemView.getHeight()) {
+					continue;
+				}
 				int nextHeaderPosition = getHeaderPosition(adapterPos);
 				if (mHeaderPosition != nextHeaderPosition) {
 					if (getOrientation(mRecyclerView) == LinearLayoutManager.HORIZONTAL) {
