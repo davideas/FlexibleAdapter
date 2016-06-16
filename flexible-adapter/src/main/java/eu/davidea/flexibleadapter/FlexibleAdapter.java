@@ -595,6 +595,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		return item != null && item instanceof IHeader;
 	}
 
+	public boolean isHeader(int position) {
+		T item = getItem(position);
+		return item != null && item instanceof IHeader;
+	}
+
 	/**
 	 * Returns if Adapter will display sticky headers on the top.
 	 *
