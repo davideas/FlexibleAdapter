@@ -175,10 +175,14 @@ public class StickyHeaderHelper extends OnScrollListener {
 			nextChildHeaderPosition = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount();
 		}
 		//Search for the position where the next header item is found and take the new offset
-		for (int i = nextChildHeaderPosition; i > 0; i--) {
-			final View nextChild = mRecyclerView.getChildAt(i);
+        for (int i = 0; i < mRecyclerView.getChildCount(); i++) {
+            final View nextChild = mRecyclerView.getChildAt(i);
 			if (nextChild != null) {
 				int adapterPos = mRecyclerView.getChildAdapterPosition(nextChild);
+                //noinspection unchecked
+                if (!mAdapter.isHeader(mAdapter.getItem(adapterPos)) && childIsSmallerThanHeader(nextChild)) {
+                    continue;
+                }
 				int nextHeaderPosition = getHeaderPosition(adapterPos);
 				if (mHeaderPosition != nextHeaderPosition) {
 					if (getOrientation(mRecyclerView) == OrientationHelper.HORIZONTAL) {
@@ -204,6 +208,13 @@ public class StickyHeaderHelper extends OnScrollListener {
 		mStickyHolderLayout.setTranslationY(headerOffsetY);
 		//Log.v(TAG, "TranslationX=" + headerOffsetX + " TranslationY=" + headerOffsetY);
 	}
+
+    private boolean childIsSmallerThanHeader(View nextChild) {
+        if (getOrientation(mRecyclerView) == OrientationHelper.HORIZONTAL) {
+            return nextChild.getWidth() < mStickyHeaderViewHolder.itemView.getWidth();
+        }
+        return nextChild.getHeight() < mStickyHeaderViewHolder.itemView.getHeight();
+    }
 
 	private void swapHeader(FlexibleViewHolder newHeader) {
 		if (mStickyHeaderViewHolder != null) {
