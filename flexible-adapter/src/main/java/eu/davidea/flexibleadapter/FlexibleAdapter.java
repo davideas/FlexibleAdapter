@@ -674,7 +674,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		return headers;
 	}
 
-	public boolean isHeader(@NonNull T item) {
+	public boolean isHeader(T item) {
 		return item != null && item instanceof IHeader;
 	}
 
