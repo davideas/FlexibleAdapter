@@ -15,17 +15,21 @@
  */
 package eu.davidea.flexibleadapter.items;
 
-import android.support.v7.widget.RecyclerView;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Generic implementation of {@link IHeader} interface.
- * <p>By default this item is hidden, not selectable.</p>
- * This abstract class extends also {@link AbstractFlexibleItem}.
+ * Generic implementation of {@link IHeader} interface. By default this item is hidden and not
+ * selectable.
+ * <p>This abstract class extends {@link AbstractFlexibleItem}.</p>
+ * The ViewHolder must be of type {@link FlexibleViewHolder} to assure correct StickyHeader
+ * behaviours.
  *
+ * @param <VH> {@link FlexibleViewHolder}
  * @author Davide Steduto
  * @since 17/01/2016 Created
+ * <br/>18/06/2016 Changed signature with FlexibleViewHolder
  */
-public abstract class AbstractHeaderItem<VH extends RecyclerView.ViewHolder>
+public abstract class AbstractHeaderItem<VH extends FlexibleViewHolder>
 		extends AbstractFlexibleItem<VH>
 		implements IHeader<VH> {
 

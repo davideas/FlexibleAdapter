@@ -15,9 +15,9 @@
  */
 package eu.davidea.flexibleadapter.items;
 
-import android.support.v7.widget.RecyclerView;
-
 import java.util.List;
+
+import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
  * Interface to manage expanding operations on items with
@@ -31,8 +31,9 @@ import java.util.List;
  * @see IHolder
  * @see ISectionable
  * @since 17/01/2016 Created
+ * <br/>18/06/2016 Changed signature with ExpandableViewHolder
  */
-public interface IExpandable<VH extends RecyclerView.ViewHolder, S extends IFlexible>
+public interface IExpandable<VH extends ExpandableViewHolder, S extends IFlexible>
 		extends IFlexible<VH> {
 
 	/*--------------------*/

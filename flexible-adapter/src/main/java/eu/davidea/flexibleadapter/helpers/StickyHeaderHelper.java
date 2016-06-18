@@ -33,6 +33,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * A sticky header helper, to use only with {@link FlexibleAdapter}.
+ * <p>Header ViewHolders must be of type {@link FlexibleViewHolder}.</p>
  *
  * @since 25/03/2016 Created
  */
@@ -45,8 +46,6 @@ public class StickyHeaderHelper extends OnScrollListener {
 	private ViewGroup mStickyHolderLayout;
 	private FlexibleViewHolder mStickyHeaderViewHolder;
 	private OnStickyHeaderChangeListener mStickyHeaderChangeListener;
-
-	/* Header state, used to not call getSectionHeader() all the time */
 	private int mHeaderPosition = RecyclerView.NO_POSITION;
 
 
@@ -146,10 +145,8 @@ public class StickyHeaderHelper extends OnScrollListener {
 		if (mHeaderPosition != headerPosition) {
 			mHeaderPosition = headerPosition;
 			FlexibleViewHolder holder = getHeaderViewHolder(headerPosition);
-			if (mStickyHeaderViewHolder != holder && holder.isStickyHeader()) {
-				if (FlexibleAdapter.DEBUG) Log.v(TAG, "swapHeader newPosition=" + mHeaderPosition);
-				swapHeader(holder);
-			}
+			if (FlexibleAdapter.DEBUG) Log.v(TAG, "swapHeader newHeaderPosition=" + mHeaderPosition);
+			swapHeader(holder);
 		} else if (updateHeaderContent && mStickyHeaderViewHolder != null) {
 			mAdapter.onBindViewHolder(mStickyHeaderViewHolder, mHeaderPosition);
 			ensureHeaderParent();
@@ -226,22 +223,26 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 	}
 
-	@SuppressWarnings({"unchecked", "ConstantConditions"})
+	@SuppressWarnings("unchecked")
 	private int getHeaderPosition(int adapterPosHere) {
 		if (adapterPosHere == RecyclerView.NO_POSITION) {
 			View firstChild = mRecyclerView.getChildAt(0);
 			adapterPosHere = mRecyclerView.getChildAdapterPosition(firstChild);
 		}
 		IHeader header = mAdapter.getSectionHeader(adapterPosHere);
+		//Header cannot be sticky if it's also an Expandable in collapsed status, RV will raise an exception
+		if (header == null || mAdapter.isExpandable(header) && !mAdapter.isExpanded(header)) {
+			return RecyclerView.NO_POSITION;
+		}
 		return mAdapter.getGlobalPositionOf(header);
 	}
 
 	/**
-	 * Gets the header view for the associated position. If it doesn't exist
-	 * yet, it will be created, measured, and laid out.
+	 * Gets the header view for the associated header position. If it doesn't exist yet, it will
+	 * be created, measured, and laid out.
 	 *
-	 * @param position the adapter position to get the header view for
-	 * @return Header ViewHolder of the associated header position
+	 * @param position the adapter position to get the header view
+	 * @return ViewHolder of type FlexibleViewHolder of the associated header position
 	 */
 	@SuppressWarnings("unchecked")
 	private FlexibleViewHolder getHeaderViewHolder(int position) {

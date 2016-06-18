@@ -25,7 +25,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 /**
  * ViewHolder for a Expandable Items. Holds callbacks which can be used to trigger expansion events.
  * <p>This class extends {@link FlexibleViewHolder}, which means it will benefit of all implemented
- * methods the lower class holds.</p>
+ * methods the super class holds.</p>
  *
  * @author Davide Steduto
  * @since 16/01/2016 Created
@@ -150,15 +150,6 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 		}
 		return super.onLongClick(view);
 	}
-
-//	@Override
-//	public boolean onTouch(View view, MotionEvent event) {
-//		//We don't allow Drag of Children if a parent is selected
-//		boolean expandable = mAdapter.isExpandable(getFlexibleAdapterPosition());
-//		if (expandable && !mAdapter.isAnyChildSelected() || !expandable && !mAdapter.isAnyParentSelected())
-//			return super.onTouch(view, event);
-//		return false;
-//	}
 
 	/**
 	 * {@inheritDoc}

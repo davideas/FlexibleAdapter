@@ -15,7 +15,7 @@
  */
 package eu.davidea.flexibleadapter.items;
 
-import android.support.v7.widget.RecyclerView;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * Wrapper empty interface to identify if the current item is a header.
@@ -27,7 +27,8 @@ import android.support.v7.widget.RecyclerView;
  * @see IHolder
  * @see ISectionable
  * @since 15/02/2016 Created
+ * <br/>18/06/2016 Changed signature with FlexibleViewHolder
  */
-public interface IHeader<VH extends RecyclerView.ViewHolder> extends IFlexible<VH> {
+public interface IHeader<VH extends FlexibleViewHolder> extends IFlexible<VH> {
 
 }

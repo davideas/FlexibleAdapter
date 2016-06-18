@@ -1,10 +1,9 @@
 package eu.davidea.samples.flexibleadapter.models;
 
-import android.support.v7.widget.RecyclerView;
-
 import java.io.Serializable;
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * This class will benefit of the already implemented methods (getter and setters) in
@@ -12,7 +11,7 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
  *
  * It is used as Base item for all example models.
  */
-public abstract class AbstractModelItem<VH extends RecyclerView.ViewHolder>
+public abstract class AbstractModelItem<VH extends FlexibleViewHolder>
 		extends AbstractFlexibleItem<VH>
 		implements Serializable {
 

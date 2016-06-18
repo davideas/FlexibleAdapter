@@ -15,20 +15,23 @@
  */
 package eu.davidea.flexibleadapter.items;
 
-import android.support.v7.widget.RecyclerView;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.davidea.viewholders.ExpandableViewHolder;
+
 /**
  * Generic implementation of {@link IExpandable} interface with most useful methods to manage
- * expansion and sub items.<br/>
- * This abstract class extends also {@link AbstractFlexibleItem}.
+ * expansion and sub items.
+ * <p>This abstract class extends {@link AbstractFlexibleItem}.</p>
  *
+ * @param <VH> {@link ExpandableViewHolder}
+ * @param <S>  The sub item of type {@link IFlexible}
  * @author Davide Steduto
  * @since 17/01/2016 Created
+ * <br/>18/06/2016 Changed signature with ExpandableViewHolder
  */
-public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder, S extends IFlexible>
+public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S extends IFlexible>
 		extends AbstractFlexibleItem<VH>
 		implements IExpandable<VH, S> {
 
@@ -67,7 +70,7 @@ public abstract class AbstractExpandableItem<VH extends RecyclerView.ViewHolder,
 	}
 
 	public final boolean hasSubItems() {
-		return mSubItems!= null && mSubItems.size() > 0;
+		return mSubItems != null && mSubItems.size() > 0;
 	}
 
 	public IFlexible setSubItems(List<S> subItem) {
