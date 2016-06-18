@@ -833,7 +833,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		List<ISectionable> sectionItems = new ArrayList<ISectionable>();
 		int startPosition = getGlobalPositionOf(header);
 		T item = getItem(++startPosition);
-		while (item != null && !isHeader(item) && item instanceof ISectionable) {
+		while (hasSameHeader(item, header)) {
 			sectionItems.add((ISectionable) item);
 			item = getItem(++startPosition);
 		}
