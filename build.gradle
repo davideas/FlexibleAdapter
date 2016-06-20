@@ -6,8 +6,8 @@ ext {
 	developerEmail = "dave.dna@gmail.com"
 
 	//Library
-	libraryCode = 16
-	libraryVersion = "5.0.0-SNAPSHOT"
+	libraryCode = 17
+	libraryVersion = "5.0.0-b7"
 	libraryDate = " built on " + getDate()
 	libraryDescription = "1 Adapter for SelectionMode, Undo, ViewHolders, Filter, FastScroller, Animations, Sticky Headers, Expandable, Draggable, Swipeable, EndlessScroll :-)"
 	libraryName = "FlexibleAdapter"
@@ -47,6 +47,15 @@ ext {
 def getDate() {
 	def date = new Date()
 	return date.format('yyyy.MM.dd')
+}
+
+//Avoid Javadoc Lint failures when using Java8
+if (JavaVersion.current().isJava8Compatible()) {
+	allprojects {
+		tasks.withType(Javadoc) {
+			options.addStringOption('Xdoclint:none', '-quiet')
+		}
+	}
 }
 
 buildscript {
