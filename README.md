@@ -48,10 +48,10 @@ Some simple functionalities have been implemented thanks to some Blogs (see at t
 ![StickyHeaders & EndlessScrolling](/screenshots/sticky_headers.png)
 
 ![Multi Selection & SC](/screenshots/multi_selection_sc.png)
-![Search](/screenshots/search_sections.png)
 ![Undo](/screenshots/undo_single_selection.png)
-
 ![Drag Linear](/screenshots/drag_linear.png)
+
+![Search](/screenshots/search_sections.png)
 ![swipe-to-dismiss1](/screenshots/swipe-to-dismiss1.png)
 ![swipe-to-dismiss2](/screenshots/swipe-to-dismiss2.png)
 
@@ -90,7 +90,7 @@ Wiki pages have been completely reviewed to support all the coming functionaliti
 Not all pages are filled, working in progress :-)
 
 # Change Log
-###### v5.0.0-b7 - 2016.06.18
+###### v5.0.0-b7 - 2016.06.20
 _Deprecation and Refactoring_ (Changes that you have to take care from all previous versions)
 - Refactored class signature for `IHeader` and `IExpandable` and their abstract implementation, [see #117].
 - Refactored method `moveItem()` to `swapItem()`.
@@ -166,8 +166,7 @@ v2.0 - 2015.06.19 | v1.0 - 2015.05.03
 
 # Limitations
 Item half swipe cannot be implemented due to how the `android.support.v7.widget.helper.ItemTouchHelper` is done.
-Half swipe can be done with others means, please see issues #98 and #100.
-Please see also commits of Apr 25, 2016. 
+Half swipe can be done with others means, please see issues #98 and #100. See also commits of Apr 25, 2016. 
 
 # Thanks
 I've used these blogs as starting point:
@@ -179,7 +178,7 @@ https://www.grokkingandroid.com/statelistdrawables-for-recyclerview-selection/
 # Imported libraries
 
 [LollipopContactsRecyclerViewFastScroller](https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller)<br/>
-Improved and adapted to work in conjunction with `FlexibleAnimatorAdapter`.
+Improved and adapted to work in conjunction with `AnimatorAdapter`.
 
 # Apps that use this Adapter
 It will be a pleasure to add your App here.

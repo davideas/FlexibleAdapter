@@ -86,9 +86,8 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
  * <br/>20/02/2016 Sticky headers
  * <br/>22/04/2016 Endless Scrolling
- * <br/>24/04/2016 FULL and PARTIAL Swipe
  */
-@SuppressWarnings({"unused", "Range", "Convert2Diamond", "ConstantConditions", "unchecked"})
+@SuppressWarnings({"unused", "Range", "Convert2Diamond", "ConstantConditions", "unchecked", "SuspiciousMethodCalls"})
 public class FlexibleAdapter<T extends IFlexible>
 		extends AnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
@@ -150,7 +149,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/* ViewTypes */
 	protected LayoutInflater mInflater;
-	@SuppressLint("UseSparseArrays")//We can usually count Type instances on the fingers of a hand..
+	@SuppressLint("UseSparseArrays")//We can usually count Type instances on the fingers of a hand
 	private HashMap<Integer, T> mTypeInstances = new HashMap<Integer, T>();
 	private boolean autoMap = false;
 
