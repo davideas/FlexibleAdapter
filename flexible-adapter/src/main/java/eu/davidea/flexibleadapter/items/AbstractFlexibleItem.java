@@ -132,12 +132,22 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 		return 0;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @throws IllegalStateException if called but not implemented
+	 */
 	@Override
 	public VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
 		throw new IllegalStateException("onCreateViewHolder(ViewGroup, ViewType) is not implemented. " +
 				MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".createViewHolder().");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @throws IllegalStateException if called but not implemented
+	 */
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads) {
 		throw new IllegalStateException("onBindViewHolder(ViewHolder, Position[, Payloads]) is not implemented. " +
