@@ -38,14 +38,6 @@ This library is configurable and it guides the developers (thanks to quality com
 * **NEW!** 1 simple constructor for all events.
 * **NEW!** Easy runtime position calculation for adding/moving items in sections. 
 
-#### How is made
-Some simple functionalities have been implemented thanks to some Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
-
-* At lower level there is `SelectableAdapter` class. It provides selection functionalities and it's able to _maintain the state_ after the rotation: you just need to call the onSave/onRestore methods from the Activity!
-* At middle level, the `AnimatorAdapter` class has been added to give some animation at startup and when user scrolls.
-* At front level, the core class `FlexibleAdapter`. It holds and handles the main list, performs actions on all different types of item paying attention at the adding and removal of the items, as well as the new concept of "selection coherence".
-* Item interfaces and predefined ViewHolders complete the whole library giving more actions to the items and configuration options to the developers and the end user.
-
 # Setup
 ```
 repositories {
@@ -66,10 +58,10 @@ dependencies {
 ```
 
 # Wiki!
-I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial and the API documentation.<br/>
+I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial* and the API* documentation.<br/>
 Wiki pages have been completely reviewed to support all the coming functionalities from 5.0.0.
 
-_Pages are under heavy revision, working in progress_ :-)
+\* = _Pages are under heavy revision, working in progress_ :-)
 
 #### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!<br/>
@@ -77,7 +69,15 @@ Active discussions:
 - [Snapshots and Pre-Releases for FlexibleAdapter v5.0.0](https://github.com/davideas/FlexibleAdapter/issues/39).
 - [Documentation](https://github.com/davideas/FlexibleAdapter/issues/120).
 
-# Screenshots of the demo App
+#### Under the hood
+Some simple functionalities have been implemented thanks to some Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability, for all Activities that use a RecyclerView.
+
+* At lower level there is `SelectableAdapter` class. It provides selection functionalities and it's able to _maintain the state_ after the rotation: you just need to call the onSave/onRestore methods from the Activity!
+* At middle level, the `AnimatorAdapter` class has been added to give some animation at startup and when user scrolls.
+* At front level, the core class `FlexibleAdapter`. It holds and handles the main list, performs actions on all different types of item paying attention at the adding and removal of the items, as well as the new concept of "selection coherence".
+* Item interfaces and predefined ViewHolders complete the whole library giving more actions to the items and configuration options to the developers and the end user.
+
+# Showcase of the demo App
 You can download the latest demo App from the latest release page.
 
 ![Drag Grid & Overall](/screenshots/drag_grid_overall.png)
@@ -112,10 +112,10 @@ You can download the latest demo App from the latest release page.
 [v4.0.1](https://github.com/davideas/FlexibleAdapter/releases/tag/4.0.1) - 2015.11.01 | 
 [v4.0.0](https://github.com/davideas/FlexibleAdapter/releases/tag/4.0.0) - 2015.10.18<br/>
 [v3.1](https://github.com/davideas/FlexibleAdapter/releases/tag/v3.1) - 2015.08.18 | 
-[v3.0](https://github.com/davideas/FlexibleAdapter/releases/tag/v3.0) - 2015.07.29<br/>
+[v3.0](https://github.com/davideas/FlexibleAdapter/releases/tag/v3.0) - 2015.07.29 | 
 [v2.2](https://github.com/davideas/FlexibleAdapter/releases/tag/v2.2) - 2015.07.20 | 
 [v2.1](https://github.com/davideas/FlexibleAdapter/releases/tag/v2.1) - 2015.07.03 | 
-[v2.0](https://github.com/davideas/FlexibleAdapter/releases/tag/v2.0) - 2015.06.19<br/>
+[v2.0](https://github.com/davideas/FlexibleAdapter/releases/tag/v2.0) - 2015.06.19 | 
 [v1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/v1.0) - 2015.05.03
 
 # Limitations
@@ -126,11 +126,12 @@ Half swipe can be done with others means, please see issues #98 and #100. See al
 I've used these blogs as starting point:
 - http://enoent.fr/blog/2015/01/18/recyclerview-basics/
 - https://www.grokkingandroid.com/statelistdrawables-for-recyclerview-selection/
+
 Special thanks goes to Martin Guillon ([Akylas](https://github.com/Akylas)) to have contributed at the development of the new technique for the Sticky Header.
 
 # Imported libraries
 - For the moment only [LollipopContactsRecyclerViewFastScroller](https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller) has been imported, improved and adapted to work in conjunction with `AnimatorAdapter`.
-- The library [sticky-headers-recyclerview](https://github.com/timehop/sticky-headers-recyclerview) was initially imported and super-optimized for _FlexibleAdapter_, then it was removed in favor of the new technique able to attach click listener.
+- The library [sticky-headers-recyclerview](https://github.com/timehop/sticky-headers-recyclerview) was initially imported and super-optimized for _FlexibleAdapter_, then it was removed in favor of the new technique able to keep the _View_ and so to handle the click events.
 
 # Apps that use this Adapter
 It will be a pleasure to add your App here.
