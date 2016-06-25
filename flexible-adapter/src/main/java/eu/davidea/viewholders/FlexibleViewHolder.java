@@ -170,8 +170,9 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * @param view handle view
 	 * @see #onTouch(View, MotionEvent)
 	 */
+	@CallSuper
 	@SuppressWarnings("ConstantConditions")
-	protected final void setDragHandleView(@NonNull View view) {
+	protected void setDragHandleView(@NonNull View view) {
 		if (view != null) view.setOnTouchListener(this);
 	}
 

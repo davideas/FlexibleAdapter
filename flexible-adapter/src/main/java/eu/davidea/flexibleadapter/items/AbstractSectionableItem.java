@@ -18,9 +18,8 @@ package eu.davidea.flexibleadapter.items;
 import android.support.v7.widget.RecyclerView;
 
 /**
- * Generic implementation of {@link ISectionable} interface for items that holds a header item.
- * This class represents an item in the section.
- * <p>This abstract class extends {@link AbstractFlexibleItem}.</p>
+ * Generic implementation of {@link ISectionable} interface for items that hold a header item.
+  * <p>This abstract class extends {@link AbstractFlexibleItem}.</p>
  *
  * @param <VH> {@link RecyclerView.ViewHolder}
  * @param <H>  The header item of type {@link IHeader}

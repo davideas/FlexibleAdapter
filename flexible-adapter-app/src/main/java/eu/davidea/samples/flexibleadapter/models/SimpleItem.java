@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter.models;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,7 +69,7 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "deprecation"})
 	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
 		//Subtitle
 		if (adapter.isExpandable(this)) {
@@ -78,11 +79,14 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 		}
 		setSubtitle(getSubtitle() + (getHeader() != null ? " - Header: " + getHeader().getId() : ""));
 
+		Context context = holder.itemView.getContext();
+		int defColorAccent = context.getResources().getColor(R.color.colorAccent_light);
+
 		if (adapter.isExpandable(this) && payloads.size() > 0){
 			Log.i(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
 			if (adapter.hasSearchText()) {
 				Utils.highlightText(holder.itemView.getContext(), holder.mSubtitle,
-						getSubtitle(), adapter.getSearchText(), R.color.colorAccent_light);
+						getSubtitle(), adapter.getSearchText(), defColorAccent);
 			} else {
 				holder.mSubtitle.setText(getSubtitle());
 			}
@@ -108,10 +112,10 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 			//In case of searchText matches with Title or with an SimpleItem's field
 			// this will be highlighted
 			if (adapter.hasSearchText()) {
-				Utils.highlightText(holder.itemView.getContext(), holder.mTitle,
-						getTitle(), adapter.getSearchText(), R.color.colorAccent_light);
-				Utils.highlightText(holder.itemView.getContext(), holder.mSubtitle,
-						getSubtitle(), adapter.getSearchText(), R.color.colorAccent_light);
+				Utils.highlightText(context, holder.mTitle,
+						getTitle(), adapter.getSearchText(), defColorAccent);
+				Utils.highlightText(context, holder.mSubtitle,
+						getSubtitle(), adapter.getSearchText(), defColorAccent);
 			} else {
 				holder.mTitle.setText(getTitle());
 				holder.mSubtitle.setText(getSubtitle());
@@ -161,16 +165,21 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 				}
 			});
 			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
-			if (adapter.isHandleDragEnabled()) {
-				this.mHandleView.setVisibility(View.VISIBLE);
-				setDragHandleView(mHandleView);
-			} else {
-				this.mHandleView.setVisibility(View.GONE);
-			}
+			setDragHandleView(mHandleView);
 
 			this.frontView = view.findViewById(R.id.front_view);
 			this.rearLeftView = view.findViewById(R.id.rear_left_view);
 			this.rearRightView = view.findViewById(R.id.rear_right_view);
+		}
+
+		@Override
+		protected void setDragHandleView(@NonNull View view) {
+			if (mAdapter.isHandleDragEnabled()) {
+				view.setVisibility(View.VISIBLE);
+				super.setDragHandleView(view);
+			} else {
+				view.setVisibility(View.GONE);
+			}
 		}
 
 		@Override
