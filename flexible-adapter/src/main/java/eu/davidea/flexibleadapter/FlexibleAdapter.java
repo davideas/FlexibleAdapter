@@ -3064,7 +3064,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Swaps the elements of list list at indices fromPosition and toPosition and notify the change.
+	 * Swaps the elements of list at indices fromPosition and toPosition and notify the change.
 	 * <p>Selection of swiped elements is automatically updated.</p>
 	 *
 	 * @param fromPosition previous position of the item.

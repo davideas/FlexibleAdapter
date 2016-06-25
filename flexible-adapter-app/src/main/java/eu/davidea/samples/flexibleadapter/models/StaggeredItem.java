@@ -118,10 +118,10 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
 	public void bindViewHolder(final FlexibleAdapter adapter, final ViewHolder holder, int position, List payloads) {
 		Context context = holder.itemTextView.getContext();
 
-		//Table Id
+		//Item Id
 		holder.itemTextView.setText(toString());
 
-		//Table Status
+		//Item Status
 		holder.statusTextView.setText(status.getResId());
 		DrawableUtils.setBackground(holder.itemView,
 				DrawableUtils.getSelectableBackgroundCompat(
