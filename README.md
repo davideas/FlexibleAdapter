@@ -10,12 +10,13 @@
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
-> When initially Android team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.
-We didn't know how to add selection and to combine all the use cases in the same Adapter.<br/>
+> When initially Android team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.<br/>
+We didn't know how to add selection and to combine all the use cases in the same Adapter.
 Since I created this library, it has become easy to configure how views will be displayed in a list, and now, nobody wants to use a ListView anymore.
 
-The idea behind is to regroup all the functionalities in a unique library, without the need to customize and import several third libraries specific for one or few of them.<br/>
-The FlexibleAdapter helps developers to simplify this process without to worry too much about the Adapter anymore. It's easy to extend, it has predefined logic for different situations and prevents common mistakes.<br/>
+The idea behind is to regroup all the functionalities in a unique library, without the need to customize and import several third libraries specific for one or few of them.
+
+The FlexibleAdapter helps developers to simplify this process without worrying too much about the Adapter anymore. It's easy to extend, it has predefined logic for different situations and prevents common mistakes.<br/>
 This library is configurable and it guides the developers (thanks to quality comments on the methods) to create a better user experience and now, even more with the new ViewHolders and new actions.
 
 #### Main functionalities
@@ -65,14 +66,14 @@ dependencies {
 ```
 
 # Wiki!
-I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial and the API documentation.
-
+I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial and the API documentation.<br/>
 Wiki pages have been completely reviewed to support all the coming functionalities from 5.0.0.
 
-Not all pages are filled, working in progress :-)
+_Pages are under heavy revision, working in progress_ :-)
 
 #### Pull requests / Issues / Improvement requests
-Feel free to contribute and ask! Active discussions:
+Feel free to contribute and ask!<br/>
+Active discussions:
 - [Snapshots and Pre-Releases for FlexibleAdapter v5.0.0](https://github.com/davideas/FlexibleAdapter/issues/39).
 - [Documentation](https://github.com/davideas/FlexibleAdapter/issues/120).
 
@@ -109,13 +110,13 @@ You can download the latest demo App from the latest release page.
 [v4.2.0](https://github.com/davideas/FlexibleAdapter/releases/tag/4.2.0) - 2015.12.12 | 
 [v4.1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/4.1.0) - 2015.11.29 | 
 [v4.0.1](https://github.com/davideas/FlexibleAdapter/releases/tag/4.0.1) - 2015.11.01 | 
-[v4.0](https://github.com/davideas/FlexibleAdapter/releases/tag/4.0) - 2015.10.18<br/>
-[v3.1](https://github.com/davideas/FlexibleAdapter/releases/tag/3.1) - 2015.08.18 | 
-[v3.0](https://github.com/davideas/FlexibleAdapter/releases/tag/3.0) - 2015.07.29<br/>
-[v2.2](https://github.com/davideas/FlexibleAdapter/releases/tag/2.2) - 2015.07.20 | 
-[v2.1](https://github.com/davideas/FlexibleAdapter/releases/tag/2.1) - 2015.07.03 | 
-[v2.0](https://github.com/davideas/FlexibleAdapter/releases/tag/2.0) - 2015.06.19<br/>
-[v1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/1.0) - 2015.05.03
+[v4.0.0](https://github.com/davideas/FlexibleAdapter/releases/tag/4.0.0) - 2015.10.18<br/>
+[v3.1](https://github.com/davideas/FlexibleAdapter/releases/tag/v3.1) - 2015.08.18 | 
+[v3.0](https://github.com/davideas/FlexibleAdapter/releases/tag/v3.0) - 2015.07.29<br/>
+[v2.2](https://github.com/davideas/FlexibleAdapter/releases/tag/v2.2) - 2015.07.20 | 
+[v2.1](https://github.com/davideas/FlexibleAdapter/releases/tag/v2.1) - 2015.07.03 | 
+[v2.0](https://github.com/davideas/FlexibleAdapter/releases/tag/v2.0) - 2015.06.19<br/>
+[v1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/v1.0) - 2015.05.03
 
 # Limitations
 Item half swipe cannot be implemented due to how the `android.support.v7.widget.helper.ItemTouchHelper` is done.
@@ -123,15 +124,13 @@ Half swipe can be done with others means, please see issues #98 and #100. See al
 
 # Thanks
 I've used these blogs as starting point:
-
-http://enoent.fr/blog/2015/01/18/recyclerview-basics/
-
-https://www.grokkingandroid.com/statelistdrawables-for-recyclerview-selection/
+- http://enoent.fr/blog/2015/01/18/recyclerview-basics/
+- https://www.grokkingandroid.com/statelistdrawables-for-recyclerview-selection/
+Special thanks goes to Martin Guillon ([Akylas](https://github.com/Akylas)) to have contributed at the development of the new technique for the Sticky Header.
 
 # Imported libraries
-
-[LollipopContactsRecyclerViewFastScroller](https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller)<br/>
-Improved and adapted to work in conjunction with `AnimatorAdapter`.
+- For the moment only [LollipopContactsRecyclerViewFastScroller](https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller) has been imported, improved and adapted to work in conjunction with `AnimatorAdapter`.
+- The library [sticky-headers-recyclerview](https://github.com/timehop/sticky-headers-recyclerview) was initially imported and super-optimized for _FlexibleAdapter_, then it was removed in favor of the new technique able to attach click listener.
 
 # Apps that use this Adapter
 It will be a pleasure to add your App here.
