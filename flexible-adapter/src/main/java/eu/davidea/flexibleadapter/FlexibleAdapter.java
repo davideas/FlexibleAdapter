@@ -1069,7 +1069,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return a new ViewHolder that holds a View of the given view type
 	 * @throws IllegalStateException if {@link IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)}
 	 *                               is not implemented and if this method is not overridden. Also
-	 *                               it is thrown if ViewType instance has not been correcly mapped.
+	 *                               it is thrown if ViewType instance has not been correctly mapped.
 	 * @see IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)
 	 */
 	@Override
