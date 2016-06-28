@@ -133,4 +133,11 @@ public class FragmentOverall extends AbstractFragment {
 		}
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.action_list_type)
+			mAdapter.setAnimationOnScrolling(true);
+		return super.onOptionsItemSelected(item);
+	}
+
 }

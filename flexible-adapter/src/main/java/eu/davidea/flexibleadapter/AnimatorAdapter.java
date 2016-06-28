@@ -84,7 +84,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	private EnumSet<AnimatorEnum> animatorsUsed = EnumSet.noneOf(AnimatorEnum.class);
 
 	private boolean isReverseEnabled = false, shouldAnimate = true,
-			isFastScroll = false, isInitialize = false;
+			onlyEntryAnimation = false, isFastScroll = false, isInitialize = false;
 
 	private long mInitialDelay = 0L,
 			mStepDelay = 100L,
@@ -182,8 +182,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * Default enabled.
 	 *
 	 * @param enabled true to enable item animation, false to disable them all.
-	 * @see #setAnimationOnReverseScrolling(boolean)
 	 * @return this AnimatorAdapter, so the call can be chained
+	 * @see #setAnimationOnReverseScrolling(boolean)
 	 */
 	public AnimatorAdapter setAnimationOnScrolling(boolean enabled) {
 		shouldAnimate = enabled;
@@ -196,11 +196,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	/**
 	 * Enable reverse scrolling animation if AnimationOnScrolling is also enabled!<br/>
-	 * Default disabled (only forward).
+	 * Default value is disabled (only forward).
 	 *
 	 * @param enabled false to animate items only forward, true to also reverse animate
-	 * @see #setAnimationOnScrolling(boolean)
 	 * @return this AnimatorAdapter, so the call can be chained
+	 * @see #setAnimationOnScrolling(boolean)
 	 */
 	public AnimatorAdapter setAnimationOnReverseScrolling(boolean enabled) {
 		isReverseEnabled = enabled;
@@ -209,6 +209,27 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	public boolean isAnimationOnReverseScrolling() {
 		return isReverseEnabled;
+	}
+
+	/**
+	 * Performs only entry animation during the initial loading. Stops the animation after
+	 * the last visible item in the RecyclerView has been animated.
+	 * Default value is false (always animate).
+	 *
+	 * @param onlyEntryAnimation true to perform only entry animation, false otherwise
+	 * @return this AnimatorAdapter, so the call can be chained
+	 * @since 5.0.0-b8
+	 */
+	public AnimatorAdapter setOnlyEntryAnimation(boolean onlyEntryAnimation) {
+		this.onlyEntryAnimation = onlyEntryAnimation;
+		return this;
+	}
+
+	/**
+	 * @since 5.0.0-b8
+	 */
+	public boolean isOnlyEntryAnimation() {
+		return onlyEntryAnimation;
 	}
 
 	@Override
@@ -298,6 +319,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			set.addListener(new HelperAnimatorListener(itemView.hashCode()));
 			set.start();
 			mAnimators.put(itemView.hashCode(), set);
+
+			//Animate only during initial loading?
+			if (onlyEntryAnimation && mLastAnimatedPosition >= mMaxChildViews) {
+				shouldAnimate = false;
+			}
 		}
 
 		if (mAnimatorNotifierObserver.isPositionNotified())
