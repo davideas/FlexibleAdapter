@@ -62,22 +62,22 @@
 	<!--<string name="overall_description">Examples may have options where available to enable/disable: (1) Filter (2) FastScroller (3) Grid Layout (4) Sticky Headers</string>-->
 
 	<string name="selection_modes">Selection modes</string>
-	<string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper (AH) + UndoHelper (UH)</string>
+	<string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper + UndoHelper</string>
 
 	<string name="endless_scrolling">EndlessScrolling</string>
-	<string name="endless_scrolling_description">EndlessScrolling + Adapter Animation + Swipe-To-Delete w/rear-views + (AH) + (UH)</string><!-- TODO: in combination with Item Animation -->
+	<string name="endless_scrolling_description">EndlessScrolling + Adapter Animation + Swipe-To-Delete w/rear-views + ActionModeHelper + UndoHelper</string><!-- TODO: in combination with Item Animation -->
 
 	<string name="expandable">Expandable</string>
-	<string name="expandable_description">List with expandable items + Selection Coherence (SC) + Filter (F) + (AH) + (UH)</string>
+	<string name="expandable_description">List with expandable items + Selection Coherence + Filter + ActionModeHelper + UndoHelper</string>
 
 	<string name="multi_level_expandable">Expandable Multi-Level</string>
-	<string name="multi_level_expandable_description">2 levels of expandable + (SC) + Swipeable &amp; Draggable items + (AH) + (UH)</string>
+	<string name="multi_level_expandable_description">2 levels of expandable + Selection Coherence + Swipeable &amp; Draggable items + ActionModeHelper + UndoHelper</string>
 
 	<string name="expandable_sections">Expandable Sections</string>
-	<string name="expandable_sections_description">Sections with (sticky) headers that can expand/collapse + Drag items + (F)</string>
+	<string name="expandable_sections_description">Sections with (sticky) headers that can expand/collapse + Drag items + Filter</string>
 
 	<string name="headers_sections">Headers and Sections</string>
-	<string name="headers_sections_description">Clickable sticky headers for sections + Drag items with Auto-Linkage + (F)</string>
+	<string name="headers_sections_description">Clickable sticky headers for sections + Drag items with Auto-Linkage + Filter</string>
 
 	<string name="instagram_headers">Instagram headers</string>
 	<string name="instagram_headers_description"><![CDATA[1 sticky header for each item + EndlessScrolling.<br/><font color="#ff4081"><b>Internet is required.</b></font>]]></string>
