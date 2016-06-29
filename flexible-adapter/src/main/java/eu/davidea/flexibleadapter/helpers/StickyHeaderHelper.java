@@ -111,6 +111,9 @@ public class StickyHeaderHelper extends OnScrollListener {
 		//Initialize Holder Layout and show sticky header if exists already
 		mStickyHolderLayout = mAdapter.getStickySectionHeadersHolder();
 		if (mStickyHolderLayout != null) {
+			if (mStickyHolderLayout.getLayoutParams() == null) {
+				throw new IllegalStateException("The ViewGroup provided, doesn't have LayoutParams correctly set, please initialize the ViewGroup accordingly");
+			}
 			mStickyHolderLayout.setClipToPadding(false);
 			mStickyHolderLayout.setAlpha(0);
 			updateOrClearHeader(false);
