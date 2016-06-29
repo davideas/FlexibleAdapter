@@ -409,12 +409,14 @@ public class FlexibleAdapter<T extends IFlexible>
 			else mItems = new ArrayList<>(items);
 			notifyDataSetChanged();
 		}
-		//Check if Data Set is empty
-		if (mUpdateListener != null && getItemCount() == 0) {
-			mUpdateListener.onUpdateEmptyView(0);
-		} else {
+		//Show headers and expanded items if Data Set not empty
+		if (getItemCount() > 0) {
 			expandItemsAtStartUp();
 			if (headersShown) showAllHeaders();
+		}
+		//Update empty view
+		if (mUpdateListener != null) {
+			mUpdateListener.onUpdateEmptyView(getItemCount());
 		}
 	}
 
