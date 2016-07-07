@@ -69,6 +69,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 *
 	 * @param view    The {@link View} being hosted in this ViewHolder
 	 * @param adapter Adapter instance of type {@link FlexibleAdapter}
+	 * @since 5.0.0-b1
 	 */
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter) {
 		this(view, adapter, false);
@@ -82,6 +83,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * @param view         The {@link View} being hosted in this ViewHolder
 	 * @param adapter      Adapter instance of type {@link FlexibleAdapter}
 	 * @param stickyHeader true if the View can be a Sticky Header, false otherwise
+	 * @since 5.0.0-b7
 	 */
 	public FlexibleViewHolder(View view, FlexibleAdapter adapter, boolean stickyHeader) {
 		super(view, adapter, stickyHeader);
@@ -97,6 +99,8 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	@CallSuper
@@ -121,6 +125,8 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	@CallSuper
@@ -145,6 +151,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * {@inheritDoc}
 	 *
 	 * @see #setDragHandleView(View)
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
@@ -169,6 +176,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 *
 	 * @param view handle view
 	 * @see #onTouch(View, MotionEvent)
+	 * @since 5.0.0-b1
 	 */
 	@CallSuper
 	@SuppressWarnings("ConstantConditions")
@@ -189,6 +197,8 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * If you do this, it's not necessary to invalidate the row (with notifyItemChanged):
 	 * In this way <i>bindViewHolder</i> is NOT called and inner Views can animate without
 	 * interruption, so you can see the animation running still having the selection activated.
+	 *
+	 * @since 5.0.0-b1
 	 */
 	@CallSuper
 	protected void toggleActivation() {
@@ -204,6 +214,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * <p>Override to return desired value of elevation on this itemView.</p>
 	 *
 	 * @return never elevate, returns 0dp if not overridden
+	 * @since 5.0.0-b2
 	 */
 	public float getActivationElevation() {
 		return 0f;
@@ -215,6 +226,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * this ItemView onClick events.</p>
 	 *
 	 * @return always false, if not overridden
+	 * @since 5.0.0-b2
 	 */
 	protected boolean shouldActivateViewWhileSwiping() {
 		return false;
@@ -226,6 +238,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * count.</p>
 	 *
 	 * @return always false, if not overridden
+	 * @since 5.0.0-b2
 	 */
 	protected boolean shouldAddSelectionInActionMode() {
 		return false;
@@ -244,6 +257,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * @param position    the position of the item touched
 	 * @param actionState one of {@link ItemTouchHelper#ACTION_STATE_SWIPE} or
 	 *                    {@link ItemTouchHelper#ACTION_STATE_DRAG}.
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	@CallSuper
@@ -288,6 +302,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * In case of Drag, the state will be cleared depends by current selection mode!
 	 *
 	 * @param position the position of the item released
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	@CallSuper
@@ -318,28 +333,43 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 		mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
 	}
 
+	/**
+	 * @since 5.0.0-b7
+	 */
 	@Override
 	public boolean isDraggable() {
 		IFlexible item = mAdapter.getItem(getFlexibleAdapterPosition());
 		return item != null && item.isDraggable();
 	}
 
+	/**
+	 * @since 5.0.0-b7
+	 */
 	@Override
 	public boolean isSwipeable() {
 		IFlexible item = mAdapter.getItem(getFlexibleAdapterPosition());
 		return item != null && item.isSwipeable();
 	}
 
+	/**
+	 * @since 5.0.0-b6
+	 */
 	@Override
 	public View getFrontView() {
 		return itemView;
 	}
 
+	/**
+	 * @since 5.0.0-b6
+	 */
 	@Override
 	public View getRearLeftView() {
 		return null;
 	}
 
+	/**
+	 * @since 5.0.0-b6
+	 */
 	@Override
 	public View getRearRightView() {
 		return null;

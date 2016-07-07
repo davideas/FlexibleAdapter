@@ -41,6 +41,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 *
 	 * @param view    The {@link View} being hosted in this ViewHolder
 	 * @param adapter Adapter instance of type {@link FlexibleAdapter}
+	 * @since 5.0.0-b1
 	 */
 	public ExpandableViewHolder(View view, FlexibleAdapter adapter) {
 		super(view, adapter);
@@ -54,6 +55,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 * @param view         The {@link View} being hosted in this ViewHolder
 	 * @param adapter      Adapter instance of type {@link FlexibleAdapter}
 	 * @param stickyHeader true if the View can be a Sticky Header, false otherwise
+	 * @since 5.0.0-b7
 	 */
 	public ExpandableViewHolder(View view, FlexibleAdapter adapter, boolean stickyHeader) {
 		super(view, adapter, stickyHeader);
@@ -70,6 +72,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 * this ItemView onClick events.</p>
 	 *
 	 * @return always true, if not overridden
+	 * @since 5.0.0-b1
 	 */
 	protected boolean isViewExpandableOnClick() {
 		return true;
@@ -82,6 +85,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 * ItemView onLongClick events.</p>
 	 *
 	 * @return always true, if not overridden
+	 * @since 5.0.0-b1
 	 */
 	protected boolean isViewCollapsibleOnLongClick() {
 		return true;
@@ -89,6 +93,8 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
 	/**
 	 * Expands or Collapses based on the current state.
+	 *
+	 * @since 5.0.0-b1
 	 */
 	@CallSuper
 	protected void toggleExpansion() {
@@ -102,6 +108,8 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
 	/**
 	 * Triggers expansion of the Item.
+	 *
+	 * @since 5.0.0-b1
 	 */
 	@CallSuper
 	protected void expandView(int position) {
@@ -110,6 +118,8 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
 	/**
 	 * Triggers collapse of the Item.
+	 *
+	 * @since 5.0.0-b1
 	 */
 	@CallSuper
 	protected void collapseView(int position) {
@@ -126,6 +136,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 * it checks if the view {@link #isViewExpandableOnClick()}.</p>
 	 *
 	 * @param view the View that is the trigger for expansion
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	public void onClick(View view) {
@@ -141,6 +152,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 * it checks if the view {@link #isViewCollapsibleOnLongClick()}.</p>
 	 *
 	 * @param view the View that is the trigger for collapsing
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	public boolean onLongClick(View view) {
@@ -154,6 +166,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	/**
 	 * {@inheritDoc}
 	 * <p><b>Note:</b> In the Expandable version, expanded items are forced to collapse.</p>
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	public void onActionStateChanged(int position, int actionState) {

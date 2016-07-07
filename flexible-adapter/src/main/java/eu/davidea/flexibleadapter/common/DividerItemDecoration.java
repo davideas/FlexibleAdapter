@@ -30,6 +30,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 	/**
 	 * Default Android divider will be used.
+	 *
+	 * @since 5.0.0-b4
 	 */
 	public DividerItemDecoration(Context context) {
 		final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
@@ -40,6 +42,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	/**
 	 * Custom divider will be used.
 	 * <p>By default, divider will be drawn underneath the item.</p>
+	 *
+	 * @since 5.0.0-b4
 	 */
 	public DividerItemDecoration(Context context, int resId) {
 		this(context, resId, 0);
@@ -47,6 +51,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 	/**
 	 * Custom divider with gap between sections (in dpi).
+	 *
+	 * @since 5.0.0-b6
 	 */
 	public DividerItemDecoration(@NonNull Context context, @DrawableRes int resId,
 								 @IntRange(from = 0) int gapWidth) {
@@ -64,6 +70,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 *
 	 * @param mDrawOver true to draw after the item has been added, false to draw underneath the item
 	 * @return this Divider, so the call can be chained
+	 * @since 5.0.0-b7
 	 */
 	public DividerItemDecoration setDrawOver(boolean mDrawOver) {
 		this.mDrawOver = mDrawOver;
@@ -73,18 +80,18 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	@Override
 	public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
 		if (mDivider != null && !mDrawOver) {
-			draw(c, parent, state);
+			draw(c, parent);
 		}
 	}
 
 	@Override
 	public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
 		if (mDivider != null && mDrawOver) {
-			draw(c, parent, state);
+			draw(c, parent);
 		}
 	}
 
-	private void draw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+	private void draw(Canvas c, RecyclerView parent) {
 		int left = parent.getPaddingLeft();
 		int right = parent.getWidth() - parent.getPaddingRight();
 
@@ -105,6 +112,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 	/**
 	 * @param gapWidth width of the gap between sections, in pixel. Must be positive.
+	 * @since 5.0.0-b6
 	 */
 	public void setSectionGapWidth(@IntRange(from = 0) int gapWidth) {
 		if (gapWidth < 0) {
@@ -113,6 +121,9 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 		mGapWidth = gapWidth;
 	}
 
+	/**
+	 * @since 5.0.0-b4
+	 */
 	@SuppressWarnings({"ConstantConditions", "unchecked", "SuspiciousNameCombination"})
 	@Override
 	public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
@@ -123,7 +134,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 			//Only ISectionable items can finish with a gap and only if next item is a IHeader item
 			if (flexibleAdapter.getItem(position) instanceof ISectionable &&
 					(flexibleAdapter.isHeader(flexibleAdapter.getItem(position + 1)) ||
-							position >= parent.getAdapter().getItemCount() - 1) ) {
+							position >= parent.getAdapter().getItemCount() - 1)) {
 
 				int orientation;
 				RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();

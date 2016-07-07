@@ -18,6 +18,12 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
 	private int mBackupPosition = RecyclerView.NO_POSITION;
 	private View contentView;
 
+	/**
+	 * @param view         The {@link View} being hosted in this ViewHolder
+	 * @param adapter      Adapter instance of type {@link FlexibleAdapter}
+	 * @param stickyHeader true if the ViewHolder is a header to be sticky
+	 * @since 5.0.0-b7
+	 */
 	public ContentViewHolder(View view, FlexibleAdapter adapter, boolean stickyHeader) {
 		//Since itemView is declared "final", the split is done before the View is initialized
 		super(stickyHeader ? new FrameLayout(view.getContext()) : view);
@@ -39,6 +45,7 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
 	 * FrameLayout, otherwise it returns the basic itemView.
 	 *
 	 * @return the real contentView
+	 * @since 5.0.0-b7
 	 */
 	public View getContentView() {
 		return contentView != null ? contentView : itemView;
@@ -53,6 +60,7 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
 	 * @return the Adapter position result of {@link #getAdapterPosition()} OR the backup position
 	 * preset and known, if the previous result was {@link RecyclerView#NO_POSITION}.
 	 * @see #setBackupPosition(int)
+	 * @since 5.0.0-b6
 	 */
 	public int getFlexibleAdapterPosition() {
 		int position = getAdapterPosition();
@@ -67,6 +75,7 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
 	 * <p>Called by StickyHeaderHelper to support the clickListeners events.</p>
 	 *
 	 * @param backupPosition the known position of this ViewHolder
+	 * @since 5.0.0-b6
 	 */
 	public void setBackupPosition(int backupPosition) {
 		mBackupPosition = backupPosition;

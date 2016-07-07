@@ -190,6 +190,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Simple Constructor with NO listeners!
 	 *
 	 * @param items items to display.
+	 * @since 4.2.0
 	 */
 	public FlexibleAdapter(@NonNull List<T> items) {
 		this(items, null);
@@ -210,6 +211,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                  <br/>- {@link OnItemMoveListener}
 	 *                  <br/>- {@link OnItemSwipeListener}
 	 *                  <br/>- {@link OnStickyHeaderChangeListener}
+	 * @since 5.0.0-b1
 	 */
 	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listeners) {
 		mItems = Collections.synchronizedList(items);
@@ -229,6 +231,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param listeners the object(s) instance(s) of any listener
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter initializeListeners(@Nullable Object listeners) {
 		if (listeners instanceof OnUpdateListener) {
@@ -248,6 +251,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>Attaches the StickyHeaderHelper from the RecyclerView when necessary</p>
+	 *
+	 * @since 5.0.0-b6
+	 */
 	@Override
 	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
@@ -256,6 +265,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>Detaches the StickyHeaderHelper from the RecyclerView if necessary.</p>
+	 *
+	 * @since 5.0.0-b6
+	 */
 	@Override
 	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
 		if (mStickyHeaderHelper != null) {
@@ -273,6 +288,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <b>Note: </b>Only items at level 0 are automatically expanded, ignored all sub-levels.
 	 *
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter expandItemsAtStartUp() {
 		int position = 0;
@@ -296,17 +312,35 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* SELECTION METHODS OVERRIDDEN */
 	/*------------------------------*/
 
+	/**
+	 * Checks if the current item has the property {@code enabled = true}.
+	 *
+	 * @param position the current position of the item to check
+	 * @return true if the item property <i>enabled</i> is set true, false otherwise
+	 * @since 5.0.0-b6
+	 */
 	public boolean isEnabled(int position) {
 		T item = getItem(position);
 		return item != null && item.isEnabled();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since 5.0.0-b6
+	 */
 	@Override
 	public boolean isSelectable(int position) {
 		T item = getItem(position);
 		return item != null && item.isSelectable();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @param position Position of the item to toggle the selection status for.
+	 * @since 5.0.0-b1
+	 */
 	@Override
 	public void toggleSelection(@IntRange(from = 0) int position) {
 		T item = getItem(position);
@@ -348,6 +382,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param viewTypes All the desired viewTypes to be selected, pass nothing to automatically
 	 *                  select all the viewTypes of the first item user selected
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	public void selectAll(Integer... viewTypes) {
@@ -358,6 +393,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since 5.0.0-b1
+	 */
 	@Override
 	@CallSuper
 	public void clearSelection() {
@@ -365,10 +405,18 @@ public class FlexibleAdapter<T extends IFlexible>
 		super.clearSelection();
 	}
 
+	/**
+	 * @return true if a parent is selected
+	 * @since 5.0.0-b1
+	 */
 	public boolean isAnyParentSelected() {
 		return parentSelected;
 	}
 
+	/**
+	 * @return true if any child of any parent is selected, false otherwise
+	 * @since 5.0.0-b1
+	 */
 	public boolean isAnyChildSelected() {
 		return childSelected;
 	}
@@ -383,6 +431,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param items the new data set
 	 * @see #updateDataSet(List, boolean)
+	 * @since 5.0.0-b1
 	 */
 	@CallSuper
 	public void updateDataSet(List<T> items) {
@@ -399,6 +448,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param items   the new data set
 	 * @param animate true to animate the changes, false for a quick refresh
 	 * @see #updateDataSet(List)
+	 * @since 5.0.0-b7
 	 */
 	@CallSuper
 	public void updateDataSet(@Nullable List<T> items, boolean animate) {
@@ -426,12 +476,18 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position the position of the item in the list
 	 * @return The custom "Item" object or null if item not found
+	 * @since 1.0.0
 	 */
 	public final T getItem(@IntRange(from = 0) int position) {
 		if (position < 0 || position >= mItems.size()) return null;
 		return mItems.get(position);
 	}
 
+	/**
+	 * @param position the position of the currect item
+	 * @return the position as id
+	 * @since 5.0.0-b1
+	 */
 	@Override
 	public long getItemId(int position) {
 		return position;
@@ -444,6 +500,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getItemCountOfTypes(Integer...)
 	 * @see #getItemCountOfTypesUntil(int, Integer...)
 	 * @see #isEmpty()
+	 * @since 1.0.0
 	 */
 	@Override
 	public final int getItemCount() {
@@ -458,6 +515,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getItemCount()
 	 * @see #getItemCountOfTypesUntil(int, Integer...)
 	 * @see #isEmpty()
+	 * @since 5.0.0-b1
 	 */
 	public int getItemCountOfTypes(Integer... viewTypes) {
 		return getItemCountOfTypesUntil(getItemCount(), viewTypes);
@@ -472,6 +530,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getItemCount()
 	 * @see #getItemCountOfTypes(Integer...)
 	 * @see #isEmpty()
+	 * @since 5.0.0-b5
 	 */
 	public int getItemCountOfTypesUntil(@IntRange(from = 0) int position, Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
@@ -492,6 +551,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return true if the list is empty, false otherwise
 	 * @see #getItemCount()
 	 * @see #getItemCountOfTypes(Integer...)
+	 * @since 4.2.0
 	 */
 	public boolean isEmpty() {
 		return getItemCount() == 0;
@@ -502,6 +562,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param item the item to find
 	 * @return the global position in the Adapter if found, -1 otherwise
+	 * @since 5.0.0-b1
 	 */
 	public int getGlobalPositionOf(@NonNull IFlexible item) {
 		return item != null && mItems != null && !mItems.isEmpty() ? mItems.indexOf(item) : -1;
@@ -512,6 +573,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param item the item to find
 	 * @return true if the provided item is currently displayed, false otherwise
+	 * @since 2.0.0
 	 */
 	public boolean contains(@NonNull T item) {
 		return item != null && mItems != null && mItems.contains(item);
@@ -526,6 +588,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param item       the item to evaluate the insertion
 	 * @param comparator the Comparator object with the logic to sort the list
 	 * @return the position resulted from sorting with the provided Comparator
+	 * @since 5.0.0-b7
 	 */
 	public int calculatePositionFor(@NonNull Object item, @Nullable Comparator comparator) {
 		//There's nothing to compare
@@ -563,6 +626,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * @return true if all headers are currently displayed, false otherwise
+	 * @since 5.0.0-b6
 	 */
 	public boolean areHeadersShown() {
 		return headersShown;
@@ -574,6 +638,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param displayHeaders true to display them, false to keep them hidden
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter setDisplayHeadersAtStartUp(boolean displayHeaders) {
 		setInitialize(true);
@@ -586,6 +651,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * @return true if orphan headers will be removed when unlinked, false if are kept unlinked
 	 * @see #setRemoveOrphanHeaders(boolean)
+	 * @since 5.0.0-b6
 	 */
 	public boolean isRemoveOrphanHeaders() {
 		return removeOrphanHeaders;
@@ -598,6 +664,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param removeOrphanHeaders true to remove the header during the remove items
 	 * @return this Adapter, so the call can be chained
 	 * @see #getOrphanHeaders()
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter setRemoveOrphanHeaders(boolean removeOrphanHeaders) {
 		this.removeOrphanHeaders = removeOrphanHeaders;
@@ -611,6 +678,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param unlinkOnRemoveHeader true to unlink also all items with the just deleted header,
 	 *                             false otherwise
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter setUnlinkAllItemsOnRemoveHeaders(boolean unlinkOnRemoveHeader) {
 		this.unlinkOnRemoveHeader = unlinkOnRemoveHeader;
@@ -623,6 +691,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return the list of the orphan headers collected until this moment
 	 * @see #setRemoveOrphanHeaders(boolean)
+	 * @since 5.0.0-b6
 	 */
 	@NonNull
 	public List<IHeader> getOrphanHeaders() {
@@ -637,6 +706,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param item   the item that holds the header
 	 * @param header the header item
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter linkHeaderTo(@NonNull T item, @NonNull IHeader header) {
 		linkHeaderTo(item, header, null);
@@ -651,6 +721,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>No undo is possible.</p>
 	 *
 	 * @param item the item that holds the header
+	 * @since 5.0.0-b6
 	 */
 	public IHeader unlinkHeaderFrom(@NonNull T item) {
 		IHeader header = unlinkHeaderFrom(item, null);
@@ -664,6 +735,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Retrieves all the header items.
 	 *
 	 * @return non-null list with all the header items
+	 * @since 5.0.0-b6
 	 */
 	@NonNull
 	public List<IHeader> getHeaderItems() {
@@ -675,6 +747,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		return headers;
 	}
 
+	/**
+	 * @param item the item to check
+	 * @return true if the item is an instance of {@link IHeader} interface
+	 * @since 5.0.0-b6
+	 */
 	public boolean isHeader(T item) {
 		return item != null && item instanceof IHeader;
 	}
@@ -683,6 +760,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Returns if Adapter will display sticky headers on the top.
 	 *
 	 * @return true if headers can be sticky, false if headers are scrolled together with all items
+	 * @since 5.0.0-b6
 	 */
 	public boolean areHeadersSticky() {
 		return headersSticky;
@@ -698,6 +776,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return this Adapter, so the call can be chained
 	 * @see #getStickySectionHeadersHolder()
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter enableStickyHeaders() {
 		return setStickyHeaders(true);
@@ -705,6 +784,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Disables the sticky header functionality.
+	 *
+	 * @since 5.0.0-b6
 	 */
 	public void disableStickyHeaders() {
 		setStickyHeaders(false);
@@ -739,6 +820,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>The ViewGroup <u>must</u> have {@code android:id="@+id/sticky_header_container"}.
 	 *
 	 * @return ViewGroup layout that will hold the sticky header ItemViews
+	 * @since 5.0.0-b6
 	 */
 	public ViewGroup getStickySectionHeadersHolder() {
 		return (ViewGroup) ((Activity) mRecyclerView.getContext()).findViewById(R.id.sticky_header_container);
@@ -749,6 +831,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param item the identified item
 	 * @return true if the item holds a header, false otherwise
+	 * @since 5.0.0-b6
 	 */
 	public boolean hasHeader(@NonNull T item) {
 		return getHeaderOf(item) != null;
@@ -760,6 +843,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param item   the item supposing having a header
 	 * @param header the header to compare
 	 * @return true if the item has a header and it is the same of the provided one, false otherwise
+	 * @since 5.0.0-b6
 	 */
 	public boolean hasSameHeader(@NonNull T item, @NonNull IHeader header) {
 		IHeader current = getHeaderOf(item);
@@ -771,6 +855,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param item the ISectionable item holding a header
 	 * @return the header of the passed Sectionable, null otherwise
+	 * @since 5.0.0-b6
 	 */
 	public IHeader getHeaderOf(@NonNull T item) {
 		if (item != null && item instanceof ISectionable) {
@@ -784,6 +869,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position the item position
 	 * @return the IHeader item linked to the specified item position
+	 * @since 5.0.0-b6
 	 */
 	public IHeader getSectionHeader(@IntRange(from = 0) int position) {
 		//Headers are not visible nor sticky
@@ -802,6 +888,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param header the header/section item
 	 * @return the index of the specified header/section
+	 * @since 5.0.0-b6
 	 */
 	public int getSectionIndex(@NonNull IHeader header) {
 		int position = getGlobalPositionOf(header);
@@ -814,6 +901,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position any item position
 	 * @return the index of the specified item position
+	 * @since 5.0.0-b6
 	 */
 	public int getSectionIndex(@IntRange(from = 0) int position) {
 		int sectionIndex = 0;
@@ -828,6 +916,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param header the header that represents the section
 	 * @return NonNull list of all items in the specified section.
+	 * @since 5.0.0-b6
 	 */
 	@NonNull
 	public List<ISectionable> getSectionItems(@NonNull IHeader header) {
@@ -846,6 +935,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param header the header that represents the section
 	 * @return NonNull list of all item positions in the specified section.
+	 * @since 5.0.0-b8
 	 */
 	@NonNull
 	public List<Integer> getSectionItemPositions(@NonNull IHeader header) {
@@ -863,6 +953,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Headers can be shown or hidden all together.</p>
 	 *
 	 * @see #hideAllHeaders()
+	 * @since 5.0.0-b1
 	 */
 	public void showAllHeaders() {
 		multiRange = true;
@@ -883,6 +974,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Headers can be shown or hidden all together.</p>
 	 *
 	 * @see #showAllHeaders()
+	 * @since 5.0.0-b1
 	 */
 	public void hideAllHeaders() {
 		multiRange = true;
@@ -908,6 +1000,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * This is necessary when {@link #setDisplayHeadersAtStartUp(boolean)} is set true and also
 	 * if an Activity/Fragment has been closed and then reopened. We need to reset hidden status,
 	 * the process is very fast.
+	 *
+	 * @since 5.0.0-b6
 	 */
 	private void resetHiddenStatus() {
 		for (T item : mItems) {
@@ -922,6 +1016,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position the position where the header will be displayed
 	 * @param item     the item that holds the header
+	 * @since 5.0.0-b1
 	 */
 	private boolean showHeaderOf(int position, @NonNull T item) {
 		//Take the header
@@ -940,6 +1035,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Internal method to hide/remove a header from the internal list.
 	 *
 	 * @param item the item that holds the header
+	 * @since 5.0.0-b1
 	 */
 	private boolean hideHeaderOf(@NonNull T item) {
 		//Take the header
@@ -971,6 +1067,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param payload any non-null user object to notify the header and the item (the payload
 	 *                will be therefore passed to the bind method of the items ViewHolder),
 	 *                pass null to <u>not</u> notify the header and item
+	 * @since 5.0.0-b6
 	 */
 	private boolean linkHeaderTo(@NonNull T item, @NonNull IHeader header, @Nullable Object payload) {
 		boolean linked = false;
@@ -1006,6 +1103,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param payload any non-null user object to notify the header and the item (the payload
 	 *                will be therefore passed to the bind method of the items ViewHolder),
 	 *                pass null to <u>not</u> notify the header and item
+	 * @since 5.0.0-b6
 	 */
 	private IHeader unlinkHeaderFrom(@NonNull T item, @Nullable Object payload) {
 		if (hasHeader(item)) {
@@ -1066,6 +1164,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position position for which ViewType is requested
 	 * @return if Item is found, any integer value from user layout resource if defined in
 	 * {@code IFlexible#getLayoutRes()}
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	public int getItemViewType(int position) {
@@ -1090,6 +1189,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                               is not implemented and if this method is not overridden. Also
 	 *                               it is thrown if ViewType instance has not been correctly mapped.
 	 * @see IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -1116,6 +1216,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @throws IllegalStateException if {@link IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
 	 *                               is not implemented and if this method is not overridden.
 	 * @see IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -1132,6 +1233,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full update.
 	 * @throws IllegalStateException if {@link IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
 	 *                               is not implemented and if this method is not overridden.
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
@@ -1170,6 +1272,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param endlessScrollListener the callback to invoke the asynchronous loading
 	 * @param progressItem          the item representing the progress bar
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter setEndlessScrollListener(@NonNull EndlessScrollListener endlessScrollListener,
 													@NonNull T progressItem) {
@@ -1188,6 +1291,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param thresholdItems minimum number of unbound items to start loading more items
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter setEndlessScrollThreshold(@IntRange(from = 1) int thresholdItems) {
 		//Increase visible threshold based on number of columns
@@ -1221,6 +1325,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>When no more to load, pass empty list or null to hide the progressItem.</p>
 	 *
 	 * @param newItems the list of the new items, can be empty or null
+	 * @since 5.0.0-b6
 	 */
 	public void onLoadMoreComplete(@Nullable List<T> newItems) {
 		int progressPosition = getGlobalPositionOf(mProgressItem);
@@ -1262,6 +1367,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param collapseOnExpand true to collapse others items, false to just expand the current
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b1
 	 */
 	public FlexibleAdapter setAutoCollapseOnExpand(boolean collapseOnExpand) {
 		this.collapseOnExpand = collapseOnExpand;
@@ -1276,16 +1382,29 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param scrollOnExpand true to enable automatic scroll, false to disable
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b1
 	 */
 	public FlexibleAdapter setAutoScrollOnExpand(boolean scrollOnExpand) {
 		this.scrollOnExpand = scrollOnExpand;
 		return this;
 	}
 
+	/**
+	 * @param position the position of the item to check
+	 * @return true if the item implements {@link IExpandable} interface and its property has
+	 * {@code expanded = true}
+	 * @since 5.0.0-b1
+	 */
 	public boolean isExpanded(@IntRange(from = 0) int position) {
 		return isExpanded(getItem(position));
 	}
 
+	/**
+	 * @param item the item to check
+	 * @return true if the item implements {@link IExpandable} interface and its property has
+	 * {@code expanded = true}
+	 * @since 5.0.0-b1
+	 */
 	public boolean isExpanded(@NonNull T item) {
 		if (isExpandable(item)) {
 			IExpandable expandable = (IExpandable) item;
@@ -1294,10 +1413,19 @@ public class FlexibleAdapter<T extends IFlexible>
 		return false;
 	}
 
+	/**
+	 * @param item the item to check
+	 * @return true if the item implements {@link IExpandable} interface, false otherwise
+	 * @since 5.0.0-b1
+	 */
 	public boolean isExpandable(@NonNull T item) {
 		return item != null && item instanceof IExpandable;
 	}
 
+	/**
+	 * @return the level of the minium collapsible level used in MultiLevel expandable
+	 * @since 5.0.0-b6
+	 */
 	public int getMinCollapsibleLevel() {
 		return minCollapsibleLevel;
 	}
@@ -1308,17 +1436,33 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param minCollapsibleLevel the minimum level to auto-collapse sub expandable items
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter setMinCollapsibleLevel(int minCollapsibleLevel) {
 		this.minCollapsibleLevel = minCollapsibleLevel;
 		return this;
 	}
 
+	/**
+	 * Utility method to check if the expandable item has sub items.
+	 *
+	 * @param expandable the {@link IExpandable} object
+	 * @return true if the expandable has subItems, false otherwise
+	 * @since 5.0.0-b1
+	 */
 	public boolean hasSubItems(@NonNull IExpandable expandable) {
 		return expandable != null && expandable.getSubItems() != null &&
 				expandable.getSubItems().size() > 0;
 	}
 
+	/**
+	 * Retrieves the parent of a child.
+	 * <p>Only for a real child of an expanded parent.</p>
+	 *
+	 * @param position the position of the child item
+	 * @return the parent of this child item or null if item has no parent
+	 * @since 5.0.0-b1
+	 */
 	public IExpandable getExpandableOf(@IntRange(from = 0) int position) {
 		return getExpandableOf(getItem(position));
 	}
@@ -1328,9 +1472,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Only for a real child of an expanded parent.</p>
 	 *
 	 * @param child the child item
-	 * @return the parent of this child item or null if not found
+	 * @return the parent of this child item or null if item has no parent
 	 * @see #getExpandablePositionOf(IFlexible)
 	 * @see #getRelativePositionOf(IFlexible)
+	 * @since 5.0.0-b1
 	 */
 	public IExpandable getExpandableOf(@NonNull T child) {
 		for (T parent : mItems) {
@@ -1357,6 +1502,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the parent position of this child item or -1 if not found
 	 * @see #getExpandableOf(IFlexible)
 	 * @see #getRelativePositionOf(IFlexible)
+	 * @since 5.0.0-b1
 	 */
 	public int getExpandablePositionOf(@NonNull T child) {
 		return getGlobalPositionOf(getExpandableOf(child));
@@ -1371,6 +1517,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getExpandablePositionOf(IFlexible)
 	 * @see #getRelativePositionOf(IFlexible)
 	 * @see #getExpandedItems()
+	 * @since 5.0.0-b1
 	 */
 	@NonNull
 	public List<T> getSiblingsOf(@NonNull T child) {
@@ -1386,6 +1533,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the position in the parent or -1 if, child is a parent itself or not found
 	 * @see #getExpandableOf(IFlexible)
 	 * @see #getExpandablePositionOf(IFlexible)
+	 * @since 5.0.0-b1
 	 */
 	public int getRelativePositionOf(@NonNull T child) {
 		return getSiblingsOf(child).indexOf(child);
@@ -1397,6 +1545,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return a list with all expanded items
 	 * @see #getSiblingsOf(IFlexible)
 	 * @see #getExpandedPositions()
+	 * @since 5.0.0-b1
 	 */
 	@NonNull
 	public List<T> getExpandedItems() {
@@ -1414,6 +1563,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return a list with the global positions of all expanded items
 	 * @see #getSiblingsOf(IFlexible)
 	 * @see #getExpandedItems()
+	 * @since 5.0.0-b1
 	 */
 	@NonNull
 	public List<Integer> getExpandedPositions() {
@@ -1435,6 +1585,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #expand(IFlexible)
 	 * @see #expand(IFlexible, boolean)
 	 * @see #expandAll()
+	 * @since 5.0.0-b1
 	 */
 	public int expand(@IntRange(from = 0) int position) {
 		return expand(position, false, false);
@@ -1451,6 +1602,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #expand(int)
 	 * @see #expand(IFlexible, boolean)
 	 * @see #expandAll()
+	 * @since 5.0.0-b6
 	 */
 	public int expand(T item) {
 		return expand(getGlobalPositionOf(item), false, false);
@@ -1472,6 +1624,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #expand(int)
 	 * @see #expand(IFlexible)
 	 * @see #expandAll()
+	 * @since 5.0.0-b7
 	 */
 	public int expand(T item, boolean init) {
 		return expand(getGlobalPositionOf(item), false, init);
@@ -1544,6 +1697,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the number of parent successfully expanded
 	 * @see #expandAll(int)
 	 * @see #setMinCollapsibleLevel(int)
+	 * @since 5.0.0-b1
 	 */
 	public int expandAll() {
 		return expandAll(minCollapsibleLevel);
@@ -1556,6 +1710,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the number of parent successfully expanded
 	 * @see #expandAll()
 	 * @see #setMinCollapsibleLevel(int)
+	 * @since 5.0.0-b6
 	 */
 	public int expandAll(int level) {
 		int expanded = 0;
@@ -1580,6 +1735,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position the position of the item to collapse
 	 * @return the number of subItems collapsed
 	 * @see #collapse(int)
+	 * @since 5.0.0-b1
 	 */
 	public int collapse(@IntRange(from = 0) int position) {
 		T item = getItem(position);
@@ -1641,6 +1797,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the number of parent successfully collapsed
 	 * @see #collapseAll(int)
 	 * @see #setMinCollapsibleLevel(int)
+	 * @since 5.0.0-b1
 	 */
 	public int collapseAll() {
 		return collapseAll(minCollapsibleLevel);
@@ -1652,6 +1809,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param level the level to start collapse sub expandable items
 	 * @return the number of parent successfully collapsed
 	 * @see #collapseAll()
+	 * @since 5.0.0-b6
 	 */
 	public int collapseAll(int level) {
 		return recursiveCollapse(mItems, level);
@@ -1669,6 +1827,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param payload any non-null user object to notify the current item (the payload will be
 	 *                therefore passed to the bind method of the item ViewHolder to optimize the
 	 *                content to update); pass null to rebind all fields of this item.
+	 * @since 2.1.0
 	 */
 	public void updateItem(@NonNull T item, @Nullable Object payload) {
 		updateItem(getGlobalPositionOf(item), item, payload);
@@ -1684,6 +1843,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param payload  any non-null user object to notify the current item (the payload will be
 	 *                 therefore passed to the bind method of the item ViewHolder to optimize the
 	 *                 content to update); pass null to rebind all fields of this item.
+	 * @since 5.0.0-b1
 	 */
 	public void updateItem(@IntRange(from = 0) int position, @NonNull T item,
 						   @Nullable Object payload) {
@@ -1714,6 +1874,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #addItems(int, List)
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
 	 * @see #removeItemWithDelay(IFlexible, long, boolean, boolean)
+	 * @since 5.0.0-b1
 	 */
 	public void addItemWithDelay(@IntRange(from = 0) final int position, @NonNull final T item,
 								 @IntRange(from = 0) long delay, final boolean scrollToPosition) {
@@ -1738,6 +1899,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #addItemWithDelay(int, IFlexible, long, boolean)
 	 * @see #addItems(int, List)
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
+	 * @since 1.0.0
 	 */
 	public boolean addItem(@IntRange(from = 0) int position, @NonNull T item) {
 		if (item == null) {
@@ -1761,6 +1923,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return true if the internal list was successfully modified, false otherwise
 	 * @see #addItem(int, IFlexible)
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
+	 * @since 5.0.0-b1
 	 */
 	public boolean addItems(@IntRange(from = 0) int position, @NonNull List<T> items) {
 		if (position < 0) {
@@ -1802,6 +1965,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return true if the internal list was successfully modified, false otherwise
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
+	 * @since 5.0.0-b1
 	 */
 	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
 							  @IntRange(from = 0) int subPosition, @NonNull T item) {
@@ -1823,6 +1987,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                       pass null to <u>not</u> notify the parent
 	 * @return true if the internal list was successfully modified, false otherwise
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
+	 * @since 5.0.0-b1
 	 */
 	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
 							  @IntRange(from = 0) int subPosition,
@@ -1855,6 +2020,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                       pass null to <u>not</u> notify the parent
 	 * @return true if the internal list was successfully modified, false otherwise
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
+	 * @since 5.0.0-b1
 	 */
 	public int addAllSubItemsFrom(@IntRange(from = 0) int parentPosition,
 								  @NonNull IExpandable parent, boolean expandParent,
@@ -1879,6 +2045,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                       pass null to <u>not</u> notify the parent
 	 * @return true if the internal list was successfully modified, false otherwise
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
+	 * @since 5.0.0-b1
 	 */
 	public boolean addSubItems(@IntRange(from = 0) int parentPosition,
 							   @IntRange(from = 0) int subPosition,
@@ -1911,6 +2078,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                       pass null to <u>not</u> notify the parent
 	 * @return true if the internal list was successfully modified, false otherwise
 	 * @see #addItems(int, List)
+	 * @since 5.0.0-b1
 	 */
 	private boolean addSubItems(@IntRange(from = 0) int parentPosition,
 								@IntRange(from = 0) int subPosition,
@@ -1936,6 +2104,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return the calculated position for the new item
 	 * @see #addSection(IHeader, Comparator)
+	 * @since 5.0.0-b6
 	 */
 	public int addSection(@NonNull IHeader header) {
 		return addSection(header, (Comparator) null);
@@ -1946,6 +2115,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * instead. This method doesn't perform any sort, so if the refHeader is unknown, the Header
 	 * is always inserted at the top, which doesn't cover all use cases.
 	 * <p>This method will be deleted with next pre-release.</p>
+	 * @since 5.0.0-b6
 	 */
 	@Deprecated
 	public void addSection(@NonNull IHeader header, @Nullable IHeader refHeader) {
@@ -1974,6 +2144,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param comparator the criteria to sort the Data Set used to extract the correct position
 	 *                   of the new header
 	 * @return the calculated position for the new item
+	 * @since 5.0.0-b7
 	 */
 	public int addSection(@NonNull IHeader header, @Nullable Comparator comparator) {
 		int position = calculatePositionFor(header, comparator);
@@ -1993,9 +2164,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                    of the new item in the section
 	 * @return the calculated final position for the new item
 	 * @see #addItemToSection(ISectionable, IHeader, int)
+	 * @since 5.0.0-b6
 	 */
 	public int addItemToSection(@NonNull ISectionable sectionable, @NonNull IHeader header,
-								 @NonNull Comparator comparator) {
+								@NonNull Comparator comparator) {
 		int index;
 		if (header != null && !header.isHidden()) {
 			List<ISectionable> sectionItems = getSectionItems(header);
@@ -2019,6 +2191,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param index  the known relative position where to add the new item into the section
 	 * @return the calculated final position for the new item
 	 * @see #addItemToSection(ISectionable, IHeader, Comparator)
+	 * @since 5.0.0-b6
 	 */
 	public int addItemToSection(@NonNull ISectionable item, @NonNull IHeader header,
 								@IntRange(from = 0) int index) {
@@ -2052,6 +2225,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeRange(int, int)
 	 * @see #removeAllSelectedItems()
 	 * @see #addItemWithDelay(int, IFlexible, long, boolean)
+	 * @since 5.0.0-b7
 	 */
 	public void removeItemWithDelay(@NonNull final T item, @IntRange(from = 0) long delay,
 									final boolean permanent, final boolean resetLayoutAnimation) {
@@ -2078,6 +2252,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeAllSelectedItems()
 	 * @see #removeItemWithDelay(IFlexible, long, boolean, boolean)
 	 * @see #removeItem(int, Object)
+	 * @since 1.0.0
 	 */
 	public void removeItem(@IntRange(from = 0) int position) {
 		this.removeItem(position, null);
@@ -2096,6 +2271,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeRange(int, int, Object)
 	 * @see #removeAllSelectedItems(Object)
 	 * @see #removeItem(int)
+	 * @since 5.0.0-b1
 	 */
 	public void removeItem(@IntRange(from = 0) int position, @Nullable Object payload) {
 		//Request to collapse after the notification of remove range
@@ -2112,6 +2288,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeRange(int, int)
 	 * @see #removeAllSelectedItems()
 	 * @see #removeItems(List, Object)
+	 * @since 1.0.0
 	 */
 	public void removeItems(@NonNull List<Integer> selectedPositions) {
 		this.removeItems(selectedPositions, null);
@@ -2132,6 +2309,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeRange(int, int, Object)
 	 * @see #removeAllSelectedItems(Object)
 	 * @see #removeItems(List)
+	 * @since 5.0.0-b1
 	 */
 	public void removeItems(@NonNull List<Integer> selectedPositions, @Nullable Object payload) {
 		if (DEBUG)
@@ -2179,6 +2357,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeItem(int, Object)
 	 * @see #removeItems(List)
 	 * @see #removeAllSelectedItems()
+	 * @since 5.0.0-b5
 	 */
 	public void removeItemsOfType(Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
@@ -2201,6 +2380,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeItemsOfType(Integer...)
 	 * @see #removeAllSelectedItems()
 	 * @see #removeRange(int, int, Object)
+	 * @since 5.0.0-b1
 	 */
 	public void removeRange(@IntRange(from = 0) int positionStart,
 							@IntRange(from = 0) int itemCount) {
@@ -2236,6 +2416,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #restoreDeletedItems()
 	 * @see #startUndoTimer(long, OnDeleteCompleteListener)
 	 * @see #emptyBin()
+	 * @since 5.0.0-b1
 	 */
 	public void removeRange(@IntRange(from = 0) int positionStart,
 							@IntRange(from = 0) int itemCount, @Nullable Object payload) {
@@ -2329,6 +2510,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeRange(int, int)
 	 * @see #removeItemsOfType(Integer...)
 	 * @see #removeAllSelectedItems(Object)
+	 * @since 5.0.0-b1
 	 */
 	public void removeAllSelectedItems() {
 		removeAllSelectedItems(null);
@@ -2346,6 +2528,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeItems(List, Object)
 	 * @see #removeRange(int, int, Object)
 	 * @see #removeAllSelectedItems()
+	 * @since 5.0.0-b1
 	 */
 	public void removeAllSelectedItems(@Nullable Object payload) {
 		this.removeItems(getSelectedPositions(), payload);
@@ -2355,6 +2538,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* UNDO/RESTORE METHODS */
 	/*----------------------*/
 
+	/**
+	 * @return true if the items are deleted instantly, false if items are retained for an
+	 * eventual restoration
+	 * @since 5.0.0-b6
+	 */
 	public boolean isPermanentDelete() {
 		return permanentDelete;
 	}
@@ -2366,6 +2554,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param permanentDelete true to delete item forever, false to use the cache for Undo feature
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter setPermanentDelete(boolean permanentDelete) {
 		this.permanentDelete = permanentDelete;
@@ -2377,6 +2566,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return true if selection will be restored, false otherwise
 	 * @see #setRestoreSelectionOnUndo(boolean)
+	 * @since 5.0.0-b1
 	 */
 	public boolean isRestoreWithSelection() {
 		return restoreSelection;
@@ -2390,6 +2580,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param restoreSelection true to have restored items still selected, false to empty selections
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b1
 	 */
 	public FlexibleAdapter setRestoreSelectionOnUndo(boolean restoreSelection) {
 		this.restoreSelection = restoreSelection;
@@ -2401,6 +2592,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p><b>NOTE:</b> If filter is active, only items that match that filter will be shown(restored).</p>
 	 *
 	 * @see #setRestoreSelectionOnUndo(boolean)
+	 * @since 3.0.0
 	 */
 	@SuppressWarnings("ResourceType")
 	public void restoreDeletedItems() {
@@ -2489,6 +2681,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Clean memory from items just removed.
 	 * <p><b>Note:</b> This method is automatically called after timer is over and after a
 	 * restoration.</p>
+	 *
+	 * @since 3.0.0
 	 */
 	public synchronized void emptyBin() {
 		if (DEBUG) Log.v(TAG, "emptyBin!");
@@ -2499,6 +2693,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Convenience method to start Undo timer with default timeout of 5''
 	 *
 	 * @param listener the listener that will be called after timeout to commit the change
+	 * @since 3.0.0
 	 */
 	public void startUndoTimer(OnDeleteCompleteListener listener) {
 		startUndoTimer(0, listener);
@@ -2509,6 +2704,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param timeout  custom timeout
 	 * @param listener the listener that will be called after timeout to commit the change
+	 * @since 3.0.0
 	 */
 	public void startUndoTimer(long timeout, OnDeleteCompleteListener listener) {
 		//Make longer the timer for new coming deleted items
@@ -2519,17 +2715,24 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Stop Undo timer.
 	 * <p><b>Note:</b> This method is automatically called in case of restoration.</p>
+	 *
+	 * @since 3.0.0
 	 */
 	protected void stopUndoTimer() {
 		mHandler.removeCallbacksAndMessages(null);
 	}
 
+	/**
+	 * @return true if the restore list is not empty, false otherwise
+	 * @since 4.0.0
+	 */
 	public boolean isRestoreInTime() {
 		return mRestoreList != null && !mRestoreList.isEmpty();
 	}
 
 	/**
 	 * @return the list of deleted items
+	 * @since 4.0.0
 	 */
 	@NonNull
 	public List<T> getDeletedItems() {
@@ -2545,6 +2748,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param child the deleted child
 	 * @return the expandable(parent) of this child, or null if no parent found.
+	 * @since 5.0.0-b1
 	 */
 	public IExpandable getExpandableOfDeletedChild(T child) {
 		for (RestoreInfo restoreInfo : mRestoreList) {
@@ -2559,6 +2763,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param expandable the parent item
 	 * @return the list of deleted children
+	 * @since 5.0.0-b1
 	 */
 	@NonNull
 	public List<T> getDeletedChildren(IExpandable expandable) {
@@ -2577,6 +2782,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param expandable the parent item
 	 * @return a non-null list of the original children minus the deleted children if some are
 	 * pending removal.
+	 * @since 5.0.0-b1
 	 */
 	@NonNull
 	public List<T> getCurrentChildren(@NonNull IExpandable expandable) {
@@ -2597,18 +2803,39 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* FILTER METHODS */
 	/*----------------*/
 
+	/**
+	 * @return true if the current search text is not empty or null
+	 * @since 3.1.0
+	 */
 	public boolean hasSearchText() {
 		return mSearchText != null && !mSearchText.isEmpty();
 	}
 
+	/**
+	 * Checks if the searchText is changed.
+	 *
+	 * @param newText the new searchText
+	 * @return true if the old search text is different than the newText, false otherwise
+	 * @since 5.0.0-b5
+	 */
 	public boolean hasNewSearchText(String newText) {
 		return !mOldSearchText.equalsIgnoreCase(newText);
 	}
 
+	/**
+	 * @return the current search text
+	 * @since 3.1.0
+	 */
 	public String getSearchText() {
 		return mSearchText;
 	}
 
+	/**
+	 * Sets the new search text.
+	 *
+	 * @param searchText the new text to filter the items
+	 * @since 3.1.0
+	 */
 	public void setSearchText(String searchText) {
 		if (searchText != null)
 			mSearchText = searchText.trim().toLowerCase(Locale.getDefault());
@@ -2627,6 +2854,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)} while filtering,
 	 *                     false otherwise
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b1
 	 */
 	public final FlexibleAdapter setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
 		this.mNotifyChangeOfUnfilteredItems = notifyChange;
@@ -2642,6 +2870,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param unfilteredItems the list to filter
 	 * @param delay           any non-negative delay
 	 * @see #filterObject(IFlexible, String)
+	 * @since 5.0.0-b1
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems, @IntRange(from = 0) long delay) {
 		//Make longer the timer for new coming deleted items
@@ -2665,6 +2894,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param unfilteredItems the list to filter
 	 * @see #filterObject(IFlexible, String)
+	 * @since 4.1.0
 	 */
 	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
 		// NOTE: In case user has deleted some items and he changes or applies a filter while
@@ -2752,6 +2982,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param item the object with subItems to be inspected
 	 * @return true, if the object should be in the filteredResult, false otherwise
+	 * @since 5.0.0-b1
 	 */
 	private boolean filterExpandableObject(T item) {
 		//Reset expansion flag
@@ -2796,6 +3027,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param constraint constraint, that the object has to fulfil
 	 * @return true, if the object returns true as well, and so if it should be in the
 	 * filteredResult, false otherwise
+	 * @since 3.1.0
 	 */
 	protected boolean filterObject(T item, String constraint) {
 		if (item instanceof IFilterable) {
@@ -2866,6 +3098,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param models the new list containing the new items
 	 * @return the cleaned up item list. make sure to set your new list to this one
 	 * @see #setNotifyChangeOfUnfilteredItems(boolean)
+	 * @since 5.0.0-b1
 	 */
 	public List<T> animateTo(@Nullable List<T> models) {
 		if (models == null) models = new ArrayList<T>();
@@ -2877,6 +3110,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Find out all removed items and animate them.
+	 *
+	 * @since 5.0.0-b1
 	 */
 	protected void applyAndAnimateRemovals(List<T> from, List<T> newItems) {
 		int out = 0;
@@ -2898,6 +3133,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Find out all added items and animate them, update also existent positions with newItems.
+	 *
+	 * @since 5.0.0-b1
 	 */
 	protected void applyAndAnimateAdditions(List<T> from, List<T> newItems) {
 		int in = 0;
@@ -2915,6 +3152,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Find out all moved items and animate them.
+	 *
+	 * @since 5.0.0-b7
 	 */
 	protected void applyAndAnimateMovedItems(List<T> from, List<T> newItems) {
 		for (int toPosition = newItems.size() - 1; toPosition >= 0; toPosition--) {
@@ -2940,6 +3179,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * to start Drag or Swipe when HandleView is touched.
 	 *
 	 * @return the ItemTouchHelper instance already initialized.
+	 * @since 5.0.0-b1
 	 */
 	public final ItemTouchHelper getItemTouchHelper() {
 		initializeItemTouchHelper();
@@ -2950,6 +3190,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Returns the customization of the ItemTouchHelper.
 	 *
 	 * @return the ItemTouchHelperCallback instance already initialized.
+	 * @since 5.0.0-b7
 	 */
 	public final ItemTouchHelperCallback getItemTouchHelperCallback() {
 		initializeItemTouchHelper();
@@ -2963,6 +3204,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return true if ItemTouchHelper should start dragging an item when it is long pressed,
 	 * false otherwise. Default value is false.
+	 * @since 5.0.0-b1
 	 */
 	public boolean isLongPressDragEnabled() {
 		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.isLongPressDragEnabled();
@@ -2977,6 +3219,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param longPressDragEnabled true to activate, false otherwise
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b1
 	 */
 	public final FlexibleAdapter setLongPressDragEnabled(boolean longPressDragEnabled) {
 		initializeItemTouchHelper();
@@ -2990,6 +3233,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * {@link FlexibleViewHolder#setDragHandleView(View)}.</p>
 	 *
 	 * @return true if active, false otherwise
+	 * @since 5.0.0-b1
 	 */
 	public boolean isHandleDragEnabled() {
 		return handleDragEnabled;
@@ -3001,6 +3245,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param handleDragEnabled true to activate, false otherwise
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b1
 	 */
 	public FlexibleAdapter setHandleDragEnabled(boolean handleDragEnabled) {
 		this.handleDragEnabled = handleDragEnabled;
@@ -3014,6 +3259,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return true if ItemTouchHelper should start swiping an item when user swipes a pointer
 	 * over the View, false otherwise. Default value is false.
+	 * @since 5.0.0-b1
 	 */
 	public final boolean isSwipeEnabled() {
 		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.isItemViewSwipeEnabled();
@@ -3025,6 +3271,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param swipeEnabled true to activate, false otherwise
 	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b1
 	 */
 	public final FlexibleAdapter setSwipeEnabled(boolean swipeEnabled) {
 		initializeItemTouchHelper();
@@ -3041,6 +3288,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param fromPosition previous position of the item
 	 * @param toPosition   new position of the item
 	 * @see #moveItem(int, int, Object)
+	 * @since 5.0.0-b7
 	 */
 	public void moveItem(int fromPosition, int toPosition) {
 		moveItem(fromPosition, toPosition, null);
@@ -3055,6 +3303,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param fromPosition previous position of the item
 	 * @param toPosition   new position of the item
 	 * @param payload      allows to update the content of the item just moved
+	 * @since 5.0.0-b7
 	 */
 	public void moveItem(int fromPosition, int toPosition, @Nullable Object payload) {
 		if (DEBUG)
@@ -3088,6 +3337,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param fromPosition previous position of the item.
 	 * @param toPosition   new position of the item.
+	 * @since 5.0.0-b7
 	 */
 	public void swapItems(int fromPosition, int toPosition) {
 		if (fromPosition < 0 || fromPosition >= getItemCount() ||
@@ -3173,6 +3423,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @since 5.0.0-b7
 	 */
 	@Override
 	public void onActionStateChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
@@ -3185,6 +3437,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
@@ -3194,6 +3448,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	@CallSuper
@@ -3208,6 +3464,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @since 5.0.0-b1
 	 */
 	@Override
 	@CallSuper
@@ -3237,6 +3495,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Internal mapper to remember and add all types for the RecyclerView.
 	 *
 	 * @param item the item to map
+	 * @since 5.0.0-b1
 	 */
 	private void mapViewTypeFrom(T item) {
 		if (item != null && !mTypeInstances.containsKey(item.getLayoutRes())) {
@@ -3251,6 +3510,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param viewType the ViewType of the item
 	 * @return the IFlexible instance, creator of the ViewType
+	 * @since 5.0.0-b1
 	 */
 	private T getViewTypeInstance(int viewType) {
 		return mTypeInstances.get(viewType);
@@ -3273,6 +3533,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param item       the deleted item
 	 * @param payload    any payload object
 	 * @return the parent position
+	 * @since 5.0.0-b1
 	 */
 	private int createRestoreSubItemInfo(IExpandable expandable, T item, @Nullable Object payload) {
 		int parentPosition = getGlobalPositionOf(expandable);
@@ -3288,6 +3549,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * @param position the position of the item to retain.
 	 * @param item     the deleted item
+	 * @since 5.0.0-b1
 	 */
 	private void createRestoreItemInfo(int position, T item, @Nullable Object payload) {
 		//Collapse Parent before removal if it is expanded!
@@ -3310,6 +3572,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * @param expandable the parent item
 	 * @return the list of the subItems not hidden
+	 * @since 5.0.0-b1
 	 */
 	@NonNull
 	private List<T> getExpandableList(IExpandable expandable) {
@@ -3329,6 +3592,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param expandable the expandable item to check
 	 * @return true if at least 1 subItem is currently selected, false if no subItems are selected
+	 * @since 5.0.0-b1
 	 */
 	private boolean hasSubItemsSelected(IExpandable expandable) {
 		for (T subItem : getExpandableList(expandable)) {
@@ -3397,6 +3661,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Save the state of the current expanded items.
 	 *
 	 * @param outState Current state
+	 * @since 5.0.0-b1
 	 */
 	public void onSaveInstanceState(Bundle outState) {
 		if (outState != null) {
@@ -3417,6 +3682,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Restore the previous state of the expanded items.
 	 *
 	 * @param savedInstanceState Previous state
+	 * @since 5.0.0-b1
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
@@ -3450,6 +3716,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * Called at startup and every time an item is inserted, removed or filtered.
 		 *
 		 * @param size the current number of items in the adapter, result of {@link #getItemCount()}
+		 * @since 5.0.0-b1
 		 */
 		void onUpdateEmptyView(int size);
 	}
@@ -3464,6 +3731,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * well manageable if we pass the List&lt;T&gt; object.<br/>
 		 * To get deleted items, use {@link #getDeletedItems()} from the
 		 * implementation of this method.</p>
+		 *
+		 * @since 5.0.0-b1
 		 */
 		void onDeleteConfirmed();
 	}
@@ -3480,6 +3749,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 *
 		 * @param position the adapter position of the item clicked
 		 * @return true if the click should activate the ItemView, false for no change.
+		 * @since 5.0.0-b1
 		 */
 		boolean onItemClick(int position);
 	}
@@ -3496,6 +3766,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * For Expandable Views it will collapse the View if configured so.
 		 *
 		 * @param position the adapter position of the item clicked
+		 * @since 5.0.0-b1
 		 */
 		void onItemLongClick(int position);
 	}
@@ -3513,6 +3784,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * @param actionState one of {@link ItemTouchHelper#ACTION_STATE_SWIPE} or
 		 *                    {@link ItemTouchHelper#ACTION_STATE_DRAG} or
 		 *                    {@link ItemTouchHelper#ACTION_STATE_IDLE}.
+		 * @since 5.0.0-b7
 		 */
 		void onActionStateChanged(RecyclerView.ViewHolder viewHolder, int actionState);
 	}
@@ -3542,6 +3814,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
 		 *                     //		 * @see #shouldMoveItem(int, int)
+		 * @since 5.0.0-b1
 		 */
 		void onItemMove(int fromPosition, int toPosition);
 	}
@@ -3559,6 +3832,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 *                  {@link ItemTouchHelper#RIGHT},
 		 *                  {@link ItemTouchHelper#UP},
 		 *                  {@link ItemTouchHelper#DOWN},
+		 * @since 5.0.0-b1
 		 */
 		void onItemSwipe(int position, int direction);
 	}
@@ -3571,6 +3845,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * Called when the current sticky header changed.
 		 *
 		 * @param sectionIndex the position of header, -1 if no header is sticky
+		 * @since 5.0.0-b1
 		 */
 		void onStickyHeaderChange(int sectionIndex);
 	}
@@ -3581,6 +3856,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	public interface EndlessScrollListener {
 		/**
 		 * Loads more data.
+		 *
+		 * @since 5.0.0-b6
 		 */
 		void onLoadMore();
 	}
