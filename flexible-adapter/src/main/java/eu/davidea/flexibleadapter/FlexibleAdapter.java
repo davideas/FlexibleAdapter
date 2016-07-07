@@ -145,7 +145,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private List<RestoreInfo> mRestoreList;
 	private boolean restoreSelection = false, multiRange = false, unlinkOnRemoveHeader = false,
-			removeOrphanHeaders = false, permanentDelete = false, adjustSelected = true;
+			removeOrphanHeaders = false, permanentDelete = true, adjustSelected = true;
 
 	/* ViewTypes */
 	protected LayoutInflater mInflater;
@@ -2539,7 +2539,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*----------------------*/
 
 	/**
-	 * @return true if the items are deleted instantly, false if items are retained for an
+	 * Returns if items will be deleted immediately when deletion is requested.
+	 * <p>Default value is true (Undo mechanism is disabled).</p>
+	 *
+	 * @return true if the items are deleted immediately, false if items are retained for an
 	 * eventual restoration
 	 * @since 5.0.0-b6
 	 */
@@ -2548,11 +2551,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Sets if a deleted item should be deleted immediately or if Adapter should cache it to
-	 * restore it when requested by the user.
-	 * <p>Default value is false (use the Undo mechanism).</p>
+	 * Sets if the deleted items should be deleted immediately or if Adapter should cache them to
+	 * restore them when requested by the user.
+	 * <p>Default value is true (Undo mechanism is disabled).</p>
 	 *
-	 * @param permanentDelete true to delete item forever, false to use the cache for Undo feature
+	 * @param permanentDelete true to delete items forever, false to use the cache for Undo feature
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
@@ -2563,6 +2566,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Returns the current configuration to restore selections on Undo.
+	 * <p>Default value is false (selection is NOT restored).</p>
 	 *
 	 * @return true if selection will be restored, false otherwise
 	 * @see #setRestoreSelectionOnUndo(boolean)
