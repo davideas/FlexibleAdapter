@@ -842,6 +842,23 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Provides all the item positions that belongs to the section represented by the specified header.
+	 *
+	 * @param header the header that represents the section
+	 * @return NonNull list of all item positions in the specified section.
+	 */
+	@NonNull
+	public List<Integer> getSectionItemPositions(@NonNull IHeader header) {
+		List<Integer> sectionItemPositions = new ArrayList<Integer>();
+		int startPosition = getGlobalPositionOf(header);
+		T item = getItem(++startPosition);
+		while (hasSameHeader(item, header)) {
+			sectionItemPositions.add(++startPosition);
+		}
+		return sectionItemPositions;
+	}
+
+	/**
 	 * Shows all headers in the RecyclerView at their linked position.
 	 * <p>Headers can be shown or hidden all together.</p>
 	 *
