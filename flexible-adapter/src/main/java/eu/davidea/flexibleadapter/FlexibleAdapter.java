@@ -41,8 +41,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
@@ -160,7 +162,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/* Filter */
 	private String mSearchText = "", mOldSearchText = "";
-	private List<IExpandable> mExpandedFilterFlags;
+	private Set<IExpandable> mExpandedFilterFlags;
 	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
 	private int mAnimateToLimit = 500;
 
@@ -3071,7 +3073,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Save which expandable was originally expanded before filtering it out
 			if (expandable.isExpanded()) {
 				if (mExpandedFilterFlags == null)
-					mExpandedFilterFlags = new ArrayList<IExpandable>();
+					mExpandedFilterFlags = new HashSet<IExpandable>();
 				mExpandedFilterFlags.add(expandable);
 			}
 			expandable.setExpanded(false);
@@ -3150,13 +3152,14 @@ public class FlexibleAdapter<T extends IFlexible>
 				expandable.setExpanded(mExpandedFilterFlags.contains(expandable));
 				if (hasSubItems(expandable)) {
 					List<T> subItems = expandable.getSubItems();
+					int refPosition = i;
 					for (int k = 0; k < subItems.size(); k++) {
 						T subItem = subItems.get(k);
 						//Reset subItem hidden flag
 						subItem.setHidden(false);
 						//Show subItems for expanded items
 						if (expandable.isExpanded()) {
-							int position = items.indexOf(item) + (k + 1);
+							int position = refPosition + (k + 1);
 							if (position < items.size()) items.add(position, subItem);
 							else items.add(subItem);
 							i++;
