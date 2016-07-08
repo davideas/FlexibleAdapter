@@ -405,12 +405,12 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onQueryTextChange(String newText) {
-		if (!mAdapter.hasSearchText() || mAdapter.hasNewSearchText(newText)) {
+		if (mAdapter.hasNewSearchText(newText)) {
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			mAdapter.setSearchText(newText);
 			//Fill and Filter mItems with your custom list and automatically animate the changes
 			//Watch out! The original list must be a copy
-			mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), 450L);
+			mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), 0L);
 		}
 		//Disable SwipeRefresh if search is active!!
 		mSwipeRefreshLayout.setEnabled(!mAdapter.hasSearchText());
