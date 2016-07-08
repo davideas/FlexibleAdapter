@@ -115,11 +115,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	private StickyHeaderHelper mStickyHeaderHelper;
 
 	/**
-	 * Handler for delayed {@link #filterItems(List)} and {@link OnDeleteCompleteListener#onDeleteConfirmed}
-	 * <p>You can override this Handler, but you must keep the "What" already used:
-	 * <br/>0 = filterItems delay
-	 * <br/>1 = deleteConfirmed when Undo timeout is over</p>
-	 * <br/>2 = reset flag to load more items</p>
+	 * Handler for delayed actions.
+	 * <p>You can use and override this Handler, but you must keep the "What" by calling super():
+	 * <br/>0 = filterItems delay.
+	 * <br/>1 = deleteConfirmed when Undo timeout is over.
+	 * <br/>2 = remove the progress item from the list, optionally delayed.
+	 * <br/>3 = reset flag to load more items, delayed.</p>
+	 * <b>Note:</b> numbers 0-9 are reserved for the Adapter, use others.
 	 */
 	protected Handler mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
@@ -132,7 +134,10 @@ public class FlexibleAdapter<T extends IFlexible>
 					if (listener != null) listener.onDeleteConfirmed();
 					emptyBin();
 					return true;
-				case 2: //onLoadMore
+				case 2: //onLoadMore remove progress item
+					deleteProgressItem();
+					return true;
+				case 3: //onLoadMore reset
 					resetOnLoadMore();
 					return true;
 			}
@@ -1267,22 +1272,41 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*------------------------*/
 
 	/**
-	 * Sets the callback to load more items asynchronously.
+	 * Sets the ProgressItem to be displayed at the end of the list and activate the Loading More
+	 * functionality.
+	 * <p>Using this method, the {@link EndlessScrollListener} won't be called so that you can
+	 * handle a click event to load more items upon a user request.</p>
+	 * To correctly implement "Load more upon a user request" check the Wiki page of this library.
 	 *
-	 * @param endlessScrollListener the callback to invoke the asynchronous loading
-	 * @param progressItem          the item representing the progress bar
+	 * @param progressItem the item representing the progress bar
 	 * @return this Adapter, so the call can be chained
-	 * @since 5.0.0-b6
+	 * @see #setEndlessScrollListener(EndlessScrollListener, IFlexible)
+	 * @since 5.0.0-b8
 	 */
-	public FlexibleAdapter setEndlessScrollListener(@NonNull EndlessScrollListener endlessScrollListener,
-													@NonNull T progressItem) {
-		if (endlessScrollListener != null && progressItem != null) {
-			mEndlessScrollListener = endlessScrollListener;
+	public FlexibleAdapter setEndlessProgressItem(@NonNull T progressItem) {
+		if (progressItem != null) {
 			setEndlessScrollThreshold(mEndlessScrollThreshold);
 			progressItem.setEnabled(false);
 			mProgressItem = progressItem;
 		}
 		return this;
+	}
+
+	/**
+	 * Sets the ProgressItem to be displayed at the end of the list and Sets the callback to
+	 * automatically load more items asynchronously (no further user action is needed but the
+	 * scroll).
+	 *
+	 * @param endlessScrollListener the callback to invoke the asynchronous loading
+	 * @param progressItem          the item representing the progress bar
+	 * @return this Adapter, so the call can be chained
+	 * @see #setEndlessProgressItem(IFlexible)
+	 * @since 5.0.0-b6
+	 */
+	public FlexibleAdapter setEndlessScrollListener(@Nullable EndlessScrollListener endlessScrollListener,
+													@NonNull T progressItem) {
+		mEndlessScrollListener = endlessScrollListener;
+		return setEndlessProgressItem(progressItem);
 	}
 
 	/**
@@ -1304,43 +1328,73 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	private void onLoadMore(int position) {
-		if (mEndlessScrollListener != null && getGlobalPositionOf(mProgressItem) < 0
+		if (mProgressItem != null && !mLoading && getGlobalPositionOf(mProgressItem) < 0
 				&& position >= getItemCount() - mEndlessScrollThreshold) {
-			if (!mLoading) {
-				mLoading = true;
-				mRecyclerView.post(new Runnable() {
-					@Override
-					public void run() {
-						mItems.add(mProgressItem);
-						notifyItemInserted(getItemCount());
+			mLoading = true;
+			mRecyclerView.post(new Runnable() {
+				@Override
+				public void run() {
+					mItems.add(mProgressItem);
+					notifyItemInserted(getItemCount());
+					if (mEndlessScrollListener != null)
 						mEndlessScrollListener.onLoadMore();
-					}
-				});
-			}
+				}
+			});
 		}
 	}
 
 	/**
 	 * To call when more items are successfully loaded.
-	 * <p>When no more to load, pass empty list or null to hide the progressItem.</p>
+	 * <p>When noMoreLoad OR onError OR onCancel, pass empty list or null to hide the
+	 * progressItem.</p>
+	 * In this case the ProgressItem is removed immediately.
 	 *
-	 * @param newItems the list of the new items, can be empty or null
+	 * @param newItems
 	 * @since 5.0.0-b6
 	 */
 	public void onLoadMoreComplete(@Nullable List<T> newItems) {
-		int progressPosition = getGlobalPositionOf(mProgressItem);
-		if (progressPosition >= 0) {
-			mItems.remove(mProgressItem);
-			notifyItemRemoved(progressPosition);
+		onLoadMoreComplete(newItems, 0L);
+	}
+
+	/**
+	 * To call to complete the action of the Loading more items.
+	 * <p>When noMoreLoad OR onError OR onCancel, pass empty list or null to hide the
+	 * progressItem.</p>
+	 * Optionally you can pass a delay time to still display the item with the latest information
+	 * inside. The message has to be handled inside the bindViewHolder of the item.
+	 *
+	 * @param newItems the list of the new items, can be empty or null
+	 * @param delay    the delay used to remove the progress item or -1 to disable the
+	 *                 loading forever and to keep the progress item.
+	 * @since 5.0.0-b8
+	 */
+	public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
+		//Handling the delay
+		if (delay < 0) {
+			mProgressItem = null;
+		} else {
+			mHandler.sendEmptyMessageDelayed(2, delay);
 		}
+		//Add the new items or reset the loading status
 		if (newItems != null && newItems.size() > 0) {
 			if (DEBUG)
 				Log.v(TAG, "onLoadMore performing adding " + newItems.size() + " new Items!");
 			addItems(getItemCount(), newItems);
 			//Reset OnLoadMore delayed
-			mHandler.sendEmptyMessageDelayed(2, 200L);
+			mHandler.sendEmptyMessageDelayed(3, 200L);
 		} else {
 			noMoreLoad();
+		}
+	}
+
+	/**
+	 * Called when loading more should continue.
+	 */
+	private void deleteProgressItem() {
+		int progressPosition = getGlobalPositionOf(mProgressItem);
+		if (progressPosition >= 0) {
+			mItems.remove(mProgressItem);
+			notifyItemRemoved(progressPosition);
 		}
 	}
 
@@ -1350,7 +1404,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	private void noMoreLoad() {
 		if (DEBUG) Log.v(TAG, "onLoadMore noMoreLoad!");
 		notifyItemChanged(getItemCount() - 1, true);
-		mHandler.sendEmptyMessageDelayed(2, 200L);
+		//Reset OnLoadMore delayed
+		mHandler.sendEmptyMessageDelayed(3, 200L);
 	}
 
 	private void resetOnLoadMore() {
