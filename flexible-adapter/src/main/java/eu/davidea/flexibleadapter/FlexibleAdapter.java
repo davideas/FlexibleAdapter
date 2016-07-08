@@ -162,6 +162,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private String mSearchText = "", mOldSearchText = "";
 	private List<IExpandable> mExpandedFilterFlags;
 	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
+	private int mFilterAnimationLimit = 500;
 
 	/* Expandable flags */
 	private int minCollapsibleLevel = 0, selectedLevel = -1;
@@ -2902,11 +2903,26 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Sets the limit after the which the animation, during the filter operation, is stopped and
+	 * {@link #notifyDataSetChanged()} will be called instead.
+	 * <p>Default value is 500 items of "current list" OR "filtered list".</p>
+	 *
+	 * @param filterAnimationLimit the number of "filtered items" that when reached will stop
+	 *                             animating the filtering.
+	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b8
+	 */
+	public FlexibleAdapter setFilterAnimationLimit(int filterAnimationLimit) {
+		this.mFilterAnimationLimit = filterAnimationLimit;
+		return this;
+	}
+
+	/**
 	 * Sometimes it is necessary, while filtering or after the DataSet has been updated, to
 	 * rebound the items that remain unfiltered.<br/>
 	 * <p>If the items have highlighted text, those items must be refreshed in order to change the
-	 * highlighted text. This happens systematically when searchText is reduced in length by the
-	 * user.</p>
+	 * highlighted text back to normal. This happens systematically when searchText is reduced in
+	 * length by the user.</p>
 	 * The notification is triggered in {@link #applyAndAnimateAdditions(List, List)} when new
 	 * items are not added.
 	 *
@@ -2929,6 +2945,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param unfilteredItems the list to filter
 	 * @param delay           any non-negative delay
 	 * @see #filterObject(IFlexible, String)
+	 * @see #setFilterAnimationLimit(int)
 	 * @since 5.0.0-b1
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems, @IntRange(from = 0) long delay) {
@@ -2943,16 +2960,22 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>This method filters the provided list with the search text previously set with
 	 * {@link #setSearchText(String)}.</p>
 	 * <b>Note:</b>
-	 * <br/>- This method calls {@link #filterObject(IFlexible, String)}.
-	 * <br/>- If search text is empty or null, the provided list is the current list.
-	 * <br/>- Any pending deleted items are always filtered out, but if restored, they will be
-	 * displayed according to the current filter and in the correct positions.
-	 * <br/>- <b>NEW!</b> Expandable items are picked up and displayed if at least a child is
-	 * collected by the current filter.
-	 * <br/>- <b>NEW!</b> Items are animated thanks to {@link #animateTo(List)}.
+	 * <ol>
+	 * <li>This method calls {@link #filterObject(IFlexible, String)}.</li>
+	 * <li>If search text is empty or null, the provided list is the current list.</li>
+	 * <li>Any pending deleted items are always filtered out, but if restored, they will be
+	 * displayed according to the current filter and in the correct positions.</li>
+	 * <li><b>NEW!</b> Expandable items are picked up and displayed if at least a child is
+	 * collected by the current filter.</li>
+	 * <li><b>NEW!</b> Items are animated thanks to {@link #animateTo(List)} BUT a limit of 500
+	 * (default) "current items" OR "filtered items" is set. <b>NOTE:</b> you can change this
+	 * limit by calling {@link #setFilterAnimationLimit(int)}.<br/>
+	 * Above this limit {@link #notifyDataSetChanged()} will be called to improve performance.</li>
+	 * </ol>
 	 *
 	 * @param unfilteredItems the list to filter
 	 * @see #filterObject(IFlexible, String)
+	 * @see #setFilterAnimationLimit(int)
 	 * @since 4.1.0
 	 */
 	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
@@ -3007,7 +3030,14 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Animate search results only in case of new SearchText
 		if (hasNewSearchText(mSearchText)) {
 			mOldSearchText = mSearchText;
-			animateTo(values);
+			if (mItems.size() > mFilterAnimationLimit || values.size() > mFilterAnimationLimit) {
+				if (DEBUG) Log.v(TAG, "filterItems notifyDataSetChanged!");
+				mItems = values;
+				notifyDataSetChanged();
+			} else {
+				if (DEBUG) Log.v(TAG, "filterItems animate changes!");
+				animateTo(values);
+			}
 			//Restore headers if necessary
 			if (!hasSearchText()) {
 				//Add headers in post. It enqueues the modification for the LayoutManager
