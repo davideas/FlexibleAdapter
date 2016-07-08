@@ -84,7 +84,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	private EnumSet<AnimatorEnum> animatorsUsed = EnumSet.noneOf(AnimatorEnum.class);
 
 	private boolean isReverseEnabled = false, shouldAnimate = true,
-			onlyEntryAnimation = false, isFastScroll = false, isInitialize = false;
+			onlyEntryAnimation = false, isFastScroll = false, animateFromObserver = false;
 
 	private long mInitialDelay = 0L,
 			mStepDelay = 100L,
@@ -112,12 +112,12 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/*-----------------------*/
 
 	/**
-	 * @param initialize true to notify this Adapter that initialization is started and so
-	 *                   animate items, false to inform that initialization is complete
+	 * @param animate true to notify this Adapter that initialization is started and so
+	 *                animate items, false to inform that the operation is complete
 	 * @since 5.0.0-b6
 	 */
-	void setInitialize(boolean initialize) {
-		isInitialize = initialize;
+	void setAnimate(boolean animate) {
+		this.animateFromObserver = animate;
 	}
 
 	/**
@@ -179,8 +179,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param start non negative minimum position to start animation.
 	 * @since 5.0.0-b1
 	 */
-	public void setAnimationStartPosition(@IntRange(from = 0) int start) {
+	public AnimatorAdapter setAnimationStartPosition(@IntRange(from = 0) int start) {
 		mLastAnimatedPosition = start;
+		return this;
 	}
 
 	/**
@@ -240,7 +241,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	/**
 	 * @return true if the scrolling animation will occur only at startup until the screen is
-	 *         filled with the items, false animation will be performed when scrolling too.
+	 * filled with the items, false animation will be performed when scrolling too.
 	 * @since 5.0.0-b8
 	 */
 	public boolean isOnlyEntryAnimation() {
@@ -593,17 +594,17 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * <p>Also, some items at the edge, are rebounded by Android and should not be animated.</p>
 	 */
 	private class AnimatorAdapterDataObserver extends RecyclerView.AdapterDataObserver {
-		private boolean isNotified;
+		private boolean notified;
 		private Handler mAnimatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 			public boolean handleMessage(Message message) {
 				if (DEBUG) Log.v(TAG, "Clear notified for binding Animations");
-				isNotified = false;
+				notified = false;
 				return true;
 			}
 		});
 
 		public boolean isPositionNotified() {
-			return isNotified;
+			return notified;
 		}
 
 		public void clearNotified() {
@@ -612,7 +613,12 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		}
 
 		private void markNotified() {
-			isNotified = !isInitialize;
+			notified = !animateFromObserver;
+		}
+
+		@Override
+		public void onChanged() {
+			markNotified();
 		}
 
 		@Override

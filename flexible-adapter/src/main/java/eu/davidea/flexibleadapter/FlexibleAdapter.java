@@ -162,7 +162,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private String mSearchText = "", mOldSearchText = "";
 	private List<IExpandable> mExpandedFilterFlags;
 	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
-	private int mFilterAnimationLimit = 500;
+	private int mAnimateToLimit = 500;
 
 	/* Expandable flags */
 	private int minCollapsibleLevel = 0, selectedLevel = -1;
@@ -298,7 +298,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public FlexibleAdapter expandItemsAtStartUp() {
 		int position = 0;
-		setInitialize(true);
+		setAnimate(true);
 		multiRange = true;
 		while (position < mItems.size()) {
 			T item = getItem(position);
@@ -310,7 +310,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			position++;
 		}
 		multiRange = false;
-		setInitialize(false);
+		setAnimate(false);
 		return this;
 	}
 
@@ -447,18 +447,21 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * This method will refresh the entire DataSet content.
 	 * <p>Optionally all changes can be animated, performance can be affected on big list.<br/>Pass
-	 * {@code animate=false} to invoke {@link #notifyDataSetChanged()} without any animations.</p>
+	 * {@code animate=false} to invoke {@link #notifyDataSetChanged()} without any animations.<br/>
+	 * Also, animation is limited by the value set with {@link #setAnimateToLimit(int)}.
+	 * </p>
 	 * This methods calls {@link #expandItemsAtStartUp()} and {@link #showAllHeaders()} if headers
 	 * are shown.
 	 *
 	 * @param items   the new data set
 	 * @param animate true to animate the changes, false for a quick refresh
 	 * @see #updateDataSet(List)
+	 * @see #setAnimateToLimit(int)
 	 * @since 5.0.0-b7
 	 */
 	@CallSuper
 	public void updateDataSet(@Nullable List<T> items, boolean animate) {
-		if (animate) {
+		if (animate && (getItemCount() <= mAnimateToLimit || items == null || items.size() <= mAnimateToLimit) ) {
 			animateTo(items);
 		} else {
 			if (items == null) mItems = new ArrayList<>();
@@ -647,10 +650,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter setDisplayHeadersAtStartUp(boolean displayHeaders) {
-		setInitialize(true);
+		setAnimate(true);
 		headersShown = displayHeaders;
 		if (displayHeaders) showAllHeaders();
-		setInitialize(false);
+		setAnimate(false);
 		return this;
 	}
 
@@ -1329,8 +1332,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	private void onLoadMore(int position) {
-		if (mProgressItem != null && !mLoading && getGlobalPositionOf(mProgressItem) < 0
-				&& position >= getItemCount() - mEndlessScrollThreshold) {
+		if (mProgressItem != null && !mLoading
+				&& position >= getItemCount() - mEndlessScrollThreshold
+				&& getGlobalPositionOf(mProgressItem) < 0) {
 			mLoading = true;
 			mRecyclerView.post(new Runnable() {
 				@Override
@@ -1350,7 +1354,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * progressItem.</p>
 	 * In this case the ProgressItem is removed immediately.
 	 *
-	 * @param newItems
+	 * @param newItems the list of the new items, can be empty or null
 	 * @since 5.0.0-b6
 	 */
 	public void onLoadMoreComplete(@Nullable List<T> newItems) {
@@ -2167,11 +2171,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * @since 5.0.0-b6
 	 * @deprecated For a correct positioning of a new Section, use {@link #addSection(IHeader, Comparator)}
 	 * instead. This method doesn't perform any sort, so if the refHeader is unknown, the Header
 	 * is always inserted at the top, which doesn't cover all use cases.
 	 * <p>This method will be deleted with next pre-release.</p>
-	 * @since 5.0.0-b6
 	 */
 	@Deprecated
 	public void addSection(@NonNull IHeader header, @Nullable IHeader refHeader) {
@@ -2285,7 +2289,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void removeItemWithDelay(@NonNull final T item, @IntRange(from = 0) long delay,
 									final boolean permanent, final boolean resetLayoutAnimation) {
-		if (resetLayoutAnimation) setInitialize(true);
+		if (resetLayoutAnimation) setAnimate(true);
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -2293,7 +2297,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				if (permanent) permanentDelete = true;
 				removeItem(getGlobalPositionOf(item));
 				permanentDelete = tempPermanent;
-				setInitialize(false);
+				setAnimate(false);
 			}
 		}, delay);
 	}
@@ -2903,21 +2907,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Sets the limit after the which the animation, during the filter operation, is stopped and
-	 * {@link #notifyDataSetChanged()} will be called instead.
-	 * <p>Default value is 500 items of "current list" OR "filtered list".</p>
-	 *
-	 * @param filterAnimationLimit the number of "filtered items" that when reached will stop
-	 *                             animating the filtering.
-	 * @return this Adapter, so the call can be chained
-	 * @since 5.0.0-b8
-	 */
-	public FlexibleAdapter setFilterAnimationLimit(int filterAnimationLimit) {
-		this.mFilterAnimationLimit = filterAnimationLimit;
-		return this;
-	}
-
-	/**
 	 * Sometimes it is necessary, while filtering or after the DataSet has been updated, to
 	 * rebound the items that remain unfiltered.<br/>
 	 * <p>If the items have highlighted text, those items must be refreshed in order to change the
@@ -2945,7 +2934,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param unfilteredItems the list to filter
 	 * @param delay           any non-negative delay
 	 * @see #filterObject(IFlexible, String)
-	 * @see #setFilterAnimationLimit(int)
+	 * @see #setAnimateToLimit(int)
 	 * @since 5.0.0-b1
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems, @IntRange(from = 0) long delay) {
@@ -2955,8 +2944,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal mechanism,
-	 * items are removed and/or added in order to animate items in the final list.
+	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal
+	 * mechanism, items are removed and/or added in order to animate items in the final list.
 	 * <p>This method filters the provided list with the search text previously set with
 	 * {@link #setSearchText(String)}.</p>
 	 * <b>Note:</b>
@@ -2968,14 +2957,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <li><b>NEW!</b> Expandable items are picked up and displayed if at least a child is
 	 * collected by the current filter.</li>
 	 * <li><b>NEW!</b> Items are animated thanks to {@link #animateTo(List)} BUT a limit of 500
-	 * (default) "current items" OR "filtered items" is set. <b>NOTE:</b> you can change this
-	 * limit by calling {@link #setFilterAnimationLimit(int)}.<br/>
-	 * Above this limit {@link #notifyDataSetChanged()} will be called to improve performance.</li>
+	 * (default) items is set. <b>NOTE:</b> you can change this limit by calling
+	 * {@link #setAnimateToLimit(int)}. Above this limit {@link #notifyDataSetChanged()} will
+	 * be called to improve performance.</li>
 	 * </ol>
 	 *
 	 * @param unfilteredItems the list to filter
 	 * @see #filterObject(IFlexible, String)
-	 * @see #setFilterAnimationLimit(int)
+	 * @see #setAnimateToLimit(int)
 	 * @since 4.1.0
 	 */
 	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
@@ -2983,8 +2972,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
 		List<T> values = new ArrayList<T>();
-		//Enable flag: skip adjustPositions!
-		filtering = true;
+		setAnimate(false);//Disable scroll animation
+		filtering = true;//Enable flag: skip adjustPositions!
 		//Reset values
 		int initialCount = getItemCount();
 		if (hasSearchText()) {
@@ -3030,7 +3019,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Animate search results only in case of new SearchText
 		if (hasNewSearchText(mSearchText)) {
 			mOldSearchText = mSearchText;
-			if (mItems.size() > mFilterAnimationLimit || values.size() > mFilterAnimationLimit) {
+			if (mItems.size() > mAnimateToLimit || values.size() > mAnimateToLimit) {
 				if (DEBUG) Log.v(TAG, "filterItems notifyDataSetChanged!");
 				mItems = values;
 				notifyDataSetChanged();
@@ -3052,8 +3041,9 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 		}
 
-		//Reset filtering flag
+		//Reset flags
 		filtering = false;
+
 
 		//Call listener to update EmptyView
 		if (mUpdateListener != null &&
@@ -3179,14 +3169,32 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Animate from the current list to another.
-	 * <p>Used by the filter.</p>
+	 * Tunes the limit after the which the synchronization animation, occurred during updateDataSet
+	 * and filter operations, is skipped and {@link #notifyDataSetChanged()} will be called instead.
+	 * <p>Default value is 500 items of "current list" OR "filtered list".</p>
+	 *
+	 * @param limit the number of "updated items" that, when reached, will skip synchronization
+	 *              animation.
+	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b8
+	 */
+	public FlexibleAdapter setAnimateToLimit(int limit) {
+		this.mAnimateToLimit = limit;
+		return this;
+	}
+
+	/**
+	 * Animate the synchronization between the current list and the new list.
+	 * <p>Used by filter and updateDataSet.</p>
+	 * <b>Note:</b> This method is skipped in favor of {@code notifyDataSetChanged} when the
+	 * size reached the limit, see {@link #setAnimateToLimit(int)}.<br/>
 	 * Unchanged items will be notified if {@code mNotifyChangeOfUnfilteredItems} is set true, and
 	 * payload will be set as a Boolean.
 	 *
 	 * @param models the new list containing the new items
 	 * @return the cleaned up item list. make sure to set your new list to this one
 	 * @see #setNotifyChangeOfUnfilteredItems(boolean)
+	 * @see #setAnimateToLimit(int)
 	 * @since 5.0.0-b1
 	 */
 	public List<T> animateTo(@Nullable List<T> models) {
