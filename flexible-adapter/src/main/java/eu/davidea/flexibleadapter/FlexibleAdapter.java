@@ -67,9 +67,9 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * filtering, adding, removing, moving and animating an item.</p>
  * With version 5.0.0, this Adapter supports a set of standard methods for Headers/Sections to
  * expand and collapse an Expandable item, to Drag&Drop and Swipe any item.
- * <p><b>NOTE:</b> This Adapter supports multi level of Expandable. Do not enable functionalities
- * like: Drag&Drop. Something might not work as expected, so better to change approach in
- * favor of a clearer design/layout: Open the sub list in a new Activity/Fragment...
+ * <p><b>NOTE:</b> This Adapter supports multi level of Expandable, but do not enable Drag&Drop.
+ * Something might not work as expected, so better to change approach in favor of a clearer
+ * design/layout: Open the sub list in a new Activity/Fragment...
  * <br/>Instead, this extra level of expansion is useful in situations where information is in
  * read only mode or with action buttons.</p>
  *
@@ -107,9 +107,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private List<T> mItems;
 
-	/**
-	 * Header/Section items
-	 */
+	/* Header-Section items */
 	private List<IHeader> mOrphanHeaders;
 	private boolean headersShown = false, headersSticky = false, recursive = false;
 	private StickyHeaderHelper mStickyHeaderHelper;
