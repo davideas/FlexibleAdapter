@@ -21,7 +21,7 @@ import android.support.v7.widget.RecyclerView;
  * Generic implementation of {@link ISectionable} interface for items that hold a header item.
   * <p>This abstract class extends {@link AbstractFlexibleItem}.</p>
  *
- * @param <VH> {@link RecyclerView.ViewHolder}
+ * @param <VH> {@link android.support.v7.widget.RecyclerView.ViewHolder}
  * @param <H>  The header item of type {@link IHeader}
  * @author Davide Steduto
  * @since 20/01/2016 Created

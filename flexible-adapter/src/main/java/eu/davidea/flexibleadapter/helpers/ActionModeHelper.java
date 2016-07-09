@@ -65,7 +65,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 *
 	 * @param adapter the FlexibleAdapter instance
 	 * @param cabMenu the menu resourceId
-	 * @param callback the custom {@link ActionMode.Callback}
+	 * @param callback the custom {@link android.support.v7.view.ActionMode.Callback}
 	 * @see #ActionModeHelper(FlexibleAdapter, int)
 	 * @since 5.0.0-b6
 	 */

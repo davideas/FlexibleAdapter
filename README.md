@@ -6,7 +6,7 @@
 # FlexibleAdapter
 
 ###### The only Adapter multi-function for your RecyclerView
-- NEW! Beta version: [v5.0.0-b7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) built on 2016.06.20 (usable library!) 111KB
+- NEW! Beta version: [v5.0.0-b7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) built on 2016.06.20 (usable library!) 112KB
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -14,10 +14,10 @@
 We didn't know how to add selection and to combine all the use cases in the same Adapter.
 Since I created this library, it has become easy to configure how views will be displayed in a list, and now, nobody wants to use a ListView anymore.
 
-The idea behind is to regroup all the functionalities in a unique library, without the need to customize and import several third libraries specific for one or few of them.
+The idea behind is to regroup all the functionalities in a unique library, without the need to customize and import several third libraries not compatible among them.
 
 The FlexibleAdapter helps developers to simplify this process without worrying too much about the Adapter anymore. It's easy to extend, it has predefined logic for different situations and prevents common mistakes.<br/>
-This library is configurable and it guides the developers (thanks to quality comments on the methods) to create a better user experience and now, even more with the new ViewHolders and new actions.
+This library is configurable and it guides the developers to create a better user experience and now, even more with the new ViewHolders and new actions.
 
 #### Main functionalities
 * Simple item selection with ripple effect, Single & Multi selection mode.
@@ -35,8 +35,9 @@ This library is configurable and it guides the developers (thanks to quality com
 * **NEW!** Innovative EndlessScroll with Adapter binding (<u>No OnScrollListener</u>).
 * **NEW!** UndoHelper &amp; ActionModeHelper.
 * **NEW!** DrawableUtils for dynamic backgrounds with ripple (<u>No XML</u>).
-* **NEW!** 1 simple constructor for all events.
-* **NEW!** Easy runtime position calculation for adding/moving items in sections. 
+* **NEW!** A simple constructor for many events.
+* **NEW!** Easy runtime position calculation for adding/moving items in sections.
+* ... more to come.
 
 # Setup
 ```
@@ -58,7 +59,7 @@ dependencies {
 ```
 
 # Wiki!
-I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial* and the API* documentation.<br/>
+I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial*.<br/>
 Wiki pages have been completely reviewed to support all the coming functionalities from 5.0.0.
 
 \* = _Pages are under heavy revision, working in progress_ :-)
@@ -119,7 +120,7 @@ You can download the latest demo App from the latest release page.
 [v1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/v1.0) - 2015.05.03
 
 # Limitations
-Item half swipe cannot be implemented due to how the `android.support.v7.widget.helper.ItemTouchHelper` is done.
+Item half swipe cannot be implemented due to how the `android.support.v7.widget.helper.ItemTouchHelper` is done, also clicks on rear view are not possible, same reason.
 Half swipe can be done with others means, please see issues #98 and #100. See also commits of Apr 25, 2016. 
 
 # Thanks

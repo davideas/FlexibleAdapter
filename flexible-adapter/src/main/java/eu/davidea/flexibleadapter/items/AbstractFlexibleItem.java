@@ -27,7 +27,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * Generic implementation of {@link IFlexible} interface with most useful methods to manage
  * selection and view holder methods.
  *
- * @param <VH> {@link RecyclerView.ViewHolder}
+ * @param <VH> {@link android.support.v7.widget.RecyclerView.ViewHolder}
  * @author Davide Steduto
  * @since 20/01/2016 Created
  */
