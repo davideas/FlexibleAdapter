@@ -38,7 +38,7 @@ import eu.davidea.samples.flexibleadapter.models.SubItem;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 1900, SUB_ITEMS = 4, HEADERS = 30;
+	private static final int SUB_ITEMS = 4, HEADERS = 30;
 	private int databaseType;
 
 	//TODO FOR YOU: Use userLearnedSelection from settings
@@ -154,7 +154,7 @@ public class DatabaseService {
 		HeaderItem header = null;
 		mItems.clear();
 		for (int i = 0; i < size; i++) {
-			header = i % (ITEMS / HEADERS) == 0 ? newHeader(i * HEADERS / ITEMS + 1) : header;
+			header = i % (size / HEADERS) == 0 ? newHeader(i * HEADERS / size + 1) : header;
 			mItems.add(newSimpleItem(i + 1, header));
 		}
 	}
