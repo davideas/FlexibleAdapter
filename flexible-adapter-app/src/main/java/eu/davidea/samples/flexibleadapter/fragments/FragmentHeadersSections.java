@@ -64,7 +64,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createHeadersSectionsDatabase();
+		DatabaseService.getInstance().createHeadersSectionsDatabase(400);
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView

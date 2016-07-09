@@ -53,7 +53,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createExpandableMultiLevelDatabase();
+		DatabaseService.getInstance().createExpandableMultiLevelDatabase(50);
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView

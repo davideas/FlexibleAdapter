@@ -38,7 +38,7 @@ import eu.davidea.samples.flexibleadapter.models.SubItem;
 public class DatabaseService {
 
 	private static DatabaseService mInstance;
-	private static final int ITEMS = 90, SUB_ITEMS = 4, HEADERS = 30;
+	private static final int ITEMS = 1900, SUB_ITEMS = 4, HEADERS = 30;
 	private int databaseType;
 
 	//TODO FOR YOU: Use userLearnedSelection from settings
@@ -116,10 +116,10 @@ public class DatabaseService {
 	/*
 	 * List of simple items TODO: showing different types of animations
 	 */
-	public void createEndlessDatabase() {
+	public void createEndlessDatabase(int startSize) {
 		databaseType = 1;
 		mItems.clear();
-		for (int i = 0; i < ITEMS; i++) {
+		for (int i = 0; i < startSize; i++) {
 			mItems.add(newSimpleItem(i + 1, null));
 		}
 	}
@@ -127,10 +127,10 @@ public class DatabaseService {
 	/*
 	 * List of expandable items (headers/sections) with SubItems with Header attached.
 	 */
-	public void createExpandableSectionsDatabase() {
+	public void createExpandableSectionsDatabase(int size) {
 		databaseType = 2;
 		mItems.clear();
-		for (int i = 0; i < ITEMS; i++) {
+		for (int i = 0; i < size; i++) {
 			mItems.add(newExpandableSectionItem(i + 1));//With expansion level 0
 		}
 	}
@@ -138,10 +138,10 @@ public class DatabaseService {
 	/*
 	 * List of headers (level 0) with expandable SubItems (level 1) with SubItems.
 	 */
-	public void createExpandableMultiLevelDatabase() {
+	public void createExpandableMultiLevelDatabase(int size) {
 		databaseType = 3;
 		mItems.clear();
-		for (int i = 0; i < ITEMS; i++) {
+		for (int i = 0; i < size; i++) {
 			mItems.add(newExpandableLevelItem(i + 1));//With expansion level 1
 		}
 	}
@@ -149,20 +149,20 @@ public class DatabaseService {
 	/*
 	 * List of Simple Items with Header attached. Only Simple Items will be added to the list.
 	 */
-	public void createHeadersSectionsDatabase() {
+	public void createHeadersSectionsDatabase(int size) {
 		databaseType = 4;
 		HeaderItem header = null;
 		mItems.clear();
-		for (int i = 0; i < ITEMS; i++) {
+		for (int i = 0; i < size; i++) {
 			header = i % (ITEMS / HEADERS) == 0 ? newHeader(i * HEADERS / ITEMS + 1) : header;
 			mItems.add(newSimpleItem(i + 1, header));
 		}
 	}
 
-	public void createInstagramHeadersDatabase() {
+	public void createInstagramHeadersDatabase(int startSize) {
 		databaseType = 5;
 		mItems.clear();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < startSize; i++) {
 			mItems.add(newInstagramItem(i + 1));
 		}
 	}

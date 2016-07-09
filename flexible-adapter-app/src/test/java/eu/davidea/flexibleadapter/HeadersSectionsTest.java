@@ -26,7 +26,7 @@ public class HeadersSectionsTest {
 
 	@Before
 	public void setUp() throws Exception {
-		DatabaseService.getInstance().createHeadersSectionsDatabase();
+		DatabaseService.getInstance().createHeadersSectionsDatabase(30);
 		mItems = DatabaseService.getInstance().getDatabaseList();
 		mAdapter = new FlexibleAdapter<>(mItems);
 	}

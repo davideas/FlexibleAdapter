@@ -86,7 +86,7 @@ public class FragmentSelectionModes extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createEndlessDatabase();
+		DatabaseService.getInstance().createEndlessDatabase(200);
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
