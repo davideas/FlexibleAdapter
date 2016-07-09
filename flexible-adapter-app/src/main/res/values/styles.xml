@@ -18,6 +18,10 @@
 		<item name="primaryTextSelector">@drawable/primary_text_selector_light</item>
 	</style>
 
+	<style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+		<item name="android:windowBackground">@drawable/background_splash</item>
+	</style>
+
 	<style name="animation_slide_from_right">
 		<item name="android:windowEnterAnimation">@anim/fab_slide_in_from_right</item>
 		<item name="android:windowExitAnimation">@anim/fab_slide_out_to_left</item>
