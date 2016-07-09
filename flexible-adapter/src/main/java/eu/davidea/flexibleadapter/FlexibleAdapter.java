@@ -162,7 +162,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private String mSearchText = "", mOldSearchText = "";
 	private Set<IExpandable> mExpandedFilterFlags;
 	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
-	private int mAnimateToLimit = 500;
+	private int mAnimateToLimit = 600;
 
 	/* Expandable flags */
 	private int minCollapsibleLevel = 0, selectedLevel = -1;
@@ -446,22 +446,23 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * This method will refresh the entire DataSet content.
-	 * <p>Optionally all changes can be animated, performance can be affected on big list.<br/>Pass
-	 * {@code animate=false} to invoke {@link #notifyDataSetChanged()} without any animations.<br/>
-	 * Also, animation is limited by the value set with {@link #setAnimateToLimit(int)}.
-	 * </p>
-	 * This methods calls {@link #expandItemsAtStartUp()} and {@link #showAllHeaders()} if headers
-	 * are shown.
+	 * <p>Optionally all changes can be animated, limited by the value previously set with
+	 * {@link #setAnimateToLimit(int)} to improve performance on big list.</p>
+	 * Pass {@code animate = false} to directly invoke {@link #notifyDataSetChanged()}
+	 * without any animations.
+	 * <p><b>Note:</b> This methods calls {@link #expandItemsAtStartUp()} and
+	 * {@link #showAllHeaders()} if headers are shown.</p>
 	 *
 	 * @param items   the new data set
 	 * @param animate true to animate the changes, false for a quick refresh
 	 * @see #updateDataSet(List)
 	 * @see #setAnimateToLimit(int)
-	 * @since 5.0.0-b7
+	 * @since 5.0.0-b7 Created
+	 * <br/>5.0.0-b8 Synchronization animations limit
 	 */
 	@CallSuper
 	public void updateDataSet(@Nullable List<T> items, boolean animate) {
-		if (animate && (getItemCount() <= mAnimateToLimit || items == null || items.size() <= mAnimateToLimit)) {
+		if (animate) {
 			animateTo(items);
 		} else {
 			if (items == null) mItems = new ArrayList<>();
@@ -1323,6 +1324,13 @@ public class FlexibleAdapter<T extends IFlexible>
 		return this;
 	}
 
+	/**
+	 * This method is called automatically if METHOD A is implemented. If instead you chose the
+	 * classic way (METHOD B) to bind the items, you have to manually call this method at the end
+	 * of {@code onBindViewHolder()}.
+	 *
+	 * @param position the current binding position
+	 */
 	protected void onLoadMore(int position) {
 		if (mProgressItem != null && !mLoading
 				&& position >= getItemCount() - mEndlessScrollThreshold
@@ -1368,8 +1376,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
 		//Handling the delay
 		if (delay < 0) {
+			//Disable the Endless functionality
 			mProgressItem = null;
 		} else {
+			//Delete the progress item with delay
 			mHandler.sendEmptyMessageDelayed(2, delay);
 		}
 		//Add the new items or reset the loading status
@@ -1694,12 +1704,12 @@ public class FlexibleAdapter<T extends IFlexible>
 						" expanded " + expandable.isExpanded());
 			return 0;
 		}
-		if (DEBUG && !init) {
-			Log.v(TAG, "Request to Expand on position=" + position +
-					" expanded=" + expandable.isExpanded() +
-					" anyParentSelected=" + parentSelected +
-					" ExpandedItems=" + getExpandedPositions());
-		}
+//		if (DEBUG && !init) {
+//			Log.v(TAG, "Request to Expand on position=" + position +
+//					" expanded=" + expandable.isExpanded() +
+//					" anyParentSelected=" + parentSelected +
+//					" ExpandedItems=" + getExpandedPositions());
+//		}
 		int subItemsCount = 0;
 		if (init || !expandable.isExpanded() &&
 				(!parentSelected || expandable.getExpansionLevel() <= selectedLevel)) {
@@ -1736,8 +1746,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 			if (DEBUG) {
 				Log.v(TAG, (init ? "Initially expanded " : "Expanded ") +
-						subItemsCount + " subItems on position=" + position +
-						(init ? "" : " ExpandedItems=" + getExpandedPositions()));
+						subItemsCount + " subItems on position=" + position);
 			}
 		}
 		return subItemsCount;
@@ -1794,12 +1803,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (!isExpandable(item)) return 0;
 
 		IExpandable expandable = (IExpandable) item;
-		if (DEBUG) {
-			Log.v(TAG, "Request to Collapse on position=" + position +
-					" expanded=" + expandable.isExpanded() +
-					" hasSubItemsSelected=" + hasSubItemsSelected(expandable) +
-					" ExpandedItems=" + getExpandedPositions());
-		}
+//		if (DEBUG) {
+//			Log.v(TAG, "Request to Collapse on position=" + position +
+//					" expanded=" + expandable.isExpanded() +
+//					" hasSubItemsSelected=" + hasSubItemsSelected(expandable) +
+//					" ExpandedItems=" + getExpandedPositions());
+//		}
 		int subItemsCount = 0, recursiveCount = 0;
 		if (expandable.isExpanded() &&
 				(!hasSubItemsSelected(expandable) || getPendingRemovedItem(item) != null)) {
@@ -1821,9 +1830,8 @@ public class FlexibleAdapter<T extends IFlexible>
 					hideHeaderOf(subItem);
 				}
 			}
-
 			if (DEBUG)
-				Log.v(TAG, "Collapsed " + subItemsCount + " subItems on position " + position + " ExpandedItems=" + getExpandedPositions());
+				Log.v(TAG, "Collapsed " + subItemsCount + " subItems on position " + position);
 		}
 		return subItemsCount + recursiveCount;
 	}
@@ -2940,12 +2948,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * mechanism, items are removed and/or added in order to animate items in the final list.
 	 * <p>This method filters the provided list with the search text previously set with
 	 * {@link #setSearchText(String)}.</p>
-	 * <b>Note:</b>
+	 * <b>Important notes:</b>
 	 * <ol>
 	 * <li>This method calls {@link #filterObject(IFlexible, String)}.</li>
 	 * <li>If search text is empty or null, the provided list is the current list.</li>
 	 * <li>Any pending deleted items are always filtered out, but if restored, they will be
-	 * displayed according to the current filter and in the correct positions.</li>
+	 * displayed according to the current filter and at the right positions.</li>
 	 * <li><b>NEW!</b> Expandable items are picked up and displayed if at least a child is
 	 * collected by the current filter.</li>
 	 * <li><b>NEW!</b> Items are animated thanks to {@link #animateTo(List)} BUT a limit of 500
@@ -2957,7 +2965,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param unfilteredItems the list to filter
 	 * @see #filterObject(IFlexible, String)
 	 * @see #setAnimateToLimit(int)
-	 * @since 4.1.0
+	 * @since 4.1.0 Created
+	 * <br/>5.0.0-b1 Expandable + Child filtering
+	 * <br/>5.0.0-b8 Synchronization animations limit
 	 */
 	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
 		// NOTE: In case user has deleted some items and he changes or applies a filter while
@@ -3011,14 +3021,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Animate search results only in case of new SearchText
 		if (hasNewSearchText(mSearchText)) {
 			mOldSearchText = mSearchText;
-			if (mItems.size() > mAnimateToLimit || values.size() > mAnimateToLimit) {
-				if (DEBUG) Log.v(TAG, "filterItems notifyDataSetChanged!");
-				mItems = values;
-				notifyDataSetChanged();
-			} else {
-				if (DEBUG) Log.v(TAG, "filterItems animate changes!");
-				animateTo(values);
-			}
+			animateTo(values);
 			//Restore headers if necessary
 			if (!hasSearchText()) {
 				//Add headers in post. It enqueues the modification for the LayoutManager
@@ -3035,7 +3038,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		//Reset flags
 		filtering = false;
-
+		setAnimate(true);
 
 		//Call listener to update EmptyView
 		if (mUpdateListener != null &&
@@ -3088,9 +3091,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p><b>NOTE:</b>
 	 * <br/>- The item will be collected if the implemented method returns true.
 	 * <br/>- {@code IExpandable} items are automatically picked up and displayed if at least a
-	 * child is collected by the current filter: however, you also need to implement
-	 * {@code IFilterable} interface on the {@code IExpandable} item and on the child type. What
-	 * you DON'T NEED to implement is the scan for the children: this is already done :-)
+	 * child is collected by the current filter. You DON'T NEED to implement the scan for the
+	 * children: this is already done :-)
 	 * <br/>- If you don't want to implement the {@code IFilterable} interface on the items, then
 	 * you can override this method to have another filter logic!
 	 *
@@ -3098,7 +3100,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param constraint constraint, that the object has to fulfil
 	 * @return true, if the object returns true as well, and so if it should be in the
 	 * filteredResult, false otherwise
-	 * @since 3.1.0
+	 * @since 3.1.0 Created
+	 * <br/>5.0.0-b1 Expandable + Child filtering
 	 */
 	protected boolean filterObject(T item, String constraint) {
 		if (item instanceof IFilterable) {
@@ -3139,7 +3142,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
 				//Reset expanded flag
-				expandable.setExpanded(mExpandedFilterFlags.contains(expandable));
+				if (mExpandedFilterFlags != null)
+					expandable.setExpanded(mExpandedFilterFlags.contains(expandable));
 				if (hasSubItems(expandable)) {
 					List<T> subItems = expandable.getSubItems();
 					int refPosition = i;
@@ -3162,12 +3166,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Tunes the limit after the which the synchronization animation, occurred during updateDataSet
-	 * and filter operations, is skipped and {@link #notifyDataSetChanged()} will be called instead.
-	 * <p>Default value is 500 items of "current list" OR "filtered list".</p>
+	 * Tunes the limit after the which the synchronization animations, occurred during
+	 * updateDataSet and filter operations, are skipped and {@link #notifyDataSetChanged()}
+	 * will be called instead.
+	 * <p>Default value is 500 items, max number between the "current list" and "new list".</p>
 	 *
-	 * @param limit the number of "updated items" that, when reached, will skip synchronization
-	 *              animation.
+	 * @param limit the max number of items that, when reached, will skip synchronization animations
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b8
 	 */
@@ -3177,29 +3181,37 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Animate the synchronization between the current list and the new list.
+	 * Animate the synchronization between the old list and the new list.
 	 * <p>Used by filter and updateDataSet.</p>
-	 * <b>Note:</b> This method is skipped in favor of {@code notifyDataSetChanged} when the
-	 * size reached the limit, see {@link #setAnimateToLimit(int)}.<br/>
-	 * Unchanged items will be notified if {@code mNotifyChangeOfUnfilteredItems} is set true, and
-	 * payload will be set as a Boolean.
+	 * <b>Note:</b> The animations are skipped in favor of {@code notifyDataSetChanged}
+	 * when the number of items reaches the limit. See {@link #setAnimateToLimit(int)}.
+	 * <p><b>Note:</b> In case the animations are performed, unchanged items will be notified if
+	 * {@code mNotifyChangeOfUnfilteredItems} is set true, and payload will be set as a Boolean.</p>
 	 *
-	 * @param models the new list containing the new items
-	 * @return the cleaned up item list. make sure to set your new list to this one
+	 * @param newItems the new list containing the new items
+	 * @return the new current list
 	 * @see #setNotifyChangeOfUnfilteredItems(boolean)
 	 * @see #setAnimateToLimit(int)
-	 * @since 5.0.0-b1
+	 * @since 5.0.0-b1 Created
+	 * <br>5.0.0-b8 Synchronization animation limit
 	 */
-	public List<T> animateTo(@Nullable List<T> models) {
-		if (models == null) models = new ArrayList<T>();
-		applyAndAnimateRemovals(mItems, models);
-		applyAndAnimateAdditions(mItems, models);
-		applyAndAnimateMovedItems(mItems, models);
+	public List<T> animateTo(@Nullable List<T> newItems) {
+		if (newItems == null) newItems = new ArrayList<T>();
+		if (Math.max(getItemCount(), newItems.size()) <= mAnimateToLimit) {
+			if (DEBUG) Log.v(TAG, "animate changes!");
+			applyAndAnimateRemovals(mItems, newItems);
+			applyAndAnimateAdditions(mItems, newItems);
+			applyAndAnimateMovedItems(mItems, newItems);
+		} else {
+			if (DEBUG) Log.v(TAG, "notifyDataSetChanged!");
+			mItems = newItems;
+			notifyDataSetChanged();
+		}
 		return mItems;
 	}
 
 	/**
-	 * Find out all removed items and animate them.
+	 * Find out all removed items and animate them, also update existent positions with newItems.
 	 *
 	 * @since 5.0.0-b1
 	 */
@@ -3222,7 +3234,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Find out all added items and animate them, update also existent positions with newItems.
+	 * Find out all added items and animate them.
 	 *
 	 * @since 5.0.0-b1
 	 */
