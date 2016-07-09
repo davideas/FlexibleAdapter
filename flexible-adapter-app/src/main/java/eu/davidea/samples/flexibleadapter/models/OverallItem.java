@@ -111,12 +111,9 @@ public class OverallItem extends AbstractFlexibleItem<LabelViewHolder> {
 	public void bindViewHolder(FlexibleAdapter adapter, LabelViewHolder holder, int position, List payloads) {
 		if (title != null) {
 			holder.mTitle.setText(title);
-			//Appear disabled if item is disabled
-			holder.mTitle.setEnabled(isEnabled());
 		}
 		if (description != null) {
 			holder.mSubtitle.setText(Html.fromHtml(description));
-			holder.mSubtitle.setEnabled(isEnabled());
 		}
 		if (icon != null) {
 			holder.mIcon.setImageDrawable(icon);
@@ -125,7 +122,7 @@ public class OverallItem extends AbstractFlexibleItem<LabelViewHolder> {
 		adapter.animateView(holder.itemView, position, adapter.isSelected(position));
 	}
 
-	static class LabelViewHolder extends FlexibleViewHolder {
+	public static class LabelViewHolder extends FlexibleViewHolder {
 
 		public TextView mTitle;
 		public TextView mSubtitle;

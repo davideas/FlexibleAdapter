@@ -34,7 +34,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 		implements IFlexible<VH> {
 
-	private static final String MAPPING_ILLEGAL_STATE = "If you want FlexibleAdapter creates and binds ViewHolder for you, you must override and implement the method ";
+	private static final String MAPPING_ILLEGAL_STATE = " is not implemented. If you want FlexibleAdapter creates and binds ViewHolder for you, you must override and implement the method ";
 
 	/* Item flags recognized by the FlexibleAdapter */
 	protected boolean mEnabled = true, mHidden = false,
@@ -139,8 +139,8 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	 */
 	@Override
 	public VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		throw new IllegalStateException("onCreateViewHolder(ViewGroup, ViewType) is not implemented. " +
-				MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".createViewHolder().");
+		throw new IllegalStateException("onCreateViewHolder()" + MAPPING_ILLEGAL_STATE
+				+ this.getClass().getSimpleName() + ".createViewHolder().");
 	}
 
 	/**
@@ -150,8 +150,8 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	 */
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads) {
-		throw new IllegalStateException("onBindViewHolder(ViewHolder, Position[, Payloads]) is not implemented. " +
-				MAPPING_ILLEGAL_STATE + this.getClass().getSimpleName() + ".bindViewHolder().");
+		throw new IllegalStateException("onBindViewHolder()" + MAPPING_ILLEGAL_STATE
+				+ this.getClass().getSimpleName() + ".bindViewHolder().");
 	}
 
 }

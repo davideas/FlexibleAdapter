@@ -7,7 +7,7 @@ ext {
 
 	//Library
 	libraryCode = 17
-	libraryVersion = "5.0.0-b7"
+	libraryVersion = "5.0.0-SNAPSHOT"
 	libraryDate = " built on " + getDate()
 	libraryDescription = "1 Adapter for SelectionMode, Undo, ViewHolders, Filter, FastScroller, Animations, Sticky Headers, Expandable, Draggable, Swipeable, EndlessScroll :-)"
 	libraryName = "FlexibleAdapter"

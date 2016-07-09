@@ -100,8 +100,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	private static final String EXTRA_HEADERS = TAG + "_headersShown";
 	private static final String EXTRA_LEVEL = TAG + "_selectedLevel";
 	private static final String EXTRA_SEARCH = TAG + "_searchText";
-	public static final int EXPANDABLE_VIEW_TYPE = -1;
-	public static final int SECTION_VIEW_TYPE = -2;
 	public static final long UNDO_TIMEOUT = 5000L;
 
 	/**
@@ -463,7 +461,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@CallSuper
 	public void updateDataSet(@Nullable List<T> items, boolean animate) {
-		if (animate && (getItemCount() <= mAnimateToLimit || items == null || items.size() <= mAnimateToLimit) ) {
+		if (animate && (getItemCount() <= mAnimateToLimit || items == null || items.size() <= mAnimateToLimit)) {
 			animateTo(items);
 		} else {
 			if (items == null) mItems = new ArrayList<>();
@@ -1168,9 +1166,9 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Returns the ViewType for all Items depends by the current position.
-	 * <p>You can override this method to return specific values or you can let this method
-	 * to call the implementation of {@link IFlexible#getLayoutRes()} so ViewTypes are
-	 * automatically mapped.</p>
+	 * <p>You can override this method to return specific values (don't call super) or you can
+	 * let this method to call the implementation of {@code IFlexible#getLayoutRes()} so ViewTypes
+	 * are automatically mapped (AutoMap).</p>
 	 *
 	 * @param position position for which ViewType is requested
 	 * @return if Item is found, any integer value from user layout resource if defined in
@@ -1187,31 +1185,28 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * You can override this method to create ViewHolder from inside the Adapter or
-	 * you can let this method to call the implementation of
-	 * {@link IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)}
-	 * to create ViewHolder from inside the Item.
+	 * You can override this method to create ViewHolder from inside the Adapter or you can let
+	 * this method to call the implementation of {@code IFlexible#createViewHolder()} to create
+	 * ViewHolder from inside the Item (AutoMap).
+	 * <p/>{@inheritDoc}
 	 *
-	 * @param parent   the ViewGroup into which the new View will be added after it is bound
-	 *                 to an adapter position
-	 * @param viewType the view type of the new View
 	 * @return a new ViewHolder that holds a View of the given view type
-	 * @throws IllegalStateException if {@link IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)}
-	 *                               is not implemented and if this method is not overridden. Also
-	 *                               it is thrown if ViewType instance has not been correctly mapped.
+	 * @throws IllegalStateException if {@code IFlexible#createViewHolder()} is not implemented and
+	 *                               if this method is not overridden OR if ViewType instance has
+	 *                               not been correctly mapped.
 	 * @see IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)
 	 * @since 5.0.0-b1
 	 */
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		if (mInflater == null) {
-			mInflater = LayoutInflater.from(parent.getContext());
-		}
 		T item = getViewTypeInstance(viewType);
 		if (item == null) {
 			//If everything has been set properly, this should never happen ;-)
-			Log.wtf(TAG, "ViewType instance has not been correctly mapped for viewType " + viewType);
-			throw new IllegalStateException("ViewType instance has not been correctly mapped for viewType " + viewType);
+			throw new IllegalStateException("ViewType instance has not been correctly mapped for viewType "
+					+ viewType + " or AutoMap is not active: super() cannot be called.");
+		}
+		if (mInflater == null) {
+			mInflater = LayoutInflater.from(parent.getContext());
 		}
 		return item.createViewHolder(this, mInflater, parent);
 	}
@@ -1219,13 +1214,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * You can override this method to bind the items into the corresponding ViewHolder from
 	 * inside the Adapter or you can let this method to call the implementation of
-	 * {@link IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
-	 * to bind the item inside itself.
+	 * {@code IFlexible#bindViewHolder()} to bind the item inside itself (AutoMap).
+	 * <p/>{@inheritDoc}
 	 *
-	 * @param holder   the ViewHolder created
-	 * @param position the adapter position to bind
-	 * @throws IllegalStateException if {@link IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
-	 *                               is not implemented and if this method is not overridden.
+	 * @throws IllegalStateException if {@code IFlexible#bindViewHolder()} is not implemented OR
+	 *                               if {@code super()} is called when AutoMap is not active.
 	 * @see IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)
 	 * @since 5.0.0-b1
 	 */
@@ -1235,40 +1228,37 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Same concept of {@link #onBindViewHolder(RecyclerView.ViewHolder, int)}, but with Payload.
-	 * <p>How to use Payload, please refer to
-	 * {@link RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}.</p>
+	 * Same concept of {@code #onBindViewHolder()} but with Payload.
+	 * <p/>{@inheritDoc}
 	 *
-	 * @param holder   the ViewHolder instance
-	 * @param position the current position
-	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full update.
-	 * @throws IllegalStateException if {@link IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)}
-	 *                               is not implemented and if this method is not overridden.
+	 * @throws IllegalStateException if {@code IFlexible#bindViewHolder()} is not implemented OR
+	 *                               if {@code super()} is called when AutoMap is not active.
+	 * @see IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)
+	 * @see #onBindViewHolder(RecyclerView.ViewHolder, int)
 	 * @since 5.0.0-b1
 	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+		if (!autoMap) {
+			throw new IllegalStateException("AutoMap is not active: super() cannot be called.");
+		}
 		//When user scrolls, this line binds the correct selection status
 		holder.itemView.setActivated(isSelected(position));
 		//Bind the correct view elevation
 		if (holder instanceof FlexibleViewHolder) {
 			FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
-			if (holder.itemView.isActivated() && flexHolder.getActivationElevation() > 0)
-				ViewCompat.setElevation(flexHolder.itemView, flexHolder.getActivationElevation());
-			else if (flexHolder.getActivationElevation() > 0)//Leave unaltered the default elevation
-				ViewCompat.setElevation(flexHolder.itemView, 0);
+			float elevation = flexHolder.getActivationElevation();
+			if (holder.itemView.isActivated() && elevation > 0)
+				ViewCompat.setElevation(holder.itemView, elevation);
+			else if (elevation > 0)//Leave unaltered the default elevation
+				ViewCompat.setElevation(holder.itemView, 0);
 		}
-		if (!autoMap) {
-			super.onBindViewHolder(holder, position, payloads);
-		} else {
-			//Bind the item
-			T item = getItem(position);
-			if (item != null) {
-				holder.itemView.setEnabled(item.isEnabled());
-				item.bindViewHolder(this, holder, position, payloads);
-			}
+		//Bind the item
+		T item = getItem(position);
+		if (item != null) {
+			holder.itemView.setEnabled(item.isEnabled());
+			item.bindViewHolder(this, holder, position, payloads);
 		}
-
 		//Endless Scroll
 		onLoadMore(position);
 	}
@@ -1333,7 +1323,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		return this;
 	}
 
-	private void onLoadMore(int position) {
+	protected void onLoadMore(int position) {
 		if (mProgressItem != null && !mLoading
 				&& position >= getItemCount() - mEndlessScrollThreshold
 				&& getGlobalPositionOf(mProgressItem) < 0) {
