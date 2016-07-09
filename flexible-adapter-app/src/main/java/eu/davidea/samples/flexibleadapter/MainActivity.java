@@ -410,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements
 			mAdapter.setSearchText(newText);
 			//Fill and Filter mItems with your custom list and automatically animate the changes
 			//Watch out! The original list must be a copy
-			mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), 0L);
+			mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), 200L);
 		}
 		//Disable SwipeRefresh if search is active!!
 		mSwipeRefreshLayout.setEnabled(!mAdapter.hasSearchText());

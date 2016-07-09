@@ -45,6 +45,11 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 		return false;
 	}
 
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+
 	public String getId() {
 		return id;
 	}

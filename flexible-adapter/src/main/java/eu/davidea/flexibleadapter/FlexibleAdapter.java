@@ -17,6 +17,7 @@ package eu.davidea.flexibleadapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -107,7 +108,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private List<T> mItems;
 
-	/* Header-Section items */
+	/* Header/Section items */
 	private List<IHeader> mOrphanHeaders;
 	private boolean headersShown = false, headersSticky = false, recursive = false;
 	private StickyHeaderHelper mStickyHeaderHelper;
@@ -125,7 +126,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		public boolean handleMessage(Message message) {
 			switch (message.what) {
 				case 0: //filterItems
-					filterItems((List<T>) message.obj);
+					if (mFilterAsyncTask != null && mFilterAsyncTask.isRunning)
+						mFilterAsyncTask.cancel(true);
+					mFilterAsyncTask = new FilterAsyncTask(1, (List<T>) message.obj);
+					mFilterAsyncTask.execute();
+					//filterItems((List<T>) message.obj);
 					return true;
 				case 1: //confirm delete
 					OnDeleteCompleteListener listener = (OnDeleteCompleteListener) message.obj;
@@ -159,8 +164,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* Filter */
 	private String mSearchText = "", mOldSearchText = "";
 	private Set<IExpandable> mExpandedFilterFlags;
-	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
+	private boolean notifyChangeOfUnfilteredItems = false, filtering = false,
+			notifyMoveOfFilteredItems = false;
 	private static int mAnimateToLimit = 600;
+	private List<Notification> notifications;
+	private FilterAsyncTask mFilterAsyncTask;
 
 	/* Expandable flags */
 	private int minCollapsibleLevel = 0, selectedLevel = -1;
@@ -2910,7 +2918,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>If the items have highlighted text, those items must be refreshed in order to change the
 	 * highlighted text back to normal. This happens systematically when searchText is reduced in
 	 * length by the user.</p>
-	 * The notification is triggered in {@link #applyAndAnimateAdditions(List, List)} when new
+	 * The notification is triggered in {@link #applyAndAnimateRemovals(List, List)} when new
 	 * items are not added.
 	 *
 	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)} while filtering,
@@ -2919,7 +2927,22 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	public final FlexibleAdapter setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
-		this.mNotifyChangeOfUnfilteredItems = notifyChange;
+		this.notifyChangeOfUnfilteredItems = notifyChange;
+		return this;
+	}
+
+	/**
+	 * This method performs a further step to nicely animate the moved items.
+	 * <p>The process is very slow on big list of the order of ~3000 items, due to the
+	 * calculation to find the correct positions. Use with caution!</p>
+	 * The slowness is more visible when the searchText is cleared out.
+	 *
+	 * @param notifyMove true to animate move changes after filtering or updateDateSet, false otherwise
+	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-b8
+	 */
+	public final FlexibleAdapter setNotifyMoveOfFilteredItems(boolean notifyMove) {
+		this.notifyMoveOfFilteredItems = notifyMove;
 		return this;
 	}
 
@@ -2938,6 +2961,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void filterItems(@NonNull List<T> unfilteredItems, @IntRange(from = 0) long delay) {
 		//Make longer the timer for new coming deleted items
 		mHandler.removeMessages(0);
+		//Special case when user clears the previous search before the old search completes
+		// nothing changed, just cancel the old one
+		//if (!hasSearchText() && !mFilterAsyncTask.hasResult) return;
 		mHandler.sendMessageDelayed(Message.obtain(mHandler, 0, unfilteredItems), delay > 0 ? delay : 0);
 	}
 
@@ -2967,15 +2993,16 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>5.0.0-b1 Expandable + Child filtering
 	 * <br/>5.0.0-b8 Synchronization animations limit
 	 */
-	public synchronized void filterItems(@NonNull List<T> unfilteredItems) {
+	public void filterItems(@NonNull List<T> unfilteredItems) {
+		mHandler.sendMessageDelayed(Message.obtain(mHandler, 0, unfilteredItems), 0);
+	}
+
+	private void asyncFilterItems(@NonNull List<T> unfilteredItems) {
 		// NOTE: In case user has deleted some items and he changes or applies a filter while
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
 		List<T> values = new ArrayList<T>();
-		setAnimate(false);//Disable scroll animation
 		filtering = true;//Enable flag: skip adjustPositions!
-		//Reset values
-		int initialCount = getItemCount();
 		if (hasSearchText()) {
 			int newOriginalPosition = -1;
 			for (T item : unfilteredItems) {
@@ -3036,13 +3063,6 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		//Reset flags
 		filtering = false;
-		setAnimate(true);
-
-		//Call listener to update EmptyView
-		if (mUpdateListener != null &&
-				(initialCount == 0 && getItemCount() > 0) ||
-				(initialCount > 0 && getItemCount() == 0))
-			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	/**
@@ -3185,7 +3205,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <b>Note:</b> The animations are skipped in favor of {@code notifyDataSetChanged}
 	 * when the number of items reaches the limit. See {@link #setAnimateToLimit(int)}.
 	 * <p><b>Note:</b> In case the animations are performed, unchanged items will be notified if
-	 * {@code mNotifyChangeOfUnfilteredItems} is set true, and payload will be set as a Boolean.</p>
+	 * {@code notifyChangeOfUnfilteredItems} is set true, and payload will be set as a Boolean.</p>
 	 *
 	 * @param newItems the new list containing the new items
 	 * @return the new current list
@@ -3194,18 +3214,26 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1 Created
 	 * <br>5.0.0-b8 Synchronization animation limit
 	 */
-	public List<T> animateTo(@Nullable List<T> newItems) {
+	public synchronized List<T> animateTo(@Nullable List<T> newItems) {
 		if (newItems == null) newItems = new ArrayList<T>();
-		if (Math.max(getItemCount(), newItems.size()) <= mAnimateToLimit) {
-			if (DEBUG) Log.v(TAG, "animate changes!");
-			applyAndAnimateRemovals(mItems, newItems);
-			applyAndAnimateAdditions(mItems, newItems);
-			applyAndAnimateMovedItems(mItems, newItems);
+		notifications = Collections.synchronizedList(new ArrayList<Notification>());
+		if (newItems.size() <= mAnimateToLimit) {
+			if (DEBUG)
+				Log.v(TAG, "animateTo animate changes! oldSize=" + getItemCount() + " newSize=" + newItems.size());
+			List<T> tempItems = new ArrayList<>(mItems);
+			applyAndAnimateRemovals(tempItems, newItems);
+			applyAndAnimateAdditions(tempItems, newItems);
+			if (notifyMoveOfFilteredItems)
+				applyAndAnimateMovedItems(tempItems, newItems);
+			mItems = tempItems;
 		} else {
-			if (DEBUG) Log.v(TAG, "notifyDataSetChanged!");
+			if (DEBUG)
+				Log.v(TAG, "animateTo notifyDataSetChanged! oldSize=" + getItemCount() + " newSize=" + newItems.size());
 			mItems = newItems;
-			notifyDataSetChanged();
+			notifications.add(new Notification(-1, 0));
 		}
+		//Execute All notification if filter was Synchronous
+		if (mFilterAsyncTask == null) executeNotifications();
 		return mItems;
 	}
 
@@ -3215,21 +3243,28 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	protected void applyAndAnimateRemovals(List<T> from, List<T> newItems) {
+		//Using Hash for performance
+		Set<T> newHash = new HashSet<>(newItems);
 		int out = 0;
 		for (int i = from.size() - 1; i >= 0; i--) {
+			if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
 			final T item = from.get(i);
-			if (!newItems.contains(item) && (!isHeader(item) || (isHeader(item) && headersShown))) {
-				if (DEBUG) Log.v(TAG, "animateRemovals remove position=" + i + " item=" + item);
+			if (!newHash.contains(item) && (!isHeader(item) || (isHeader(item) && headersShown))) {
+				if (DEBUG)
+					Log.v(TAG, "animateRemovals remove position=" + i + " item=" + item + " searchText=" + mSearchText);
 				from.remove(i);
-				notifyItemRemoved(i);
+				notifications.add(new Notification(i, 1));
+				//notifyItemRemoved(i);
 				out++;
-			} else if (mNotifyChangeOfUnfilteredItems) {
+			} else if (notifyChangeOfUnfilteredItems) {
 				from.set(i, item);
-				notifyItemChanged(i, mNotifyChangeOfUnfilteredItems);
-				if (DEBUG) Log.v(TAG, "animateRemovals   keep position=" + i + " item=" + item);
+				notifications.add(new Notification(i, 2));
+				//notifyItemChanged(i, notifyChangeOfUnfilteredItems);
+				if (DEBUG)
+					Log.v(TAG, "animateRemovals   keep position=" + i + " item=" + item + " searchText=" + mSearchText);
 			}
 		}
-		if (DEBUG) Log.v(TAG, "animateRemovals total out=" + out + " size=" + newItems.size());
+		if (DEBUG) Log.v(TAG, "animateRemovals total out=" + out);
 	}
 
 	/**
@@ -3238,37 +3273,84 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	protected void applyAndAnimateAdditions(List<T> from, List<T> newItems) {
+		//Using Hash for performance
+		Set<T> fromHash = new HashSet<>(from);
 		int in = 0;
 		for (int i = 0; i < newItems.size(); i++) {
+			if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
 			final T item = newItems.get(i);
-			if (!from.contains(item)) {
-				if (DEBUG) Log.v(TAG, "animateAdditions    add position=" + i + " item=" + item);
-				from.add(item);//We add always at the end to animate moved items at the missing position
-				notifyItemInserted(from.size());
+			if (!fromHash.contains(item)) {
+				if (DEBUG)
+					Log.v(TAG, "animateAdditions    add position=" + i + " item=" + item + " searchText=" + mSearchText);
+				if (notifyMoveOfFilteredItems) {
+					from.add(item);//We add always at the end to animate moved items at the missing position
+					notifications.add(new Notification(from.size(), 3));
+				} else {
+					from.add(i, item);
+					notifications.add(new Notification(i, 3));
+				}
 				in++;
 			}
 		}
-		if (DEBUG) Log.v(TAG, "animateAdditions total new=" + in + " size=" + newItems.size());
+		if (DEBUG) Log.v(TAG, "animateAdditions total new=" + in);
 	}
 
 	/**
 	 * Find out all moved items and animate them.
+	 * <p>This method is very slow on list bigger than ~3000 items. Use with caution!</p>
 	 *
 	 * @since 5.0.0-b7
 	 */
 	protected void applyAndAnimateMovedItems(List<T> from, List<T> newItems) {
+		int move = 0;
 		for (int toPosition = newItems.size() - 1; toPosition >= 0; toPosition--) {
+			if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
 			final T item = newItems.get(toPosition);
 			final int fromPosition = from.indexOf(item);
 			if (fromPosition >= 0 && fromPosition != toPosition) {
 				if (DEBUG)
-					Log.v(TAG, "animateMoved fromPosition=" + fromPosition + " toPosition=" + toPosition);
+					Log.v(TAG, "animateMoved fromPosition=" + fromPosition + " toPosition=" + toPosition + " searchText=" + mSearchText);
 				T movedItem = from.remove(fromPosition);
 				if (toPosition < from.size()) from.add(toPosition, movedItem);
 				else from.add(movedItem);
-				notifyItemMoved(fromPosition, toPosition);
+				notifications.add(new Notification(fromPosition, toPosition, 4));
+				//notifyItemMoved(fromPosition, toPosition);
+				move++;
 			}
 		}
+		if (DEBUG) Log.v(TAG, "animateMovedItems total move=" + move);
+	}
+
+	private synchronized void executeNotifications() {
+		if (DEBUG)
+			Log.d(TAG, "Size=" + getItemCount() + " Notifications=" + notifications.size());
+		for (Notification notification : notifications) {
+			setAnimate(false);//Disable scroll animation
+			switch (notification.operation) {
+				case 1:
+					notifyItemRemoved(notification.position);
+					break;
+				case 2:
+					notifyItemChanged(notification.position);
+					break;
+				case 3:
+					if (DEBUG) Log.d(TAG, "notifyItemInserted position=" + notification.position);
+					notifyItemInserted(notification.position);
+					break;
+				case 4:
+					notifyItemMoved(notification.fromPosition, notification.position);
+					break;
+				default:
+					if (DEBUG) Log.d(TAG, "notifyDataSetChanged");
+					notifyDataSetChanged();
+					break;
+			}
+		}
+		notifications = Collections.synchronizedList(new ArrayList<Notification>());
+
+		//Call listener to update EmptyView
+		if (mUpdateListener != null)
+			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 	/*---------------*/
@@ -4061,6 +4143,76 @@ public class FlexibleAdapter<T extends IFlexible>
 			return "RestoreInfo[item=" + item +
 					", refItem=" + refItem +
 					", filterRefItem=" + filterRefItem + "]";
+		}
+	}
+
+	/**
+	 * Class necessary to notify the changes when using AsyncTask.
+	 */
+	private class Notification {
+		int fromPosition, position, operation;
+
+		public Notification(int position, int operation) {
+			this.position = position;
+			this.operation = operation;
+		}
+
+		public Notification(int fromPosition, int toPosition, int operation) {
+			this(toPosition, operation);
+			this.fromPosition = fromPosition;
+		}
+	}
+
+	private class FilterAsyncTask extends AsyncTask<Void, Void, Void> {
+
+		private final String TAG = FilterAsyncTask.class.getSimpleName();
+		List<T> newItems;
+		int what, initialCount;
+		boolean isRunning, hasResult;
+
+		FilterAsyncTask(int what, List<T> newItems) {
+			this.what = what;
+			this.newItems = newItems;
+		}
+
+		@Override
+		protected void onCancelled() {
+			if (DEBUG) Log.i(TAG, "FilterAsyncTask cancelled!");
+		}
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			initialCount = getItemCount();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			isRunning = true;
+			hasResult = false;
+			switch (what) {
+				case 1:
+					if (DEBUG) Log.v(TAG, "doInBackground - started FilterAsyncTask!");
+					asyncFilterItems(newItems);
+					if (DEBUG) Log.v(TAG, "doInBackground - ended FilterAsyncTask!");
+					break;
+				case 2:
+					if (DEBUG) Log.v(TAG, "doInBackground - started ExpandingAll!");
+					if (DEBUG) Log.v(TAG, "doInBackground - ended ExpandingAll!");
+					break;
+				case 3:
+					if (DEBUG) Log.v(TAG, "doInBackground - started CollapsingAll!");
+					if (DEBUG) Log.v(TAG, "doInBackground - ended CollapsingAll!");
+					break;
+			}
+			isRunning = false;
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			hasResult = true;
+			executeNotifications();
 		}
 	}
 

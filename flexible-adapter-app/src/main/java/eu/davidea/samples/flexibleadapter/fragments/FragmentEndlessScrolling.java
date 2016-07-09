@@ -64,7 +64,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createEndlessDatabase(50);
+		DatabaseService.getInstance().createEndlessDatabase(2000);
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -77,6 +77,9 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAutoScrollOnExpand(true)
 				.setHandleDragEnabled(true)
+				.setAnimateToLimit(7000)//Animate synchronization until 7000th items
+				.setNotifyChangeOfUnfilteredItems(true)
+				.setNotifyMoveOfFilteredItems(true)//On big list the method is very slow!
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);

@@ -104,7 +104,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	}
 
 	@Override
-	public synchronized void filterItems(@NonNull List<AbstractFlexibleItem> unfilteredItems) {
+	public void filterItems(@NonNull List<AbstractFlexibleItem> unfilteredItems) {
 		super.filterItems(unfilteredItems);
 		addUserLearnedSelection(false);
 		showLayoutInfo(false);
