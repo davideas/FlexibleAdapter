@@ -162,7 +162,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private String mSearchText = "", mOldSearchText = "";
 	private Set<IExpandable> mExpandedFilterFlags;
 	private boolean mNotifyChangeOfUnfilteredItems = false, filtering = false;
-	private int mAnimateToLimit = 600;
+	private static int mAnimateToLimit = 600;
 
 	/* Expandable flags */
 	private int minCollapsibleLevel = 0, selectedLevel = -1;
@@ -2956,10 +2956,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * displayed according to the current filter and at the right positions.</li>
 	 * <li><b>NEW!</b> Expandable items are picked up and displayed if at least a child is
 	 * collected by the current filter.</li>
-	 * <li><b>NEW!</b> Items are animated thanks to {@link #animateTo(List)} BUT a limit of 500
-	 * (default) items is set. <b>NOTE:</b> you can change this limit by calling
-	 * {@link #setAnimateToLimit(int)}. Above this limit {@link #notifyDataSetChanged()} will
-	 * be called to improve performance.</li>
+	 * <li><b>NEW!</b> Items are animated thanks to {@link #animateTo(List)} BUT a limit of
+	 * {@value mAnimateToLimit} (default) items is set. <b>NOTE:</b> you can change this limit
+	 * by calling {@link #setAnimateToLimit(int)}. Above this limit {@link #notifyDataSetChanged()}
+	 * will be called to improve performance.</li>
 	 * </ol>
 	 *
 	 * @param unfilteredItems the list to filter
@@ -3169,14 +3169,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Tunes the limit after the which the synchronization animations, occurred during
 	 * updateDataSet and filter operations, are skipped and {@link #notifyDataSetChanged()}
 	 * will be called instead.
-	 * <p>Default value is 500 items, max number between the "current list" and "new list".</p>
+	 * <p>Default value is {@value mAnimateToLimit} items, max number between the "current list"
+	 * and "new list".</p>
 	 *
 	 * @param limit the max number of items that, when reached, will skip synchronization animations
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b8
 	 */
 	public FlexibleAdapter setAnimateToLimit(int limit) {
-		this.mAnimateToLimit = limit;
+		mAnimateToLimit = limit;
 		return this;
 	}
 
