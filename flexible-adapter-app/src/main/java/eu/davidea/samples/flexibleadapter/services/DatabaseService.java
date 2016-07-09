@@ -152,9 +152,9 @@ public class DatabaseService {
 	public void createHeadersSectionsDatabase(int size) {
 		databaseType = 4;
 		HeaderItem header = null;
-		mItems.clear();
+		mItems.clear(); int lastHeaderId = 0;
 		for (int i = 0; i < size; i++) {
-			header = i % (size / HEADERS) == 0 ? newHeader(i * HEADERS / size + 1) : header;
+			header = i % Math.round(size / HEADERS) == 0 ? newHeader(++lastHeaderId) : header;
 			mItems.add(newSimpleItem(i + 1, header));
 		}
 	}

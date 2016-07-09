@@ -6,8 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,14 +113,15 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		super.selectAll();
 	}
 
-	@Override
-	public ViewGroup getStickySectionHeadersHolder() {
-		FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
-		frameLayout.setLayoutParams(new ViewGroup.LayoutParams(
-				ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT));
-		return (ViewGroup) mInflater.inflate(R.layout.sticky_header_layout, frameLayout);
-	}
+//	FIXME: This customization makes the header disappear. Why?!?
+//	@Override
+//	public ViewGroup getStickySectionHeadersHolder() {
+//		FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
+//		frameLayout.setLayoutParams(new ViewGroup.LayoutParams(
+//				ViewGroup.LayoutParams.WRAP_CONTENT,
+//				ViewGroup.LayoutParams.WRAP_CONTENT));
+//		return (ViewGroup) mInflater.inflate(R.layout.sticky_header_layout, frameLayout);
+//	}
 
 	/**
 	 * METHOD A - NEW! Via Model objects. In this case you don't need to implement this method!
