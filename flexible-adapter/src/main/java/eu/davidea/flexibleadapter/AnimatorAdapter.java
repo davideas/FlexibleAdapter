@@ -84,7 +84,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 */
 	private EnumSet<AnimatorEnum> animatorsUsed = EnumSet.noneOf(AnimatorEnum.class);
 
-	private boolean isReverseEnabled = false, shouldAnimate = true,
+	private boolean isReverseEnabled = false, shouldAnimate = false,
 			onlyEntryAnimation = false, isFastScroll = false, animateFromObserver = false;
 
 	private long mInitialDelay = 0L,
