@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/empty"
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/empty_view"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:gravity="center"
-	android:visibility="visible"
-	android:freezesText="true"
-	android:text="@string/no_items"
-	android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-	android:textColor="?android:attr/textColorSecondary"/>
+	android:gravity="center_vertical"
+	android:alpha="0.0"
+	tools:alpha="1.0">
+
+	<ImageView
+		android:id="@+id/label_background"
+		android:layout_width="164dp"
+		android:layout_height="164dp"
+		android:layout_centerHorizontal="true"
+		android:layout_marginTop="-16dp"
+		android:alpha="0.2"
+		android:scaleType="fitCenter"
+		android:src="@drawable/ic_xml_grey600_48dp"/>
+
+	<TextView
+		android:id="@+id/empty_text"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:freezesText="true"
+		android:gravity="center_horizontal"
+		android:text="@string/no_items"
+		android:layout_below="@+id/label_background"
+		android:alpha="0.4"
+		android:textAppearance="@style/TextAppearance.AppCompat.Large"
+		android:textColor="?android:textColorSecondary"/>
+
+</RelativeLayout>

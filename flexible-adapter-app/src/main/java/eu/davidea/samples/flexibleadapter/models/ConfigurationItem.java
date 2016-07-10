@@ -1,0 +1,173 @@
+package eu.davidea.samples.flexibleadapter.models;
+
+import android.support.annotation.IntDef;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.SeekBar;
+import android.widget.Switch;
+import android.widget.TextView;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.List;
+
+import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.viewholders.FlexibleViewHolder;
+
+public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.ViewHolder> {
+
+	private String id;
+	private String title;
+	private String description;
+	private int type;
+	private boolean moreDescription;
+	private static final int SEEK_BAR = 0, SWITCH = 1;
+	private int stepValue = 10;
+	private int value = 600;
+
+	@IntDef({SEEK_BAR, SWITCH})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface Type {
+	}
+
+	public ConfigurationItem(String id, @Type int type) {
+		super();
+		this.id = id;
+		this.type = type;
+	}
+
+	@Override
+	public boolean equals(Object inObject) {
+		if (inObject instanceof ConfigurationItem) {
+			ConfigurationItem inItem = (ConfigurationItem) inObject;
+			return this.getId().equals(inItem.getId());
+		}
+		return false;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public int getValue() {
+		return value;
+	}
+
+	public void setValue(int value) {
+		this.value = value;
+	}
+
+	public int getStepValue() {
+		return stepValue;
+	}
+
+	public void setStepValue(int stepValue) {
+		this.stepValue = stepValue;
+	}
+
+	public boolean isMoreDescription() {
+		return moreDescription;
+	}
+
+	public void setMoreDescription(boolean moreDescription) {
+		this.moreDescription = moreDescription;
+	}
+
+	@Override
+	public int getLayoutRes() {
+		return R.layout.recycler_configuration_item;
+	}
+
+	@Override
+	public ViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new ViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void bindViewHolder(FlexibleAdapter adapter, ViewHolder holder, int position, List payloads) {
+		holder.mTitle.setText(getTitle());
+		if (getDescription() != null)
+			holder.mDescription.setText(getDescription());
+		switch (getType()) {
+			case SEEK_BAR:
+				holder.mSeekBar.setVisibility(View.VISIBLE);
+				holder.mSwitchView.setVisibility(View.GONE);
+				break;
+			case SWITCH:
+				holder.mSeekBar.setVisibility(View.GONE);
+				holder.mSwitchView.setVisibility(View.VISIBLE);
+				break;
+		}
+	}
+
+	static class ViewHolder extends FlexibleViewHolder {
+
+		public TextView mTitle;
+		public TextView mDescription;
+		public TextView mMore;
+		public SeekBar mSeekBar;
+		public Switch mSwitchView;
+
+		public ViewHolder(View view, FlexibleAdapter adapter) {
+			super(view, adapter, true);//True for sticky
+			mTitle = (TextView) view.findViewById(R.id.title);
+			mDescription = (TextView) view.findViewById(R.id.description);
+			mMore = (TextView) view.findViewById(R.id.more);
+			mMore.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+
+				}
+			});
+			mSeekBar = (SeekBar) view.findViewById(R.id.seek_bar);
+			mSwitchView = (Switch) view.findViewById(R.id.switch_box);
+		}
+
+		@Override
+		public void onClick(View view) {
+			super.onClick(view);
+			if (mSwitchView.getVisibility() == View.VISIBLE) {
+				mSwitchView.setChecked(!mSwitchView.isChecked());
+			}
+		}
+
+	}
+
+	@Override
+	public String toString() {
+		return "ConfigurationItem[id=" + id + "]";
+	}
+
+}

@@ -13,38 +13,37 @@
 			android:icon="@drawable/ic_select_all_grey600_24dp"
 			android:title="@string/selection_modes"/>
 		<item
-			android:id="@+id/nav_endless_scrolling"
-			android:icon="@drawable/ic_playlist_play_grey600_24dp"
-			android:title="@string/endless_scrolling"/>
-		<item
-			android:id="@+id/nav_expandable"
-			android:enabled="false"
-			android:icon="@drawable/ic_expandable_grey_600_24dp"
-			android:title="@string/expandable"/>
-		<item
-			android:id="@+id/nav_multi_level_expandable"
-			android:icon="@drawable/ic_expandable_grey_600_24dp"
-			android:title="@string/multi_level_expandable"/>
-		<item
-			android:id="@+id/nav_expandable_sections"
-			android:icon="@drawable/ic_expandable_grey_600_24dp"
-			android:title="@string/expandable_sections"/>
+			android:id="@+id/nav_filter"
+			android:icon="@drawable/ic_filter_outline_grey600_24dp"
+			android:title="@string/filter"/>
 		<item
 			android:id="@+id/nav_headers_and_sections"
 			android:icon="@drawable/ic_sections_grey600_24dp"
 			android:title="@string/headers_sections"/>
 		<item
-			android:id="@+id/nav_instagram_headers"
-			android:icon="@drawable/ic_instagram_grey600_24dp"
-			android:title="@string/instagram_headers"/>
+			android:id="@+id/nav_expandable_sections"
+			android:icon="@drawable/ic_expandable_grey_600_24dp"
+			android:title="@string/expandable_sections"/>
 		<item
-			android:id="@+id/nav_model_holders"
-			android:enabled="false"
-			android:icon="@drawable/ic_select_inverse_grey600_24dp"
-			android:title="@string/model_holders"/>
+			android:id="@+id/nav_multi_level_expandable"
+			android:icon="@drawable/ic_expandable_grey_600_24dp"
+			android:title="@string/multi_level_expandable"/>
+		<item
+			android:id="@+id/nav_endless_scrolling"
+			android:icon="@drawable/ic_playlist_play_grey600_24dp"
+			android:title="@string/endless_scrolling"/>
 
-		<item android:title="@string/special_layouts">
+		<item android:title="@string/special_use_cases">
 			<menu>
+				<item
+					android:id="@+id/nav_instagram_headers"
+					android:icon="@drawable/ic_instagram_grey600_24dp"
+					android:title="@string/instagram_headers"/>
+				<item
+					android:id="@+id/nav_model_holders"
+					android:enabled="false"
+					android:icon="@drawable/ic_select_inverse_grey600_24dp"
+					android:title="@string/model_holders"/>
 				<item
 					android:id="@+id/nav_horizontal"
 					android:enabled="false"
@@ -80,9 +79,9 @@
 				android:enabled="false"
 				android:icon="@drawable/ic_github_circle_grey600_24dp"
 				android:title="@string/github"/>
-			<item
-				android:id="@+id/nav_empty_space"
-				android:title=""/>
+			<!--<item-->
+				<!--android:id="@+id/nav_empty_space"-->
+				<!--android:title=""/>-->
 		</menu>
 	</item>
 

@@ -2,7 +2,6 @@ package eu.davidea.utils;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -10,17 +9,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.IntRange;
-import android.support.v4.content.ContextCompat;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -63,7 +58,6 @@ public final class Utils {
 
 	/**
 	 * dd MMM yyyy HH:mm:ss z
-	 * @param date
 	 * @return The date formatted.
 	 */
 	public static String formatDate(Date date) {
@@ -119,6 +113,14 @@ public final class Utils {
 		return Build.VERSION.SDK_INT >= VERSION_CODES.M;
 	}
 
+	/**
+	 * API 24
+	 * @see VERSION_CODES#N
+	 */
+	public static boolean hasNougat() {
+		return Build.VERSION.SDK_INT >= VERSION_CODES.N;
+	}
+
 	public static String getVersionName(Context context) {
 		try {
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -135,115 +137,6 @@ public final class Utils {
 		} catch (PackageManager.NameNotFoundException e) {
 			return 0;
 		}
-	}
-
-	/**
-	 * Helper method to set the background depending on the android version.
-	 *
-	 * @param view the view to apply the background drawable
-	 * @param drawable the Drawable, if null the background will be removed
-	 */
-	public static void setBackground(View view, Drawable drawable) {
-		if (hasJellyBean()) {
-			view.setBackground(drawable);
-		} else {
-			view.setBackgroundDrawable(drawable);
-		}
-	}
-
-	/**
-	 * Helper method to set the background depending on the android version.
-	 *
-	 * @param view the view to apply the background drawable
-	 * @param drawableRes the Drawable resource id
-	 */
-	public static void setBackground(View view, @DrawableRes int drawableRes) {
-		setBackground(view, getCompatDrawable(view.getContext(), drawableRes));
-	}
-
-	/**
-	 * Helper method to get the drawable by its resource. specific to the correct android version.
-	 *
-	 * @param context the context
-	 * @param drawableRes the Drawable resource id
-	 * @return the compatible API Drawable
-	 */
-	@SuppressLint("NewApi")
-	public static Drawable getCompatDrawable(Context context, @DrawableRes int drawableRes) {
-		try {
-			return hasLollipop() ? context.getResources().getDrawable(drawableRes, context.getTheme())
-					: context.getResources().getDrawable(drawableRes);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	/**
-	 * Helper to get the system default selectable background.
-	 *
-	 * @param context the context
-	 * @return the Drawable resource id
-	 */
-	public static int getSelectableBackground(Context context) {
-		if (hasHoneycomb()) {
-			//If we're running on Honeycomb or newer, then we can use the Theme's
-			//selectableItemBackground to ensure that the View has a pressed state
-			TypedValue outValue = new TypedValue();
-			//It is important here to not use the android.R because this wouldn't add the latest drawable
-			context.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
-			return outValue.resourceId;
-		} else {
-			TypedValue outValue = new TypedValue();
-			context.getTheme().resolveAttribute(android.R.attr.itemBackground, outValue, true);
-			return outValue.resourceId;
-		}
-	}
-
-	/**
-	 * Helper to get the system default selectable background inclusive an active state.
-	 *
-	 * @param context       the context
-	 * @param selectedColor the selected color
-	 * @param animate       true if you want to fade over the states (only animates if API
-	 *                      newer than Build.VERSION_CODES.HONEYCOMB)
-	 * @return the StateListDrawable
-	 */
-	public static StateListDrawable getSelectableBackground(
-			Context context, @ColorInt int selectedColor, boolean animate) {
-
-		StateListDrawable states = new StateListDrawable();
-		ColorDrawable clrActive = new ColorDrawable(selectedColor);
-		states.addState(new int[]{android.R.attr.state_selected}, clrActive);
-		states.addState(new int[]{android.R.attr.state_activated}, clrActive);
-		states.addState(new int[]{}, ContextCompat.getDrawable(context, getSelectableBackground(context)));
-		//if possible we enable animating across states
-		if (animate && hasHoneycomb()) {
-			int duration = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
-			states.setEnterFadeDuration(duration);
-			states.setExitFadeDuration(duration);
-		}
-		return states;
-	}
-
-	/**
-	 * Helper to get the system default selectable background inclusive an active and pressed state.
-	 * <p>Useful for Image item selection.</p>
-	 *
-	 * @param context       the context
-	 * @param selectedColor the selected color
-	 * @param pressedAlpha  0-255
-	 * @param animate       true if you want to fade over the states (only animates if API
-	 *                      newer than Build.VERSION_CODES.HONEYCOMB)
-	 * @return the StateListDrawable
-	 */
-	public static StateListDrawable getSelectablePressedBackground(
-			Context context, @ColorInt int selectedColor,
-			@IntRange(from = 0, to = 255) int pressedAlpha, boolean animate) {
-
-		StateListDrawable states = getSelectableBackground(context, selectedColor, animate);
-		ColorDrawable clrPressed = new ColorDrawable(adjustAlpha(selectedColor, pressedAlpha));
-		states.addState(new int[]{android.R.attr.state_pressed}, clrPressed);
-		return states;
 	}
 
 	/**
@@ -266,6 +159,15 @@ public final class Utils {
 			androidAttr.recycle();
 		}
 		return colorAccent;
+	}
+
+	@SuppressWarnings("deprecation")
+	public static Spanned fromHtmlCompat(String text) {
+		if (hasNougat()) {
+			return Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			return Html.fromHtml(text);
+		}
 	}
 
 	/**

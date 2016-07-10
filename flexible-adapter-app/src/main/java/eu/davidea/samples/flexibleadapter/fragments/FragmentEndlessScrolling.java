@@ -64,7 +64,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createEndlessDatabase(100000);//N. of items
+		DatabaseService.getInstance().createEndlessDatabase(100);//N. of items
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -77,8 +77,8 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAutoScrollOnExpand(true)
 				.setHandleDragEnabled(true)
-				.setAnimateToLimit(Integer.MAX_VALUE)//Size limit = MAX_VALUE will always animate the changes
-				.setNotifyMoveOfFilteredItems(false)//When true, filtering on big list is very slow!
+				//.setAnimateToLimit(Integer.MAX_VALUE)//Use the default value
+				.setNotifyMoveOfFilteredItems(true)//When true, filtering on big list is very slow, not in this case!
 				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true);

@@ -99,8 +99,6 @@ public class FragmentSelectionModes extends AbstractFragment
 		mAdapter.setMode(SelectableAdapter.MODE_SINGLE);
 
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setAnimationOnScrolling(true);
-		mAdapter.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);

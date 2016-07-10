@@ -13,7 +13,7 @@
 	      app:showAsAction="never"/>
 
 	<item android:id="@+id/action_expand_collapse_all"
-	      android:title="@string/expand_all"
+	      android:title="@string/collapse_all"
 	      app:showAsAction="never"/>
 
 </menu>

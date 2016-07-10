@@ -47,6 +47,7 @@ import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.fragments.AbstractFragment;
+import eu.davidea.samples.flexibleadapter.fragments.FragmentAsyncFilter;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentEndlessScrolling;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableMultiLevel;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableSections;
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements
 		Log.d(TAG, "onCreate");
 		FlexibleAdapter.enableLogs(true);
 
-		//Initialize Toolbar, Drawer, FAB & BottomSheet
+		//Initialize Toolbar, Drawer & FAB
 		initializeToolbar();
 		initializeDrawer();
 		initializeFab();
@@ -213,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements
 				//Passing true as parameter we always animate the changes between the old and the new data set
 				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), true);
 				mSwipeRefreshLayout.setEnabled(false);
-				mRefreshHandler.sendEmptyMessageDelayed(0, 1000L);
+				mRefreshHandler.sendEmptyMessageDelayed(0, 100L);//Simulate network time
 				mActionModeHelper.destroyActionModeIfCan();
 			}
 		});
@@ -265,6 +266,9 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
+	/**
+	 * IMPORTANT!! READ THE COMMENT FOR THE FRAGMENT REPLACE
+	 */
 	@SuppressWarnings("StatementWithEmptyBody")
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item) {
@@ -287,8 +291,10 @@ public class MainActivity extends AppCompatActivity implements
 			fabBehavior.setEnabled(true);
 		} else if (id == R.id.nav_selection_modes) {
 			mFragment = FragmentSelectionModes.newInstance(2);
-		} else if (id == R.id.nav_expandable) {
-
+		} else if (id == R.id.nav_filter) {
+			mFragment = FragmentAsyncFilter.newInstance(-1);
+			showFab();
+			fabBehavior.setEnabled(true);
 		} else if (id == R.id.nav_multi_level_expandable) {
 			mFragment = FragmentExpandableMultiLevel.newInstance(2);
 		} else if (id == R.id.nav_expandable_sections) {
@@ -328,27 +334,6 @@ public class MainActivity extends AppCompatActivity implements
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		Log.v(TAG, "onPrepareOptionsMenu called!");
-
-		if (mSearchView != null) {
-			//Has searchText?
-			if (!mAdapter.hasSearchText()) {
-				Log.d(TAG, "onPrepareOptionsMenu Clearing SearchView!");
-				mSearchView.setIconified(true);// This also clears the text in SearchView widget
-			} else {
-				//Necessary after the restoreInstanceState
-				menu.findItem(R.id.action_search).expandActionView();//must be called first
-				//This restores the text, must be after the expandActionView()
-				mSearchView.setQuery(mAdapter.getSearchText(), false);//submit = false!!!
-				mSearchView.clearFocus();//Optionally the keyboard can be closed
-				//mSearchView.setIconified(false);//This is not necessary
-			}
-		}
-		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
@@ -395,12 +380,15 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private void showFab() {
-		if (mFragment instanceof FragmentHeadersSections || mFragment instanceof FragmentStaggeredLayout)
+		if (mFragment instanceof FragmentHeadersSections ||
+				mFragment instanceof FragmentStaggeredLayout ||
+				mFragment instanceof FragmentAsyncFilter) {
 			ViewCompat.animate(mFab)
 					.scaleX(1f).scaleY(1f)
 					.alpha(1f).setDuration(100)
 					.setStartDelay(300L)
 					.start();
+		}
 	}
 
 	@Override
@@ -421,6 +409,27 @@ public class MainActivity extends AppCompatActivity implements
 	public boolean onQueryTextSubmit(String query) {
 		Log.v(TAG, "onQueryTextSubmit called!");
 		return onQueryTextChange(query);
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		Log.v(TAG, "onPrepareOptionsMenu called!");
+
+		if (mSearchView != null) {
+			//Has searchText?
+			if (!mAdapter.hasSearchText()) {
+				Log.d(TAG, "onPrepareOptionsMenu Clearing SearchView!");
+				mSearchView.setIconified(true);// This also clears the text in SearchView widget
+			} else {
+				//Necessary after the restoreInstanceState
+				menu.findItem(R.id.action_search).expandActionView();//must be called first
+				//This restores the text, must be after the expandActionView()
+				mSearchView.setQuery(mAdapter.getSearchText(), false);//submit = false!!!
+				mSearchView.clearFocus();//Optionally the keyboard can be closed
+				//mSearchView.setIconified(false);//This is not necessary
+			}
+		}
+		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
@@ -599,7 +608,7 @@ public class MainActivity extends AppCompatActivity implements
 					.remove(positions, findViewById(R.id.main_view), message,
 							getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
 
-		//Here, option 1B) is implemented
+			//Here, option 1B) is implemented
 		} else if (direction == ItemTouchHelper.RIGHT) {
 			message.append(getString(R.string.action_deleted));
 			new UndoHelper(mAdapter, this)
@@ -644,14 +653,16 @@ public class MainActivity extends AppCompatActivity implements
 	public void onUpdateEmptyView(int size) {
 		Log.d(TAG, "onUpdateEmptyView size=" + size);
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
-		TextView emptyView = (TextView) findViewById(R.id.empty);
-		emptyView.setText(getString(R.string.no_items));
+		View emptyView = findViewById(R.id.empty_view);
+		TextView emptyText = (TextView) findViewById(R.id.empty_text);
+		emptyText.setText(getString(R.string.no_items));
 		if (size > 0) {
 			fastScroller.setVisibility(View.VISIBLE);
-			emptyView.setVisibility(View.GONE);
+			emptyView.setAlpha(0);
 		} else {
+			emptyView.setAlpha(0);
+			ViewCompat.animate(emptyView).alpha(1);
 			fastScroller.setVisibility(View.GONE);
-			emptyView.setVisibility(View.VISIBLE);
 		}
 	}
 

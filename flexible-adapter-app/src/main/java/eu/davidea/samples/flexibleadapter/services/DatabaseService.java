@@ -63,6 +63,10 @@ public class DatabaseService {
 	/* DATABASE CREATION */
 	/*-------------------*/
 
+	public void clear() {
+		mItems.clear();
+	}
+
 	public int getDatabaseType() {
 		return databaseType;
 	}
@@ -78,27 +82,27 @@ public class DatabaseService {
 				.withDescription(resources.getString(R.string.selection_modes_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_select_all_grey600_24dp)));
 
-		mItems.add(new OverallItem(R.id.nav_endless_scrolling, resources.getString(R.string.endless_scrolling))
-				.withDescription(resources.getString(R.string.endless_scrolling_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_playlist_play_grey600_24dp)));
+		mItems.add(new OverallItem(R.id.nav_headers_and_sections, resources.getString(R.string.headers_sections))
+				.withDescription(resources.getString(R.string.headers_sections_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_sections_grey600_24dp)));
 
-		mItems.add(new OverallItem(R.id.nav_expandable, resources.getString(R.string.expandable))
-				.withDescription(resources.getString(R.string.expandable_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp))
-				.withEnabled(false));
-
-		mItems.add(new OverallItem(R.id.nav_multi_level_expandable, resources.getString(R.string.multi_level_expandable))
-				.withDescription(resources.getString(R.string.multi_level_expandable_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));
+		mItems.add(new OverallItem(R.id.nav_filter, resources.getString(R.string.filter))
+				.withDescription(resources.getString(R.string.filter_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_filter_outline_grey600_24dp)));
 
 		mItems.add(new OverallItem(R.id.nav_expandable_sections, resources.getString(R.string.expandable_sections))
 				.withDescription(resources.getString(R.string.expandable_sections_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));
 
-		mItems.add(new OverallItem(R.id.nav_headers_and_sections, resources.getString(R.string.headers_sections))
-				.withDescription(resources.getString(R.string.headers_sections_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_sections_grey600_24dp)));
+		mItems.add(new OverallItem(R.id.nav_multi_level_expandable, resources.getString(R.string.multi_level_expandable))
+				.withDescription(resources.getString(R.string.multi_level_expandable_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));
 
+		mItems.add(new OverallItem(R.id.nav_endless_scrolling, resources.getString(R.string.endless_scrolling))
+				.withDescription(resources.getString(R.string.endless_scrolling_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_playlist_play_grey600_24dp)));
+
+		//Special Use Cases
 		mItems.add(new OverallItem(R.id.nav_instagram_headers, resources.getString(R.string.instagram_headers))
 				.withDescription(resources.getString(R.string.instagram_headers_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_instagram_grey600_24dp)));
@@ -114,7 +118,16 @@ public class DatabaseService {
 	}
 
 	/*
-	 * List of simple items TODO: showing different types of animations
+	 * List of Configuration items
+	 */
+	public void createConfigurationDatabase() {
+		databaseType = 0;
+		mItems.clear();
+
+	}
+
+	/*
+	 * List of Simple items
 	 */
 	public void createEndlessDatabase(int startSize) {
 		databaseType = 1;
@@ -125,7 +138,7 @@ public class DatabaseService {
 	}
 
 	/*
-	 * List of expandable items (headers/sections) with SubItems with Header attached.
+	 * List of Expandable items (headers/sections) with SubItems with Header attached.
 	 */
 	public void createExpandableSectionsDatabase(int size) {
 		databaseType = 2;
@@ -136,7 +149,7 @@ public class DatabaseService {
 	}
 
 	/*
-	 * List of headers (level 0) with expandable SubItems (level 1) with SubItems.
+	 * List of Headers (level 0) with Expandable SubItems (level 1) with SubItems.
 	 */
 	public void createExpandableMultiLevelDatabase(int size) {
 		databaseType = 3;
@@ -159,6 +172,9 @@ public class DatabaseService {
 		}
 	}
 
+	/*
+	 * List of Instagram items
+	 */
 	public void createInstagramHeadersDatabase(int startSize) {
 		databaseType = 5;
 		mItems.clear();
@@ -167,6 +183,9 @@ public class DatabaseService {
 		}
 	}
 
+	/*
+	 * List of CardView items
+	 */
 	public void createStaggeredDatabase(Context context) {
 		databaseType = 6;
 		mItems.clear();
