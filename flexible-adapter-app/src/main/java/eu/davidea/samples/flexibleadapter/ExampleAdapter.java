@@ -53,7 +53,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 		//Add example view
 		showLayoutInfo(true);
-		addUserLearnedSelection(true);
 	}
 
 	/*
