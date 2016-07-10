@@ -3040,8 +3040,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		//Call listener to update EmptyView
 		if (mUpdateListener != null &&
-				(initialCount == 0 && getItemCount() > 0) ||
-				(initialCount > 0 && getItemCount() == 0))
+				((initialCount == 0 && getItemCount() > 0) ||
+				(initialCount > 0 && getItemCount() == 0)) )
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
