@@ -228,7 +228,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	public FlexibleAdapter(@NonNull List<T> items, @Nullable Object listeners) {
-		mItems = items;
+		if (items == null) mItems = new ArrayList<>();
+		else mItems = items;
 		mRestoreList = new ArrayList<>();
 		mOrphanHeaders = new ArrayList<>();
 
@@ -250,7 +251,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public FlexibleAdapter initializeListeners(@Nullable Object listeners) {
 		if (listeners instanceof OnUpdateListener) {
 			mUpdateListener = (OnUpdateListener) listeners;
-			mUpdateListener.onUpdateEmptyView(mItems.size());
+			mUpdateListener.onUpdateEmptyView(getItemCount());
 		}
 		if (listeners instanceof OnItemClickListener)
 			mItemClickListener = (OnItemClickListener) listeners;
@@ -2922,7 +2923,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Sometimes it is necessary, while filtering or after the DataSet has been updated, to
-	 * rebound the items that remain unfiltered.<br/>
+	 * rebound the items that remain unfiltered.
 	 * <p>If the items have highlighted text, those items must be refreshed in order to change the
 	 * highlighted text back to normal. This happens systematically when searchText is reduced in
 	 * length by the user.</p>
@@ -4135,6 +4136,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Class necessary to notify the changes when using AsyncTask.
 	 */
 	private static class Notification {
+
 		public static final int ADD = 1, CHANGE = 2, REMOVE = 3, MOVE = 4, FULL = 0;
 		int fromPosition, position, operation;
 
@@ -4146,10 +4148,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		public Notification(int fromPosition, int toPosition, int operation) {
 			this(toPosition, operation);
 			this.fromPosition = fromPosition;
-		}
-
-		public static Notification newInstance(int fromPosition, int toPosition, int operation) {
-			return new Notification(fromPosition, toPosition, operation);
 		}
 	}
 
