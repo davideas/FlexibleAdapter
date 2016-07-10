@@ -40,10 +40,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	public ExampleAdapter(Activity activity) {
 		super(DatabaseService.getInstance().getDatabaseList(), activity);
-
-		//NEW! We have highlighted text while filtering, so let's enable this feature
-		//to be consistent with the active filter
-		setNotifyChangeOfUnfilteredItems(true);
 	}
 
 	@Override

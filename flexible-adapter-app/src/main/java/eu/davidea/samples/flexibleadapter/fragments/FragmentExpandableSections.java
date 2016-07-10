@@ -54,7 +54,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createExpandableSectionsDatabase(1000);
+		DatabaseService.getInstance().createExpandableSectionsDatabase(2000);//N. of sections
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -68,6 +68,9 @@ public class FragmentExpandableSections extends AbstractFragment {
 		mAdapter.expandItemsAtStartUp()
 				.setAutoCollapseOnExpand(false)
 				.setAutoScrollOnExpand(true)
+				.setAnimateToLimit(Integer.MAX_VALUE)//Size limit = MAX_VALUE will always animate the changes
+				.setNotifyMoveOfFilteredItems(false)//When true, filtering on big list is very slow!
+				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setRemoveOrphanHeaders(false)
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true);
