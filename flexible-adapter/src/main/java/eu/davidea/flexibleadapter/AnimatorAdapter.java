@@ -236,6 +236,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b8
 	 */
 	public AnimatorAdapter setOnlyEntryAnimation(boolean onlyEntryAnimation) {
+		if (onlyEntryAnimation) this.shouldAnimate = true;
 		this.onlyEntryAnimation = onlyEntryAnimation;
 		return this;
 	}
