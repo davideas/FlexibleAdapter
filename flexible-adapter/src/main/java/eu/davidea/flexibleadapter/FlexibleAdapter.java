@@ -2925,8 +2925,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Sometimes it is necessary, while filtering or after the DataSet has been updated, to
 	 * rebound the items that remain unfiltered.
 	 * <p>If the items have highlighted text, those items must be refreshed in order to change the
-	 * highlighted text back to normal. This happens systematically when searchText is reduced in
-	 * length by the user.</p>
+	 * text back to normal. This happens systematically when searchText is reduced in length by
+	 * the user.</p>
 	 * The notification is triggered in {@link #animateTo(List)} when new items are not added.
 	 *
 	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)} while filtering,
@@ -2941,9 +2941,9 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * This method performs a further step to nicely animate the moved items.
-	 * <p>The process is very slow on big list of the order of ~3000 items, due to the
-	 * calculation to find the correct positions. Use with caution!</p>
-	 * The slowness is more visible when the searchText is cleared out.
+	 * <p>The process is very slow on big list of the order of ~3-5000 items and higher,
+	 * due to calculate the correct position for each item to shift. Use with caution!</p>
+	 * The slowness is higher when the searchText is cleared out.
 	 *
 	 * @param notifyMove true to animate move changes after filtering or updateDateSet, false otherwise
 	 * @return this Adapter, so the call can be chained
