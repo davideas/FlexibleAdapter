@@ -66,6 +66,7 @@ import eu.davidea.samples.flexibleadapter.models.SimpleItem;
 import eu.davidea.samples.flexibleadapter.models.StaggeredItem;
 import eu.davidea.samples.flexibleadapter.models.SubItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
+import eu.davidea.samples.flexibleadapter.services.DatabaseType;
 import eu.davidea.utils.ScrollAwareFABBehavior;
 import eu.davidea.utils.Utils;
 
@@ -873,7 +874,7 @@ public class MainActivity extends AppCompatActivity implements
 			return;
 		}
 		//Return to Overall View
-		if (DatabaseService.getInstance().getDatabaseType() != 0) {
+		if (DatabaseService.getInstance().getDatabaseType() != DatabaseType.OVERALL) {
 			MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.nav_overall);
 			onNavigationItemSelected(menuItem);
 			return;

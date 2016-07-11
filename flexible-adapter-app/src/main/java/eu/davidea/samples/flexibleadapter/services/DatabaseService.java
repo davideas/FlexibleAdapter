@@ -17,6 +17,7 @@ import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
+import eu.davidea.samples.flexibleadapter.models.ConfigurationItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableLevel0Item;
@@ -39,9 +40,9 @@ public class DatabaseService {
 
 	private static DatabaseService mInstance;
 	private static final int SUB_ITEMS = 4, HEADERS = 30;
-	private int databaseType;
+	private DatabaseType databaseType = DatabaseType.NONE;
 
-	//TODO FOR YOU: Use userLearnedSelection from settings
+	//TODO FOR YOU: Should use userLearnedSelection from settings
 	public static boolean userLearnedSelection = false;
 
 	//Database original items (used as cache)
@@ -67,7 +68,7 @@ public class DatabaseService {
 		mItems.clear();
 	}
 
-	public int getDatabaseType() {
+	public DatabaseType getDatabaseType() {
 		return databaseType;
 	}
 
@@ -76,7 +77,7 @@ public class DatabaseService {
 	 * It also shows how adapter animation can be configured.
 	 */
 	public void createOverallDatabase(Resources resources) {
-		databaseType = 0;
+		databaseType = DatabaseType.OVERALL;
 		mItems.clear();
 		mItems.add(new OverallItem(R.id.nav_selection_modes, resources.getString(R.string.selection_modes))
 				.withDescription(resources.getString(R.string.selection_modes_description))
@@ -120,17 +121,45 @@ public class DatabaseService {
 	/*
 	 * List of Configuration items
 	 */
-	public void createConfigurationDatabase() {
-		databaseType = 0;
+	public void createConfigurationDatabase(Resources resources) {
+		databaseType = DatabaseType.CONFIGURATION;
 		mItems.clear();
 
+		mItems.add(new ConfigurationItem("number_of_items", ConfigurationItem.SEEK_BAR)
+				.withTitle(resources.getString(R.string.config_num_of_items))
+				.withValue(100000)//items
+				.withMaxValue(500000)
+				.withStepValue(50)
+		);
+		mItems.add(new ConfigurationItem("delay", ConfigurationItem.SEEK_BAR)
+				.withTitle(resources.getString(R.string.config_delay))
+				.withDescription(resources.getString(R.string.config_delay_description))
+				.withValue(300)//milliseconds
+				.withMaxValue(1000)
+				.withStepValue(10)
+		);
+		mItems.add(new ConfigurationItem("animate_to_limit", ConfigurationItem.SEEK_BAR)
+				.withTitle(resources.getString(R.string.config_animate_to_limit))
+				.withDescription(resources.getString(R.string.config_animate_to_limit_description))
+				.withValue(5000)//limit items
+				.withStepValue(50)
+		);
+		mItems.add(new ConfigurationItem("notify_change", ConfigurationItem.SWITCH)
+				.withTitle(resources.getString(R.string.config_notify_change))
+				.withDescription(resources.getString(R.string.config_notify_change_description))
+				.withValue(1)//true
+		);
+		mItems.add(new ConfigurationItem("notify_move", ConfigurationItem.SWITCH)
+				.withTitle(resources.getString(R.string.config_notify_move))
+				.withDescription(resources.getString(R.string.config_notify_move_description))
+		);
 	}
 
 	/*
 	 * List of Simple items
 	 */
 	public void createEndlessDatabase(int startSize) {
-		databaseType = 1;
+		databaseType = DatabaseType.ENDLESS_SCROLLING;
 		mItems.clear();
 		for (int i = 0; i < startSize; i++) {
 			mItems.add(newSimpleItem(i + 1, null));
@@ -141,7 +170,7 @@ public class DatabaseService {
 	 * List of Expandable items (headers/sections) with SubItems with Header attached.
 	 */
 	public void createExpandableSectionsDatabase(int size) {
-		databaseType = 2;
+		databaseType = DatabaseType.EXPANDABLE_SECTIONS;
 		mItems.clear();
 		for (int i = 0; i < size; i++) {
 			mItems.add(newExpandableSectionItem(i + 1));//With expansion level 0
@@ -152,7 +181,7 @@ public class DatabaseService {
 	 * List of Headers (level 0) with Expandable SubItems (level 1) with SubItems.
 	 */
 	public void createExpandableMultiLevelDatabase(int size) {
-		databaseType = 3;
+		databaseType = DatabaseType.EXPANDABLE_MULTI_LEVEL;
 		mItems.clear();
 		for (int i = 0; i < size; i++) {
 			mItems.add(newExpandableLevelItem(i + 1));//With expansion level 1
@@ -163,9 +192,10 @@ public class DatabaseService {
 	 * List of Simple Items with Header attached. Only Simple Items will be added to the list.
 	 */
 	public void createHeadersSectionsDatabase(int size) {
-		databaseType = 4;
+		databaseType = DatabaseType.HEADERS_SECTIONS;
 		HeaderItem header = null;
-		mItems.clear(); int lastHeaderId = 0;
+		mItems.clear();
+		int lastHeaderId = 0;
 		for (int i = 0; i < size; i++) {
 			header = i % Math.round(size / HEADERS) == 0 ? newHeader(++lastHeaderId) : header;
 			mItems.add(newSimpleItem(i + 1, header));
@@ -176,7 +206,7 @@ public class DatabaseService {
 	 * List of Instagram items
 	 */
 	public void createInstagramHeadersDatabase(int startSize) {
-		databaseType = 5;
+		databaseType = DatabaseType.INSTAGRAM;
 		mItems.clear();
 		for (int i = 0; i < startSize; i++) {
 			mItems.add(newInstagramItem(i + 1));
@@ -187,7 +217,7 @@ public class DatabaseService {
 	 * List of CardView items
 	 */
 	public void createStaggeredDatabase(Context context) {
-		databaseType = 6;
+		databaseType = DatabaseType.LAYOUT_STAGGERED;
 		mItems.clear();
 
 		if (headers == null) {
@@ -465,8 +495,9 @@ public class DatabaseService {
 			if (lhs instanceof StaggeredHeaderItem && rhs instanceof StaggeredHeaderItem) {
 				result = ((StaggeredHeaderItem) lhs).getOrder() - ((StaggeredHeaderItem) rhs).getOrder();
 			} else if (lhs instanceof StaggeredItem && rhs instanceof StaggeredItem) {
-				result = ((StaggeredItem) lhs).getHeader().getOrder() -((StaggeredItem) rhs).getHeader().getOrder();
-				if (result == 0) result = ((StaggeredItem) lhs).getId() - ((StaggeredItem) rhs).getId();
+				result = ((StaggeredItem) lhs).getHeader().getOrder() - ((StaggeredItem) rhs).getHeader().getOrder();
+				if (result == 0)
+					result = ((StaggeredItem) lhs).getId() - ((StaggeredItem) rhs).getId();
 			} else if (lhs instanceof StaggeredItem && rhs instanceof StaggeredHeaderItem) {
 				result = ((StaggeredItem) lhs).getHeader().getOrder() - ((StaggeredHeaderItem) rhs).getOrder();
 			} else if (lhs instanceof StaggeredHeaderItem && rhs instanceof StaggeredItem) {

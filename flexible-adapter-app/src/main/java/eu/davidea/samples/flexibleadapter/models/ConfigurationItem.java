@@ -19,24 +19,22 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 
 public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.ViewHolder> {
 
-	private String id;
-	private String title;
-	private String description;
-	private int type;
-	private boolean moreDescription;
-	private static final int SEEK_BAR = 0, SWITCH = 1;
-	private int stepValue = 10;
-	private int value = 600;
+	public static final int SEEK_BAR = 0, SWITCH = 1;
+
+	private String id, title, description;
+	private int widgetType;
+	private boolean moreDescription = false;
+	private int value, maxValue, stepValue;
 
 	@IntDef({SEEK_BAR, SWITCH})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface Type {
 	}
 
-	public ConfigurationItem(String id, @Type int type) {
+	public ConfigurationItem(String id, @Type int widgetType) {
 		super();
 		this.id = id;
-		this.type = type;
+		this.widgetType = widgetType;
 	}
 
 	@Override
@@ -56,52 +54,58 @@ public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.Vi
 		this.id = id;
 	}
 
+	public int getWidgetType() {
+		return widgetType;
+	}
+
+	public void setWidgetType(int widgetType) {
+		this.widgetType = widgetType;
+	}
+
 	public String getTitle() {
 		return title;
 	}
 
-	public void setTitle(String title) {
+	public ConfigurationItem withTitle(String title) {
 		this.title = title;
+		return this;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	public void setDescription(String description) {
+	public ConfigurationItem withDescription(String description) {
 		this.description = description;
+		this.moreDescription = description.length() > 50;
+		return this;
 	}
 
 	public int getValue() {
 		return value;
 	}
 
-	public void setValue(int value) {
+	public ConfigurationItem withValue(int value) {
 		this.value = value;
+		return this;
+	}
+
+	public int getMaxValue() {
+		return maxValue;
+	}
+
+	public ConfigurationItem withMaxValue(int maxValue) {
+		this.maxValue = maxValue;
+		return this;
 	}
 
 	public int getStepValue() {
 		return stepValue;
 	}
 
-	public void setStepValue(int stepValue) {
+	public ConfigurationItem withStepValue(int stepValue) {
 		this.stepValue = stepValue;
-	}
-
-	public boolean isMoreDescription() {
-		return moreDescription;
-	}
-
-	public void setMoreDescription(boolean moreDescription) {
-		this.moreDescription = moreDescription;
+		return this;
 	}
 
 	@Override
@@ -120,7 +124,7 @@ public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.Vi
 		holder.mTitle.setText(getTitle());
 		if (getDescription() != null)
 			holder.mDescription.setText(getDescription());
-		switch (getType()) {
+		switch (getWidgetType()) {
 			case SEEK_BAR:
 				holder.mSeekBar.setVisibility(View.VISIBLE);
 				holder.mSwitchView.setVisibility(View.GONE);
