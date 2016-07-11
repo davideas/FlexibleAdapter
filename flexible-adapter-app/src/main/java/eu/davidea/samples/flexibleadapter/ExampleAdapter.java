@@ -40,10 +40,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	public ExampleAdapter(Activity activity) {
 		super(DatabaseService.getInstance().getDatabaseList(), activity);
-
-		//NEW! We have highlighted text while filtering, so let's enable this feature
-		//to be consistent with the active filter
-		setNotifyChangeOfUnfilteredItems(true);
 	}
 
 	@Override
@@ -57,7 +53,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 		//Add example view
 		showLayoutInfo(true);
-		addUserLearnedSelection(true);
 	}
 
 	/*
@@ -102,7 +97,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	}
 
 	@Override
-	public synchronized void filterItems(@NonNull List<AbstractFlexibleItem> unfilteredItems) {
+	public void filterItems(@NonNull List<AbstractFlexibleItem> unfilteredItems) {
 		super.filterItems(unfilteredItems);
 		addUserLearnedSelection(false);
 		showLayoutInfo(false);

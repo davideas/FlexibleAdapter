@@ -64,7 +64,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createEndlessDatabase(50);
+		DatabaseService.getInstance().createEndlessDatabase(100);//N. of items
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -77,6 +77,9 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAutoScrollOnExpand(true)
 				.setHandleDragEnabled(true)
+				//.setAnimateToLimit(Integer.MAX_VALUE)//Use the default value
+				.setNotifyMoveOfFilteredItems(true)//When true, filtering on big list is very slow, not in this case!
+				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
@@ -102,6 +105,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//EndlessScrollListener - OnLoadMore (v5.0.0)
@@ -136,7 +140,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				final List<AbstractFlexibleItem> newItems = new ArrayList<AbstractFlexibleItem>();
+				final List<AbstractFlexibleItem> newItems = new ArrayList<>();
 
 				//Simulating success/failure
 				int count = new Random().nextInt(5);

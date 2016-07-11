@@ -20,12 +20,12 @@
 		app:headerLayout="@layout/nav_header"
 		app:menu="@menu/activity_entry_drawer">
 
-		<android.support.v7.widget.Toolbar
-			android:id="@+id/nav_toolbar"
-			android:layout_width="match_parent"
-			android:layout_height="?attr/actionBarSize"
-			android:background="@drawable/side_nav_bar"
-			android:layout_gravity="bottom"/>
+		<!--<android.support.v7.widget.Toolbar-->
+			<!--android:id="@+id/nav_toolbar"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="?attr/actionBarSize"-->
+			<!--android:background="@drawable/side_nav_bar"-->
+			<!--android:layout_gravity="bottom"/>-->
 
 	</android.support.design.widget.NavigationView>
 

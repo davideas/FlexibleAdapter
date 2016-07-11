@@ -148,7 +148,8 @@ public class StickyHeaderHelper extends OnScrollListener {
 		if (mHeaderPosition != headerPosition) {
 			mHeaderPosition = headerPosition;
 			FlexibleViewHolder holder = getHeaderViewHolder(headerPosition);
-			if (FlexibleAdapter.DEBUG) Log.v(TAG, "swapHeader newHeaderPosition=" + mHeaderPosition);
+			if (FlexibleAdapter.DEBUG)
+				Log.v(TAG, "swapHeader newHeaderPosition=" + mHeaderPosition);
 			swapHeader(holder);
 		} else if (updateHeaderContent && mStickyHeaderViewHolder != null) {
 			mAdapter.onBindViewHolder(mStickyHeaderViewHolder, mHeaderPosition);
@@ -163,8 +164,8 @@ public class StickyHeaderHelper extends OnScrollListener {
 		int headerOffsetX = 0, headerOffsetY = 0;
 
 		//Search for the position where the next header item is found and take the new offset
-        for (int i = 0; i < mRecyclerView.getChildCount(); i++) {
-            final View nextChild = mRecyclerView.getChildAt(i);
+		for (int i = 0; i < mRecyclerView.getChildCount(); i++) {
+			final View nextChild = mRecyclerView.getChildAt(i);
 			if (nextChild != null) {
 				int adapterPos = mRecyclerView.getChildAdapterPosition(nextChild);
 				int nextHeaderPosition = getHeaderPosition(adapterPos);

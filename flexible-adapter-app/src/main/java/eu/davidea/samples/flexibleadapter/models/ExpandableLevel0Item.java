@@ -17,6 +17,7 @@ import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.ExpandableLevel0Item.L0ViewHolder;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
+import eu.davidea.samples.flexibleadapter.services.DatabaseType;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
@@ -132,7 +133,8 @@ public class ExpandableLevel0Item
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
-			if (adapter.isHandleDragEnabled() && DatabaseService.getInstance().getDatabaseType() == 2) {
+			if (adapter.isHandleDragEnabled() &&
+					DatabaseService.getInstance().getDatabaseType() == DatabaseType.EXPANDABLE_SECTIONS) {
 				this.mHandleView.setVisibility(View.VISIBLE);
 				setDragHandleView(mHandleView);
 			} else {

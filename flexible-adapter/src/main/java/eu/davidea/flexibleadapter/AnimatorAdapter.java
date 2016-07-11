@@ -52,6 +52,7 @@ import java.util.List;
  * @since 10/01/2016 Created
  * <br/>30/01/2016 Class now extends {@link SelectableAdapter}
  */
+@SuppressWarnings("unused")
 public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	protected static final String TAG = AnimatorAdapter.class.getSimpleName();
@@ -83,7 +84,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 */
 	private EnumSet<AnimatorEnum> animatorsUsed = EnumSet.noneOf(AnimatorEnum.class);
 
-	private boolean isReverseEnabled = false, shouldAnimate = true,
+	private boolean isReverseEnabled = false, shouldAnimate = false,
 			onlyEntryAnimation = false, isFastScroll = false, animateFromObserver = false;
 
 	private long mInitialDelay = 0L,
@@ -283,7 +284,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
-		return new ArrayList<Animator>();
+		return new ArrayList<>();
 	}
 
 	/**

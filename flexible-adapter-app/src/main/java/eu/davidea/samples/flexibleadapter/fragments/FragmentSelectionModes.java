@@ -99,8 +99,6 @@ public class FragmentSelectionModes extends AbstractFragment
 		mAdapter.setMode(SelectableAdapter.MODE_SINGLE);
 
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setAnimationOnScrolling(true);
-		mAdapter.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
@@ -125,6 +123,7 @@ public class FragmentSelectionModes extends AbstractFragment
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_SINGLE);
 
 		//Add sample HeaderView items on the top (not belongs to the library)

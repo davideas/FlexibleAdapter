@@ -34,6 +34,11 @@ public abstract class AbstractModelItem<VH extends FlexibleViewHolder>
 		return false;
 	}
 
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+
 	public String getId() {
 		return id;
 	}

@@ -49,7 +49,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
  * <br/>29/05/2016 Use of TreeSet instead of ArrayList
  */
-@SuppressWarnings({"unused", "Convert2Diamond", "unchecked", "ConstantConditions"})
+@SuppressWarnings({"unused", "unchecked", "ConstantConditions"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
 		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener {
 
@@ -57,17 +57,11 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	public static boolean DEBUG = false;
 
 	/**
-	 * Adapter will not keep track of selections
+	 * - MODE_IDLE: Adapter will not keep track of selections<br/>
+	 * - MODE_SINGLE: Select only one per time<br/>
+	 * - MODE_MULTI: Multi selection will be activated
 	 */
-	public static final int MODE_IDLE = 0;
-	/**
-	 * Default mode for selection
-	 */
-	public static final int MODE_SINGLE = 1;
-	/**
-	 * Multi selection will be activated
-	 */
-	public static final int MODE_MULTI = 2;
+	public static final int MODE_IDLE = 0, MODE_SINGLE = 1, MODE_MULTI = 2;
 
 	/**
 	 * Annotation interface for selection modes.
@@ -102,7 +96,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 1.0.0
 	 */
 	public SelectableAdapter() {
-		mSelectedPositions = new TreeSet<Integer>();
+		mSelectedPositions = new TreeSet<>();
 		mMode = MODE_IDLE;
 	}
 
@@ -393,7 +387,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 5.0.0-b2
 	 */
 	public List<Integer> getSelectedPositions() {
-		return new ArrayList<Integer>(mSelectedPositions);
+		return new ArrayList<>(mSelectedPositions);
 	}
 
 	/**
@@ -428,7 +422,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 1.0.0
 	 */
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putIntegerArrayList(TAG, new ArrayList<Integer>(mSelectedPositions));
+		outState.putIntegerArrayList(TAG, new ArrayList<>(mSelectedPositions));
 	}
 
 	/**

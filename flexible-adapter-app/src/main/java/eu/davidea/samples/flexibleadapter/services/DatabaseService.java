@@ -2,6 +2,7 @@ package eu.davidea.samples.flexibleadapter.services;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
+import eu.davidea.samples.flexibleadapter.models.ConfigurationItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableLevel0Item;
@@ -37,11 +39,12 @@ import eu.davidea.samples.flexibleadapter.models.SubItem;
  */
 public class DatabaseService {
 
+	private static final String TAG = DatabaseService.class.getSimpleName();
 	private static DatabaseService mInstance;
 	private static final int SUB_ITEMS = 4, HEADERS = 30;
-	private int databaseType;
+	private DatabaseType databaseType = DatabaseType.NONE;
 
-	//TODO FOR YOU: Use userLearnedSelection from settings
+	//TODO FOR YOU: Should use userLearnedSelection from settings
 	public static boolean userLearnedSelection = false;
 
 	//Database original items (used as cache)
@@ -63,7 +66,11 @@ public class DatabaseService {
 	/* DATABASE CREATION */
 	/*-------------------*/
 
-	public int getDatabaseType() {
+	public void clear() {
+		mItems.clear();
+	}
+
+	public DatabaseType getDatabaseType() {
 		return databaseType;
 	}
 
@@ -72,33 +79,34 @@ public class DatabaseService {
 	 * It also shows how adapter animation can be configured.
 	 */
 	public void createOverallDatabase(Resources resources) {
-		databaseType = 0;
+		databaseType = DatabaseType.OVERALL;
 		mItems.clear();
+
 		mItems.add(new OverallItem(R.id.nav_selection_modes, resources.getString(R.string.selection_modes))
 				.withDescription(resources.getString(R.string.selection_modes_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_select_all_grey600_24dp)));
-
-		mItems.add(new OverallItem(R.id.nav_endless_scrolling, resources.getString(R.string.endless_scrolling))
-				.withDescription(resources.getString(R.string.endless_scrolling_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_playlist_play_grey600_24dp)));
-
-		mItems.add(new OverallItem(R.id.nav_expandable, resources.getString(R.string.expandable))
-				.withDescription(resources.getString(R.string.expandable_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp))
-				.withEnabled(false));
-
-		mItems.add(new OverallItem(R.id.nav_multi_level_expandable, resources.getString(R.string.multi_level_expandable))
-				.withDescription(resources.getString(R.string.multi_level_expandable_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));
-
-		mItems.add(new OverallItem(R.id.nav_expandable_sections, resources.getString(R.string.expandable_sections))
-				.withDescription(resources.getString(R.string.expandable_sections_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));
 
 		mItems.add(new OverallItem(R.id.nav_headers_and_sections, resources.getString(R.string.headers_sections))
 				.withDescription(resources.getString(R.string.headers_sections_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_sections_grey600_24dp)));
 
+		mItems.add(new OverallItem(R.id.nav_filter, resources.getString(R.string.filter))
+				.withDescription(resources.getString(R.string.filter_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_filter_outline_grey600_24dp)));
+
+		mItems.add(new OverallItem(R.id.nav_expandable_sections, resources.getString(R.string.expandable_sections))
+				.withDescription(resources.getString(R.string.expandable_sections_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));
+
+		mItems.add(new OverallItem(R.id.nav_multi_level_expandable, resources.getString(R.string.multi_level_expandable))
+				.withDescription(resources.getString(R.string.multi_level_expandable_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));
+
+		mItems.add(new OverallItem(R.id.nav_endless_scrolling, resources.getString(R.string.endless_scrolling))
+				.withDescription(resources.getString(R.string.endless_scrolling_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_playlist_play_grey600_24dp)));
+
+		//Special Use Cases
 		mItems.add(new OverallItem(R.id.nav_instagram_headers, resources.getString(R.string.instagram_headers))
 				.withDescription(resources.getString(R.string.instagram_headers_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_instagram_grey600_24dp)));
@@ -114,10 +122,53 @@ public class DatabaseService {
 	}
 
 	/*
-	 * List of simple items TODO: showing different types of animations
+	 * List of Configuration items
+	 */
+	public void createConfigurationDatabase(Resources resources) {
+		databaseType = DatabaseType.CONFIGURATION;
+		mItems.clear();
+
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.TITLE, ConfigurationItem.NONE)
+				.withTitle(resources.getString(R.string.config_title))
+				.withDescription(resources.getString(R.string.config_description))
+		);
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.NUMBER_OF_ITEMS, ConfigurationItem.SEEK_BAR)
+				.withTitle(resources.getString(R.string.config_num_of_items))
+				.withValue(DatabaseConfiguration.size)//items
+				.withMaxValue(DatabaseConfiguration.maxSize)
+				.withStepValue(50)
+		);
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.SEARCH_DELAY, ConfigurationItem.SEEK_BAR)
+				.withTitle(resources.getString(R.string.config_delay))
+				.withDescription(resources.getString(R.string.config_delay_description))
+				.withValue(DatabaseConfiguration.delay)//milliseconds
+				.withMaxValue(DatabaseConfiguration.maxSearchDelay)
+				.withStepValue(10)
+		);
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.ANIMATE_TO_LIMIT, ConfigurationItem.SEEK_BAR)
+				.withTitle(resources.getString(R.string.config_animate_to_limit))
+				.withDescription(resources.getString(R.string.config_animate_to_limit_description))
+				.withValue(DatabaseConfiguration.animateToLimit)//limit items
+				.withMaxValue(DatabaseConfiguration.maxSize)
+				.withStepValue(50)
+		);
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.NOTIFY_CHANGE, ConfigurationItem.SWITCH)
+				.withTitle(resources.getString(R.string.config_notify_change))
+				.withDescription(resources.getString(R.string.config_notify_change_description))
+				.withValue(DatabaseConfiguration.notifyChange ? 1 : 0)
+		);
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.NOTIFY_MOVE, ConfigurationItem.SWITCH)
+				.withTitle(resources.getString(R.string.config_notify_move))
+				.withDescription(resources.getString(R.string.config_notify_move_description))
+				.withValue(DatabaseConfiguration.notifyMove ? 1 : 0)
+		);
+	}
+
+	/*
+	 * List of Simple items
 	 */
 	public void createEndlessDatabase(int startSize) {
-		databaseType = 1;
+		databaseType = DatabaseType.ENDLESS_SCROLLING;
 		mItems.clear();
 		for (int i = 0; i < startSize; i++) {
 			mItems.add(newSimpleItem(i + 1, null));
@@ -125,10 +176,10 @@ public class DatabaseService {
 	}
 
 	/*
-	 * List of expandable items (headers/sections) with SubItems with Header attached.
+	 * List of Expandable items (headers/sections) with SubItems with Header attached.
 	 */
 	public void createExpandableSectionsDatabase(int size) {
-		databaseType = 2;
+		databaseType = DatabaseType.EXPANDABLE_SECTIONS;
 		mItems.clear();
 		for (int i = 0; i < size; i++) {
 			mItems.add(newExpandableSectionItem(i + 1));//With expansion level 0
@@ -136,10 +187,10 @@ public class DatabaseService {
 	}
 
 	/*
-	 * List of headers (level 0) with expandable SubItems (level 1) with SubItems.
+	 * List of Headers (level 0) with Expandable SubItems (level 1) with SubItems.
 	 */
 	public void createExpandableMultiLevelDatabase(int size) {
-		databaseType = 3;
+		databaseType = DatabaseType.EXPANDABLE_MULTI_LEVEL;
 		mItems.clear();
 		for (int i = 0; i < size; i++) {
 			mItems.add(newExpandableLevelItem(i + 1));//With expansion level 1
@@ -150,25 +201,32 @@ public class DatabaseService {
 	 * List of Simple Items with Header attached. Only Simple Items will be added to the list.
 	 */
 	public void createHeadersSectionsDatabase(int size) {
-		databaseType = 4;
+		databaseType = DatabaseType.HEADERS_SECTIONS;
 		HeaderItem header = null;
-		mItems.clear(); int lastHeaderId = 0;
+		mItems.clear();
+		int lastHeaderId = 0;
 		for (int i = 0; i < size; i++) {
 			header = i % Math.round(size / HEADERS) == 0 ? newHeader(++lastHeaderId) : header;
 			mItems.add(newSimpleItem(i + 1, header));
 		}
 	}
 
+	/*
+	 * List of Instagram items
+	 */
 	public void createInstagramHeadersDatabase(int startSize) {
-		databaseType = 5;
+		databaseType = DatabaseType.INSTAGRAM;
 		mItems.clear();
 		for (int i = 0; i < startSize; i++) {
 			mItems.add(newInstagramItem(i + 1));
 		}
 	}
 
+	/*
+	 * List of CardView items
+	 */
 	public void createStaggeredDatabase(Context context) {
-		databaseType = 6;
+		databaseType = DatabaseType.LAYOUT_STAGGERED;
 		mItems.clear();
 
 		if (headers == null) {
@@ -308,6 +366,7 @@ public class DatabaseService {
 	 * @return Always a copy of the original list.
 	 */
 	public List<AbstractFlexibleItem> getDatabaseList() {
+		Log.i(TAG, "Database Type: " + databaseType);
 		//Return a copy of the DB: we will perform some tricky code on this list.
 		return new ArrayList<>(mItems);
 	}
@@ -446,8 +505,9 @@ public class DatabaseService {
 			if (lhs instanceof StaggeredHeaderItem && rhs instanceof StaggeredHeaderItem) {
 				result = ((StaggeredHeaderItem) lhs).getOrder() - ((StaggeredHeaderItem) rhs).getOrder();
 			} else if (lhs instanceof StaggeredItem && rhs instanceof StaggeredItem) {
-				result = ((StaggeredItem) lhs).getHeader().getOrder() -((StaggeredItem) rhs).getHeader().getOrder();
-				if (result == 0) result = ((StaggeredItem) lhs).getId() - ((StaggeredItem) rhs).getId();
+				result = ((StaggeredItem) lhs).getHeader().getOrder() - ((StaggeredItem) rhs).getHeader().getOrder();
+				if (result == 0)
+					result = ((StaggeredItem) lhs).getId() - ((StaggeredItem) rhs).getId();
 			} else if (lhs instanceof StaggeredItem && rhs instanceof StaggeredHeaderItem) {
 				result = ((StaggeredItem) lhs).getHeader().getOrder() - ((StaggeredHeaderItem) rhs).getOrder();
 			} else if (lhs instanceof StaggeredHeaderItem && rhs instanceof StaggeredItem) {

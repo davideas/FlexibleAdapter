@@ -2,6 +2,7 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -76,11 +77,17 @@ public class FragmentHeadersSections extends AbstractFragment
 		//Restore FAB icon
 		FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
 		fab.setImageResource(R.drawable.fab_add);
+		ViewCompat.animate(fab)
+				.scaleX(1f).scaleY(1f)
+				.alpha(1f).setDuration(100)
+				.setStartDelay(300L)
+				.start();
 
 		//Initialize Adapter and RecyclerView
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setRemoveOrphanHeaders(false)
+				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
@@ -108,6 +115,7 @@ public class FragmentHeadersSections extends AbstractFragment
 				.enableStickyHeaders();
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//Add sample HeaderView items on the top (not belongs to the library)

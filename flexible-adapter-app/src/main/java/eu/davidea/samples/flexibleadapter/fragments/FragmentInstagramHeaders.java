@@ -89,6 +89,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 				.setEndlessScrollThreshold(1);//Default=1
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 	}
 

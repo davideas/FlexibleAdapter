@@ -19,6 +19,7 @@ import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.samples.flexibleadapter.models.LayoutItem;
 import eu.davidea.samples.flexibleadapter.models.OverallItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
+import eu.davidea.utils.Utils;
 
 /**
  * This is a custom implementation extending FlexibleAdapter. {@code AbstractFlexibleItem} is
@@ -121,11 +122,11 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 			if (item.getTitle() != null) {
 				vHolder.mTitle.setText(item.getTitle());
-				vHolder.mTitle.setEnabled(item.isEnabled());
+				vHolder.mTitle.setEnabled(isEnabled(position));
 			}
 			if (item.getDescription() != null) {
-				vHolder.mSubtitle.setText(item.getDescription());
-				vHolder.mSubtitle.setEnabled(item.isEnabled());
+				vHolder.mSubtitle.setText(Utils.fromHtmlCompat(item.getDescription()));
+				vHolder.mSubtitle.setEnabled(isEnabled(position));
 			}
 			if (item.getIcon() != null) {
 				vHolder.mIcon.setImageDrawable(item.getIcon());
