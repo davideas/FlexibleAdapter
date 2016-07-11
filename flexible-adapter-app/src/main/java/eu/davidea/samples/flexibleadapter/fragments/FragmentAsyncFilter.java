@@ -118,7 +118,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 	@Override
 	public void performFabAction() {
 		if (mSize < 0) {
-			DatabaseService.getInstance().createConfigurationDatabase();
+			DatabaseService.getInstance().createConfigurationDatabase(getResources());
 			mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
 			FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
 			fab.setImageResource(R.drawable.fab_add);
