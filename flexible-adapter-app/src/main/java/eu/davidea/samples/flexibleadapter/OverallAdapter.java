@@ -122,9 +122,11 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 			if (item.getTitle() != null) {
 				vHolder.mTitle.setText(item.getTitle());
+				vHolder.mTitle.setEnabled(isEnabled(position));
 			}
 			if (item.getDescription() != null) {
 				vHolder.mSubtitle.setText(Utils.fromHtmlCompat(item.getDescription()));
+				vHolder.mSubtitle.setEnabled(isEnabled(position));
 			}
 			if (item.getIcon() != null) {
 				vHolder.mIcon.setImageDrawable(item.getIcon());

@@ -65,6 +65,7 @@ import eu.davidea.samples.flexibleadapter.models.OverallItem;
 import eu.davidea.samples.flexibleadapter.models.SimpleItem;
 import eu.davidea.samples.flexibleadapter.models.StaggeredItem;
 import eu.davidea.samples.flexibleadapter.models.SubItem;
+import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.samples.flexibleadapter.services.DatabaseType;
 import eu.davidea.utils.ScrollAwareFABBehavior;
@@ -205,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements
 		//Swipe down to force synchronize
 		//mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
 		mSwipeRefreshLayout.setDistanceToTriggerSync(390);
-		mSwipeRefreshLayout.setEnabled(true);
+		//mSwipeRefreshLayout.setEnabled(true); Controlled by fragments!
 		mSwipeRefreshLayout.setColorSchemeResources(
 				android.R.color.holo_purple, android.R.color.holo_blue_light,
 				android.R.color.holo_green_light, android.R.color.holo_orange_light);
@@ -288,21 +289,17 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentInstagramHeaders.newInstance();
 		} else if (id == R.id.nav_headers_and_sections) {
 			mFragment = FragmentHeadersSections.newInstance(2);
-			showFab();
 			fabBehavior.setEnabled(true);
 		} else if (id == R.id.nav_selection_modes) {
 			mFragment = FragmentSelectionModes.newInstance(2);
 		} else if (id == R.id.nav_filter) {
-			mFragment = FragmentAsyncFilter.newInstance(-1);
-			showFab();
-			fabBehavior.setEnabled(true);
+			mFragment = FragmentAsyncFilter.newInstance(true);
 		} else if (id == R.id.nav_multi_level_expandable) {
 			mFragment = FragmentExpandableMultiLevel.newInstance(2);
 		} else if (id == R.id.nav_expandable_sections) {
 			mFragment = FragmentExpandableSections.newInstance(3);
 		} else if (id == R.id.nav_staggered) {
 			mFragment = FragmentStaggeredLayout.newInstance(2);
-			showFab();
 			fabBehavior.setEnabled(true);
 		} else if (id == R.id.nav_about) {
 			MessageDialogFragment.newInstance(
@@ -399,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements
 			mAdapter.setSearchText(newText);
 			//Fill and Filter mItems with your custom list and automatically animate the changes
 			//Watch out! The original list must be a copy
-			mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), 200L);
+			mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), DatabaseConfiguration.delay);
 		}
 		//Disable SwipeRefresh if search is active!!
 		mSwipeRefreshLayout.setEnabled(!mAdapter.hasSearchText());
@@ -504,7 +501,6 @@ public class MainActivity extends AppCompatActivity implements
 			showFab();
 		}
 		//TODO: Add toggle for mAdapter.toggleFastScroller();
-		//TODO: Add dialog configuration settings
 
 		return super.onOptionsItemSelected(item);
 	}
@@ -526,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements
 			//Notify the active callbacks or implement a custom action onClick
 			if (!(flexibleItem instanceof ExpandableItem) && flexibleItem instanceof SimpleItem
 					|| flexibleItem instanceof SubItem) {
-				//TODO FOR YOU: call your custom Action
+				//TODO FOR YOU: call your custom Action on item click
 				String title = extractTitleFrom(flexibleItem);
 				EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
 			}
@@ -536,7 +532,8 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemLongClick(int position) {
-		mActionModeHelper.onLongClick(this, position);
+		if (!(mFragment instanceof FragmentAsyncFilter))
+			mActionModeHelper.onLongClick(this, position);
 	}
 
 //	/**
@@ -646,9 +643,8 @@ public class MainActivity extends AppCompatActivity implements
 
 	/**
 	 * Handling RecyclerView when empty.
-	 * <br/><br/>
-	 * <b>Note:</b> The order, how the 3 Views (RecyclerView, EmptyView, FastScroller)
-	 * are placed in the Layout, is important!
+	 * <p><b>Note:</b> The order, how the 3 Views (RecyclerView, EmptyView, FastScroller)
+	 * are placed in the Layout, is important!</p>
 	 */
 	@Override
 	public void onUpdateEmptyView(int size) {
@@ -664,6 +660,9 @@ public class MainActivity extends AppCompatActivity implements
 			emptyView.setAlpha(0);
 			ViewCompat.animate(emptyView).alpha(1);
 			fastScroller.setVisibility(View.GONE);
+		}
+		if (mAdapter != null && mAdapter.hasSearchText()) {
+			Snackbar.make(findViewById(R.id.main_view), "Filtered " + size + " items", Snackbar.LENGTH_SHORT).show();
 		}
 	}
 

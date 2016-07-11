@@ -32,30 +32,24 @@
 			android:id="@+id/nav_endless_scrolling"
 			android:icon="@drawable/ic_playlist_play_grey600_24dp"
 			android:title="@string/endless_scrolling"/>
-
-		<item android:title="@string/special_use_cases">
-			<menu>
-				<item
-					android:id="@+id/nav_instagram_headers"
-					android:icon="@drawable/ic_instagram_grey600_24dp"
-					android:title="@string/instagram_headers"/>
-				<item
-					android:id="@+id/nav_model_holders"
-					android:enabled="false"
-					android:icon="@drawable/ic_select_inverse_grey600_24dp"
-					android:title="@string/model_holders"/>
-				<item
-					android:id="@+id/nav_horizontal"
-					android:enabled="false"
-					android:icon="@drawable/ic_view_column_grey600_24dp"
-					android:title="@string/horizontal"/>
-				<item
-					android:id="@+id/nav_staggered"
-					android:icon="@drawable/ic_dashboard_grey600_24dp"
-					android:title="@string/staggered_layout"/>
-			</menu>
-		</item>
-
+		<item
+			android:id="@+id/nav_instagram_headers"
+			android:icon="@drawable/ic_instagram_grey600_24dp"
+			android:title="@string/instagram_headers"/>
+		<item
+			android:id="@+id/nav_model_holders"
+			android:enabled="false"
+			android:icon="@drawable/ic_select_inverse_grey600_24dp"
+			android:title="@string/model_holders"/>
+		<item
+			android:id="@+id/nav_staggered"
+			android:icon="@drawable/ic_dashboard_grey600_24dp"
+			android:title="@string/staggered_layout"/>
+		<item
+			android:id="@+id/nav_horizontal"
+			android:enabled="false"
+			android:icon="@drawable/ic_view_column_grey600_24dp"
+			android:title="@string/horizontal"/>
 	</group>
 
 	<!--<item android:title="Options">-->

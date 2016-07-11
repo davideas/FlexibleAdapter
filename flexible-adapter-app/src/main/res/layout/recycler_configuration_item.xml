@@ -3,8 +3,9 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:layout_margin="@dimen/activity_horizontal_margin"
+	android:layout_height="wrap_content"
+	android:padding="@dimen/activity_horizontal_margin"
+	android:background="?selectableItemBackground"
 	android:orientation="horizontal">
 
 	<LinearLayout
@@ -17,30 +18,21 @@
 			android:id="@+id/title"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:textAppearance="@style/TextAppearance.AppCompat.Widget.Switch"
+			android:textAppearance="@style/TextAppearance.AppCompat.Title"
 			tools:text="@string/config_notify_move"/>
 
 		<TextView
-			android:id="@+id/description"
+			android:id="@+id/subtitle"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="@dimen/margin_top"
-			android:ellipsize="end"
-			android:maxLines="3"
+			android:layout_marginTop="@dimen/margin_top_medium"
+			android:textAppearance="@style/TextAppearance.AppCompat.Small"
 			tools:text="@string/config_notify_move_description"/>
-
-		<TextView
-			android:id="@+id/more"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textColor="?colorAccent"
-			tools:text="@string/more"/>
 
 		<SeekBar
 			android:id="@+id/seek_bar"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_horizontal"
+			android:layout_height="match_parent"
 			android:layout_marginTop="@dimen/margin_top"/>
 
 	</LinearLayout>
@@ -49,9 +41,6 @@
 		android:id="@+id/switch_box"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_marginLeft="@dimen/margin_left"
-		android:layout_marginStart="@dimen/margin_left"
-		android:splitTrack="true"
 		tools:visibility="visible"/>
 
 </LinearLayout>

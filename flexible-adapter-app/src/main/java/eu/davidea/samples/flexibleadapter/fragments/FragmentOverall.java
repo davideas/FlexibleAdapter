@@ -79,6 +79,7 @@ public class FragmentOverall extends AbstractFragment {
 		}, 1500L);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//Add sample HeaderView items on the top (not belongs to the library)

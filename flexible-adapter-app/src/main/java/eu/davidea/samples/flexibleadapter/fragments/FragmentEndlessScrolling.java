@@ -105,6 +105,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//EndlessScrollListener - OnLoadMore (v5.0.0)

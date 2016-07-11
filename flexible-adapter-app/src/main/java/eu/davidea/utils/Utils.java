@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -167,6 +168,15 @@ public final class Utils {
 			return Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
 		} else {
 			return Html.fromHtml(text);
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void textAppearanceCompat(TextView textView, int resId) {
+		if (hasMarshmallow()) {
+			textView.setTextAppearance(resId);
+		} else {
+			textView.setTextAppearance(textView.getContext(), resId);
 		}
 	}
 

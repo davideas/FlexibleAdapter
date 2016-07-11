@@ -95,6 +95,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 				.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//Add sample HeaderView items on the top (not belongs to the library)

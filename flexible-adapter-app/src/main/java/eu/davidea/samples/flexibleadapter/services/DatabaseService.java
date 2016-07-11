@@ -2,6 +2,7 @@ package eu.davidea.samples.flexibleadapter.services;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +39,7 @@ import eu.davidea.samples.flexibleadapter.models.SubItem;
  */
 public class DatabaseService {
 
+	private static final String TAG = DatabaseService.class.getSimpleName();
 	private static DatabaseService mInstance;
 	private static final int SUB_ITEMS = 4, HEADERS = 30;
 	private DatabaseType databaseType = DatabaseType.NONE;
@@ -79,6 +81,7 @@ public class DatabaseService {
 	public void createOverallDatabase(Resources resources) {
 		databaseType = DatabaseType.OVERALL;
 		mItems.clear();
+
 		mItems.add(new OverallItem(R.id.nav_selection_modes, resources.getString(R.string.selection_modes))
 				.withDescription(resources.getString(R.string.selection_modes_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_select_all_grey600_24dp)));
@@ -125,33 +128,39 @@ public class DatabaseService {
 		databaseType = DatabaseType.CONFIGURATION;
 		mItems.clear();
 
-		mItems.add(new ConfigurationItem("number_of_items", ConfigurationItem.SEEK_BAR)
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.TITLE, ConfigurationItem.NONE)
+				.withTitle(resources.getString(R.string.config_title))
+				.withDescription(resources.getString(R.string.config_description))
+		);
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.NUMBER_OF_ITEMS, ConfigurationItem.SEEK_BAR)
 				.withTitle(resources.getString(R.string.config_num_of_items))
-				.withValue(100000)//items
-				.withMaxValue(500000)
+				.withValue(DatabaseConfiguration.size)//items
+				.withMaxValue(DatabaseConfiguration.maxSize)
 				.withStepValue(50)
 		);
-		mItems.add(new ConfigurationItem("delay", ConfigurationItem.SEEK_BAR)
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.SEARCH_DELAY, ConfigurationItem.SEEK_BAR)
 				.withTitle(resources.getString(R.string.config_delay))
 				.withDescription(resources.getString(R.string.config_delay_description))
-				.withValue(300)//milliseconds
-				.withMaxValue(1000)
+				.withValue(DatabaseConfiguration.delay)//milliseconds
+				.withMaxValue(DatabaseConfiguration.maxSearchDelay)
 				.withStepValue(10)
 		);
-		mItems.add(new ConfigurationItem("animate_to_limit", ConfigurationItem.SEEK_BAR)
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.ANIMATE_TO_LIMIT, ConfigurationItem.SEEK_BAR)
 				.withTitle(resources.getString(R.string.config_animate_to_limit))
 				.withDescription(resources.getString(R.string.config_animate_to_limit_description))
-				.withValue(5000)//limit items
+				.withValue(DatabaseConfiguration.animateToLimit)//limit items
+				.withMaxValue(DatabaseConfiguration.maxSize)
 				.withStepValue(50)
 		);
-		mItems.add(new ConfigurationItem("notify_change", ConfigurationItem.SWITCH)
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.NOTIFY_CHANGE, ConfigurationItem.SWITCH)
 				.withTitle(resources.getString(R.string.config_notify_change))
 				.withDescription(resources.getString(R.string.config_notify_change_description))
-				.withValue(1)//true
+				.withValue(DatabaseConfiguration.notifyChange ? 1 : 0)
 		);
-		mItems.add(new ConfigurationItem("notify_move", ConfigurationItem.SWITCH)
+		mItems.add(new ConfigurationItem(DatabaseConfiguration.NOTIFY_MOVE, ConfigurationItem.SWITCH)
 				.withTitle(resources.getString(R.string.config_notify_move))
 				.withDescription(resources.getString(R.string.config_notify_move_description))
+				.withValue(DatabaseConfiguration.notifyMove ? 1 : 0)
 		);
 	}
 
@@ -357,6 +366,7 @@ public class DatabaseService {
 	 * @return Always a copy of the original list.
 	 */
 	public List<AbstractFlexibleItem> getDatabaseList() {
+		Log.i(TAG, "Database Type: " + databaseType);
 		//Return a copy of the DB: we will perform some tricky code on this list.
 		return new ArrayList<>(mItems);
 	}

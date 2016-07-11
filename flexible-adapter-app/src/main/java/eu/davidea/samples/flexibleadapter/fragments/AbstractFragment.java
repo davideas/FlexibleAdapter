@@ -25,7 +25,7 @@ public abstract class AbstractFragment extends Fragment {
 
 	public static final String TAG = AbstractFragment.class.getSimpleName();
 	protected static final String ARG_COLUMN_COUNT = "column_count";
-	protected static final String ARG_DYNAMIC_LIST = "dynamic_list";
+	protected static final String ARG_CONFIGURE = "dynamic_list";
 
 	protected OnFragmentInteractionListener mListener;
 	protected int mColumnCount = 2;

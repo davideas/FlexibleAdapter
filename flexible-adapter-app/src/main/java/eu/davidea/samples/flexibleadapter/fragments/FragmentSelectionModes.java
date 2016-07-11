@@ -123,6 +123,7 @@ public class FragmentSelectionModes extends AbstractFragment
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_SINGLE);
 
 		//Add sample HeaderView items on the top (not belongs to the library)

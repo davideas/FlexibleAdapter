@@ -2,7 +2,8 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentManager;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +19,7 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -31,13 +33,15 @@ public class FragmentAsyncFilter extends AbstractFragment {
 
 	public static final String TAG = FragmentAsyncFilter.class.getSimpleName();
 
+	private FloatingActionButton mFab;
 	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
-	private int mSize;
+	private boolean configure;
+	private MenuItem mSearchView;
 
-	public static FragmentAsyncFilter newInstance(int size) {
+	public static FragmentAsyncFilter newInstance(boolean configure) {
 		FragmentAsyncFilter fragment = new FragmentAsyncFilter();
 		Bundle args = new Bundle();
-		args.putInt(ARG_DYNAMIC_LIST, size);
+		args.putBoolean(ARG_CONFIGURE, configure);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -54,7 +58,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments() != null) {
-			mSize = getArguments().getInt(ARG_DYNAMIC_LIST);
+			configure = getArguments().getBoolean(ARG_CONFIGURE);
 		}
 	}
 
@@ -63,17 +67,21 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		super.onActivityCreated(savedInstanceState);
 
 		//Restore FAB icon
-		FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+		mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+		mFab.setImageResource(R.drawable.ic_settings_white_24dp);
+		ViewCompat.animate(mFab)
+				.scaleX(1f).scaleY(1f)
+				.alpha(1f).setDuration(100)
+				.setStartDelay(300L)
+				.start();
 
-		if (mSize == -1) {
+		if (configure) {
 			DatabaseService.getInstance().clear();
 			mAdapter = new FlexibleAdapter<>(null, getActivity());
-			fab.setImageResource(R.drawable.fab_add);
 		} else {
 			//Create Database with custom size
-			DatabaseService.getInstance().createEndlessDatabase(mSize);//N. of items
+			DatabaseService.getInstance().createEndlessDatabase(DatabaseConfiguration.size);//N. of items
 			mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
-			fab.setImageResource(R.drawable.ic_settings_white_24dp);
 		}
 
 		initializeRecyclerView();
@@ -84,11 +92,10 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setAnimateToLimit(Integer.MAX_VALUE)//Size limit = MAX_VALUE will always animate the changes
-				.setNotifyMoveOfFilteredItems(false)//When true, filtering on big list is very slow!
-				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
-				.setAnimationOnScrolling(true)
-				.setAnimationOnReverseScrolling(true);
+		mAdapter.setAnimateToLimit(DatabaseConfiguration.animateToLimit)//Size limit = MAX_VALUE will always animate the changes
+				.setNotifyMoveOfFilteredItems(DatabaseConfiguration.notifyMove)//When true, filtering on big list is very slow!
+				.setNotifyChangeOfUnfilteredItems(DatabaseConfiguration.notifyChange)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
+				.setOnlyEntryAnimation(true);//TODO: To test entry Animation
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
@@ -105,10 +112,12 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		//mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider));
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
-				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
-
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		if (!configure) {
+			mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
+					Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+		}
+		swipeRefreshLayout.setEnabled(!configure);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//Settings for FlipView
@@ -117,16 +126,17 @@ public class FragmentAsyncFilter extends AbstractFragment {
 
 	@Override
 	public void performFabAction() {
-		if (mSize < 0) {
+		if (configure) {
+			configure = false;
 			DatabaseService.getInstance().createConfigurationDatabase(getResources());
-			mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
-			FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-			fab.setImageResource(R.drawable.fab_add);
+			mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), false);//false will call notifyDataSetChange(), instant refresh!
+			mFab.setImageResource(R.drawable.ic_check_white_24dp);
+			mSearchView.setVisible(false);
 		} else {
-			mAdapter.onDetachedFromRecyclerView(mRecyclerView);
-			//Inflate the new Fragment with the new RecyclerView and a new Adapter
-			FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-			fragmentManager.beginTransaction().replace(R.id.recycler_view_container, FragmentAsyncFilter.newInstance(-1)).commit();
+			Snackbar.make(getView(), "Created list with " + DatabaseConfiguration.size + " items", Snackbar.LENGTH_LONG).show();
+			onActivityCreated(null);
+			mSearchView.setVisible(mAdapter.getItemCount() > 0);
+			configure = true;
 		}
 	}
 
@@ -141,7 +151,8 @@ public class FragmentAsyncFilter extends AbstractFragment {
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-		menu.findItem(R.id.action_search).setVisible(mSize >= 0);
+		mSearchView = menu.findItem(R.id.action_search);
+		mSearchView.setVisible(!configure);
 	}
 
 	@SuppressWarnings("unchecked")

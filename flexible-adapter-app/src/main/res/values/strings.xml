@@ -58,24 +58,25 @@
 	<string name="status_e">STATUS E</string>
 
 	<!-- Configuration for Dynamic List -->
-	<string name="config_num_of_items">Number of items: %1$s</string>
-	<string name="config_animate_to_limit">AnimateTo limit (items): %1$s</string>
+	<string name="config_title">Configure the list ...</string>
+	<string name="config_description">... apply the configuration, then, try to filter the list with few and many items.</string>
+	<string name="config_num_of_items">Number of items:</string>
+	<string name="config_animate_to_limit"><![CDATA[<i>AnimateTo</i> limit (items):]]></string>
 	<string name="config_animate_to_limit_description"><![CDATA[Tunes the limit after the which
 the synchronization animations, occurred during updateDataSet and filter operations, are skipped
-and notifyDataSetChanged() will be called instead.]]></string>
-	<string name="config_delay">Delay (ms): %1$s</string>
-	<string name="config_delay_description">Waiting time before the search process starts.</string>
+and <i>notifyDataSetChanged()</i> will be called instead.<br/>The limit is checked against the new
+filtered list.]]></string>
+	<string name="config_delay">Search delay (ms):</string>
+	<string name="config_delay_description">Waiting time before the search process starts. The time is reset at each new typing.</string>
 	<string name="config_notify_change">Notify change of unfiltered items</string>
-	<string name="config_notify_change_description"><![CDATA[rebound the items that remain unfiltered.
-<p>If the items have highlighted text, those items must be refreshed in order to change the
-highlighted text back to normal. This happens systematically when searchText is reduced in
-length by the user.</p>]]></string>
+	<string name="config_notify_change_description"><![CDATA[Rebound the items that remain unfiltered.
+<br/>If the items have highlighted text, those items must be refreshed in order to change the
+text back to normal. This happens systematically when searchText is reduced in length by the user.]]></string>
 	<string name="config_notify_move">Notify move of filtered items (Nicely animate the moved items)</string>
 	<string name="config_notify_move_description"><![CDATA[Performs a further step to nicely
-animate the moved items.<p>The process is <b>very slow</b> on big list of the order of ~3000
-items, due to the calculation to find the correct positions. Use with caution!</p>The slowness
-is more visible when the searchText is cleared out.<p>Try to disable to improve performance</p>]]></string>
-	<string name="more">more</string>
+animate the moved items.<br/>The process is <b>very slow</b> on big list of the order of ~3-5000
+items and higher, due to calculate the correct position for each item to shift. Use with caution!
+<br/>The slowness is higher when the searchText is cleared out. Try to disable to improve performance]]></string>
 
 	<!-- Menu Drawers -->
 	<string name="overall">Overall</string>
@@ -97,8 +98,6 @@ is more visible when the searchText is cleared out.<p>Try to disable to improve 
 
 	<string name="endless_scrolling">Endless Scrolling</string>
 	<string name="endless_scrolling_description">EndlessScrolling + Drag + Swipe-To-Delete w/rear-views + Scroll Animations + ActionModeHelper + UndoHelper</string>
-
-	<string name="special_use_cases">Special use cases</string>
 
 	<string name="instagram_headers">Instagram headers</string>
 	<string name="instagram_headers_description"><![CDATA[1 sticky header for each item + Endless Scrolling.<br/><font color="#ff4081"><b>Internet is required.</b></font>]]></string>
