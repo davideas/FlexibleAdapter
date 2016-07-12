@@ -21,7 +21,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 	private Drawable mDivider;
 	private int mSectionOffset;
-	private boolean mDrawOver = false;
+	private boolean mDrawOver = false, withOffset = false;
 
 	private static final int[] ATTRS = new int[]{
 			android.R.attr.listDivider
@@ -50,7 +50,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 	/**
 	 * Custom divider with gap between sections (in dpi).
-	 * Passing a negative divider will only use the gap value for sections.
+	 * Passing a negative divider will only use
 	 *
 	 * @since 5.0.0-b6
 	 */
@@ -68,13 +68,20 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 * thus  appear <i>over</i> the views.</p>
 	 * Default value is false (drawn underneath).
 	 *
-	 * @param mDrawOver true to draw after the item has been added, false to draw underneath the item
+	 * @param drawOver true to draw after the item has been added, false to draw underneath the item
 	 * @return this Divider, so the call can be chained
-	 * @since 5.0.0-b7
+	 * @since 5.0.0-b8
 	 */
-	public DividerItemDecoration setDrawOver(boolean mDrawOver) {
-		this.mDrawOver = mDrawOver;
+	public DividerItemDecoration withDrawOver(boolean drawOver) {
+		this.mDrawOver = drawOver;
 		return this;
+	}
+
+	/**
+	 * @deprecated use {@link #withDrawOver(boolean)} instead.
+	 */
+	public DividerItemDecoration setDrawOver(boolean drawOver) {
+		return withDrawOver(drawOver);
 	}
 
 	@Override
@@ -124,12 +131,25 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	}
 
 	/**
+	 * Applies the physical offset between items, of the same size of the divider previously set.
+	 *
+	 * @param withOffset true to leave space between items, false divider will be drawn overlapping
+	 *                   the items
+	 * @return this DividerItemDecoration instance so the call can be chained
+	 * @since 5.0.0-b8
+	 */
+	public DividerItemDecoration withOffset(boolean withOffset) {
+		this.withOffset = withOffset;
+		return this;
+	}
+
+	/**
 	 * @since 5.0.0-b4
 	 */
 	@SuppressWarnings({"ConstantConditions", "unchecked", "SuspiciousNameCombination"})
 	@Override
 	public void getItemOffsets(Rect outRect, View view, RecyclerView recyclerView, RecyclerView.State state) {
-		int offset = (mDivider != null ? mDivider.getIntrinsicHeight() : 0);
+		int offset = (mDivider != null && withOffset ? mDivider.getIntrinsicHeight() : 0);
 		if (mSectionOffset > 0 && recyclerView.getAdapter() instanceof FlexibleAdapter) {
 			FlexibleAdapter flexibleAdapter = (FlexibleAdapter) recyclerView.getAdapter();
 			int position = recyclerView.getChildAdapterPosition(view);
