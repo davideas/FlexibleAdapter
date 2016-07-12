@@ -16,11 +16,9 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.animation.Animator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +27,7 @@ import android.view.ViewParent;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnStickyHeaderChangeListener;
 import eu.davidea.flexibleadapter.items.IHeader;
+import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -170,7 +169,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 				int adapterPos = mRecyclerView.getChildAdapterPosition(nextChild);
 				int nextHeaderPosition = getHeaderPosition(adapterPos);
 				if (mHeaderPosition != nextHeaderPosition) {
-					if (getOrientation(mRecyclerView) == OrientationHelper.HORIZONTAL) {
+					if (Utils.getOrientation(mRecyclerView) == OrientationHelper.HORIZONTAL) {
 						if (nextChild.getLeft() > 0) {
 							int headerWidth = mStickyHolderLayout.getMeasuredWidth();
 							headerOffsetX = Math.min(nextChild.getLeft() - headerWidth, 0);
@@ -286,7 +285,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 			//Calculate width and height
 			int widthSpec;
 			int heightSpec;
-			if (getOrientation(mRecyclerView) == OrientationHelper.VERTICAL) {
+			if (Utils.getOrientation(mRecyclerView) == OrientationHelper.VERTICAL) {
 				widthSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getWidth(), View.MeasureSpec.EXACTLY);
 				heightSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getHeight(), View.MeasureSpec.UNSPECIFIED);
 			} else {
@@ -307,16 +306,6 @@ public class StickyHeaderHelper extends OnScrollListener {
 			headerView.layout(0, 0, headerView.getMeasuredWidth(), headerView.getMeasuredHeight());
 		}
 		return holder;
-	}
-
-	private static int getOrientation(RecyclerView recyclerView) {
-		RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-		if (layoutManager instanceof LinearLayoutManager) {
-			return ((LinearLayoutManager) layoutManager).getOrientation();
-		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).getOrientation();
-		}
-		return OrientationHelper.HORIZONTAL;
 	}
 
 }

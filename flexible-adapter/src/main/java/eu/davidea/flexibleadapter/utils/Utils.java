@@ -23,6 +23,10 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -112,6 +116,22 @@ public final class Utils {
 			}
 		}
 		return colorAccent;
+	}
+
+	/**
+	 * Finds the layout orientation of the RecyclerView.
+	 *
+	 * @param recyclerView the RV instance
+	 * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
+	 */
+	public static int getOrientation(RecyclerView recyclerView) {
+		RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+		if (layoutManager instanceof LinearLayoutManager) {
+			return ((LinearLayoutManager) layoutManager).getOrientation();
+		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).getOrientation();
+		}
+		return OrientationHelper.HORIZONTAL;
 	}
 
 }

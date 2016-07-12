@@ -6,6 +6,6 @@
 		android:width="1dp"
 		android:height="16dp" />
  
-	<solid android:color="@color/list_choice_pressed_bg_light" />
+	<solid android:color="@color/material_color_grey_100" />
  
 </shape>

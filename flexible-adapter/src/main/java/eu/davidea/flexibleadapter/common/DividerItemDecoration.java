@@ -10,18 +10,17 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.ISectionable;
+import eu.davidea.flexibleadapter.utils.Utils;
 
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 	private Drawable mDivider;
-	private int mGapWidth;
+	private int mSectionOffset;
 	private boolean mDrawOver = false;
 
 	private static final int[] ATTRS = new int[]{
@@ -55,9 +54,9 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 * @since 5.0.0-b6
 	 */
 	public DividerItemDecoration(@NonNull Context context, @DrawableRes int resId,
-								 @IntRange(from = 0) int gapWidth) {
+								 @IntRange(from = 0) int sectionOffset) {
 		if (resId > 0) mDivider = ContextCompat.getDrawable(context, resId);
-		setSectionGapWidth((int) (context.getResources().getDisplayMetrics().density * gapWidth));
+		mSectionOffset = (int) (context.getResources().getDisplayMetrics().density * sectionOffset);
 	}
 
 	/**
@@ -111,14 +110,16 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	}
 
 	/**
-	 * @param gapWidth width of the gap between sections, in pixel. Must be positive.
+	 * @param gap width of the gap between sections, in pixel. Must be positive.
 	 * @since 5.0.0-b6
+	 * @deprecated Use Constructor instead.
 	 */
-	public void setSectionGapWidth(@IntRange(from = 0) int gapWidth) {
-		if (gapWidth < 0) {
-			throw new IllegalArgumentException("Invalid section gap width [<0]: " + gapWidth);
+	@Deprecated
+	public void setSectionGapWidth(@IntRange(from = 0) int gap) {
+		if (gap < 0) {
+			throw new IllegalArgumentException("Invalid section gap width [<0]: " + gap);
 		}
-		mGapWidth = gapWidth;
+		mSectionOffset = gap;
 	}
 
 	/**
@@ -126,29 +127,24 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 */
 	@SuppressWarnings({"ConstantConditions", "unchecked", "SuspiciousNameCombination"})
 	@Override
-	public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-		if (mGapWidth > 0 && parent.getAdapter() instanceof FlexibleAdapter) {
-			FlexibleAdapter flexibleAdapter = (FlexibleAdapter) parent.getAdapter();
-			int position = parent.getChildAdapterPosition(view);
+	public void getItemOffsets(Rect outRect, View view, RecyclerView recyclerView, RecyclerView.State state) {
+		int offset = mDivider.getIntrinsicHeight();
+		if (mSectionOffset > 0 && recyclerView.getAdapter() instanceof FlexibleAdapter) {
+			FlexibleAdapter flexibleAdapter = (FlexibleAdapter) recyclerView.getAdapter();
+			int position = recyclerView.getChildAdapterPosition(view);
 
 			//Only ISectionable items can finish with a gap and only if next item is a IHeader item
 			if (flexibleAdapter.getItem(position) instanceof ISectionable &&
 					(flexibleAdapter.isHeader(flexibleAdapter.getItem(position + 1)) ||
-							position >= parent.getAdapter().getItemCount() - 1)) {
+							position >= recyclerView.getAdapter().getItemCount() - 1)) {
 
-				int orientation;
-				RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
-				if (layoutManager instanceof LinearLayoutManager) {
-					orientation = ((LinearLayoutManager) layoutManager).getOrientation();
-				} else {
-					orientation = ((StaggeredGridLayoutManager) layoutManager).getOrientation();
-				}
-				if (orientation == RecyclerView.VERTICAL) {
-					outRect.set(0, 0, 0, mGapWidth);
-				} else {
-					outRect.set(0, 0, mGapWidth, 0);
-				}
+				offset += mSectionOffset;
 			}
+		}
+		if (Utils.getOrientation(recyclerView) == RecyclerView.VERTICAL) {
+			outRect.set(0, 0, 0, offset);
+		} else {
+			outRect.set(0, 0, offset, 0);
 		}
 	}
 
