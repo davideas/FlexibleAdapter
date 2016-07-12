@@ -10,9 +10,23 @@
 	      android:animateLayoutChanges="true"
 	      app:actionViewClass="android.support.v7.widget.SearchView"/>
 
+	<item android:id="@+id/action_entry_animation"
+		  android:title="@string/scrolling_entry_animation"
+		  android:checkable="true"
+		  android:checked="true"
+		  app:showAsAction="never"/>
+
+	<item android:id="@+id/action_animation"
+		  android:title="@string/scrolling_animation"
+		  android:checkable="true"
+		  android:checked="false"
+		  android:enabled="false"
+		  app:showAsAction="never"/>
+
 	<item android:id="@+id/action_reverse"
-	      android:title="@string/forward_scrolling"
-	      android:icon="@drawable/ic_sort_descending_white_24dp"
-	      app:showAsAction="never"/>
+		  android:title="@string/reverse_scrolling"
+		  android:checkable="true"
+		  android:enabled="false"
+		  app:showAsAction="never"/>
 
 </menu>

@@ -16,9 +16,15 @@
 	      android:icon="@drawable/ic_view_grid_white_24dp"
 	      app:showAsAction="always"/>
 
+	<item android:id="@+id/action_animation"
+		  android:title="@string/scrolling_animation"
+		  android:checkable="true"
+		  android:checked="true"
+		  app:showAsAction="never"/>
+
 	<item android:id="@+id/action_reverse"
-	      android:title="@string/forward_scrolling"
-	      android:icon="@drawable/ic_sort_descending_white_24dp"
+	      android:title="@string/reverse_scrolling"
+		  android:checkable="true"
 	      app:showAsAction="never"/>
 
 </menu>

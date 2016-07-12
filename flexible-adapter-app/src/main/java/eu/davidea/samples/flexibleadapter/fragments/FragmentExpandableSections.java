@@ -155,7 +155,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 		if (headersSticky != null) {
 			if (mAdapter.areHeadersShown()) {
 				headersSticky.setVisible(true);
-				headersSticky.setTitle(mAdapter.areHeadersSticky() ? R.string.scroll_headers : R.string.sticky_headers);
+				headersSticky.setChecked(mAdapter.areHeadersSticky());
 			} else {
 				headersSticky.setVisible(false);
 			}

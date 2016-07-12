@@ -231,10 +231,10 @@ public class FragmentHeadersSections extends AbstractFragment
 		MenuItem headersSticky = menu.findItem(R.id.action_sticky_headers);
 		if (headersSticky != null) {
 			if (mAdapter.areHeadersShown()) {
-				headersSticky.setVisible(true);
-				headersSticky.setTitle(mAdapter.areHeadersSticky() ? R.string.scroll_headers : R.string.sticky_headers);
+				headersSticky.setEnabled(true);
+				headersSticky.setChecked(mAdapter.areHeadersSticky());
 			} else {
-				headersSticky.setVisible(false);
+				headersSticky.setEnabled(false);
 			}
 		}
 	}

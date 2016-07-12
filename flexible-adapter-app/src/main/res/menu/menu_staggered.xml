@@ -19,6 +19,7 @@
 
 	<item android:id="@+id/action_sticky_headers"
 	      android:title="@string/sticky_headers"
+		  android:checkable="true"
 	      app:showAsAction="never"/>
 
 </menu>
