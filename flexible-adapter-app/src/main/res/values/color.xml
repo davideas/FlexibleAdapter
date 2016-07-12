@@ -10,6 +10,6 @@
 
 	<!-- Common colors -->
 	<color name="list_choice_normal_bg_light">#fffafafa</color>
-	<color name="list_choice_pressed_bg_light">#fccc</color>
+	<color name="list_choice_pressed_bg_light">#fddd</color>
 
 </resources>

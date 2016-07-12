@@ -427,15 +427,31 @@ public class MainActivity extends AppCompatActivity implements
 				//mSearchView.setIconified(false);//This is not necessary
 			}
 		}
+		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
+		if (headersMenuItem != null) {
+			headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
+		}
 		//Sticky Header item
 		MenuItem stickyItem = menu.findItem(R.id.action_sticky_headers);
 		if (stickyItem != null) {
 			stickyItem.setEnabled(mAdapter.areHeadersShown());
+			stickyItem.setChecked(mAdapter.areHeadersSticky());
+		}
+		//Animations
+		MenuItem entryAnimationMenuItem = menu.findItem(R.id.action_entry_animation);
+		MenuItem animationMenuItem = menu.findItem(R.id.action_animation);
+		MenuItem reverseMenuItem = menu.findItem(R.id.action_reverse);
+		if (entryAnimationMenuItem != null) {
+			entryAnimationMenuItem.setChecked(mAdapter.isOnlyEntryAnimation());
+		}
+		if (animationMenuItem != null) {
+			animationMenuItem.setEnabled(!mAdapter.isOnlyEntryAnimation());
+			animationMenuItem.setChecked(mAdapter.isAnimationOnScrollingEnabled());
 		}
 		//Action reverse item
-		MenuItem reverseItem = menu.findItem(R.id.action_reverse);
-		if (reverseItem != null) {
-			reverseItem.setEnabled(mAdapter.isAnimationOnScrollingEnabled());
+		if (reverseMenuItem != null) {
+			reverseMenuItem.setEnabled(!entryAnimationMenuItem.isChecked() && mAdapter.isAnimationOnScrollingEnabled());
+			reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrolling());
 		}
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -443,7 +459,17 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
-		if (id == R.id.action_animation) {
+		if (id == R.id.action_entry_animation) {
+			if (mAdapter.isOnlyEntryAnimation()) {
+				mAdapter.setOnlyEntryAnimation(false);
+				item.setChecked(false);
+				Snackbar.make(findViewById(R.id.main_view), "Disabled Reverse scrolling animation", Snackbar.LENGTH_SHORT).show();
+			} else {
+				mAdapter.setOnlyEntryAnimation(true);
+				item.setChecked(true);
+				Snackbar.make(findViewById(R.id.main_view), "Enabled Reverse scrolling animation", Snackbar.LENGTH_SHORT).show();
+			}
+		} else if (id == R.id.action_animation) {
 			if (mAdapter.isAnimationOnScrollingEnabled()) {
 				mAdapter.setAnimationOnScrolling(false);
 				item.setChecked(false);
@@ -464,14 +490,14 @@ public class MainActivity extends AppCompatActivity implements
 				Snackbar.make(findViewById(R.id.main_view), "Enabled Reverse scrolling animation", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_auto_collapse) {
-			if (item.getTitle().equals(getString(R.string.auto_collapse))) {
-				mAdapter.setAutoCollapseOnExpand(true);
-				item.setChecked(true);
-				Snackbar.make(findViewById(R.id.main_view), "Auto-Collapse is enabled", Snackbar.LENGTH_SHORT).show();
-			} else {
+			if (mAdapter.isAutoCollapseOnExpand()) {
 				mAdapter.setAutoCollapseOnExpand(false);
 				item.setChecked(false);
 				Snackbar.make(findViewById(R.id.main_view), "Auto-Collapse is disabled", Snackbar.LENGTH_SHORT).show();
+			} else {
+				mAdapter.setAutoCollapseOnExpand(true);
+				item.setChecked(true);
+				Snackbar.make(findViewById(R.id.main_view), "Auto-Collapse is enabled", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_expand_collapse_all) {
 			if (item.getTitle().equals(getString(R.string.expand_all))) {

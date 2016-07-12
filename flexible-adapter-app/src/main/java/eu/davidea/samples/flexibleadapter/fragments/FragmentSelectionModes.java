@@ -111,7 +111,7 @@ public class FragmentSelectionModes extends AbstractFragment
 			}
 		});
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider).setDrawOver(true));
+		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider).withDrawOver(true));
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {

@@ -37,6 +37,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 
 	private FloatingActionButton mFab;
 	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
+	private DividerItemDecoration mDivider;
 	private boolean configure;
 	private MenuItem mSearchView;
 
@@ -70,25 +71,20 @@ public class FragmentAsyncFilter extends AbstractFragment {
 
 		//Restore FAB icon
 		mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-		ViewCompat.animate(mFab)
-				.scaleX(1f).scaleY(1f)
-				.alpha(1f).setDuration(100)
-				.setStartDelay(300L)
-				.start();
 
 		if (configure) {
 			//Create configuration list
 			DatabaseService.getInstance().createConfigurationDatabase(getResources());
 			mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
-			//mFab.setImageResource(R.drawable.ic_check_white_24dp);
+
 		} else {
 			//Create Database with custom size
 			DatabaseService.getInstance().createEndlessDatabase(DatabaseConfiguration.size);//N. of items
 			mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
-			mFab.setImageResource(R.drawable.ic_settings_white_24dp);
 		}
 
 		initializeRecyclerView();
+		if (configure) configure = false;
 	}
 
 	private void initializeRecyclerView() {
@@ -102,7 +98,11 @@ public class FragmentAsyncFilter extends AbstractFragment {
 				.setOnlyEntryAnimation(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
-		mRecyclerView.setAdapter(mAdapter);
+		if (mRecyclerView.getAdapter() == null) {
+			mRecyclerView.setAdapter(mAdapter);
+		} else {
+			mRecyclerView.swapAdapter(mAdapter, false);
+		}
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 			@SuppressWarnings("NullableProblems")
@@ -112,23 +112,33 @@ public class FragmentAsyncFilter extends AbstractFragment {
 				return true;
 			}
 		});
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider_large));
+		if (mDivider == null) {
+			mDivider = new DividerItemDecoration(getActivity(), R.drawable.divider_large).withOffset(true);
+		}
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		if (!configure) {
-			mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
-					Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
-		}
 		swipeRefreshLayout.setEnabled(!configure);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
+		if (configure) {
+			mFab.setImageResource(R.drawable.ic_check_white_24dp);
+			mRecyclerView.addItemDecoration(mDivider);
+		} else {
+			mFab.setImageResource(R.drawable.ic_settings_white_24dp);
+			mRecyclerView.removeItemDecoration(mDivider);
+			mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
+					Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+		}
+
 		//Settings for FlipView
 		FlipView.stopLayoutAnimation();
+		showFab();
 	}
 
 	@Override
 	public void performFabAction() {
+		hideFab();
 		if (configure) {
 			onActivityCreated(null);
 			mSearchView.setVisible(false);
@@ -163,5 +173,23 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		return super.onOptionsItemSelected(item);
 	}
 
+	private void hideFab() {
+		ViewCompat.animate(mFab)
+				.scaleX(0f).scaleY(0f)
+				.alpha(0f).setDuration(100)
+				.start();
+	}
+
+	private void showFab() {
+		mRecyclerView.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				ViewCompat.animate(mFab)
+						.scaleX(1f).scaleY(1f)
+						.alpha(1f).setDuration(100)
+						.start();
+			}
+		}, 500L);
+	}
 
 }

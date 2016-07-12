@@ -145,21 +145,6 @@ public class FragmentExpandableSections extends AbstractFragment {
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-
-		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
-		if (headersMenuItem != null) {
-			headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
-		}
-
-		MenuItem headersSticky = menu.findItem(R.id.action_sticky_headers);
-		if (headersSticky != null) {
-			if (mAdapter.areHeadersShown()) {
-				headersSticky.setVisible(true);
-				headersSticky.setChecked(mAdapter.areHeadersSticky());
-			} else {
-				headersSticky.setVisible(false);
-			}
-		}
 	}
 
 	@Override

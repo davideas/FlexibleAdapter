@@ -974,6 +974,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #hideAllHeaders()
 	 * @since 5.0.0-b1
 	 */
+	//TODO: Improve performance
 	public void showAllHeaders() {
 		multiRange = true;
 		//Show linked headers only
@@ -995,6 +996,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #showAllHeaders()
 	 * @since 5.0.0-b1
 	 */
+	//TODO: Improve performance
 	public void hideAllHeaders() {
 		multiRange = true;
 		//Hide orphan headers first
@@ -1433,6 +1435,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*--------------------*/
 
 	/**
+	 * @return true if autoCollapseOnExpand is enabled, false otherwise
+	 * @since 5.0.0-b8
+	 */
+	public boolean isAutoCollapseOnExpand() {
+		return collapseOnExpand;
+	}
+
+	/**
 	 * Automatically collapse all previous expanded parents before expand the clicked parent.
 	 * <p>Default value is disabled.</p>
 	 *
@@ -1443,6 +1453,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	public FlexibleAdapter setAutoCollapseOnExpand(boolean collapseOnExpand) {
 		this.collapseOnExpand = collapseOnExpand;
 		return this;
+	}
+
+	/**
+	 * @return true if autoScrollOnExpand is enabled, false otherwise
+	 * @since 5.0.0-b8
+	 */
+	public boolean isAutoScrollOnExpand() {
+		return scrollOnExpand;
 	}
 
 	/**

@@ -223,27 +223,15 @@ public class FragmentHeadersSections extends AbstractFragment
 
 		menu.findItem(R.id.action_auto_collapse).setVisible(false);
 		menu.findItem(R.id.action_expand_collapse_all).setVisible(false);
-
-		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
-		if (headersMenuItem != null) {
-			headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
-		}
-
-		MenuItem headersSticky = menu.findItem(R.id.action_sticky_headers);
-		if (headersSticky != null) {
-			if (mAdapter.areHeadersShown()) {
-				headersSticky.setEnabled(true);
-				headersSticky.setChecked(mAdapter.areHeadersSticky());
-			} else {
-				headersSticky.setEnabled(false);
-			}
-		}
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.action_list_type)
-			mAdapter.setAnimationOnScrolling(true);
+		if (item.getItemId() == R.id.action_list_type) {
+			if (!mAdapter.isAnimationOnScrollingEnabled())
+				mAdapter.setOnlyEntryAnimation(true);
+			else mAdapter.setAnimationOnScrolling(true);
+		}
 		return super.onOptionsItemSelected(item);
 	}
 
