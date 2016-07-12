@@ -6,7 +6,7 @@
 # FlexibleAdapter
 
 ###### The only Adapter multi-function for your RecyclerView
-- NEW! Beta version: [v5.0.0-b8](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) built on 2016.07.31 (usable library!) 116KB
+- NEW! Beta version: [v5.0.0-b7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) built on 2016.06.20 (usable library!) 112KB
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -24,8 +24,7 @@ This library is configurable and it guides the developers to create a better use
 * Restore deleted items, **NEW** works with Expandable items too!
 * FastScroller, **NEW** now in the library supporting all the 3 Layouts.
 * Customizable ItemDecoration.
-* SearchFilter with Spannable text, **NEW** result is animated. Works with sub items too!
-* **NEW!** AsyncFilter with high performance on big list and animated result (available from beta8).
+* SearchFilter with Spannable text, **NEW** now items are animated. Works with sub items too!
 * Add and Remove items with custom animations.
 * **NEW!** Auto mapping ViewTypes with Item interfaces.
 * **NEW!** Predefined ViewHolders.
@@ -38,7 +37,6 @@ This library is configurable and it guides the developers to create a better use
 * **NEW!** DrawableUtils for dynamic backgrounds with ripple (<u>No XML</u>).
 * **NEW!** A simple constructor for many events.
 * **NEW!** Easy runtime position calculation for adding/moving items in sections.
-* **NEW!** Wiki pages documentation.
 * ... more to come.
 
 # Setup
@@ -53,7 +51,7 @@ repositories {
 dependencies {
 	//Using JCenter
 	compile 'eu.davidea:flexible-adapter:4.2.0'
-	compile 'eu.davidea:flexible-adapter:5.0.0-b8'
+	compile 'eu.davidea:flexible-adapter:5.0.0-b7'
 	
 	//Using MavenSnapshots repository for continuous updates from my development
 	compile 'eu.davidea:flexible-adapter:5.0.0-SNAPSHOT'
@@ -101,10 +99,9 @@ You can download the latest demo App from the latest release page.
 
 # Change Log
 ###### Latest release
-[v5.0.0-b8](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b8) - 2016.07.31
+[v5.0.0-b7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) - 2016.06.20
 
 ###### Old releases
-[v5.0.0-b7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) - 2016.06.20 |
 [v5.0.0-b6](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b6) - 2016.05.01 | 
 [v5.0.0-b5](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b5) - 2016.04.04 | 
 [v5.0.0-b4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b4) - 2016.02.21<br/>
