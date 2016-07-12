@@ -44,12 +44,13 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 *
 	 * @since 5.0.0-b4
 	 */
-	public DividerItemDecoration(Context context, int resId) {
+	public DividerItemDecoration(@NonNull Context context, @DrawableRes int resId) {
 		this(context, resId, 0);
 	}
 
 	/**
 	 * Custom divider with gap between sections (in dpi).
+	 * Passing a negative divider will only use the gap value for sections.
 	 *
 	 * @since 5.0.0-b6
 	 */
@@ -128,7 +129,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	@SuppressWarnings({"ConstantConditions", "unchecked", "SuspiciousNameCombination"})
 	@Override
 	public void getItemOffsets(Rect outRect, View view, RecyclerView recyclerView, RecyclerView.State state) {
-		int offset = mDivider.getIntrinsicHeight();
+		int offset = (mDivider != null ? mDivider.getIntrinsicHeight() : 0);
 		if (mSectionOffset > 0 && recyclerView.getAdapter() instanceof FlexibleAdapter) {
 			FlexibleAdapter flexibleAdapter = (FlexibleAdapter) recyclerView.getAdapter();
 			int position = recyclerView.getChildAdapterPosition(view);
