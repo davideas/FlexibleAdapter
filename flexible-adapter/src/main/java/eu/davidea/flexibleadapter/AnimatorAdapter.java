@@ -187,15 +187,18 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	/**
 	 * Enable/Disable item animation while scrolling and on loading.
-	 * <p>Disabling scrolling will disable also reverse scrolling!</p>
-	 * Default enabled.
+	 * <p>Enabling scrolling will disable onlyEntryAnimation.<br/>
+	 * Disabling scrolling will disable also reverse scrolling!</p>
+	 * Default value is disabled.
 	 *
 	 * @param enabled true to enable item animation, false to disable them all.
 	 * @return this AnimatorAdapter, so the call can be chained
+	 * @see #setOnlyEntryAnimation(boolean)
 	 * @see #setAnimationOnReverseScrolling(boolean)
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationOnScrolling(boolean enabled) {
+		if (enabled) this.onlyEntryAnimation = false;
 		shouldAnimate = enabled;
 		return this;
 	}
@@ -205,7 +208,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Enable reverse scrolling animation if AnimationOnScrolling is also enabled!<br/>
+	 * Enable reverse scrolling animation if AnimationOnScrolling is also enabled!
+	 * <p>Value is ignored if basic animation on scrolling is disabled.</p>
 	 * Default value is disabled (only forward).
 	 *
 	 * @param enabled false to animate items only forward, true to also reverse animate
@@ -229,15 +233,17 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/**
 	 * Performs only entry animation during the initial loading. Stops the animation after
 	 * the last visible item in the RecyclerView has been animated.
-	 * Default value is false (always animate).
+	 * Default value is false.
 	 *
-	 * @param onlyEntryAnimation true to perform only entry animation, false otherwise
+	 * @param enabled true to perform only entry animation, false otherwise
 	 * @return this AnimatorAdapter, so the call can be chained
+	 * @see #setAnimationOnScrolling(boolean)
+	 * @see #setAnimationOnReverseScrolling(boolean)
 	 * @since 5.0.0-b8
 	 */
-	public AnimatorAdapter setOnlyEntryAnimation(boolean onlyEntryAnimation) {
-		if (onlyEntryAnimation) this.shouldAnimate = true;
-		this.onlyEntryAnimation = onlyEntryAnimation;
+	public AnimatorAdapter setOnlyEntryAnimation(boolean enabled) {
+		if (enabled) this.shouldAnimate = true;
+		this.onlyEntryAnimation = enabled;
 		return this;
 	}
 
