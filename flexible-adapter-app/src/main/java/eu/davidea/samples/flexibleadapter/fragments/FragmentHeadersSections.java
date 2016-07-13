@@ -66,7 +66,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createHeadersSectionsDatabase(400);
+		DatabaseService.getInstance().createHeadersSectionsDatabase(400, 30);
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -88,9 +88,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setRemoveOrphanHeaders(false)
-				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
-				.setAnimationOnScrolling(true)
-				.setAnimationOnReverseScrolling(true);
+				.setNotifyChangeOfUnfilteredItems(true);//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);

@@ -133,22 +133,27 @@ public class FragmentAsyncFilter extends AbstractFragment {
 
 		//Settings for FlipView
 		FlipView.stopLayoutAnimation();
-		showFab();
+		showFab(1000L);
 	}
 
 	@Override
 	public void performFabAction() {
-		hideFab();
-		if (configure) {
-			onActivityCreated(null);
-			mSearchView.setVisible(false);
-			configure = false;
-		} else {
-			Snackbar.make(getView(), "Created list with " + DatabaseConfiguration.size + " items", Snackbar.LENGTH_LONG).show();
-			onActivityCreated(null);
-			mSearchView.setVisible(mAdapter.getItemCount() > 0);
-			configure = true;
-		}
+		hideFab();//Give time to hide FAB before changing everything
+		mRecyclerView.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (configure) {
+					onActivityCreated(null);
+					mSearchView.setVisible(false);
+					configure = false;
+				} else {
+					Snackbar.make(getView(), "Created list with " + DatabaseConfiguration.size + " items", Snackbar.LENGTH_LONG).show();
+					onActivityCreated(null);
+					mSearchView.setVisible(mAdapter.getItemCount() > 0);
+					configure = true;
+				}
+			}
+		}, 100L);
 	}
 
 	@Override
@@ -180,7 +185,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 				.start();
 	}
 
-	private void showFab() {
+	private void showFab(long delay) {
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -189,7 +194,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 						.alpha(1f).setDuration(100)
 						.start();
 			}
-		}, 500L);
+		}, delay);
 	}
 
 }

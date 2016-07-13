@@ -117,9 +117,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	private List<T> mItems;
 
 	/**
-	 * Used to search items, it increases performance in big list
+	 * HashSet and AsyncTask objects, will increase performance in big list
 	 */
 	private Set<T> hashItems;
+	private List<Notification> notifications;
+	private FilterAsyncTask mFilterAsyncTask;
 
 	/**
 	 * Handler for delayed actions.
@@ -179,8 +181,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	private boolean notifyChangeOfUnfilteredItems = false, filtering = false,
 			notifyMoveOfFilteredItems = false;
 	private static int mAnimateToLimit = 600;
-	private List<Notification> notifications;
-	private FilterAsyncTask mFilterAsyncTask;
 
 	/* Expandable flags */
 	private int minCollapsibleLevel = 0, selectedLevel = -1;
@@ -797,7 +797,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getStickySectionHeadersHolder()
 	 * @since 5.0.0-b6
 	 */
-	//TODO: deprecation use setStickyHeaders?
+	//TODO: deprecation use setStickyHeaders(true)?
 	public FlexibleAdapter enableStickyHeaders() {
 		return setStickyHeaders(true);
 	}
@@ -807,7 +807,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @since 5.0.0-b6
 	 */
-	//TODO: deprecation use setStickyHeaders?
+	//TODO: deprecation use setStickyHeaders(false?
 	public void disableStickyHeaders() {
 		setStickyHeaders(false);
 	}
@@ -888,7 +888,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	public IHeader getHeaderOf(@NonNull T item) {
-		if (isHeader(item)) {
+		if (item != null && item instanceof ISectionable) {
 			return ((ISectionable) item).getHeader();
 		}
 		return null;
@@ -988,7 +988,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #hideAllHeaders()
 	 * @since 5.0.0-b1
 	 */
-	//TODO: Improve performance
 	public void showAllHeaders() {
 		mHandler.post(new Runnable() {
 			@Override
@@ -1015,7 +1014,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #showAllHeaders()
 	 * @since 5.0.0-b1
 	 */
-	//TODO: Improve performance
 	public void hideAllHeaders() {
 		mHandler.post(new Runnable() {
 			@Override
@@ -1028,8 +1026,9 @@ public class FlexibleAdapter<T extends IFlexible>
 				//Hide linked headers
 				int position = mItems.size() - 1;
 				while (position >= 0) {
-					if (hideHeaderOf(mItems.get(position)))
-						position--;//It's the same element, skip it.
+					T item = mItems.get(position);
+					if (isHeader(item))
+						hideHeader(position, (IHeader) item);
 					position--;
 				}
 				headersShown = false;
@@ -2235,7 +2234,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @deprecated For a correct positioning of a new Section, use {@link #addSection(IHeader, Comparator)}
 	 * instead. This method doesn't perform any sort, so if the refHeader is unknown, the Header
 	 * is always inserted at the top, which doesn't cover all use cases.
-	 * <p>This method will be deleted with next pre-release.</p>
+	 * <p>This method will be deleted before the final release.</p>
 	 */
 	@Deprecated
 	public void addSection(@NonNull IHeader header, @Nullable IHeader refHeader) {
@@ -3261,7 +3260,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		notifications = new ArrayList<>();
 		if (newItems.size() <= mAnimateToLimit) {
 			if (DEBUG)
-				Log.v(TAG, "Animate changes! oldSize=" + getItemCount() + " newSize=" + newItems.size());
+				Log.v(TAG, "Animate changes! oldSize=" + getItemCount() + " newSize=" + newItems.size() + " limit=" + mAnimateToLimit);
 			List<T> tempItems = new ArrayList<>(mItems);
 			applyAndAnimateRemovals(tempItems, newItems);
 			applyAndAnimateAdditions(tempItems, newItems);
@@ -3270,7 +3269,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			mItems = tempItems;
 		} else {
 			if (DEBUG)
-				Log.v(TAG, "NotifyDataSetChanged! oldSize=" + getItemCount() + " newSize=" + newItems.size());
+				Log.v(TAG, "NotifyDataSetChanged! oldSize=" + getItemCount() + " newSize=" + newItems.size() + " limit=" + mAnimateToLimit);
 			mItems = newItems;
 			notifications.add(new Notification(-1, 0));
 		}
@@ -4222,22 +4221,25 @@ public class FlexibleAdapter<T extends IFlexible>
 		@Override
 		protected Void doInBackground(Void... params) {
 			switch (what) {
-				case FILTER:
-					if (DEBUG) Log.i(TAG, "doInBackground - started Filter");
-					filterItemsAsync(newItems);
-					if (DEBUG) Log.i(TAG, "doInBackground - ended Filter");
-					break;
 				case UPDATE:
+					if (DEBUG) Log.i(TAG, "doInBackground - started UPDATE");
 					animateTo(newItems);
+					if (DEBUG) Log.i(TAG, "doInBackground - ended UPDATE");
 					break;
-
+				case FILTER:
+					if (DEBUG) Log.i(TAG, "doInBackground - started FILTER");
+					filterItemsAsync(newItems);
+					if (DEBUG) Log.i(TAG, "doInBackground - ended FILTER");
+					break;
 			}
 			return null;
 		}
 
 		@Override
 		protected void onPostExecute(Void result) {
+			//Notify all the changes
 			executeNotifications();
+			//Execute post data
 			switch (what) {
 				case UPDATE:
 					postUpdate();

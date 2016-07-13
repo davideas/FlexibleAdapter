@@ -83,14 +83,14 @@ items and higher, due to calculate the correct position for each item to shift. 
 	<string name="selection_modes">Selection modes</string>
 	<string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper + UndoHelper</string>
 
-	<string name="headers_sections">Headers and Sections</string>
-	<string name="headers_sections_description">Clickable sticky headers for sections + Drag items with Auto-Linkage + Filter + Scroll Animations</string>
-
 	<string name="filter">Async Filter</string>
-	<string name="filter_description">A [big] list with Asynchronous Filter + Synchronization Animations</string>
+	<string name="filter_description">Big list with Asynchronous filter and refresh + Synchronization Animations + Configuration</string>
+
+	<string name="headers_sections">Headers and Sections</string>
+	<string name="headers_sections_description">Clickable sticky headers for sections + Draggable items with Auto-Linkage + Filter</string>
 
 	<string name="expandable_sections">Expandable Sections</string>
-	<string name="expandable_sections_description">Sections with [sticky] headers that can expand/collapse + Drag items + Filter + Scroll Animations</string>
+	<string name="expandable_sections_description">Sections with [sticky] headers that can expand/collapse + Draggable items + Filter + Scroll Animations</string>
 
 	<string name="multi_level_expandable">Expandable Multi Level</string>
 	<string name="multi_level_expandable_description">2 levels of expandable + Selection Coherence + Swipeable &amp; Draggable items + ActionModeHelper + UndoHelper</string>

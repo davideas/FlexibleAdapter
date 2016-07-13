@@ -41,7 +41,7 @@ public class DatabaseService {
 
 	private static final String TAG = DatabaseService.class.getSimpleName();
 	private static DatabaseService mInstance;
-	private static final int SUB_ITEMS = 4, HEADERS = 30;
+	private static final int SUB_ITEMS = 4;
 	private DatabaseType databaseType = DatabaseType.NONE;
 
 	//TODO FOR YOU: Should use userLearnedSelection from settings
@@ -86,13 +86,13 @@ public class DatabaseService {
 				.withDescription(resources.getString(R.string.selection_modes_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_select_all_grey600_24dp)));
 
-		mItems.add(new OverallItem(R.id.nav_headers_and_sections, resources.getString(R.string.headers_sections))
-				.withDescription(resources.getString(R.string.headers_sections_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_sections_grey600_24dp)));
-
 		mItems.add(new OverallItem(R.id.nav_filter, resources.getString(R.string.filter))
 				.withDescription(resources.getString(R.string.filter_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_filter_outline_grey600_24dp)));
+
+		mItems.add(new OverallItem(R.id.nav_headers_and_sections, resources.getString(R.string.headers_sections))
+				.withDescription(resources.getString(R.string.headers_sections_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_sections_grey600_24dp)));
 
 		mItems.add(new OverallItem(R.id.nav_expandable_sections, resources.getString(R.string.expandable_sections))
 				.withDescription(resources.getString(R.string.expandable_sections_description))
@@ -176,6 +176,20 @@ public class DatabaseService {
 	}
 
 	/*
+	 * List of Simple Items with Header attached. Only Simple Items will be added to the list.
+	 */
+	public void createHeadersSectionsDatabase(int size, int headers) {
+		databaseType = DatabaseType.HEADERS_SECTIONS;
+		HeaderItem header = null;
+		mItems.clear();
+		int lastHeaderId = 0;
+		for (int i = 0; i < size; i++) {
+			header = i % Math.round(size / headers) == 0 ? newHeader(++lastHeaderId) : header;
+			mItems.add(newSimpleItem(i + 1, header));
+		}
+	}
+
+	/*
 	 * List of Expandable items (headers/sections) with SubItems with Header attached.
 	 */
 	public void createExpandableSectionsDatabase(int size) {
@@ -194,20 +208,6 @@ public class DatabaseService {
 		mItems.clear();
 		for (int i = 0; i < size; i++) {
 			mItems.add(newExpandableLevelItem(i + 1));//With expansion level 1
-		}
-	}
-
-	/*
-	 * List of Simple Items with Header attached. Only Simple Items will be added to the list.
-	 */
-	public void createHeadersSectionsDatabase(int size) {
-		databaseType = DatabaseType.HEADERS_SECTIONS;
-		HeaderItem header = null;
-		mItems.clear();
-		int lastHeaderId = 0;
-		for (int i = 0; i < size; i++) {
-			header = i % Math.round(size / HEADERS) == 0 ? newHeader(++lastHeaderId) : header;
-			mItems.add(newSimpleItem(i + 1, header));
 		}
 	}
 
@@ -265,7 +265,7 @@ public class DatabaseService {
 	/*---------------*/
 
 	/*
-	 * Create a Header item for normal items.
+	 * Creates a Header item.
 	 */
 	public static HeaderItem newHeader(int i) {
 		HeaderItem header = new HeaderItem("H" + i);
@@ -319,7 +319,7 @@ public class DatabaseService {
 
 	/*
 	 * Creates a special expandable item which has another level of expandable.
-	 * <p>IMPORTANT: Give different IDs to each child and override getExpansionLevel().</p>
+	 * <p>IMPORTANT: Give different IDs to each child and override getExpansionLevel()!</p>
 	 */
 	private ExpandableLevel0Item newExpandableLevelItem(int i) {
 		//ExpandableLevel0Item is an expandable with Level=0
@@ -491,6 +491,9 @@ public class DatabaseService {
 		Collections.sort(mItems, new ItemComparatorById());
 	}
 
+	/**
+	 * A simple item comparator by Id.
+	 */
 	public static class ItemComparatorById implements Comparator<AbstractFlexibleItem> {
 		@Override
 		public int compare(AbstractFlexibleItem lhs, AbstractFlexibleItem rhs) {
@@ -498,6 +501,11 @@ public class DatabaseService {
 		}
 	}
 
+	/**
+	 * A complex item comparator able to compare different item types for different view types:
+	 * Sort by HEADER than by ITEM.
+	 * <p>In this way items are always displayed in the corresponding section and position.</p>
+	 */
 	public static class ItemComparatorByGroup implements Comparator<IFlexible> {
 		@Override
 		public int compare(IFlexible lhs, IFlexible rhs) {
