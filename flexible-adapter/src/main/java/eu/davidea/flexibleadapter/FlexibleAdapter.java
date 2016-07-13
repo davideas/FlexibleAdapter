@@ -103,12 +103,19 @@ public class FlexibleAdapter<T extends IFlexible>
 	private static final String EXTRA_HEADERS = TAG + "_headersShown";
 	private static final String EXTRA_LEVEL = TAG + "_selectedLevel";
 	private static final String EXTRA_SEARCH = TAG + "_searchText";
-	public static final long UNDO_TIMEOUT = 5000L;
+	/**
+	 * Handler operations
+	 */
+	private static final int
+			UPDATE = 0, FILTER = 1, CONFIRM_DELETE = 2,
+			LOAD_MORE_COMPLETE = 8, LOAD_MORE_RESET = 9;
+
 
 	/**
 	 * The main container for ALL items.
 	 */
 	private List<T> mItems;
+
 	/**
 	 * Used to search items, it increases performance in big list
 	 */
@@ -117,29 +124,31 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Handler for delayed actions.
 	 * <p>You can use and override this Handler, but you must keep the "What" by calling super():
-	 * <br/>0 = filterItems delay.
-	 * <br/>1 = deleteConfirmed when Undo timeout is over.
-	 * <br/>2 = remove the progress item from the list, optionally delayed.
-	 * <br/>3 = reset flag to load more items, delayed.</p>
+	 * <br/>0 = updateDataSet.
+	 * <br/>1 = filterItems, optionally delayed.
+	 * <br/>2 = deleteConfirmed when Undo timeout is over.
+	 * <br/>8 = remove the progress item from the list, optionally delayed.
+	 * <br/>9 = reset flag to load more items, delayed.</p>
 	 * <b>Note:</b> numbers 0-9 are reserved for the Adapter, use others.
 	 */
 	protected Handler mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
 			switch (message.what) {
-				case 0: //filterItems
+				case UPDATE: //updateDataSet OR
+				case FILTER: //filterItems
 					if (mFilterAsyncTask != null) mFilterAsyncTask.cancel(true);
-					mFilterAsyncTask = new FilterAsyncTask(FilterAsyncTask.FILTER, (List<T>) message.obj);
+					mFilterAsyncTask = new FilterAsyncTask(message.what, (List<T>) message.obj);
 					mFilterAsyncTask.execute();
 					return true;
-				case 1: //confirm delete
+				case CONFIRM_DELETE: //confirm delete
 					OnDeleteCompleteListener listener = (OnDeleteCompleteListener) message.obj;
 					if (listener != null) listener.onDeleteConfirmed();
 					emptyBin();
 					return true;
-				case 2: //onLoadMore remove progress item
+				case LOAD_MORE_COMPLETE: //onLoadMore remove progress item
 					deleteProgressItem();
 					return true;
-				case 3: //onLoadMore reset
+				case LOAD_MORE_RESET: //onLoadMore reset
 					resetOnLoadMore();
 					return true;
 			}
@@ -148,6 +157,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	});
 
 	/* Used to save deleted items and to recover them (Undo) */
+	public static final long UNDO_TIMEOUT = 5000L;
 	private List<RestoreInfo> mRestoreList;
 	private boolean restoreSelection = false, multiRange = false, unlinkOnRemoveHeader = false,
 			removeOrphanHeaders = false, permanentDelete = true, adjustSelected = true;
@@ -472,20 +482,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	@CallSuper
 	public void updateDataSet(@Nullable List<T> items, boolean animate) {
 		if (animate) {
-			animateTo(items);
+			mHandler.removeMessages(UPDATE);
+			mHandler.sendMessage(Message.obtain(mHandler, UPDATE, items));
 		} else {
 			if (items == null) mItems = new ArrayList<>();
 			else mItems = new ArrayList<>(items);
 			notifyDataSetChanged();
-		}
-		//Show headers and expanded items if Data Set not empty
-		if (getItemCount() > 0) {
-			expandItemsAtStartUp();
-			if (headersShown) showAllHeaders();
-		}
-		//Update empty view
-		if (mUpdateListener != null) {
-			mUpdateListener.onUpdateEmptyView(getItemCount());
+			postUpdate();
 		}
 	}
 
@@ -551,6 +554,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #isEmpty()
 	 * @since 5.0.0-b5
 	 */
+	//TODO: deprecation?
 	public int getItemCountOfTypesUntil(@IntRange(from = 0) int position, Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
 		int count = 0;
@@ -672,6 +676,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setRemoveOrphanHeaders(boolean)
 	 * @since 5.0.0-b6
 	 */
+	//TODO: deprecation?
 	public boolean isRemoveOrphanHeaders() {
 		return removeOrphanHeaders;
 	}
@@ -685,6 +690,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getOrphanHeaders()
 	 * @since 5.0.0-b6
 	 */
+	//TODO: deprecation?
 	public FlexibleAdapter setRemoveOrphanHeaders(boolean removeOrphanHeaders) {
 		this.removeOrphanHeaders = removeOrphanHeaders;
 		return this;
@@ -712,6 +718,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setRemoveOrphanHeaders(boolean)
 	 * @since 5.0.0-b6
 	 */
+	//TODO: deprecation?
 	@NonNull
 	public List<IHeader> getOrphanHeaders() {
 		return mOrphanHeaders;
@@ -727,6 +734,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
+	//TODO: deprecation?
 	public FlexibleAdapter linkHeaderTo(@NonNull T item, @NonNull IHeader header) {
 		linkHeaderTo(item, header, null);
 		if (header.isHidden() && headersShown) {
@@ -742,6 +750,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param item the item that holds the header
 	 * @since 5.0.0-b6
 	 */
+	//TODO: deprecation?
 	public IHeader unlinkHeaderFrom(@NonNull T item) {
 		IHeader header = unlinkHeaderFrom(item, null);
 		if (header != null && !header.isHidden()) {
@@ -767,15 +776,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * @param item the item to check
-	 * @return true if the item is an instance of {@link IHeader} interface
-	 * @since 5.0.0-b6
-	 */
-	public boolean isHeader(T item) {
-		return item != null && item instanceof IHeader;
-	}
-
-	/**
 	 * Returns if Adapter will display sticky headers on the top.
 	 *
 	 * @return true if headers can be sticky, false if headers are scrolled together with all items
@@ -797,6 +797,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getStickySectionHeadersHolder()
 	 * @since 5.0.0-b6
 	 */
+	//TODO: deprecation use setStickyHeaders?
 	public FlexibleAdapter enableStickyHeaders() {
 		return setStickyHeaders(true);
 	}
@@ -806,6 +807,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @since 5.0.0-b6
 	 */
+	//TODO: deprecation use setStickyHeaders?
 	public void disableStickyHeaders() {
 		setStickyHeaders(false);
 	}
@@ -846,6 +848,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * @param item the item to check
+	 * @return true if the item is an instance of {@link IHeader} interface
+	 * @since 5.0.0-b6
+	 */
+	public boolean isHeader(T item) {
+		return item != null && item instanceof IHeader;
+	}
+
+	/**
 	 * Helper for the Adapter to check if an item holds a header
 	 *
 	 * @param item the identified item
@@ -877,7 +888,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	public IHeader getHeaderOf(@NonNull T item) {
-		if (item != null && item instanceof ISectionable) {
+		if (isHeader(item)) {
 			return ((ISectionable) item).getHeader();
 		}
 		return null;
@@ -890,6 +901,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the IHeader item linked to the specified item position
 	 * @since 5.0.0-b6
 	 */
+	//TODO: rename to getSectionByItemPosition?
 	public IHeader getSectionHeader(@IntRange(from = 0) int position) {
 		//Headers are not visible nor sticky
 		if (!headersShown) return null;
@@ -909,6 +921,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the index of the specified header/section
 	 * @since 5.0.0-b6
 	 */
+	//TODO: deprecation?
 	public int getSectionIndex(@NonNull IHeader header) {
 		int position = getGlobalPositionOf(header);
 		return getSectionIndex(position);
@@ -922,6 +935,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the index of the specified item position
 	 * @since 5.0.0-b6
 	 */
+	//TODO: deprecation?
 	public int getSectionIndex(@IntRange(from = 0) int position) {
 		int sectionIndex = 0;
 		for (int i = 0; i <= position; i++) {
@@ -976,17 +990,22 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	//TODO: Improve performance
 	public void showAllHeaders() {
-		multiRange = true;
-		//Show linked headers only
-		resetHiddenStatus();
-		int position = 0;
-		while (position < mItems.size()) {
-			if (showHeaderOf(position, mItems.get(position)))
-				position++;//It's the same element, skip it.
-			position++;
-		}
-		headersShown = true;
-		multiRange = false;
+		mHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				multiRange = true;
+				//Show linked headers only
+				resetHiddenStatus();
+				int position = 0;
+				while (position < mItems.size()) {
+					if (showHeaderOf(position, mItems.get(position)))
+						position++;//It's the same element, skip it.
+					position++;
+				}
+				headersShown = true;
+				multiRange = false;
+			}
+		});
 	}
 
 	/**
@@ -998,21 +1017,26 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	//TODO: Improve performance
 	public void hideAllHeaders() {
-		multiRange = true;
-		//Hide orphan headers first
-		for (IHeader header : getOrphanHeaders()) {
-			hideHeader(getGlobalPositionOf(header), header);
-		}
-		//Hide linked headers
-		int position = mItems.size() - 1;
-		while (position >= 0) {
-			if (hideHeaderOf(mItems.get(position)))
-				position--;//It's the same element, skip it.
-			position--;
-		}
-		headersShown = false;
-		setStickyHeaders(false);
-		multiRange = false;
+		mHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				multiRange = true;
+				//Hide orphan headers first
+				for (IHeader header : getOrphanHeaders()) {
+					hideHeader(getGlobalPositionOf(header), header);
+				}
+				//Hide linked headers
+				int position = mItems.size() - 1;
+				while (position >= 0) {
+					if (hideHeaderOf(mItems.get(position)))
+						position--;//It's the same element, skip it.
+					position--;
+				}
+				headersShown = false;
+				setStickyHeaders(false);
+				multiRange = false;
+			}
+		});
 	}
 
 	/**
@@ -1143,6 +1167,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		return null;
 	}
 
+	//TODO: deprecation?
 	private void addToOrphanListIfNeeded(IHeader header, int positionStart, int itemCount) {
 		//Check if the header is not already added (happens after un-linkage with un-success linkage)
 		if (!mOrphanHeaders.contains(header) && !isHeaderShared(header, positionStart, itemCount)) {
@@ -1152,11 +1177,13 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
+	//TODO: deprecation?
 	private void removeFromOrphanList(IHeader header) {
 		if (mOrphanHeaders.remove(header) && DEBUG)
 			Log.v(TAG, "Removed from orphan list [" + mOrphanHeaders.size() + "] Header " + header);
 	}
 
+	//TODO: deprecation?
 	private boolean isHeaderShared(IHeader header, int positionStart, int itemCount) {
 		int firstElementWithHeader = getGlobalPositionOf(header) + 1;
 		for (int i = firstElementWithHeader; i < mItems.size(); i++) {
@@ -1387,11 +1414,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
 		//Handling the delay
 		if (delay < 0) {
-			//Disable the Endless functionality
+			//Disable the Endless functionality and keep the item
 			mProgressItem = null;
 		} else {
 			//Delete the progress item with delay
-			mHandler.sendEmptyMessageDelayed(2, delay);
+			mHandler.sendEmptyMessageDelayed(LOAD_MORE_COMPLETE, delay);
 		}
 		//Add the new items or reset the loading status
 		if (newItems != null && newItems.size() > 0) {
@@ -1399,7 +1426,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				Log.v(TAG, "onLoadMore performing adding " + newItems.size() + " new Items!");
 			addItems(getItemCount(), newItems);
 			//Reset OnLoadMore delayed
-			mHandler.sendEmptyMessageDelayed(3, 200L);
+			mHandler.sendEmptyMessageDelayed(LOAD_MORE_RESET, 200L);
 		} else {
 			noMoreLoad();
 		}
@@ -1423,7 +1450,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (DEBUG) Log.v(TAG, "onLoadMore noMoreLoad!");
 		notifyItemChanged(getItemCount() - 1, true);
 		//Reset OnLoadMore delayed
-		mHandler.sendEmptyMessageDelayed(3, 200L);
+		mHandler.sendEmptyMessageDelayed(LOAD_MORE_RESET, 200L);
 	}
 
 	private void resetOnLoadMore() {
@@ -2544,7 +2571,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					parentPosition = createRestoreSubItemInfo(parent, item, payload);
 				}
 			}
-			//Restore hidden status for section headers
+			//Change to hidden status for section headers
 			if (isHeader(item)) {
 				header = (IHeader) item;
 				header.setHidden(true);
@@ -2805,8 +2832,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void startUndoTimer(long timeout, OnDeleteCompleteListener listener) {
 		//Make longer the timer for new coming deleted items
-		mHandler.removeMessages(1);
-		mHandler.sendMessageDelayed(Message.obtain(mHandler, 1, listener), timeout > 0 ? timeout : UNDO_TIMEOUT);
+		stopUndoTimer();
+		mHandler.sendMessageDelayed(Message.obtain(mHandler, CONFIRM_DELETE, listener), timeout > 0 ? timeout : UNDO_TIMEOUT);
 	}
 
 	/**
@@ -2816,7 +2843,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 3.0.0
 	 */
 	protected void stopUndoTimer() {
-		mHandler.removeCallbacksAndMessages(null);
+		mHandler.removeMessages(CONFIRM_DELETE);
 	}
 
 	/**
@@ -2987,8 +3014,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems, @IntRange(from = 0) long delay) {
 		//Make longer the timer for new coming deleted items
-		mHandler.removeMessages(0);
-		mHandler.sendMessageDelayed(Message.obtain(mHandler, 0, unfilteredItems), delay > 0 ? delay : 0);
+		mHandler.removeMessages(FILTER);
+		mHandler.sendMessageDelayed(Message.obtain(mHandler, FILTER, unfilteredItems), delay > 0 ? delay : 0);
 	}
 
 	/**
@@ -3018,7 +3045,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>5.0.0-b8 Synchronization animations limit + AsyncFilter
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems) {
-		mHandler.sendMessageDelayed(Message.obtain(mHandler, 0, unfilteredItems), 0);
+		mHandler.removeMessages(FILTER);
+		mHandler.sendMessage(Message.obtain(mHandler, FILTER, unfilteredItems));
 	}
 
 	private synchronized void filterItemsAsync(@NonNull List<T> unfilteredItems) {
@@ -3026,7 +3054,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
 
-		if (DEBUG) Log.v(TAG, "FilterItems with searchText=" + mSearchText);
+		if (DEBUG) Log.v(TAG, "filterItems with searchText=" + mSearchText);
 		List<T> filteredItems = new ArrayList<>();
 		filtering = true;//Enable flag: skip adjustPositions!
 
@@ -3057,7 +3085,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					item.setHidden(true);
 				}
 			}
-		} else if (hasNewSearchText(mSearchText)) {
+		} else if (hasNewSearchText(mSearchText)) {//this is better than checking emptiness
 			filteredItems = unfilteredItems; //with no filter
 			if (!mRestoreList.isEmpty()) {
 				for (RestoreInfo restoreInfo : mRestoreList) {
@@ -4171,7 +4199,6 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	private class FilterAsyncTask extends AsyncTask<Void, Void, Void> {
 
-		public static final int FILTER = 1;
 		private final String TAG = FilterAsyncTask.class.getSimpleName();
 
 		private List<T> newItems;
@@ -4200,6 +4227,10 @@ public class FlexibleAdapter<T extends IFlexible>
 					filterItemsAsync(newItems);
 					if (DEBUG) Log.i(TAG, "doInBackground - ended Filter");
 					break;
+				case UPDATE:
+					animateTo(newItems);
+					break;
+
 			}
 			return null;
 		}
@@ -4207,24 +4238,37 @@ public class FlexibleAdapter<T extends IFlexible>
 		@Override
 		protected void onPostExecute(Void result) {
 			executeNotifications();
-
-			//Restore headers if necessary
-			if (!hasSearchText()) {
-				//Add headers in post. It enqueues the modification for the LayoutManager
-				//Attempt to read from field 'android.support.v7.widget.RecyclerView$ViewHolder
-				// android.support.v7.widget.RecyclerView$LayoutParams.mViewHolder' on a null object reference
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						showAllHeaders();
-					}
-				});
+			switch (what) {
+				case UPDATE:
+					postUpdate();
+					break;
+				case FILTER:
+					postFilter();
+					break;
 			}
-
-			//Call listener to update EmptyView, assuming the filter always made a change
-			if (mUpdateListener != null)
-				mUpdateListener.onUpdateEmptyView(getItemCount());
 		}
+	}
+
+	private void postUpdate() {
+		//Show headers and expanded items if Data Set not empty
+		if (getItemCount() > 0) {
+			expandItemsAtStartUp();
+			if (headersShown) showAllHeaders();
+		}
+		//Update empty view
+		if (mUpdateListener != null) {
+			mUpdateListener.onUpdateEmptyView(getItemCount());
+		}
+	}
+
+	private void postFilter() {
+		//Restore headers if necessary
+		if (!hasSearchText()) {
+			showAllHeaders();
+		}
+		//Call listener to update EmptyView, assuming the filter always made a change
+		if (mUpdateListener != null)
+			mUpdateListener.onUpdateEmptyView(getItemCount());
 	}
 
 }
