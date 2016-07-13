@@ -450,7 +450,8 @@ public class MainActivity extends AppCompatActivity implements
 		}
 		//Action reverse item
 		if (reverseMenuItem != null) {
-			reverseMenuItem.setEnabled(!entryAnimationMenuItem.isChecked() && mAdapter.isAnimationOnScrollingEnabled());
+			reverseMenuItem.setEnabled(mAdapter.isAnimationOnScrollingEnabled() &&
+					entryAnimationMenuItem != null && !entryAnimationMenuItem.isChecked());
 			reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrolling());
 		}
 		return super.onPrepareOptionsMenu(menu);
