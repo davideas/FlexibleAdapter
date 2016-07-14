@@ -54,7 +54,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createExpandableSectionsDatabase(2000);//N. of sections
+		DatabaseService.getInstance().createExpandableSectionsDatabase(100);//N. of sections
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView

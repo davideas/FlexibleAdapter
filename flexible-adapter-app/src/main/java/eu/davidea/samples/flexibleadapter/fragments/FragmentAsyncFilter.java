@@ -79,7 +79,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 
 		} else {
 			//Create Database with custom size
-			DatabaseService.getInstance().createEndlessDatabase(DatabaseConfiguration.size);//N. of items
+			DatabaseService.getInstance().createEndlessDatabase(DatabaseConfiguration.size);//N. of items (1000 items it's already a medium size)
 			mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		}
 
