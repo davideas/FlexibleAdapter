@@ -3063,9 +3063,11 @@ public class FlexibleAdapter<T extends IFlexible>
 				if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
 				//Filter header first
 				T header = (T) getHeaderOf(item);
-				if (header != null && filterObject(header, getSearchText())
-						&& !filteredItems.contains(getHeaderOf(item))) {
-					filteredItems.add(header);
+				if (headersShown) {
+					if (header != null && filterObject(header, getSearchText())
+							&& !filteredItems.contains(header)) {
+						filteredItems.add(header);
+					}
 				}
 				if (filterExpandableObject(item)) {
 					RestoreInfo restoreInfo = getPendingRemovedItem(item);
@@ -3074,8 +3076,8 @@ public class FlexibleAdapter<T extends IFlexible>
 						restoreInfo.filterRefItem = ++newOriginalPosition < filteredItems.size() ?
 								filteredItems.get(newOriginalPosition) : null;
 					} else {
-						if (hasHeader(item) && !filteredItems.contains(getHeaderOf(item))) {
-							filteredItems.add((T) getHeaderOf(item));
+						if (headersShown && hasHeader(item) && !filteredItems.contains(header)) {
+							filteredItems.add(header);
 						}
 						filteredItems.add(item);
 						newOriginalPosition += 1 + addFilteredSubItems(filteredItems, item);
@@ -4265,7 +4267,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	private void postFilter() {
 		//Restore headers if necessary
-		if (!hasSearchText()) {
+		if (headersShown && !hasSearchText()) {
 			showAllHeaders();
 		}
 		//Call listener to update EmptyView, assuming the filter always made a change
