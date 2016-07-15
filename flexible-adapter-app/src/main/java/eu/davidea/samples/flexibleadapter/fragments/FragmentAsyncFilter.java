@@ -60,7 +60,9 @@ public class FragmentAsyncFilter extends AbstractFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (getArguments() != null) {
+		if (savedInstanceState != null) {
+			configure = savedInstanceState.getBoolean(ARG_CONFIGURE);
+		} else if (getArguments() != null) {
 			configure = getArguments().getBoolean(ARG_CONFIGURE);
 		}
 	}
@@ -84,7 +86,14 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		}
 
 		initializeRecyclerView();
-		if (configure) configure = false;
+		configure = !configure;
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		configure = !configure;//revert the change so next time the "if-else" is executed correctly
+		outState.putBoolean(ARG_CONFIGURE, configure);
+		super.onSaveInstanceState(outState);
 	}
 
 	private void initializeRecyclerView() {
