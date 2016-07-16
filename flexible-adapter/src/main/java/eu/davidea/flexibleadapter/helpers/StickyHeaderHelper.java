@@ -214,13 +214,14 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 	private void ensureHeaderParent() {
 		final View view = mStickyHeaderViewHolder.getContentView();
-		//#121 - Make sure the item params are kept if WRAP_CONTENT has been set for the Header View
+		//#121 - Make sure the measured height (width for horizontal layout) is kept if
+		// WRAP_CONTENT has been set for the Header View
 		mStickyHeaderViewHolder.itemView.getLayoutParams().width = view.getMeasuredWidth();
 		mStickyHeaderViewHolder.itemView.getLayoutParams().height = view.getMeasuredHeight();
-		//#121 - Now make sure the params are transferred to the StickyHolderLayout
+		//#139 - Copy xml params instead of Measured params
 		ViewGroup.LayoutParams params = mStickyHolderLayout.getLayoutParams();
-		params.width = view.getMeasuredWidth();
-		params.height = view.getMeasuredHeight();
+		params.width = view.getLayoutParams().width;
+		params.height = view.getLayoutParams().height;
 		removeViewFromParent(view);
 		mStickyHolderLayout.setClipToPadding(false);
 		mStickyHolderLayout.addView(view);
