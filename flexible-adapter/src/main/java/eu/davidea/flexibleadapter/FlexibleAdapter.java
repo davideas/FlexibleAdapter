@@ -656,10 +656,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Sets if all headers should be shown at startup. To call before setting the headers!
+	 * Sets if all headers should be shown at startup. To call before enabling sticky headers!
 	 * <p>Default value is false.</p>
 	 *
-	 * @param displayHeaders true to display them, false to keep them hidden
+	 * @param displayHeaders true to display headers, false to keep them hidden
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
@@ -1003,6 +1003,17 @@ public class FlexibleAdapter<T extends IFlexible>
 				}
 				headersShown = true;
 				multiRange = false;
+
+				//#142 - At startup when headers are shown for the first time, the position 0 is hidden
+				// by default. Header item at position 0 has to be forced to display by scrolling to it
+				int firstVisibleItem;
+				if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+					firstVisibleItem = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPositions(null)[0];
+				} else {
+					firstVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+				}
+				if (firstVisibleItem == 0 && isHeader(getItem(0)) && !isHeader(getItem(1)))
+					mRecyclerView.scrollToPosition(0);
 			}
 		});
 	}

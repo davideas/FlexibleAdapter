@@ -16,9 +16,11 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.animation.Animator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,6 +124,11 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 	}
 
+//	public boolean hasStickyHeaderTranslated(int position) {
+//		RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(position);
+//		return vh != null && (vh.itemView.getX() < 0 || vh.itemView.getY() < 0);
+//	}
+
 	private void onStickyHeaderChange(int sectionIndex) {
 		if (mStickyHeaderChangeListener != null) {
 			mStickyHeaderChangeListener.onStickyHeaderChange(sectionIndex);
@@ -207,10 +214,10 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 	private void ensureHeaderParent() {
 		final View view = mStickyHeaderViewHolder.getContentView();
-		//Make sure the item params are kept if WRAP_CONTENT has been set for the Header View
+		//#121 - Make sure the item params are kept if WRAP_CONTENT has been set for the Header View
 		mStickyHeaderViewHolder.itemView.getLayoutParams().width = view.getMeasuredWidth();
 		mStickyHeaderViewHolder.itemView.getLayoutParams().height = view.getMeasuredHeight();
-		//Now make sure the params are transferred to the StickyHolderLayout
+		//#121 - Now make sure the params are transferred to the StickyHolderLayout
 		ViewGroup.LayoutParams params = mStickyHolderLayout.getLayoutParams();
 		params.width = view.getMeasuredWidth();
 		params.height = view.getMeasuredHeight();
@@ -252,8 +259,12 @@ public class StickyHeaderHelper extends OnScrollListener {
 	@SuppressWarnings("unchecked")
 	private int getHeaderPosition(int adapterPosHere) {
 		if (adapterPosHere == RecyclerView.NO_POSITION) {
-			View firstChild = mRecyclerView.getChildAt(0);
-			adapterPosHere = mRecyclerView.getChildAdapterPosition(firstChild);
+			//Fix to display correct sticky header (especially after the searchText is cleared out)
+			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+				adapterPosHere = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstVisibleItemPositions(null)[0];
+			} else {
+				adapterPosHere = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+			}
 		}
 		IHeader header = mAdapter.getSectionHeader(adapterPosHere);
 		//Header cannot be sticky if it's also an Expandable in collapsed status, RV will raise an exception
