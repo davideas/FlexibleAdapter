@@ -6,7 +6,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,8 +13,10 @@ import android.view.MenuItem;
 
 import java.util.Random;
 
+import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.items.IHeader;
+import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.StaggeredHeaderItem;
@@ -209,7 +210,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 
 			int toPosition = mAdapter.calculatePositionFor(staggeredItem, new DatabaseService.ItemComparatorByGroup());
 			//Move item to just calculated position under the correct section
-			mAdapter.moveItem(mAdapter.getGlobalPositionOf(staggeredItem), toPosition, null);
+			mAdapter.moveItem(mAdapter.getGlobalPositionOf(staggeredItem), toPosition, Payload.MOVE);
 		}
 		//Retrieve the final position due to a possible hidden header became now visible!
 		int scrollTo = mAdapter.getGlobalPositionOf(staggeredItem);
@@ -223,14 +224,13 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) mRecyclerView.getLayoutManager();
-				int[] first = layoutManager.findFirstCompletelyVisibleItemPositions(null);
-				int[] last = layoutManager.findLastCompletelyVisibleItemPositions(null);
+				int first = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+				int last = Utils.findLastCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 				int headerPosition = mAdapter.getGlobalPositionOf(headerItem);
-				if (scrollTo <= first[0]) {
+				if (scrollTo <= first) {
 					Log.d(TAG, "ScrollTo headerPosition=" + headerPosition);
 					mRecyclerView.smoothScrollToPosition(Math.max(0, headerPosition));
-				} else if (scrollTo >= last[0]) {
+				} else if (scrollTo >= last) {
 					Log.d(TAG, "ScrollTo itemPosition=" + scrollTo);
 					mRecyclerView.smoothScrollToPosition(Math.min(scrollTo, mAdapter.getItemCount()));
 				}

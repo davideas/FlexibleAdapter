@@ -134,4 +134,40 @@ public final class Utils {
 		return OrientationHelper.HORIZONTAL;
 	}
 
+	/**
+	 * Helper method to find the adapter position of the First completely visible view [for each
+	 * span], no matter which Layout is.
+	 *
+	 * @param layoutManager the layout manager in use
+	 * @return the adapter position of the first fully visible item or {@code RecyclerView.NO_POSITION}
+	 * if there aren't any visible items.
+	 * @see #findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @since 5.0.0-b8
+	 */
+	public static int findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findFirstCompletelyVisibleItemPositions(null)[0];
+		} else {
+			return ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
+		}
+	}
+
+	/**
+	 * Helper method to find the adapter position of the Last completely visible view [for each
+	 * span], no matter which Layout is.
+	 *
+	 * @param layoutManager the layout manager in use
+	 * @return the adapter position of the last fully visible item or {@code RecyclerView.NO_POSITION}
+	 * if there aren't any visible items.
+	 * @see #findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @since 5.0.0-b8
+	 */
+	public static int findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findLastCompletelyVisibleItemPositions(null)[0];
+		} else {
+			return ((LinearLayoutManager) layoutManager).findLastCompletelyVisibleItemPosition();
+		}
+	}
+
 }

@@ -39,6 +39,7 @@ import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.helpers.ActionModeHelper;
 import eu.davidea.flexibleadapter.helpers.UndoHelper;
@@ -627,7 +628,7 @@ public class MainActivity extends AppCompatActivity implements
 		if (direction == ItemTouchHelper.LEFT) {
 			message.append(getString(R.string.action_archived));
 			new UndoHelper(mAdapter, this)
-					.withPayload(true)//You can pass any custom object (in this case Boolean is enough)
+					.withPayload(null)//You can pass any custom object (in this case Boolean is enough)
 					.withAction(UndoHelper.ACTION_UPDATE, new UndoHelper.SimpleActionListener() {
 						@Override
 						public boolean onPreAction() {
@@ -644,7 +645,7 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (direction == ItemTouchHelper.RIGHT) {
 			message.append(getString(R.string.action_deleted));
 			new UndoHelper(mAdapter, this)
-					.withPayload(true)//You can pass any custom object (in this case Boolean is enough)
+					.withPayload(null)//You can pass any custom object (in this case Boolean is enough)
 					.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.SimpleActionListener() {
 						@Override
 						public void onPostAction() {
@@ -805,7 +806,7 @@ public class MainActivity extends AppCompatActivity implements
 
 				//New Undo Helper
 				new UndoHelper(mAdapter, this)
-						.withPayload(true)
+						.withPayload(Payload.CHANGE)
 						.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.OnActionListener() {
 							@Override
 							public boolean onPreAction() {

@@ -26,9 +26,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -38,6 +36,8 @@ import android.view.animation.LinearInterpolator;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+
+import eu.davidea.flexibleadapter.utils.Utils;
 
 /**
  * This class is responsible to animate items. Bounded items are animated initially and also
@@ -370,17 +370,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * Reset stepDelay.
 	 */
 	private long calculateAnimationDelay1(int position) {
-		RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
-		int lastVisiblePosition, firstVisiblePosition;
-		if (layoutManager instanceof LinearLayoutManager) {
-			LinearLayoutManager linearLayout = (LinearLayoutManager) layoutManager;
-			lastVisiblePosition = linearLayout.findLastCompletelyVisibleItemPosition();
-			firstVisiblePosition = linearLayout.findFirstCompletelyVisibleItemPosition();
-		} else {
-			StaggeredGridLayoutManager staggeredGridLayout = (StaggeredGridLayoutManager) layoutManager;
-			lastVisiblePosition = staggeredGridLayout.findLastCompletelyVisibleItemPositions(null)[0];
-			firstVisiblePosition = staggeredGridLayout.findFirstCompletelyVisibleItemPositions(null)[0];
-		}
+		int firstVisiblePosition = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+		int lastVisiblePosition = Utils.findLastCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 
 		//Use always the max child count reached
 		if (mMaxChildViews < mRecyclerView.getChildCount())
@@ -414,17 +405,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 */
 	private long calculateAnimationDelay2(int position) {
 		long delay;
-		RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
-		int lastVisiblePosition, firstVisiblePosition;
-		if (layoutManager instanceof LinearLayoutManager) {
-			LinearLayoutManager linearLayout = (LinearLayoutManager) layoutManager;
-			lastVisiblePosition = linearLayout.findLastCompletelyVisibleItemPosition();
-			firstVisiblePosition = linearLayout.findFirstCompletelyVisibleItemPosition();
-		} else {
-			StaggeredGridLayoutManager staggeredGridLayout = (StaggeredGridLayoutManager) layoutManager;
-			lastVisiblePosition = staggeredGridLayout.findLastCompletelyVisibleItemPositions(null)[0];
-			firstVisiblePosition = staggeredGridLayout.findFirstCompletelyVisibleItemPositions(null)[0];
-		}
+		int firstVisiblePosition = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+		int lastVisiblePosition = Utils.findLastCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 
 		if (mLastAnimatedPosition > lastVisiblePosition)
 			lastVisiblePosition = mLastAnimatedPosition;

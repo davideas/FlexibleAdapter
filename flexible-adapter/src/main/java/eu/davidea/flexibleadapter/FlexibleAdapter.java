@@ -27,9 +27,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,6 +55,7 @@ import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
+import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -738,7 +737,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	//TODO: deprecation?
 	public FlexibleAdapter linkHeaderTo(@NonNull T item, @NonNull IHeader header) {
-		linkHeaderTo(item, header, null);
+		linkHeaderTo(item, header, Payload.LINK);
 		if (header.isHidden() && headersShown) {
 			showHeaderOf(getGlobalPositionOf(item), item);
 		}
@@ -754,7 +753,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	//TODO: deprecation?
 	public IHeader unlinkHeaderFrom(@NonNull T item) {
-		IHeader header = unlinkHeaderFrom(item, null);
+		IHeader header = unlinkHeaderFrom(item, Payload.UNLINK);
 		if (header != null && !header.isHidden()) {
 			hideHeaderOf(item);
 		}
@@ -1011,7 +1010,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 				//#142 - At startup when headers are shown for the first time, the position 0 is hidden
 				// by default. Header item at position 0 has to be forced to display by scrolling to it
-				int firstVisibleItem = findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+				int firstVisibleItem = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 				if (firstVisibleItem == 0 && isHeader(getItem(0)) && !isHeader(getItem(1)))
 					mRecyclerView.scrollToPosition(0);
 			}
@@ -1130,7 +1129,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			ISectionable sectionable = (ISectionable) item;
 			//Unlink header only if different
 			if (sectionable.getHeader() != null && !sectionable.getHeader().equals(header)) {
-				unlinkHeaderFrom((T) sectionable, payload);
+				unlinkHeaderFrom((T) sectionable, Payload.UNLINK);
 			}
 			if (sectionable.getHeader() == null && header != null) {
 				if (DEBUG) Log.v(TAG, "Link header " + header + " to " + sectionable);
@@ -1458,7 +1457,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private void noMoreLoad() {
 		if (DEBUG) Log.v(TAG, "onLoadMore noMoreLoad!");
-		notifyItemChanged(getItemCount() - 1, true);
+		notifyItemChanged(getItemCount() - 1, Payload.NO_MORE_LOAD);
 		//Reset OnLoadMore delayed
 		mHandler.sendEmptyMessageDelayed(LOAD_MORE_RESET, 200L);
 	}
@@ -2099,7 +2098,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public boolean addSubItem(@IntRange(from = 0) int parentPosition,
 							  @IntRange(from = 0) int subPosition, @NonNull T item) {
-		return this.addSubItem(parentPosition, subPosition, item, false, null);
+		return this.addSubItem(parentPosition, subPosition, item, false, Payload.CHANGE);
 	}
 
 	/**
@@ -2330,7 +2329,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (index >= 0) {
 			item.setHeader(header);
 			if (headerPosition >= 0 && isExpandable((T) header))
-				addSubItem(headerPosition, index, (T) item, false, true);
+				addSubItem(headerPosition, index, (T) item, false, Payload.SUB_ITEM);
 			else
 				addItem(headerPosition + 1 + index, (T) item);
 		}
@@ -2385,7 +2384,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 1.0.0
 	 */
 	public void removeItem(@IntRange(from = 0) int position) {
-		this.removeItem(position, null);
+		this.removeItem(position, Payload.CHANGE);
 	}
 
 	/**
@@ -2421,7 +2420,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 1.0.0
 	 */
 	public void removeItems(@NonNull List<Integer> selectedPositions) {
-		this.removeItems(selectedPositions, null);
+		this.removeItems(selectedPositions, Payload.CHANGE);
 	}
 
 	/**
@@ -2514,7 +2513,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void removeRange(@IntRange(from = 0) int positionStart,
 							@IntRange(from = 0) int itemCount) {
-		this.removeRange(positionStart, itemCount, null);
+		this.removeRange(positionStart, itemCount, Payload.CHANGE);
 	}
 
 	/**
@@ -2576,9 +2575,9 @@ public class FlexibleAdapter<T extends IFlexible>
 				if (parent == null) parent = getExpandableOf(item);
 				//Differentiate: (Expandable & NonExpandable with No parent) from (NonExpandable with a parent)
 				if (parent == null) {
-					createRestoreItemInfo(positionStart, item, payload);
+					createRestoreItemInfo(positionStart, item, Payload.UNDO);
 				} else {
-					parentPosition = createRestoreSubItemInfo(parent, item, payload);
+					parentPosition = createRestoreSubItemInfo(parent, item, Payload.UNDO);
 				}
 			}
 			//Change to hidden status for section headers
@@ -2592,7 +2591,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				for (ISectionable sectionable : sectionableList) {
 					sectionable.setHeader(null);
 					if (payload != null)
-						notifyItemChanged(getGlobalPositionOf(sectionable), payload);
+						notifyItemChanged(getGlobalPositionOf(sectionable), Payload.UNLINK);
 				}
 			}
 			//Remove item from internal list
@@ -2618,7 +2617,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				if (headerPosition >= 0) {
 					if (DEBUG) Log.v(TAG, "Removing orphan header " + orphanHeader);
 					if (!permanentDelete)
-						createRestoreItemInfo(headerPosition, (T) orphanHeader, payload);
+						createRestoreItemInfo(headerPosition, (T) orphanHeader, Payload.UNDO);
 					mItems.remove(headerPosition);
 					notifyItemRemoved(headerPosition);
 				}
@@ -2757,7 +2756,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					//Add parent + subItem
 					restoreInfo.refItem.setHidden(false);
 					addItem(restoreInfo.getRestorePosition(false), restoreInfo.refItem);
-					addSubItem(restoreInfo.getRestorePosition(true), 0, restoreInfo.item, true, null);
+					addSubItem(restoreInfo.getRestorePosition(true), 0, restoreInfo.item, true, restoreInfo.payload);
 				} else {
 					//Add subItem
 					addSubItem(restoreInfo.getRestorePosition(true), restoreInfo.relativePosition,
@@ -3379,7 +3378,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					notifyItemInserted(notification.position);
 					break;
 				case Notification.CHANGE:
-					notifyItemChanged(notification.position);
+					notifyItemChanged(notification.position, Payload.FILTER);
 					break;
 				case Notification.REMOVE:
 					notifyItemRemoved(notification.position);
@@ -3388,7 +3387,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					notifyItemMoved(notification.fromPosition, notification.position);
 					break;
 				default:
-					if (DEBUG) Log.v(TAG, "notifyDataSetChanged");
+					if (DEBUG) Log.v(TAG, "notifyDataSetChanged!");
 					notifyDataSetChanged();
 					break;
 			}
@@ -3517,7 +3516,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b7
 	 */
 	public void moveItem(int fromPosition, int toPosition) {
-		moveItem(fromPosition, toPosition, null);
+		moveItem(fromPosition, toPosition, Payload.MOVE);
 	}
 
 	/**
@@ -3607,7 +3606,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					IHeader header = (IHeader) fromItem;
 					List<ISectionable> items = getSectionItems(header);
 					for (ISectionable sectionable : items) {
-						linkHeaderTo((T) sectionable, header, true);
+						linkHeaderTo((T) sectionable, header, Payload.LINK);
 					}
 				} else {
 					//Dragging up fromHeader
@@ -3615,7 +3614,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					IHeader header = (IHeader) toItem;
 					List<ISectionable> items = getSectionItems(header);
 					for (ISectionable sectionable : items) {
-						linkHeaderTo((T) sectionable, header, true);
+						linkHeaderTo((T) sectionable, header, Payload.LINK);
 					}
 				}
 			} else if (toItem instanceof IHeader) {
@@ -3624,16 +3623,16 @@ public class FlexibleAdapter<T extends IFlexible>
 				oldPosition = fromPosition < toPosition ? toPosition + 1 : toPosition;
 				newPosition = fromPosition < toPosition ? toPosition : fromPosition + 1;
 				//Swap header linkage
-				linkHeaderTo(getItem(oldPosition), getSectionHeader(oldPosition), true);
-				linkHeaderTo(getItem(newPosition), (IHeader) toItem, true);
+				linkHeaderTo(getItem(oldPosition), getSectionHeader(oldPosition), Payload.LINK);
+				linkHeaderTo(getItem(newPosition), (IHeader) toItem, Payload.LINK);
 			} else if (fromItem instanceof IHeader) {
 				//A Header is being dragged down
 				//Else a Header is being dragged up
 				oldPosition = fromPosition < toPosition ? fromPosition : fromPosition + 1;
 				newPosition = fromPosition < toPosition ? toPosition + 1 : fromPosition;
 				//Swap header linkage
-				linkHeaderTo(getItem(oldPosition), getSectionHeader(oldPosition), true);
-				linkHeaderTo(getItem(newPosition), (IHeader) fromItem, true);
+				linkHeaderTo(getItem(oldPosition), getSectionHeader(oldPosition), Payload.LINK);
+				linkHeaderTo(getItem(newPosition), (IHeader) fromItem, Payload.LINK);
 			} else {
 				//A Header receives the toItem
 				//Else a Header receives the fromItem
@@ -3642,7 +3641,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				//Swap header linkage
 				IHeader header = getHeaderOf(getItem(oldPosition));
 				if (header != null)
-					linkHeaderTo(getItem(newPosition), header, true);
+					linkHeaderTo(getItem(newPosition), header, Payload.LINK);
 			}
 		}
 	}
@@ -3834,8 +3833,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Must be delayed to give time at RecyclerView to recalculate positions after an automatic collapse
 		new Handler(Looper.getMainLooper(), new Handler.Callback() {
 			public boolean handleMessage(Message message) {
-				int firstVisibleItem = findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
-				int lastVisibleItem = findLastCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+				int firstVisibleItem = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+				int lastVisibleItem = Utils.findLastCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 				int itemsToShow = position + subItemsCount - lastVisibleItem;
 //				if (DEBUG)
 //					Log.v(TAG, "autoScroll itemsToShow=" + itemsToShow + " firstVisibleItem=" + firstVisibleItem + " lastVisibleItem=" + lastVisibleItem + " RvChildCount=" + mRecyclerView.getChildCount());
@@ -3857,22 +3856,6 @@ public class FlexibleAdapter<T extends IFlexible>
 				return true;
 			}
 		}).sendMessageDelayed(Message.obtain(mHandler), delay);
-	}
-
-	private static int findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).findFirstCompletelyVisibleItemPositions(null)[0];
-		} else {
-			return ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
-		}
-	}
-
-	private static int findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).findLastCompletelyVisibleItemPositions(null)[0];
-		} else {
-			return ((LinearLayoutManager) layoutManager).findLastCompletelyVisibleItemPosition();
-		}
 	}
 
 	private void adjustSelected(int startPosition, int itemCount) {
