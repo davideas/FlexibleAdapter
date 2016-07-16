@@ -1011,12 +1011,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 				//#142 - At startup when headers are shown for the first time, the position 0 is hidden
 				// by default. Header item at position 0 has to be forced to display by scrolling to it
-				int firstVisibleItem;
-				if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-					firstVisibleItem = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPositions(null)[0];
-				} else {
-					firstVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-				}
+				int firstVisibleItem = findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 				if (firstVisibleItem == 0 && isHeader(getItem(0)) && !isHeader(getItem(1)))
 					mRecyclerView.scrollToPosition(0);
 			}
@@ -3839,17 +3834,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Must be delayed to give time at RecyclerView to recalculate positions after an automatic collapse
 		new Handler(Looper.getMainLooper(), new Handler.Callback() {
 			public boolean handleMessage(Message message) {
-				int firstVisibleItem, lastVisibleItem;
-				if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-					firstVisibleItem = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPositions(null)[0];
-					lastVisibleItem = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPositions(null)[0];
-				} else {
-					firstVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-					lastVisibleItem = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
-				}
+				int firstVisibleItem = findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+				int lastVisibleItem = findLastCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 				int itemsToShow = position + subItemsCount - lastVisibleItem;
-				if (DEBUG)
-					Log.v(TAG, "autoScroll itemsToShow=" + itemsToShow + " firstVisibleItem=" + firstVisibleItem + " lastVisibleItem=" + lastVisibleItem + " RvChildCount=" + mRecyclerView.getChildCount());
+//				if (DEBUG)
+//					Log.v(TAG, "autoScroll itemsToShow=" + itemsToShow + " firstVisibleItem=" + firstVisibleItem + " lastVisibleItem=" + lastVisibleItem + " RvChildCount=" + mRecyclerView.getChildCount());
 				if (itemsToShow > 0) {
 					int scrollMax = position - firstVisibleItem;
 					int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
@@ -3859,8 +3848,8 @@ public class FlexibleAdapter<T extends IFlexible>
 						scrollBy = scrollBy % spanCount + spanCount;
 					}
 					int scrollTo = firstVisibleItem + scrollBy;
-					if (DEBUG)
-						Log.v(TAG, "autoScroll scrollMin=" + scrollMin + " scrollMax=" + scrollMax + " scrollBy=" + scrollBy + " scrollTo=" + scrollTo);
+//					if (DEBUG)
+//						Log.v(TAG, "autoScroll scrollMin=" + scrollMin + " scrollMax=" + scrollMax + " scrollBy=" + scrollBy + " scrollTo=" + scrollTo);
 					mRecyclerView.smoothScrollToPosition(scrollTo);
 				} else if (position < firstVisibleItem) {
 					mRecyclerView.smoothScrollToPosition(position);
@@ -3868,6 +3857,22 @@ public class FlexibleAdapter<T extends IFlexible>
 				return true;
 			}
 		}).sendMessageDelayed(Message.obtain(mHandler), delay);
+	}
+
+	private static int findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findFirstCompletelyVisibleItemPositions(null)[0];
+		} else {
+			return ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
+		}
+	}
+
+	private static int findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findLastCompletelyVisibleItemPositions(null)[0];
+		} else {
+			return ((LinearLayoutManager) layoutManager).findLastCompletelyVisibleItemPosition();
+		}
 	}
 
 	private void adjustSelected(int startPosition, int itemCount) {
