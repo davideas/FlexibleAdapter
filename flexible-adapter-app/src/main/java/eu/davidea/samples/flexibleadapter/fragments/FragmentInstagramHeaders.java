@@ -67,7 +67,6 @@ public class FragmentInstagramHeaders extends AbstractFragment
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		mAdapter.initializeListeners(getActivity())
-				.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!
 				//Experimenting NEW features (v5.0.0)
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true);
@@ -83,7 +82,8 @@ public class FragmentInstagramHeaders extends AbstractFragment
 			}
 		});
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 0, 24));
-		mAdapter.enableStickyHeaders()//Make headers sticky
+		mAdapter.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!
+				.enableStickyHeaders()//Make headers sticky
 				//Endless scroll with 1 item threshold
 				.setEndlessScrollListener(this, new ProgressItem())
 				.setEndlessScrollThreshold(1);//Default=1

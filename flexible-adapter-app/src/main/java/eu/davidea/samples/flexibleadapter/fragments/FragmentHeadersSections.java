@@ -66,7 +66,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createHeadersSectionsDatabase(400, 30);
+		DatabaseService.getInstance().createHeadersSectionsDatabase(400, 80);
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -118,7 +118,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//Add sample HeaderView items on the top (not belongs to the library)
-		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		//mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.showLayoutInfo(savedInstanceState == null);
 	}
 

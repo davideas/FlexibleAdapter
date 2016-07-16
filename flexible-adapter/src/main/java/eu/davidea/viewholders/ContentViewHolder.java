@@ -9,6 +9,8 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 /**
  * This Class separates the initialization of an eventual StickyHeader ViewHolder from a Normal
  * ViewHolder. It improves code readability of FlexibleViewHolder.
+ * <p>Because itemView is declared final, we can't initialize it twice, this separation must be
+ * done in the constructor.</p>
  *
  * @author Davide Steduto
  * @since 18/06/2016 Created

@@ -52,7 +52,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		super.updateDataSet(items, animate);
 
 		//Add example view
-		showLayoutInfo(true);
+		//showLayoutInfo(true);
 	}
 
 	/*

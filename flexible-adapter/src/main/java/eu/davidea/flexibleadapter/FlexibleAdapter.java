@@ -658,9 +658,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Sets if all headers should be shown at startup. To call before enabling sticky headers!
 	 * <p>Default value is false.</p>
+	 * <b>Note:</b> {@code showAllHeaders()} is already called by this method.
 	 *
 	 * @param displayHeaders true to display headers, false to keep them hidden
 	 * @return this Adapter, so the call can be chained
+	 * @see #showAllHeaders()
 	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter setDisplayHeadersAtStartUp(boolean displayHeaders) {
@@ -982,10 +984,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Shows all headers in the RecyclerView at their linked position.
-	 * <p>Headers can be shown or hidden all together.</p>
+	 * Shows all headers in the RecyclerView at their linked position. Not intended to be called at
+	 * startup.<br/> To display headers at startup please use {@code setDisplayHeadersAtStartUp()}
+	 * instead.
+	 * <p><b>Note:</b> Headers can only be shown or hidden all together.</p>
 	 *
 	 * @see #hideAllHeaders()
+	 * @see #setDisplayHeadersAtStartUp(boolean)
 	 * @since 5.0.0-b1
 	 */
 	public void showAllHeaders() {
