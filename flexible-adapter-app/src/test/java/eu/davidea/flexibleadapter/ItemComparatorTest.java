@@ -48,6 +48,7 @@ public class ItemComparatorTest {
 		SimpleItem aa = new SimpleItem(headers[0], "aa");
 		SimpleItem ab = new SimpleItem(headers[0], "ab");
 		SimpleItem ac = new SimpleItem(headers[0], "ac");
+		System.out.println("addItem precondition: " + initItems);
 
 		adapter.addItem(adapter.calculatePositionFor(ab, comparator), ab);
 		assertEquals(1, adapter.getGlobalPositionOf(ab));
@@ -72,11 +73,12 @@ public class ItemComparatorTest {
 		initItems.add(ab);
 		initItems.add(ac);
 		Collections.sort(initItems, comparator);
-		
+
 		FlexibleAdapter<AbstractFlexibleItem> adapter = new FlexibleAdapter<>(initItems);
 		adapter.setDisplayHeadersAtStartUp(true);
 
 		//Precondition = Item "aa" has been added correctly
+		System.out.println("moveItem Preconditions: " + initItems);
 		assertEquals(1, adapter.getGlobalPositionOf(aa));
 
 		//---------------------------------------------------------------
