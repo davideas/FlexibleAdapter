@@ -63,25 +63,6 @@ public class ItemComparatorTest {
 	}
 
 	@Test
-	public void testCalculatePositionFor_AddItemToSection() {
-		FlexibleAdapter<AbstractFlexibleItem> adapter = new FlexibleAdapter<>(initItems);
-		adapter.setDisplayHeadersAtStartUp(true);
-
-		SimpleItem aa = new SimpleItem(headers[0], "aa");
-		SimpleItem ab = new SimpleItem(headers[0], "ab");
-
-		//TEST1 = New Item for a New Section
-		adapter.addItemToSection(aa, headers[0], comparator);
-		assertEquals(1, adapter.getGlobalPositionOf(aa));
-		System.out.println("addItemToSection item aa, new Section: " + initItems);
-
-		//TEST2 = New Item for an Existing Section
-		adapter.addItemToSection(ab, headers[0], comparator);
-		assertEquals(2, adapter.getGlobalPositionOf(ab));
-		System.out.println("addItemToSection item ab, existing Section: " + initItems);
-	}
-
-	@Test
 	public void testCalculatePositionFor_MoveItem() {
 		//Integrate sorted initItems with new section of 3 sectionables + new header
 		SimpleItem aa = new SimpleItem(headers[0], "aa");
@@ -143,7 +124,55 @@ public class ItemComparatorTest {
 	}
 
 	@Test
-	public void testSimpleItemComparator() {
+	public void testCalculatePositionFor_AddSection() {
+		FlexibleAdapter<AbstractFlexibleItem> adapter = new FlexibleAdapter<>(initItems);
+		adapter.setDisplayHeadersAtStartUp(true);
+
+		//TEST1 - Head of the list
+		int position = adapter.calculatePositionFor(headers[0], comparator);
+		adapter.addItem(position, headers[0]);
+		assertEquals(0, adapter.getGlobalPositionOf(headers[0]));
+		System.out.println("addItem new Section a (Head): " + initItems);
+
+		//TEST1 - Tail of the list
+		SimpleHeader d = new SimpleHeader("d");
+		position = adapter.calculatePositionFor(d, comparator);
+		adapter.addItem(position, d);
+		assertEquals(9, adapter.getGlobalPositionOf(d));
+		System.out.println("addItem new Section d (Tail): " + initItems);
+	}
+
+	@Test
+	public void testComparator_AddSection() {
+		FlexibleAdapter<AbstractFlexibleItem> adapter = new FlexibleAdapter<>(initItems);
+		adapter.setDisplayHeadersAtStartUp(true);
+
+		adapter.addSection(headers[0], comparator);
+		assertEquals(0, adapter.getGlobalPositionOf(headers[0]));
+		System.out.println("addSection new Section a (Head): " + initItems);
+	}
+
+	@Test
+	public void testComparator_AddItemToSection() {
+		FlexibleAdapter<AbstractFlexibleItem> adapter = new FlexibleAdapter<>(initItems);
+		adapter.setDisplayHeadersAtStartUp(true);
+
+		SimpleItem aa = new SimpleItem(headers[0], "aa");
+		SimpleItem ab = new SimpleItem(headers[0], "ab");
+
+		//TEST1 = New Item for a New Section (internal use of calculatePositionFor())
+		adapter.addItemToSection(aa, headers[0], comparator);
+		assertEquals(1, adapter.getGlobalPositionOf(aa));
+		System.out.println("addItemToSection item aa, new Section: " + initItems);
+
+		//TEST2 = New Item for an Existing Section
+		adapter.addItemToSection(ab, headers[0], comparator);
+		assertEquals(2, adapter.getGlobalPositionOf(ab));
+		System.out.println("addItemToSection item ab, existing Section: " + initItems);
+	}
+
+	@Test
+	public void testComparator() {
 		SimpleItem aa = new SimpleItem(headers[0], "aa");
 		SimpleItem ba = new SimpleItem(headers[1], "ba");
 		SimpleItem cb = new SimpleItem(headers[2], "cb");
