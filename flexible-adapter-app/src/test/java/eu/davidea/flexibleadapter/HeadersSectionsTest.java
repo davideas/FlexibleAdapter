@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
  * @since 23/06/2016
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class)
+@Config(constants = BuildConfig.class, sdk = 23)
 public class HeadersSectionsTest {
 
 	FlexibleAdapter<AbstractFlexibleItem> mAdapter;

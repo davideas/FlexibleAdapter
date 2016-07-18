@@ -623,11 +623,15 @@ public class FlexibleAdapter<T extends IFlexible>
 				List sortedList = getSectionItems(header);
 				sortedList.add(item);
 				Collections.sort(sortedList, comparator);
-				int fix = mItems.indexOf(item) < getGlobalPositionOf(header) ? 0 : 1;
-				int result = getGlobalPositionOf(header) + sortedList.indexOf(item) + fix;
+				int itemPosition = mItems.indexOf(item);
+				int headerPosition = getGlobalPositionOf(header);
+				//#143 - calculatePositionFor() missing a +1 when addItem (fixed by condition: itemPosition != -1)
+				//fix represents the situation when item is before the target position (used in moveItem)
+				int fix = itemPosition != -1 && itemPosition < headerPosition ? 0 : 1;
+				int result = headerPosition + sortedList.indexOf(item) + fix;
 				if (DEBUG) {
 					Log.v(TAG, "Calculated finalPosition=" + result +
-							" sectionPosition=" + getGlobalPositionOf(header) +
+							" sectionPosition=" + headerPosition +
 							" relativePosition=" + sortedList.indexOf(item) + " fix=" + fix);
 				}
 				return result;
@@ -1010,9 +1014,11 @@ public class FlexibleAdapter<T extends IFlexible>
 
 				//#142 - At startup when headers are shown for the first time, the position 0 is hidden
 				// by default. Header item at position 0 has to be forced to display by scrolling to it
-				int firstVisibleItem = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
-				if (firstVisibleItem == 0 && isHeader(getItem(0)) && !isHeader(getItem(1)))
-					mRecyclerView.scrollToPosition(0);
+				if (mRecyclerView != null) {
+					int firstVisibleItem = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+					if (firstVisibleItem == 0 && isHeader(getItem(0)) && !isHeader(getItem(1)))
+						mRecyclerView.scrollToPosition(0);
+				}
 			}
 		});
 	}
