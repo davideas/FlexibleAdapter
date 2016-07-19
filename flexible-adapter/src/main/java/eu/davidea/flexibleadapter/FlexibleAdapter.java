@@ -486,8 +486,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		} else {
 			if (items == null) mItems = new ArrayList<>();
 			else mItems = new ArrayList<>(items);
+			//Show headers and expanded items if Data Set not empty
+			if (getItemCount() > 0) {
+				expandItemsAtStartUp();
+				if (headersShown) initializeHeaders(true);
+			}
 			notifyDataSetChanged();
-			postUpdate();
 		}
 	}
 
@@ -743,7 +747,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public FlexibleAdapter linkHeaderTo(@NonNull T item, @NonNull IHeader header) {
 		linkHeaderTo(item, header, Payload.LINK);
 		if (header.isHidden() && headersShown) {
-			showHeaderOf(getGlobalPositionOf(item), item);
+			showHeaderOf(getGlobalPositionOf(item), item, false);
 		}
 		return this;
 	}
@@ -1003,12 +1007,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				multiRange = true;
 				//Show linked headers only
 				resetHiddenStatus();
-				int position = 0;
-				while (position < mItems.size()) {
-					if (showHeaderOf(position, mItems.get(position)))
-						position++;//It's the same element, skip it.
-					position++;
-				}
+				initializeHeaders(false);
 				headersShown = true;
 				multiRange = false;
 
@@ -1021,6 +1020,20 @@ public class FlexibleAdapter<T extends IFlexible>
 				}
 			}
 		});
+	}
+
+	/**
+	 * Insert the headers with no notifications, to use with {@code notifyDataSetChanged()}.
+	 *
+	 * @param init true to skip the call to notifyItemInserted, false otherwise
+	 */
+	private void initializeHeaders(boolean init) {
+		int position = 0;
+		while (position < mItems.size()) {
+			if (showHeaderOf(position, mItems.get(position), init))
+				position++;//It's the same element, skip it.
+			position++;
+		}
 	}
 
 	/**
@@ -1076,9 +1089,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position the position where the header will be displayed
 	 * @param item     the item that holds the header
+	 * @param init     for silent initialization
 	 * @since 5.0.0-b1
 	 */
-	private boolean showHeaderOf(int position, @NonNull T item) {
+	private boolean showHeaderOf(int position, @NonNull T item, boolean init) {
 		//Take the header
 		IHeader header = getHeaderOf(item);
 		//Check header existence
@@ -1086,7 +1100,16 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (header.isHidden()) {
 			if (DEBUG) Log.v(TAG, "Showing header at position " + position + " header=" + header);
 			header.setHidden(false);
-			return addItem(position, (T) header);
+			if (init) {
+				if (position < mItems.size()) {
+					mItems.add(position, item);
+				} else {
+					mItems.add(item);
+				}
+				return true;
+			} else {
+				return addItem(position, (T) header);
+			}
 		}
 		return false;
 	}
@@ -1804,12 +1827,13 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 
 			//Expand!
-			notifyItemRangeInserted(position + 1, subItemsCount);
+			if (!init)
+				notifyItemRangeInserted(position + 1, subItemsCount);
 			//Show also the headers of the subItems
 			if (!init && headersShown) {
 				int count = 0;
 				for (T subItem : subItems) {
-					if (showHeaderOf(position + (++count), subItem)) count++;
+					if (showHeaderOf(position + (++count), subItem, false)) count++;
 				}
 			}
 			if (DEBUG) {
@@ -2085,7 +2109,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (headersShown && !recursive) {
 			recursive = true;
 			for (T item : items)
-				showHeaderOf(getGlobalPositionOf(item), item);//We have to find the correct position!
+				showHeaderOf(getGlobalPositionOf(item), item, false);//We have to find the correct position!
 			recursive = false;
 		}
 		//Call listener to update EmptyView
@@ -3556,7 +3580,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (payload != null) notifyItemChanged(toPosition, payload);
 		//Eventually display the new Header
 		if (headersShown) {
-			showHeaderOf(toPosition, item);
+			showHeaderOf(toPosition, item, false);
 		}
 		//Restore original expanded status
 		if (expanded) expand(toPosition);
