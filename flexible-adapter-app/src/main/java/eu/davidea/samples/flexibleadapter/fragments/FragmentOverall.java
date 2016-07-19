@@ -74,7 +74,9 @@ public class FragmentOverall extends AbstractFragment {
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				Snackbar.make(getView(), "Long press drag is enabled", Snackbar.LENGTH_SHORT).show();
+				if (getView() != null) {//Fix NPE when closing app before the execution of Runnable
+					Snackbar.make(getView(), "Long press drag is enabled", Snackbar.LENGTH_SHORT).show();
+				}
 			}
 		}, 1500L);
 
