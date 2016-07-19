@@ -486,12 +486,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		} else {
 			if (items == null) mItems = new ArrayList<>();
 			else mItems = new ArrayList<>(items);
-			//Show headers and expanded items if Data Set not empty
-			if (getItemCount() > 0) {
-				expandItemsAtStartUp();
-				if (headersShown) initializeHeaders(true);
-			}
-			notifyDataSetChanged();
+			postUpdate(true);
 		}
 	}
 
@@ -1001,37 +996,48 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	public void showAllHeaders() {
-		mHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				multiRange = true;
-				//Show linked headers only
-				resetHiddenStatus();
-				initializeHeaders(false);
-				headersShown = true;
-				multiRange = false;
-
-				//#142 - At startup when headers are shown for the first time, the position 0 is hidden
-				// by default. Header item at position 0 has to be forced to display by scrolling to it
-				if (mRecyclerView != null) {
-					int firstVisibleItem = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
-					if (firstVisibleItem == 0 && isHeader(getItem(0)) && !isHeader(getItem(1)))
-						mRecyclerView.scrollToPosition(0);
-				}
-			}
-		});
+		showAllHeaders(false);
 	}
 
 	/**
-	 * Insert the headers with no notifications, to use with {@code notifyDataSetChanged()}.
-	 *
+	 * @param init true to skip {@code notifyItemInserted}, false to make the call in Post and
+	 *             notify single insertion
+	 */
+	private void showAllHeaders(boolean init) {
+		if (init) {
+			//No notifyItemInserted!
+			showAllHeadersWithReset(true);
+		} else {
+			//In post, let's notifyItemInserted!
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					multiRange = true;
+					showAllHeadersWithReset(false);
+					headersShown = true;
+					multiRange = false;
+					//#142 - At startup, with animations, when headers are shown for the first time,
+					// the position 0 is hidden by default. Header item at position 0 has to be
+					// forced to display by scrolling to it. Resolves item below sticky header.
+					if (mRecyclerView != null) {
+						int firstVisibleItem = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+						if (firstVisibleItem == 0 && isHeader(getItem(0)) && !isHeader(getItem(1)))
+							mRecyclerView.scrollToPosition(0);
+					}
+				}
+			});
+		}
+	}
+
+	/**
 	 * @param init true to skip the call to notifyItemInserted, false otherwise
 	 */
-	private void initializeHeaders(boolean init) {
+	private void showAllHeadersWithReset(boolean init) {
 		int position = 0;
+		resetHiddenStatus();
 		while (position < mItems.size()) {
 			if (showHeaderOf(position, mItems.get(position), init))
-				position++;//It's the same element, skip it.
+				position++;//It's the same element, skip it
 			position++;
 		}
 	}
@@ -1100,11 +1106,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (header.isHidden()) {
 			if (DEBUG) Log.v(TAG, "Showing header at position " + position + " header=" + header);
 			header.setHidden(false);
-			if (init) {
+			if (init) {//Skip notifyItemInserted!
 				if (position < mItems.size()) {
-					mItems.add(position, item);
+					mItems.add(position, (T) header);
 				} else {
-					mItems.add(item);
+					mItems.add((T) header);
 				}
 				return true;
 			} else {
@@ -1767,10 +1773,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p><b>Note:</b> Must be used in combination with adding new items that require to be
 	 * initially expanded.</p>
 	 * <b>WARNING!</b>
-	 * <br/>Expanded status is ignored if {@code init = true}, it will always
-	 * attempt to expand the item: If subItems are already visible and the new item has status
-	 * expanded, the subItems will appear duplicated! Also, if configured, automatic smooth
-	 * scroll will be skipped!
+	 * <br/>Expanded status is ignored if {@code init = true}: it will always attempt to expand
+	 * the item: If subItems are already visible and the new item has status expanded, the
+	 * subItems will appear duplicated and the automatic smooth scroll will be skipped!
 	 *
 	 * @param item the item to expand, must be an Expandable and present in the list
 	 * @param init true to initially expand item
@@ -1827,8 +1832,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 
 			//Expand!
-			if (!init)
-				notifyItemRangeInserted(position + 1, subItemsCount);
+			notifyItemRangeInserted(position + 1, subItemsCount);
 			//Show also the headers of the subItems
 			if (!init && headersShown) {
 				int count = 0;
@@ -3941,7 +3945,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (!headersShown)
 				hideAllHeaders();
 			else if (headersShown && !this.headersShown)
-				showAllHeaders();
+				showAllHeadersWithReset(true);
 			this.headersShown = headersShown;
 			//Restore selection state
 			super.onRestoreInstanceState(savedInstanceState);
@@ -4278,7 +4282,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Execute post data
 			switch (what) {
 				case UPDATE:
-					postUpdate();
+					postUpdate(false);
 					break;
 				case FILTER:
 					postFilter();
@@ -4287,11 +4291,18 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
-	private void postUpdate() {
+	/**
+	 * @param init true to skip all notifications and instant reset by calling notifyDataSetChanged
+	 */
+	private void postUpdate(boolean init) {
 		//Show headers and expanded items if Data Set not empty
 		if (getItemCount() > 0) {
 			expandItemsAtStartUp();
-			if (headersShown) showAllHeaders();
+			if (headersShown) showAllHeaders(init);
+		}
+		//Execute instant reset on init
+		if (init) {
+			notifyDataSetChanged();
 		}
 		//Update empty view
 		if (mUpdateListener != null) {

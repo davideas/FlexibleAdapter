@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements
 			@Override
 			public void onRefresh() {
 				//Passing true as parameter we always animate the changes between the old and the new data set
-				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), true);
+				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), DatabaseConfiguration.animateOnUpdate);
 				mSwipeRefreshLayout.setEnabled(false);
 				mRefreshHandler.sendEmptyMessageDelayed(0, 100L);//Simulate network time
 				mActionModeHelper.destroyActionModeIfCan();
@@ -460,7 +460,10 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
-		if (id == R.id.action_animation) {
+		if (id == R.id.action_animate_on_update) {
+			DatabaseConfiguration.animateOnUpdate = !DatabaseConfiguration.animateOnUpdate;
+			item.setChecked(DatabaseConfiguration.animateOnUpdate);
+		} else if (id == R.id.action_animation) {
 			if (mAdapter.isAnimationOnScrollingEnabled()) {
 				mAdapter.setAnimationOnScrolling(false);
 				item.setChecked(false);
