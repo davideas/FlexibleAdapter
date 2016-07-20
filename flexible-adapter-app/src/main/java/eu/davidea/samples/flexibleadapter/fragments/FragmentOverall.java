@@ -66,7 +66,7 @@ public class FragmentOverall extends AbstractFragment {
 		mAdapter.setAnimationDelay(150L);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setItemViewCacheSize(0);//Setting ViewCache to 0 (default=2) will animate items better while scrolling down+up with LinearLayout
-		mRecyclerView.setLayoutManager(createNewGridLayoutManager());
+		mRecyclerView.setLayoutManager(createNewStaggeredGridLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true);//Size of RV will not change
 		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
@@ -131,6 +131,13 @@ public class FragmentOverall extends AbstractFragment {
 			gridMenuItem.setIcon(R.drawable.ic_view_grid_white_24dp);
 			gridMenuItem.setTitle(R.string.grid_layout);
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.action_list_type)
+			mAdapter.setAnimationOnScrolling(true);
+		return super.onOptionsItemSelected(item);
 	}
 
 }

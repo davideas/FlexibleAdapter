@@ -68,7 +68,9 @@ public class UndoHelper extends Snackbar.Callback {
 
 
 	/**
-	 * Basic constructor.
+	 * Default constructor.
+	 * <p>Only from version 5.0.0-b8, by calling this constructor,
+	 * {@link FlexibleAdapter#setPermanentDelete(boolean)} is set {@code false} automatically.
 	 *
 	 * @param adapter      the instance of {@code FlexibleAdapter}
 	 * @param undoListener the callback for the Undo and Delete confirmation
@@ -76,6 +78,7 @@ public class UndoHelper extends Snackbar.Callback {
 	public UndoHelper(FlexibleAdapter adapter, OnUndoListener undoListener) {
 		this.mAdapter = adapter;
 		this.mUndoListener = undoListener;
+		adapter.setPermanentDelete(false);
 	}
 
 	/**

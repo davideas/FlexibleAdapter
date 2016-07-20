@@ -111,6 +111,9 @@ public class StickyHeaderHelper extends OnScrollListener {
 		//Initialize Holder Layout and show sticky header if exists already
 		mStickyHolderLayout = mAdapter.getStickySectionHeadersHolder();
 		if (mStickyHolderLayout != null) {
+			if (mStickyHolderLayout.getLayoutParams() == null) {
+				throw new IllegalStateException("The ViewGroup provided, doesn't have LayoutParams correctly set, please initialize the ViewGroup accordingly");
+			}
 			mStickyHolderLayout.setClipToPadding(false);
 			mStickyHolderLayout.setAlpha(0);
 			updateOrClearHeader(false);
@@ -204,6 +207,10 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 	private void ensureHeaderParent() {
 		final View view = mStickyHeaderViewHolder.getContentView();
+		//Make sure the item params are kept if WRAP_CONTENT has been set for the Header View
+		mStickyHeaderViewHolder.itemView.getLayoutParams().width = view.getMeasuredWidth();
+		mStickyHeaderViewHolder.itemView.getLayoutParams().height = view.getMeasuredHeight();
+		//Now make sure the params are transferred to the StickyHolderLayout
 		ViewGroup.LayoutParams params = mStickyHolderLayout.getLayoutParams();
 		params.width = view.getMeasuredWidth();
 		params.height = view.getMeasuredHeight();
@@ -220,6 +227,25 @@ public class StickyHeaderHelper extends OnScrollListener {
 			mStickyHeaderViewHolder = null;
 			mHeaderPosition = RecyclerView.NO_POSITION;
 			onStickyHeaderChange(mHeaderPosition);
+		}
+	}
+
+	private void resetHeader(FlexibleViewHolder header) {
+		final View view = header.getContentView();
+		removeViewFromParent(view);
+		//Reset transformation on removed header
+		view.setTranslationX(0);
+		view.setTranslationY(0);
+		mStickyHeaderViewHolder.itemView.setVisibility(View.VISIBLE);
+		if (!header.itemView.equals(view))
+			((ViewGroup) header.itemView).addView(view);
+		header.setIsRecyclable(true);
+	}
+
+	private static void removeViewFromParent(final View view) {
+		final ViewParent parent = view.getParent();
+		if (parent instanceof ViewGroup) {
+			((ViewGroup) parent).removeView(view);
 		}
 	}
 
@@ -280,24 +306,6 @@ public class StickyHeaderHelper extends OnScrollListener {
 			headerView.layout(0, 0, headerView.getMeasuredWidth(), headerView.getMeasuredHeight());
 		}
 		return holder;
-	}
-
-	private void resetHeader(FlexibleViewHolder header) {
-		final View view = header.getContentView();
-		removeViewFromParent(view);
-		//Reset transformation on removed header
-		view.setTranslationX(0);
-		view.setTranslationY(0);
-		if (!header.itemView.equals(view))
-			((ViewGroup) header.itemView).addView(view);
-		header.setIsRecyclable(true);
-	}
-
-	private static void removeViewFromParent(final View view) {
-		final ViewParent parent = view.getParent();
-		if (parent instanceof ViewGroup) {
-			((ViewGroup) parent).removeView(view);
-		}
 	}
 
 	private static int getOrientation(RecyclerView recyclerView) {

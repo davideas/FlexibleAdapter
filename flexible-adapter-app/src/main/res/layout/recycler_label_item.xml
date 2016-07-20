@@ -51,7 +51,6 @@
 			android:layout_height="wrap_content"
 			android:gravity="center"
 			android:ellipsize="end"
-			android:maxLines="4"
 			android:textAppearance="@style/TextAppearance.AppCompat.Small"
 			tools:text="@string/endless_scrolling_description"/>
 

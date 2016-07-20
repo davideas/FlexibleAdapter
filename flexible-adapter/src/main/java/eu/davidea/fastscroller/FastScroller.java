@@ -31,10 +31,11 @@ import eu.davidea.flexibleadapter.R;
 
 /**
  * Class taken from GitHub, customized and optimized for FlexibleAdapter project.
- * @since Up to the date 23/01/2016
- *   <br/>23/01/2016 Added onFastScrollerStateChange in the listener
+ *
  * @see <a href="https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller">
- *     github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller</a>
+ * github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller</a>
+ * @since Up to the date 23/01/2016
+ * <br/>23/01/2016 Added onFastScrollerStateChange in the listener
  */
 public class FastScroller extends FrameLayout {
 
@@ -93,7 +94,7 @@ public class FastScroller extends FrameLayout {
 			}
 		});
 
-		if (recyclerView.getAdapter() instanceof  BubbleTextCreator)
+		if (recyclerView.getAdapter() instanceof BubbleTextCreator)
 			this.bubbleTextCreator = (BubbleTextCreator) recyclerView.getAdapter();
 		if (recyclerView.getAdapter() instanceof OnScrollStateChangeListener)
 			addOnScrollStateChangeListener((OnScrollStateChangeListener) recyclerView.getAdapter());

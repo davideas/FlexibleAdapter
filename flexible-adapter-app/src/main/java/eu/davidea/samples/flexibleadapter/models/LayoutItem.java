@@ -66,7 +66,7 @@ public class LayoutItem extends AbstractModelItem<LayoutItem.ExampleViewHolder> 
 	/**
 	 * Used for UserLearnsSelection.
 	 */
-	static class ExampleViewHolder extends FlexibleViewHolder {
+	public static class ExampleViewHolder extends FlexibleViewHolder {
 
 		public TextView mTitle;
 		public TextView mSubtitle;

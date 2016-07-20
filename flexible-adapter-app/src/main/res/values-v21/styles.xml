@@ -5,6 +5,11 @@
 		<item name="windowNoTitle">true</item>
 		<item name="android:windowDrawsSystemBarBackgrounds">true</item>
 		<item name="android:statusBarColor">@android:color/transparent</item>
+
+		<!-- Transitions settings -->
+		<item name="android:windowContentTransitions">true</item>
+		<item name="android:windowAllowEnterTransitionOverlap">true</item>
+		<item name="android:windowAllowReturnTransitionOverlap">true</item>
 	</style>
 
 	<style name="AppTheme.AlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">

@@ -44,6 +44,7 @@ public final class DrawableUtils {
 	 *
 	 * @param view     the view to apply the drawable
 	 * @param drawable drawable object
+	 * @since 5.0.0-b7
 	 */
 	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
@@ -60,6 +61,7 @@ public final class DrawableUtils {
 	 *
 	 * @param view        the view to apply the drawable
 	 * @param drawableRes drawable resource id
+	 * @since 5.0.0-b7
 	 */
 	public static void setBackground(View view, @DrawableRes int drawableRes) {
 		setBackground(view, getDrawableCompat(view.getContext(), drawableRes));
@@ -71,6 +73,7 @@ public final class DrawableUtils {
 	 * @param context     the context
 	 * @param drawableRes drawable resource id
 	 * @return the drawable object
+	 * @since 5.0.0-b7
 	 */
 	@SuppressWarnings("deprecation")
 	public static Drawable getDrawableCompat(Context context, @DrawableRes int drawableRes) {
@@ -90,6 +93,7 @@ public final class DrawableUtils {
 	 *
 	 * @param context the context
 	 * @return Default selectable background resId
+	 * @since 5.0.0-b7
 	 */
 	public static int getSelectableBackground(Context context) {
 		TypedValue outValue = new TypedValue();
@@ -103,6 +107,7 @@ public final class DrawableUtils {
 	 *
 	 * @param context the context
 	 * @return Default Color Control Highlight resId
+	 * @since 5.0.0-b7
 	 */
 	public static int getColorControlHighlight(Context context) {
 		TypedValue outValue = new TypedValue();
@@ -119,6 +124,7 @@ public final class DrawableUtils {
 	 * @param pressedColor the pressed color
 	 * @return the RippleDrawable with StateListDrawable if at least Lollipop, the normal
 	 * StateListDrawable otherwise
+	 * @since 5.0.0-b7
 	 */
 	public static Drawable getSelectableBackgroundCompat(@ColorInt int rippleColor,
 														 @ColorInt int normalColor,

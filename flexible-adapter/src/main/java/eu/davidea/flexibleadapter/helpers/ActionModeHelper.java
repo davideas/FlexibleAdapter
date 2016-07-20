@@ -47,13 +47,30 @@ public class ActionModeHelper implements ActionMode.Callback {
 	private ActionMode.Callback mCallback;
 	protected ActionMode mActionMode;
 
-
-	public ActionModeHelper(FlexibleAdapter adapter, int cabMenu) {
+	/**
+	 * Default constructor with internal callback.
+	 *
+	 * @param adapter the FlexibleAdapter instance
+	 * @param cabMenu the menu resourceId
+	 * @see #ActionModeHelper(FlexibleAdapter, int, ActionMode.Callback)
+	 * @since 5.0.0-b6
+	 */
+	public ActionModeHelper(@NonNull FlexibleAdapter adapter, @MenuRes int cabMenu) {
 		this.mAdapter = adapter;
 		this.mCabMenu = cabMenu;
 	}
 
-	public ActionModeHelper(FlexibleAdapter adapter, int cabMenu, ActionMode.Callback callback) {
+	/**
+	 * Constructor with internal callback + custom callback.
+	 *
+	 * @param adapter the FlexibleAdapter instance
+	 * @param cabMenu the menu resourceId
+	 * @param callback the custom {@link android.support.v7.view.ActionMode.Callback}
+	 * @see #ActionModeHelper(FlexibleAdapter, int)
+	 * @since 5.0.0-b6
+	 */
+	public ActionModeHelper(@NonNull FlexibleAdapter adapter, @MenuRes int cabMenu,
+							@NonNull ActionMode.Callback callback) {
 		this(adapter, cabMenu);
 		this.mCallback = callback;
 	}
@@ -66,6 +83,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * @param defaultMode the new default mode when ActionMode is off, accepted values:
 	 *                    {@code MODE_IDLE, MODE_SINGLE}
 	 * @return this object, so it can be chained
+	 * @since 5.0.0-b6
 	 */
 	public final ActionModeHelper withDefaultMode(@Mode int defaultMode) {
 		if (defaultMode == SelectableAdapter.MODE_IDLE || defaultMode == SelectableAdapter.MODE_SINGLE)
@@ -75,6 +93,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 
 	/**
 	 * @return the current instance of the ActionMode, {@code null} if ActionMode is off.
+	 * @since 5.0.0-b6
 	 */
 	public ActionMode getActionMode() {
 		return mActionMode;
@@ -86,6 +105,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * @param position the current item position
 	 * @return true if selection is changed, false if the click event should ignore the ActionMode
 	 * and continue
+	 * @since 5.0.0-b6
 	 */
 	public boolean onClick(int position) {
 		if (position != RecyclerView.NO_POSITION) {
@@ -101,6 +121,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * @param activity the current Activity
 	 * @param position the position of the clicked item
 	 * @return the initialized ActionMode or null if nothing was done
+	 * @since 5.0.0-b6
 	 */
 	@NonNull
 	public ActionMode onLongClick(AppCompatActivity activity, int position) {
@@ -119,6 +140,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * Note that the selection must already be started (actionMode must not be null).</p>
 	 *
 	 * @param position position of the item to toggle the selection state
+	 * @since 5.0.0-b6
 	 */
 	public void toggleSelection(int position) {
 		if (position >= 0 && (mAdapter.getMode() == SelectableAdapter.MODE_SINGLE ||
@@ -140,7 +162,8 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * Updates the title of the Context Menu.
 	 * <p>Override to customize the title and subtitle.</p>
 	 *
-	 * @param count      the current number of selected items
+	 * @param count the current number of selected items
+	 * @since 5.0.0-b6
 	 */
 	public void updateContextTitle(int count) {
 		if (mActionMode != null) {
@@ -156,6 +179,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * <i>onRestoreInstanceState</i>.</p>
 	 *
 	 * @param activity the current Activity
+	 * @since 5.0.0-b6
 	 */
 	public void restoreSelection(AppCompatActivity activity) {
 		if ((defaultMode == SelectableAdapter.MODE_IDLE && mAdapter.getSelectedItemCount() > 0) ||
@@ -221,6 +245,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * <i>onRefresh</i> for SwipeRefreshLayout, after <i>deleting</i> all selected items.
 	 *
 	 * @return true if ActionMode was active (in case it is also terminated), false otherwise
+	 * @since 5.0.0-b6
 	 */
 	public boolean destroyActionModeIfCan() {
 		if (mActionMode != null) {

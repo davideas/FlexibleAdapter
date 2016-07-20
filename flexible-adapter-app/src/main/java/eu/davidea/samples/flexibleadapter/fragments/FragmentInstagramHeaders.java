@@ -7,6 +7,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 	/**
 	 * Custom implementation of FlexibleAdapter
 	 */
-	private FlexibleAdapter mAdapter;
+	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
 
 
 	public static FragmentInstagramHeaders newInstance() {
@@ -62,12 +63,14 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		FlipView.stopLayoutAnimation();
 	}
 
-	@SuppressWarnings({"ConstantConditions", "unchecked"})
+	@SuppressWarnings({"unchecked", "ConstantConditions"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
-		//Experimenting NEW features (v5.0.0)
-		mAdapter.setAnimationOnScrolling(true);
-		mAdapter.setAnimationOnReverseScrolling(true);
+		mAdapter.initializeListeners(getActivity())
+				.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!
+				//Experimenting NEW features (v5.0.0)
+				.setAnimationOnScrolling(true)
+				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
@@ -80,8 +83,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 			}
 		});
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 0, 24));
-		mAdapter.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!
-				.enableStickyHeaders()//Make headers sticky
+		mAdapter.enableStickyHeaders()//Make headers sticky
 				//Endless scroll with 1 item threshold
 				.setEndlessScrollListener(this, new ProgressItem())
 				.setEndlessScrollThreshold(1);//Default=1
@@ -118,6 +120,13 @@ public class FragmentInstagramHeaders extends AbstractFragment
 				Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
 			}
 		}, 2000);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.action_list_type)
+			mAdapter.setAnimationOnScrolling(true);
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

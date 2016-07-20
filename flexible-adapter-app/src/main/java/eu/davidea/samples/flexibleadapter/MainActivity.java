@@ -24,10 +24,12 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.transition.Fade;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -120,7 +122,13 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		if (Utils.hasLollipop()) requestWindowFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 		super.onCreate(savedInstanceState);
+
+		if (Utils.hasLollipop()) {
+			getWindow().setEnterTransition(new Fade());
+		}
+
 		setContentView(R.layout.activity_main);
 		Log.d(TAG, "onCreate");
 		FlexibleAdapter.enableLogs(true);
@@ -397,12 +405,12 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onQueryTextChange(String newText) {
-		if (!mAdapter.hasSearchText() || mAdapter.hasNewSearchText(newText)) {
+		if (mAdapter.hasNewSearchText(newText)) {
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			mAdapter.setSearchText(newText);
 			//Fill and Filter mItems with your custom list and automatically animate the changes
 			//Watch out! The original list must be a copy
-			mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), 450L);
+			mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), 0L);
 		}
 		//Disable SwipeRefresh if search is active!!
 		mSwipeRefreshLayout.setEnabled(!mAdapter.hasSearchText());
@@ -851,6 +859,12 @@ public class MainActivity extends AppCompatActivity implements
 		//If SearchView is visible, back key cancels search and iconify it
 		if (mSearchView != null && !mSearchView.isIconified()) {
 			mSearchView.setIconified(true);
+			return;
+		}
+		//Return to Overall View
+		if (DatabaseService.getInstance().getDatabaseType() != 0) {
+			MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.nav_overall);
+			onNavigationItemSelected(menuItem);
 			return;
 		}
 		//Close the App

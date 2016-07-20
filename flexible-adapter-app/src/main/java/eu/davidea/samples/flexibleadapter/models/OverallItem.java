@@ -1,28 +1,25 @@
 package eu.davidea.samples.flexibleadapter.models;
 
 import android.graphics.drawable.Drawable;
-import android.text.Html;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
-
-import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.OverallItem.LabelViewHolder;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Displays Overall example items as label in CardView.
+ * Model object representing Overall functionality as CardView.
+ * This Model object is bound via METHOD B: {@code OverallAdapter} implements the 3 methods to
+ * bind this item.
  *
  * @author Davide Steduto
+ * @see eu.davidea.samples.flexibleadapter.OverallAdapter
  * @since 12/04/2016
  */
-public class OverallItem extends AbstractFlexibleItem<LabelViewHolder> {
+public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolder> {
 
 	private int id;
 	private String title;
@@ -97,35 +94,8 @@ public class OverallItem extends AbstractFlexibleItem<LabelViewHolder> {
 		this.icon = icon;
 	}
 
-	@Override
-	public int getLayoutRes() {
-		return R.layout.recycler_label_item;
-	}
 
-	@Override
-	public LabelViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new LabelViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
-	}
-
-	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, LabelViewHolder holder, int position, List payloads) {
-		if (title != null) {
-			holder.mTitle.setText(title);
-			//Appear disabled if item is disabled
-			holder.mTitle.setEnabled(isEnabled());
-		}
-		if (description != null) {
-			holder.mSubtitle.setText(Html.fromHtml(description));
-			holder.mSubtitle.setEnabled(isEnabled());
-		}
-		if (icon != null) {
-			holder.mIcon.setImageDrawable(icon);
-		}
-
-		adapter.animateView(holder.itemView, position, adapter.isSelected(position));
-	}
-
-	static class LabelViewHolder extends FlexibleViewHolder {
+	public static class LabelViewHolder extends FlexibleViewHolder {
 
 		public TextView mTitle;
 		public TextView mSubtitle;
