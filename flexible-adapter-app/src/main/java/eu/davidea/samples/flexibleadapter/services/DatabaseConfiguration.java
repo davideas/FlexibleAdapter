@@ -23,6 +23,7 @@ public class DatabaseConfiguration {
 	public static int animateToLimit = maxSize;//start with maxSize
 	public static boolean notifyChange = true;
 	public static boolean notifyMove = false;
+	public static boolean animateOnScrolling = true;
 	public static boolean animateOnUpdate = true;
 
 

@@ -96,6 +96,8 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 		String subTitle = (sectionableList.isEmpty() ? "Empty section" :
 				sectionableList.size() + " section items");
 		holder.mSubtitle.setText(subTitle);
+
+		adapter.animateView(holder.itemView, position, adapter.isSelected(position));
 	}
 
 	@Override

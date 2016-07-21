@@ -20,6 +20,8 @@ import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.services.DatabaseService;
+import eu.davidea.samples.flexibleadapter.services.DatabaseType;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
@@ -82,7 +84,7 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 		Context context = holder.itemView.getContext();
 		int defColorAccent = context.getResources().getColor(R.color.colorAccent_light);
 
-		if (adapter.isExpandable(this) && payloads.size() > 0){
+		if (adapter.isExpandable(this) && payloads.size() > 0) {
 			Log.i(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
 			if (adapter.hasSearchText()) {
 				Utils.highlightText(holder.itemView.getContext(), holder.mSubtitle,
@@ -93,7 +95,8 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 			//We stop the process here, we only want to update the subtitle
 
 		} else {
-			//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
+			//DemoApp: INNER ANIMATION EXAMPLE! ImageView - Handle Flip Animation on Select ALL
+			// and Deselect ALL
 			if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
 				//Reset the flags with delay
 				holder.itemView.postDelayed(new Runnable() {
@@ -121,11 +124,15 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 				holder.mSubtitle.setText(getSubtitle());
 			}
 
-			//This "if-else" is just an example of what you can do with item animation
-			if (adapter.isSelected(position)) {
-				adapter.animateView(holder.itemView, position, true);
-			} else {
-				adapter.animateView(holder.itemView, position, false);
+			//DemoApp: I want animate this item where scrolling animation is active and in the
+			// list where database type is different than HEADERS_SECTIONS
+			if (DatabaseService.getInstance().getDatabaseType() != DatabaseType.HEADERS_SECTIONS) {
+				//DemoApp: This "if-else" is just an example of what you can do with item animation
+				if (adapter.isSelected(position)) {
+					adapter.animateView(holder.itemView, position, true);
+				} else {
+					adapter.animateView(holder.itemView, position, false);
+				}
 			}
 		}
 	}

@@ -42,6 +42,10 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		super(DatabaseService.getInstance().getDatabaseList(), activity);
 	}
 
+	public ExampleAdapter(List<AbstractFlexibleItem> items, Object listeners) {
+		super(items, listeners);
+	}
+
 	@Override
 	public void updateDataSet(List<AbstractFlexibleItem> items, boolean animate) {
 		//NOTE: To have views/items not changed, set them into "items" before passing the final
@@ -75,7 +79,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 				item.setTitle(mRecyclerView.getContext().getString(R.string.linear_layout));
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
-			addItemWithDelay((getItem(0) instanceof ULSItem ? 1 : 0), item, 100L, (!(getItem(0) instanceof ULSItem) && scrollToPosition));
+			addItemWithDelay((getItem(0) instanceof ULSItem ? 1 : 0), item, 0L, (!(getItem(0) instanceof ULSItem) && scrollToPosition));
 			removeItemWithDelay(item, 4000L, true, true);
 		}
 	}
@@ -92,7 +96,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			final ULSItem item = new ULSItem("ULS");
 			item.setTitle(mRecyclerView.getContext().getString(R.string.uls_title));
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.uls_subtitle));
-			addItemWithDelay(0, item, 1400L, scrollToPosition);
+			addItemWithDelay(0, item, 1500L, scrollToPosition);
 		}
 	}
 
@@ -281,6 +285,9 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		} else {
 			//LinearLayout
 			switch (getItemViewType(position)) {
+				case R.layout.recycler_header_item:
+					addSlideInFromRightAnimator(animators, itemView, 1.0f);
+					break;
 				case R.layout.recycler_staggered_item:
 					if (position < positionOld) //inverted to have items animated up-side-down
 						addSlideInFromBottomAnimator(animators, itemView);

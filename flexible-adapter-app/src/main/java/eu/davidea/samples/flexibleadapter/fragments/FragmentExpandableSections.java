@@ -18,6 +18,7 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -72,7 +73,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 				.setNotifyMoveOfFilteredItems(false)//When true, filtering on big list is very slow!
 				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setRemoveOrphanHeaders(false)
-				.setAnimationOnScrolling(true)
+				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
 				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());

@@ -113,9 +113,12 @@ public class MainActivity extends AppCompatActivity implements
 					mSwipeRefreshLayout.setRefreshing(false);
 					mSwipeRefreshLayout.setEnabled(true);
 					return true;
-				case 1: //1 Start
+				case 1: //Start
 					mSwipeRefreshLayout.setRefreshing(true);
 					mSwipeRefreshLayout.setEnabled(false);
+					return true;
+				case 2: //Show empty view
+					ViewCompat.animate(findViewById(R.id.empty_view)).alpha(1);
 					return true;
 				default:
 					return false;
@@ -433,22 +436,28 @@ public class MainActivity extends AppCompatActivity implements
 				//mSearchView.setIconified(false);//This is not necessary
 			}
 		}
+		//Animate on update?
+		MenuItem animateUpdateMenuItem = menu.findItem(R.id.action_animate_on_update);
+		if (animateUpdateMenuItem != null) {
+			animateUpdateMenuItem.setChecked(DatabaseConfiguration.animateOnUpdate);
+		}
+		//Headers are shown?
 		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
 		if (headersMenuItem != null) {
 			headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
 		}
-		//Sticky Header item
+		//Sticky Header item?
 		MenuItem stickyItem = menu.findItem(R.id.action_sticky_headers);
 		if (stickyItem != null) {
 			stickyItem.setEnabled(mAdapter.areHeadersShown());
 			stickyItem.setChecked(mAdapter.areHeadersSticky());
 		}
-		//Animations
+		//Scrolling Animations?
 		MenuItem animationMenuItem = menu.findItem(R.id.action_animation);
 		if (animationMenuItem != null) {
-			animationMenuItem.setChecked(mAdapter.isAnimationOnScrollingEnabled());
+			animationMenuItem.setChecked(DatabaseConfiguration.animateOnScrolling);
 		}
-		//Action reverse item
+		//Reverse scrolling animation?
 		MenuItem reverseMenuItem = menu.findItem(R.id.action_reverse);
 		if (reverseMenuItem != null) {
 			reverseMenuItem.setEnabled(mAdapter.isAnimationOnScrollingEnabled());
@@ -463,15 +472,19 @@ public class MainActivity extends AppCompatActivity implements
 		if (id == R.id.action_animate_on_update) {
 			DatabaseConfiguration.animateOnUpdate = !DatabaseConfiguration.animateOnUpdate;
 			item.setChecked(DatabaseConfiguration.animateOnUpdate);
+			Snackbar.make(findViewById(R.id.main_view), (DatabaseConfiguration.animateOnUpdate ? "Enabled" : "Disabled") +
+					" animation on update, now refresh!\n(P = persistent)", Snackbar.LENGTH_SHORT).show();
 		} else if (id == R.id.action_animation) {
 			if (mAdapter.isAnimationOnScrollingEnabled()) {
+				DatabaseConfiguration.animateOnScrolling = false;
 				mAdapter.setAnimationOnScrolling(false);
 				item.setChecked(false);
-				Snackbar.make(findViewById(R.id.main_view), "Disabled scrolling animation", Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(findViewById(R.id.main_view), "Disabled scrolling animation, now reopen the page\n(P = persistent)", Snackbar.LENGTH_SHORT).show();
 			} else {
+				DatabaseConfiguration.animateOnScrolling = true;
 				mAdapter.setAnimationOnScrolling(true);
 				item.setChecked(true);
-				Snackbar.make(findViewById(R.id.main_view), "Enabled scrolling animation", Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(findViewById(R.id.main_view), "Enabled scrolling animation, now reopen the page\n(P = persistent)", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_reverse) {
 			if (mAdapter.isAnimationOnReverseScrolling()) {
@@ -693,10 +706,11 @@ public class MainActivity extends AppCompatActivity implements
 		emptyText.setText(getString(R.string.no_items));
 		if (size > 0) {
 			fastScroller.setVisibility(View.VISIBLE);
+			mRefreshHandler.removeMessages(2);
 			emptyView.setAlpha(0);
 		} else {
 			emptyView.setAlpha(0);
-			ViewCompat.animate(emptyView).alpha(1);
+			mRefreshHandler.sendEmptyMessage(2);
 			fastScroller.setVisibility(View.GONE);
 		}
 		if (mAdapter != null && mAdapter.hasSearchText()) {

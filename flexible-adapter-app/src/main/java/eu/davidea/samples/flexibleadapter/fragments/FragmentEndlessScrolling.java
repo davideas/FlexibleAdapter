@@ -26,6 +26,7 @@ import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.ProgressItem;
+import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -80,7 +81,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				//.setAnimateToLimit(Integer.MAX_VALUE)//Use the default value
 				.setNotifyMoveOfFilteredItems(true)//When true, filtering on big list is very slow, not in this case!
 				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
-				.setAnimationOnScrolling(true)
+				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
 				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
@@ -177,7 +178,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 						"Simulated: No more items to load :-(");
 				Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
 			}
-		}, 3000);
+		}, 2500);
 	}
 
 	@Override

@@ -181,12 +181,6 @@ public class FragmentAsyncFilter extends AbstractFragment {
 				DatabaseService.getInstance().getDatabaseType() != DatabaseType.CONFIGURATION);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		return super.onOptionsItemSelected(item);
-	}
-
 	private void hideFab() {
 		ViewCompat.animate(mFab)
 				.scaleX(0f).scaleY(0f)

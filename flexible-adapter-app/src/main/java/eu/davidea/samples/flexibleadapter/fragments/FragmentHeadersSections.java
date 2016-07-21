@@ -25,6 +25,7 @@ import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem;
+import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -66,7 +67,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createHeadersSectionsDatabase(400, 80);
+		DatabaseService.getInstance().createHeadersSectionsDatabase(400, 100);
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -88,7 +89,8 @@ public class FragmentHeadersSections extends AbstractFragment
 		mAdapter = new ExampleAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setRemoveOrphanHeaders(false)
-				.setNotifyChangeOfUnfilteredItems(true);//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
+				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
+				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
@@ -110,8 +112,13 @@ public class FragmentHeadersSections extends AbstractFragment
 				.setHandleDragEnabled(true)
 				.setSwipeEnabled(true)
 				.setUnlinkAllItemsOnRemoveHeaders(true)
-				.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!
-				.enableStickyHeaders();
+				//Show Headers at startUp, 1st call, correctly executed, no warning log message!
+				.setDisplayHeadersAtStartUp(true)
+				.enableStickyHeaders()
+				//Simulate developer 2nd call mistake, now it's safe, not executed, no warning log message!
+				.setDisplayHeadersAtStartUp(true)
+				//Simulate developer 3rd call mistake, still safe, not executed, warning log message displayed!
+				.showAllHeaders();
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
@@ -221,16 +228,6 @@ public class FragmentHeadersSections extends AbstractFragment
 
 		menu.findItem(R.id.action_auto_collapse).setVisible(false);
 		menu.findItem(R.id.action_expand_collapse_all).setVisible(false);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.action_list_type) {
-			if (!mAdapter.isAnimationOnScrollingEnabled())
-				mAdapter.setOnlyEntryAnimation(true);
-			else mAdapter.setAnimationOnScrolling(true);
-		}
-		return super.onOptionsItemSelected(item);
 	}
 
 }
