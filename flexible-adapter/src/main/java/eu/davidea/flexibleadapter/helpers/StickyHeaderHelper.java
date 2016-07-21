@@ -124,10 +124,10 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 	}
 
-//	public boolean hasStickyHeaderTranslated(int position) {
-//		RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(position);
-//		return vh != null && (vh.itemView.getX() < 0 || vh.itemView.getY() < 0);
-//	}
+	public boolean hasStickyHeaderTranslated(int position) {
+		RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(position);
+		return vh != null && (vh.itemView.getX() < 0 || vh.itemView.getY() < 0);
+	}
 
 	private void onStickyHeaderChange(int sectionIndex) {
 		if (mStickyHeaderChangeListener != null) {
@@ -150,7 +150,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	private void updateHeader(int headerPosition, boolean updateHeaderContent) {
-		// Check if there is a new header should be sticky
+		// Check if there is a new header to be sticky
 		if (mHeaderPosition != headerPosition) {
 			mHeaderPosition = headerPosition;
 			FlexibleViewHolder holder = getHeaderViewHolder(headerPosition);
@@ -265,6 +265,9 @@ public class StickyHeaderHelper extends OnScrollListener {
 				adapterPosHere = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstVisibleItemPositions(null)[0];
 			} else {
 				adapterPosHere = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+			}
+			if (adapterPosHere == 0 && !hasStickyHeaderTranslated(0)) {
+				return RecyclerView.NO_POSITION;
 			}
 		}
 		IHeader header = mAdapter.getSectionHeader(adapterPosHere);
