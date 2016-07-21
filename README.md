@@ -136,6 +136,7 @@ Special thanks goes to Martin Guillon ([Akylas](https://github.com/Akylas)) to h
 
 # Apps that use this Adapter
 It will be a pleasure to add your App here.
+- [Socio - Shake and Connect!](https://play.google.com/store/apps/details?id=com.atsocio.socio&hl=en)<br/>
 
 # License
 
