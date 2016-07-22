@@ -77,9 +77,9 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 		if (adapter.isExpandable(this)) {
 			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems");
 		} else {
-			setSubtitle("Subtitle " + getId());
+			setSubtitle(getId());
 		}
-		setSubtitle(getSubtitle() + (getHeader() != null ? " - Header: " + getHeader().getId() : ""));
+		setSubtitle(getSubtitle() + (getHeader() != null ? " - " + getHeader().getId() : ""));
 
 		Context context = holder.itemView.getContext();
 		int defColorAccent = context.getResources().getColor(R.color.colorAccent_light);

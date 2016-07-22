@@ -305,6 +305,23 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	/**
+	 * Helper method to easily swap selection between 2 positions only if one of the positions
+	 * is <i>not</i> selected.
+	 *
+	 * @param fromPosition first position
+	 * @param toPosition   second position
+	 */
+	protected void swapSelection(int fromPosition, int toPosition) {
+		if (isSelected(fromPosition) && !isSelected(toPosition)) {
+			removeSelection(fromPosition);
+			addSelection(toPosition);
+		} else if (!isSelected(fromPosition) && isSelected(toPosition)) {
+			removeSelection(toPosition);
+			addSelection(fromPosition);
+		}
+	}
+
+	/**
 	 * Sets the selection status for all items which the ViewTypes are included in the specified array.
 	 * <p><b>Note:</b> All items are invalidated and rebound!</p>
 	 *
