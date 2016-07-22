@@ -3631,6 +3631,12 @@ public class FlexibleAdapter<T extends IFlexible>
 					toPosition + " [selected? " + isSelected(toPosition) + "]");
 		}
 
+		//TODO: Move child from a Parent to another? update the 2 sub list. Expand the toParent
+		//Collapse expandable before swapping
+		if (fromPosition < toPosition && isExpandable(getItem(fromPosition)) && isExpanded(toPosition)) {
+			collapse(toPosition);
+		}
+
 		//Perform item swap (for all LayoutManagers)
 		if (fromPosition < toPosition) {
 			for (int i = fromPosition; i < toPosition; i++) {
@@ -3727,8 +3733,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
-		//Always allow swapping
-		return true;
+		return !(isExpandable(getItem(fromPosition)) && getExpandableOf(toPosition) != null);
 	}
 
 	/**

@@ -139,7 +139,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	@Override
 	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
 		List<Animator> animators = new ArrayList<Animator>();
-		if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+		if (mRecyclerView != null && mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 			//GridLayout
 			if (position % 2 != 0)
 				addSlideInFromRightAnimator(animators, itemView, 0.5f);
