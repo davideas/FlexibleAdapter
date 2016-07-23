@@ -43,7 +43,7 @@ public class ItemTouchHelperCallback extends Callback {
 
 	private AdapterCallback mItemTouchCallback;
 	private boolean mIsLongPressDragEnabled = false, mIsSwipeEnabled = false;
-	private float mSwipeThreshold = 0.5f;
+	private float mSwipeThreshold = 0.5f, mMoveThreshold = 0.5f;
 	private int mSwipeFlags = -1;
 
 	/*-------------*/
@@ -59,6 +59,12 @@ public class ItemTouchHelperCallback extends Callback {
 	/*-----------------------*/
 	/* DRAG */
 
+	/**
+	 * Enable / disable the drag operation with long press on the ViewHolder.
+	 * <p>Default value is {@code false}.</p>
+	 *
+	 * @param isLongPressDragEnabled true to enable, false to disable
+	 */
 	public void setLongPressDragEnabled(boolean isLongPressDragEnabled) {
 		this.mIsLongPressDragEnabled = isLongPressDragEnabled;
 	}
@@ -79,11 +85,31 @@ public class ItemTouchHelperCallback extends Callback {
 		return super.canDropOver(recyclerView, current, target);
 	}
 
+	/**
+	 * Configures the fraction that the user should move the View to be considered as it is
+	 * dragged. After a view is moved this amount, ItemTouchHelper starts checking for Views
+	 * below it for a possible drop.
+	 * <p>Default value is {@code 0.5f}.</p>
+	 *
+	 * @param moveThreshold A float value that denotes the fraction of the View size.
+	 */
+	public void setMoveThreshold(float moveThreshold) {
+		this.mMoveThreshold = moveThreshold;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public float getMoveThreshold(RecyclerView.ViewHolder viewHolder) {
+		return mMoveThreshold;
+	}
+
 	/* SWIPE */
 
 	/**
 	 * Enable the swipe operation on the ViewHolder.
-	 * <p>Default value is false.</p>
+	 * <p>Default value is {@code false}.</p>
 	 *
 	 * @param isSwipeEnabled true to enable swipe, false to disable
 	 */
@@ -101,7 +127,7 @@ public class ItemTouchHelperCallback extends Callback {
 
 	/**
 	 * Configures the fraction that the user should move the View to be considered as swiped.
-	 * <p>Default value is 0.5f.</p>
+	 * <p>Default value is {@code 0.5f}.</p>
 	 *
 	 * @param threshold A float value that denotes the fraction of the View size.
 	 */
