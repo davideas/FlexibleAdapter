@@ -62,7 +62,7 @@ public final class Utils {
 	}
 
 	/**
-	 * Sets a spannable text with the accent color (if available) into the passed TextView.
+	 * Sets a spannable text with the accent color (if available) into the provided TextView.
 	 * <p>Internally calls {@link #fetchAccentColor(Context, int)}.</p>
 	 *
 	 * @param context      context
@@ -72,6 +72,7 @@ public final class Utils {
 	 * @param defColor     the default color in case accentColor is not found
 	 * @see #fetchAccentColor(Context, int)
 	 */
+	//TODO: Deprecate defColor?
 	public static void highlightText(@NonNull Context context, @NonNull TextView textView,
 									 String originalText, String constraint, @ColorInt int defColor) {
 		if (originalText == null) originalText = "";
@@ -104,6 +105,7 @@ public final class Utils {
 	 * @param context  context
 	 * @param defColor value to return if the accentColor cannot be found
 	 */
+	//TODO: Deprecate defColor and use R.attr.colorAccent?
 	@TargetApi(VERSION_CODES.LOLLIPOP)
 	public static int fetchAccentColor(Context context, @ColorInt int defColor) {
 		if (colorAccent == INVALID_COLOR) {
