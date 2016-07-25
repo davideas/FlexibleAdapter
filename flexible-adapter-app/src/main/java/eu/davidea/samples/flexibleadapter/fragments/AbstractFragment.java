@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
+import eu.davidea.flexibleadapter.common.SmoothScrollStaggeredLayoutManager;
 import eu.davidea.samples.flexibleadapter.R;
 
 /**
@@ -100,7 +101,7 @@ public abstract class AbstractFragment extends Fragment {
 	}
 
 	protected StaggeredGridLayoutManager createNewStaggeredGridLayoutManager() {
-		return new StaggeredGridLayoutManager(mColumnCount, StaggeredGridLayoutManager.VERTICAL);
+		return new SmoothScrollStaggeredLayoutManager(getActivity(), mColumnCount);
 	}
 
 	public void performFabAction() {

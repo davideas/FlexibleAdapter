@@ -304,7 +304,6 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentExpandableSections.newInstance(3);
 		} else if (id == R.id.nav_staggered) {
 			mFragment = FragmentStaggeredLayout.newInstance(2);
-			fabBehavior.setEnabled(true);
 		} else if (id == R.id.nav_about) {
 			MessageDialogFragment.newInstance(
 					R.drawable.ic_info_grey600_24dp,
@@ -392,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements
 				mFragment instanceof FragmentAsyncFilter) {
 			ViewCompat.animate(mFab)
 					.scaleX(1f).scaleY(1f)
-					.alpha(1f).setDuration(100)
+					.alpha(1f).setDuration(200)
 					.setStartDelay(300L)
 					.start();
 		}

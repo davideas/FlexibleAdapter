@@ -142,7 +142,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 
 		//Settings for FlipView
 		FlipView.stopLayoutAnimation();
-		showFab(1000L);
+		showFab(1200L);
 	}
 
 	@Override
@@ -162,7 +162,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 					configure = true;
 				}
 			}
-		}, 100L);
+		}, 200L);
 	}
 
 	@Override
@@ -184,7 +184,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 	private void hideFab() {
 		ViewCompat.animate(mFab)
 				.scaleX(0f).scaleY(0f)
-				.alpha(0f).setDuration(100)
+				.alpha(0f).setDuration(50)
 				.start();
 	}
 
@@ -194,7 +194,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 			public void run() {
 				ViewCompat.animate(mFab)
 						.scaleX(1f).scaleY(1f)
-						.alpha(1f).setDuration(100)
+						.alpha(1f).setDuration(200)
 						.start();
 			}
 		}, delay);

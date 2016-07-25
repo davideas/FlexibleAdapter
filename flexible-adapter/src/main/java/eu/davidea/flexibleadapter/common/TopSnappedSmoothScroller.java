@@ -24,9 +24,21 @@ import android.util.DisplayMetrics;
 
 import eu.davidea.flexibleadapter.utils.Utils;
 
-class TopSnappedSmoothScroller extends LinearSmoothScroller {
+/**
+ * Common class for all Smooth Scroller Layout Managers.
+ *
+ * @since 5.0.0-b6 Creation
+ * <br/>5.0.0-b8 Class is now public to allow customization of the MILLISECONDS_PER_INCH
+ */
+public class TopSnappedSmoothScroller extends LinearSmoothScroller {
 
-	private static final float MILLISECONDS_PER_INCH = 100f;
+	/**
+	 * The modification of this value affects the creation of ALL Layout Managers.
+	 * <b>Note:</b> Every time you change this value you MUST recreate the LayoutManager instance
+	 * and to assign it again to the RecyclerView!
+	 * <p>Default value is {@code 100f}. Default Android value is {@code 25f}.</p>
+	 */
+	public static float MILLISECONDS_PER_INCH = 100f;
 
 	private PointF vectorPosition = new PointF(0, 0);
 	private RecyclerView.LayoutManager layoutManager;

@@ -15,6 +15,7 @@ import java.util.Random;
 
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.common.TopSnappedSmoothScroller;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
@@ -75,7 +76,17 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		mAdapter = new ExampleAdapter(getActivity());
 		mAdapter.setNotifyMoveOfFilteredItems(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+
+		//Customize the speed of the smooth scroll.
+		//NOTE: Every time you change this value you MUST recreate the LayoutManager instance
+		// and to assign it again to the RecyclerView!
+		TopSnappedSmoothScroller.MILLISECONDS_PER_INCH = 33f;
 		mRecyclerView.setLayoutManager(createNewStaggeredGridLayoutManager());
+		//This value is restored to 100f (default) right here, because it is used in the constructor
+		// by Android. If we don't change it now, others LayoutManager will be impacted too by the
+		// above modification!
+		TopSnappedSmoothScroller.MILLISECONDS_PER_INCH = 100f;
+
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
