@@ -177,7 +177,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 				offset += mSectionOffset;
 			}
 		}
-		if (Utils.getOrientation(recyclerView) == RecyclerView.VERTICAL) {
+		if (Utils.getOrientation(recyclerView.getLayoutManager()) == RecyclerView.VERTICAL) {
 			outRect.set(0, 0, 0, offset);
 		} else {
 			outRect.set(0, 0, offset, 0);

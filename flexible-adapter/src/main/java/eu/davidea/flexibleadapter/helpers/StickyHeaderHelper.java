@@ -176,7 +176,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 				int adapterPos = mRecyclerView.getChildAdapterPosition(nextChild);
 				int nextHeaderPosition = getHeaderPosition(adapterPos);
 				if (mHeaderPosition != nextHeaderPosition) {
-					if (Utils.getOrientation(mRecyclerView) == OrientationHelper.HORIZONTAL) {
+					if (Utils.getOrientation(mRecyclerView.getLayoutManager()) == OrientationHelper.HORIZONTAL) {
 						if (nextChild.getLeft() > 0) {
 							int headerWidth = mStickyHolderLayout.getMeasuredWidth();
 							headerOffsetX = Math.min(nextChild.getLeft() - headerWidth, 0);
@@ -300,7 +300,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 			//Calculate width and height
 			int widthSpec;
 			int heightSpec;
-			if (Utils.getOrientation(mRecyclerView) == OrientationHelper.VERTICAL) {
+			if (Utils.getOrientation(mRecyclerView.getLayoutManager()) == OrientationHelper.VERTICAL) {
 				widthSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getWidth(), View.MeasureSpec.EXACTLY);
 				heightSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getHeight(), View.MeasureSpec.UNSPECIFIED);
 			} else {

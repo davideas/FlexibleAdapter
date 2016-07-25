@@ -125,9 +125,20 @@ public final class Utils {
 	 *
 	 * @param recyclerView the RV instance
 	 * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
+	 * @deprecated Use {@link #getOrientation(RecyclerView.LayoutManager)} instead
 	 */
+	@Deprecated
 	public static int getOrientation(RecyclerView recyclerView) {
-		RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+		return getOrientation(recyclerView.getLayoutManager());
+	}
+
+	/**
+	 * Finds the layout orientation of the RecyclerView, no matter which LayoutManager is in use.
+	 *
+	 * @param layoutManager the LayoutManager instance in use by the RV
+	 * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
+	 */
+	public static int getOrientation(RecyclerView.LayoutManager layoutManager) {
 		if (layoutManager instanceof LinearLayoutManager) {
 			return ((LinearLayoutManager) layoutManager).getOrientation();
 		} else if (layoutManager instanceof StaggeredGridLayoutManager) {

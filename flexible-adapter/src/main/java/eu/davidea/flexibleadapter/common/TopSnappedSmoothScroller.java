@@ -17,18 +17,21 @@ package eu.davidea.flexibleadapter.common;
 
 import android.content.Context;
 import android.graphics.PointF;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
+import android.support.v7.widget.OrientationHelper;
+import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+
+import eu.davidea.flexibleadapter.utils.Utils;
 
 class TopSnappedSmoothScroller extends LinearSmoothScroller {
 
 	private static final float MILLISECONDS_PER_INCH = 100f;
 
 	private PointF vectorPosition = new PointF(0, 0);
-	private LinearLayoutManager layoutManager;
+	private RecyclerView.LayoutManager layoutManager;
 
-	public TopSnappedSmoothScroller(Context context, LinearLayoutManager layoutManager) {
+	public TopSnappedSmoothScroller(Context context, RecyclerView.LayoutManager layoutManager) {
 		super(context);
 		this.layoutManager = layoutManager;
 	}
@@ -40,10 +43,10 @@ class TopSnappedSmoothScroller extends LinearSmoothScroller {
 	 */
 	@Override
 	public PointF computeScrollVectorForPosition(int targetPosition) {
-		final int firstChildPos = layoutManager.findFirstCompletelyVisibleItemPosition();
+		final int firstChildPos = Utils.findFirstCompletelyVisibleItemPosition(layoutManager);
 		final int direction = targetPosition < firstChildPos ? -1 : 1;
 
-		if (layoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL) {
+		if (Utils.getOrientation(layoutManager) == OrientationHelper.HORIZONTAL) {
 			vectorPosition.set(direction, 0);
 			return vectorPosition;
 		} else {
