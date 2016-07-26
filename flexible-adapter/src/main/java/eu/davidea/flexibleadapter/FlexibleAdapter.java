@@ -3472,9 +3472,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Returns the customization of the ItemTouchHelper.
+	 * Returns the customization of the ItemTouchHelperCallback.
 	 *
-	 * @return the ItemTouchHelperCallback instance already initialized.
+	 * @return the ItemTouchHelperCallback instance already initialized
 	 * @since 5.0.0-b7
 	 */
 	public final ItemTouchHelperCallback getItemTouchHelperCallback() {
@@ -3491,7 +3491,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * false otherwise. Default value is {@code false}.
 	 * @since 5.0.0-b1
 	 */
-	public boolean isLongPressDragEnabled() {
+	public final boolean isLongPressDragEnabled() {
 		return mItemTouchHelperCallback != null && mItemTouchHelperCallback.isLongPressDragEnabled();
 	}
 
@@ -3520,7 +3520,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return true if active, false otherwise
 	 * @since 5.0.0-b1
 	 */
-	public boolean isHandleDragEnabled() {
+	public final boolean isHandleDragEnabled() {
 		return handleDragEnabled;
 	}
 
@@ -3532,7 +3532,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b1
 	 */
-	public FlexibleAdapter setHandleDragEnabled(boolean handleDragEnabled) {
+	public final FlexibleAdapter setHandleDragEnabled(boolean handleDragEnabled) {
 		this.handleDragEnabled = handleDragEnabled;
 		return this;
 	}

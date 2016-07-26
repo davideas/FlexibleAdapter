@@ -28,6 +28,7 @@ import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemMoveListener;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemSwipeListener;
+import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -43,6 +44,7 @@ public class ItemTouchHelperCallback extends Callback {
 
 	private AdapterCallback mItemTouchCallback;
 	private boolean mIsLongPressDragEnabled = false, mIsSwipeEnabled = false;
+	private long mSwipeAnimationDuration = 300L, mDragAnimationDuration = 400L;
 	private float mSwipeThreshold = 0.5f, mMoveThreshold = 0.5f;
 	private int mSwipeFlags = -1;
 
@@ -163,6 +165,40 @@ public class ItemTouchHelperCallback extends Callback {
 		return mSwipeThreshold;
 	}
 
+	/**
+	 * Sets the animation duration of Drag event, starting when the items is released.
+	 * <p>Default value is {@code 400ms}.</p>
+	 *
+	 * @param animationDuration duration in milliseconds
+	 */
+	public void setDragAnimationDuration(long animationDuration) {
+		this.mDragAnimationDuration = animationDuration;
+	}
+
+	/**
+	 * Sets the animation duration of Swipe removal event, starting when the items is released.
+	 * <p>Default value is {@code 300ms}.</p>
+	 *
+	 * @param animationDuration duration in milliseconds
+	 */
+	public void setSwipeAnimationDuration(long animationDuration) {
+		this.mSwipeAnimationDuration = animationDuration;
+	}
+
+	/**
+	 * Provides the animation duration for Drag and Swipe previously set with
+	 * {@link #setDragAnimationDuration} and {@link #setSwipeAnimationDuration}.
+	 * <p>{@inheritDoc}</p>
+	 *
+	 * @return Drag or Swipe animation duration depending the animationType
+	 * @see #setDragAnimationDuration(long)
+	 * @see #setSwipeAnimationDuration(long)
+	 */
+	@Override
+	public long getAnimationDuration(RecyclerView recyclerView, int animationType, float animateDx, float animateDy) {
+		return animationType == ItemTouchHelper.ANIMATION_TYPE_DRAG ? mDragAnimationDuration : mSwipeAnimationDuration;
+	}
+
 	/*--------------*/
 	/* MAIN METHODS */
 	/*--------------*/
@@ -201,11 +237,11 @@ public class ItemTouchHelperCallback extends Callback {
 		RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
 		int dragFlags;
 		int swipeFlags;
-		//Set movement flags based on the Layout Manager and Orientation (if linear)
+		//Set movement flags based on the Layout Manager and Orientation
 		if (layoutManager instanceof GridLayoutManager || layoutManager instanceof StaggeredGridLayoutManager) {
 			dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 			swipeFlags = 0;
-		} else if (((LinearLayoutManager) layoutManager).getOrientation() == LinearLayoutManager.VERTICAL) {
+		} else if (Utils.getOrientation(layoutManager) == LinearLayoutManager.VERTICAL) {
 			dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
 			swipeFlags = mSwipeFlags > 0 ? mSwipeFlags : ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 		} else {
