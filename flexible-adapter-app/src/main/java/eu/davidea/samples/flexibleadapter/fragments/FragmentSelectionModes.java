@@ -95,7 +95,7 @@ public class FragmentSelectionModes extends AbstractFragment
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		mAdapter = new ExampleAdapter(getActivity());
+		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		mAdapter.setMode(SelectableAdapter.MODE_SINGLE);
 
 		//Experimenting NEW features (v5.0.0)

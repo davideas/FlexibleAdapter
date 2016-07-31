@@ -74,7 +74,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		mAdapter = new ExampleAdapter(getActivity());
+		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAutoScrollOnExpand(true)
 				.setHandleDragEnabled(true)

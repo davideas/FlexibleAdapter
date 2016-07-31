@@ -1,7 +1,6 @@
 package eu.davidea.samples.flexibleadapter;
 
 import android.animation.Animator;
-import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -37,10 +36,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	private AbstractFlexibleItem mUseCaseItem;
 	private int positionOld = -1;
-
-	public ExampleAdapter(Activity activity) {
-		super(DatabaseService.getInstance().getDatabaseList(), activity);
-	}
 
 	public ExampleAdapter(List<AbstractFlexibleItem> items, Object listeners) {
 		super(items, listeners);
@@ -112,13 +107,16 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		super.selectAll();
 	}
 
-//	FIXME: This customization makes the header disappear. Why?!?
+	/**
+	 * This is a customization of the Layout that hosts the header when sticky
+	 */
 //	@Override
 //	public ViewGroup getStickySectionHeadersHolder() {
 //		FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
 //		frameLayout.setLayoutParams(new ViewGroup.LayoutParams(
-//				ViewGroup.LayoutParams.WRAP_CONTENT,
+//				ViewGroup.LayoutParams.WRAP_CONTENT,//or MATCH_PARENT
 //				ViewGroup.LayoutParams.WRAP_CONTENT));
+//		((ViewGroup) mRecyclerView.getParent()).addView(frameLayout);//This is important otherwise the Header disappears!
 //		return (ViewGroup) mInflater.inflate(R.layout.sticky_header_layout, frameLayout);
 //	}
 

@@ -85,7 +85,7 @@ public class FragmentHeadersSections extends AbstractFragment
 				.start();
 
 		//Initialize Adapter and RecyclerView
-		mAdapter = new ExampleAdapter(getActivity());
+		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setRemoveOrphanHeaders(false)
 				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter

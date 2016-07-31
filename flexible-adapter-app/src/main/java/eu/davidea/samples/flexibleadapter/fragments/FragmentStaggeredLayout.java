@@ -73,7 +73,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 				.start();
 
 		//Initialize Adapter and RecyclerView
-		mAdapter = new ExampleAdapter(getActivity());
+		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		mAdapter.setNotifyMoveOfFilteredItems(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 
