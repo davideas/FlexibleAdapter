@@ -364,8 +364,8 @@ public class ItemTouchHelperCallback extends Callback {
 		/**
 		 * Evaluate if positions are compatible for swapping.
 		 *
-		 * @param fromPosition the start position of the moved item
-		 * @param toPosition   the resolved position of the moved item
+		 * @param fromPosition the start position of the moving item
+		 * @param toPosition   the potential target position of the moving item
 		 * @return true if the from-item is allowed to swap with the to-item
 		 */
 		boolean shouldMove(int fromPosition, int toPosition);

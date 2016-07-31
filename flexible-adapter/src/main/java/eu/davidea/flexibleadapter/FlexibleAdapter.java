@@ -1959,7 +1959,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	private int recursiveCollapse(int startPosition, List<T> subItems, int level) {
 		int collapsed = 0;
-		for (int i = subItems.size() - 1; i >= 0; i--) {
+		for (int i = 0; i < subItems.size(); i++) {
 			T subItem = subItems.get(i);
 			if (isExpanded(subItem)) {
 				IExpandable expandable = (IExpandable) subItem;
@@ -3635,8 +3635,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					toPosition + " [selected? " + isSelected(toPosition) + "]");
 		}
 
-		//TODO: Move child from a Parent to another? update the 2 sub list. Expand the toParent
-		//Collapse expandable before swapping
+		//Collapse expandable before swapping (otherwise items are mixed badly)
 		if (fromPosition < toPosition && isExpandable(getItem(fromPosition)) && isExpanded(toPosition)) {
 			collapse(toPosition);
 		}
@@ -3737,7 +3736,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
-		return !(isExpandable(getItem(fromPosition)) && getExpandableOf(toPosition) != null);
+		return (mItemMoveListener == null || mItemMoveListener.shouldMoveItem(fromPosition, toPosition)) &&
+				!(isExpandable(getItem(fromPosition)) && getExpandableOf(toPosition) != null);
 	}
 
 	/**
@@ -4062,7 +4062,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * @since 06/06/2016 Created
+	 * @since 06/06/2016
 	 */
 	public interface OnActionStateListener {
 		/**
@@ -4092,8 +4092,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * @return return true if the items can swap ({@code onItemMove()} will be called),
 		 * false otherwise (nothing happens)
 		 * @see #onItemMove(int, int)
+		 * @since 5.0.0-b8
 		 */
-//		boolean shouldMoveItem(int fromPosition, int toPosition);
+		boolean shouldMoveItem(int fromPosition, int toPosition);
 
 		/**
 		 * Called when an item has been dragged far enough to trigger a move. <b>This is called
@@ -4103,14 +4104,14 @@ public class FlexibleAdapter<T extends IFlexible>
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
-		 *                     //		 * @see #shouldMoveItem(int, int)
+		 * @see #shouldMoveItem(int, int)
 		 * @since 5.0.0-b1
 		 */
 		void onItemMove(int fromPosition, int toPosition);
 	}
 
 	/**
-	 * @since 26/01/2016 Created
+	 * @since 26/01/2016
 	 */
 	public interface OnItemSwipeListener extends OnActionStateListener {
 		/**
