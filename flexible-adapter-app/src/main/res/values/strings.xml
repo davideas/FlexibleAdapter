@@ -26,6 +26,7 @@
 	<string name="collapse_all">Collapse All</string>
 	<string name="show_headers">Show Headers</string>
 	<string name="hide_headers">Hide Headers</string>
+	<string name="fast_scroller">Fast Scroller</string>
 	<string name="sticky_headers">Sticky Headers</string>
 	<string name="create_new_item">Create new Item</string>
 	<string name="mode_idle">Mode Idle</string>

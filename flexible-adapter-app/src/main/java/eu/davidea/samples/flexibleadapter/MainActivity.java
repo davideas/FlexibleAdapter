@@ -435,6 +435,11 @@ public class MainActivity extends AppCompatActivity implements
 				//mSearchView.setIconified(false);//This is not necessary
 			}
 		}
+		//Fast Scroller
+		MenuItem fastScrollerItem = menu.findItem(R.id.action_fast_scroller);
+		if (fastScrollerItem != null) {
+			fastScrollerItem.setChecked(mAdapter.isFastScrollerEnabled());
+		}
 		//Animate on update?
 		MenuItem animateUpdateMenuItem = menu.findItem(R.id.action_animate_on_update);
 		if (animateUpdateMenuItem != null) {
@@ -547,10 +552,12 @@ public class MainActivity extends AppCompatActivity implements
 				item.setTitle(R.string.mode_single);
 				Snackbar.make(findViewById(R.id.main_view), "Selection MODE_IDLE is enabled", Snackbar.LENGTH_SHORT).show();
 			}
+		} else if (id == R.id.action_fast_scroller) {
+			mAdapter.toggleFastScroller();
+			item.setChecked(mAdapter.isFastScrollerEnabled());
 		} else if (id == R.id.action_reset || id == R.id.action_delete) {
 			showFab();
 		}
-		//TODO: Add toggle for mAdapter.toggleFastScroller();
 
 		return super.onOptionsItemSelected(item);
 	}
@@ -586,28 +593,23 @@ public class MainActivity extends AppCompatActivity implements
 			mActionModeHelper.onLongClick(this, position);
 	}
 
-//	/**
-//	 * Not yet analyzed
-//	 */
-//	@Override
-//	public boolean shouldMoveItem(int fromPosition, int toPosition) {
-//		return true;
-//	}
 
 	@Override
 	public void onActionStateChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
 		mSwipeRefreshLayout.setEnabled(actionState == ItemTouchHelper.ACTION_STATE_IDLE);
 	}
 
+	/**
+	 * Not yet analyzed
+	 */
+	@Override
+	public boolean shouldMoveItem(int fromPosition, int toPosition) {
+		return true;
+	}
+
 	@Override
 	public void onItemMove(int fromPosition, int toPosition) {
-//		IFlexible fromItem = mAdapter.getItem(fromPosition);
-//		IFlexible toItem = mAdapter.getItem(toPosition);
-		//Don't swap if a Header is involved!!!
-//		if (fromItem instanceof ISectionable || toItem instanceof ISectionable) {
-//			return;
-//		}
-		//FIXME: this doesn't work with all types of items (of course)..... we need to implement some custom logic
+		//TODO FOR YOU: this doesn't work with all types of items (of course)..... we need to implement some custom logic. Consider to use also onActionStateChanged() when dragging is completed
 //		DatabaseService.getInstance().swapItems(
 //				DatabaseService.getInstance().getDatabaseList().indexOf(fromItem),
 //				DatabaseService.getInstance().getDatabaseList().indexOf(toItem));

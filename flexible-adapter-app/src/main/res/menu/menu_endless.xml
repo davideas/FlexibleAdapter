@@ -27,4 +27,9 @@
 		  android:checkable="true"
 	      app:showAsAction="never"/>
 
+	<item android:id="@+id/action_fast_scroller"
+	      android:title="@string/fast_scroller"
+	      android:checkable="true"
+	      app:showAsAction="never"/>
+
 </menu>

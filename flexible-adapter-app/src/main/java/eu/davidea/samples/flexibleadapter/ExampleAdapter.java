@@ -49,7 +49,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	@Override
 	public void updateDataSet(List<AbstractFlexibleItem> items, boolean animate) {
 		//NOTE: To have views/items not changed, set them into "items" before passing the final
-		// list to the Adapter, also pass animate=true in order to not delete those items.
+		// list to the Adapter.
 
 		//Overwrite the list and fully notify the change, pass false to not animate changes.
 		//Watch out! The original list must a copy

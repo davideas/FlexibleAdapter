@@ -13,4 +13,9 @@
 	      android:icon="@drawable/ic_select_off_white_24dp"
 	      app:showAsAction="always"/>
 
+	<item android:id="@+id/action_fast_scroller"
+	      android:title="@string/fast_scroller"
+	      android:checkable="true"
+	      app:showAsAction="never"/>
+
 </menu>
