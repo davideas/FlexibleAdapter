@@ -16,7 +16,6 @@
 package eu.davidea.flexibleadapter;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -970,9 +969,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return ViewGroup layout that will hold the sticky header ItemViews
 	 * @since 5.0.0-b6
 	 */
-	//TODO: make it working programmatically
 	public ViewGroup getStickySectionHeadersHolder() {
-		return (ViewGroup) ((Activity) mRecyclerView.getContext()).findViewById(R.id.sticky_header_container);
+		return (ViewGroup) Utils.scanForActivity(mRecyclerView.getContext()).findViewById(R.id.sticky_header_container);
 	}
 
 	/**
@@ -1758,9 +1756,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Expands an item that is Expandable, not yet expanded, that has subItems and
-	 * no child is selected.
-	 * <p>If configured, automatic smooth scroll will be performed.</p>
+	 * Expands an item that is IExpandable type, not yet expanded and if has subItems.
+	 * <p>If configured, automatic smooth scroll will be performed when necessary.</p>
 	 *
 	 * @param position the position of the item to expand
 	 * @return the number of subItems expanded
@@ -1832,8 +1829,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (init || !expandable.isExpanded() &&
 				(!parentSelected || expandable.getExpansionLevel() <= selectedLevel)) {
 
-			//Collapse others expandable if configured so
-			//Skip when expanding all is requested
+			//Collapse others expandable if configured so Skip when expanding all is requested
 			//Fetch again the new position after collapsing all!!
 			if (collapseOnExpand && !expandAll && collapseAll(minCollapsibleLevel) > 0) {
 				position = getGlobalPositionOf(item);
@@ -1871,7 +1867,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Expands all expandable items with minimum of level {@link #minCollapsibleLevel}.
+	 * Expands all IExpandable items with minimum of level {@link #minCollapsibleLevel}.
 	 *
 	 * @return the number of parent successfully expanded
 	 * @see #expandAll(int)
@@ -1883,7 +1879,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Expands all expandable items with at least the specified level.
+	 * Expands all IExpandable items with at least the specified level.
 	 *
 	 * @param level the minimum level to expand the sub expandable items
 	 * @return the number of parent successfully expanded
@@ -1907,13 +1903,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Collapses an Expandable item that is already expanded, in conjunction with no subItems
-	 * selected or item is pending removal (used in combination with removeRange).
-	 * <p>All Expandable subItem, that are expanded, are recursively collapsed.</p>
+	 * Collapses an IExpandable item that is already expanded, if no subItem is selected.
+	 * <p>Multilevel behaviour: all IExpandable subItem, that are expanded, are recursively
+	 * collapsed.</p>
 	 *
 	 * @param position the position of the item to collapse
 	 * @return the number of subItems collapsed
-	 * @see #collapse(int)
+	 * @see #collapseAll()
 	 * @since 5.0.0-b1
 	 */
 	public int collapse(@IntRange(from = 0) int position) {
@@ -1976,6 +1972,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Collapses all expandable items with the minimum level of {@link #minCollapsibleLevel}.
 	 *
 	 * @return the number of parent successfully collapsed
+	 * @see #collapse(int)
 	 * @see #collapseAll(int)
 	 * @see #setMinCollapsibleLevel(int)
 	 * @since 5.0.0-b1

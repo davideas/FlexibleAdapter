@@ -54,10 +54,11 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	 * public boolean equals(Object o) {
 	 *     return this == o;
 	 * }</pre></p>
-	 * <p>When used with {@code HashMap}, the general contract for the {@code equals} and
-	 * {@link #hashCode()} methods is that if {@code equals} returns {@code true} for any two
-	 * objects, then {@code hashCode()} must return the same value for these objects. This means
-	 * that subclasses of {@code Object} usually override either both methods or neither of them.
+	 * <p><b>Note:</b> When used with {@code Hash[Map,Set]}, the general contract for the
+	 * {@code equals} and {@link #hashCode()} methods is that if {@code equals} returns {@code true}
+	 * for any two objects, then {@code hashCode()} must return the same value for these objects.
+	 * This means that subclasses of {@code Object} usually override either both methods or neither
+	 * of them.</p>
 	 *
 	 * @param o instance to compare
 	 * @return true if items are equals, false otherwise.

@@ -16,7 +16,9 @@
 package eu.davidea.flexibleadapter.utils;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -181,6 +183,19 @@ public final class Utils {
 		} else {
 			return ((LinearLayoutManager) layoutManager).findLastCompletelyVisibleItemPosition();
 		}
+	}
+
+	/**
+	 * Resolves bug #161. Necessary when {@code theme} attribute is used in the layout.
+	 * Used by {@code FlexibleAdapter.getStickySectionHeadersHolder()} method.
+	 */
+	public static Activity scanForActivity(Context context) {
+		if (context instanceof Activity)
+			return (Activity) context;
+		else if (context instanceof ContextWrapper)
+			return scanForActivity(((ContextWrapper) context).getBaseContext());
+
+		return null;
 	}
 
 }
