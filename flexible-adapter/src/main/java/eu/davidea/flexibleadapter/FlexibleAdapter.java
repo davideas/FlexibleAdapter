@@ -503,13 +503,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * @param position the position of the currect item
-	 * @return the position as id
+	 * @param position the position of the current item
+	 * @return Hashcode of the item at the specific position
 	 * @since 5.0.0-b1
 	 */
 	@Override
 	public long getItemId(int position) {
-		return position;
+		T item = getItem(position);
+		return item != null ? item.hashCode() : RecyclerView.NO_ID;
 	}
 
 	/**
