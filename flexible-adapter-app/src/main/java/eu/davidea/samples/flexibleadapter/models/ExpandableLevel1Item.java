@@ -120,8 +120,7 @@ public class ExpandableLevel1Item
 			holder.mFlipView.flipSilently(adapter.isSelected(position));
 		}
 
-		//This is just an example of what you can do with item animation
-		adapter.animateView(holder.itemView, position, adapter.isSelected(position));
+		adapter.animateView(holder.itemView, position);
 	}
 
 	@Override

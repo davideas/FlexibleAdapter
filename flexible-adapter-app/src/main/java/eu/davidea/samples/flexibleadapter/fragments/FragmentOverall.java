@@ -12,10 +12,10 @@ import android.view.MenuItem;
 import android.view.animation.DecelerateInterpolator;
 
 import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.samples.flexibleadapter.OverallAdapter;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 
 /**
  * A fragment representing a list of Examples for FlexibleAdapter displayed with GridLayout.
@@ -60,7 +60,7 @@ public class FragmentOverall extends AbstractFragment {
 		mAdapter = new OverallAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true);
-		mAdapter.setAnimationOnReverseScrolling(false);
+		mAdapter.setAnimationOnReverseScrolling(true);
 		mAdapter.setAnimationInterpolator(new DecelerateInterpolator());
 		mAdapter.setAnimationInitialDelay(500L);
 		mAdapter.setAnimationDelay(150L);

@@ -97,7 +97,7 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 				sectionableList.size() + " section items");
 		holder.mSubtitle.setText(subTitle);
 
-		adapter.animateView(holder.itemView, position, adapter.isSelected(position));
+		adapter.animateView(holder.itemView, position);
 	}
 
 	@Override

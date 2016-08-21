@@ -37,7 +37,8 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	private static final String TAG = OverallAdapter.class.getSimpleName();
 
 	public OverallAdapter(Activity activity) {
-		super(DatabaseService.getInstance().getDatabaseList(), activity);
+		//true = Items implement hashCode() and have stableIds!
+		super(DatabaseService.getInstance().getDatabaseList(), activity, true);
 	}
 
 	/*
@@ -133,11 +134,11 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			}
 
 		}
-		animateView(holder.itemView, position, isSelected(position));
+		animateView(holder.itemView, position);
 	}
 
 	@Override
-	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
+	public List<Animator> getAnimators(View itemView, int position, boolean isForward) {
 		List<Animator> animators = new ArrayList<Animator>();
 		if (mRecyclerView != null && mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 			//GridLayout
@@ -149,7 +150,10 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			//LinearLayout
 			switch (getItemViewType(position)) {
 				default:
-					addSlideInFromBottomAnimator(animators, itemView);
+					if (isForward)
+						addSlideInFromBottomAnimator(animators, itemView);
+					else
+						addSlideInFromTopAnimator(animators, itemView);
 					break;
 			}
 		}

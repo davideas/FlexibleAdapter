@@ -43,6 +43,8 @@ public enum Payload {
 	UNLINK,
 	/** when items are notified after a merge */
 	MERGE,
+	/** when items are notified due to Selecting All items / Clearing Selection) */
+	SELECTION,
 	/** when items are notified after a split */
 	SPLIT
 }

@@ -105,6 +105,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 				}
 			});
 			mStickyHolderLayout.animate().alpha(0).start();
+			if (FlexibleAdapter.DEBUG) Log.i(TAG, "StickyHolderLayout detached");
 		}
 	}
 
@@ -119,6 +120,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 			mStickyHolderLayout.setAlpha(0);
 			updateOrClearHeader(false);
 			mStickyHolderLayout.animate().alpha(1).start();
+			if (FlexibleAdapter.DEBUG) Log.i(TAG, "StickyHolderLayout initialized");
 		} else {
 			Log.w(TAG, "WARNING! ViewGroup for Sticky Headers unspecified! You must include @layout/sticky_header_layout or implement FlexibleAdapter.getStickySectionHeadersHolder() method");
 		}
@@ -155,7 +157,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 			mHeaderPosition = headerPosition;
 			FlexibleViewHolder holder = getHeaderViewHolder(headerPosition);
 			if (FlexibleAdapter.DEBUG)
-				Log.v(TAG, "swapHeader newHeaderPosition=" + mHeaderPosition);
+				Log.d(TAG, "swapHeader newHeaderPosition=" + mHeaderPosition);
 			swapHeader(holder);
 		} else if (updateHeaderContent && mStickyHeaderViewHolder != null) {
 			mAdapter.onBindViewHolder(mStickyHeaderViewHolder, mHeaderPosition);
@@ -229,7 +231,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 	public void clearHeader() {
 		if (mStickyHeaderViewHolder != null) {
-			if (FlexibleAdapter.DEBUG) Log.v(TAG, "clearHeader");
+			if (FlexibleAdapter.DEBUG) Log.d(TAG, "clearHeader");
 			resetHeader(mStickyHeaderViewHolder);
 			mStickyHolderLayout.setAlpha(1);
 			mStickyHeaderViewHolder = null;

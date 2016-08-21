@@ -35,10 +35,10 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public static final int EXAMPLE_VIEW_TYPE = 1;
 
 	private AbstractFlexibleItem mUseCaseItem;
-	private int positionOld = -1;
 
 	public ExampleAdapter(List<AbstractFlexibleItem> items, Object listeners) {
-		super(items, listeners);
+		//true = Items implement hashCode() and have stableIds!
+		super(items, listeners, true);
 	}
 
 	@Override
@@ -272,14 +272,14 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //	}
 
 	@Override
-	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
+	public List<Animator> getAnimators(View itemView, int position, boolean isForward) {
 		List<Animator> animators = new ArrayList<Animator>();
 		if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
 			//GridLayout
 			if (position % 2 == 0)
-				addSlideInFromRightAnimator(animators, itemView, 0.5f);
-			else
 				addSlideInFromLeftAnimator(animators, itemView, 0.5f);
+			else
+				addSlideInFromRightAnimator(animators, itemView, 0.5f);
 		} else {
 			//LinearLayout
 			switch (getItemViewType(position)) {
@@ -287,7 +287,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 					addSlideInFromRightAnimator(animators, itemView, 1.0f);
 					break;
 				case R.layout.recycler_staggered_item:
-					if (position < positionOld) //inverted to have items animated up-side-down
+					if (isForward) //inverted to have items animated up-side-down
 						addSlideInFromBottomAnimator(animators, itemView);
 					else
 						addSlideInFromTopAnimator(animators, itemView);
@@ -302,16 +302,13 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 					addScaleInAnimator(animators, itemView, 0.0f);
 					break;
 				default:
-					if (isSelected)
+					if (isSelected(position))
 						addSlideInFromRightAnimator(animators, itemView, 0.5f);
 					else
 						addSlideInFromLeftAnimator(animators, itemView, 0.5f);
 					break;
 			}
 		}
-
-		if (position != positionOld)
-			positionOld = position;
 
 		//Alpha Animator is automatically added
 		return animators;

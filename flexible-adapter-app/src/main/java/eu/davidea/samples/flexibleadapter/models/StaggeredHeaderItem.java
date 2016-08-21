@@ -68,7 +68,7 @@ public class StaggeredHeaderItem extends AbstractHeaderItem<StaggeredHeaderItem.
 			holder.title.setText(title);
 		}
 
-		adapter.animateView(holder.itemView, position, adapter.isSelected(position));
+		adapter.animateView(holder.itemView, position);
 	}
 
 	static class HeaderViewHolder extends FlexibleViewHolder {

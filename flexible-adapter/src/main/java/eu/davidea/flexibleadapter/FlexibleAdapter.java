@@ -227,15 +227,32 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param items     items to display
 	 * @param listeners can be an instance of:
-	 *                  <br/>- {@link OnUpdateListener}
-	 *                  <br/>- {@link OnItemClickListener}
-	 *                  <br/>- {@link OnItemLongClickListener}
-	 *                  <br/>- {@link OnItemMoveListener}
-	 *                  <br/>- {@link OnItemSwipeListener}
-	 *                  <br/>- {@link OnStickyHeaderChangeListener}
+	 *                  <ul>
+	 *                  <li>{@link OnUpdateListener}
+	 *                  <li>{@link OnItemClickListener}
+	 *                  <li>{@link OnItemLongClickListener}
+	 *                  <li>{@link OnItemMoveListener}
+	 *                  <li>{@link OnItemSwipeListener}
+	 *                  <li>{@link OnStickyHeaderChangeListener}
+	 *                  </ul>
 	 * @since 5.0.0-b1
 	 */
 	public FlexibleAdapter(@Nullable List<T> items, @Nullable Object listeners) {
+		this(items, listeners, false);
+	}
+
+	/**
+	 * Same as {@link #FlexibleAdapter(List, Object)} with possibility to set stableIds.
+	 * <p><b>Note:</b> Setting true allows the RecyclerView to rebind only items changed after
+	 * a refresh. This increase performance</p>
+	 * Set {@code true} if items implements {@code hashcode()} and have stable ids. The method
+	 * {@link #setHasStableIds(boolean)} will be called.
+	 *
+	 * @param stableIds set {@code true} if items implements {@code hashcode()} and have stable ids.
+	 * @since 5.0.0-b8
+	 */
+	public FlexibleAdapter(@Nullable List<T> items, @Nullable Object listeners, boolean stableIds) {
+		super(stableIds);
 		if (items == null) mItems = new ArrayList<>();
 		else mItems = items;
 		mRestoreList = new ArrayList<>();
@@ -1343,6 +1360,20 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+		if (DEBUG) {
+			Log.v(TAG, "onViewBound    Holder=" + holder.getClass().getSimpleName() +
+					" position=" + position +
+					" itemId=" + holder.getItemId() +
+					" layoutPosition=" + holder.getLayoutPosition());
+		}
+		//This check is necessary when using Expandable items, it helps to optimize binding.
+		// Expandable items can lay out of the screen during the initialization/refresh
+		// as soon as they are expanded one by one.
+		if (holder.getLayoutPosition() > mRecyclerView.getChildCount()) {
+			Log.w(TAG, "onViewBound    Skip binding for view out of screen " +
+					holder.getLayoutPosition() + "/" + mRecyclerView.getChildCount());
+			return;
+		}
 		if (!autoMap) {
 			throw new IllegalStateException("AutoMap is not active: super() cannot be called.");
 		}
@@ -1488,7 +1519,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Add the new items or reset the loading status
 		if (newItems != null && newItems.size() > 0) {
 			if (DEBUG)
-				Log.v(TAG, "onLoadMore performing adding " + newItems.size() + " new Items!");
+				Log.i(TAG, "onLoadMore performing adding " + newItems.size() + " new Items!");
 			addItems(getItemCount(), newItems);
 			//Reset OnLoadMore delayed
 			mHandler.sendEmptyMessageDelayed(LOAD_MORE_RESET, 200L);
@@ -1860,7 +1891,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				}
 			}
 			if (DEBUG) {
-				Log.v(TAG, (init ? "Initially expanded " : "Expanded ") +
+				Log.i(TAG, (init ? "Initially expanded " : "Expanded ") +
 						subItemsCount + " subItems on position=" + position);
 			}
 		}
@@ -2035,7 +2066,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			return;
 		}
 		mItems.set(position, item);
-		if (DEBUG) Log.v(TAG, "updateItem notifyItemChanged on position " + position);
+		if (DEBUG) Log.d(TAG, "updateItem notifyItemChanged on position " + position);
 		notifyItemChanged(position, payload);
 	}
 
@@ -2117,7 +2148,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.e(TAG, "No items to add!");
 			return false;
 		}
-		if (DEBUG) Log.v(TAG, "addItems on position=" + position + " itemCount=" + items.size());
+		if (DEBUG) Log.d(TAG, "addItems on position=" + position + " itemCount=" + items.size());
 
 		//Insert Items
 		int initialCount = getItemCount();
@@ -2378,7 +2409,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public int addItemToSection(@NonNull ISectionable item, @NonNull IHeader header,
 								@IntRange(from = 0) int index) {
-		if (DEBUG) Log.v(TAG, "addItemToSection relativePosition=" + index);
+		if (DEBUG) Log.d(TAG, "addItemToSection relativePosition=" + index);
 		int headerPosition = getGlobalPositionOf(header);
 		if (index >= 0) {
 			item.setHeader(header);
@@ -2605,7 +2636,7 @@ public class FlexibleAdapter<T extends IFlexible>
 							@IntRange(from = 0) int itemCount, @Nullable Object payload) {
 		int initialCount = getItemCount();
 		if (DEBUG)
-			Log.v(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
+			Log.d(TAG, "removeRange positionStart=" + positionStart + " itemCount=" + itemCount);
 		if (positionStart < 0 || (positionStart + itemCount) > initialCount) {
 			Log.e(TAG, "Cannot removeRange with positionStart out of OutOfBounds!");
 			return;
@@ -2800,7 +2831,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 			if (restoreInfo.relativePosition >= 0) {
 				//Restore child, if not deleted
-				if (DEBUG) Log.v(TAG, "Restore Child " + restoreInfo);
+				if (DEBUG) Log.d(TAG, "Restore Child " + restoreInfo);
 				//Skip subItem addition if filter is active
 				if (hasSearchText() && !filterObject(restoreInfo.item, getSearchText()))
 					continue;
@@ -2818,7 +2849,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				}
 			} else {
 				//Restore parent or simple item, if not deleted
-				if (DEBUG) Log.v(TAG, "Restore Parent " + restoreInfo);
+				if (DEBUG) Log.d(TAG, "Restore Parent " + restoreInfo);
 				//Skip item addition if filter is active
 				if (hasSearchText() && !filterExpandableObject(restoreInfo.item))
 					continue;
@@ -2853,7 +2884,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					addSelection(getGlobalPositionOf(restoreInfo.item));
 				}
 			}
-			if (DEBUG) Log.v(TAG, "Selected positions after restore " + getSelectedPositions());
+			if (DEBUG) Log.d(TAG, "Selected positions after restore " + getSelectedPositions());
 		}
 
 		//Call listener to update EmptyView
@@ -2872,7 +2903,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 3.0.0
 	 */
 	public synchronized void emptyBin() {
-		if (DEBUG) Log.v(TAG, "emptyBin!");
+		if (DEBUG) Log.d(TAG, "emptyBin!");
 		mRestoreList.clear();
 	}
 
@@ -3121,7 +3152,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
 
-		if (DEBUG) Log.v(TAG, "filterItems with searchText=" + mSearchText);
+		if (DEBUG) Log.i(TAG, "filterItems with searchText=" + mSearchText);
 		List<T> filteredItems = new ArrayList<>();
 		filtering = true;//Enable flag: skip adjustPositions!
 
@@ -3428,7 +3459,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	private synchronized void executeNotifications() {
-		if (DEBUG) Log.v(TAG, "Performing " + notifications.size() + " notifications");
+		if (DEBUG) Log.i(TAG, "Performing " + notifications.size() + " notifications");
 		setAnimate(false);//Disable scroll animation
 		for (Notification notification : notifications) {
 			switch (notification.operation) {
@@ -3445,7 +3476,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					notifyItemMoved(notification.fromPosition, notification.position);
 					break;
 				default:
-					if (DEBUG) Log.v(TAG, "notifyDataSetChanged!");
+					if (DEBUG) Log.w(TAG, "notifyDataSetChanged!");
 					notifyDataSetChanged();
 					break;
 			}
@@ -4297,14 +4328,14 @@ public class FlexibleAdapter<T extends IFlexible>
 		protected Void doInBackground(Void... params) {
 			switch (what) {
 				case UPDATE:
-					if (DEBUG) Log.i(TAG, "doInBackground - started UPDATE");
+					if (DEBUG) Log.d(TAG, "doInBackground - started UPDATE");
 					animateTo(newItems);
-					if (DEBUG) Log.i(TAG, "doInBackground - ended UPDATE");
+					if (DEBUG) Log.d(TAG, "doInBackground - ended UPDATE");
 					break;
 				case FILTER:
-					if (DEBUG) Log.i(TAG, "doInBackground - started FILTER");
+					if (DEBUG) Log.d(TAG, "doInBackground - started FILTER");
 					filterItemsAsync(newItems);
-					if (DEBUG) Log.i(TAG, "doInBackground - ended FILTER");
+					if (DEBUG) Log.d(TAG, "doInBackground - ended FILTER");
 					break;
 			}
 			return null;
@@ -4339,7 +4370,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 		//Execute instant reset on init
 		if (init) {
-			if (DEBUG) Log.v(TAG, "notifyDataSetChanged!");
+			if (DEBUG) Log.w(TAG, "notifyDataSetChanged!");
 			notifyDataSetChanged();
 		}
 		//Update empty view

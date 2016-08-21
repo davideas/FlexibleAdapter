@@ -162,7 +162,7 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
 			holder.mergedTextView.setVisibility(View.GONE);
 		}
 
-		adapter.animateView(holder.itemView, position, adapter.isSelected(position));
+		adapter.animateView(holder.itemView, position);
 	}
 
 	@Override

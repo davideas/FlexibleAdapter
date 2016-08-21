@@ -127,12 +127,7 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 			//DemoApp: I want animate this item where scrolling animation is active and in the
 			// list where database type is different than HEADERS_SECTIONS
 			if (DatabaseService.getInstance().getDatabaseType() != DatabaseType.HEADERS_SECTIONS) {
-				//DemoApp: This "if-else" is just an example of what you can do with item animation
-				if (adapter.isSelected(position)) {
-					adapter.animateView(holder.itemView, position, true);
-				} else {
-					adapter.animateView(holder.itemView, position, false);
-				}
+				adapter.animateView(holder.itemView, position);
 			}
 		}
 	}

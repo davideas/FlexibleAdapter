@@ -56,7 +56,7 @@ public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
 		holder.mTitle.setSelected(true);//For marquee
 		holder.mTitle.setText(Html.fromHtml(getTitle()));
 		holder.mSubtitle.setText(Html.fromHtml(getSubtitle()));
-		adapter.animateView(holder.itemView, position, false);
+		adapter.animateView(holder.itemView, position);
 	}
 
 	/**

@@ -191,9 +191,9 @@ public class ActionModeHelper implements ActionMode.Callback {
 	@CallSuper
 	@Override
 	public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-		if (SelectableAdapter.DEBUG) Log.v(TAG, "ActionMode is active!");
 		//Inflate the Context Menu
 		actionMode.getMenuInflater().inflate(mCabMenu, menu);
+		if (SelectableAdapter.DEBUG) Log.i(TAG, "ActionMode is active!");
 		//Activate the ActionMode Multi
 		mAdapter.setMode(SelectableAdapter.MODE_MULTI);
 		//Notify the provided callback
@@ -229,7 +229,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	@Override
 	public void onDestroyActionMode(ActionMode actionMode) {
 		if (SelectableAdapter.DEBUG)
-			Log.v(TAG, "ActionMode is about to be destroyed! New mode will be " + defaultMode);
+			Log.i(TAG, "ActionMode is about to be destroyed! New mode will be " + defaultMode);
 		//Change mode and deselect everything
 		mAdapter.setMode(defaultMode);
 		mAdapter.clearSelection();

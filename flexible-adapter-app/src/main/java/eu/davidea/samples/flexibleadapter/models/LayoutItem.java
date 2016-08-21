@@ -54,7 +54,7 @@ public class LayoutItem extends AbstractModelItem<LayoutItem.ExampleViewHolder> 
 		holder.mTitle.setSelected(true);//For marquee
 		holder.mTitle.setText(getTitle());
 		holder.mSubtitle.setText(getSubtitle());
-		adapter.animateView(holder.itemView, position, false);
+		adapter.animateView(holder.itemView, position);
 
 		//Support for StaggeredGridLayoutManager
 		if (holder.itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {

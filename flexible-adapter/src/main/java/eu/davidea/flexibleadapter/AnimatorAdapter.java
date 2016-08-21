@@ -100,8 +100,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 *
 	 * @since 5.0.0-b1
 	 */
-	public AnimatorAdapter() {
+	public AnimatorAdapter(boolean stableIds) {
 		super();
+		if (stableIds && DEBUG) Log.i(TAG, "Setting StableIds");
+		setHasStableIds(stableIds);
 
 		//Get notified when an item is changed (should skip animation)
 		mAnimatorNotifierObserver = new AnimatorAdapterDataObserver();
@@ -275,6 +277,37 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/* MAIN METHODS */
 	/*--------------*/
 
+	@Override
+	public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
+		int position = holder.getAdapterPosition();
+		if (DEBUG) {
+			Log.v(TAG, "onViewAttached Holder=" + holder.getClass().getSimpleName() +
+					" position=" + position +
+					" itemId=" + holder.getItemId());
+		}
+		//animateView2(holder.itemView, position);
+	}
+
+	@Override
+	public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+		int position = holder.getAdapterPosition();
+		if (DEBUG) {
+			Log.v(TAG, "onViewDetached Holder=" + holder.getClass().getSimpleName() +
+					" position=" + position +
+					" itemId=" + holder.getItemId());
+		}
+	}
+
+	@Override
+	public void onViewRecycled(RecyclerView.ViewHolder holder) {
+		int position = holder.getAdapterPosition();
+		if (DEBUG) {
+			Log.v(TAG, "onViewRecycled Holder=" + holder.getClass().getSimpleName() +
+					" position=" + position +
+					" itemId=" + holder.getItemId());
+		}
+	}
+
 	/**
 	 * Build your custom list of {@link Animator} to apply on the ItemView.<br/>
 	 * Write the logic based on the position and/or viewType and/or the item selection.
@@ -285,15 +318,15 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * <br/>- If you want to apply same animation for all items, create new list at class level
 	 * and initialize it in the constructor, not inside this method!</p>
 	 *
-	 * @param itemView   the bounded ItemView
-	 * @param position   position can be used to differentiate the list of Animators
-	 * @param isSelected boolean to be used to differentiate the list of Animators
+	 * @param itemView  the bounded ItemView
+	 * @param position  position can be used to differentiate the list of Animators
+	 * @param isForward boolean to be used to differentiate the list of Animators
 	 * @return The list of animators to animate all together.
-	 * @see #animateView(View, int, boolean)
+	 * @see #animateView(View, int)
 	 * @see #getItemViewType(int)
 	 * @since 5.0.0-b1
 	 */
-	public List<Animator> getAnimators(View itemView, int position, boolean isSelected) {
+	public List<Animator> getAnimators(View itemView, int position, boolean isForward) {
 		return new ArrayList<>();
 	}
 
@@ -306,24 +339,29 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		if (animator != null) animator.end();
 	}
 
+	public final void animateView2(final View itemView, int position) {
+
+	}
+
 	/**
 	 * Animates the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
 	 *
 	 * @since 5.0.0-b1
 	 */
-	public final void animateView(final View itemView, int position, boolean isSelected) {
+	public final void animateView(final View itemView, int position) {
 		//FIXME: first completed visible item on rotation gets high delay
 		//FIXME: Expanded children: find a way to Not animate items from custom ItemAnimator!!!
 		// (ItemAnimators should work in conjunction with AnimatorViewHolder???)
 		//TODO: Customize children animations (don't use animateAdd or animateRemove from custom ItemAnimator)
 
-//		if (DEBUG)
-//			Log.v(TAG, "shouldAnimate=" + shouldAnimate
-//					+ " isFastScroll=" + isFastScroll
-//					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
-//					+ " isReverseEnabled=" + isReverseEnabled
-//					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
-//			);
+		if (DEBUG)
+			Log.v(TAG, "shouldAnimate=" + shouldAnimate
+					+ " isFastScroll=" + isFastScroll
+					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
+					+ " isReverseEnabled=" + isReverseEnabled
+					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
+					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
+			);
 
 		if (shouldAnimate && !isFastScroll && !mAnimatorNotifierObserver.isPositionNotified() &&
 				(isReverseEnabled || position > mLastAnimatedPosition || (position == 0 && mRecyclerView.getChildCount() == 0))) {
@@ -332,15 +370,15 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			cancelExistingAnimation(itemView);
 
 			//Retrieve user animators
-			List<Animator> animators = getAnimators(itemView, position, isSelected);
+			List<Animator> animators = getAnimators(itemView, position, position > mLastAnimatedPosition);
 
 			//Add Alpha animator if not yet
 			ViewCompat.setAlpha(itemView, 0);
 			if (!animatorsUsed.contains(AnimatorEnum.ALPHA)) {
 				addAlphaAnimator(animators, itemView, 0f);
 			}
-//			if (DEBUG)
-//				Log.v(TAG, "Started Animation on position " + position + " animatorsUsed=" + animatorsUsed);
+			if (DEBUG)
+				Log.d(TAG, "Started Animation on position " + position + " animatorsUsed=" + animatorsUsed);
 			//Clear animators since the new item might have different animations
 			animatorsUsed.clear();
 
@@ -396,7 +434,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		if (mLastAnimatedPosition > visibleItems || //Normal Forward scrolling
 				(firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews)) { //Reverse scrolling
 			if (DEBUG) Log.v(TAG, "Reset AnimationDelay on position " + position);
-			mInitialDelay = 0L;
+			return 0L;
 		}
 
 		return mInitialDelay += mStepDelay;

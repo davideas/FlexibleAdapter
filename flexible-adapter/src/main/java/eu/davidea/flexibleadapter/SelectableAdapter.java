@@ -348,7 +348,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 			}
 		}
 		if (DEBUG)
-			Log.v(TAG, "selectAll notifyItemRangeChanged from positionStart=" + positionStart + " itemCount=" + getItemCount());
+			Log.d(TAG, "selectAll notifyItemRangeChanged from positionStart=" + positionStart + " itemCount=" + getItemCount());
 		notifySelectionChanged(positionStart, getItemCount());
 	}
 
@@ -361,7 +361,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 1.0.0
 	 */
 	public void clearSelection() {
-		if (DEBUG) Log.v(TAG, "clearSelection " + mSelectedPositions);
+		if (DEBUG) Log.d(TAG, "clearSelection " + mSelectedPositions);
 		Iterator<Integer> iterator = mSelectedPositions.iterator();
 		int positionStart = 0, itemCount = 0;
 		//The notification is done only on items that are currently selected.
@@ -383,7 +383,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	private void notifySelectionChanged(int positionStart, int itemCount) {
-		if (itemCount > 0) notifyItemRangeChanged(positionStart, itemCount);
+		if (itemCount > 0) notifyItemRangeChanged(positionStart, itemCount, Payload.SELECTION);
 	}
 
 	/**
@@ -450,7 +450,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		mSelectedPositions.addAll(savedInstanceState.getIntegerArrayList(TAG));
-		Log.d(TAG, "restore selection " + mSelectedPositions);
+		Log.d(TAG, "Restore selection " + mSelectedPositions);
 	}
 
 	/*---------------*/
@@ -511,6 +511,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor,
 								FastScroller.OnScrollStateChangeListener stateChangeListener) {
+		if (DEBUG) Log.v(TAG, "Setting FastScroller...");
 		if (mRecyclerView == null) {
 			throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter has been added to the RecyclerView.");
 		} else if (fastScroller == null) {
@@ -524,6 +525,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 				R.layout.library_fast_scroller_layout,
 				R.id.fast_scroller_bubble,
 				R.id.fast_scroller_handle, accentColor);
+		if (DEBUG) Log.i(TAG, "FastScroller initialized with color " + accentColor);
 	}
 
 	/**
