@@ -6,14 +6,11 @@
 # FlexibleAdapter
 
 ###### The only Adapter multi-function for your RecyclerView
-- NEW! Beta version: [v5.0.0-b7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) built on 2016.06.20 (usable library!) 112KB
-
-####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
+- **NEW!** Beta version: [v5.0.0-b7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) built on 2016.06.20 (usable library!) 112KB
+- **ANNOUNCEMENT**: Important and Revolutionary changes are foreseen in v5.0.0 - Currently working on _Scrolling Animations coherent with Item Animators_. Meanwhile, you can use _Snapshot version_ containing already many fixes and improvements from Beta7. For more details, please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
 > When initially Android team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.<br/>
 We didn't know how to add selection and to combine all the use cases in the same Adapter.
-Since I created this library, it has become easy to configure how views will be displayed in a list, and now, nobody wants to use a ListView anymore.
-
 The idea behind is to regroup all the functionalities in a unique library, without the need to customize and import several third libraries not compatible among them.
 
 The FlexibleAdapter helps developers to simplify this process without worrying too much about the Adapter anymore. It's easy to extend, it has predefined logic for different situations and prevents common mistakes.<br/>
@@ -50,7 +47,6 @@ repositories {
 ```
 dependencies {
 	//Using JCenter
-	compile 'eu.davidea:flexible-adapter:4.2.0'
 	compile 'eu.davidea:flexible-adapter:5.0.0-b7'
 	
 	//Using MavenSnapshots repository for continuous updates from my development
