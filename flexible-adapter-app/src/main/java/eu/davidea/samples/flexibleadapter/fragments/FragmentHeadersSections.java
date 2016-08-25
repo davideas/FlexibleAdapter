@@ -23,6 +23,7 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.animators.SlideInRightAnimator;
 import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -101,7 +102,7 @@ public class FragmentHeadersSections extends AbstractFragment
 				return true;
 			}
 		});
-		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
+		mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		//mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), -1, 32));//-1 for no divider! 32dp for gap between sections
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!

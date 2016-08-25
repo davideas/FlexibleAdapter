@@ -28,14 +28,14 @@ import eu.davidea.utils.Utils;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class FragmentExpandableSections extends AbstractFragment {
+public class FragmentAnimators extends AbstractFragment {
 
-	public static final String TAG = FragmentExpandableSections.class.getSimpleName();
+	public static final String TAG = FragmentAnimators.class.getSimpleName();
 
 	private ExampleAdapter mAdapter;
 
-	public static FragmentExpandableSections newInstance(int columnCount) {
-		FragmentExpandableSections fragment = new FragmentExpandableSections();
+	public static FragmentAnimators newInstance(int columnCount) {
+		FragmentAnimators fragment = new FragmentAnimators();
 		Bundle args = new Bundle();
 		args.putInt(ARG_COLUMN_COUNT, columnCount);
 		fragment.setArguments(args);
@@ -46,7 +46,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
 	 */
-	public FragmentExpandableSections() {
+	public FragmentAnimators() {
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createExpandableSectionsDatabase(100);//N. of sections
+		DatabaseService.getInstance().createExpandableSectionsDatabase(10);//N. of sections
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView

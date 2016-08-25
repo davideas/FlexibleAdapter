@@ -41,7 +41,7 @@ public class DatabaseService {
 
 	private static final String TAG = DatabaseService.class.getSimpleName();
 	private static DatabaseService mInstance;
-	private static final int SUB_ITEMS = 4;
+	private static final int SUB_ITEMS = 9;
 	private DatabaseType databaseType = DatabaseType.NONE;
 
 	//TODO FOR YOU: Should use userLearnedSelection from settings

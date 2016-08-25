@@ -75,7 +75,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
 			addItemWithDelay((getItem(0) instanceof ULSItem ? 1 : 0), item, 0L, (!(getItem(0) instanceof ULSItem) && scrollToPosition));
-			removeItemWithDelay(item, 4000L, true, true);
+			removeItemWithDelay(item, 4000L, true);
 		}
 	}
 
