@@ -1369,11 +1369,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		//This check is necessary when using Expandable items, it helps to optimize binding.
 		// Expandable items can lay out of the screen during the initialization/refresh
 		// as soon as they are expanded one by one.
-		if (holder.getLayoutPosition() > mRecyclerView.getChildCount()) {
-			Log.w(TAG, "onViewBound    Skip binding for view out of screen " +
-					holder.getLayoutPosition() + "/" + mRecyclerView.getChildCount());
-			return;
-		}
+//		if (holder.getLayoutPosition() > mRecyclerView.getChildCount()) {
+//			Log.w(TAG, "onViewBound    Skip binding for view out of screen " +
+//					holder.getLayoutPosition() + "/" + mRecyclerView.getChildCount());
+//			return;
+//		}
 		if (!autoMap) {
 			throw new IllegalStateException("AutoMap is not active: super() cannot be called.");
 		}
@@ -2087,7 +2087,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #addItem(int, IFlexible)
 	 * @see #addItems(int, List)
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
-	 * @see #removeItemWithDelay(IFlexible, long, boolean, boolean)
+	 * @see #removeItemWithDelay(IFlexible, long, boolean)
 	 * @since 5.0.0-b1
 	 */
 	public void addItemWithDelay(@IntRange(from = 0) final int position, @NonNull final T item,
@@ -2427,12 +2427,22 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*----------------------*/
 
 	/**
+	 * @deprecated Param {@code resetLayoutAnimation} cannot be used anymore. Simply use
+	 * {@link #removeItemWithDelay(IFlexible, long, boolean)}
+	 */
+	@Deprecated
+	public void removeItemWithDelay(@NonNull final T item, @IntRange(from = 0) long delay,
+									final boolean permanent, boolean resetLayoutAnimation) {
+		Log.w(TAG, "Method removeItemWithDelay() with 'resetLayoutAnimation' has been deprecated, param 'resetLayoutAnimation'. Method will be removed with next release!");
+		removeItemWithDelay(item, delay, permanent);
+	}
+
+	/**
 	 * Removes the given Item after the given delay.
 	 *
 	 * @param item                 the item to add
 	 * @param delay                a non-negative delay
 	 * @param permanent            true to permanently delete the item (no undo), false otherwise
-	 * @param resetLayoutAnimation true to reset Layout scrolling animation, false otherwise
 	 * @see #removeItem(int)
 	 * @see #removeItems(List)
 	 * @see #removeItemsOfType(Integer...)
@@ -2442,8 +2452,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b7
 	 */
 	public void removeItemWithDelay(@NonNull final T item, @IntRange(from = 0) long delay,
-									final boolean permanent, final boolean resetLayoutAnimation) {
-		if (resetLayoutAnimation) setAnimate(true);
+									final boolean permanent) {
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -2451,7 +2460,6 @@ public class FlexibleAdapter<T extends IFlexible>
 				if (permanent) permanentDelete = true;
 				removeItem(getGlobalPositionOf(item));
 				permanentDelete = tempPermanent;
-				setAnimate(false);
 			}
 		}, delay);
 	}

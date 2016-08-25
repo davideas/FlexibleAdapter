@@ -288,26 +288,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		//animateView2(holder.itemView, position);
 	}
 
-	@Override
-	public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
-		int position = holder.getAdapterPosition();
-		if (DEBUG) {
-			Log.v(TAG, "onViewDetached Holder=" + holder.getClass().getSimpleName() +
-					" position=" + position +
-					" itemId=" + holder.getItemId());
-		}
-	}
-
-	@Override
-	public void onViewRecycled(RecyclerView.ViewHolder holder) {
-		int position = holder.getAdapterPosition();
-		if (DEBUG) {
-			Log.v(TAG, "onViewRecycled Holder=" + holder.getClass().getSimpleName() +
-					" position=" + position +
-					" itemId=" + holder.getItemId());
-		}
-	}
-
 	/**
 	 * Build your custom list of {@link Animator} to apply on the ItemView.<br/>
 	 * Write the logic based on the position and/or viewType and/or the item selection.
