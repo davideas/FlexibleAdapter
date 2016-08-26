@@ -110,7 +110,7 @@ public class FragmentSelectionModes extends AbstractFragment
 				return true;
 			}
 		});
-		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
+		//Divider item decorator with DrawOver enabled
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider).withDrawOver(true));
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override

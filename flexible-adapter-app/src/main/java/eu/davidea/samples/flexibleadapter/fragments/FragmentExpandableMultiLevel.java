@@ -82,8 +82,6 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 				return true;
 			}
 		});
-		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
-		//mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider));
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),

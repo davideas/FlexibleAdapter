@@ -69,7 +69,6 @@ public class FragmentOverall extends AbstractFragment {
 		mRecyclerView.setLayoutManager(createNewStaggeredGridLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true);//Size of RV will not change
-		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 		mAdapter.setLongPressDragEnabled(true);
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override

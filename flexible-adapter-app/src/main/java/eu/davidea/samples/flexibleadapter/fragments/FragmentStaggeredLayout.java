@@ -96,7 +96,6 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 				return true;
 			}
 		});
-		//mRecyclerView.setItemAnimator(new SlideInRightAnimator());
 
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!

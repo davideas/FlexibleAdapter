@@ -18,7 +18,6 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.animators.FlipInTopXAnimator;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
@@ -80,6 +79,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
+		//Use default item animator
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 			@Override
 			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
@@ -87,7 +87,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 				return true;
 			}
 		});
-		mRecyclerView.setItemAnimator(new FlipInTopXAnimator());
+		//Custom divider item decorator
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
 				R.drawable.divider, 0));//Increase to add gap between sections (Works only with LinearLayout!)
 

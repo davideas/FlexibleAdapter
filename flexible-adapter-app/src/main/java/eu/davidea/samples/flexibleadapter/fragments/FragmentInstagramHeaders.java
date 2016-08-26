@@ -74,6 +74,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
+		//Use default item animator
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 			@Override
 			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
@@ -81,7 +82,9 @@ public class FragmentInstagramHeaders extends AbstractFragment
 				return true;
 			}
 		});
+		//Custom divider item decorator with 24dpi
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 0, 24));
+
 		mAdapter.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!
 				.enableStickyHeaders()//Make headers sticky
 				//Endless scroll with 1 item threshold

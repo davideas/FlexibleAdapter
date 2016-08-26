@@ -10,18 +10,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.SelectableAdapter;
-import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
-import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.animators.FlipInTopXAnimator;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -70,7 +66,6 @@ public class FragmentAnimators extends AbstractFragment {
 		mAdapter.expandItemsAtStartUp()
 				.setAutoCollapseOnExpand(false)
 				.setAutoScrollOnExpand(true)
-				.setAnimateToLimit(Integer.MAX_VALUE)//Size limit = MAX_VALUE will always animate the changes
 				.setNotifyMoveOfFilteredItems(false)//When true, filtering on big list is very slow!
 				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setRemoveOrphanHeaders(false)
@@ -80,6 +75,7 @@ public class FragmentAnimators extends AbstractFragment {
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
+
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
 			@Override
 			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
@@ -88,16 +84,10 @@ public class FragmentAnimators extends AbstractFragment {
 			}
 		});
 		mRecyclerView.setItemAnimator(new FlipInTopXAnimator());
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
-				R.drawable.divider, 0));//Increase to add gap between sections (Works only with LinearLayout!)
 
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
-				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true)//Enable long press to drag items
 				.setHandleDragEnabled(true);//Enable handle drag
-				//.setDisplayHeadersAtStartUp(true);//Show Headers at startUp! (not necessary if Headers are also Expandable)
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
@@ -141,7 +131,6 @@ public class FragmentAnimators extends AbstractFragment {
 		super.onCreateOptionsMenu(menu, inflater);
 		Log.v(TAG, "onCreateOptionsMenu called!");
 		inflater.inflate(R.menu.menu_sections, menu);
-		mListener.initSearchView(menu);
 	}
 
 	@Override
