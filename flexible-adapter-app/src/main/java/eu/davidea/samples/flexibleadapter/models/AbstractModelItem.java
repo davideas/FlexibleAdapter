@@ -35,8 +35,8 @@ public abstract class AbstractModelItem<VH extends FlexibleViewHolder>
 	}
 
 	/**
-	 * Override this method too, when using functionalities like Filter or CollapseAll.
-	 * FlexibleAdapter is making use of HashSet to improve performance in big list.
+	 * Override this method too, when using functionalities like StableIds, Filter or CollapseAll.
+	 * FlexibleAdapter is making use of HashSet to improve performance, especially in big list.
 	 */
 	@Override
 	public int hashCode() {

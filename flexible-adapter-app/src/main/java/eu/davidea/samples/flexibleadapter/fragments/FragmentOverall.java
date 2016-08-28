@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
@@ -57,13 +58,15 @@ public class FragmentOverall extends AbstractFragment {
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
+		//Initialize Adapter and RecyclerView
+		//OverallAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new OverallAdapter(getActivity());
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setAnimationOnScrolling(true);
-		mAdapter.setAnimationOnReverseScrolling(true);
-		mAdapter.setAnimationInterpolator(new DecelerateInterpolator());
-		mAdapter.setAnimationInitialDelay(500L);
-		mAdapter.setAnimationDelay(150L);
+		mAdapter.setAnimationOnScrolling(true)
+				.setAnimationOnReverseScrolling(true)
+				.setAnimationInterpolator(new DecelerateInterpolator())
+				.setAnimationInitialDelay(500L)
+				.setAnimationDelay(150L);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setItemViewCacheSize(0);//Setting ViewCache to 0 (default=2) will animate items better while scrolling down+up with LinearLayout
 		mRecyclerView.setLayoutManager(createNewStaggeredGridLayoutManager());
@@ -94,7 +97,14 @@ public class FragmentOverall extends AbstractFragment {
 	}
 
 	@Override
+	protected LinearLayoutManager createNewLinearLayoutManager() {
+		mAdapter.setUseStepDelay(true);
+		return super.createNewLinearLayoutManager();
+	}
+
+	@Override
 	protected GridLayoutManager createNewGridLayoutManager() {
+		mAdapter.setUseStepDelay(false);
 		GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
@@ -110,6 +120,12 @@ public class FragmentOverall extends AbstractFragment {
 			}
 		});
 		return gridLayoutManager;
+	}
+
+	@Override
+	protected StaggeredGridLayoutManager createNewStaggeredGridLayoutManager() {
+		mAdapter.setUseStepDelay(true);
+		return super.createNewStaggeredGridLayoutManager();
 	}
 
 	@Override

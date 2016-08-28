@@ -59,6 +59,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	private Interpolator mInterpolator = new LinearInterpolator();
 	private AnimatorAdapterDataObserver mAnimatorNotifierObserver;
+	private boolean mUseStepDelay = true;
 
 	private enum AnimatorEnum {
 		ALPHA, SLIDE_IN_LEFT, SLIDE_IN_RIGHT, SLIDE_IN_BOTTOM, SLIDE_IN_TOP, SCALE
@@ -125,7 +126,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	/**
 	 * Customize the initial delay for the first item animation.
-	 * <p>Default value is 0ms.</p>
+	 * <p>Default value is {@code 0ms}.</p>
 	 *
 	 * @param initialDelay any non negative delay
 	 * @return this AnimatorAdapter, so the call can be chained
@@ -139,7 +140,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/**
 	 * Customize the step delay between an animation and the next to be added to the initial delay.
 	 * <p>The delay is added on top of the previous delay.</p>
-	 * Default value is 100ms.
+	 * Default value is {@code 100ms}.
 	 *
 	 * @param delay any positive delay
 	 * @return this AnimatorAdapter, so the call can be chained
@@ -151,8 +152,19 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
+	 * If initial loading animation should use step delay between an animation and the next.
+	 * <p>Default value is {@code true}.</p>
+	 *
+	 * @param useStepDelay
+	 * since 5.0.0-b8
+	 */
+	public void setUseStepDelay(boolean useStepDelay) {
+		this.mUseStepDelay = useStepDelay;
+	}
+
+	/**
 	 * Customize the duration of the animation for ALL items.
-	 * <p>Default value is 300ms.</p>
+	 * <p>Default value is {@code 300ms}.</p>
 	 *
 	 * @param duration any positive time
 	 * @return this AnimatorAdapter, so the call can be chained
@@ -177,7 +189,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	/**
 	 * Define an initial start animation adapter position.
-	 * <p>Default value is 0 (1st position).</p>
+	 * <p>Default value is {@code 0} (1st position).</p>
 	 *
 	 * @param start non negative minimum position to start animation.
 	 * @since 5.0.0-b1
@@ -362,15 +374,17 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			//Clear animators since the new item might have different animations
 			animatorsUsed.clear();
 
-			//Execute the animations all together
+			//Execute the animations
 			AnimatorSet set = new AnimatorSet();
 			set.playTogether(animators);
-			//TODO: Animate with Solution 1 or 2?
-			//set.setStartDelay(calculateAnimationDelay1(position));
-			set.setStartDelay(calculateAnimationDelay2(position));
 			set.setInterpolator(mInterpolator);
 			set.setDuration(mDuration);
 			set.addListener(new HelperAnimatorListener(itemView.hashCode()));
+			if (mUseStepDelay) {
+				//TODO: Animate with Solution 1 or 2?
+				//set.setStartDelay(calculateAnimationDelay1(position));
+				set.setStartDelay(calculateAnimationDelay2(position));
+			}
 			set.start();
 			mAnimators.put(itemView.hashCode(), set);
 

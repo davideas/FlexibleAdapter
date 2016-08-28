@@ -95,6 +95,8 @@ public class FragmentSelectionModes extends AbstractFragment
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
+		//Initialize Adapter and RecyclerView
+		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		mAdapter.setMode(SelectableAdapter.MODE_SINGLE);
 
@@ -103,21 +105,19 @@ public class FragmentSelectionModes extends AbstractFragment
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
-			@Override
-			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!!
-				return true;
-			}
-		});
+		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
+		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		//Divider item decorator with DrawOver enabled
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider).withDrawOver(true));
+		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider)
+				.withDrawOver(true));
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				Snackbar.make(getView(), "Selection MODE_SINGLE is enabled", Snackbar.LENGTH_SHORT).show();
 			}
 		}, 1500L);
+
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());

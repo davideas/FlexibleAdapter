@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eu.davidea.samples.flexibleadapter.HeaderView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	>
+
+	<!-- Title -->
+	<TextView
+		android:id="@+id/header_view_title"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textColor="@android:color/white"
+		android:textSize="18sp"
+		/>
+
+	<!-- Subtitle -->
+	<TextView
+		android:id="@+id/header_view_sub_title"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textColor="@android:color/white"
+		android:textSize="16sp"
+		/>
+
+
+</eu.davidea.samples.flexibleadapter.HeaderView>

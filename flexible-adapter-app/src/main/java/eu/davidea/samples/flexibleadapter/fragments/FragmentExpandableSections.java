@@ -64,6 +64,8 @@ public class FragmentExpandableSections extends AbstractFragment {
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
+		//Initialize Adapter and RecyclerView
+		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.expandItemsAtStartUp()
@@ -79,14 +81,9 @@ public class FragmentExpandableSections extends AbstractFragment {
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//Use default item animator
-		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
-			@Override
-			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-				//NOTE: This allows to receive Payload objects when notifyItemChanged is called by the Adapter!!!
-				return true;
-			}
-		});
+		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
+		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		//Custom divider item decorator
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
 				R.drawable.divider, 0));//Increase to add gap between sections (Works only with LinearLayout!)

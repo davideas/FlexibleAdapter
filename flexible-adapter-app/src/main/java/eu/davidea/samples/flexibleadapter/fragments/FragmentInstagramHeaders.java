@@ -65,7 +65,9 @@ public class FragmentInstagramHeaders extends AbstractFragment
 
 	@SuppressWarnings({"unchecked", "ConstantConditions"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
+		//Initialize Adapter and RecyclerView
+		//true = it makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity(), true);
 		mAdapter.initializeListeners(getActivity())
 				//Experimenting NEW features (v5.0.0)
 				.setAnimationOnScrolling(true)
@@ -74,15 +76,10 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//Use default item animator
-		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
-			@Override
-			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-				//NOTE: This allows to receive Payload objects on notifyItemChanged called by the Adapter!!!
-				return true;
-			}
-		});
-		//Custom divider item decorator with 24dpi
+		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
+		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+		//Custom divider item decorator with 24dpi as empty space between sections
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 0, 24));
 
 		mAdapter.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!

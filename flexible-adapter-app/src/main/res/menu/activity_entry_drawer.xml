@@ -17,6 +17,10 @@
 			android:icon="@drawable/ic_filter_outline_grey600_24dp"
 			android:title="@string/filter"/>
 		<item
+			android:id="@+id/nav_animator"
+			android:icon="@drawable/ic_animation_grey600_24dp"
+			android:title="@string/animator"/>
+		<item
 			android:id="@+id/nav_headers_and_sections"
 			android:icon="@drawable/ic_sections_grey600_24dp"
 			android:title="@string/headers_sections"/>

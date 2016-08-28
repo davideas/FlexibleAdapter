@@ -88,6 +88,9 @@ items and higher, due to calculate the correct position for each item to shift. 
 	<string name="filter">Async Filter</string>
 	<string name="filter_description">Big list with Asynchronous filter and refresh + Synchronization Animations + Configuration</string>
 
+	<string name="animator">Item Animators</string>
+	<string name="animator_description">ItemAnimators coherent with ScrollingAnimation</string>
+
 	<string name="headers_sections">Headers and Sections</string>
 	<string name="headers_sections_description">Clickable sticky headers for sections + Draggable items with Auto-Linkage + Filter</string>
 

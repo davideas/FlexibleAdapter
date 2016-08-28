@@ -33,14 +33,12 @@ public class FlipInTopXAnimator extends BaseItemAnimator {
 
 	@Override
 	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
-		setRemoveDuration(index * 100L);
-		setMoveDuration(getRemoveDuration());
 		ViewCompat.animate(holder.itemView)
 				.rotationX(90)
 				.setDuration(getRemoveDuration())
 				.setInterpolator(mInterpolator)
 				.setListener(new DefaultRemoveVpaListener(holder))
-				.setStartDelay(getRemoveDuration())
+				.setStartDelay(index * 40L)
 				.start();
 	}
 
@@ -52,14 +50,12 @@ public class FlipInTopXAnimator extends BaseItemAnimator {
 
 	@Override
 	protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
-		setAddDuration(index * 100L);
-		setMoveDuration(getRemoveDuration());
 		ViewCompat.animate(holder.itemView)
 				.rotationX(0)
 				.setDuration(getAddDuration())
 				.setInterpolator(mInterpolator)
 				.setListener(new DefaultAddVpaListener(holder))
-				.setStartDelay(getAddDuration())
+				.setStartDelay(index * 150L)
 				.start();
 	}
 

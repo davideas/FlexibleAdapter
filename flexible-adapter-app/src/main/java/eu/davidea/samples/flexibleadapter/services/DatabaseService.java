@@ -18,6 +18,8 @@ import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
+import eu.davidea.samples.flexibleadapter.models.AnimatorExpandableItem;
+import eu.davidea.samples.flexibleadapter.models.AnimatorSubItem;
 import eu.davidea.samples.flexibleadapter.models.ConfigurationItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableItem;
@@ -41,7 +43,7 @@ public class DatabaseService {
 
 	private static final String TAG = DatabaseService.class.getSimpleName();
 	private static DatabaseService mInstance;
-	private static final int SUB_ITEMS = 9;
+	private static final int SUB_ITEMS = 4;
 	private DatabaseType databaseType = DatabaseType.NONE;
 
 	//TODO FOR YOU: Should use userLearnedSelection from settings
@@ -89,6 +91,10 @@ public class DatabaseService {
 		mItems.add(new OverallItem(R.id.nav_filter, resources.getString(R.string.filter))
 				.withDescription(resources.getString(R.string.filter_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_filter_outline_grey600_24dp)));
+
+		mItems.add(new OverallItem(R.id.nav_animator, resources.getString(R.string.animator))
+				.withDescription(resources.getString(R.string.animator_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_animation_grey600_24dp)));
 
 		mItems.add(new OverallItem(R.id.nav_headers_and_sections, resources.getString(R.string.headers_sections))
 				.withDescription(resources.getString(R.string.headers_sections_description))
@@ -172,6 +178,17 @@ public class DatabaseService {
 		mItems.clear();
 		for (int i = 0; i < startSize; i++) {
 			mItems.add(newSimpleItem(i + 1, null));
+		}
+	}
+
+	/*
+	 * List of Animators items (with sections and Animators SubItems).
+	 */
+	public void createAnimatorsDatabase(int size) {
+		databaseType = DatabaseType.ANIMATORS;
+		mItems.clear();
+		for (int i = 0; i < size; i++) {
+			mItems.add(newAnimatorItem(i + 1));
 		}
 	}
 
@@ -319,7 +336,7 @@ public class DatabaseService {
 
 	/*
 	 * Creates a special expandable item which has another level of expandable.
-	 * <p>IMPORTANT: Give different IDs to each child and override getExpansionLevel()!</p>
+	 * IMPORTANT: Give different IDs to each child and override getExpansionLevel()!
 	 */
 	private ExpandableLevel0Item newExpandableLevelItem(int i) {
 		//ExpandableLevel0Item is an expandable with Level=0
@@ -337,6 +354,21 @@ public class DatabaseService {
 			expandableItem.addSubItem(expSubItem);
 		}
 		return expandableItem;
+	}
+
+	/*
+	 * Creates a special animator expandable item which is also a Header.
+	 * The animator subItems will have linked its parent as Header!
+	 */
+	public static AnimatorExpandableItem newAnimatorItem(int i) {
+		AnimatorExpandableItem animatorItem = new AnimatorExpandableItem("AH" + i);
+		animatorItem.setTitle("Animator Header " + i);
+		for (int j = 1; j <= SUB_ITEMS; j++) {
+			AnimatorSubItem subItem = new AnimatorSubItem(animatorItem.getId() + "-SB" + j, animatorItem);
+			subItem.setTitle("Sub Item " + j);
+			animatorItem.addSubItem(subItem);
+		}
+		return animatorItem;
 	}
 
 	/*

@@ -85,7 +85,7 @@ public class ExpandableHeaderItem
 
 	public void addSubItem(SubItem subItem) {
 		if (mSubItems == null)
-			mSubItems = new ArrayList<SubItem>();
+			mSubItems = new ArrayList<>();
 		mSubItems.add(subItem);
 	}
 

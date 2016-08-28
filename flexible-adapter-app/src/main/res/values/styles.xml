@@ -16,6 +16,23 @@
 		<!-- For selection -->
 		<item name="selectableItemBackground">@drawable/selector_item_light</item>
 		<item name="primaryTextSelector">@drawable/primary_text_selector_light</item>
+
+		<!-- Spinner -->
+		<item name="android:spinnerStyle">@style/Spinner</item>
+		<item name="android:spinnerItemStyle">@style/SpinnerItem</item>
+	</style>
+
+	<style name="Spinner" parent="Widget.AppCompat.Spinner">
+		<item name="android:dropDownWidth">160dp</item>
+	</style>
+
+	<style name="SpinnerItem" parent="Widget.AppCompat.TextView.SpinnerItem">
+		<item name="android:background">@drawable/selector_item_light</item>
+		<item name="android:textAppearance">@style/TextAppearanceSpinnerItem</item>
+	</style>
+
+	<style name="TextAppearanceSpinnerItem" parent="TextAppearance.AppCompat.Widget.TextView.SpinnerItem">
+		<item name="android:textColor">@color/material_text_color_purple_500</item>
 	</style>
 
 	<style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">

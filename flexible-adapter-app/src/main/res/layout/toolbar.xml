@@ -9,4 +9,14 @@
 	android:background="?attr/colorPrimary"
 	android:popupTheme="@style/AppTheme.PopupOverlay"
 	app:popupTheme="@style/AppTheme.PopupOverlay"
-	tools:showIn="@layout/activity_main"/>
+	tools:showIn="@layout/activity_main">
+
+	<include
+		android:id="@+id/toolbar_header_view"
+		layout="@layout/header_view"
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:layout_marginRight="@dimen/header_view_end_margin_right"
+		android:visibility="gone"/>
+
+</android.support.v7.widget.Toolbar>

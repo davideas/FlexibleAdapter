@@ -243,8 +243,9 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Same as {@link #FlexibleAdapter(List, Object)} with possibility to set stableIds.
-	 * <p><b>Note:</b> Setting true allows the RecyclerView to rebind only items changed after
-	 * a refresh. This increase performance</p>
+	 * <p><b>Note:</b> Setting true allows the RecyclerView to rebind only items really changed
+	 * after a refresh or after swapping Adapter. This increase performance, you loose scrolling
+	 * animations.</p>
 	 * Set {@code true} if items implements {@code hashcode()} and have stable ids. The method
 	 * {@link #setHasStableIds(boolean)} will be called.
 	 *
@@ -2077,13 +2078,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Inserts the given Item at desired position or Add Item at last position with a delay
 	 * and auto-scroll to the position.
-	 * <p>Useful at startup, when there's an item to add after Adapter Animations is completed.</p>
+	 * <p>Scrolling animation is automatically preserved, meaning that, notification for animation
+	 * is ignored.</p>
+	 * Useful at startup, when there's an item to add after Adapter Animations is completed.
 	 *
-	 * @param position         position of the item to add
-	 * @param item             the item to add
-	 * @param delay            a non-negative delay
-	 * @param scrollToPosition true if RecyclerView should scroll after item has been added,
-	 *                         false otherwise
+	 * @param position             position of the item to add
+	 * @param item                 the item to add
+	 * @param delay                a non-negative delay
+	 * @param scrollToPosition     true if RecyclerView should scroll after item has been added,
+	 *                             false otherwise
 	 * @see #addItem(int, IFlexible)
 	 * @see #addItems(int, List)
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
@@ -2095,10 +2098,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
+				setAnimate(true);
 				if (addItem(position, item) && scrollToPosition && mRecyclerView != null) {
 					mRecyclerView.smoothScrollToPosition(
 							Math.min(Math.max(0, position), getItemCount() - 1));
 				}
+				setAnimate(false);
 			}
 		}, delay);
 	}
@@ -2439,6 +2444,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Removes the given Item after the given delay.
+	 * <p>Scrolling animation is automatically preserved, meaning that notification for animation
+	 * is ignored.</p>
 	 *
 	 * @param item                 the item to add
 	 * @param delay                a non-negative delay
@@ -2456,10 +2463,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
+				setAnimate(true);
 				boolean tempPermanent = permanentDelete;
 				if (permanent) permanentDelete = true;
 				removeItem(getGlobalPositionOf(item));
 				permanentDelete = tempPermanent;
+				setAnimate(false);
 			}
 		}, delay);
 	}
@@ -2472,7 +2481,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeItemsOfType(Integer...)
 	 * @see #removeRange(int, int)
 	 * @see #removeAllSelectedItems()
-	 * @see #removeItemWithDelay(IFlexible, long, boolean, boolean)
+	 * @see #removeItemWithDelay(IFlexible, long, boolean)
 	 * @see #removeItem(int, Object)
 	 * @since 1.0.0
 	 */

@@ -73,6 +73,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 				.start();
 
 		//Initialize Adapter and RecyclerView
+		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		mAdapter.setNotifyMoveOfFilteredItems(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
@@ -89,13 +90,9 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
-			@Override
-			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-				//NOTE: This allows to receive Payload objects when notifyItemChanged is called by the Adapter!!!
-				return true;
-			}
-		});
+		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
+		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!

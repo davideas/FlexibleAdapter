@@ -5,7 +5,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -77,12 +76,15 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		if (configure) {
 			//Create configuration list
 			DatabaseService.getInstance().createConfigurationDatabase(getResources());
-			mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
-
+			//true = let's use stableIds! Since RecyclerView doesn't switch Adapters, we can
+			// optimize the changes of the items.
+			mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(),
+					getActivity(), true);
 		} else {
-			//Create Database with custom size
+			//Create Database with custom size (stableIds must remains = false)
 			DatabaseService.getInstance().createEndlessDatabase(DatabaseConfiguration.size);//N. of items (1000 items it's already a medium size)
-			mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
+			mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(),
+					getActivity(), true);
 		}
 
 		initializeRecyclerView();
@@ -105,22 +107,14 @@ public class FragmentAsyncFilter extends AbstractFragment {
 				.setNotifyMoveOfFilteredItems(DatabaseConfiguration.notifyMove)//When true, filtering on big list is very slow!
 				.setNotifyChangeOfUnfilteredItems(DatabaseConfiguration.notifyChange)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setOnlyEntryAnimation(true);
-		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
-		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
-		if (mRecyclerView.getAdapter() == null) {
-			mRecyclerView.setAdapter(mAdapter);
-		} else {
-			mRecyclerView.swapAdapter(mAdapter, false);
+		if (mRecyclerView == null) {
+			mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+			mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
+			mRecyclerView.setHasFixedSize(true);//Adapter changes won't affect the size of the RecyclerView
 		}
-		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
-			@SuppressWarnings("NullableProblems")
-			@Override
-			public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
-				//NOTE: This allows to receive Payload objects when notifyItemChanged is called by the Adapter!!!
-				return true;
-			}
-		});
+		// ViewHolders are different so we do NOT swap Adapters
+		mRecyclerView.setAdapter(mAdapter);
+		//Custom divider item decorator with Offset
 		if (mDivider == null) {
 			mDivider = new DividerItemDecoration(getActivity(), R.drawable.divider_large).withOffset(true);
 		}

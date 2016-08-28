@@ -48,6 +48,7 @@ import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.fragments.AbstractFragment;
+import eu.davidea.samples.flexibleadapter.fragments.FragmentAnimators;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentAsyncFilter;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentEndlessScrolling;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableMultiLevel;
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements
 	private ActionModeHelper mActionModeHelper;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private Toolbar mToolbar;
+	private HeaderView mHeaderView;
 	private DrawerLayout mDrawer;
 	private NavigationView mNavigationView;
 	private AbstractFragment mFragment;
@@ -229,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements
 	private void initializeToolbar() {
 		Log.d(TAG, "initializeToolbar as actionBar");
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
+		mHeaderView = (HeaderView) findViewById(R.id.toolbar_header_view);
 		//Toolbar will now take on default Action Bar characteristics
 		setSupportActionBar(mToolbar);
 	}
@@ -260,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements
 			}
 		});
 		//No Fab on 1st fragment
-		hideFab();
+		hideFabSilently();
 	}
 
 	@Override
@@ -278,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements
 	@SuppressWarnings("StatementWithEmptyBody")
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item) {
-		hideFab();
+		hideFabSilently();
 		CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mFab.getLayoutParams();
 		ScrollAwareFABBehavior fabBehavior = ((ScrollAwareFABBehavior) layoutParams.getBehavior());
 		fabBehavior.setEnabled(false);
@@ -287,6 +290,12 @@ public class MainActivity extends AppCompatActivity implements
 		int id = item.getItemId();
 		if (id == R.id.nav_overall) {
 			mFragment = FragmentOverall.newInstance(2);
+		} else if (id == R.id.nav_selection_modes) {
+			mFragment = FragmentSelectionModes.newInstance(2);
+		} else if (id == R.id.nav_filter) {
+			mFragment = FragmentAsyncFilter.newInstance(true);
+		} else if (id == R.id.nav_animator) {
+			mFragment = FragmentAnimators.newInstance();
 		} else if (id == R.id.nav_endless_scrolling) {
 			mFragment = FragmentEndlessScrolling.newInstance(2);
 		} else if (id == R.id.nav_instagram_headers) {
@@ -294,10 +303,6 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_headers_and_sections) {
 			mFragment = FragmentHeadersSections.newInstance(2);
 			fabBehavior.setEnabled(true);
-		} else if (id == R.id.nav_selection_modes) {
-			mFragment = FragmentSelectionModes.newInstance(2);
-		} else if (id == R.id.nav_filter) {
-			mFragment = FragmentAsyncFilter.newInstance(true);
 		} else if (id == R.id.nav_multi_level_expandable) {
 			mFragment = FragmentExpandableMultiLevel.newInstance(2);
 		} else if (id == R.id.nav_expandable_sections) {
@@ -337,6 +342,7 @@ public class MainActivity extends AppCompatActivity implements
 				}
 			});
 			mToolbar.setSubtitle(item.getTitle());
+			mHeaderView.bindTo("FlexibleAdapter", item.getTitle());
 			return true;
 		}
 		return false;
@@ -356,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements
 							MenuItem listTypeItem = menu.findItem(R.id.action_list_type);
 							if (listTypeItem != null)
 								listTypeItem.setVisible(false);
-							hideFab();
+							//hideFab();
 							return true;
 						}
 
@@ -365,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements
 							MenuItem listTypeItem = menu.findItem(R.id.action_list_type);
 							if (listTypeItem != null)
 								listTypeItem.setVisible(true);
-							showFab();
+							//showFab();
 							return true;
 						}
 					});
@@ -376,6 +382,10 @@ public class MainActivity extends AppCompatActivity implements
 			mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 			mSearchView.setOnQueryTextListener(this);
 		}
+	}
+
+	private void hideFabSilently() {
+		mFab.setAlpha(0f);
 	}
 
 	private void hideFab() {
@@ -555,8 +565,8 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.action_fast_scroller) {
 			mAdapter.toggleFastScroller();
 			item.setChecked(mAdapter.isFastScrollerEnabled());
-		} else if (id == R.id.action_reset || id == R.id.action_delete) {
-			showFab();
+//		} else if (id == R.id.action_reset || id == R.id.action_delete) {
+//			showFab();
 		}
 
 		return super.onOptionsItemSelected(item);

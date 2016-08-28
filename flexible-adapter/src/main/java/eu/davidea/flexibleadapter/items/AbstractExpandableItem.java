@@ -95,7 +95,7 @@ public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S 
 
 	public void addSubItem(S subItem) {
 		if (mSubItems == null)
-			mSubItems = new ArrayList<S>();
+			mSubItems = new ArrayList<>();
 		mSubItems.add(subItem);
 	}
 

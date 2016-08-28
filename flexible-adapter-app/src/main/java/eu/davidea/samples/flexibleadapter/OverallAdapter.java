@@ -61,7 +61,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 				item.setTitle(mRecyclerView.getContext().getString(R.string.linear_layout));
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
-			addItemWithDelay(0, item, 100L, scrollToPosition);
+			addItemWithDelay(0, item, 500L, scrollToPosition);
 			removeItemWithDelay(item, 2000L, true);
 		}
 	}
@@ -144,11 +144,14 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			//GridLayout
 			if (position % 2 != 0)
 				addSlideInFromRightAnimator(animators, itemView, 0.5f);
+			else if (getItemViewType(position) == R.layout.recycler_layout_item)
+				addSlideInFromTopAnimator(animators, itemView);
 			else
 				addSlideInFromLeftAnimator(animators, itemView, 0.5f);
 		} else {
-			//LinearLayout
 			switch (getItemViewType(position)) {
+				case R.layout.recycler_layout_item:
+					addSlideInFromTopAnimator(animators, itemView);
 				default:
 					if (isForward)
 						addSlideInFromBottomAnimator(animators, itemView);

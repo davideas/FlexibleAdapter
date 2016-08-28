@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
+	android:id="@+id/main_view"
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/main_view"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:fitsSystemWindows="true"
 	tools:context="eu.davidea.samples.flexibleadapter.MainActivity">
 
 	<!-- Toolbar -->
@@ -16,7 +15,71 @@
 		android:layout_height="wrap_content"
 		android:theme="@style/AppTheme.AppBarOverlay">
 
-		<include layout="@layout/toolbar"/>
+		<android.support.design.widget.CollapsingToolbarLayout
+			android:id="@+id/toolbar_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			tit="@string/app_name"
+			app:layout_scrollFlags="scroll|enterAlways|exitUntilCollapsed">
+
+			<include layout="@layout/toolbar"/>
+
+			<LinearLayout
+				android:id="@+id/layout_for_spinners"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="@dimen/toolbar_height"
+				android:layout_marginBottom="@dimen/margin_bottom_small"
+				android:layout_marginEnd="@dimen/margin_right"
+				android:layout_marginLeft="@dimen/margin_left"
+				android:layout_marginRight="@dimen/margin_right"
+				android:layout_marginStart="@dimen/margin_left"
+				android:visibility="gone"
+				tools:visibility="visible"
+				android:elevation="4dp"
+				android:orientation="horizontal">
+
+				<LinearLayout
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:orientation="vertical">
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Item Animators"/>
+
+					<Spinner
+						android:id="@+id/spinner_item_animators"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:orientation="vertical">
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Scrolling Animations"/>
+
+					<Spinner
+						android:id="@+id/spinner_scrolling_animation"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+				</LinearLayout>
+
+			</LinearLayout>
+
+		</android.support.design.widget.CollapsingToolbarLayout>
 
 	</android.support.design.widget.AppBarLayout>
 
@@ -26,19 +89,6 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
-	<!-- Bottom Sheet -->
-	<!--<FrameLayout-->
-		<!--android:id="@+id/bottom_sheet"-->
-		<!--android:layout_width="match_parent"-->
-		<!--android:layout_height="match_parent"-->
-		<!--app:behavior_hideable="true"-->
-		<!--app:behavior_peekHeight="56dp"-->
-		<!--app:layout_behavior="@string/bottom_sheet_behavior">-->
-
-		<!--<include layout="@layout/bottom_sheet_headers_sections"/>-->
-
-	<!--</FrameLayout>-->
 
 	<!-- FAB -->
 	<android.support.design.widget.FloatingActionButton
