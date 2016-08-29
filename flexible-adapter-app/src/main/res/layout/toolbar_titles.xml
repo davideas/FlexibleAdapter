@@ -11,18 +11,16 @@
 		android:id="@+id/header_view_title"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:textColor="@android:color/white"
-		android:textSize="18sp"
-		/>
+		android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+		android:textSize="18sp"/>
 
 	<!-- Subtitle -->
 	<TextView
 		android:id="@+id/header_view_sub_title"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:textColor="@android:color/white"
-		android:textSize="16sp"
-		/>
+		android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
+		android:textSize="16sp"/>
 
 
 </eu.davidea.samples.flexibleadapter.HeaderView>

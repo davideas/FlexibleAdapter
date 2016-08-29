@@ -13,10 +13,9 @@
 
 	<include
 		android:id="@+id/toolbar_header_view"
-		layout="@layout/header_view"
+		layout="@layout/toolbar_titles"
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
-		android:layout_marginRight="@dimen/header_view_end_margin_right"
-		android:visibility="gone"/>
+		android:layout_marginRight="@dimen/header_view_end_margin_right"/>
 
 </android.support.v7.widget.Toolbar>

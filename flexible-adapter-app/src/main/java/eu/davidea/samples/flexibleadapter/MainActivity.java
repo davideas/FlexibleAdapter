@@ -203,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements
 		}
 		if (mFragment == null) {
 			mFragment = FragmentOverall.newInstance(2);
-			mToolbar.setSubtitle(getString(R.string.overall));
 		}
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.recycler_view_container,
@@ -234,7 +233,8 @@ public class MainActivity extends AppCompatActivity implements
 		Log.d(TAG, "initializeToolbar as actionBar");
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		mHeaderView = (HeaderView) findViewById(R.id.toolbar_header_view);
-		mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+		mHeaderView.bindTo(getString(R.string.app_name), getString(R.string.overall));
+		//mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
 		//Toolbar will now take on default Action Bar characteristics
 		setSupportActionBar(mToolbar);
 	}
@@ -344,9 +344,9 @@ public class MainActivity extends AppCompatActivity implements
 					mDrawer.closeDrawer(GravityCompat.START);
 				}
 			});
-			mToolbar.setSubtitle(item.getTitle());
+			//mToolbar.setSubtitle(item.getTitle());
 			mHeaderView.bindTo(getString(R.string.app_name), item.getTitle());
-			mToolbarLayout.setTitle(getString(R.string.app_name));
+			//mToolbarLayout.setTitle(getString(R.string.app_name));
 
 			return true;
 		}
