@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements
 	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
 	private ActionModeHelper mActionModeHelper;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
+	private CollapsingToolbarLayout mToolbarLayout;
 	private Toolbar mToolbar;
 	private HeaderView mHeaderView;
 	private DrawerLayout mDrawer;
@@ -232,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements
 		Log.d(TAG, "initializeToolbar as actionBar");
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		mHeaderView = (HeaderView) findViewById(R.id.toolbar_header_view);
+		mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
 		//Toolbar will now take on default Action Bar characteristics
 		setSupportActionBar(mToolbar);
 	}
@@ -342,7 +345,9 @@ public class MainActivity extends AppCompatActivity implements
 				}
 			});
 			mToolbar.setSubtitle(item.getTitle());
-			mHeaderView.bindTo("FlexibleAdapter", item.getTitle());
+			mHeaderView.bindTo(getString(R.string.app_name), item.getTitle());
+			mToolbarLayout.setTitle(getString(R.string.app_name));
+
 			return true;
 		}
 		return false;

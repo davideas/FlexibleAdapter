@@ -34,10 +34,8 @@
 				android:layout_marginLeft="@dimen/margin_left"
 				android:layout_marginRight="@dimen/margin_right"
 				android:layout_marginStart="@dimen/margin_left"
-				android:visibility="gone"
-				tools:visibility="visible"
-				android:elevation="4dp"
-				android:orientation="horizontal">
+				android:orientation="horizontal"
+				android:baselineAligned="false">
 
 				<LinearLayout
 					android:layout_width="0dp"

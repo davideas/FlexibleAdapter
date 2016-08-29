@@ -72,4 +72,9 @@ dependencies {
 	//Glide (Image Loader)
 	compile 'com.github.bumptech.glide:glide:3.7.0'
 
+	//Smooth-app-bar-layout
+	compile ('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
+		exclude group: "com.android.support"
+	}
+
 }
