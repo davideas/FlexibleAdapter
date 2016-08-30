@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <eu.davidea.samples.flexibleadapter.HeaderView
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:orientation="vertical"
-	>
+	android:orientation="vertical">
 
 	<!-- Title -->
 	<TextView
@@ -12,7 +12,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-		android:textSize="18sp"/>
+		tools:text="Title"/>
 
 	<!-- Subtitle -->
 	<TextView
@@ -20,7 +20,9 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
-		android:textSize="16sp"/>
-
+		android:ellipsize="marquee"
+		android:marqueeRepeatLimit="marquee_forever"
+		android:singleLine="true"
+		tools:text="Subtitle"/>
 
 </eu.davidea.samples.flexibleadapter.HeaderView>

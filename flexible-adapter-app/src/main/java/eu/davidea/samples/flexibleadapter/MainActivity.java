@@ -48,7 +48,9 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
+import eu.davidea.samples.flexibleadapter.dialogs.MessageDialog;
 import eu.davidea.samples.flexibleadapter.fragments.AbstractFragment;
+import eu.davidea.samples.flexibleadapter.dialogs.EditItemDialog;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentAnimators;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentAsyncFilter;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentEndlessScrolling;
@@ -59,7 +61,6 @@ import eu.davidea.samples.flexibleadapter.fragments.FragmentInstagramHeaders;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentOverall;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentSelectionModes;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentStaggeredLayout;
-import eu.davidea.samples.flexibleadapter.fragments.MessageDialogFragment;
 import eu.davidea.samples.flexibleadapter.fragments.OnFragmentInteractionListener;
 import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableItem;
@@ -74,6 +75,32 @@ import eu.davidea.samples.flexibleadapter.services.DatabaseType;
 import eu.davidea.utils.ScrollAwareFABBehavior;
 import eu.davidea.utils.Utils;
 
+/**
+ * The Demo application is organized in Fragments with 1 Activity {@code MainActivity}
+ * implementing most of the methods. Each Fragment shows a different example and can assemble
+ * more functionalities at once.
+ *
+ * <p>The Activity implementation is organized in this order:</p>
+ *
+ * <ul>
+ * <li>Activity management
+ * <li>Initialization methods
+ * <li>Navigation drawer & Fragment management
+ * <li>Floating Action Button
+ * <li>SearchView
+ * <li>Option menu preparation & management
+ * <li>Dialog listener implementation (for the example of onItemClick)
+ * <li><b>FlexibleAdapter listeners implementation</b>
+ * <li>ActionMode implementation
+ * <li>Extras
+ * </ul>
+ *
+ * The Fragments <u>may</u> use Activity implementations or may override specific behaviors
+ * themselves. Fragments have {@code AbstractFragment} in common to have some methods reusable.
+ *
+ * <p>...more on
+ * <a href="https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-App">Demo app Wiki page</a>.</p>
+ */
 @SuppressWarnings({"ConstantConditions", "unchecked"})
 public class MainActivity extends AppCompatActivity implements
 		ActionMode.Callback, EditItemDialog.OnEditItemListener, SearchView.OnQueryTextListener,
@@ -130,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	});
 
+	/* ACTIVITY MANAGEMENT */
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -183,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements
 		initializeSwipeToRefresh();
 		initializeActionModeHelper(mode);
 	}
+
+	/* INITIALIZATION METHODS */
 
 	private void initializeActionModeHelper(int mode) {
 		mActionModeHelper = new ActionModeHelper(mAdapter, mFragment.getContextMenuResId(), this) {
@@ -278,6 +308,8 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
+	/* NAVIGATION DRAWER & FRAGMENT MANAGEMENT */
+
 	/**
 	 * IMPORTANT!! READ THE COMMENT FOR THE FRAGMENT REPLACE
 	 */
@@ -313,13 +345,13 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_staggered) {
 			mFragment = FragmentStaggeredLayout.newInstance(2);
 		} else if (id == R.id.nav_about) {
-			MessageDialogFragment.newInstance(
+			MessageDialog.newInstance(
 					R.drawable.ic_info_grey600_24dp,
 					getString(R.string.about_title),
 					getString(R.string.about_body,
 							Utils.getVersionName(this),
 							Utils.getVersionCode(this)))
-					.show(getFragmentManager(), MessageDialogFragment.TAG);
+					.show(getFragmentManager(), MessageDialog.TAG);
 			return true;
 		} else if (id == R.id.nav_github) {
 
@@ -352,6 +384,33 @@ public class MainActivity extends AppCompatActivity implements
 		}
 		return false;
 	}
+
+	/* FLOATING ACTION BUTTON */
+
+	private void hideFabSilently() {
+		mFab.setAlpha(0f);
+	}
+
+	private void hideFab() {
+		ViewCompat.animate(mFab)
+				.scaleX(0f).scaleY(0f)
+				.alpha(0f).setDuration(100)
+				.start();
+	}
+
+	private void showFab() {
+		if (mFragment instanceof FragmentHeadersSections ||
+				mFragment instanceof FragmentStaggeredLayout ||
+				mFragment instanceof FragmentAsyncFilter) {
+			ViewCompat.animate(mFab)
+					.scaleX(1f).scaleY(1f)
+					.alpha(1f).setDuration(200)
+					.setStartDelay(300L)
+					.start();
+		}
+	}
+
+	/* SEARCH VIEW */
 
 	@Override
 	public void initSearchView(final Menu menu) {
@@ -389,29 +448,6 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	private void hideFabSilently() {
-		mFab.setAlpha(0f);
-	}
-
-	private void hideFab() {
-		ViewCompat.animate(mFab)
-				.scaleX(0f).scaleY(0f)
-				.alpha(0f).setDuration(100)
-				.start();
-	}
-
-	private void showFab() {
-		if (mFragment instanceof FragmentHeadersSections ||
-				mFragment instanceof FragmentStaggeredLayout ||
-				mFragment instanceof FragmentAsyncFilter) {
-			ViewCompat.animate(mFab)
-					.scaleX(1f).scaleY(1f)
-					.alpha(1f).setDuration(200)
-					.setStartDelay(300L)
-					.start();
-		}
-	}
-
 	@Override
 	public boolean onQueryTextChange(String newText) {
 		if (mAdapter.hasNewSearchText(newText)) {
@@ -431,6 +467,8 @@ public class MainActivity extends AppCompatActivity implements
 		Log.v(TAG, "onQueryTextSubmit called!");
 		return onQueryTextChange(query);
 	}
+
+	/* OPTION MENU PREPARATION & MANAGEMENT */
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -570,12 +608,31 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.action_fast_scroller) {
 			mAdapter.toggleFastScroller();
 			item.setChecked(mAdapter.isFastScrollerEnabled());
-//		} else if (id == R.id.action_reset || id == R.id.action_delete) {
-//			showFab();
+		} else if (id == R.id.action_reset || id == R.id.action_delete) {
+			showFab();
 		}
 
 		return super.onOptionsItemSelected(item);
 	}
+
+	/* DIALOG LISTENER IMPLEMENTATION (For the example of onItemClick) */
+	
+
+	@Override
+	public void onTitleModified(int position, String newTitle) {
+		AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
+		assert abstractItem != null;
+		if (abstractItem instanceof AbstractModelItem) {
+			AbstractModelItem exampleItem = (AbstractModelItem) abstractItem;
+			exampleItem.setTitle(newTitle);
+		} else if (abstractItem instanceof HeaderItem) {
+			HeaderItem headerItem = (HeaderItem) abstractItem;
+			headerItem.setTitle(newTitle);
+		}
+		mAdapter.updateItem(position, abstractItem, null);
+	}
+
+	/* FLEXIBLE ADAPTER LISTENERS IMPLEMENTATION */
 
 	@Override
 	public boolean onItemClick(int position) {
@@ -614,9 +671,6 @@ public class MainActivity extends AppCompatActivity implements
 		mSwipeRefreshLayout.setEnabled(actionState == ItemTouchHelper.ACTION_STATE_IDLE);
 	}
 
-	/**
-	 * Not yet analyzed
-	 */
 	@Override
 	public boolean shouldMoveItem(int fromPosition, int toPosition) {
 		return true;
@@ -692,20 +746,6 @@ public class MainActivity extends AppCompatActivity implements
 					.remove(positions, findViewById(R.id.main_view), message,
 							getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
 		}
-	}
-
-	@Override
-	public void onTitleModified(int position, String newTitle) {
-		AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
-		assert abstractItem != null;
-		if (abstractItem instanceof AbstractModelItem) {
-			AbstractModelItem exampleItem = (AbstractModelItem) abstractItem;
-			exampleItem.setTitle(newTitle);
-		} else if (abstractItem instanceof HeaderItem) {
-			HeaderItem headerItem = (HeaderItem) abstractItem;
-			headerItem.setTitle(newTitle);
-		}
-		mAdapter.updateItem(position, abstractItem, null);
 	}
 
 	/**
@@ -798,6 +838,8 @@ public class MainActivity extends AppCompatActivity implements
 			}
 		}
 	}
+
+	/* ACTION MODE IMPLEMENTATION */
 
 	@Override
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -925,6 +967,8 @@ public class MainActivity extends AppCompatActivity implements
 			getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark_light));
 		}
 	}
+	
+	/* EXTRAS */
 
 	@Override
 	public void onBackPressed() {

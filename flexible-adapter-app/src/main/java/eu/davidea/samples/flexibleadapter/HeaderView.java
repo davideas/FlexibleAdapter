@@ -35,7 +35,6 @@ public class HeaderView extends LinearLayout {
 		super(context, attrs, defStyleAttr, defStyleRes);
 	}
 
-
 	@Override
 	protected void onFinishInflate() {
 		super.onFinishInflate();
@@ -57,6 +56,5 @@ public class HeaderView extends LinearLayout {
 		else
 			tv.setText(text);
 	}
-
 
 }

@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter.fragments;
+package eu.davidea.samples.flexibleadapter.dialogs;
 
 import java.util.List;
 

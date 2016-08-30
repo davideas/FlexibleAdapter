@@ -23,7 +23,6 @@ import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
-import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * A fragment representing a list of Items.
@@ -157,7 +156,7 @@ public class FragmentSelectionModes extends AbstractFragment
 		return gridLayoutManager;
 	}
 
-	//TODO: Include setActivatedPosition in the library?
+	//TODO: Should include setActivatedPosition in the library?
 	public void setSelection(final int position) {
 		if (mAdapter.getMode() == FlexibleAdapter.MODE_SINGLE) {
 			Log.v(TAG, "setSelection called!");
@@ -178,25 +177,19 @@ public class FragmentSelectionModes extends AbstractFragment
 
 	/**
 	 * Called when single tap occurs.
-	 * <p>Delegates the click event to the listener and checks if selection MODE if
-	 * SINGLE or MULTI is enabled in order to activate the ItemView.</p>
-	 * For Expandable Views it will toggle the Expansion if configured so.
 	 *
 	 * @param position the adapter position of the item clicked
 	 * @return true if the click should activate the ItemView, false for no change.
 	 */
 	@Override
 	public boolean onItemClick(int position) {
-		if (position != mActivatedPosition) setActivatedPosition(position);
+		if (position != mActivatedPosition)
+			setActivatedPosition(position);
 		return true;
 	}
 
 	/**
 	 * Called when long tap occurs.
-	 * <p>This method always calls
-	 * {@link FlexibleViewHolder#toggleActivation}
-	 * after listener event is consumed in order to activate the ItemView.</p>
-	 * For Expandable Views it will collapse the View if configured so.
 	 *
 	 * @param position the adapter position of the item clicked
 	 */

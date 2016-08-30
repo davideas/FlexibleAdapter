@@ -25,6 +25,7 @@ public class DatabaseConfiguration {
 	public static boolean notifyMove = false;
 	public static boolean animateOnScrolling = true;
 	public static boolean animateOnUpdate = true;
+	public static boolean userLearnedSelection = false;
 
 
 	public static void setConfiguration(String id, int value) {

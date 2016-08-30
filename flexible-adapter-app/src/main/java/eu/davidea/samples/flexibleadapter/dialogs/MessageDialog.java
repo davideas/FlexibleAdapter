@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter.fragments;
+package eu.davidea.samples.flexibleadapter.dialogs;
 
 import android.annotation.SuppressLint;
 import android.app.DialogFragment;
@@ -15,14 +15,14 @@ import android.widget.TextView;
 
 import eu.davidea.samples.flexibleadapter.R;
 
-public class MessageDialogFragment extends DialogFragment {
+public class MessageDialog extends DialogFragment {
 
-	public static final String TAG = MessageDialogFragment.class.getSimpleName();
+	public static final String TAG = MessageDialog.class.getSimpleName();
 	public static final String ARG_ICON = "icon";
 	public static final String ARG_TITLE = "title";
 	public static final String ARG_MESSAGE = "message";
 
-	public MessageDialogFragment() {
+	public MessageDialog() {
 	}
 
 	/**
@@ -31,9 +31,9 @@ public class MessageDialogFragment extends DialogFragment {
 	 * @param icon    dialog icon
 	 * @param title   dialog title
 	 * @param message dialog message
-	 * @return a new instance of MessageDialogFragment
+	 * @return a new instance of MessageDialog
 	 */
-	public static MessageDialogFragment newInstance(int icon, String title, String message) {
+	public static MessageDialog newInstance(int icon, String title, String message) {
 		return newInstance(icon, title, message, null);
 	}
 
@@ -44,10 +44,10 @@ public class MessageDialogFragment extends DialogFragment {
 	 * @param title    dialog title
 	 * @param message  dialog message
 	 * @param fragment target fragment
-	 * @return a new instance of MessageDialogFragment
+	 * @return a new instance of MessageDialog
 	 */
-	public static MessageDialogFragment newInstance(int icon, String title, String message, Fragment fragment) {
-		MessageDialogFragment confirmDialog = new MessageDialogFragment();
+	public static MessageDialog newInstance(int icon, String title, String message, Fragment fragment) {
+		MessageDialog confirmDialog = new MessageDialog();
 		Bundle args = new Bundle();
 		args.putInt(ARG_ICON, icon);
 		args.putString(ARG_TITLE, title);

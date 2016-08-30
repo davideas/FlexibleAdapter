@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter;
+package eu.davidea.samples.flexibleadapter.dialogs;
 
 import android.annotation.SuppressLint;
 import android.app.DialogFragment;
@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import eu.davidea.common.SimpleTextWatcher;
+import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.utils.Utils;
 
 
@@ -166,8 +167,6 @@ public class EditItemDialog extends DialogFragment {
 			editText.setError(getActivity().getString(R.string.err_no_edit));
 			buttonOK.setEnabled(false);
 		}
-
-		return;
 	}
 
 }

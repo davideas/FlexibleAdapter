@@ -10,9 +10,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -78,8 +78,7 @@ public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					//TODO FOR YOU: Save the boolean into Settings!
-					DatabaseService.userLearnedSelection = true;
+					DatabaseConfiguration.userLearnedSelection = true;
 					mAdapter.setPermanentDelete(true);
 					mAdapter.removeItem(0);
 					mAdapter.setPermanentDelete(false);
@@ -97,4 +96,5 @@ public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
 	public String toString() {
 		return "ULSItem[" + super.toString() + "]";
 	}
+
 }

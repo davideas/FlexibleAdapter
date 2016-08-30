@@ -70,8 +70,8 @@ public class FragmentAsyncFilter extends AbstractFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		//Restore FAB icon
-		mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+		//Restore FAB button and icon
+		initializeFab();
 
 		if (configure) {
 			//Create configuration list

@@ -50,11 +50,7 @@ public class FragmentAnimators extends AbstractFragment {
 	private ExampleAdapter mAdapter;
 
 	public static FragmentAnimators newInstance() {
-		FragmentAnimators fragment = new FragmentAnimators();
-//		Bundle args = new Bundle();
-//		args.putInt(ARG_COLUMN_COUNT, columnCount);
-//		fragment.setArguments(args);
-		return fragment;
+		return new FragmentAnimators();
 	}
 
 	/**
@@ -73,6 +69,9 @@ public class FragmentAnimators extends AbstractFragment {
 		//Create New Database and Initialize RecyclerView
 		DatabaseService.getInstance().createAnimatorsDatabase(10);//N. of sections
 		initializeRecyclerView(savedInstanceState);
+
+		//Restore FAB button and icon
+		initializeFab();
 
 		//Settings for FlipView
 		FlipView.stopLayoutAnimation();
@@ -136,7 +135,7 @@ public class FragmentAnimators extends AbstractFragment {
 	private static int selectedItem2 = -1;
 
 	private void initializeSpinner1() {
-		// Creating adapter for spinner
+		// Creating adapter for spinner1
 		ArrayAdapter<AnimatorType> spinnerAdapter = new ArrayAdapter<AnimatorType>(
 				getActivity(), android.R.layout.simple_spinner_item, AnimatorType.values()) {
 			@Override
@@ -173,7 +172,7 @@ public class FragmentAnimators extends AbstractFragment {
 	}
 
 	private void initializeSpinner2() {
-		// Creating adapter for spinner
+		// Creating adapter for spinner2
 		ArrayAdapter<ScrollingType> spinnerAdapter = new ArrayAdapter<ScrollingType>(
 				getActivity(), android.R.layout.simple_spinner_item, ScrollingType.values()) {
 			@Override

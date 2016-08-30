@@ -46,9 +46,6 @@ public class DatabaseService {
 	private static final int SUB_ITEMS = 4;
 	private DatabaseType databaseType = DatabaseType.NONE;
 
-	//TODO FOR YOU: Should use userLearnedSelection from settings
-	public static boolean userLearnedSelection = false;
-
 	//Database original items (used as cache)
 	private List<AbstractFlexibleItem> mItems = new ArrayList<AbstractFlexibleItem>();
 	private Map<StaggeredItemStatus, StaggeredHeaderItem> headers;

@@ -2,7 +2,6 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -59,19 +58,13 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		//Create New Database and Initialize RecyclerView
 		DatabaseService.getInstance().createStaggeredDatabase(getActivity());
 		initializeRecyclerView(savedInstanceState);
+
+		//Restore FAB button and icon
+		initializeFab();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Restore FAB icon
-		FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-		fab.setImageResource(R.drawable.fab_add);
-		ViewCompat.animate(fab)
-				.scaleX(1f).scaleY(1f)
-				.alpha(1f).setDuration(100)
-				.setStartDelay(300L)
-				.start();
-
 		//Initialize Adapter and RecyclerView
 		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());

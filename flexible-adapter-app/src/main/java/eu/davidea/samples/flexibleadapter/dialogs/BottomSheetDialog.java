@@ -1,11 +1,10 @@
-package eu.davidea.samples.flexibleadapter.fragments;
+package eu.davidea.samples.flexibleadapter.dialogs;
 
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.View;
@@ -24,29 +23,29 @@ import eu.davidea.samples.flexibleadapter.R;
  * @since 20/04/2016
  */
 @SuppressWarnings({"ConstantConditions", "unchecked"})
-public class BottomSheetDialogFragment extends android.support.design.widget.BottomSheetDialogFragment
+public class BottomSheetDialog extends android.support.design.widget.BottomSheetDialogFragment
 		implements View.OnClickListener, AdapterView.OnItemClickListener {
 
-	public static final String TAG = BottomSheetDialogFragment.class.getSimpleName();
+	public static final String TAG = BottomSheetDialog.class.getSimpleName();
 	public static final String ARG_LAYOUT = "layout";
 
-	private BottomSheetDialog mBottomSheetDialog;
+	private android.support.design.widget.BottomSheetDialog mBottomSheetDialog;
 	private ArrayAdapter mAdapterItemType;
 	private ArrayAdapter mAdapterReference;
 	private ListPopupWindow mPopupItemType;
 	private ListPopupWindow mPopupReference;
 	private int mItemType = 0, mReferencePosition = -1, mChildPosition = 0;
 
-	public BottomSheetDialogFragment() {
+	public BottomSheetDialog() {
 	}
 
 	/**
 	 * Use from Activities.
 	 *
 	 * @param layoutResId custom layout to use for the bottom sheet
-	 * @return a new instance of BottomSheetDialogFragment
+	 * @return a new instance of BottomSheetDialog
 	 */
-	public static BottomSheetDialogFragment newInstance(@LayoutRes int layoutResId) {
+	public static BottomSheetDialog newInstance(@LayoutRes int layoutResId) {
 		return newInstance(layoutResId, null);
 	}
 
@@ -55,10 +54,10 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
 	 *
 	 * @param layoutResId custom layout to use for the bottom sheet
 	 * @param fragment    target fragment
-	 * @return a new instance of BottomSheetDialogFragment
+	 * @return a new instance of BottomSheetDialog
 	 */
-	public static BottomSheetDialogFragment newInstance(@LayoutRes int layoutResId, @Nullable Fragment fragment) {
-		BottomSheetDialogFragment bottomSheetFragment = new BottomSheetDialogFragment();
+	public static BottomSheetDialog newInstance(@LayoutRes int layoutResId, @Nullable Fragment fragment) {
+		BottomSheetDialog bottomSheetFragment = new BottomSheetDialog();
 		Bundle args = new Bundle();
 		args.putInt(ARG_LAYOUT, layoutResId);
 		bottomSheetFragment.setArguments(args);
@@ -78,7 +77,7 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
 	@NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		mBottomSheetDialog = new BottomSheetDialog(getActivity(), R.style.AppTheme_BottomSheetDialog);
+		mBottomSheetDialog = new android.support.design.widget.BottomSheetDialog(getActivity(), R.style.AppTheme_BottomSheetDialog);
 		mBottomSheetDialog.setContentView(getArguments().getInt(ARG_LAYOUT));
 		mBottomSheetDialog.findViewById(R.id.select_item_type).setOnClickListener(this);
 		mBottomSheetDialog.findViewById(R.id.select_item_type).setOnTouchListener(new SimpleOnTouchListener(getContext()));

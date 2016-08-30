@@ -57,6 +57,8 @@
 	<string name="status_c">STATUS C</string>
 	<string name="status_d">STATUS D</string>
 	<string name="status_e">STATUS E</string>
+	<string name="scrolling_animations">Scrolling Animations</string>
+	<string name="item_animators">Item Animators</string>
 
 	<!-- Configuration for Dynamic List -->
 	<string name="config_title">Configure the list ...</string>
@@ -113,6 +115,12 @@ items and higher, due to calculate the correct position for each item to shift. 
 	<string name="horizontal_description">Items are disposed in vertical</string>
 
 	<string name="staggered_description">Cards with sticky headers disposed in Staggered Layout, dynamic background, insertion and sorting</string>
+
+	<string name="viewpager">View Pager</string>
+	<string name="viewpager_description">Example usage in ViewPager layout</string>
+
+	<string name="dialogs">Dialogs</string>
+	<string name="dialogs_description">Example usage in Dialogs</string>
 
 	<!-- About -->
 	<string name="app_name">Flexible Adapter</string>

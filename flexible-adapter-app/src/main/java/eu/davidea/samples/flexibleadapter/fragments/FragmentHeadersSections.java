@@ -1,8 +1,6 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -23,6 +21,8 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.dialogs.BottomSheetDialog;
+import eu.davidea.samples.flexibleadapter.dialogs.OnParameterSelectedListener;
 import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -69,21 +69,15 @@ public class FragmentHeadersSections extends AbstractFragment
 		DatabaseService.getInstance().createHeadersSectionsDatabase(400, 100);
 		initializeRecyclerView(savedInstanceState);
 
+		//Restore FAB button and icon
+		initializeFab();
+
 		//Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Restore FAB icon
-		FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-		fab.setImageResource(R.drawable.fab_add);
-		ViewCompat.animate(fab)
-				.scaleX(1f).scaleY(1f)
-				.alpha(1f).setDuration(100)
-				.setStartDelay(300L)
-				.start();
-
 		//Initialize Adapter and RecyclerView
 		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
@@ -125,8 +119,8 @@ public class FragmentHeadersSections extends AbstractFragment
 
 	@Override
 	public void performFabAction() {
-		BottomSheetDialogFragment bottomSheetDialogFragment = BottomSheetDialogFragment.newInstance(R.layout.bottom_sheet_headers_sections, this);
-		bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), BottomSheetDialogFragment.TAG);
+		BottomSheetDialog bottomSheetDialogFragment = BottomSheetDialog.newInstance(R.layout.bottom_sheet_headers_sections, this);
+		bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), BottomSheetDialog.TAG);
 	}
 
 	@Override

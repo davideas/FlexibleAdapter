@@ -19,7 +19,6 @@
 			android:id="@+id/toolbar_layout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			tit="@string/app_name"
 			app:layout_scrollFlags="scroll|enterAlways|exitUntilCollapsed">
 
 			<include layout="@layout/toolbar"/>
@@ -49,7 +48,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-						android:text="Item Animators"/>
+						android:text="@string/item_animators"/>
 
 					<Spinner
 						android:id="@+id/spinner_item_animators"
@@ -69,7 +68,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-						android:text="Scrolling Animations"/>
+						android:text="@string/scrolling_animations"/>
 
 					<Spinner
 						android:id="@+id/spinner_scrolling_animation"

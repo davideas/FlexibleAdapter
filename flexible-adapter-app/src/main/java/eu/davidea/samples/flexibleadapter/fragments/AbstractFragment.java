@@ -3,7 +3,9 @@ package eu.davidea.samples.flexibleadapter.fragments;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +33,7 @@ public abstract class AbstractFragment extends Fragment {
 	protected OnFragmentInteractionListener mListener;
 	protected int mColumnCount = 2;
 	protected RecyclerView mRecyclerView;
+	protected FloatingActionButton mFab;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,19 @@ public abstract class AbstractFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_recycler_view, container, false);
+	}
+
+	/**
+	 * Display FAB button and restore default icon
+	 */
+	protected void initializeFab() {
+		mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+		mFab.setImageResource(R.drawable.fab_add);
+		ViewCompat.animate(mFab)
+				.scaleX(1f).scaleY(1f)
+				.alpha(1f).setDuration(100)
+				.setStartDelay(300L)
+				.start();
 	}
 
 	@Override
