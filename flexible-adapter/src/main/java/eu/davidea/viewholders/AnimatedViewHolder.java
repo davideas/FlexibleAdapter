@@ -16,35 +16,47 @@
 package eu.davidea.viewholders;
 
 import android.support.v4.view.ViewPropertyAnimatorListener;
+import android.support.v7.widget.RecyclerView;
+
+import eu.davidea.flexibleadapter.common.BaseItemAnimator;
 
 public interface AnimatedViewHolder {
 
 	/**
-	 * <p>Default value is {@code true}.</p>
+	 * Prepares the View for Add Animation. If this method is implemented and returns {@code true},
+	 * then this method is performed against the {@link BaseItemAnimator#preAnimateAddImpl(RecyclerView.ViewHolder)}
+	 * which will be ignored.
+	 * <p/>
+	 * <p>Default value is {@code false}.</p>
 	 *
 	 * @return {@code true} to confirm the execution of {@link #animateAddImpl(ViewPropertyAnimatorListener, int)},
-	 * {@code false} to cancel the animation.
+	 * {@code false} to use generic animation for all types of View.
 	 */
 	boolean preAnimateAddImpl();
 
 	/**
-	 * <p>Default value is {@code true}.</p>
+	 * <p>Default value is {@code false}.</p>
 	 *
-	 * @return {@code true} to confirm the execution of {@link #animateAddImpl(ViewPropertyAnimatorListener, int)},
+	 * @return {@code true} to confirm the execution of {@link #animateRemoveImpl(ViewPropertyAnimatorListener, int)},
 	 * {@code false} to cancel the animation.
 	 */
 	boolean preAnimateRemoveImpl();
 
 	/**
+	 * By returning {@code true} this ViewHolder will perform customized animation, while by
+	 * returning {@code false} generic animation is applied also for this ViewHolder.
+	 *
 	 * @param listener
 	 * @param index    order of execution, starts with 0
+	 * @return
 	 */
-	void animateAddImpl(ViewPropertyAnimatorListener listener, int index);
+	boolean animateAddImpl(ViewPropertyAnimatorListener listener, int index);
 
 	/**
 	 * @param listener
 	 * @param index    order of execution, starts with 0
+	 * @return
 	 */
-	void animateRemoveImpl(ViewPropertyAnimatorListener listener, int index);
+	boolean animateRemoveImpl(ViewPropertyAnimatorListener listener, int index);
 
 }

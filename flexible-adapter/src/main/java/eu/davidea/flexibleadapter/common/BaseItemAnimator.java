@@ -258,35 +258,51 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 	/* REMOVE */
 
 	/**
+	 * Prepares the View for Remove Animation. If {@link AnimatedViewHolder#preAnimateRemoveImpl()}:
+	 * <p>- is implemented and returns {@code true}, then ViewHolder has precedence and the
+	 * implementation of this method is ignored;
+	 * <br/>- is not implemented or returns {@code false}, the implementation of this method is
+	 * therefore performed.</p>
+	 * Default value is {@code true}.
 	 *
-	 * @param holder
-	 * @return
+	 * @param holder the ViewHolder
+	 * @return {@code true} if a later call to {@link #runPendingAnimations()} is requested,
+	 * false otherwise.
 	 */
 	protected boolean preAnimateRemoveImpl(final ViewHolder holder) {
 		return true;
 	}
 
 	/**
+	 * Performs the Remove Animation of this ViewHolder.
+	 * if {@link AnimatedViewHolder#animateRemoveImpl(ViewPropertyAnimatorListener, int)}:
+	 * <p>- is implemented and returns true, then ViewHolder has precedence and the
+	 * implementation of this method is ignored;
+	 * <br/>- is not implemented or returns {@code false}, the implementation of this method is
+	 * therefore performed.</p>
 	 *
-	 * @param holder
-	 * @param index
+	 * @param holder the ViewHolder
+	 * @param index the progressive order of execution
 	 */
 	protected abstract void animateRemoveImpl(final ViewHolder holder, int index);
 
 	private boolean preAnimateRemove(final ViewHolder holder) {
 		clear(holder.itemView);
+		boolean consumed = false;
 		if (holder instanceof AnimatedViewHolder) {
-			return ((AnimatedViewHolder) holder).preAnimateRemoveImpl();
+			consumed = ((AnimatedViewHolder) holder).preAnimateRemoveImpl();
 		}
-		return preAnimateRemoveImpl(holder);
+		return consumed || preAnimateRemoveImpl(holder);
 	}
 
 	private void doAnimateRemove(final ViewHolder holder, final int index) {
 		if (FlexibleAdapter.DEBUG)
 			Log.v(TAG, "AnimateRemove on itemId " + holder.getItemId());
+		boolean consumed = false;
 		if (holder instanceof AnimatedViewHolder) {
-			((AnimatedViewHolder) holder).animateRemoveImpl(new DefaultRemoveVpaListener(holder), index);
-		} else {
+			consumed = ((AnimatedViewHolder) holder).animateRemoveImpl(new DefaultRemoveVpaListener(holder), index);
+		}
+		if (!consumed) {
 			animateRemoveImpl(holder, index);
 		}
 		mRemoveAnimations.add(holder);
@@ -301,35 +317,51 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 	/* ADD */
 
 	/**
+	 * Prepares the View for Add Animation. If {@link AnimatedViewHolder#preAnimateAddImpl()}:
+	 * <p>- is implemented and returns {@code true}, then ViewHolder has precedence and the
+	 * implementation of this method is ignored;
+	 * <br/>- is not implemented or returns {@code false}, the implementation of this method is
+	 * therefore performed.</p>
+	 * Default value is {@code true}.
 	 *
-	 * @param holder
-	 * @return
+	 * @param holder the ViewHolder
+	 * @return {@code true} if a later call to {@link #runPendingAnimations()} is requested,
+	 * false otherwise.
 	 */
 	protected boolean preAnimateAddImpl(final ViewHolder holder) {
 		return true;
 	}
 
 	/**
+	 * Performs the Add Animation of this ViewHolder.
+	 * if {@link AnimatedViewHolder#animateAddImpl(ViewPropertyAnimatorListener, int)}:
+	 * <p>- is implemented and returns true, then ViewHolder has precedence and the
+	 * implementation of this method is ignored;
+	 * <br/>- is not implemented or returns {@code false}, the implementation of this method is
+	 * therefore performed.</p>
 	 *
-	 * @param holder
-	 * @param index
+	 * @param holder the ViewHolder
+	 * @param index the progressive order of execution
 	 */
 	protected abstract void animateAddImpl(final ViewHolder holder, int index);
 
 	private boolean preAnimateAdd(final ViewHolder holder) {
 		clear(holder.itemView);
+		boolean consumed = false;
 		if (holder instanceof AnimatedViewHolder) {
-			return ((AnimatedViewHolder) holder).preAnimateAddImpl();
+			consumed = ((AnimatedViewHolder) holder).preAnimateAddImpl();
 		}
-		return preAnimateAddImpl(holder);
+		return consumed || preAnimateAddImpl(holder);
 	}
 
 	private void doAnimateAdd(final ViewHolder holder, final int index) {
 		if (FlexibleAdapter.DEBUG)
 			Log.v(TAG, "AnimateAdd on position " + holder.getLayoutPosition() + " itemId=" + holder.getItemId());
+		boolean consumed = false;
 		if (holder instanceof AnimatedViewHolder) {
-			((AnimatedViewHolder) holder).animateAddImpl(new DefaultAddVpaListener(holder), index);
-		} else {
+			consumed = ((AnimatedViewHolder) holder).animateAddImpl(new DefaultAddVpaListener(holder), index);
+		}
+		if (!consumed) {
 			animateAddImpl(holder, index);
 		}
 		mAddAnimations.add(holder);
@@ -747,7 +779,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
+	 * <p/>
 	 * If the payload list is not empty, DefaultItemAnimator returns <code>true</code>.
 	 * When this is the case:
 	 * <ul>
