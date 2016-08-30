@@ -1,7 +1,6 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -34,7 +33,6 @@ public class FragmentAsyncFilter extends AbstractFragment {
 
 	public static final String TAG = FragmentAsyncFilter.class.getSimpleName();
 
-	private FloatingActionButton mFab;
 	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
 	private DividerItemDecoration mDivider;
 	private boolean configure;

@@ -258,11 +258,10 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 	/* REMOVE */
 
 	/**
-	 * Prepares the View for Remove Animation. If {@link AnimatedViewHolder#preAnimateRemoveImpl()}:
-	 * <p>- is implemented and returns {@code true}, then ViewHolder has precedence and the
-	 * implementation of this method is ignored;
-	 * <br/>- is not implemented or returns {@code false}, the implementation of this method is
-	 * therefore performed.</p>
+	 * Prepares the View for Remove Animation.
+	 * <p>- If {@link AnimatedViewHolder#preAnimateRemoveImpl()} is implemented and returns
+	 * {@code true}, then ViewHolder has precedence and the implementation of this method is ignored;
+	 * <br/>- If <u>not</u>, the implementation of this method is therefore performed.</p>
 	 * Default value is {@code true}.
 	 *
 	 * @param holder the ViewHolder
@@ -275,11 +274,10 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
 	/**
 	 * Performs the Remove Animation of this ViewHolder.
-	 * if {@link AnimatedViewHolder#animateRemoveImpl(ViewPropertyAnimatorListener, int)}:
-	 * <p>- is implemented and returns true, then ViewHolder has precedence and the
-	 * implementation of this method is ignored;
-	 * <br/>- is not implemented or returns {@code false}, the implementation of this method is
-	 * therefore performed.</p>
+	 * <p>- If {@link AnimatedViewHolder#animateRemoveImpl(ViewPropertyAnimatorListener, int)} is
+	 * implemented and returns true, then ViewHolder has precedence and the implementation of this
+	 * method is ignored;
+	 * <br/>- If <u>not</u>, the implementation of this method is therefore performed.</p>
 	 *
 	 * @param holder the ViewHolder
 	 * @param index the progressive order of execution
@@ -317,11 +315,10 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 	/* ADD */
 
 	/**
-	 * Prepares the View for Add Animation. If {@link AnimatedViewHolder#preAnimateAddImpl()}:
-	 * <p>- is implemented and returns {@code true}, then ViewHolder has precedence and the
-	 * implementation of this method is ignored;
-	 * <br/>- is not implemented or returns {@code false}, the implementation of this method is
-	 * therefore performed.</p>
+	 * Prepares the View for Add Animation.
+	 * <p>- If {@link AnimatedViewHolder#preAnimateAddImpl()} is implemented and returns
+	 * {@code true}, then ViewHolder has precedence and the implementation of this method is ignored;
+	 * <br/>- If <u>not</u>, the implementation of this method is therefore performed.</p>
 	 * Default value is {@code true}.
 	 *
 	 * @param holder the ViewHolder
@@ -334,11 +331,10 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
 	/**
 	 * Performs the Add Animation of this ViewHolder.
-	 * if {@link AnimatedViewHolder#animateAddImpl(ViewPropertyAnimatorListener, int)}:
-	 * <p>- is implemented and returns true, then ViewHolder has precedence and the
-	 * implementation of this method is ignored;
-	 * <br/>- is not implemented or returns {@code false}, the implementation of this method is
-	 * therefore performed.</p>
+	 * <p>- If {@link AnimatedViewHolder#animateAddImpl(ViewPropertyAnimatorListener, int)} is
+	 * implemented and returns {@code true}, then ViewHolder has precedence and the implementation
+	 * of this method is ignored;
+	 * <br/>- If <u>not</u>, the implementation of this method is therefore performed.</p>
 	 *
 	 * @param holder the ViewHolder
 	 * @param index the progressive order of execution

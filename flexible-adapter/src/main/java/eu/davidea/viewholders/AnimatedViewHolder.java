@@ -23,39 +23,57 @@ import eu.davidea.flexibleadapter.common.BaseItemAnimator;
 public interface AnimatedViewHolder {
 
 	/**
-	 * Prepares the View for Add Animation. If this method is implemented and returns {@code true},
-	 * then this method is performed against the {@link BaseItemAnimator#preAnimateAddImpl(RecyclerView.ViewHolder)}
-	 * which will be ignored.
-	 * <p/>
+	 * Method called to animate this view while the user actively scrolls the list
+	 * (forward or backward).
+	 *
+	 * @param position  can be used to differentiate the list of Animators based on positions
+	 * @param isForward can be used to separate animation from top/left or from bottom/right
+	 */
+	void animateView(int position, boolean isForward);
+
+	/**
+	 * Prepares the View for Add Animation. If this method is implemented and returns
+	 * {@code true}, then this method is performed against the
+	 * {@link BaseItemAnimator#preAnimateAddImpl(RecyclerView.ViewHolder)} which will be ignored.
 	 * <p>Default value is {@code false}.</p>
 	 *
 	 * @return {@code true} to confirm the execution of {@link #animateAddImpl(ViewPropertyAnimatorListener, int)},
-	 * {@code false} to use generic animation for all types of View.
+	 * of this class, {@code false} to use generic animation for all types of View.
 	 */
 	boolean preAnimateAddImpl();
 
 	/**
+	 * Prepares the View for Remove Animation. If this method is implemented and returns
+	 * {@code true}, then this method is performed against the
+	 * {@link BaseItemAnimator#preAnimateRemoveImpl(RecyclerView.ViewHolder)} which will be ignored.
 	 * <p>Default value is {@code false}.</p>
 	 *
 	 * @return {@code true} to confirm the execution of {@link #animateRemoveImpl(ViewPropertyAnimatorListener, int)},
-	 * {@code false} to cancel the animation.
+	 * of this class, {@code false} to use generic animation for all types of View.
 	 */
 	boolean preAnimateRemoveImpl();
 
 	/**
-	 * By returning {@code true} this ViewHolder will perform customized animation, while by
-	 * returning {@code false} generic animation is applied also for this ViewHolder.
+	 * Animates this ViewHolder with this specific Add Animation.
+	 * <p>By returning {@code true} this ViewHolder will perform customized animation, while by
+	 * returning {@code false} generic animation is applied also for this ViewHolder.</p>
 	 *
 	 * @param listener
 	 * @param index    order of execution, starts with 0
-	 * @return
+	 * @return {@code true} to animate with this implementation, {@code false} to use the generic
+	 * animation.
 	 */
 	boolean animateAddImpl(ViewPropertyAnimatorListener listener, int index);
 
 	/**
+	 * Animates this ViewHolder with this specific Remove Animation.
+	 * <p>By returning {@code true} this ViewHolder will perform customized animation, while by
+	 * returning {@code false} generic animation is applied also for this ViewHolder.</p>
+	 *
 	 * @param listener
 	 * @param index    order of execution, starts with 0
-	 * @return
+	 * @return {@code true} to animate with this implementation, {@code false} to use the generic
+	 * animation.
 	 */
 	boolean animateRemoveImpl(ViewPropertyAnimatorListener listener, int index);
 
