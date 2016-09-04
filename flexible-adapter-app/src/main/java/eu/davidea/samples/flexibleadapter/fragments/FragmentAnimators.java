@@ -16,7 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import eu.davidea.flexibleadapter.SelectableAdapter;
-import eu.davidea.flexibleadapter.common.BaseItemAnimator;
+import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.R;
@@ -223,13 +223,13 @@ public class FragmentAnimators extends AbstractFragment {
 		OvershootInRight(new OvershootInRightAnimator(1f)),
 		OvershootInLeft(new OvershootInLeftAnimator(1f));
 
-		private BaseItemAnimator mAnimator;
+		private FlexibleItemAnimator mAnimator;
 
-		AnimatorType(BaseItemAnimator animator) {
+		AnimatorType(FlexibleItemAnimator animator) {
 			mAnimator = animator;
 		}
 
-		public BaseItemAnimator getAnimator() {
+		public FlexibleItemAnimator getAnimator() {
 			return mAnimator;
 		}
 	}

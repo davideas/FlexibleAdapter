@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Davide Steduto (code optimization)
+ * Copyright (C) 2016 Davide Steduto (Special customization for FlexibleAdapter)
  * Copyright (C) 2015 Wasabeef
  * Copyright (C) 2014 The Android Open Source Project
  *
@@ -46,7 +46,7 @@ import eu.davidea.viewholders.AnimatedViewHolder;
  *
  * @see RecyclerView#setItemAnimator(RecyclerView.ItemAnimator)
  */
-public abstract class BaseItemAnimator extends SimpleItemAnimator {
+public class FlexibleItemAnimator extends SimpleItemAnimator {
 
 	private final String TAG = this.getClass().getSimpleName();
 
@@ -112,7 +112,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 		}
 	}
 
-	public BaseItemAnimator() {
+	public FlexibleItemAnimator() {
 		super();
 		setSupportsChangeAnimations(true);
 	}
@@ -255,7 +255,9 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 		}
 	}
 
+	/* ====== */
 	/* REMOVE */
+	/* ====== */
 
 	/**
 	 * Prepares the View for Remove Animation.
@@ -282,7 +284,9 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 	 * @param holder the ViewHolder
 	 * @param index the progressive order of execution
 	 */
-	protected abstract void animateRemoveImpl(final ViewHolder holder, int index);
+	protected void animateRemoveImpl(final ViewHolder holder, int index) {
+		//Free to implement
+	}
 
 	private boolean preAnimateRemove(final ViewHolder holder) {
 		clear(holder.itemView);
@@ -312,7 +316,9 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 		return preAnimateRemove(holder) && mPendingRemovals.add(holder);
 	}
 
+	/* === */
 	/* ADD */
+	/* === */
 
 	/**
 	 * Prepares the View for Add Animation.
@@ -339,7 +345,9 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 	 * @param holder the ViewHolder
 	 * @param index the progressive order of execution
 	 */
-	protected abstract void animateAddImpl(final ViewHolder holder, int index);
+	protected void animateAddImpl(final ViewHolder holder, int index) {
+		//Free to implement
+	}
 
 	private boolean preAnimateAdd(final ViewHolder holder) {
 		clear(holder.itemView);
@@ -352,7 +360,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
 	private void doAnimateAdd(final ViewHolder holder, final int index) {
 		if (FlexibleAdapter.DEBUG)
-			Log.v(TAG, "AnimateAdd on position " + holder.getLayoutPosition() + " itemId=" + holder.getItemId());
+			Log.v(TAG, "AnimateAdd on itemId=" + holder.getItemId() + " position=" + holder.getLayoutPosition());
 		boolean consumed = false;
 		if (holder instanceof AnimatedViewHolder) {
 			consumed = ((AnimatedViewHolder) holder).animateAddImpl(new DefaultAddVpaListener(holder), index);
@@ -369,7 +377,9 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 		return preAnimateAdd(holder) && mPendingAdditions.add(holder);
 	}
 
+	/* ==== */
 	/* MOVE */
+	/* ==== */
 
 	@Override
 	public final boolean animateMove(final ViewHolder holder, int fromX, int fromY, int toX, int toY) {
@@ -434,7 +444,9 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 		}).start();
 	}
 
+	/* ====== */
 	/* CHANGE */
+	/* ====== */
 
 	@Override
 	public boolean animateChange(ViewHolder oldHolder, ViewHolder newHolder,
@@ -560,7 +572,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 		final View view = item.itemView;
 		// This will trigger end callback which should set properties to their target values.
 		ViewCompat.animate(view).cancel();
-		// TODO if some other animations are chained to end, how do we cancel them as well?
+		// TODO: if some other animations are chained to end, how do we cancel them as well?
 		for (int i = mPendingMoves.size() - 1; i >= 0; i--) {
 			MoveInfo moveInfo = mPendingMoves.get(i);
 			if (moveInfo.holder == item) {

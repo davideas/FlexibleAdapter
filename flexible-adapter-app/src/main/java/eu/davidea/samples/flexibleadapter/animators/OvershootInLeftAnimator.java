@@ -19,9 +19,9 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.animation.OvershootInterpolator;
 
-import eu.davidea.flexibleadapter.common.BaseItemAnimator;
+import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
-public class OvershootInLeftAnimator extends BaseItemAnimator {
+public class OvershootInLeftAnimator extends FlexibleItemAnimator {
 
 	private final float mTension;
 

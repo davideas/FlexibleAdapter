@@ -20,9 +20,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
-import eu.davidea.flexibleadapter.common.BaseItemAnimator;
+import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
-public class FlipInTopXAnimator extends BaseItemAnimator {
+public class FlipInTopXAnimator extends FlexibleItemAnimator {
 
 	public FlipInTopXAnimator() {
 	}

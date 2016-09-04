@@ -19,9 +19,9 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.animation.Interpolator;
 
-import eu.davidea.flexibleadapter.common.BaseItemAnimator;
+import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
-public class FlipInBottomXAnimator extends BaseItemAnimator {
+public class FlipInBottomXAnimator extends FlexibleItemAnimator {
 
 	public FlipInBottomXAnimator() {
 	}

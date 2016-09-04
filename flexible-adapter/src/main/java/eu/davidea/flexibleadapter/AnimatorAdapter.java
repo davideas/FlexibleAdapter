@@ -38,6 +38,9 @@ import java.util.EnumSet;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
+import eu.davidea.viewholders.AnimatedViewHolder;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * This class is responsible to animate items. Bounded items are animated initially and also
@@ -304,7 +307,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * Build your custom list of {@link Animator} to apply on the ItemView.<br/>
 	 * Write the logic based on the position and/or viewType and/or the item selection.
 	 * <p><b>Suggestions:</b>
-	 * <br/>- A simple boolean for <i>isSelected</i> is preferable instead of {@link #isSelected(int)}
 	 * <br/>- You can also use {@link #getItemViewType(int)} to apply different Animation for
 	 * each view type.
 	 * <br/>- If you want to apply same animation for all items, create new list at class level
@@ -317,7 +319,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @see #animateView(View, int)
 	 * @see #getItemViewType(int)
 	 * @since 5.0.0-b1
+	 * @deprecated Should use {@link FlexibleItemAnimator} or any of its subclasses(extensions),
+	 * optionally in collaboration with {@link AnimatedViewHolder} interface. See Wiki page for
+	 * animations on Github.
 	 */
+	@Deprecated
 	public List<Animator> getAnimators(View itemView, int position, boolean isForward) {
 		return new ArrayList<>();
 	}
@@ -331,7 +337,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		if (animator != null) animator.end();
 	}
 
-	public final void animateView2(final View itemView, int position) {
+	public final void animateView2(final RecyclerView.ViewHolder holder, int position) {
+		if (holder instanceof FlexibleViewHolder) {
+			FlexibleViewHolder flexibleViewHolder = (FlexibleViewHolder) holder;
+			flexibleViewHolder.prepareAnimators(new ArrayList<Animator>(), position, position > mLastAnimatedPosition);
+		}
 
 	}
 

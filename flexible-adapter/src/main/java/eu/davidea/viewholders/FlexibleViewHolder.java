@@ -15,6 +15,7 @@
  */
 package eu.davidea.viewholders;
 
+import android.animation.Animator;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
@@ -23,6 +24,8 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
@@ -242,6 +245,24 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 */
 	protected boolean shouldAddSelectionInActionMode() {
 		return false;
+	}
+
+	/*-----------*/
+	/* ANIMATION */
+	/*-----------*/
+
+	/**
+	 * This method is automatically called by FlexibleAdapter to animate the View while the user
+	 * actively scrolls the list (forward or backward).
+	 * <p>Implement your logic for different animators based on position, selection and/or
+	 * direction.</p>
+	 *
+	 * @param position  can be used to differentiate the Animators based on positions
+	 * @param isForward can be used to separate animation from top/bottom or from left/right
+	 * @since 5.0.0-b8
+	 */
+	public void prepareAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
+		//Free to implement
 	}
 
 	/*--------------------------------*/
