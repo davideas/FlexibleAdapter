@@ -3683,7 +3683,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		//Collapse expandable before swapping (otherwise items are mixed badly)
 		if (fromPosition < toPosition && isExpandable(getItem(fromPosition)) && isExpanded(toPosition)) {
-			collapse(toPosition);
+			//collapse(toPosition);
 		}
 
 		//Perform item swap (for all LayoutManagers)
@@ -3782,8 +3782,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
-		return (mItemMoveListener == null || mItemMoveListener.shouldMoveItem(fromPosition, toPosition)) &&
-				!(isExpandable(getItem(fromPosition)) && getExpandableOf(toPosition) != null);
+		return (mItemMoveListener == null || mItemMoveListener.shouldMoveItem(fromPosition, toPosition));// &&
+				//!(isExpandable(getItem(fromPosition)) && getExpandableOf(toPosition) != null);
 	}
 
 	/**

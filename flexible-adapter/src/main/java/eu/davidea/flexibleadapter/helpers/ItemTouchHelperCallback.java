@@ -84,7 +84,7 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public boolean canDropOver(RecyclerView recyclerView, RecyclerView.ViewHolder current, RecyclerView.ViewHolder target) {
-		return super.canDropOver(recyclerView, current, target);
+		return current.getItemViewType() == target.getItemViewType();
 	}
 
 	/**
