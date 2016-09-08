@@ -340,7 +340,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	public final void animateView2(final RecyclerView.ViewHolder holder, int position) {
 		if (holder instanceof FlexibleViewHolder) {
 			FlexibleViewHolder flexibleViewHolder = (FlexibleViewHolder) holder;
-			flexibleViewHolder.prepareAnimators(new ArrayList<Animator>(), position, position > mLastAnimatedPosition);
+			flexibleViewHolder.animators(new ArrayList<Animator>(), position, position > mLastAnimatedPosition);
 		}
 
 	}

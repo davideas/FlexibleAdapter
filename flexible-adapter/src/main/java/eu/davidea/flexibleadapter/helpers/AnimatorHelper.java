@@ -47,8 +47,7 @@ public class AnimatorHelper {
 	/**
 	 * This is the default animator.<br/>
 	 * Alpha animator will be always automatically added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added.<br/>
-	 * Incompatible with ALPHA animator.</p>
+	 * <p>Incompatible with ALPHA animator.</p>
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
@@ -57,16 +56,12 @@ public class AnimatorHelper {
 	 */
 	public static void alphaAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float alphaFrom) {
-		if (animatorsUsed.contains(AnimatorEnum.ALPHA)) return;
 		animators.add(ObjectAnimator.ofFloat(view, "alpha", alphaFrom, 1f));
-		animatorsUsed.add(AnimatorEnum.ALPHA);
 	}
 
 	/**
-	 * Item will slide from Left to Right.<br/>
-	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with LEFT, TOP, BOTTOM animators.<br/>
+	 * Item will slide from Left to Right.
+	 * <p>Incompatible with LEFT, TOP, BOTTOM animators</p>
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
@@ -76,19 +71,12 @@ public class AnimatorHelper {
 	public static void slideInFromLeftAnimator(
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView, @FloatRange(from = 0.0, to= 1.0) float percent) {
-		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_RIGHT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_TOP) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_BOTTOM)) return;
 		animators.add(ObjectAnimator.ofFloat(view, "translationX", -recyclerView.getLayoutManager().getWidth() * percent, 0));
-		animatorsUsed.add(AnimatorEnum.SLIDE_IN_LEFT);
 	}
 
 	/**
-	 * Item will slide from Right to Left.<br/>
-	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with RIGHT, TOP, BOTTOM animators.<br/>
+	 * Item will slide from Right to Left.
+	 * <p>Incompatible with RIGHT, TOP, BOTTOM animators.</p>
 	 *
 	 * @param animators user defined list
 	 * @param view      ItemView to animate
@@ -98,19 +86,12 @@ public class AnimatorHelper {
 	public static void slideInFromRightAnimator(
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView, @FloatRange(from = 0.0, to = 1.0) float percent) {
-		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_RIGHT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_TOP) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_BOTTOM)) return;
 		animators.add(ObjectAnimator.ofFloat(view, "translationX", recyclerView.getLayoutManager().getWidth() * percent, 0));
-		animatorsUsed.add(AnimatorEnum.SLIDE_IN_RIGHT);
 	}
 
 	/**
-	 * Item will slide from Top of the screen to its natural position.<br/>
-	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with LEFT, RIGHT, TOP, BOTTOM animators.</p>
+	 * Item will slide from Top of the screen to its natural position.
+	 * <p>Incompatible with LEFT, RIGHT, TOP, BOTTOM animators.</p>
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
@@ -119,19 +100,12 @@ public class AnimatorHelper {
 	public static void slideInFromTopAnimator(
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView) {
-		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_RIGHT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_TOP) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_BOTTOM)) return;
 		animators.add(ObjectAnimator.ofFloat(view, "translationY", -recyclerView.getMeasuredHeight() >> 1, 0));
-		animatorsUsed.add(AnimatorEnum.SLIDE_IN_TOP);
 	}
 
 	/**
-	 * Item will slide from Bottom of the screen to its natural position.<br/>
-	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with LEFT, RIGHT, TOP, BOTTOM animators.</p>
+	 * Item will slide from Bottom of the screen to its natural position.
+	 * <p>Incompatible with LEFT, RIGHT, TOP, BOTTOM animators.</p>
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
@@ -140,19 +114,12 @@ public class AnimatorHelper {
 	public static void slideInFromBottomAnimator(
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView) {
-		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_RIGHT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_TOP) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_BOTTOM)) return;
 		animators.add(ObjectAnimator.ofFloat(view, "translationY", recyclerView.getMeasuredHeight() >> 1, 0));
-		animatorsUsed.add(AnimatorEnum.SLIDE_IN_BOTTOM);
 	}
 
 	/**
-	 * Item will scale.<br/>
-	 * Ignored if SCALE animator was already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with LEFT, RIGHT, BOTTOM animators.<br/>
+	 * Item will scale.
+	 * <p>Incompatible with LEFT, RIGHT, BOTTOM animators.</p>
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
@@ -161,10 +128,8 @@ public class AnimatorHelper {
 	 */
 	public static void scaleInAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float scaleFrom) {
-		if (animatorsUsed.contains(AnimatorEnum.SCALE)) return;
 		animators.add(ObjectAnimator.ofFloat(view, "scaleX", scaleFrom, 1f));
 		animators.add(ObjectAnimator.ofFloat(view, "scaleY", scaleFrom, 1f));
-		animatorsUsed.add(AnimatorEnum.SCALE);
 	}
 
 }

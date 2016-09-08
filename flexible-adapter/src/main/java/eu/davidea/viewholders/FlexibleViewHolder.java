@@ -261,7 +261,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * @param isForward can be used to separate animation from top/bottom or from left/right
 	 * @since 5.0.0-b8
 	 */
-	public void prepareAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
+	public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
 		//Free to implement
 	}
 

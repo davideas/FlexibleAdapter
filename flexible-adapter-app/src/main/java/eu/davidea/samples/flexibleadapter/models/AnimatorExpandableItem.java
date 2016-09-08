@@ -1,5 +1,7 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.AnimatorExpandableItem.AnimatorExpandableViewHolder;
@@ -128,6 +131,10 @@ public class AnimatorExpandableItem
 			if (!mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
 		}
 
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			AnimatorHelper.scaleInAnimator(animators, itemView, 0.0f);
+		}
 	}
 
 	@Override

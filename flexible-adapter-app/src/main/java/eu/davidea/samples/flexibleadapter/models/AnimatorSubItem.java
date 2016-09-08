@@ -1,5 +1,7 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.utils.Utils;
@@ -93,6 +96,14 @@ public class AnimatorSubItem extends AbstractSectionableItem<AnimatorSubItem.Chi
 		@Override
 		public float getActivationElevation() {
 			return Utils.dpToPx(itemView.getContext(), 4f);
+		}
+
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			if (mAdapter.isSelected(position))
+				AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+			else
+				AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
 		}
 	}
 
