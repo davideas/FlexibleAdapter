@@ -1,5 +1,7 @@
 package eu.davidea.samples.flexibleadapter.services;
 
+import eu.davidea.samples.flexibleadapter.fragments.FragmentAnimators;
+
 /**
  * @author Davide
  * @since 11/07/2016
@@ -26,7 +28,8 @@ public class DatabaseConfiguration {
 	public static boolean animateOnScrolling = true;
 	public static boolean animateOnUpdate = true;
 	public static boolean userLearnedSelection = false;
-
+	public static boolean subItemSpecificAnimation = false;
+	public static FragmentAnimators.ScrollAnimatorType scrollAnimatorType;
 
 	public static void setConfiguration(String id, int value) {
 		switch (id) {
@@ -45,7 +48,6 @@ public class DatabaseConfiguration {
 			case NOTIFY_MOVE:
 				notifyMove = value == 1;
 				break;
-
 		}
 	}
 

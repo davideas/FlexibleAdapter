@@ -45,23 +45,7 @@ public class AnimatorHelper {
 	/*-----------*/
 
 	/**
-	 * This is the default animator.<br/>
-	 * Alpha animator will be always automatically added.
-	 * <p>Incompatible with ALPHA animator.</p>
-	 *
-	 * @param animators user defined list
-	 * @param view      itemView to animate
-	 * @param alphaFrom starting alpha value
-	 * @since 5.0.0-b1
-	 */
-	public static void alphaAnimator(
-			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float alphaFrom) {
-		animators.add(ObjectAnimator.ofFloat(view, "alpha", alphaFrom, 1f));
-	}
-
-	/**
 	 * Item will slide from Left to Right.
-	 * <p>Incompatible with LEFT, TOP, BOTTOM animators</p>
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
@@ -76,7 +60,6 @@ public class AnimatorHelper {
 
 	/**
 	 * Item will slide from Right to Left.
-	 * <p>Incompatible with RIGHT, TOP, BOTTOM animators.</p>
 	 *
 	 * @param animators user defined list
 	 * @param view      ItemView to animate
@@ -91,7 +74,6 @@ public class AnimatorHelper {
 
 	/**
 	 * Item will slide from Top of the screen to its natural position.
-	 * <p>Incompatible with LEFT, RIGHT, TOP, BOTTOM animators.</p>
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
@@ -105,7 +87,6 @@ public class AnimatorHelper {
 
 	/**
 	 * Item will slide from Bottom of the screen to its natural position.
-	 * <p>Incompatible with LEFT, RIGHT, TOP, BOTTOM animators.</p>
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
@@ -118,15 +99,14 @@ public class AnimatorHelper {
 	}
 
 	/**
-	 * Item will scale.
-	 * <p>Incompatible with LEFT, RIGHT, BOTTOM animators.</p>
+	 * Item will scale to {@code 1.0f}.
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
 	 * @param scaleFrom initial scale value
 	 * @since 5.0.0-b1
 	 */
-	public static void scaleInAnimator(
+	public static void scaleAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float scaleFrom) {
 		animators.add(ObjectAnimator.ofFloat(view, "scaleX", scaleFrom, 1f));
 		animators.add(ObjectAnimator.ofFloat(view, "scaleY", scaleFrom, 1f));

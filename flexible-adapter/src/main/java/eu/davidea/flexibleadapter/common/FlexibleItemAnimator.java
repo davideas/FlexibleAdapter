@@ -276,7 +276,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 
 	/**
 	 * Performs the Remove Animation of this ViewHolder.
-	 * <p>- If {@link AnimatedViewHolder#animateRemoveImpl(ViewPropertyAnimatorListener, int)} is
+	 * <p>- If {@link AnimatedViewHolder#animateRemoveImpl(ViewPropertyAnimatorListener, long, int)} is
 	 * implemented and returns true, then ViewHolder has precedence and the implementation of this
 	 * method is ignored;
 	 * <br/>- If <u>not</u>, the implementation of this method is therefore performed.</p>
@@ -302,7 +302,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 			Log.v(TAG, "AnimateRemove on itemId " + holder.getItemId());
 		boolean consumed = false;
 		if (holder instanceof AnimatedViewHolder) {
-			consumed = ((AnimatedViewHolder) holder).animateRemoveImpl(new DefaultRemoveVpaListener(holder), index);
+			consumed = ((AnimatedViewHolder) holder).animateRemoveImpl(new DefaultRemoveVpaListener(holder), getRemoveDuration(), index);
 		}
 		if (!consumed) {
 			animateRemoveImpl(holder, index);
@@ -337,7 +337,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 
 	/**
 	 * Performs the Add Animation of this ViewHolder.
-	 * <p>- If {@link AnimatedViewHolder#animateAddImpl(ViewPropertyAnimatorListener, int)} is
+	 * <p>- If {@link AnimatedViewHolder#animateAddImpl(ViewPropertyAnimatorListener, long, int)} is
 	 * implemented and returns {@code true}, then ViewHolder has precedence and the implementation
 	 * of this method is ignored;
 	 * <br/>- If <u>not</u>, the implementation of this method is therefore performed.</p>
@@ -363,7 +363,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 			Log.v(TAG, "AnimateAdd on itemId=" + holder.getItemId() + " position=" + holder.getLayoutPosition());
 		boolean consumed = false;
 		if (holder instanceof AnimatedViewHolder) {
-			consumed = ((AnimatedViewHolder) holder).animateAddImpl(new DefaultAddVpaListener(holder), index);
+			consumed = ((AnimatedViewHolder) holder).animateAddImpl(new DefaultAddVpaListener(holder), getAddDuration(), index);
 		}
 		if (!consumed) {
 			animateAddImpl(holder, index);

@@ -2,9 +2,12 @@ package eu.davidea.samples.flexibleadapter.models;
 
 import android.animation.Animator;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import java.util.List;
@@ -13,7 +16,9 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.utils.Utils;
+import eu.davidea.viewholders.AnimatedViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -84,7 +89,7 @@ public class AnimatorSubItem extends AbstractSectionableItem<AnimatorSubItem.Chi
 	 * Complex data labels may need more than one view per item, and
 	 * you provide access to all the views for a data item in a view holder.
 	 */
-	static final class ChildViewHolder extends FlexibleViewHolder {
+	static final class ChildViewHolder extends FlexibleViewHolder implements AnimatedViewHolder {
 
 		public TextView mTitle;
 
@@ -104,6 +109,49 @@ public class AnimatorSubItem extends AbstractSectionableItem<AnimatorSubItem.Chi
 				AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
 			else
 				AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+		}
+
+		public boolean preAnimateAddImpl() {
+			if (DatabaseConfiguration.subItemSpecificAnimation) {
+				ViewCompat.setRotationX(itemView, 90);
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public boolean preAnimateRemoveImpl() {
+			return false;
+		}
+
+		@Override
+		public boolean animateAddImpl(ViewPropertyAnimatorListener listener, long addDuration, int index) {
+			if (DatabaseConfiguration.subItemSpecificAnimation) {
+				ViewCompat.animate(itemView)
+						.rotationX(0)
+						.setDuration(addDuration)
+						.setInterpolator(new DecelerateInterpolator())
+						.setListener(listener)
+						.setStartDelay(index * 150L)
+						.start();
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public boolean animateRemoveImpl(ViewPropertyAnimatorListener listener, long removeDuration, int index) {
+			if (DatabaseConfiguration.subItemSpecificAnimation) {
+				ViewCompat.animate(itemView)
+						.rotationX(90)
+						.setDuration(removeDuration)
+						.setInterpolator(new DecelerateInterpolator())
+						.setListener(listener)
+						.setStartDelay(index * 40L)
+						.start();
+				return true;
+			}
+			return false;
 		}
 	}
 

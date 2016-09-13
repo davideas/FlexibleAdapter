@@ -34,4 +34,15 @@
 		  android:checkable="true"
 		  app:showAsAction="never"/>
 
+	<item android:id="@+id/action_step_delay"
+		  android:title="@string/step_delay"
+		  android:checkable="true"
+		  android:checked="true"
+		  app:showAsAction="never"/>
+
+	<item android:id="@+id/action_sub_item_specific"
+		  android:title="@string/sub_item_specific"
+		  android:checkable="true"
+		  app:showAsAction="never"/>
+
 </menu>

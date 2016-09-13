@@ -39,15 +39,17 @@ import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 /**
- * A fragment representing a list of Items.
- * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
- * interface.
+ * Testing different types of item animators including scrolling animations.
  */
 public class FragmentAnimators extends AbstractFragment {
 
 	public static final String TAG = FragmentAnimators.class.getSimpleName();
 
 	private ExampleAdapter mAdapter;
+
+	/* Spinner selected item */
+	private static int selectedItem1 = -1;
+	private static int selectedItem2 = -1;
 
 	public static FragmentAnimators newInstance() {
 		return new FragmentAnimators();
@@ -93,10 +95,10 @@ public class FragmentAnimators extends AbstractFragment {
 
 		//NOTE: Custom item animators inherit 'canReuseUpdatedViewHolder()' from Default Item
 		// Animator. It will return true if a Payload is provided. FlexibleAdapter is actually
-		// sending Payloads onItemChange.
-		mRecyclerView.setItemAnimator(new FlipInTopXAnimator());
-		initializeSpinner1();
-		initializeSpinner2();
+		// sending Payloads onItemChange notifications.
+		mRecyclerView.setItemAnimator(new FlexibleItemAnimator());
+		initializeSpinnerItemAnimators();
+		initializeSpinnerScrollAnimators();
 
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setSwipeEnabled(true)
@@ -125,16 +127,25 @@ public class FragmentAnimators extends AbstractFragment {
 	}
 
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == R.id.action_step_delay) {
+			item.setChecked(!item.isChecked());
+			mAdapter.setUseStepDelay(item.isChecked());
+		} else if (id == R.id.action_sub_item_specific) {
+			item.setChecked(!item.isChecked());
+			DatabaseConfiguration.subItemSpecificAnimation = item.isChecked();
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
 	public void onDetach() {
 		super.onDetach();
 		getActivity().findViewById(R.id.layout_for_spinners).setVisibility(View.GONE);
 	}
 
-	/* Spinner selected item */
-	private static int selectedItem1 = -1;
-	private static int selectedItem2 = -1;
-
-	private void initializeSpinner1() {
+	private void initializeSpinnerItemAnimators() {
 		// Creating adapter for spinner1
 		ArrayAdapter<AnimatorType> spinnerAdapter = new ArrayAdapter<AnimatorType>(
 				getActivity(), android.R.layout.simple_spinner_item, AnimatorType.values()) {
@@ -171,10 +182,10 @@ public class FragmentAnimators extends AbstractFragment {
 		});
 	}
 
-	private void initializeSpinner2() {
+	private void initializeSpinnerScrollAnimators() {
 		// Creating adapter for spinner2
-		ArrayAdapter<ScrollingType> spinnerAdapter = new ArrayAdapter<ScrollingType>(
-				getActivity(), android.R.layout.simple_spinner_item, ScrollingType.values()) {
+		ArrayAdapter<ScrollAnimatorType> spinnerAdapter = new ArrayAdapter<ScrollAnimatorType>(
+				getActivity(), android.R.layout.simple_spinner_item, ScrollAnimatorType.values()) {
 			@Override
 			public View getDropDownView(int position, View convertView, ViewGroup parent) {
 				View view = super.getDropDownView(position, convertView, parent);
@@ -195,7 +206,7 @@ public class FragmentAnimators extends AbstractFragment {
 		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				ScrollingType.values()[position].getName();
+				DatabaseConfiguration.scrollAnimatorType = ScrollAnimatorType.values()[position];
 				selectedItem2 = position;
 			}
 
@@ -206,7 +217,7 @@ public class FragmentAnimators extends AbstractFragment {
 		});
 	}
 
-	enum AnimatorType {
+	public enum AnimatorType {
 		FadeIn(new FadeInAnimator(new OvershootInterpolator(1f))),
 		FadeInDown(new FadeInDownAnimator(new OvershootInterpolator(1f))),
 		FadeInUp(new FadeInUpAnimator(new OvershootInterpolator(1f))),
@@ -234,17 +245,18 @@ public class FragmentAnimators extends AbstractFragment {
 		}
 	}
 
-	enum ScrollingType {
+	public enum ScrollAnimatorType {
 		Alpha("Alpha (Default)"),
 		SlideInFromTop("SlideIn from Top"),
 		SlideInFromBottom("SlideIn from Bottom"),
+		SlideInTopBottom("SlideIn Top + Bottom"),
 		SlideInFromLeft("SlideIn from Left"),
 		SlideInFromRight("SlideIn from Right"),
 		ScaleIn("ScaleIn");
 
 		private String name;
 
-		ScrollingType(String name) {
+		ScrollAnimatorType(String name) {
 			this.name = name;
 		}
 

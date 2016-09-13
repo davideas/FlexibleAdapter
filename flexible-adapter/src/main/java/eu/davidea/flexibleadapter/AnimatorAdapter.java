@@ -21,6 +21,7 @@ import android.animation.ObjectAnimator;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -37,9 +38,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.utils.Utils;
-import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
-import eu.davidea.viewholders.AnimatedViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -156,13 +156,16 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	/**
 	 * If initial loading animation should use step delay between an animation and the next.
+	 * When false, all items are animated with no delay.
 	 * <p>Default value is {@code true}.</p>
 	 *
-	 * @param useStepDelay
+	 * @param useStepDelay true to enable step delay, false otherwise
+	 * @return this AnimatorAdapter, so the call can be chained
 	 * since 5.0.0-b8
 	 */
-	public void setUseStepDelay(boolean useStepDelay) {
+	public AnimatorAdapter setUseStepDelay(boolean useStepDelay) {
 		this.mUseStepDelay = useStepDelay;
+		return this;
 	}
 
 	/**
@@ -293,6 +296,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/*--------------*/
 
 	@Override
+	@CallSuper
 	public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
 		int position = holder.getAdapterPosition();
 		if (DEBUG) {
@@ -300,7 +304,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 					" position=" + position +
 					" itemId=" + holder.getItemId());
 		}
-		//animateView2(holder.itemView, position);
+		animateView(holder, position);
 	}
 
 	/**
@@ -319,9 +323,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @see #animateView(View, int)
 	 * @see #getItemViewType(int)
 	 * @since 5.0.0-b1
-	 * @deprecated Should use {@link FlexibleItemAnimator} or any of its subclasses(extensions),
-	 * optionally in collaboration with {@link AnimatedViewHolder} interface. See Wiki page for
-	 * animations on Github.
+	 * @deprecated Use {@link AnimatorHelper} from {@link FlexibleViewHolder#animators(List, int, boolean)}.
 	 */
 	@Deprecated
 	public List<Animator> getAnimators(View itemView, int position, boolean isForward) {
@@ -331,31 +333,74 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/**
 	 * Cancels any existing animations for given View. Useful when fling.
 	 */
-	private void cancelExistingAnimation(@NonNull final View itemView) {
-		int hashCode = itemView.hashCode();
+	private void cancelExistingAnimation(final int hashCode) {
 		Animator animator = mAnimators.get(hashCode);
 		if (animator != null) animator.end();
 	}
 
-	public final void animateView2(final RecyclerView.ViewHolder holder, int position) {
-		if (holder instanceof FlexibleViewHolder) {
+	protected void animateView(final RecyclerView.ViewHolder holder, int position) {
+		//FIXME: first completed visible item on rotation gets high delay
+
+		if (DEBUG)
+			Log.v(TAG, "shouldAnimate=" + shouldAnimate
+					+ " isFastScroll=" + isFastScroll
+					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
+					+ " isReverseEnabled=" + isReverseEnabled
+					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
+					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
+			);
+
+		if (holder instanceof FlexibleViewHolder && shouldAnimate && !isFastScroll &&
+				!mAnimatorNotifierObserver.isPositionNotified() &&
+				(isReverseEnabled || position > mLastAnimatedPosition || (position == 0 && mRecyclerView.getChildCount() == 0)) ) {
+
+			//Cancel animation is necessary when fling
+			int hashCode = holder.itemView.hashCode();
+			cancelExistingAnimation(hashCode);
+
+			//Add Alpha Animator (necessary to not display item at the beginning)
+			List<Animator> animators = new ArrayList<>();
+			ViewCompat.setAlpha(holder.itemView, 0);
+			animators.add(ObjectAnimator.ofFloat(holder.itemView, "alpha", 0f, 1f));
+
+			//Additional user animators
 			FlexibleViewHolder flexibleViewHolder = (FlexibleViewHolder) holder;
-			flexibleViewHolder.animators(new ArrayList<Animator>(), position, position > mLastAnimatedPosition);
+			flexibleViewHolder.animators(animators, position, position > mLastAnimatedPosition);
+
+			//Execute the animations together
+			AnimatorSet set = new AnimatorSet();
+			set.playTogether(animators);
+			set.setInterpolator(mInterpolator);
+			set.setDuration(mDuration);
+			set.addListener(new HelperAnimatorListener(hashCode));
+			if (mUseStepDelay) {
+				//TODO: Animate with Solution 1 or 2?
+				//set.setStartDelay(calculateAnimationDelay1(position));
+				set.setStartDelay(calculateAnimationDelay2(position));
+			}
+			if (DEBUG) Log.d(TAG, "Started Animation on position " + position);
+			set.start();
+			mAnimators.put(hashCode, set);
+
+			//Animate only during initial loading?
+			if (onlyEntryAnimation && mLastAnimatedPosition >= mMaxChildViews) {
+				shouldAnimate = false;
+			}
 		}
 
+		mAnimatorNotifierObserver.clearNotified();
+		mLastAnimatedPosition = position;
 	}
 
 	/**
 	 * Animates the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
 	 *
 	 * @since 5.0.0-b1
+	 * @deprecated New system in place. Implement {@link FlexibleViewHolder#animators(List, int, boolean)}
+	 * and add new animator(s) to the list of {@code animators}.
 	 */
+	@Deprecated
 	public final void animateView(final View itemView, int position) {
-		//FIXME: first completed visible item on rotation gets high delay
-		//FIXME: Expanded children: find a way to Not animate items from custom ItemAnimator!!!
-		// (ItemAnimators should work in conjunction with AnimatorViewHolder???)
-		//TODO: Customize children animations (don't use animateAdd or animateRemove from custom ItemAnimator)
-
 		if (DEBUG)
 			Log.v(TAG, "shouldAnimate=" + shouldAnimate
 					+ " isFastScroll=" + isFastScroll
@@ -369,20 +414,15 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 				(isReverseEnabled || position > mLastAnimatedPosition || (position == 0 && mRecyclerView.getChildCount() == 0))) {
 
 			//Cancel animation is necessary when fling
-			cancelExistingAnimation(itemView);
+			cancelExistingAnimation(itemView.hashCode());
 
 			//Retrieve user animators
 			List<Animator> animators = getAnimators(itemView, position, position > mLastAnimatedPosition);
 
-			//Add Alpha animator if not yet
+			//Add Alpha animator
 			ViewCompat.setAlpha(itemView, 0);
-			if (!animatorsUsed.contains(AnimatorEnum.ALPHA)) {
-				addAlphaAnimator(animators, itemView, 0f);
-			}
-			if (DEBUG)
-				Log.d(TAG, "Started Animation on position " + position + " animatorsUsed=" + animatorsUsed);
-			//Clear animators since the new item might have different animations
-			animatorsUsed.clear();
+			animators.add(ObjectAnimator.ofFloat(itemView, "alpha", 0f, 1f));
+			if (DEBUG) Log.d(TAG, "Started Animation on position " + position);
 
 			//Execute the animations
 			AnimatorSet set = new AnimatorSet();
@@ -404,9 +444,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			}
 		}
 
-		if (mAnimatorNotifierObserver.isPositionNotified())
-			mAnimatorNotifierObserver.clearNotified();
-
+		mAnimatorNotifierObserver.clearNotified();
 		mLastAnimatedPosition = position;
 	}
 
@@ -510,7 +548,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param view      itemView to animate
 	 * @param alphaFrom starting alpha value
 	 * @since 5.0.0-b1
+	 * @deprecated Use {@link AnimatorHelper}.
 	 */
+	@Deprecated
 	private void addAlphaAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float alphaFrom) {
 		if (animatorsUsed.contains(AnimatorEnum.ALPHA)) return;
@@ -528,7 +568,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param view      itemView to animate
 	 * @param percent   any % multiplier (between 0 and 1) of the LayoutManager Width
 	 * @since 5.0.0-b1
+	 * @deprecated Use {@link AnimatorHelper}.
 	 */
+	@Deprecated
 	public void addSlideInFromLeftAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float percent) {
 		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
@@ -549,7 +591,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param view      ItemView to animate
 	 * @param percent   Any % multiplier (between 0 and 1) of the LayoutManager Width
 	 * @since 5.0.0-b1
+	 * @deprecated Use {@link AnimatorHelper}.
 	 */
+	@Deprecated
 	public void addSlideInFromRightAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float percent) {
 		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
@@ -569,7 +613,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param animators user defined list
 	 * @param view      itemView to animate
 	 * @since 5.0.0-b7
+	 * @deprecated Use {@link AnimatorHelper}.
 	 */
+	@Deprecated
 	public void addSlideInFromTopAnimator(
 			@NonNull List<Animator> animators, @NonNull View view) {
 		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
@@ -589,7 +635,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param animators user defined list
 	 * @param view      itemView to animate
 	 * @since 5.0.0-b1
+	 * @deprecated Use {@link AnimatorHelper}.
 	 */
+	@Deprecated
 	public void addSlideInFromBottomAnimator(
 			@NonNull List<Animator> animators, @NonNull View view) {
 		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
@@ -610,7 +658,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param view      itemView to animate
 	 * @param scaleFrom initial scale value
 	 * @since 5.0.0-b1
+	 * @deprecated Use {@link AnimatorHelper}.
 	 */
+	@Deprecated
 	public void addScaleInAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float scaleFrom) {
 		if (animatorsUsed.contains(AnimatorEnum.SCALE)) return;
@@ -643,8 +693,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		}
 
 		public void clearNotified() {
-			mAnimatorHandler.removeCallbacksAndMessages(null);
-			mAnimatorHandler.sendMessageDelayed(Message.obtain(mAnimatorHandler), 200L);
+			if (notified) {
+				mAnimatorHandler.removeCallbacksAndMessages(null);
+				mAnimatorHandler.sendMessageDelayed(Message.obtain(mAnimatorHandler), 200L);
+			}
 		}
 
 		private void markNotified() {

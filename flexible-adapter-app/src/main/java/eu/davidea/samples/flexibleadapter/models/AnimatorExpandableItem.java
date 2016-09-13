@@ -16,6 +16,7 @@ import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.AnimatorExpandableItem.AnimatorExpandableViewHolder;
+import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
@@ -33,6 +34,7 @@ public class AnimatorExpandableItem
 	public AnimatorExpandableItem(String id) {
 		super();
 		this.id = id;
+		setExpanded(false);//Start collapsed
 		setSwipeable(true);
 	}
 
@@ -133,7 +135,29 @@ public class AnimatorExpandableItem
 
 		@Override
 		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
-			AnimatorHelper.scaleInAnimator(animators, itemView, 0.0f);
+			switch (DatabaseConfiguration.scrollAnimatorType) {
+				case ScaleIn:
+					AnimatorHelper.scaleAnimator(animators, itemView, 0f);
+					break;
+				case SlideInTopBottom:
+					if (isForward) {
+						AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
+					} else {
+						AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
+					}
+				case SlideInFromTop:
+					AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
+					break;
+				case SlideInFromBottom:
+					AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
+					break;
+				case SlideInFromLeft:
+					AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.3f);//Start from 30%
+					break;
+				case SlideInFromRight:
+					AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.3f);//Start from 30%
+					break;
+			}
 		}
 	}
 

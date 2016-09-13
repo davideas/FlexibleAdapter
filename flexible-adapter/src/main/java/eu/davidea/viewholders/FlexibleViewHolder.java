@@ -256,10 +256,12 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * actively scrolls the list (forward or backward).
 	 * <p>Implement your logic for different animators based on position, selection and/or
 	 * direction.</p>
+	 * Create your {@link Animator}(s), then add it to the list of animators.
 	 *
 	 * @param position  can be used to differentiate the Animators based on positions
-	 * @param isForward can be used to separate animation from top/bottom or from left/right
+	 * @param isForward can be used to separate animation from top/bottom or from left/right scrolling
 	 * @since 5.0.0-b8
+	 * @see eu.davidea.flexibleadapter.helpers.AnimatorHelper
 	 */
 	public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
 		//Free to implement
