@@ -1,5 +1,7 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -54,7 +57,6 @@ public class LayoutItem extends AbstractModelItem<LayoutItem.ExampleViewHolder> 
 		holder.mTitle.setSelected(true);//For marquee
 		holder.mTitle.setText(getTitle());
 		holder.mSubtitle.setText(getSubtitle());
-		adapter.animateView(holder.itemView, position);
 
 		//Support for StaggeredGridLayoutManager
 		if (holder.itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
@@ -75,6 +77,11 @@ public class LayoutItem extends AbstractModelItem<LayoutItem.ExampleViewHolder> 
 			super(view, adapter, true);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
+		}
+
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
 		}
 	}
 

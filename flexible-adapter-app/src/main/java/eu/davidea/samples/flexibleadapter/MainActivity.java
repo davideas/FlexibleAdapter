@@ -665,7 +665,6 @@ public class MainActivity extends AppCompatActivity implements
 			mActionModeHelper.onLongClick(this, position);
 	}
 
-
 	@Override
 	public void onActionStateChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
 		mSwipeRefreshLayout.setEnabled(actionState == ItemTouchHelper.ACTION_STATE_IDLE);

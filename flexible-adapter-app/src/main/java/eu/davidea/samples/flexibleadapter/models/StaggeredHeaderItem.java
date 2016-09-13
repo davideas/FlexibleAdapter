@@ -67,8 +67,6 @@ public class StaggeredHeaderItem extends AbstractHeaderItem<StaggeredHeaderItem.
 			String title = this.title + " (" + adapter.getSectionItems(this).size() + ")";
 			holder.title.setText(title);
 		}
-
-		adapter.animateView(holder.itemView, position);
 	}
 
 	static class HeaderViewHolder extends FlexibleViewHolder {

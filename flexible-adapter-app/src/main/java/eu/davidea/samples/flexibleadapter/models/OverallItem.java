@@ -1,11 +1,17 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -106,6 +112,21 @@ public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolde
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 			mIcon = (ImageView) view.findViewById(R.id.label_background);
+		}
+
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			if (mAdapter.getRecyclerView().getLayoutManager() instanceof GridLayoutManager) {
+				if (position % 2 != 0)
+					AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+				else
+					AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+			} else {
+				if (isForward)
+					AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
+				else
+					AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
+			}
 		}
 	}
 

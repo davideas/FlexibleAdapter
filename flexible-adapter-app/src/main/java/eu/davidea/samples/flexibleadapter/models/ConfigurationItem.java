@@ -182,9 +182,6 @@ public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.Vi
 				});
 				break;
 		}
-
-		//Use alpha animation
-		adapter.animateView(holder.itemView, position);
 	}
 
 	static class ViewHolder extends FlexibleViewHolder {

@@ -119,8 +119,6 @@ public class ExpandableLevel1Item
 			//Display the current flip status
 			holder.mFlipView.flipSilently(adapter.isSelected(position));
 		}
-
-		adapter.animateView(holder.itemView, position);
 	}
 
 	@Override

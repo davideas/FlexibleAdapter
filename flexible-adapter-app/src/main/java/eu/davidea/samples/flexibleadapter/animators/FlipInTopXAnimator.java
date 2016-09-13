@@ -17,7 +17,6 @@ package eu.davidea.samples.flexibleadapter.animators;
 
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
@@ -28,7 +27,7 @@ public class FlipInTopXAnimator extends FlexibleItemAnimator {
 	}
 
 	public FlipInTopXAnimator(Interpolator interpolator) {
-		mInterpolator = new DecelerateInterpolator();
+		mInterpolator = interpolator;
 	}
 
 	@Override

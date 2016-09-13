@@ -1,5 +1,7 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,7 @@ import android.widget.ProgressBar;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.models.ProgressItem.ProgressViewHolder;
@@ -46,6 +49,10 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 		public ProgressViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
+		}
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			AnimatorHelper.scaleAnimator(animators, itemView, 0f);
 		}
 	}
 

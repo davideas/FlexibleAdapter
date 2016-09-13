@@ -20,8 +20,6 @@ import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.samples.flexibleadapter.services.DatabaseType;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
@@ -122,12 +120,6 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 			} else {
 				holder.mTitle.setText(getTitle());
 				holder.mSubtitle.setText(getSubtitle());
-			}
-
-			//DemoApp: I want animate this item where scrolling animation is active and in the
-			// list where database type is different than HEADERS_SECTIONS
-			if (DatabaseService.getInstance().getDatabaseType() != DatabaseType.HEADERS_SECTIONS) {
-				adapter.animateView(holder.itemView, position);
 			}
 		}
 	}

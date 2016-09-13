@@ -98,13 +98,13 @@ public class FragmentOverall extends AbstractFragment {
 
 	@Override
 	protected LinearLayoutManager createNewLinearLayoutManager() {
-		mAdapter.setUseStepDelay(true);
+		mAdapter.setEntryStepDelay(true);
 		return super.createNewLinearLayoutManager();
 	}
 
 	@Override
 	protected GridLayoutManager createNewGridLayoutManager() {
-		mAdapter.setUseStepDelay(false);
+		mAdapter.setEntryStepDelay(false);
 		GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
@@ -124,7 +124,7 @@ public class FragmentOverall extends AbstractFragment {
 
 	@Override
 	protected StaggeredGridLayoutManager createNewStaggeredGridLayoutManager() {
-		mAdapter.setUseStepDelay(true);
+		mAdapter.setEntryStepDelay(true);
 		return super.createNewStaggeredGridLayoutManager();
 	}
 

@@ -1,12 +1,9 @@
 package eu.davidea.samples.flexibleadapter;
 
-import android.animation.Animator;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.view.View;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
@@ -28,7 +25,6 @@ import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
-	public static final int EXAMPLE_VIEW_TYPE = 1;
 
 	private AbstractFlexibleItem mUseCaseItem;
 
@@ -139,49 +135,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 //		//Not implemented: METHOD A is used
 //	}
-
-	@Override
-	public List<Animator> getAnimators(View itemView, int position, boolean isForward) {
-		List<Animator> animators = new ArrayList<Animator>();
-		if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-			//GridLayout
-			if (position % 2 == 0)
-				addSlideInFromLeftAnimator(animators, itemView, 0.5f);
-			else
-				addSlideInFromRightAnimator(animators, itemView, 0.5f);
-		} else {
-			//LinearLayout
-			switch (getItemViewType(position)) {
-				case R.layout.recycler_header_item:
-					addSlideInFromRightAnimator(animators, itemView, 1.0f);
-					break;
-				case R.layout.recycler_staggered_item:
-					if (isForward) //inverted to have items animated up-side-down
-						addSlideInFromBottomAnimator(animators, itemView);
-					else
-						addSlideInFromTopAnimator(animators, itemView);
-					break;
-				case R.layout.recycler_staggered_header_item:
-				case R.layout.recycler_layout_item:
-				case R.layout.recycler_uls_item:
-					addSlideInFromTopAnimator(animators, itemView);
-					break;
-				case R.layout.recycler_sub_item:
-				case EXAMPLE_VIEW_TYPE:
-					addScaleInAnimator(animators, itemView, 0.0f);
-					break;
-				default:
-					if (isSelected(position))
-						addSlideInFromRightAnimator(animators, itemView, 0.5f);
-					else
-						addSlideInFromLeftAnimator(animators, itemView, 0.5f);
-					break;
-			}
-		}
-
-		//Alpha Animator is automatically added
-		return animators;
-	}
 
 	@Override
 	public String onCreateBubbleText(int position) {

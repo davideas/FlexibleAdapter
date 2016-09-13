@@ -161,8 +161,6 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
 					context.getResources().getDimension(R.dimen.card_height));
 			holder.mergedTextView.setVisibility(View.GONE);
 		}
-
-		adapter.animateView(holder.itemView, position);
 	}
 
 	@Override

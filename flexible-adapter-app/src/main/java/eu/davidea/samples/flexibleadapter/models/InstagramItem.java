@@ -1,6 +1,8 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
@@ -101,6 +104,10 @@ public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHol
 			this.mQuantityLikes = (TextView) view.findViewById(R.id.instagram_quantity_likes);
 		}
 
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
+		}
 	}
 
 	@Override

@@ -73,8 +73,6 @@ public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
 		if (getHeader() != null) {
 			setSubtitle("Header " + getHeader().toString());
 		}
-
-		adapter.animateView(holder.itemView, position);
 	}
 
 	@Override

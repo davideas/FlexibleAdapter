@@ -428,12 +428,16 @@ public class DatabaseService {
 		if (position < mItems.size())
 			mItems.add(position, item);
 		else
-			mItems.add(item);
+			addItem(item);
 	}
 
 	public void addItem(AbstractFlexibleItem item, Comparator comparator) {
-		mItems.add(item);
+		addItem(item);
 		Collections.sort(mItems, comparator);
+	}
+
+	public void addItem(AbstractFlexibleItem item) {
+		mItems.add(item);
 	}
 
 	public void addSubItem(int position, IExpandable parent, SubItem subItem) {

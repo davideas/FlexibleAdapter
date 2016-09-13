@@ -1,16 +1,13 @@
 package eu.davidea.samples.flexibleadapter;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
@@ -132,37 +129,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			if (item.getIcon() != null) {
 				vHolder.mIcon.setImageDrawable(item.getIcon());
 			}
-
 		}
-		animateView(holder.itemView, position);
-	}
-
-	@Override
-	public List<Animator> getAnimators(View itemView, int position, boolean isForward) {
-		List<Animator> animators = new ArrayList<Animator>();
-		if (mRecyclerView != null && mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-			//GridLayout
-			if (position % 2 != 0)
-				addSlideInFromRightAnimator(animators, itemView, 0.5f);
-			else if (getItemViewType(position) == R.layout.recycler_layout_item)
-				addSlideInFromTopAnimator(animators, itemView);
-			else
-				addSlideInFromLeftAnimator(animators, itemView, 0.5f);
-		} else {
-			switch (getItemViewType(position)) {
-				case R.layout.recycler_layout_item:
-					addSlideInFromTopAnimator(animators, itemView);
-				default:
-					if (isForward)
-						addSlideInFromBottomAnimator(animators, itemView);
-					else
-						addSlideInFromTopAnimator(animators, itemView);
-					break;
-			}
-		}
-
-		//Alpha Animator is automatically added
-		return animators;
 	}
 
 }
