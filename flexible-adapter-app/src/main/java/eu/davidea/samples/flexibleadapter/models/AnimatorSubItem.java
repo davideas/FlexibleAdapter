@@ -81,7 +81,6 @@ public class AnimatorSubItem extends AbstractSectionableItem<AnimatorSubItem.Chi
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ChildViewHolder holder, int position, List payloads) {
 		holder.mTitle.setText(getTitle());
-		adapter.animateView(holder.itemView, position);
 	}
 
 	/**
@@ -105,10 +104,30 @@ public class AnimatorSubItem extends AbstractSectionableItem<AnimatorSubItem.Chi
 
 		@Override
 		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
-			if (mAdapter.isSelected(position))
-				AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
-			else
-				AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+			switch (DatabaseConfiguration.scrollAnimatorType) {
+				case Scale:
+					AnimatorHelper.scaleAnimator(animators, itemView, 0f);
+					break;
+				case SlideInTopBottom:
+					if (isForward) {
+						AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
+					} else {
+						AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
+					}
+					break;
+				case SlideInFromTop:
+					AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
+					break;
+				case SlideInFromBottom:
+					AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
+					break;
+				case SlideInFromLeft:
+					AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+					break;
+				case SlideInFromRight:
+					AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+					break;
+			}
 		}
 
 		public boolean preAnimateAddImpl() {

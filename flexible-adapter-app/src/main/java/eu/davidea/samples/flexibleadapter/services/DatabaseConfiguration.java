@@ -29,7 +29,7 @@ public class DatabaseConfiguration {
 	public static boolean animateOnUpdate = true;
 	public static boolean userLearnedSelection = false;
 	public static boolean subItemSpecificAnimation = false;
-	public static FragmentAnimators.ScrollAnimatorType scrollAnimatorType;
+	public static FragmentAnimators.ScrollAnimatorType scrollAnimatorType = FragmentAnimators.ScrollAnimatorType.Alpha;
 
 	public static void setConfiguration(String id, int value) {
 		switch (id) {

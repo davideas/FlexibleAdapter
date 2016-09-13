@@ -20,10 +20,12 @@ import android.animation.ObjectAnimator;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
-import java.util.EnumSet;
 import java.util.List;
+
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 /**
  * @author Davide Steduto
@@ -31,14 +33,11 @@ import java.util.List;
  */
 public class AnimatorHelper {
 
-	private enum AnimatorEnum {
-		ALPHA, SLIDE_IN_LEFT, SLIDE_IN_RIGHT, SLIDE_IN_BOTTOM, SLIDE_IN_TOP, SCALE
-	}
+	protected static final String TAG = AnimatorHelper.class.getSimpleName();
 
-	/**
-	 * Contains type of animators already added
-	 */
-	private static EnumSet<AnimatorEnum> animatorsUsed = EnumSet.noneOf(AnimatorEnum.class);
+//	private enum AnimatorEnum {
+//		ALPHA, SLIDE_IN_LEFT, SLIDE_IN_RIGHT, SLIDE_IN_BOTTOM, SLIDE_IN_TOP, SCALE
+//	}
 
 	/*-----------*/
 	/* ANIMATORS */
@@ -56,6 +55,7 @@ public class AnimatorHelper {
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView, @FloatRange(from = 0.0, to= 1.0) float percent) {
 		animators.add(ObjectAnimator.ofFloat(view, "translationX", -recyclerView.getLayoutManager().getWidth() * percent, 0));
+		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added LEFT Animator");
 	}
 
 	/**
@@ -70,6 +70,7 @@ public class AnimatorHelper {
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView, @FloatRange(from = 0.0, to = 1.0) float percent) {
 		animators.add(ObjectAnimator.ofFloat(view, "translationX", recyclerView.getLayoutManager().getWidth() * percent, 0));
+		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added RIGHT Animator");
 	}
 
 	/**
@@ -83,6 +84,7 @@ public class AnimatorHelper {
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView) {
 		animators.add(ObjectAnimator.ofFloat(view, "translationY", -recyclerView.getMeasuredHeight() >> 1, 0));
+		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added TOP Animator");
 	}
 
 	/**
@@ -96,6 +98,7 @@ public class AnimatorHelper {
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView) {
 		animators.add(ObjectAnimator.ofFloat(view, "translationY", recyclerView.getMeasuredHeight() >> 1, 0));
+		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added BOTTOM Animator");
 	}
 
 	/**
@@ -110,6 +113,7 @@ public class AnimatorHelper {
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float scaleFrom) {
 		animators.add(ObjectAnimator.ofFloat(view, "scaleX", scaleFrom, 1f));
 		animators.add(ObjectAnimator.ofFloat(view, "scaleY", scaleFrom, 1f));
+		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added SCALE Animator");
 	}
 
 }

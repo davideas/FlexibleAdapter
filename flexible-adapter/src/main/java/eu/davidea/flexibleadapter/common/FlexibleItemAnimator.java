@@ -246,7 +246,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 				long removeDuration = removalsPending ? getRemoveDuration() : 0;
 				long moveDuration = movesPending ? getMoveDuration() : 0;
 				long changeDuration = changesPending ? getChangeDuration() : 0;
-				long totalDelay = removeDuration;// + Math.max(moveDuration, changeDuration);
+				long totalDelay = removeDuration + Math.max(moveDuration, changeDuration);
 				View view = additions.get(0).itemView;
 				ViewCompat.postOnAnimationDelayed(view, adder, totalDelay);
 			} else {

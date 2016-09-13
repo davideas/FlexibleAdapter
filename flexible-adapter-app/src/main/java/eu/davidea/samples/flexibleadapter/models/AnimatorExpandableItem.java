@@ -89,7 +89,7 @@ public class AnimatorExpandableItem
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, AnimatorExpandableViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
-			Log.i(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads);
+			Log.i(this.getClass().getSimpleName(), "AnimatorExpandableItem Payload " + payloads);
 		} else {
 			holder.mTitle.setText(getTitle());
 		}
@@ -136,7 +136,7 @@ public class AnimatorExpandableItem
 		@Override
 		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
 			switch (DatabaseConfiguration.scrollAnimatorType) {
-				case ScaleIn:
+				case Scale:
 					AnimatorHelper.scaleAnimator(animators, itemView, 0f);
 					break;
 				case SlideInTopBottom:
@@ -145,6 +145,7 @@ public class AnimatorExpandableItem
 					} else {
 						AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
 					}
+					break;
 				case SlideInFromTop:
 					AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
 					break;
@@ -152,10 +153,10 @@ public class AnimatorExpandableItem
 					AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
 					break;
 				case SlideInFromLeft:
-					AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.3f);//Start from 30%
+					AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
 					break;
 				case SlideInFromRight:
-					AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.3f);//Start from 30%
+					AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
 					break;
 			}
 		}

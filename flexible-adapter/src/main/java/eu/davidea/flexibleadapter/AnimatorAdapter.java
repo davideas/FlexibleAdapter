@@ -62,7 +62,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	private Interpolator mInterpolator = new LinearInterpolator();
 	private AnimatorAdapterDataObserver mAnimatorNotifierObserver;
-	private boolean mUseStepDelay = true;
+	private boolean mEntryStepDelay = true;
 
 	private enum AnimatorEnum {
 		ALPHA, SLIDE_IN_LEFT, SLIDE_IN_RIGHT, SLIDE_IN_BOTTOM, SLIDE_IN_TOP, SCALE
@@ -155,16 +155,17 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * If initial loading animation should use step delay between an animation and the next.
+	 * If initial loading animation should use step delay between an item animation and the next.
 	 * When false, all items are animated with no delay.
-	 * <p>Default value is {@code true}.</p>
+	 * <p>Better to disable when using Grid layouts.</p>
+	 * Default value is {@code true}.
 	 *
-	 * @param useStepDelay true to enable step delay, false otherwise
+	 * @param entryStepDelay true to enable step delay, false otherwise
 	 * @return this AnimatorAdapter, so the call can be chained
 	 * since 5.0.0-b8
 	 */
-	public AnimatorAdapter setUseStepDelay(boolean useStepDelay) {
-		this.mUseStepDelay = useStepDelay;
+	public AnimatorAdapter setEntryStepDelay(boolean entryStepDelay) {
+		this.mEntryStepDelay = entryStepDelay;
 		return this;
 	}
 
@@ -338,7 +339,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		if (animator != null) animator.end();
 	}
 
-	protected void animateView(final RecyclerView.ViewHolder holder, int position) {
+	protected void animateView(final RecyclerView.ViewHolder holder, final int position) {
 		//FIXME: first completed visible item on rotation gets high delay
 
 		if (DEBUG)
@@ -361,7 +362,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			//Add Alpha Animator (necessary to not display item at the beginning)
 			List<Animator> animators = new ArrayList<>();
 			ViewCompat.setAlpha(holder.itemView, 0);
-			animators.add(ObjectAnimator.ofFloat(holder.itemView, "alpha", 0f, 1f));
+			animators.add(ObjectAnimator.ofFloat(holder.itemView, "alpha", 0.3f, 1f));
 
 			//Additional user animators
 			FlexibleViewHolder flexibleViewHolder = (FlexibleViewHolder) holder;
@@ -373,17 +374,16 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			set.setInterpolator(mInterpolator);
 			set.setDuration(mDuration);
 			set.addListener(new HelperAnimatorListener(hashCode));
-			if (mUseStepDelay) {
-				//TODO: Animate with Solution 1 or 2?
-				//set.setStartDelay(calculateAnimationDelay1(position));
+			if (mEntryStepDelay) {
+				//Stop stepDelay when screen is filled
 				set.setStartDelay(calculateAnimationDelay2(position));
 			}
-			if (DEBUG) Log.d(TAG, "Started Animation on position " + position);
 			set.start();
 			mAnimators.put(hashCode, set);
+			if (DEBUG) Log.d(TAG, "Started Animation on position " + position);
 
 			//Animate only during initial loading?
-			if (onlyEntryAnimation && mLastAnimatedPosition >= mMaxChildViews) {
+			if (onlyEntryAnimation && position >= mMaxChildViews) {
 				shouldAnimate = false;
 			}
 		}
@@ -401,14 +401,14 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 */
 	@Deprecated
 	public final void animateView(final View itemView, int position) {
-		if (DEBUG)
-			Log.v(TAG, "shouldAnimate=" + shouldAnimate
-					+ " isFastScroll=" + isFastScroll
-					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
-					+ " isReverseEnabled=" + isReverseEnabled
-					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
-					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
-			);
+//		if (DEBUG)
+//			Log.v(TAG, "shouldAnimate=" + shouldAnimate
+//					+ " isFastScroll=" + isFastScroll
+//					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
+//					+ " isReverseEnabled=" + isReverseEnabled
+//					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
+//					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
+//			);
 
 		if (shouldAnimate && !isFastScroll && !mAnimatorNotifierObserver.isPositionNotified() &&
 				(isReverseEnabled || position > mLastAnimatedPosition || (position == 0 && mRecyclerView.getChildCount() == 0))) {
@@ -422,7 +422,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			//Add Alpha animator
 			ViewCompat.setAlpha(itemView, 0);
 			animators.add(ObjectAnimator.ofFloat(itemView, "alpha", 0f, 1f));
-			if (DEBUG) Log.d(TAG, "Started Animation on position " + position);
+			if (DEBUG) Log.d(TAG, "Started Deprecated Animation on position " + position);
 
 			//Execute the animations
 			AnimatorSet set = new AnimatorSet();
@@ -430,8 +430,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			set.setInterpolator(mInterpolator);
 			set.setDuration(mDuration);
 			set.addListener(new HelperAnimatorListener(itemView.hashCode()));
-			if (mUseStepDelay) {
-				//TODO: Animate with Solution 1 or 2?
+			if (mEntryStepDelay) {
 				//set.setStartDelay(calculateAnimationDelay1(position));
 				set.setStartDelay(calculateAnimationDelay2(position));
 			}

@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +18,7 @@ import android.widget.Spinner;
 
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.R;
@@ -48,8 +50,8 @@ public class FragmentAnimators extends AbstractFragment {
 	private ExampleAdapter mAdapter;
 
 	/* Spinner selected item */
-	private static int selectedItem1 = -1;
-	private static int selectedItem2 = -1;
+	private static int selectedItemAnimator = -1;
+	private static int selectedScrollAnimator = -1;
 
 	public static FragmentAnimators newInstance() {
 		return new FragmentAnimators();
@@ -69,7 +71,7 @@ public class FragmentAnimators extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createAnimatorsDatabase(10);//N. of sections
+		DatabaseService.getInstance().createAnimatorsDatabase(20);//N. of sections
 		initializeRecyclerView(savedInstanceState);
 
 		//Restore FAB button and icon
@@ -86,8 +88,12 @@ public class FragmentAnimators extends AbstractFragment {
 		mAdapter.expandItemsAtStartUp()
 				.setAutoCollapseOnExpand(false)
 				.setAutoScrollOnExpand(true)
+				.setOnlyEntryAnimation(false)
+				.setEntryStepDelay(true)//check the effect at initial loading when Grid Layout (see list in Overall)
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
-				.setAnimationOnReverseScrolling(true);
+				.setAnimationOnReverseScrolling(true)
+				.setAnimationInterpolator(new DecelerateInterpolator())
+				.setAnimationDuration(300L);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
@@ -106,11 +112,19 @@ public class FragmentAnimators extends AbstractFragment {
 				.setSwipeFlags(ItemTouchHelper.RIGHT);//Enable swipe
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-		swipeRefreshLayout.setEnabled(true);
+		swipeRefreshLayout.setEnabled(false);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//Add sample HeaderView items on the top (not belongs to the library)
 		mAdapter.showLayoutInfo(savedInstanceState == null);
+	}
+
+	@Override
+	public void performFabAction() {
+		int size = 1 + DatabaseService.getInstance().getDatabaseList().size();
+		AbstractFlexibleItem item = DatabaseService.newAnimatorItem(size);
+		DatabaseService.getInstance().addItem(item);
+		mAdapter.addItem(1, item);
 	}
 
 	@Override
@@ -129,10 +143,7 @@ public class FragmentAnimators extends AbstractFragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
-		if (id == R.id.action_step_delay) {
-			item.setChecked(!item.isChecked());
-			mAdapter.setUseStepDelay(item.isChecked());
-		} else if (id == R.id.action_sub_item_specific) {
+		if (id == R.id.action_sub_item_specific) {
 			item.setChecked(!item.isChecked());
 			DatabaseConfiguration.subItemSpecificAnimation = item.isChecked();
 		}
@@ -153,7 +164,7 @@ public class FragmentAnimators extends AbstractFragment {
 			public View getDropDownView(int position, View convertView, ViewGroup parent) {
 				View view = super.getDropDownView(position, convertView, parent);
 				view.setBackgroundResource(R.drawable.selector_item_light);
-				view.setActivated(position == selectedItem1);
+				view.setActivated(position == selectedItemAnimator);
 				return view;
 			}
 		};
@@ -166,13 +177,14 @@ public class FragmentAnimators extends AbstractFragment {
 
 		Spinner spinner = (Spinner) getActivity().findViewById(R.id.spinner_item_animators);
 		spinner.setAdapter(spinnerAdapter);
+		spinner.setSelection(7);
 		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				mRecyclerView.setItemAnimator(AnimatorType.values()[position].getAnimator());
 				mRecyclerView.getItemAnimator().setAddDuration(500);
 				mRecyclerView.getItemAnimator().setRemoveDuration(500);
-				selectedItem1 = position;
+				selectedItemAnimator = position;
 			}
 
 			@Override
@@ -190,7 +202,7 @@ public class FragmentAnimators extends AbstractFragment {
 			public View getDropDownView(int position, View convertView, ViewGroup parent) {
 				View view = super.getDropDownView(position, convertView, parent);
 				view.setBackgroundResource(R.drawable.selector_item_light);
-				view.setActivated(position == selectedItem2);
+				view.setActivated(position == selectedScrollAnimator);
 				return view;
 			}
 		};
@@ -203,11 +215,12 @@ public class FragmentAnimators extends AbstractFragment {
 
 		Spinner spinner = (Spinner) getActivity().findViewById(R.id.spinner_scrolling_animation);
 		spinner.setAdapter(spinnerAdapter);
+		spinner.setSelection(3);
 		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				DatabaseConfiguration.scrollAnimatorType = ScrollAnimatorType.values()[position];
-				selectedItem2 = position;
+				selectedScrollAnimator = position;
 			}
 
 			@Override
@@ -225,7 +238,7 @@ public class FragmentAnimators extends AbstractFragment {
 		FadeInRight(new FadeInRightAnimator(new OvershootInterpolator(1f))),
 		Landing(new LandingAnimator(new OvershootInterpolator(1f))),
 		ScaleIn(new ScaleInAnimator(new OvershootInterpolator(1f))),
-		FlipInTopX(new FlipInTopXAnimator(new OvershootInterpolator(1f))),
+		FlipInTopX(new FlipInTopXAnimator(new DecelerateInterpolator(1f))),//Makes use of index inside
 		FlipInBottomX(new FlipInBottomXAnimator(new OvershootInterpolator(1f))),
 		SlideInLeft(new SlideInLeftAnimator(new OvershootInterpolator(1f))),
 		SlideInRight(new SlideInRightAnimator(new OvershootInterpolator(1f))),
@@ -246,23 +259,13 @@ public class FragmentAnimators extends AbstractFragment {
 	}
 
 	public enum ScrollAnimatorType {
-		Alpha("Alpha (Default)"),
-		SlideInFromTop("SlideIn from Top"),
-		SlideInFromBottom("SlideIn from Bottom"),
-		SlideInTopBottom("SlideIn Top + Bottom"),
-		SlideInFromLeft("SlideIn from Left"),
-		SlideInFromRight("SlideIn from Right"),
-		ScaleIn("ScaleIn");
-
-		private String name;
-
-		ScrollAnimatorType(String name) {
-			this.name = name;
-		}
-
-		public String getName() {
-			return name;
-		}
+		Alpha,
+		SlideInFromTop,
+		SlideInFromBottom,
+		SlideInTopBottom,
+		SlideInFromLeft,
+		SlideInFromRight,
+		Scale
 	}
 
 }
