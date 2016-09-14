@@ -1,6 +1,8 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
@@ -105,6 +108,11 @@ public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
 		@Override
 		public float getActivationElevation() {
 			return eu.davidea.utils.Utils.dpToPx(itemView.getContext(), 4f);
+		}
+
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			AnimatorHelper.scaleAnimator(animators, itemView, 0f);
 		}
 	}
 

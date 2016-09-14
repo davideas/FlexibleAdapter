@@ -89,9 +89,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!
-				.setPermanentDelete(true)
-				.setAnimationOnScrolling(true)
-				.setAnimationOnReverseScrolling(true);
+				.setPermanentDelete(true);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);

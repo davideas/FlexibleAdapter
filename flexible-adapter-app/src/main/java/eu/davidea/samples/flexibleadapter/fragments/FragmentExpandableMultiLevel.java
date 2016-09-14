@@ -70,9 +70,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 				.setAutoCollapseOnExpand(false)
 				.setMinCollapsibleLevel(1)//Auto-collapse only items with level >= 1 (avoid to collapse also sections!)
 				.setAutoScrollOnExpand(true)
-				.setRemoveOrphanHeaders(false)
-				.setAnimationOnScrolling(true)
-				.setAnimationOnReverseScrolling(true);
+				.setRemoveOrphanHeaders(false);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);

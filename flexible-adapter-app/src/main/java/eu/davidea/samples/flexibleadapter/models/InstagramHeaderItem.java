@@ -115,7 +115,11 @@ public class InstagramHeaderItem extends AbstractHeaderItem<InstagramHeaderItem.
 
 		@Override
 		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
-			AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
+			if (isForward) {
+				AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
+			} else {
+				AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
+			}
 		}
 	}
 

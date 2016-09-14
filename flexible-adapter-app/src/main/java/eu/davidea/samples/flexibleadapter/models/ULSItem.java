@@ -1,5 +1,7 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -88,6 +91,11 @@ public class ULSItem extends AbstractModelItem<ULSItem.ExampleViewHolder> {
 			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
 				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
 			}
+		}
+
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
 		}
 	}
 

@@ -1,5 +1,7 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractHeaderItem;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.ISectionable;
@@ -131,6 +134,11 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
 				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
 			}
+		}
+
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			AnimatorHelper.scaleAnimator(animators, itemView, 0f);
 		}
 	}
 

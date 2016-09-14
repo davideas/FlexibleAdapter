@@ -1,7 +1,10 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +17,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.ISectionable;
@@ -223,6 +227,23 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 		@Override
 		public View getRearRightView() {
 			return rearRightView;
+		}
+
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			if (mAdapter.getRecyclerView().getLayoutManager() instanceof GridLayoutManager ||
+					mAdapter.getRecyclerView().getLayoutManager() instanceof StaggeredGridLayoutManager) {
+				if (position % 2 != 0)
+					AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+				else
+					AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+			} else {
+				//Linear layout
+				if (mAdapter.isSelected(position))
+					AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+				else
+					AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
+			}
 		}
 	}
 
