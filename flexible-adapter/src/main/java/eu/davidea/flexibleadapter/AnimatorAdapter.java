@@ -359,12 +359,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			int hashCode = holder.itemView.hashCode();
 			cancelExistingAnimation(hashCode);
 
-			//Add Alpha Animator (necessary to not display item at the beginning)
+			//User animators
 			List<Animator> animators = new ArrayList<>();
-			ViewCompat.setAlpha(holder.itemView, 0);
-			animators.add(ObjectAnimator.ofFloat(holder.itemView, "alpha", 0.3f, 1f));
-
-			//Additional user animators
 			FlexibleViewHolder flexibleViewHolder = (FlexibleViewHolder) holder;
 			flexibleViewHolder.animators(animators, position, position > mLastAnimatedPosition);
 

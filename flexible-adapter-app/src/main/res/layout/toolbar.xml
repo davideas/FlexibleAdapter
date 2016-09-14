@@ -11,11 +11,6 @@
 	app:popupTheme="@style/AppTheme.PopupOverlay"
 	tools:showIn="@layout/activity_main">
 
-	<include
-		android:id="@+id/toolbar_header_view"
-		layout="@layout/toolbar_titles"
-		android:layout_height="wrap_content"
-		android:layout_width="match_parent"
-		android:layout_marginRight="@dimen/header_view_end_margin_right"/>
+	<include layout="@layout/toolbar_titles"/>
 
 </android.support.v7.widget.Toolbar>

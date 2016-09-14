@@ -19,6 +19,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -44,6 +45,20 @@ public class AnimatorHelper {
 	/*-----------*/
 
 	/**
+	 * This is the default animator.
+	 *
+	 * @param animators user defined list
+	 * @param view      itemView to animate
+	 * @param alphaFrom starting alpha value
+	 * @since 5.0.0-b1
+	 */
+	public static void alphaAnimator(
+			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float alphaFrom) {
+		ViewCompat.setAlpha(view, 0);
+		animators.add(ObjectAnimator.ofFloat(view, "alpha", alphaFrom, 1f));
+	}
+
+	/**
 	 * Item will slide from Left to Right.
 	 *
 	 * @param animators user defined list
@@ -54,6 +69,7 @@ public class AnimatorHelper {
 	public static void slideInFromLeftAnimator(
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView, @FloatRange(from = 0.0, to= 1.0) float percent) {
+		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationX", -recyclerView.getLayoutManager().getWidth() * percent, 0));
 		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added LEFT Animator");
 	}
@@ -69,6 +85,7 @@ public class AnimatorHelper {
 	public static void slideInFromRightAnimator(
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView, @FloatRange(from = 0.0, to = 1.0) float percent) {
+		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationX", recyclerView.getLayoutManager().getWidth() * percent, 0));
 		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added RIGHT Animator");
 	}
@@ -83,6 +100,7 @@ public class AnimatorHelper {
 	public static void slideInFromTopAnimator(
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView) {
+		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationY", -recyclerView.getMeasuredHeight() >> 1, 0));
 		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added TOP Animator");
 	}
@@ -97,6 +115,7 @@ public class AnimatorHelper {
 	public static void slideInFromBottomAnimator(
 			@NonNull List<Animator> animators, @NonNull View view,
 			RecyclerView recyclerView) {
+		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationY", recyclerView.getMeasuredHeight() >> 1, 0));
 		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added BOTTOM Animator");
 	}
@@ -111,6 +130,7 @@ public class AnimatorHelper {
 	 */
 	public static void scaleAnimator(
 			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float scaleFrom) {
+		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "scaleX", scaleFrom, 1f));
 		animators.add(ObjectAnimator.ofFloat(view, "scaleY", scaleFrom, 1f));
 		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added SCALE Animator");

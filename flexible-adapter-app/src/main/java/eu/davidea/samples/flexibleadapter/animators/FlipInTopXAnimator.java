@@ -37,7 +37,7 @@ public class FlipInTopXAnimator extends FlexibleItemAnimator {
 				.setDuration(getRemoveDuration())
 				.setInterpolator(mInterpolator)
 				.setListener(new DefaultRemoveVpaListener(holder))
-				.setStartDelay(index * 40L)
+				.setStartDelay(index * 20L)
 				.start();
 	}
 

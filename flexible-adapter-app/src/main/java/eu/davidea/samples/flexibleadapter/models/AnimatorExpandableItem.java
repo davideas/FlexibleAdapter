@@ -158,6 +158,9 @@ public class AnimatorExpandableItem
 				case SlideInFromRight:
 					AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
 					break;
+				default:
+					AnimatorHelper.alphaAnimator(animators, itemView, 0f);
+					break;
 			}
 		}
 	}

@@ -71,7 +71,8 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		mAdapter.initializeListeners(getActivity())
 				//Experimenting NEW features (v5.0.0)
 				.setAnimationOnScrolling(true)
-				.setAnimationOnReverseScrolling(true);
+				.setAnimationOnReverseScrolling(true)
+				.setEntryStepDelay(false);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);

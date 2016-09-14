@@ -124,7 +124,7 @@ public class FragmentAnimators extends AbstractFragment {
 		int size = 1 + DatabaseService.getInstance().getDatabaseList().size();
 		AbstractFlexibleItem item = DatabaseService.newAnimatorItem(size);
 		DatabaseService.getInstance().addItem(item);
-		mAdapter.addItem(1, item);
+		mAdapter.addItem(size, item);
 	}
 
 	@Override

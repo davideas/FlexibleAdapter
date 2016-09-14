@@ -1,6 +1,8 @@
 package eu.davidea.samples.flexibleadapter.models;
 
+import android.animation.Animator;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
@@ -205,6 +208,11 @@ public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.Vi
 			if (mSwitchView.getVisibility() == View.VISIBLE) {
 				mSwitchView.setChecked(!mSwitchView.isChecked());
 			}
+		}
+
+		@Override
+		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+			AnimatorHelper.alphaAnimator(animators, itemView, 0f);
 		}
 	}
 

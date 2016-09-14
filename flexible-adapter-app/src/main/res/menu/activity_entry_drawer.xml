@@ -58,12 +58,12 @@
 			android:id="@+id/nav_viewpager"
 			android:enabled="false"
 			android:icon="@drawable/ic_view_carousel_grey600_24dp"
-			android:title="@string/horizontal"/>
+			android:title="@string/viewpager"/>
 		<item
 			android:id="@+id/nav_dialogs"
 			android:enabled="false"
 			android:icon="@drawable/ic_comment_grey600_24dp"
-			android:title="@string/horizontal"/>
+			android:title="@string/dialogs"/>
 	</group>
 
 	<!--<item android:title="Options">-->

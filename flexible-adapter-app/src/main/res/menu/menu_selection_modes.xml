@@ -3,11 +3,6 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	tools:context="eu.davidea.samples.flexibleadapter.MainActivity">
 
-	<item android:id="@+id/action_list_type"
-	      android:title="@string/grid_layout"
-	      android:icon="@drawable/ic_view_grid_white_24dp"
-	      app:showAsAction="always"/>
-
 	<item android:id="@+id/action_selection_mode"
 	      android:title="@string/mode_idle"
 	      android:icon="@drawable/ic_select_off_white_24dp"
