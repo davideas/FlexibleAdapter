@@ -263,7 +263,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * @since 5.0.0-b8
 	 * @see eu.davidea.flexibleadapter.helpers.AnimatorHelper
 	 */
-	public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+	public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 		//Free to implement
 	}
 

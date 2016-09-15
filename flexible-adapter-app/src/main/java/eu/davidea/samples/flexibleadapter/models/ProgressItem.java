@@ -51,7 +51,7 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 			progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
 		}
 		@Override
-		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 			AnimatorHelper.scaleAnimator(animators, itemView, 0f);
 		}
 	}

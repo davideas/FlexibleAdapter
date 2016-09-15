@@ -5,8 +5,8 @@
 
 # FlexibleAdapter
 
-###### The only Adapter multi-function for your RecyclerView
-- NEW! Beta version: [v5.0.0-b7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) built on 2016.06.20 (usable library!) 112KB
+###### Fast and Versatile Adapter for your RecyclerView
+- NEW! Beta version: [v5.0.0-b8](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b8) built on 2016.09.17 (144KB)
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -14,7 +14,7 @@
 We didn't know how to add selection and to combine all the use cases in the same Adapter.
 Since I created this library, it has become easy to configure how views will be displayed in a list, and now, nobody wants to use a ListView anymore.
 
-The idea behind is to regroup all the functionalities in a unique library, without the need to customize and import several third libraries not compatible among them.
+The idea behind is to regroup many functionalities in a unique library, without the need to customize and import several third libraries not compatible among them.
 
 The FlexibleAdapter helps developers to simplify this process without worrying too much about the Adapter anymore. It's easy to extend, it has predefined logic for different situations and prevents common mistakes.<br/>
 This library is configurable and it guides the developers to create a better user experience and now, even more with the new ViewHolders and new actions.
@@ -22,22 +22,22 @@ This library is configurable and it guides the developers to create a better use
 #### Main functionalities
 * Simple item selection with ripple effect, Single & Multi selection mode.
 * Restore deleted items, **NEW** works with Expandable items too!
-* FastScroller, **NEW** now in the library supporting all the 3 Layouts.
-* Customizable ItemDecoration.
-* SearchFilter with Spannable text, **NEW** now items are animated. Works with sub items too!
+* Customizable [FastScroller](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-FastScroller), **NEW** now in the library supporting all the 3 Layouts.
+* Customizable divider item decoration.
 * Add and Remove items with custom animations.
-* **NEW!** Auto mapping ViewTypes with Item interfaces.
-* **NEW!** Predefined ViewHolders.
-* **NEW!** Headers/Sections with sticky behaviour fully clickable, collapsible, automatic linkage!
+* [SearchFilter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text, **NEW** result is animated. Works with sub items too!
+* **NEW!** [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) on big list filtered with synchronization animations < 1'', slow phones < 2,5'' (available from beta8).
+* **NEW!** Auto mapping ViewTypes with  [Item interfaces](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Item-Interfaces).
+* **NEW!** Predefined [ViewHolders](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ViewHolders).
+* **NEW!** [Headers/Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behaviour fully clickable, collapsible, automatic linkage!
 * **NEW!** Expandable items with <u>Selection Coherence</u>, multi-level expansion.
-* **NEW!** Drag&Drop and Swipe-To-Dismiss with Leave-Behind pattern, with <u>Selection Coherence</u>.
-* **NEW!** Adapter Animations with custom configuration based on adapter position and beyond.
-* **NEW!** Innovative EndlessScroll with Adapter binding (<u>No OnScrollListener</u>).
-* **NEW!** UndoHelper &amp; ActionModeHelper.
+* **NEW!** [Drag&Drop and Swipe-To-Dismiss](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Drag&Drop-and-Swipe#swiping-the-front-view) with Leave-Behind pattern, with <u>Selection Coherence</u>.
+* **NEW!** Customizable Scrolling-Animations based on adapter position and beyond.
+* **NEW!** Innovative [EndlessScroll](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-On-Load-More) (<u>No OnScrollListener</u>).
+* **NEW!** UndoHelper &amp; [ActionModeHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ActionModeHelper).
 * **NEW!** DrawableUtils for dynamic backgrounds with ripple (<u>No XML</u>).
-* **NEW!** A simple constructor for many events.
 * **NEW!** Easy runtime position calculation for adding/moving items in sections.
-* ... more to come.
+* **NEW!** [Wiki](https://github.com/davideas/FlexibleAdapter/wiki/) pages documentation.
 
 # Setup
 ```
@@ -50,8 +50,7 @@ repositories {
 ```
 dependencies {
 	//Using JCenter
-	compile 'eu.davidea:flexible-adapter:4.2.0'
-	compile 'eu.davidea:flexible-adapter:5.0.0-b7'
+	compile 'eu.davidea:flexible-adapter:5.0.0-b8'
 	
 	//Using MavenSnapshots repository for continuous updates from my development
 	compile 'eu.davidea:flexible-adapter:5.0.0-SNAPSHOT'
@@ -99,9 +98,10 @@ You can download the latest demo App from the latest release page.
 
 # Change Log
 ###### Latest release
-[v5.0.0-b7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) - 2016.06.20
+[v5.0.0-b8](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b8) - 2016.09.17
 
 ###### Old releases
+[v5.0.0-b7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b7) - 2016.06.20 |
 [v5.0.0-b6](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b6) - 2016.05.01 | 
 [v5.0.0-b5](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b5) - 2016.04.04 | 
 [v5.0.0-b4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b4) - 2016.02.21<br/>
@@ -136,7 +136,8 @@ Special thanks goes to Martin Guillon ([Akylas](https://github.com/Akylas)) to h
 
 # Apps that use this Adapter
 It will be a pleasure to add your App here.
-- [Socio - Shake and Connect!](https://play.google.com/store/apps/details?id=com.atsocio.socio&hl=en)<br/>
+- [Socio - Shake and Connect!](https://play.google.com/store/apps/details?id=com.atsocio.socio)<br/>
+- [BNVR Client](https://play.google.com/store/apps/details?id=ru.beward.bnvr)<br/>
 
 # License
 

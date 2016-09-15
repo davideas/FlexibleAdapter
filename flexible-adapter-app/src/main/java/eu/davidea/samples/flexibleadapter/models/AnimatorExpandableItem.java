@@ -134,7 +134,7 @@ public class AnimatorExpandableItem
 		}
 
 		@Override
-		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 			switch (DatabaseConfiguration.scrollAnimatorType) {
 				case Scale:
 					AnimatorHelper.scaleAnimator(animators, itemView, 0f);

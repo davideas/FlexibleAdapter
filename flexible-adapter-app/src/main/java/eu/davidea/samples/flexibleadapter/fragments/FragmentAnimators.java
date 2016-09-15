@@ -89,7 +89,7 @@ public class FragmentAnimators extends AbstractFragment {
 				.setAutoCollapseOnExpand(false)
 				.setAutoScrollOnExpand(true)
 				.setOnlyEntryAnimation(false)
-				.setEntryStepDelay(true)//check the effect at initial loading when Grid Layout (see list in Overall)
+				.setAnimationEntryStep(true)//In Overall, watch the effect at initial loading when Grid Layout is set
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
 				.setAnimationOnReverseScrolling(true)
 				.setAnimationInterpolator(new DecelerateInterpolator())
@@ -124,7 +124,7 @@ public class FragmentAnimators extends AbstractFragment {
 		int size = 1 + DatabaseService.getInstance().getDatabaseList().size();
 		AbstractFlexibleItem item = DatabaseService.newAnimatorItem(size);
 		DatabaseService.getInstance().addItem(item);
-		mAdapter.addItem(size, item);
+		mAdapter.addItem(mAdapter.getItemCount(), item);
 	}
 
 	@Override

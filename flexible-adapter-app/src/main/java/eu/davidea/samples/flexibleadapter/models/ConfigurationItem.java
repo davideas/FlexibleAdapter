@@ -211,7 +211,7 @@ public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.Vi
 		}
 
 		@Override
-		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 			AnimatorHelper.alphaAnimator(animators, itemView, 0f);
 		}
 	}

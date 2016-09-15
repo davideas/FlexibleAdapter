@@ -230,7 +230,7 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 		}
 
 		@Override
-		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 			if (mAdapter.getRecyclerView().getLayoutManager() instanceof GridLayoutManager ||
 					mAdapter.getRecyclerView().getLayoutManager() instanceof StaggeredGridLayoutManager) {
 				if (position % 2 != 0)

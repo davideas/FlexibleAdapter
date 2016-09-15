@@ -80,7 +80,7 @@ public class LayoutItem extends AbstractModelItem<LayoutItem.ExampleViewHolder> 
 		}
 
 		@Override
-		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 			AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
 		}
 	}

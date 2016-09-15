@@ -62,7 +62,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	private Interpolator mInterpolator = new LinearInterpolator();
 	private AnimatorAdapterDataObserver mAnimatorNotifierObserver;
-	private boolean mEntryStepDelay = true;
+	private boolean mEntryStep = true;
 
 	private enum AnimatorEnum {
 		ALPHA, SLIDE_IN_LEFT, SLIDE_IN_RIGHT, SLIDE_IN_BOTTOM, SLIDE_IN_TOP, SCALE
@@ -160,12 +160,12 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * <p>Better to disable when using Grid layouts.</p>
 	 * Default value is {@code true}.
 	 *
-	 * @param entryStepDelay true to enable step delay, false otherwise
+	 * @param entryStep true to enable step delay, false otherwise
 	 * @return this AnimatorAdapter, so the call can be chained
 	 * since 5.0.0-b8
 	 */
-	public AnimatorAdapter setEntryStepDelay(boolean entryStepDelay) {
-		this.mEntryStepDelay = entryStepDelay;
+	public AnimatorAdapter setAnimationEntryStep(boolean entryStep) {
+		this.mEntryStep = entryStep;
 		return this;
 	}
 
@@ -300,11 +300,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	@CallSuper
 	public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
 		int position = holder.getAdapterPosition();
-		if (DEBUG) {
-			Log.v(TAG, "onViewAttached Holder=" + holder.getClass().getSimpleName() +
-					" position=" + position +
-					" itemId=" + holder.getItemId());
-		}
+//		if (DEBUG) {
+//			Log.v(TAG, "onViewAttached Holder=" + holder.getClass().getSimpleName() +
+//					" position=" + position +
+//					" itemId=" + holder.getItemId());
+//		}
 		animateView(holder, position);
 	}
 
@@ -324,7 +324,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @see #animateView(View, int)
 	 * @see #getItemViewType(int)
 	 * @since 5.0.0-b1
-	 * @deprecated Use {@link AnimatorHelper} from {@link FlexibleViewHolder#animators(List, int, boolean)}.
+	 * @deprecated Use {@link AnimatorHelper} from {@link FlexibleViewHolder#scrollAnimators(List, int, boolean)}.
 	 */
 	@Deprecated
 	public List<Animator> getAnimators(View itemView, int position, boolean isForward) {
@@ -342,14 +342,14 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	protected void animateView(final RecyclerView.ViewHolder holder, final int position) {
 		//FIXME: first completed visible item on rotation gets high delay
 
-		if (DEBUG)
-			Log.v(TAG, "shouldAnimate=" + shouldAnimate
-					+ " isFastScroll=" + isFastScroll
-					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
-					+ " isReverseEnabled=" + isReverseEnabled
-					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
-					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
-			);
+//		if (DEBUG)
+//			Log.v(TAG, "shouldAnimate=" + shouldAnimate
+//					+ " isFastScroll=" + isFastScroll
+//					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
+//					+ " isReverseEnabled=" + isReverseEnabled
+//					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
+//					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
+//			);
 
 		if (holder instanceof FlexibleViewHolder && shouldAnimate && !isFastScroll &&
 				!mAnimatorNotifierObserver.isPositionNotified() &&
@@ -362,7 +362,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			//User animators
 			List<Animator> animators = new ArrayList<>();
 			FlexibleViewHolder flexibleViewHolder = (FlexibleViewHolder) holder;
-			flexibleViewHolder.animators(animators, position, position > mLastAnimatedPosition);
+			flexibleViewHolder.scrollAnimators(animators, position, position > mLastAnimatedPosition);
 
 			//Execute the animations together
 			AnimatorSet set = new AnimatorSet();
@@ -370,7 +370,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			set.setInterpolator(mInterpolator);
 			set.setDuration(mDuration);
 			set.addListener(new HelperAnimatorListener(hashCode));
-			if (mEntryStepDelay) {
+			if (mEntryStep) {
 				//Stop stepDelay when screen is filled
 				set.setStartDelay(calculateAnimationDelay2(position));
 			}
@@ -392,7 +392,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * Animates the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
 	 *
 	 * @since 5.0.0-b1
-	 * @deprecated New system in place. Implement {@link FlexibleViewHolder#animators(List, int, boolean)}
+	 * @deprecated New system in place. Implement {@link FlexibleViewHolder#scrollAnimators(List, int, boolean)}
 	 * and add new animator(s) to the list of {@code animators}.
 	 */
 	@Deprecated
@@ -426,7 +426,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			set.setInterpolator(mInterpolator);
 			set.setDuration(mDuration);
 			set.addListener(new HelperAnimatorListener(itemView.hashCode()));
-			if (mEntryStepDelay) {
+			if (mEntryStep) {
 				//set.setStartDelay(calculateAnimationDelay1(position));
 				set.setStartDelay(calculateAnimationDelay2(position));
 			}

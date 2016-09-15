@@ -111,7 +111,7 @@ public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
 		}
 
 		@Override
-		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 			AnimatorHelper.scaleAnimator(animators, itemView, 0f);
 		}
 	}

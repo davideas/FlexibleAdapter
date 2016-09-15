@@ -115,7 +115,7 @@ public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolde
 		}
 
 		@Override
-		public void animators(@NonNull List<Animator> animators, int position, boolean isForward) {
+		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 			if (mAdapter.getRecyclerView().getLayoutManager() instanceof GridLayoutManager) {
 				if (position % 2 != 0)
 					AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);

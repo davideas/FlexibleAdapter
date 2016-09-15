@@ -71,8 +71,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		mAdapter.initializeListeners(getActivity())
 				//Experimenting NEW features (v5.0.0)
 				.setAnimationOnScrolling(true)
-				.setAnimationOnReverseScrolling(true)
-				.setEntryStepDelay(false);
+				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
@@ -105,7 +104,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 			@SuppressWarnings("unchecked")
 			@Override
 			public void run() {
-				final List<AbstractFlexibleItem> newItems = new ArrayList<AbstractFlexibleItem>(3);
+				final List<AbstractFlexibleItem> newItems = new ArrayList<>(3);
 
 				//Simulating success/failure
 				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_instagram_item);
