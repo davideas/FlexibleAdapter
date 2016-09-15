@@ -92,6 +92,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	/*-------------------*/
 	/* TOUCHABLE METHODS */
 	/*-------------------*/
+	//TODO: All these methods could be deprecated in favour of the same methods in FlexibleViewHolder
 
 	boolean isDraggable();
 

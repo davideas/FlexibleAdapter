@@ -23,7 +23,7 @@ import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 /**
  * Interface for {@code itemView} addition/removal animation.
  * <p>Used by {@link FlexibleItemAnimator} when notify events occur. If any of these methods
- * are implemented, the ItemAnimator extending FlexibleItemAnimator is skipped in favour this
+ * are implemented, the ItemAnimator extending FlexibleItemAnimator is skipped in favour of this
  * ViewHolder implementation.</p>
  *
  * @author Davide Steduto
@@ -38,7 +38,7 @@ public interface AnimatedViewHolder {
 	 * {@link FlexibleItemAnimator#preAnimateAddImpl(RecyclerView.ViewHolder)} which will be ignored.
 	 * <p>Default value is {@code false}.</p>
 	 *
-	 * @return {@code true} to confirm the execution of {@link #animateAddImpl(ViewPropertyAnimatorListener, int)},
+	 * @return {@code true} to confirm the execution of {@link #animateAddImpl(ViewPropertyAnimatorListener, long, int)},
 	 * of this class, {@code false} to use generic animation for all types of View.
 	 * @since 5.0.0-b8
 	 */
