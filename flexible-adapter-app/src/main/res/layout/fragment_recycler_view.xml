@@ -10,7 +10,7 @@
 		android:id="@+id/swipeRefreshLayout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:enabled="false">
+		android:enabled="true"><!-- To restore to false when bug is fixed by Android team -->
 
 		<!-- This FrameLayout is needed ONLY IF sticky headers are used, in order to
 			 display the refresh circle on the top of sticky_header_layout.
