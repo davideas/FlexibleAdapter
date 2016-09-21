@@ -90,7 +90,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>22/04/2016 Endless Scrolling
  * <br/>09/07/2016 FilterAsyncTask (performance on big list)
  */
-@SuppressWarnings({"Range", "unused", "unchecked", "ConstantConditions", "SuspiciousMethodCalls"})
+@SuppressWarnings({"Range", "unused", "unchecked", "ConstantConditions", "SuspiciousMethodCalls", "WeakerAccess"})
 public class FlexibleAdapter<T extends IFlexible>
 		extends AnimatorAdapter
 		implements ItemTouchHelperCallback.AdapterCallback {
@@ -3682,9 +3682,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 
 		//Collapse expandable before swapping (otherwise items are mixed badly)
-		if (fromPosition < toPosition && isExpandable(getItem(fromPosition)) && isExpanded(toPosition)) {
-			//collapse(toPosition);
-		}
+//		if (fromPosition < toPosition && isExpandable(getItem(fromPosition)) && isExpanded(toPosition)) {
+//			collapse(toPosition);
+//		}
 
 		//Perform item swap (for all LayoutManagers)
 		if (fromPosition < toPosition) {
