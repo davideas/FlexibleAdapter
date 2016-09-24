@@ -112,7 +112,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * The main container for ALL items.
 	 */
-	private List<T> mItems;
+	private List<T> mItems, mTempItems;
 
 	/**
 	 * HashSet and AsyncTask objects, will increase performance in big list
@@ -2082,11 +2082,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * is ignored.</p>
 	 * Useful at startup, when there's an item to add after Adapter Animations is completed.
 	 *
-	 * @param position             position of the item to add
-	 * @param item                 the item to add
-	 * @param delay                a non-negative delay
-	 * @param scrollToPosition     true if RecyclerView should scroll after item has been added,
-	 *                             false otherwise
+	 * @param position         position of the item to add
+	 * @param item             the item to add
+	 * @param delay            a non-negative delay
+	 * @param scrollToPosition true if RecyclerView should scroll after item has been added,
+	 *                         false otherwise
 	 * @see #addItem(int, IFlexible)
 	 * @see #addItems(int, List)
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
@@ -2447,9 +2447,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Scrolling animation is automatically preserved, meaning that notification for animation
 	 * is ignored.</p>
 	 *
-	 * @param item                 the item to add
-	 * @param delay                a non-negative delay
-	 * @param permanent            true to permanently delete the item (no undo), false otherwise
+	 * @param item      the item to add
+	 * @param delay     a non-negative delay
+	 * @param permanent true to permanently delete the item (no undo), false otherwise
 	 * @see #removeItem(int)
 	 * @see #removeItems(List)
 	 * @see #removeItemsOfType(Integer...)
@@ -3373,22 +3373,21 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1 Created
 	 * <br>5.0.0-b8 Synchronization animation limit
 	 */
-	public synchronized void animateTo(@Nullable List<T> newItems) {
+	private synchronized void animateTo(@Nullable List<T> newItems) {
 		if (newItems == null) newItems = new ArrayList<>();
 		notifications = new ArrayList<>();
 		if (newItems.size() <= mAnimateToLimit) {
 			if (DEBUG)
 				Log.v(TAG, "Animate changes! oldSize=" + getItemCount() + " newSize=" + newItems.size() + " limit=" + mAnimateToLimit);
-			List<T> tempItems = new ArrayList<>(mItems);
-			applyAndAnimateRemovals(tempItems, newItems);
-			applyAndAnimateAdditions(tempItems, newItems);
+			mTempItems = new ArrayList<>(mItems);
+			applyAndAnimateRemovals(mTempItems, newItems);
+			applyAndAnimateAdditions(mTempItems, newItems);
 			if (notifyMoveOfFilteredItems)
-				applyAndAnimateMovedItems(tempItems, newItems);
-			mItems = tempItems;
+				applyAndAnimateMovedItems(mTempItems, newItems);
 		} else {
 			if (DEBUG)
 				Log.v(TAG, "NotifyDataSetChanged! oldSize=" + getItemCount() + " newSize=" + newItems.size() + " limit=" + mAnimateToLimit);
-			mItems = newItems;
+			mTempItems = newItems;
 			notifications.add(new Notification(-1, 0));
 		}
 		//Execute All notifications if filter was Synchronous!
@@ -3477,6 +3476,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	private synchronized void executeNotifications() {
 		if (DEBUG) Log.i(TAG, "Performing " + notifications.size() + " notifications");
+		mItems = mTempItems;// Update mItems in the UI Thread
 		setAnimate(false);//Disable scroll animation
 		for (Notification notification : notifications) {
 			switch (notification.operation) {
@@ -3498,7 +3498,8 @@ public class FlexibleAdapter<T extends IFlexible>
 					break;
 			}
 		}
-		notifications.clear();
+		mTempItems = null;
+		notifications = null;
 	}
 
 	/*---------------*/
@@ -3783,7 +3784,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
 		return (mItemMoveListener == null || mItemMoveListener.shouldMoveItem(fromPosition, toPosition));// &&
-				//!(isExpandable(getItem(fromPosition)) && getExpandableOf(toPosition) != null);
+		//!(isExpandable(getItem(fromPosition)) && getExpandableOf(toPosition) != null);
 	}
 
 	/**
@@ -4371,6 +4372,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					postFilter();
 					break;
 			}
+			mFilterAsyncTask = null;
 		}
 	}
 
