@@ -55,7 +55,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @since 10/01/2016 Created
  * <br/>30/01/2016 Class now extends {@link SelectableAdapter}
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	protected static final String TAG = AnimatorAdapter.class.getSimpleName();

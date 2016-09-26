@@ -49,7 +49,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
  * <br/>29/05/2016 Use of TreeSet instead of ArrayList
  */
-@SuppressWarnings({"unused", "unchecked", "ConstantConditions"})
+@SuppressWarnings({"unused", "unchecked", "ConstantConditions", "WeakerAccess"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
 		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener {
 

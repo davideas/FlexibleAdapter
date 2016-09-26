@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -48,9 +48,9 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
+import eu.davidea.samples.flexibleadapter.dialogs.EditItemDialog;
 import eu.davidea.samples.flexibleadapter.dialogs.MessageDialog;
 import eu.davidea.samples.flexibleadapter.fragments.AbstractFragment;
-import eu.davidea.samples.flexibleadapter.dialogs.EditItemDialog;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentAnimators;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentAsyncFilter;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentEndlessScrolling;
@@ -130,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements
 	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
 	private ActionModeHelper mActionModeHelper;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
-	private CollapsingToolbarLayout mToolbarLayout;
 	private Toolbar mToolbar;
 	private HeaderView mHeaderView;
 	private DrawerLayout mDrawer;
@@ -220,8 +219,8 @@ public class MainActivity extends AppCompatActivity implements
 			public void updateContextTitle(int count) {
 				if (mActionMode != null) {//You can use the internal ActionMode instance
 					mActionMode.setTitle(count == 1 ?
-							getString(R.string.action_selected_one, count) :
-							getString(R.string.action_selected_many, count));
+							getString(R.string.action_selected_one, Integer.toString(count)) :
+							getString(R.string.action_selected_many, Integer.toString(count)));
 				}
 			}
 		}.withDefaultMode(mode);
@@ -283,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements
 		TextView appVersion = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.app_version);
 		appVersion.setText(getString(R.string.about_version,
 				Utils.getVersionName(this),
-				Utils.getVersionCode(this)));
+				Integer.toString(Utils.getVersionCode(this))));
 	}
 
 	private void initializeFab() {
@@ -315,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements
 	 */
 	@SuppressWarnings("StatementWithEmptyBody")
 	@Override
-	public boolean onNavigationItemSelected(MenuItem item) {
+	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 		hideFabSilently();
 		CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mFab.getLayoutParams();
 		ScrollAwareFABBehavior fabBehavior = ((ScrollAwareFABBehavior) layoutParams.getBehavior());
@@ -350,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements
 					getString(R.string.about_title),
 					getString(R.string.about_body,
 							Utils.getVersionName(this),
-							Utils.getVersionCode(this)))
+							Integer.toString(Utils.getVersionCode(this))))
 					.show(getFragmentManager(), MessageDialog.TAG);
 			return true;
 		} else if (id == R.id.nav_github) {
@@ -698,7 +697,7 @@ public class MainActivity extends AppCompatActivity implements
 		//   A) on time out do something based on direction (open dialog with options);
 
 		//Create list for single position (only in onItemSwipe)
-		List<Integer> positions = new ArrayList<Integer>(1);
+		List<Integer> positions = new ArrayList<>(1);
 		positions.add(position);
 		//Build the message
 		IFlexible abstractItem = mAdapter.getItem(position);
