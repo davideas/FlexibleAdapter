@@ -32,21 +32,22 @@ import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * This class is an implementation of {@link Callback} that enables drag & drop
- * and swipe actions. Drag and Swipe events are started depending by its configuration.
+ * This class is an implementation of {@link Callback} that enables Drag & Drop
+ * and Swipe actions. Drag and Swipe events are started depending by the configuration.
  *
  * @author Davide Steduto
  * @since 23/01/2016 Created
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class ItemTouchHelperCallback extends Callback {
 
-	private static final float ALPHA_FULL = 1.0f;
+	protected static final float ALPHA_FULL = 1.0f;
 
-	private AdapterCallback mItemTouchCallback;
-	private boolean mIsLongPressDragEnabled = false, mIsSwipeEnabled = false;
-	private long mSwipeAnimationDuration = 300L, mDragAnimationDuration = 400L;
-	private float mSwipeThreshold = 0.5f, mMoveThreshold = 0.5f;
-	private int mSwipeFlags = -1;
+	protected AdapterCallback mItemTouchCallback;
+	protected boolean mIsLongPressDragEnabled = false, mIsSwipeEnabled = false;
+	protected long mSwipeAnimationDuration = 300L, mDragAnimationDuration = 400L;
+	protected float mSwipeThreshold = 0.5f, mMoveThreshold = 0.5f;
+	protected int mSwipeFlags = -1;
 
 	/*-------------*/
 	/* CONSTRUCTOR */
@@ -84,7 +85,7 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public boolean canDropOver(RecyclerView recyclerView, RecyclerView.ViewHolder current, RecyclerView.ViewHolder target) {
-		return current.getItemViewType() == target.getItemViewType();
+		return true;
 	}
 
 	/**

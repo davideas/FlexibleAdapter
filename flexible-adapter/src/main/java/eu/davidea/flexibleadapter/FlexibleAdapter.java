@@ -3530,6 +3530,21 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Sets a custom callback implementation for Item touch.
+	 * <p>Helper will be reinitialized.</p>
+	 *
+	 * @param itemTouchHelperCallback the custom callback implementation for Item touch
+	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-rc1
+	 */
+	public final FlexibleAdapter setItemTouchHelperCallback(ItemTouchHelperCallback itemTouchHelperCallback) {
+		mItemTouchHelperCallback = itemTouchHelperCallback;
+		mItemTouchHelper = null;
+		initializeItemTouchHelper();
+		return this;
+	}
+
+	/**
 	 * Returns whether ItemTouchHelper should start a drag and drop operation if an item is
 	 * long pressed.<p>
 	 * Default value is {@code false}.
@@ -3683,9 +3698,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 
 		//Collapse expandable before swapping (otherwise items are mixed badly)
-//		if (fromPosition < toPosition && isExpandable(getItem(fromPosition)) && isExpanded(toPosition)) {
-//			collapse(toPosition);
-//		}
+		if (fromPosition < toPosition && isExpandable(getItem(fromPosition)) && isExpanded(toPosition)) {
+			collapse(toPosition);
+		}
 
 		//Perform item swap (for all LayoutManagers)
 		if (fromPosition < toPosition) {
@@ -3822,7 +3837,9 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (mRecyclerView == null) {
 				throw new IllegalStateException("RecyclerView cannot be null. Enabling LongPressDrag or Swipe must be done after the Adapter is added to the RecyclerView.");
 			}
-			mItemTouchHelperCallback = new ItemTouchHelperCallback(this);
+			if (mItemTouchHelperCallback == null) {
+				mItemTouchHelperCallback = new ItemTouchHelperCallback(this);
+			}
 			mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
 			mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 		}
