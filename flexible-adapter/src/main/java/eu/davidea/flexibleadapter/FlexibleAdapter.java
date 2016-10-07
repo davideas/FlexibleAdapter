@@ -106,8 +106,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private static final int
 			UPDATE = 0, FILTER = 1, CONFIRM_DELETE = 2,
-			LOAD_MORE_COMPLETE = 8, LOAD_MORE_RESET = 9;
-
+			LOAD_MORE_COMPLETE = 8;
 
 	/**
 	 * The main container for ALL items.
@@ -127,8 +126,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>0 = updateDataSet.
 	 * <br/>1 = filterItems, optionally delayed.
 	 * <br/>2 = deleteConfirmed when Undo timeout is over.
-	 * <br/>8 = remove the progress item from the list, optionally delayed.
-	 * <br/>9 = reset flag to load more items, delayed.</p>
+	 * <br/>8 = remove the progress item from the list, optionally delayed.</p>
 	 * <b>Note:</b> numbers 0-9 are reserved for the Adapter, use others.
 	 */
 	protected Handler mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
@@ -147,9 +145,6 @@ public class FlexibleAdapter<T extends IFlexible>
 					return true;
 				case LOAD_MORE_COMPLETE: //onLoadMore remove progress item
 					deleteProgressItem();
-					return true;
-				case LOAD_MORE_RESET: //onLoadMore reset
-					resetOnLoadMore();
 					return true;
 			}
 			return false;
@@ -1467,17 +1462,28 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position the current binding position
 	 */
 	protected void onLoadMore(int position) {
-		if (mProgressItem != null && !mLoading
-				&& position >= getItemCount() - mEndlessScrollThreshold
-				&& getGlobalPositionOf(mProgressItem) < 0) {
+		//Skip everything when no loading more
+		if (mProgressItem == null || position == getGlobalPositionOf(mProgressItem)) {
+			return;
+		} else if (DEBUG) {
+			Log.v(TAG, "onLoadMore     loading=" + mLoading + ", position=" + position
+					+ ", itemCount=" + getItemCount() + ", threshold=" + mEndlessScrollThreshold
+					+ ", inside the threshold? " + (position >= getItemCount() - mEndlessScrollThreshold));
+		}
+		//Load more if not loading and inside the threshold
+		if (!mLoading && position >= getItemCount() - mEndlessScrollThreshold) {
 			mLoading = true;
+			if (DEBUG) Log.d(TAG, "onLoadMore     invoked!");
 			mRecyclerView.post(new Runnable() {
 				@Override
 				public void run() {
-					mItems.add(mProgressItem);
-					notifyItemInserted(getItemCount());
-					if (mEndlessScrollListener != null)
+					if (getGlobalPositionOf(mProgressItem) < 0) {
+						mItems.add(mProgressItem);
+						notifyItemInserted(getItemCount());
+					}
+					if (mEndlessScrollListener != null) {
 						mEndlessScrollListener.onLoadMore();
+					}
 				}
 			});
 		}
@@ -1505,25 +1511,24 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param newItems the list of the new items, can be empty or null
 	 * @param delay    the delay used to remove the progress item or -1 to disable the
-	 *                 loading forever and to keep the progress item.
+	 *                 loading forever and to keep the progress item visible.
 	 * @since 5.0.0-b8
 	 */
 	public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
 		//Handling the delay
 		if (delay < 0) {
-			//Disable the Endless functionality and keep the item
+			//Disable the Automatic Endless functionality and keep the item
 			mProgressItem = null;
 		} else {
 			//Delete the progress item with delay
 			mHandler.sendEmptyMessageDelayed(LOAD_MORE_COMPLETE, delay);
 		}
 		//Add the new items or reset the loading status
+		mLoading = false;
 		if (newItems != null && newItems.size() > 0) {
 			if (DEBUG)
-				Log.i(TAG, "onLoadMore performing adding " + newItems.size() + " new Items!");
+				Log.i(TAG, "onLoadMore     performing adding " + newItems.size() + " new Items!");
 			addItems(getItemCount(), newItems);
-			//Reset OnLoadMore delayed
-			mHandler.sendEmptyMessageDelayed(LOAD_MORE_RESET, 200L);
 		} else {
 			noMoreLoad();
 		}
@@ -1544,14 +1549,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Called when no more items are loaded.
 	 */
 	private void noMoreLoad() {
-		if (DEBUG) Log.v(TAG, "onLoadMore noMoreLoad!");
+		if (DEBUG) Log.i(TAG, "onLoadMore     noMoreLoad!");
 		notifyItemChanged(getItemCount() - 1, Payload.NO_MORE_LOAD);
-		//Reset OnLoadMore delayed
-		mHandler.sendEmptyMessageDelayed(LOAD_MORE_RESET, 200L);
-	}
-
-	private void resetOnLoadMore() {
-		mLoading = false;
 	}
 
 	/*--------------------*/
@@ -1853,11 +1852,11 @@ public class FlexibleAdapter<T extends IFlexible>
 						" expanded " + expandable.isExpanded());
 			return 0;
 		}
-//		if (DEBUG && !init) {
-//			Log.v(TAG, "Request to Expand on position=" + position +
-//					" expanded=" + expandable.isExpanded() +
-//					" anyParentSelected=" + parentSelected);
-//		}
+		if (DEBUG && !init) {
+			Log.v(TAG, "Request to Expand on position=" + position +
+					" expanded=" + expandable.isExpanded() +
+					" anyParentSelected=" + parentSelected);
+		}
 		int subItemsCount = 0;
 		if (init || !expandable.isExpanded() &&
 				(!parentSelected || expandable.getExpansionLevel() <= selectedLevel)) {

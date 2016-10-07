@@ -65,7 +65,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createEndlessDatabase(100);//N. of items
+		DatabaseService.getInstance().createEndlessDatabase(1);//N. of items
 		initializeRecyclerView(savedInstanceState);
 
 		//Settings for FlipView
@@ -132,7 +132,6 @@ public class FragmentEndlessScrolling extends AbstractFragment
 			mAdapter.onLoadMoreComplete(null);
 			return;
 		}
-		Log.i(TAG, "onLoadMore invoked!");
 		//Simulating asynchronous call
 		new Handler().postDelayed(new Runnable() {
 			@Override
@@ -140,7 +139,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				final List<AbstractFlexibleItem> newItems = new ArrayList<>();
 
 				//Simulating success/failure
-				int count = new Random().nextInt(5);
+				int count = new Random().nextInt(3);
 				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item);
 				for (int i = 1; i <= count; i++) {
 					if (i % 2 != 0) {
@@ -171,7 +170,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				//Notify user
 				String message = (newItems.size() > 0 ?
 						"Simulated: " + newItems.size() + " new items arrived :-)" :
-						"Simulated: No more items to load :-(");
+						"Simulated: No more items to load :-(\nRefresh to retry.");
 				Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
 			}
 		}, 2500);
