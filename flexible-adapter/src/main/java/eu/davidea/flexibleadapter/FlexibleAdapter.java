@@ -3066,6 +3066,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Sets the new search text.
+	 * <p><b>Note:</b> text is always trimmed and to lowercase.</p>
 	 *
 	 * @param searchText the new text to filter the items
 	 * @since 3.1.0
@@ -3082,7 +3083,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>If the items have highlighted text, those items must be refreshed in order to change the
 	 * text back to normal. This happens systematically when searchText is reduced in length by
 	 * the user.</p>
-	 * The notification is triggered in {@link #animateTo(List)} when new items are not added.
+	 * The notification is triggered in {@link #animateTo(List, Payload)} when new items are not added.
 	 * <p>Default value is {@code false}.</p>
 	 *
 	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)} while filtering,
@@ -3145,8 +3146,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * displayed according to the current filter and at the right positions.</li>
 	 * <li><b>NEW!</b> Expandable items are picked up and displayed if at least a child is
 	 * collected by the current filter.</li>
-	 * <li><b>NEW!</b> Items are animated thanks to {@link #animateTo(List)} BUT a limit of
-	 * {@value mAnimateToLimit} (default) items is set. <b>NOTE:</b> you can change this limit
+	 * <li><b>NEW!</b> Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit
+	 * of {@value mAnimateToLimit} (default) items is set. <b>NOTE:</b> you can change this limit
 	 * by calling {@link #setAnimateToLimit(int)}. Above this limit {@link #notifyDataSetChanged()}
 	 * will be called to improve performance.</li>
 	 * </ol>
@@ -3168,11 +3169,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
 
-		if (DEBUG) Log.i(TAG, "filterItems with searchText=" + mSearchText);
+		if (DEBUG) Log.i(TAG, "filterItems with searchText=\"" + mSearchText + "\"");
 		List<T> filteredItems = new ArrayList<>();
 		filtering = true;//Enable flag: skip adjustPositions!
 
-		if (hasSearchText()) {
+		if (hasSearchText() && hasNewSearchText(mSearchText)) { //skip when text is unchanged
 			int newOriginalPosition = -1;
 			for (T item : unfilteredItems) {
 				if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
@@ -3223,7 +3224,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Animate search results only in case of new SearchText
 		if (hasNewSearchText(mSearchText)) {
 			mOldSearchText = mSearchText;
-			animateTo(filteredItems);
+			animateTo(filteredItems, Payload.FILTER);
 		}
 	}
 
@@ -3372,7 +3373,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1 Created
 	 * <br>5.0.0-b8 Synchronization animation limit
 	 */
-	private synchronized void animateTo(@Nullable List<T> newItems) {
+	private synchronized void animateTo(@Nullable List<T> newItems, Payload payloadChange) {
 		if (newItems == null) newItems = new ArrayList<>();
 		notifications = new ArrayList<>();
 		if (newItems.size() <= mAnimateToLimit) {
@@ -3390,7 +3391,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			notifications.add(new Notification(-1, 0));
 		}
 		//Execute All notifications if filter was Synchronous!
-		if (mFilterAsyncTask == null) executeNotifications();
+		if (mFilterAsyncTask == null) executeNotifications(payloadChange);
 	}
 
 	/**
@@ -3473,7 +3474,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (DEBUG) Log.v(TAG, "calculateMovedItems total move=" + move);
 	}
 
-	private synchronized void executeNotifications() {
+	private synchronized void executeNotifications(Payload payloadChange) {
 		if (DEBUG) Log.i(TAG, "Performing " + notifications.size() + " notifications");
 		mItems = mTempItems;// Update mItems in the UI Thread
 		setAnimate(false);//Disable scroll animation
@@ -3483,7 +3484,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					notifyItemInserted(notification.position);
 					break;
 				case Notification.CHANGE:
-					notifyItemChanged(notification.position, Payload.FILTER);
+					notifyItemChanged(notification.position, payloadChange);
 					break;
 				case Notification.REMOVE:
 					notifyItemRemoved(notification.position);
@@ -4346,7 +4347,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			switch (what) {
 				case UPDATE:
 					if (DEBUG) Log.d(TAG, "doInBackground - started UPDATE");
-					animateTo(newItems);
+					animateTo(newItems, Payload.CHANGE);
 					if (DEBUG) Log.d(TAG, "doInBackground - ended UPDATE");
 					break;
 				case FILTER:
@@ -4360,16 +4361,20 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		@Override
 		protected void onPostExecute(Void result) {
-			//Notify all the changes
-			executeNotifications();
-			//Execute post data
-			switch (what) {
-				case UPDATE:
-					postUpdate(false);
-					break;
-				case FILTER:
-					postFilter();
-					break;
+			if (notifications != null) {
+				//Execute post data
+				switch (what) {
+					case UPDATE:
+						//Notify all the changes
+						executeNotifications(Payload.CHANGE);
+						postUpdate(false);
+						break;
+					case FILTER:
+						//Notify all the changes
+						executeNotifications(Payload.FILTER);
+						postFilter();
+						break;
+				}
 			}
 			mFilterAsyncTask = null;
 		}
