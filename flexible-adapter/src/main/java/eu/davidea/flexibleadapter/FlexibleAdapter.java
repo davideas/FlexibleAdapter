@@ -161,6 +161,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private List<IHeader> mOrphanHeaders;
 	private boolean headersShown = false, headersSticky = false, recursive = false;
 	private StickyHeaderHelper mStickyHeaderHelper;
+	private ViewGroup mStickyContainer;
 
 	/* ViewTypes */
 	protected LayoutInflater mInflater;
@@ -984,7 +985,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	public ViewGroup getStickySectionHeadersHolder() {
-		return (ViewGroup) Utils.scanForActivity(mRecyclerView.getContext()).findViewById(R.id.sticky_header_container);
+		if (mStickyContainer != null) {
+			return mStickyContainer;
+		} else {
+			return (ViewGroup) Utils.scanForActivity(mRecyclerView.getContext()).findViewById(R.id.sticky_header_container);
+		}
 	}
 
 	/**
@@ -1275,6 +1280,11 @@ public class FlexibleAdapter<T extends IFlexible>
 				return true;
 		}
 		return false;
+	}
+
+	public FlexibleAdapter setStickyHeaderContainer(@Nullable ViewGroup stickyContainer) {
+		this.mStickyContainer = stickyContainer;
+		return this;
 	}
 
 	/*---------------------*/
