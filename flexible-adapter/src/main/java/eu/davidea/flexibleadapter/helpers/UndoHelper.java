@@ -16,6 +16,8 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -65,6 +67,7 @@ public class UndoHelper extends Snackbar.Callback {
 	private FlexibleAdapter mAdapter;
 	private OnActionListener mActionListener;
 	private OnUndoListener mUndoListener;
+	private @ColorInt int mActionTextColor = Color.TRANSPARENT;
 
 
 	/**
@@ -107,6 +110,17 @@ public class UndoHelper extends Snackbar.Callback {
 		return this;
 	}
 
+    /**
+     * Sets the text color of the action.
+     *
+     * @param color the color for the action button
+     * @return this object, so it can be chained
+     */
+    public UndoHelper withActionTextColor(@ColorInt int color) {
+        this.mActionTextColor = color;
+        return this;
+    }
+
 	/**
 	 * As {@link #remove(List, View, CharSequence, CharSequence, int)} but with String
 	 * resources instead of CharSequence.
@@ -142,7 +156,6 @@ public class UndoHelper extends Snackbar.Callback {
 		Snackbar snackbar;
 		if (!mAdapter.isPermanentDelete()) {
 			snackbar = Snackbar.make(mainView, message, undoTime + 400)//More time due to the animation
-					.setCallback(this)
 					.setAction(actionText, new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
@@ -150,14 +163,15 @@ public class UndoHelper extends Snackbar.Callback {
 								mUndoListener.onUndoConfirmed(mAction);
 						}
 					});
-			snackbar.show();
-			return snackbar;
 		} else {
-			snackbar = Snackbar.make(mainView, message, undoTime)
-					.setCallback(this);
-			snackbar.show();
-			return snackbar;
+			snackbar = Snackbar.make(mainView, message, undoTime);
 		}
+		if (mActionTextColor != Color.TRANSPARENT) {
+			snackbar.setActionTextColor(mActionTextColor);
+		}
+		snackbar.setCallback(this);
+		snackbar.show();
+		return snackbar;
 	}
 
 	/**

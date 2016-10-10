@@ -2,6 +2,7 @@ package eu.davidea.samples.flexibleadapter;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -711,6 +712,15 @@ public class MainActivity extends AppCompatActivity implements
 		//Here, option 2A) is implemented
 		if (direction == ItemTouchHelper.LEFT) {
 			message.append(getString(R.string.action_archived));
+
+			//Example of UNDO color
+			int actionTextColor = Color.TRANSPARENT;
+			if (Utils.hasMarshmallow()) {
+				actionTextColor = getResources().getColor(R.color.material_color_orange_500, this.getTheme());
+			} else if (Utils.hasLollipop()) {
+				actionTextColor = getResources().getColor(R.color.material_color_orange_500);
+			}
+
 			new UndoHelper(mAdapter, this)
 					.withPayload(null)//You can pass any custom object (in this case Boolean is enough)
 					.withAction(UndoHelper.ACTION_UPDATE, new UndoHelper.SimpleActionListener() {
@@ -722,6 +732,7 @@ public class MainActivity extends AppCompatActivity implements
 							return true;
 						}
 					})
+					.withActionTextColor(actionTextColor)
 					.remove(positions, findViewById(R.id.main_view), message,
 							getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
 
