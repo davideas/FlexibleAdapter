@@ -116,8 +116,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * HashSet and AsyncTask objects, will increase performance in big list
 	 */
-	private Set<T> hashItems;
-	private List<Notification> notifications;
+	private Set<T> mHashItems;
+	private List<Notification> mNotifications;
 	private FilterAsyncTask mFilterAsyncTask;
 
 	/**
@@ -177,7 +177,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private static int mAnimateToLimit = 600;
 
 	/* Expandable flags */
-	private int minCollapsibleLevel = 0, selectedLevel = -1;
+	private int mMinCollapsibleLevel = 0, mSelectedLevel = -1;
 	private boolean scrollOnExpand = false, collapseOnExpand = false,
 			childSelected = false, parentSelected = false;
 
@@ -388,20 +388,20 @@ public class FlexibleAdapter<T extends IFlexible>
 			if ((isExpandable(item) || !hasParent) && !childSelected) {
 				//Allow selection of Parent if no Child has been previously selected
 				parentSelected = true;
-				if (hasParent) selectedLevel = parent.getExpansionLevel();
+				if (hasParent) mSelectedLevel = parent.getExpansionLevel();
 				super.toggleSelection(position);
-			} else if (!parentSelected && hasParent && parent.getExpansionLevel() + 1 == selectedLevel
-					|| selectedLevel == -1) {
+			} else if (!parentSelected && hasParent && parent.getExpansionLevel() + 1 == mSelectedLevel
+					|| mSelectedLevel == -1) {
 				//Allow selection of Child of same level and if no Parent has been previously selected
 				childSelected = true;
-				selectedLevel = parent.getExpansionLevel() + 1;
+				mSelectedLevel = parent.getExpansionLevel() + 1;
 				super.toggleSelection(position);
 			}
 		}
 
 		//Reset flags if necessary, just to be sure
 		if (getSelectedItemCount() == 0) {
-			selectedLevel = -1;
+			mSelectedLevel = -1;
 			parentSelected = childSelected = false;
 		}
 	}
@@ -821,7 +821,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the IHeader item linked to the specified item position
 	 * @since 5.0.0-b6
 	 */
-	//TODO: rename to getSectionByItemPosition?
+	//TODO: rename to getSectionHeaderByPosition?
 	public IHeader getSectionHeader(@IntRange(from = 0) int position) {
 		//Headers are not visible nor sticky
 		if (!headersShown) return null;
@@ -984,12 +984,26 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return ViewGroup layout that will hold the sticky header ItemViews
 	 * @since 5.0.0-b6
 	 */
+	//TODO: Rename the method to getStickyHeaderContainer
 	public ViewGroup getStickySectionHeadersHolder() {
-		if (mStickyContainer != null) {
-			return mStickyContainer;
-		} else {
-			return (ViewGroup) Utils.scanForActivity(mRecyclerView.getContext()).findViewById(R.id.sticky_header_container);
+		if (mStickyContainer == null) {
+			mStickyContainer = (ViewGroup) Utils
+					.scanForActivity(mRecyclerView.getContext())
+					.findViewById(R.id.sticky_header_container);
 		}
+		return mStickyContainer;
+	}
+
+	/**
+	 * Sets a custom {@link ViewGroup} for Sticky Headers when the default can't be used.
+	 * <p>Useful in conjunction with ViewPager.</p>
+	 *
+	 * @param stickyContainer custom container for Sticky Headers
+	 * @since 5.0.0-rc1
+	 */
+	public FlexibleAdapter setStickyHeaderContainer(@Nullable ViewGroup stickyContainer) {
+		this.mStickyContainer = stickyContainer;
+		return this;
 	}
 
 	/**
@@ -1280,11 +1294,6 @@ public class FlexibleAdapter<T extends IFlexible>
 				return true;
 		}
 		return false;
-	}
-
-	public FlexibleAdapter setStickyHeaderContainer(@Nullable ViewGroup stickyContainer) {
-		this.mStickyContainer = stickyContainer;
-		return this;
 	}
 
 	/*---------------------*/
@@ -1649,19 +1658,19 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	public int getMinCollapsibleLevel() {
-		return minCollapsibleLevel;
+		return mMinCollapsibleLevel;
 	}
 
 	/**
 	 * Sets the minimum level which all sub expandable items will be collapsed too.
-	 * <p>Default value is {@link #minCollapsibleLevel} (All levels including 0).</p>
+	 * <p>Default value is {@link #mMinCollapsibleLevel} (All levels including 0).</p>
 	 *
 	 * @param minCollapsibleLevel the minimum level to auto-collapse sub expandable items
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter setMinCollapsibleLevel(int minCollapsibleLevel) {
-		this.minCollapsibleLevel = minCollapsibleLevel;
+		this.mMinCollapsibleLevel = minCollapsibleLevel;
 		return this;
 	}
 
@@ -1869,11 +1878,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 		int subItemsCount = 0;
 		if (init || !expandable.isExpanded() &&
-				(!parentSelected || expandable.getExpansionLevel() <= selectedLevel)) {
+				(!parentSelected || expandable.getExpansionLevel() <= mSelectedLevel)) {
 
 			//Collapse others expandable if configured so Skip when expanding all is requested
 			//Fetch again the new position after collapsing all!!
-			if (collapseOnExpand && !expandAll && collapseAll(minCollapsibleLevel) > 0) {
+			if (collapseOnExpand && !expandAll && collapseAll(mMinCollapsibleLevel) > 0) {
 				position = getGlobalPositionOf(item);
 			}
 
@@ -1909,7 +1918,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Expands all IExpandable items with minimum of level {@link #minCollapsibleLevel}.
+	 * Expands all IExpandable items with minimum of level {@link #mMinCollapsibleLevel}.
 	 *
 	 * @return the number of parent successfully expanded
 	 * @see #expandAll(int)
@@ -1917,7 +1926,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	public int expandAll() {
-		return expandAll(minCollapsibleLevel);
+		return expandAll(mMinCollapsibleLevel);
 	}
 
 	/**
@@ -1963,7 +1972,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		List<T> subItems = getExpandableList(expandable);
 		int subItemsCount = subItems.size(), recursiveCount = 0;
 
-		if (DEBUG && hashItems == null) {
+		if (DEBUG && mHashItems == null) {
 			Log.v(TAG, "Request to Collapse on position=" + position +
 					" expanded=" + expandable.isExpanded() +
 					" hasSubItemsSelected=" + hasSubItemsSelected(position, subItems));
@@ -1975,7 +1984,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Recursive collapse of all sub expandable
 			recursiveCount = recursiveCollapse(position + 1, subItems, expandable.getExpansionLevel());
 			//Use HashSet (will improve the performance when collapseAll)
-			if (hashItems != null) hashItems.removeAll(subItems);
+			if (mHashItems != null) mHashItems.removeAll(subItems);
 			else mItems.removeAll(subItems);
 			subItemsCount = subItems.size();
 			//Save expanded state
@@ -2011,7 +2020,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Collapses all expandable items with the minimum level of {@link #minCollapsibleLevel}.
+	 * Collapses all expandable items with the minimum level of {@link #mMinCollapsibleLevel}.
 	 *
 	 * @return the number of parent successfully collapsed
 	 * @see #collapse(int)
@@ -2020,7 +2029,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	public int collapseAll() {
-		return collapseAll(minCollapsibleLevel);
+		return collapseAll(mMinCollapsibleLevel);
 	}
 
 	/**
@@ -2032,10 +2041,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	public int collapseAll(int level) {
-		hashItems = new LinkedHashSet<>(mItems);
+		mHashItems = new LinkedHashSet<>(mItems);
 		int collapsed = recursiveCollapse(0, mItems, level);
-		mItems = new ArrayList<>(hashItems);
-		hashItems = null;
+		mItems = new ArrayList<>(mHashItems);
+		mHashItems = null;
 		return collapsed;
 	}
 
@@ -3371,7 +3380,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Animate the synchronization between the old list and the new list.
 	 * <p>Used by filter and updateDataSet.</p>
-	 * <b>Note:</b> The animations are skipped in favor of {@code notifyDataSetChanged}
+	 * <b>Note:</b> The animations are skipped in favor of {@link #notifyDataSetChanged()}
 	 * when the number of items reaches the limit. See {@link #setAnimateToLimit(int)}.
 	 * <p><b>Note:</b> In case the animations are performed, unchanged items will be notified if
 	 * {@code notifyChangeOfUnfilteredItems} is set true, and payload will be set as a Boolean.</p>
@@ -3385,7 +3394,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private synchronized void animateTo(@Nullable List<T> newItems, Payload payloadChange) {
 		if (newItems == null) newItems = new ArrayList<>();
-		notifications = new ArrayList<>();
+		mNotifications = new ArrayList<>();
 		if (newItems.size() <= mAnimateToLimit) {
 			if (DEBUG)
 				Log.v(TAG, "Animate changes! oldSize=" + getItemCount() + " newSize=" + newItems.size() + " limit=" + mAnimateToLimit);
@@ -3398,7 +3407,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (DEBUG)
 				Log.v(TAG, "NotifyDataSetChanged! oldSize=" + getItemCount() + " newSize=" + newItems.size() + " limit=" + mAnimateToLimit);
 			mTempItems = newItems;
-			notifications.add(new Notification(-1, 0));
+			mNotifications.add(new Notification(-1, 0));
 		}
 		//Execute All notifications if filter was Synchronous!
 		if (mFilterAsyncTask == null) executeNotifications(payloadChange);
@@ -3411,23 +3420,23 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private void applyAndAnimateRemovals(List<T> from, List<T> newItems) {
 		//Using Hash for performance
-		hashItems = new HashSet<>(newItems);
+		mHashItems = new HashSet<>(newItems);
 		int out = 0;
 		for (int i = from.size() - 1; i >= 0; i--) {
 			if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
 			final T item = from.get(i);
-			if (!hashItems.contains(item) && (!isHeader(item) || (isHeader(item) && headersShown))) {
+			if (!mHashItems.contains(item) && (!isHeader(item) || (isHeader(item) && headersShown))) {
 				//if (DEBUG) Log.v(TAG, "calculateRemovals remove position=" + i + " item=" + item + " searchText=" + mSearchText);
 				from.remove(i);
-				notifications.add(new Notification(i, Notification.REMOVE));
+				mNotifications.add(new Notification(i, Notification.REMOVE));
 				out++;
 			} else if (notifyChangeOfUnfilteredItems) {
 				from.set(i, item);
-				notifications.add(new Notification(i, Notification.CHANGE));
+				mNotifications.add(new Notification(i, Notification.CHANGE));
 				//if (DEBUG) Log.v(TAG, "calculateRemovals   keep position=" + i + " item=" + item + " searchText=" + mSearchText);
 			}
 		}
-		hashItems = null;
+		mHashItems = null;
 		if (DEBUG) Log.v(TAG, "calculateRemovals total out=" + out);
 	}
 
@@ -3438,25 +3447,25 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private void applyAndAnimateAdditions(List<T> from, List<T> newItems) {
 		//Using Hash for performance
-		hashItems = new HashSet<>(from);
+		mHashItems = new HashSet<>(from);
 		int in = 0;
 		for (int i = 0; i < newItems.size(); i++) {
 			if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
 			final T item = newItems.get(i);
-			if (!hashItems.contains(item)) {
+			if (!mHashItems.contains(item)) {
 				//if (DEBUG) Log.v(TAG, "calculateAdditions    add position=" + i + " item=" + item + " searchText=" + mSearchText);
 				if (notifyMoveOfFilteredItems) {
 					//We add always at the end to animate moved items at the missing position
 					from.add(item);
-					notifications.add(new Notification(from.size(), Notification.ADD));
+					mNotifications.add(new Notification(from.size(), Notification.ADD));
 				} else {
 					from.add(i, item);
-					notifications.add(new Notification(i, Notification.ADD));
+					mNotifications.add(new Notification(i, Notification.ADD));
 				}
 				in++;
 			}
 		}
-		hashItems = null;
+		mHashItems = null;
 		if (DEBUG) Log.v(TAG, "calculateAdditions total new=" + in);
 	}
 
@@ -3477,7 +3486,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				T movedItem = from.remove(fromPosition);
 				if (toPosition < from.size()) from.add(toPosition, movedItem);
 				else from.add(movedItem);
-				notifications.add(new Notification(fromPosition, toPosition, Notification.MOVE));
+				mNotifications.add(new Notification(fromPosition, toPosition, Notification.MOVE));
 				move++;
 			}
 		}
@@ -3485,10 +3494,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	private synchronized void executeNotifications(Payload payloadChange) {
-		if (DEBUG) Log.i(TAG, "Performing " + notifications.size() + " notifications");
+		if (DEBUG) Log.i(TAG, "Performing " + mNotifications.size() + " notifications");
 		mItems = mTempItems;// Update mItems in the UI Thread
 		setAnimate(false);//Disable scroll animation
-		for (Notification notification : notifications) {
+		for (Notification notification : mNotifications) {
 			switch (notification.operation) {
 				case Notification.ADD:
 					notifyItemInserted(notification.position);
@@ -3509,7 +3518,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 		}
 		mTempItems = null;
-		notifications = null;
+		mNotifications = null;
 	}
 
 	/*---------------*/
@@ -4033,7 +4042,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Save selection coherence
 			outState.putBoolean(EXTRA_CHILD, this.childSelected);
 			outState.putBoolean(EXTRA_PARENT, this.parentSelected);
-			outState.putInt(EXTRA_LEVEL, this.selectedLevel);
+			outState.putInt(EXTRA_LEVEL, this.mSelectedLevel);
 			//Current filter. Old text is not saved otherwise animateTo() cannot be called
 			outState.putString(EXTRA_SEARCH, this.mSearchText);
 			//Save headers shown status
@@ -4062,7 +4071,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Restore selection coherence
 			this.parentSelected = savedInstanceState.getBoolean(EXTRA_PARENT);
 			this.childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
-			this.selectedLevel = savedInstanceState.getInt(EXTRA_LEVEL);
+			this.mSelectedLevel = savedInstanceState.getInt(EXTRA_LEVEL);
 			//Current filter (old text must not be saved)
 			this.mSearchText = savedInstanceState.getString(EXTRA_SEARCH);
 		}
@@ -4388,7 +4397,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		@Override
 		protected void onPostExecute(Void result) {
-			if (notifications != null) {
+			if (mNotifications != null) {
 				//Execute post data
 				switch (what) {
 					case UPDATE:
@@ -4408,7 +4417,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * @param init true to skip all notifications and instant reset by calling notifyDataSetChanged
+	 * @param init true to skip all notifications and instant refresh the list by calling
+	 *             {@link #notifyDataSetChanged()}
 	 */
 	private void postUpdate(boolean init) {
 		//Show headers and expanded items if Data Set not empty

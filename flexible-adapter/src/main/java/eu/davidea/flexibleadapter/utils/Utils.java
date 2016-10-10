@@ -15,7 +15,6 @@
  */
 package eu.davidea.flexibleadapter.utils;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -35,6 +34,8 @@ import android.text.style.StyleSpan;
 import android.widget.TextView;
 
 import java.util.Locale;
+
+import eu.davidea.flexibleadapter.R;
 
 /**
  * @author Davide Steduto
@@ -107,17 +108,13 @@ public final class Utils {
 	 * @param context  context
 	 * @param defColor value to return if the accentColor cannot be found
 	 */
-	//TODO: Deprecate defColor and use R.attr.colorAccent?
-	@TargetApi(VERSION_CODES.LOLLIPOP)
 	public static int fetchAccentColor(Context context, @ColorInt int defColor) {
 		if (colorAccent == INVALID_COLOR) {
-			if (hasLollipop()) {
-				TypedArray androidAttr = context.getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorAccent});
-				colorAccent = androidAttr.getColor(0, defColor);
-				androidAttr.recycle();
-			} else {
-				colorAccent = defColor;
-			}
+			int attr = R.attr.colorAccent;
+			if (hasLollipop()) attr = android.R.attr.colorAccent;
+			TypedArray androidAttr = context.getTheme().obtainStyledAttributes(new int[]{attr});
+			colorAccent = androidAttr.getColor(0, defColor);
+			androidAttr.recycle();
 		}
 		return colorAccent;
 	}

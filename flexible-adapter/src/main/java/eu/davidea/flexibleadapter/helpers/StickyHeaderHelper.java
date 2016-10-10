@@ -229,7 +229,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		mStickyHolderLayout.addView(view);
 	}
 
-	public void clearHeader() {
+	private void clearHeader() {
 		if (mStickyHeaderViewHolder != null) {
 			if (FlexibleAdapter.DEBUG) Log.d(TAG, "clearHeader");
 			resetHeader(mStickyHeaderViewHolder);

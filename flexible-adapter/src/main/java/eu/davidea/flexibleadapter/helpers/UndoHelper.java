@@ -37,6 +37,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @author Davide Steduto
  * @since 30/04/2016
  */
+@SuppressWarnings("WeakerAccess")
 public class UndoHelper extends Snackbar.Callback {
 
 	/**
@@ -181,15 +182,15 @@ public class UndoHelper extends Snackbar.Callback {
 	public void onDismissed(Snackbar snackbar, int event) {
 		if (mAdapter.isPermanentDelete()) return;
 		switch (event) {
-			case DISMISS_EVENT_ACTION:
-				//We ignore it, action is performed already
-				break;
 			case DISMISS_EVENT_SWIPE:
 			case DISMISS_EVENT_MANUAL:
 			case DISMISS_EVENT_TIMEOUT:
 				if (mUndoListener != null)
 					mUndoListener.onDeleteConfirmed(mAction);
 				mAdapter.emptyBin();
+			case DISMISS_EVENT_CONSECUTIVE:
+			case DISMISS_EVENT_ACTION:
+			default:
 				break;
 		}
 	}
