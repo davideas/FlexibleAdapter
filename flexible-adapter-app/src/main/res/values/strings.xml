@@ -115,10 +115,10 @@ items and higher, due to calculate the correct position for each item to shift. 
 	<string name="horizontal">Horizontal Layout</string>
 	<string name="horizontal_description">Items are disposed in vertical</string>
 
-	<string name="staggered_description">Cards with sticky headers disposed in Staggered Layout, dynamic background, insertion and sorting</string>
+	<string name="staggered_description">Cards with Sticky Headers disposed in Staggered Layout, dynamic background, insertion and sorting</string>
 
 	<string name="viewpager">View Pager</string>
-	<string name="viewpager_description">Example usage in ViewPager layout</string>
+	<string name="viewpager_description">Example usage with Sticky Headers in ViewPager layout</string>
 
 	<string name="dialogs">Dialogs</string>
 	<string name="dialogs_description">Example usage in Dialogs</string>
@@ -152,5 +152,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 <br/>See the License for the specific language governing permissions and
 limitations under the License.
 ]]></string>
+	<string name="title_activity_view_pager">ViewPagerActivity</string>
+	<string name="section_format">Hello World from section: %1$d</string>
 
 </resources>

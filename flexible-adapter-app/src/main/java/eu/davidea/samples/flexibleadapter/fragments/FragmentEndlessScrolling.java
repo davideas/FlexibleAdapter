@@ -94,7 +94,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
+		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items

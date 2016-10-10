@@ -3,6 +3,7 @@ package eu.davidea.samples.flexibleadapter;
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Color;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,6 +13,8 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -344,6 +347,18 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentExpandableSections.newInstance(3);
 		} else if (id == R.id.nav_staggered) {
 			mFragment = FragmentStaggeredLayout.newInstance(2);
+		} else if (id == R.id.nav_viewpager) {
+			Intent intent = new Intent(this, ViewPagerActivity.class);
+			ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeBasic();
+			ActivityCompat.startActivity(this, intent, activityOptionsCompat.toBundle());
+			//Close drawer
+			mRecyclerView.post(new Runnable() {
+				@Override
+				public void run() {
+					mDrawer.closeDrawer(GravityCompat.START);
+				}
+			});
+			return true;
 		} else if (id == R.id.nav_about) {
 			MessageDialog.newInstance(
 					R.drawable.ic_info_grey600_24dp,

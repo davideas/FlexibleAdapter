@@ -116,7 +116,7 @@ public class FragmentSelectionModes extends AbstractFragment
 		}, 1500L);
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
+		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);

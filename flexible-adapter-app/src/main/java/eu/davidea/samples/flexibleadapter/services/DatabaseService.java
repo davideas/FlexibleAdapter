@@ -122,6 +122,10 @@ public class DatabaseService {
 		mItems.add(new OverallItem(R.id.nav_staggered, resources.getString(R.string.staggered_layout))
 				.withDescription(resources.getString(R.string.staggered_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_dashboard_grey600_24dp)));
+
+		mItems.add(new OverallItem(R.id.nav_viewpager, resources.getString(R.string.viewpager))
+				.withDescription(resources.getString(R.string.viewpager_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_view_carousel_grey600_24dp)));
 	}
 
 	/*

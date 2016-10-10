@@ -128,7 +128,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		} else {
 			mFab.setImageResource(R.drawable.ic_settings_white_24dp);
 			mRecyclerView.removeItemDecoration(mDivider);
-			mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
+			mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 					Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		}
 
