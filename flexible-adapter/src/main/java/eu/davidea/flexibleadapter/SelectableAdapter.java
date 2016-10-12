@@ -157,6 +157,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @return the span count
 	 * @since 5.0.0-b7
 	 */
+	//TODO: Deprecated? move to Utils
 	public static int getSpanCount(RecyclerView.LayoutManager layoutManager) {
 		if (layoutManager instanceof GridLayoutManager) {
 			return ((GridLayoutManager) layoutManager).getSpanCount();
@@ -180,10 +181,19 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 2.0.0
 	 */
 	public void setMode(@Mode int mode) {
+		if (DEBUG) Log.i(TAG, getModeName(mode) + " enabled");
 		if (mMode == MODE_SINGLE && mode == MODE_IDLE)
 			clearSelection();
 		this.mMode = mode;
 		mLastItemInActionMode = (mode == MODE_IDLE);
+	}
+
+	private String getModeName(int mode) {
+		switch (mode) {
+			case 1: return "MODE_SINGLE";
+			case 2: return "MODE_MULTI";
+			default: return "MODE_IDLE";
+		}
 	}
 
 	/**

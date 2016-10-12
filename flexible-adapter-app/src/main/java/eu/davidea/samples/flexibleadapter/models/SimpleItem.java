@@ -87,7 +87,7 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 		int defColorAccent = context.getResources().getColor(R.color.colorAccent_light);
 
 		if (adapter.isExpandable(this) && payloads.size() > 0) {
-			Log.i(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
+			Log.d(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
 			if (adapter.hasSearchText()) {
 				Utils.highlightText(holder.itemView.getContext(), holder.mSubtitle,
 						getSubtitle(), adapter.getSearchText(), defColorAccent);

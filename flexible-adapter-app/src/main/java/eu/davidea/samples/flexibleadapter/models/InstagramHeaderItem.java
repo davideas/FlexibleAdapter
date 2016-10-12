@@ -73,7 +73,7 @@ public class InstagramHeaderItem extends AbstractHeaderItem<InstagramHeaderItem.
 	@SuppressWarnings("unchecked")
 	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
-			Log.i(this.getClass().getSimpleName(), "InstagramHeaderItem Payload " + payloads);
+			Log.d(this.getClass().getSimpleName(), "InstagramHeaderItem Payload " + payloads);
 		} else {
 			holder.mTitle.setText(getTitle());
 		}

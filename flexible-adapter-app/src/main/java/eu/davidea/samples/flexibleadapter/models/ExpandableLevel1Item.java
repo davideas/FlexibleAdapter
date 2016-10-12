@@ -97,7 +97,7 @@ public class ExpandableLevel1Item
 	@Override
 	public void bindViewHolder(final FlexibleAdapter adapter, SimpleItem.ParentViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
-			Log.i(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads);
+			Log.d(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads);
 		} else {
 			holder.mTitle.setText(getTitle());
 		}

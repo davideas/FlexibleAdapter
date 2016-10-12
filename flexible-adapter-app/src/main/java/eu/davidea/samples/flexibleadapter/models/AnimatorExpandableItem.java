@@ -89,7 +89,7 @@ public class AnimatorExpandableItem
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, AnimatorExpandableViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
-			Log.i(this.getClass().getSimpleName(), "AnimatorExpandableItem Payload " + payloads);
+			Log.d(this.getClass().getSimpleName(), "AnimatorExpandableItem Payload " + payloads);
 		} else {
 			holder.mTitle.setText(getTitle());
 		}

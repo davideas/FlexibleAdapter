@@ -29,7 +29,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	private AbstractFlexibleItem mUseCaseItem;
 
 	public ExampleAdapter(List<AbstractFlexibleItem> items, Object listeners) {
-		//true = Items implement hashCode() and have stableIds!
+		//stableIds ? true = Items implement hashCode() so they can have stableIds!
 		super(items, listeners, true);
 	}
 

@@ -36,10 +36,6 @@ public class AnimatorHelper {
 
 	protected static final String TAG = AnimatorHelper.class.getSimpleName();
 
-//	private enum AnimatorEnum {
-//		ALPHA, SLIDE_IN_LEFT, SLIDE_IN_RIGHT, SLIDE_IN_BOTTOM, SLIDE_IN_TOP, SCALE
-//	}
-
 	/*-----------*/
 	/* ANIMATORS */
 	/*-----------*/

@@ -44,7 +44,7 @@ public class ItemTouchHelperCallback extends Callback {
 	protected static final float ALPHA_FULL = 1.0f;
 
 	protected AdapterCallback mItemTouchCallback;
-	protected boolean mIsLongPressDragEnabled = false, mIsSwipeEnabled = false;
+	protected boolean longPressDragEnabled = false, handleDragEnabled = false, swipeEnabled = false;
 	protected long mSwipeAnimationDuration = 300L, mDragAnimationDuration = 400L;
 	protected float mSwipeThreshold = 0.5f, mMoveThreshold = 0.5f;
 	protected int mSwipeFlags = -1;
@@ -60,16 +60,17 @@ public class ItemTouchHelperCallback extends Callback {
 	/*-----------------------*/
 	/* CONFIGURATION SETTERS */
 	/*-----------------------*/
+
 	/* DRAG */
 
 	/**
-	 * Enable / disable the drag operation with long press on the ViewHolder.
+	 * Enable / Disable the drag operation with long press on the ViewHolder.
 	 * <p>Default value is {@code false}.</p>
 	 *
 	 * @param isLongPressDragEnabled true to enable, false to disable
 	 */
 	public void setLongPressDragEnabled(boolean isLongPressDragEnabled) {
-		this.mIsLongPressDragEnabled = isLongPressDragEnabled;
+		this.longPressDragEnabled = isLongPressDragEnabled;
 	}
 
 	/**
@@ -77,7 +78,25 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public boolean isLongPressDragEnabled() {
-		return mIsLongPressDragEnabled;
+		return longPressDragEnabled;
+	}
+
+	/**
+	 * @return true if handle drag is enabled, false otherwise
+	 */
+	public boolean isHandleDragEnabled() {
+		return handleDragEnabled;
+	}
+
+	/**
+	 * Enable / Disable the drag of the itemView with a handle view.
+	 * <p>Default value is {@code false}.</p>
+	 *
+	 * @param handleDragEnabled true to activate, false to disable
+	 * @since 5.0.0-b1
+	 */
+	public void setHandleDragEnabled(boolean handleDragEnabled) {
+		this.handleDragEnabled = handleDragEnabled;
 	}
 
 	/**
@@ -117,7 +136,7 @@ public class ItemTouchHelperCallback extends Callback {
 	 * @param isSwipeEnabled true to enable swipe, false to disable
 	 */
 	public void setSwipeEnabled(boolean isSwipeEnabled) {
-		this.mIsSwipeEnabled = isSwipeEnabled;
+		this.swipeEnabled = isSwipeEnabled;
 	}
 
 	/**
@@ -125,7 +144,7 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public boolean isItemViewSwipeEnabled() {
-		return mIsSwipeEnabled;
+		return swipeEnabled;
 	}
 
 	/**

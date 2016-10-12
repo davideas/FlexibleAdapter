@@ -88,7 +88,7 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 	@SuppressWarnings("unchecked")
 	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
-			Log.i(this.getClass().getSimpleName(), "HeaderItem " + id + " Payload " + payloads);
+			Log.d(this.getClass().getSimpleName(), "HeaderItem " + id + " Payload " + payloads);
 		} else {
 			holder.mTitle.setText(getTitle());
 		}

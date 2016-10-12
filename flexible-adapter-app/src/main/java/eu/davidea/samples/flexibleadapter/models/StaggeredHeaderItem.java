@@ -62,7 +62,7 @@ public class StaggeredHeaderItem extends AbstractHeaderItem<StaggeredHeaderItem.
 	@SuppressWarnings("unchecked")
 	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
-			Log.i(this.getClass().getSimpleName(), "StaggeredHeaderItem Payload " + payloads);
+			Log.d(this.getClass().getSimpleName(), "StaggeredHeaderItem Payload " + payloads);
 		} else {
 			String title = this.title + " (" + adapter.getSectionItems(this).size() + ")";
 			holder.title.setText(title);

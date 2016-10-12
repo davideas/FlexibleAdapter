@@ -40,7 +40,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  */
 public class StickyHeaderHelper extends OnScrollListener {
 
-	private static final String TAG = FlexibleAdapter.class.getSimpleName();
+	private static final String TAG = StickyHeaderHelper.class.getSimpleName();
 
 	private FlexibleAdapter mAdapter;
 	private RecyclerView mRecyclerView;

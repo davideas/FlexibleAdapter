@@ -79,7 +79,6 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setAutoScrollOnExpand(true)
-				.setHandleDragEnabled(true)
 				//.setAnimateToLimit(Integer.MAX_VALUE)//Use the default value
 				.setNotifyMoveOfFilteredItems(true)//When true, filtering on big list is very slow, not in this case!
 				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
@@ -97,9 +96,10 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setLongPressDragEnabled(true);//Enable long press to drag items
-		mAdapter.setSwipeEnabled(true);//Enable swipe items
-		mAdapter.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
+		mAdapter.setLongPressDragEnabled(true)//Enable long press to drag items
+				.setHandleDragEnabled(true)//Enable drag using handle view
+				.setSwipeEnabled(true)//Enable swipe items
+				.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
@@ -107,7 +107,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 		//EndlessScrollListener - OnLoadMore (v5.0.0)
 		mAdapter.setEndlessScrollListener(this, new ProgressItem());
-		mAdapter.setEndlessScrollThreshold(1);//Default=1
+		//mAdapter.setEndlessScrollThreshold(1);//Default=1
 
 		//Add sample HeaderView items on the top (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);

@@ -21,7 +21,6 @@ import android.animation.ObjectAnimator;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -58,7 +57,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class AnimatorAdapter extends SelectableAdapter {
 
-	protected static final String TAG = AnimatorAdapter.class.getSimpleName();
+	private static final String TAG = AnimatorAdapter.class.getSimpleName();
 
 	private Interpolator mInterpolator = new LinearInterpolator();
 	private AnimatorAdapterDataObserver mAnimatorNotifierObserver;
@@ -104,9 +103,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 *
 	 * @since 5.0.0-b1
 	 */
-	public AnimatorAdapter(boolean stableIds) {
+	AnimatorAdapter(boolean stableIds) {
 		super();
-		if (stableIds && DEBUG) Log.i(TAG, "Setting StableIds");
+		if (stableIds && DEBUG) Log.i("FlexibleAdapter", "initialize with StableIds");
 		setHasStableIds(stableIds);
 
 		//Get notified when an item is changed (should skip animation)
@@ -136,6 +135,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationInitialDelay(long initialDelay) {
+		if (DEBUG) Log.i(TAG, "Set animationInitialDelay=" + initialDelay);
 		mInitialDelay = initialDelay;
 		return this;
 	}
@@ -150,6 +150,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationDelay(@IntRange(from = 0) long delay) {
+		if (DEBUG) Log.i(TAG, "Set animationDelay=" + delay);
 		mStepDelay = delay;
 		return this;
 	}
@@ -165,6 +166,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * since 5.0.0-b8
 	 */
 	public AnimatorAdapter setAnimationEntryStep(boolean entryStep) {
+		if (DEBUG) Log.i(TAG, "Set animationEntryStep=" + entryStep);
 		this.mEntryStep = entryStep;
 		return this;
 	}
@@ -178,6 +180,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationDuration(@IntRange(from = 1) long duration) {
+		if (DEBUG) Log.i(TAG, "Set animationDuration=" + duration);
 		mDuration = duration;
 		return this;
 	}
@@ -190,6 +193,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @return this AnimatorAdapter, so the call can be chained
 	 */
 	public AnimatorAdapter setAnimationInterpolator(@NonNull Interpolator interpolator) {
+		if (DEBUG) Log.i(TAG, "Set animationInterpolator=" + interpolator.getClass().getSimpleName());
 		mInterpolator = interpolator;
 		return this;
 	}
@@ -202,6 +206,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationStartPosition(@IntRange(from = 0) int start) {
+		if (DEBUG) Log.i(TAG, "Set animationStartPosition=" + start);
 		mLastAnimatedPosition = start;
 		return this;
 	}
@@ -221,6 +226,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationOnScrolling(boolean enabled) {
+		if (DEBUG) Log.i(TAG, "Set animationOnScrolling=" + enabled);
 		if (enabled) this.onlyEntryAnimation = false;
 		shouldAnimate = enabled;
 		return this;
@@ -241,6 +247,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationOnReverseScrolling(boolean enabled) {
+		if (DEBUG) Log.i(TAG, "Set animationOnReverseScrolling=" + enabled);
 		isReverseEnabled = enabled;
 		return this;
 	}
@@ -266,6 +273,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b8
 	 */
 	public AnimatorAdapter setOnlyEntryAnimation(boolean enabled) {
+		if (DEBUG) Log.i(TAG, "Set onlyEntryAnimation=" + enabled);
 		if (enabled) this.shouldAnimate = true;
 		this.onlyEntryAnimation = enabled;
 		return this;
@@ -295,18 +303,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/*--------------*/
 	/* MAIN METHODS */
 	/*--------------*/
-
-	@Override
-	@CallSuper
-	public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
-		int position = holder.getAdapterPosition();
-//		if (DEBUG) {
-//			Log.v(TAG, "onViewAttached Holder=" + holder.getClass().getSimpleName() +
-//					" position=" + position +
-//					" itemId=" + holder.getItemId());
-//		}
-		animateView(holder, position);
-	}
 
 	/**
 	 * Build your custom list of {@link Animator} to apply on the ItemView.<br/>
@@ -339,9 +335,14 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		if (animator != null) animator.end();
 	}
 
+	/**
+	 * Performs checks to scroll animate the itemView and in case, it animates the view.
+	 *
+	 * @param holder   the ViewHolder just bound
+	 * @param position the current item position
+	 */
+	//FIXME: first completed visible item on rotation gets high delay
 	protected void animateView(final RecyclerView.ViewHolder holder, final int position) {
-		//FIXME: first completed visible item on rotation gets high delay
-
 //		if (DEBUG)
 //			Log.v(TAG, "shouldAnimate=" + shouldAnimate
 //					+ " isFastScroll=" + isFastScroll
@@ -376,7 +377,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			}
 			set.start();
 			mAnimators.put(hashCode, set);
-			if (DEBUG) Log.d(TAG, "Started Animation on position " + position);
+			if (DEBUG) Log.v(TAG, "animateView    Scroll animation on position " + position);
 
 			//Animate only during initial loading?
 			if (onlyEntryAnimation && position >= mMaxChildViews) {
@@ -418,7 +419,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			//Add Alpha animator
 			ViewCompat.setAlpha(itemView, 0);
 			animators.add(ObjectAnimator.ofFloat(itemView, "alpha", 0f, 1f));
-			if (DEBUG) Log.d(TAG, "Started Deprecated Animation on position " + position);
+			Log.w(TAG, "Started Deprecated Animation on position " + position);
 
 			//Execute the animations
 			AnimatorSet set = new AnimatorSet();
@@ -671,13 +672,13 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/**
 	 * Observer Class responsible to skip animation when items are notified to avoid
 	 * double animation with {@link android.support.v7.widget.RecyclerView.ItemAnimator}.
-	 * <p>Also, some items at the edge, are rebounded by Android and should not be animated.</p>
+	 * <p>Also, some items at the edge, are rebound by Android and should not be animated.</p>
 	 */
 	private class AnimatorAdapterDataObserver extends RecyclerView.AdapterDataObserver {
 		private boolean notified;
 		private Handler mAnimatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 			public boolean handleMessage(Message message) {
-				if (DEBUG) Log.v(TAG, "Clear notified for binding Animations");
+				if (DEBUG) Log.v(TAG, "Clear notified for scrolling Animations");
 				notified = false;
 				return true;
 			}
