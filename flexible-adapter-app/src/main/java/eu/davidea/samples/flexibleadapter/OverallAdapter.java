@@ -98,7 +98,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 * METHOD A - NEW! Via Model objects. In this case you don't need to implement this method!
 	 * METHOD B - You override and implement this method as you prefer (don't call super).
 	 *
-	 * Using Method B, some calls need to be called by the user, see bottom of this method!
+	 * Using Method B, some methods need to be called by the user, see bottom of this method!
 	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payload) {
