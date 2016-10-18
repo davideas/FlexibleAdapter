@@ -113,7 +113,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//Add sample HeaderView items on the top (not belongs to the library)
-		//mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.showLayoutInfo(savedInstanceState == null);
 	}
 

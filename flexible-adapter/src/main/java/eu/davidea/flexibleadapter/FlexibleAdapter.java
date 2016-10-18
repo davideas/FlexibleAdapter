@@ -223,12 +223,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param items     items to display
 	 * @param listeners can be an instance of:
 	 *                  <ul>
-	 *                  <li>{@link OnUpdateListener}
 	 *                  <li>{@link OnItemClickListener}
 	 *                  <li>{@link OnItemLongClickListener}
 	 *                  <li>{@link OnItemMoveListener}
 	 *                  <li>{@link OnItemSwipeListener}
 	 *                  <li>{@link OnStickyHeaderChangeListener}
+	 *                  <li>{@link OnUpdateListener}
 	 *                  </ul>
 	 * @since 5.0.0-b1
 	 */
@@ -269,8 +269,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
+	//TODO: Rename to addListener?
+	@CallSuper
 	public FlexibleAdapter initializeListeners(@Nullable Object listener) {
-		if (DEBUG) Log.i(TAG, "Initialize Class " + listener.getClass().getSimpleName() + " as:");
+		if (DEBUG && listener != null) {
+			Log.i(TAG, "Initialize Class " + listener.getClass().getSimpleName() + " as:");
+		}
 		if (listener instanceof OnItemClickListener) {
 			if (DEBUG) Log.i(TAG, "- OnItemClickListener");
 			mItemClickListener = (OnItemClickListener) listener;
@@ -499,6 +503,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param animate true to animate the changes, false for a quick refresh
 	 * @see #updateDataSet(List)
 	 * @see #setAnimateToLimit(int)
+	 * @see #onPostUpdate()
 	 * @since 5.0.0-b7 Created
 	 * <br/>5.0.0-b8 Synchronization animations limit
 	 */
@@ -3165,6 +3170,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param unfilteredItems the list to filter
 	 * @param delay           any non-negative delay
 	 * @see #filterObject(IFlexible, String)
+	 * @see #onPostFilter()
 	 * @see #setAnimateToLimit(int)
 	 * @since 5.0.0-b1
 	 * <br/>5.0.0-b8 Synchronization animations limit + AsyncFilter
@@ -3182,6 +3188,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * {@link #setSearchText(String)}.</p>
 	 * <b>Important notes:</b>
 	 * <ol>
+	 * <li><b>NEW!</b> The Filter is <u>always</u> executed in background, asynchronously.
+	 * The method {@link #onPostFilter()} is called after the filter task is completed.</li>
 	 * <li>This method calls {@link #filterObject(IFlexible, String)}.</li>
 	 * <li>If search text is empty or null, the provided list is the current list.</li>
 	 * <li>Any pending deleted items are always filtered out, but if restored, they will be
@@ -3189,13 +3197,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <li><b>NEW!</b> Expandable items are picked up and displayed if at least a child is
 	 * collected by the current filter.</li>
 	 * <li><b>NEW!</b> Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit
-	 * of {@value mAnimateToLimit} (default) items is set. <b>NOTE:</b> you can change this limit
+	 * of {@value mAnimateToLimit} (default) items is set. <b>NOTE:</b> You can change this limit
 	 * by calling {@link #setAnimateToLimit(int)}. Above this limit {@link #notifyDataSetChanged()}
 	 * will be called to improve performance.</li>
 	 * </ol>
 	 *
 	 * @param unfilteredItems the list to filter
 	 * @see #filterObject(IFlexible, String)
+	 * @see #onPostFilter()
 	 * @see #setAnimateToLimit(int)
 	 * @since 4.1.0 Created
 	 * <br/>5.0.0-b1 Expandable + Child filtering
@@ -4463,10 +4472,22 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (DEBUG) Log.w(TAG, "updateDataSet with notifyDataSetChanged!");
 			notifyDataSetChanged();
 		}
+		// Perform user code
+		onPostUpdate();
 		//Update empty view
 		if (mUpdateListener != null) {
 			mUpdateListener.onUpdateEmptyView(getItemCount());
 		}
+	}
+
+	/**
+	 * This method is called after the execution of Async Update and before the call to the
+	 * {@link OnUpdateListener#onUpdateEmptyView(int)}.
+	 *
+	 * @see #updateDataSet(List, boolean)
+	 */
+	protected void onPostUpdate() {
+		//Dedicated for user implementation
 	}
 
 	private void postFilter() {
@@ -4474,9 +4495,21 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (headersShown && !hasSearchText()) {
 			showAllHeadersWithReset(false);
 		}
+		//Perform user code
+		onPostFilter();
 		//Call listener to update EmptyView, assuming the filter always made a change
 		if (mUpdateListener != null)
 			mUpdateListener.onUpdateEmptyView(getItemCount());
+	}
+
+	/**
+	 * This method is called after the execution of Async Filter and before the call to the
+	 * {@link OnUpdateListener#onUpdateEmptyView(int)}.
+	 *
+	 * @see #filterItems(List)
+	 */
+	protected void onPostFilter() {
+		//Dedicated for user implementation
 	}
 
 }

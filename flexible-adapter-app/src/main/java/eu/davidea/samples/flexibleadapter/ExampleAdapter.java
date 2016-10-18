@@ -1,6 +1,5 @@
 package eu.davidea.samples.flexibleadapter;
 
-import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 
@@ -42,8 +41,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		//Watch out! The original list must a copy
 		super.updateDataSet(items, animate);
 
-		//Add example view
-		//showLayoutInfo(true);
+		//onPostUpdate() will be automatically called at the end of the Asynchronous update process.
+		// Manipulate the list inside that method only or you won't see the changes.
 	}
 
 	/*
@@ -65,7 +64,10 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			} else {
 				item.setTitle(mRecyclerView.getContext().getString(R.string.linear_layout));
 			}
-			item.setSubtitle(mRecyclerView.getContext().getString(R.string.columns, getSpanCount(mRecyclerView.getLayoutManager())));
+			item.setSubtitle(mRecyclerView.getContext().getString(
+					R.string.columns,
+					String.valueOf(getSpanCount(mRecyclerView.getLayoutManager())))
+			);
 			addItemWithDelay((getItem(0) instanceof ULSItem ? 1 : 0), item, 0L,
 					(!(getItem(0) instanceof ULSItem) && scrollToPosition));
 			removeItemWithDelay(item, 4000L, true);
@@ -89,10 +91,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	}
 
 	@Override
-	public void filterItems(@NonNull List<AbstractFlexibleItem> unfilteredItems) {
-		super.filterItems(unfilteredItems);
+	protected void onPostFilter() {
 		addUserLearnedSelection(false);
-		showLayoutInfo(false);
 	}
 
 	/**

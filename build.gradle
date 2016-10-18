@@ -24,7 +24,7 @@ ext {
 	//Support and Build tools version
 	minSdk = 14
 	targetSdk = 24
-	buildTools = "24.0.2"
+	buildTools = "24.0.3"
 	supportLib = "24.2.1"
 
 	//Support Libraries dependencies
@@ -49,7 +49,7 @@ def getDate() {
 	return date.format('yyyy.MM.dd')
 }
 
-//Avoid Javadoc Lint failures when using Java8
+//Avoid JavaDoc Lint failures when using Java8
 if (JavaVersion.current().isJava8Compatible()) {
 	allprojects {
 		tasks.withType(Javadoc) {
