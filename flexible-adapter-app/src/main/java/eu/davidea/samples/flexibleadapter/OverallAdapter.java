@@ -97,6 +97,8 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	/**
 	 * METHOD A - NEW! Via Model objects. In this case you don't need to implement this method!
 	 * METHOD B - You override and implement this method as you prefer (don't call super).
+	 *
+	 * Using Method B, some calls need to be called by the user, see bottom of this method!
 	 */
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payload) {
@@ -132,6 +134,14 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			if (item.getIcon() != null) {
 				vHolder.mIcon.setImageDrawable(item.getIcon());
 			}
+
+			// IMPORTANT!!!
+			// With method B, animateView() needs to be called by the user!
+			// With method A, the call is handled by the Adapter
+			animateView(holder, position);
+			// Same concept for EndlessScrolling and View activation:
+			// - onLoadMore(position);
+			// - holder.itemView.setActivated(isSelected(position));
 		}
 	}
 
