@@ -2,8 +2,8 @@ package eu.davidea.samples.flexibleadapter;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.graphics.Color;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -61,12 +61,13 @@ import eu.davidea.samples.flexibleadapter.fragments.FragmentEndlessScrolling;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableMultiLevel;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableSections;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentHeadersSections;
+import eu.davidea.samples.flexibleadapter.fragments.FragmentHolderSections;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentInstagramHeaders;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentOverall;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentSelectionModes;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentStaggeredLayout;
 import eu.davidea.samples.flexibleadapter.fragments.OnFragmentInteractionListener;
-import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
+import eu.davidea.samples.flexibleadapter.models.AbstractItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableItem;
 import eu.davidea.samples.flexibleadapter.models.HeaderItem;
 import eu.davidea.samples.flexibleadapter.models.OverallItem;
@@ -347,6 +348,8 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentExpandableSections.newInstance(3);
 		} else if (id == R.id.nav_staggered) {
 			mFragment = FragmentStaggeredLayout.newInstance(2);
+		} else if (id == R.id.nav_model_holders) {
+			mFragment = FragmentHolderSections.newInstance();
 		} else if (id == R.id.nav_viewpager) {
 			Intent intent = new Intent(this, ViewPagerActivity.class);
 			ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeBasic();
@@ -637,8 +640,8 @@ public class MainActivity extends AppCompatActivity implements
 	public void onTitleModified(int position, String newTitle) {
 		AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
 		assert abstractItem != null;
-		if (abstractItem instanceof AbstractModelItem) {
-			AbstractModelItem exampleItem = (AbstractModelItem) abstractItem;
+		if (abstractItem instanceof AbstractItem) {
+			AbstractItem exampleItem = (AbstractItem) abstractItem;
 			exampleItem.setTitle(newTitle);
 		} else if (abstractItem instanceof HeaderItem) {
 			HeaderItem headerItem = (HeaderItem) abstractItem;
@@ -783,7 +786,8 @@ public class MainActivity extends AppCompatActivity implements
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
 		View emptyView = findViewById(R.id.empty_view);
 		TextView emptyText = (TextView) findViewById(R.id.empty_text);
-		emptyText.setText(getString(R.string.no_items));
+		if (emptyText != null)
+			emptyText.setText(getString(R.string.no_items));
 		if (size > 0) {
 			fastScroller.setVisibility(View.VISIBLE);
 			mRefreshHandler.removeMessages(2);
@@ -1028,8 +1032,8 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private String extractTitleFrom(IFlexible flexibleItem) {
-		if (flexibleItem instanceof AbstractModelItem) {
-			AbstractModelItem exampleItem = (AbstractModelItem) flexibleItem;
+		if (flexibleItem instanceof AbstractItem) {
+			AbstractItem exampleItem = (AbstractItem) flexibleItem;
 			String title = exampleItem.getTitle();
 			if (exampleItem instanceof ExpandableItem) {
 				ExpandableItem expandableItem = (ExpandableItem) flexibleItem;

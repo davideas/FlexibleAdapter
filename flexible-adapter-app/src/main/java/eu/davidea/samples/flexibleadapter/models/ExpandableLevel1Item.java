@@ -17,7 +17,7 @@ import eu.davidea.flexibleadapter.items.IExpandable;
  * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
  */
 public class ExpandableLevel1Item
-		extends AbstractModelItem<SimpleItem.ParentViewHolder>
+		extends AbstractItem<SimpleItem.ParentViewHolder>
 		implements IExpandable<SimpleItem.ParentViewHolder, SubItem> {
 
 	private static final long serialVersionUID = -1882711111814491060L;

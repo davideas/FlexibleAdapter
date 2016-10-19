@@ -25,7 +25,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SubItem extends AbstractModelItem<SubItem.ChildViewHolder>
+public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
 		implements ISectionable<SubItem.ChildViewHolder, IHeader>, IFilterable {
 
 	private static final long serialVersionUID = 2519281529221244210L;

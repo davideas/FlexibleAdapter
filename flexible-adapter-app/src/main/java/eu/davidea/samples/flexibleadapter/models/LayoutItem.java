@@ -24,7 +24,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).</p>
  */
-public class LayoutItem extends AbstractModelItem<LayoutItem.ExampleViewHolder> {
+public class LayoutItem extends AbstractItem<LayoutItem.ExampleViewHolder> {
 
 	private static final long serialVersionUID = -5041296095060813327L;
 

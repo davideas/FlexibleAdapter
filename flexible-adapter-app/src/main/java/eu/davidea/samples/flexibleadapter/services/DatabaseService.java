@@ -17,7 +17,7 @@ import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
+import eu.davidea.samples.flexibleadapter.models.AbstractItem;
 import eu.davidea.samples.flexibleadapter.models.AnimatorExpandableItem;
 import eu.davidea.samples.flexibleadapter.models.AnimatorSubItem;
 import eu.davidea.samples.flexibleadapter.models.ConfigurationItem;
@@ -25,9 +25,13 @@ import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableItem;
 import eu.davidea.samples.flexibleadapter.models.ExpandableLevel0Item;
 import eu.davidea.samples.flexibleadapter.models.ExpandableLevel1Item;
+import eu.davidea.samples.flexibleadapter.models.HeaderHolder;
 import eu.davidea.samples.flexibleadapter.models.HeaderItem;
+import eu.davidea.samples.flexibleadapter.models.HeaderModel;
 import eu.davidea.samples.flexibleadapter.models.InstagramHeaderItem;
 import eu.davidea.samples.flexibleadapter.models.InstagramItem;
+import eu.davidea.samples.flexibleadapter.models.ItemHolder;
+import eu.davidea.samples.flexibleadapter.models.ItemModel;
 import eu.davidea.samples.flexibleadapter.models.OverallItem;
 import eu.davidea.samples.flexibleadapter.models.SimpleItem;
 import eu.davidea.samples.flexibleadapter.models.StaggeredHeaderItem;
@@ -116,8 +120,7 @@ public class DatabaseService {
 
 		mItems.add(new OverallItem(R.id.nav_model_holders, resources.getString(R.string.model_holders))
 				.withDescription(resources.getString(R.string.model_holders_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_select_inverse_grey600_24dp))
-				.withEnabled(false));
+				.withIcon(resources.getDrawable(R.drawable.ic_select_inverse_grey600_24dp)));
 
 		mItems.add(new OverallItem(R.id.nav_staggered, resources.getString(R.string.staggered_layout))
 				.withDescription(resources.getString(R.string.staggered_description))
@@ -204,6 +207,21 @@ public class DatabaseService {
 		for (int i = 0; i < size; i++) {
 			header = i % Math.round(size / headers) == 0 ? newHeader(++lastHeaderId) : header;
 			mItems.add(newSimpleItem(i + 1, header));
+		}
+	}
+
+	/*
+	 * List of Holder Items and Header. Only Holder Simple Items will be
+	 * added to the list. IHolder items hold the model data inside.
+	 */
+	public void createHolderSectionsDatabase(int size, int headers) {
+		databaseType = DatabaseType.MODEL_HOLDERS;
+		HeaderHolder header = null;
+		mItems.clear();
+		int lastHeaderId = 0;
+		for (int i = 0; i < size; i++) {
+			header = i % Math.round(size / headers) == 0 ? newHeaderHolder(++lastHeaderId) : header;
+			mItems.add(newItemHolder(i + 1, header));
 		}
 	}
 
@@ -391,6 +409,19 @@ public class DatabaseService {
 		return new StaggeredItem(i, header);
 	}
 
+	private HeaderHolder newHeaderHolder(int i) {
+		HeaderModel model = new HeaderModel("H" + i);
+		model.setTitle("Header " + i);
+		return new HeaderHolder(model);
+	}
+
+	private ItemHolder newItemHolder(int i, HeaderHolder header) {
+		ItemModel model = new ItemModel("I" + i);
+		model.setTitle("Holder Item " + i);
+		model.setSubtitle("Subtitle " + i);
+		return new ItemHolder(model, header);
+	}
+
 	/*-----------------------*/
 	/* MAIN DATABASE METHODS */
 	/*-----------------------*/
@@ -428,7 +459,7 @@ public class DatabaseService {
 		mItems.addAll(newItems);
 	}
 
-	public void addItem(int position, AbstractModelItem item) {
+	public void addItem(int position, AbstractItem item) {
 		if (position < mItems.size())
 			mItems.add(position, item);
 		else

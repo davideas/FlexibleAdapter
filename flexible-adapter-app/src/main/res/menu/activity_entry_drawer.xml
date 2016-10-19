@@ -42,7 +42,6 @@
 			android:title="@string/instagram_headers"/>
 		<item
 			android:id="@+id/nav_model_holders"
-			android:enabled="false"
 			android:icon="@drawable/ic_select_inverse_grey600_24dp"
 			android:title="@string/model_holders"/>
 		<item

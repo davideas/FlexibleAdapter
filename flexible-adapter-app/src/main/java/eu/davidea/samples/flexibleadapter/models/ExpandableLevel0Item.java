@@ -26,7 +26,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
  */
 public class ExpandableLevel0Item
-		extends AbstractModelItem<L0ViewHolder>
+		extends AbstractItem<L0ViewHolder>
 		implements IExpandable<L0ViewHolder, ExpandableLevel1Item>, IHeader<L0ViewHolder> {
 
 	private static final long serialVersionUID = -1882711111814491060L;

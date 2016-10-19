@@ -31,7 +31,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
+public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 		implements ISectionable<SimpleItem.ParentViewHolder, HeaderItem>, IFilterable, Serializable {
 
 	private static final long serialVersionUID = -6882745111884490060L;
@@ -157,9 +157,11 @@ public class SimpleItem extends AbstractModelItem<SimpleItem.ParentViewHolder>
 			this.mFlipView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					mAdapter.mItemLongClickListener.onItemLongClick(getAdapterPosition());
-					Toast.makeText(mContext, "ImageClick on " + mTitle.getText() + " position " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
-					toggleActivation();
+					if (mAdapter.mItemLongClickListener != null) {
+						mAdapter.mItemLongClickListener.onItemLongClick(getAdapterPosition());
+						Toast.makeText(mContext, "ImageClick on " + mTitle.getText() + " position " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
+						toggleActivation();
+					}
 				}
 			});
 			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);

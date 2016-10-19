@@ -24,7 +24,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
  */
 public class ExpandableHeaderItem
-		extends AbstractModelItem<ExpandableHeaderViewHolder>
+		extends AbstractItem<ExpandableHeaderViewHolder>
 		implements IExpandable<ExpandableHeaderViewHolder, SubItem>,
 		IHeader<ExpandableHeaderViewHolder> {
 

@@ -1,34 +1,34 @@
 package eu.davidea.samples.flexibleadapter.models;
 
 import java.io.Serializable;
-
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.viewholders.FlexibleViewHolder;
+import eu.davidea.flexibleadapter.items.IHolder;
 
 /**
- * This class will benefit of the already implemented methods (getter and setters) in
- * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem}.
+ * This class is Pojo for the {@link IHolder} items.
+ * It is used as base item for Item and Header model examples.
  *
- * It is used as Base item for all example models.
+ * Using Holder pattern, you can implement DB, XML & JSON (de)serialization libraries on this
+ * item as usual.
+ *
+ * @author Davide Steduto
+ * @since 19/10/2016
  */
-public abstract class AbstractModelItem<VH extends FlexibleViewHolder>
-		extends AbstractFlexibleItem<VH>
-		implements Serializable {
+public abstract class AbstractModel implements Serializable {
 
-	private static final long serialVersionUID = -6882745111884490060L;
+	private static final long serialVersionUID = -7385882749119849060L;
 
 	private String id;
 	private String title;
 	private String subtitle;
 
-	public AbstractModelItem(String id) {
+	public AbstractModel(String id) {
 		this.id = id;
 	}
 
 	@Override
 	public boolean equals(Object inObject) {
-		if (inObject instanceof AbstractModelItem) {
-			AbstractModelItem inItem = (AbstractModelItem) inObject;
+		if (inObject instanceof AbstractModel) {
+			AbstractModel inItem = (AbstractModel) inObject;
 			return this.id.equals(inItem.id);
 		}
 		return false;
