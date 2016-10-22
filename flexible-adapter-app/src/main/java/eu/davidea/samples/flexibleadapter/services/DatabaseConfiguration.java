@@ -18,11 +18,12 @@ public class DatabaseConfiguration {
 			NOTIFY_MOVE = "notify_move";
 
 	//Values
-	public static int maxSize = 100000;//max number of items
+	public static int maxSize = 10000;//max number of items
 	public static int maxSearchDelay = 1000;//max search delay in ms
-	public static int size = 10000;//items
+	public static int size = 1000;//items
 	public static int delay = 200;//ms
 	public static int animateToLimit = maxSize;//start with maxSize
+	public static boolean animateWithDiffUtil = false;
 	public static boolean notifyChange = true;
 	public static boolean notifyMove = false;
 	public static boolean animateOnScrolling = true;

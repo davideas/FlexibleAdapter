@@ -26,6 +26,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -114,11 +115,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	private List<T> mItems, mTempItems;
 
 	/**
-	 * HashSet and AsyncTask objects, will increase performance in big list
+	 * HashSet, AsyncTask and DiffUtil objects, will increase performance in big list
 	 */
 	private Set<T> mHashItems;
 	private List<Notification> mNotifications;
 	private FilterAsyncTask mFilterAsyncTask;
+	private long start, time;
+	private boolean useDiffUtil = false;
+	private DiffUtil.DiffResult diffResult;
+	private DiffUtilCallback diffUtilCallback;
 
 	/**
 	 * Handler for delayed actions.
@@ -1021,7 +1026,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-rc1
 	 */
 	public FlexibleAdapter setStickyHeaderContainer(@Nullable ViewGroup stickyContainer) {
-		if (DEBUG) Log.i(TAG, "Set stickyHeaderContainer=" + stickyContainer.getClass().getSimpleName());
+		if (DEBUG)
+			Log.i(TAG, "Set stickyHeaderContainer=" + stickyContainer.getClass().getSimpleName());
 		this.mStickyContainer = stickyContainer;
 		return this;
 	}
@@ -1470,7 +1476,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	//TODO: Deprecation? use setProgressItem + setEndlessScrollListener
 	public FlexibleAdapter setEndlessScrollListener(@Nullable EndlessScrollListener endlessScrollListener,
 													@NonNull T progressItem) {
-		if (DEBUG) Log.i(TAG, "Set endlessScrollListener=" + endlessScrollListener.getClass().getSimpleName());
+		if (DEBUG)
+			Log.i(TAG, "Set endlessScrollListener=" + endlessScrollListener.getClass().getSimpleName());
 		mEndlessScrollListener = endlessScrollListener;
 		return setEndlessProgressItem(progressItem);
 	}
@@ -3275,7 +3282,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Animate search results only in case of new SearchText
 		if (hasNewSearchText(mSearchText)) {
 			mOldSearchText = mSearchText;
-			animateTo(filteredItems, Payload.FILTER);
+			animateDiff(filteredItems, Payload.FILTER);
+			//animateTo(filteredItems, Payload.FILTER);
 		}
 	}
 
@@ -3410,13 +3418,68 @@ public class FlexibleAdapter<T extends IFlexible>
 		return this;
 	}
 
+	/*-------------------------*/
+	/* ANIMATE CHANGES METHODS */
+	/*-------------------------*/
+
+	/**
+	 * @return true to calculate animation changes with DiffUtil, false to use default calculation.
+	 * @see #setAnimateChangesWithDiffUtil(boolean)
+	 */
+	public boolean isAnimateChangesWithDiffUtil() {
+		return useDiffUtil;
+	}
+
+	/**
+	 * Whether use {@link DiffUtil} to calculate the changes between 2 lists after Update or
+	 * Filter operations. If disabled, the advanced default calculation will be used instead.
+	 * <p>A time, to compare the 2 different approaches, is calculated and displayed in the log.
+	 * To see the logs call {@link #enableLogs(boolean)} before creating the Adapter instance!</p>
+	 * Default value is {@code false} (default calculation is used).
+	 *
+	 * @param useDiffUtil true to switch the calculation and use DiffUtil, false to use the default
+	 *                    calculation.
+	 * @return this Adapter, so the call can be chained
+	 * @see #setDiffUtilCallback(DiffUtilCallback)
+	 */
+	public FlexibleAdapter setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
+		this.useDiffUtil = useDiffUtil;
+		return this;
+	}
+
+	/**
+	 * Sets a custom implementation of {@link DiffUtilCallback} for the DiffUtil. Extend to
+	 * implement the comparing methods.
+	 *
+	 * @param diffUtilCallback the custom callback that DiffUtil will call
+	 * @return this Adapter, so the call can be chained
+	 * @see #setAnimateChangesWithDiffUtil(boolean)
+	 */
+	public FlexibleAdapter setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
+		this.diffUtilCallback = diffUtilCallback;
+		return this;
+	}
+
+	private synchronized void animateDiff(@Nullable List<T> newItems, Payload payloadChange) {
+		if (useDiffUtil) {
+			Log.v(TAG, "Animate changes with DiffUtils! oldSize=" + getItemCount() + " newSize=" + newItems.size());
+			if (diffUtilCallback == null) {
+				diffUtilCallback = new DiffUtilCallback();
+			}
+			diffUtilCallback.setItems(mItems, newItems);
+			diffResult = DiffUtil.calculateDiff(diffUtilCallback, notifyMoveOfFilteredItems);
+		} else {
+			animateTo(newItems, payloadChange);
+		}
+	}
+
 	/**
 	 * Animate the synchronization between the old list and the new list.
 	 * <p>Used by filter and updateDataSet.</p>
 	 * <b>Note:</b> The animations are skipped in favor of {@link #notifyDataSetChanged()}
 	 * when the number of items reaches the limit. See {@link #setAnimateToLimit(int)}.
 	 * <p><b>Note:</b> In case the animations are performed, unchanged items will be notified if
-	 * {@code notifyChangeOfUnfilteredItems} is set true, and payload will be set as a Boolean.</p>
+	 * {@code notifyChangeOfUnfilteredItems} is set true, and CHANGE payload will be set.</p>
 	 *
 	 * @param newItems the new list containing the new items
 	 * @see #setNotifyChangeOfUnfilteredItems(boolean)
@@ -3454,23 +3517,28 @@ public class FlexibleAdapter<T extends IFlexible>
 	private void applyAndAnimateRemovals(List<T> from, List<T> newItems) {
 		//Using Hash for performance
 		mHashItems = new HashSet<>(newItems);
-		int out = 0;
+		int out = 0, mod = 0;
 		for (int i = from.size() - 1; i >= 0; i--) {
 			if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
 			final T item = from.get(i);
-			if (!mHashItems.contains(item) && (!isHeader(item) || (isHeader(item) && headersShown))) {
+			boolean isHeader = isHeader(item);
+			if (!mHashItems.contains(item) && (!isHeader || (isHeader && headersShown))) {
 				//if (DEBUG) Log.v(TAG, "calculateRemovals remove position=" + i + " item=" + item + " searchText=" + mSearchText);
 				from.remove(i);
 				mNotifications.add(new Notification(i, Notification.REMOVE));
 				out++;
 			} else if (notifyChangeOfUnfilteredItems) {
-				from.set(i, item);
+				from.set(i, newItems.get(newItems.indexOf(item)));
 				mNotifications.add(new Notification(i, Notification.CHANGE));
-				//if (DEBUG) Log.v(TAG, "calculateRemovals   keep position=" + i + " item=" + item + " searchText=" + mSearchText);
+				mod++;
+				//if (DEBUG) Log.v(TAG, "calculateAdditions   keep position=" + i + " item=" + item + " searchText=" + mSearchText);
 			}
 		}
 		mHashItems = null;
-		if (DEBUG) Log.v(TAG, "calculateRemovals total out=" + out);
+		if (DEBUG) {
+			Log.v(TAG, "calculateRemovals total out=" + out);
+			Log.v(TAG, "calculateModifications total mod=" + mod);
+		}
 	}
 
 	/**
@@ -3527,36 +3595,67 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	private synchronized void executeNotifications(Payload payloadChange) {
-		if (DEBUG) Log.i(TAG, "Performing " + mNotifications.size() + " notifications");
-		mItems = mTempItems;// Update mItems in the UI Thread
-		setAnimate(false);//Disable scroll animation
-		for (Notification notification : mNotifications) {
-			switch (notification.operation) {
-				case Notification.ADD:
-					notifyItemInserted(notification.position);
-					break;
-				case Notification.CHANGE:
-					notifyItemChanged(notification.position, payloadChange);
-					break;
-				case Notification.REMOVE:
-					notifyItemRemoved(notification.position);
-					break;
-				case Notification.MOVE:
-					notifyItemMoved(notification.fromPosition, notification.position);
-					break;
-				default:
-					if (DEBUG) Log.w(TAG, "notifyDataSetChanged!");
-					notifyDataSetChanged();
-					break;
+		if (diffResult != null) {
+			if (DEBUG) Log.i(TAG, "Dispatching notifications");
+			mItems = diffUtilCallback.getNewItems();// Update mItems in the UI Thread
+			diffResult.dispatchUpdatesTo(this);
+			diffResult = null;
+		} else {
+			if (DEBUG) Log.i(TAG, "Performing " + mNotifications.size() + " notifications");
+			mItems = mTempItems;// Update mItems in the UI Thread
+			setAnimate(false);//Disable scroll animation
+			for (Notification notification : mNotifications) {
+				switch (notification.operation) {
+					case Notification.ADD:
+						notifyItemInserted(notification.position);
+						break;
+					case Notification.CHANGE:
+						notifyItemChanged(notification.position, payloadChange);
+						break;
+					case Notification.REMOVE:
+						notifyItemRemoved(notification.position);
+						break;
+					case Notification.MOVE:
+						notifyItemMoved(notification.fromPosition, notification.position);
+						break;
+					default:
+						if (DEBUG) Log.w(TAG, "notifyDataSetChanged!");
+						notifyDataSetChanged();
+						break;
+				}
 			}
+			mTempItems = null;
+			mNotifications = null;
 		}
-		mTempItems = null;
-		mNotifications = null;
+		time = System.currentTimeMillis();
+		time = time - start;
+		if (DEBUG) Log.i(TAG, "Animate changes DONE in " + time + "ms");
+	}
+
+	/**
+	 * @return the time (in ms) of the last update or filter operation.
+	 */
+	public long getTime() {
+		return time;
 	}
 
 	/*---------------*/
 	/* TOUCH METHODS */
 	/*---------------*/
+
+	private void initializeItemTouchHelper() {
+		if (mItemTouchHelper == null) {
+			if (mRecyclerView == null) {
+				throw new IllegalStateException("RecyclerView cannot be null. Enabling LongPressDrag or Swipe must be done after the Adapter is added to the RecyclerView.");
+			}
+			if (mItemTouchHelperCallback == null) {
+				if (DEBUG) Log.i(TAG, "Initialize default ItemTouchHelperCallback");
+				mItemTouchHelperCallback = new ItemTouchHelperCallback(this);
+			}
+			mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
+			mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+		}
+	}
 
 	/**
 	 * Used by {@link FlexibleViewHolder#onTouch(View, MotionEvent)}
@@ -3571,9 +3670,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Returns the customization of the ItemTouchHelperCallback.
+	 * Returns the customization of the ItemTouchHelperCallback or the default if it wasn't set
+	 * before.
 	 *
 	 * @return the ItemTouchHelperCallback instance already initialized
+	 * @see #setItemTouchHelperCallback(ItemTouchHelperCallback)
 	 * @since 5.0.0-b7
 	 */
 	public final ItemTouchHelperCallback getItemTouchHelperCallback() {
@@ -3583,7 +3684,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Sets a custom callback implementation for Item touch.
-	 * <p>Helper will be reinitialized.</p>
+	 * <p>If called, Helper will be reinitialized.</p>
+	 * If not called, the default Helper will be used.
 	 *
 	 * @param itemTouchHelperCallback the custom callback implementation for Item touch
 	 * @return this Adapter, so the call can be chained
@@ -3604,6 +3706,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return true if ItemTouchHelper should start dragging an item when it is long pressed,
 	 * false otherwise. Default value is {@code false}.
+	 * @see #setLongPressDragEnabled(boolean)
 	 * @since 5.0.0-b1
 	 */
 	public final boolean isLongPressDragEnabled() {
@@ -3629,11 +3732,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Enabled by default.
-	 * <p>To use, it is sufficient to set the HandleView by calling
-	 * {@link FlexibleViewHolder#setDragHandleView(View)}.</p>
+	 * Returns whether ItemTouchHelper should start a drag and drop operation by touching its
+	 * handle.
+	 * <p>Default value is {@code false}.</p>
+	 * To use, it is sufficient to set the HandleView by calling
+	 * {@link FlexibleViewHolder#setDragHandleView(View)}.
 	 *
 	 * @return true if active, false otherwise
+	 * @see #setHandleDragEnabled(boolean)
 	 * @since 5.0.0-b1
 	 */
 	public final boolean isHandleDragEnabled() {
@@ -3662,6 +3768,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return true if ItemTouchHelper should start swiping an item when user swipes a pointer
 	 * over the View, false otherwise. Default value is {@code false}.
+	 * @see #setSwipeEnabled(boolean)
 	 * @since 5.0.0-b1
 	 */
 	public final boolean isSwipeEnabled() {
@@ -3886,20 +3993,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Delegate actions to the user
 		if (mItemSwipeListener != null) {
 			mItemSwipeListener.onItemSwipe(position, direction);
-		}
-	}
-
-	private void initializeItemTouchHelper() {
-		if (mItemTouchHelper == null) {
-			if (mRecyclerView == null) {
-				throw new IllegalStateException("RecyclerView cannot be null. Enabling LongPressDrag or Swipe must be done after the Adapter is added to the RecyclerView.");
-			}
-			if (mItemTouchHelperCallback == null) {
-				if (DEBUG) Log.i(TAG, "Initialize default ItemTouchHelperCallback");
-				mItemTouchHelperCallback = new ItemTouchHelperCallback(this);
-			}
-			mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
-			mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 		}
 	}
 
@@ -4419,10 +4512,12 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		@Override
 		protected Void doInBackground(Void... params) {
+			start = System.currentTimeMillis();
 			switch (what) {
 				case UPDATE:
 					if (DEBUG) Log.d(TAG, "doInBackground - started UPDATE");
-					animateTo(newItems, Payload.CHANGE);
+					animateDiff(newItems, Payload.CHANGE);
+					//animateTo(newItems, Payload.CHANGE);
 					if (DEBUG) Log.d(TAG, "doInBackground - ended UPDATE");
 					break;
 				case FILTER:
@@ -4436,7 +4531,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		@Override
 		protected void onPostExecute(Void result) {
-			if (mNotifications != null) {
+			if (diffResult != null || mNotifications != null) {
 				//Execute post data
 				switch (what) {
 					case UPDATE:
@@ -4510,6 +4605,99 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	protected void onPostFilter() {
 		//Dedicated for user implementation
+	}
+
+	/**
+	 * The following Lists are available as:
+	 * <p>- {@code protected List oldItems;}
+	 * <br/>- {@code protected List newItems;}
+	 */
+	public static class DiffUtilCallback<T> extends DiffUtil.Callback {
+
+		protected List<T> oldItems;
+		protected List<T> newItems;
+
+		public final void setItems(List<T> oldItems, List<T> newItems) {
+			this.oldItems = oldItems;
+			this.newItems = newItems;
+		}
+
+		public final List<T> getNewItems() {
+			return newItems;
+		}
+
+		@Override
+		public final int getOldListSize() {
+			return oldItems.size();
+		}
+
+		@Override
+		public final int getNewListSize() {
+			return newItems.size();
+		}
+
+		/**
+		 * Called by the DiffUtil to decide whether two object represent the same Item.
+		 * <p>
+		 * For example, if your items have unique ids, this method should check their id equality.
+		 *
+		 * @param oldItemPosition The position of the item in the old list
+		 * @param newItemPosition The position of the item in the new list
+		 * @return True if the two items represent the same object or false if they are different.
+		 */
+		@Override
+		public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+//			if (DEBUG) Log.w(TAG, "oldItemPosition=" + oldItemPosition + ", newItemPosition=" + newItemPosition);
+			T oldItem = oldItems.get(oldItemPosition);
+			T newItem = newItems.get(newItemPosition);
+			return oldItem.equals(newItem);
+		}
+
+		/**
+		 * Called by the DiffUtil when it wants to check whether two items have the same data.
+		 * DiffUtil uses this information to detect if the contents of an item has changed.
+		 * <p>
+		 * DiffUtil uses this method to check equality instead of {@link Object#equals(Object)}
+		 * so that you can change its behavior depending on your UI.
+		 * For example, if you are using DiffUtil with a
+		 * {@link RecyclerView.Adapter RecyclerView.Adapter}, you should
+		 * return whether the items' visual representations are the same.
+		 * <p>
+		 * This method is called only if {@link #areItemsTheSame(int, int)} returns
+		 * {@code true} for these items.
+		 *
+		 * @param oldItemPosition The position of the item in the old list
+		 * @param newItemPosition The position of the item in the new list which replaces the
+		 *                        oldItem
+		 * @return True if the contents of the items are the same or false if they are different.
+		 */
+		@Override
+		public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+			return false;
+		}
+
+		/**
+		 * When {@link #areItemsTheSame(int, int)} returns {@code true} for two items and
+		 * {@link #areContentsTheSame(int, int)} returns false for them, DiffUtil
+		 * calls this method to get a payload about the change.
+		 * <p>
+		 * For example, if you are using DiffUtil with {@link RecyclerView}, you can return the
+		 * particular field that changed in the item and your
+		 * {@link android.support.v7.widget.RecyclerView.ItemAnimator ItemAnimator} can use that
+		 * information to run the correct animation.
+		 * <p>
+		 * Default implementation returns {@code null}.
+		 *
+		 * @param oldItemPosition The position of the item in the old list
+		 * @param newItemPosition The position of the item in the new list
+		 *
+		 * @return A payload object that represents the change between the two items.
+		 */
+		@Nullable
+		@Override
+		public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+			return Payload.CHANGE;
+		}
 	}
 
 }

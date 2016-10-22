@@ -538,6 +538,11 @@ public class MainActivity extends AppCompatActivity implements
 			reverseMenuItem.setEnabled(mAdapter.isAnimationOnScrollingEnabled());
 			reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrolling());
 		}
+		//DiffUtil?
+		MenuItem diffUtilItem = menu.findItem(R.id.action_diff_util);
+		if (diffUtilItem != null) {
+			diffUtilItem.setChecked(DatabaseConfiguration.animateWithDiffUtil);
+		}
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -554,12 +559,12 @@ public class MainActivity extends AppCompatActivity implements
 				DatabaseConfiguration.animateOnScrolling = false;
 				mAdapter.setAnimationOnScrolling(false);
 				item.setChecked(false);
-				Snackbar.make(findViewById(R.id.main_view), "Disabled scrolling animation, now reopen the page\n(P = persistent)", Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(findViewById(R.id.main_view), "Disabled scrolling animation, now reopen the page\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
 			} else {
 				DatabaseConfiguration.animateOnScrolling = true;
 				mAdapter.setAnimationOnScrolling(true);
 				item.setChecked(true);
-				Snackbar.make(findViewById(R.id.main_view), "Enabled scrolling animation, now reopen the page\n(P = persistent)", Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(findViewById(R.id.main_view), "Enabled scrolling animation, now reopen the page\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_reverse) {
 			if (mAdapter.isAnimationOnReverseScrolling()) {
@@ -570,6 +575,18 @@ public class MainActivity extends AppCompatActivity implements
 				mAdapter.setAnimationOnReverseScrolling(true);
 				item.setChecked(true);
 				Snackbar.make(findViewById(R.id.main_view), "Enabled reverse scrolling animation", Snackbar.LENGTH_SHORT).show();
+			}
+		} else if (id == R.id.action_diff_util) {
+			if (mAdapter.isAnimateChangesWithDiffUtil()) {
+				DatabaseConfiguration.animateWithDiffUtil = false;
+				mAdapter.setAnimateChangesWithDiffUtil(false);
+				item.setChecked(false);
+				Snackbar.make(findViewById(R.id.main_view), "Default calculation is used to animate changes\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+			} else {
+				DatabaseConfiguration.animateWithDiffUtil = true;
+				mAdapter.setAnimateChangesWithDiffUtil(true);
+				item.setChecked(true);
+				Snackbar.make(findViewById(R.id.main_view), "DiffUtil is used to animate changes\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_auto_collapse) {
 			if (mAdapter.isAutoCollapseOnExpand()) {
@@ -797,8 +814,10 @@ public class MainActivity extends AppCompatActivity implements
 			mRefreshHandler.sendEmptyMessage(2);
 			fastScroller.setVisibility(View.GONE);
 		}
-		if (mAdapter != null && mAdapter.hasSearchText()) {
-			Snackbar.make(findViewById(R.id.main_view), "Filtered " + size + " items", Snackbar.LENGTH_SHORT).show();
+		if (mAdapter != null) {
+			String message = (mAdapter.hasSearchText() ? "Filtered " + size + " items in " : "Refreshed list in ");
+			message +=  mAdapter.getTime() + "ms";
+			Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
 		}
 	}
 
