@@ -25,7 +25,6 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
@@ -341,17 +340,25 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param holder   the ViewHolder just bound
 	 * @param position the current item position
 	 */
-	//FIXME: first completed visible item on rotation gets high delay
 	protected void animateView(final RecyclerView.ViewHolder holder, final int position) {
-//		if (DEBUG)
+		//Use always the max child count reached
+		if (mMaxChildViews < mRecyclerView.getChildCount()) {
+			mMaxChildViews = mRecyclerView.getChildCount();
+		}
+		//Animate only during initial loading?
+		if (onlyEntryAnimation && mLastAnimatedPosition == mMaxChildViews) {
+			shouldAnimate = false;
+		}
+//		if (DEBUG) {
 //			Log.v(TAG, "shouldAnimate=" + shouldAnimate
 //					+ " isFastScroll=" + isFastScroll
 //					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
 //					+ " isReverseEnabled=" + isReverseEnabled
 //					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
 //					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
+//					+ " mMaxChildViews=" + mMaxChildViews
 //			);
-
+//		}
 		if (holder instanceof FlexibleViewHolder && shouldAnimate && !isFastScroll &&
 				!mAnimatorNotifierObserver.isPositionNotified() &&
 				(isReverseEnabled || position > mLastAnimatedPosition || (position == 0 && mRecyclerView.getChildCount() == 0)) ) {
@@ -363,7 +370,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			//User animators
 			List<Animator> animators = new ArrayList<>();
 			FlexibleViewHolder flexibleViewHolder = (FlexibleViewHolder) holder;
-			flexibleViewHolder.scrollAnimators(animators, position, position > mLastAnimatedPosition);
+			flexibleViewHolder.scrollAnimators(animators, position, position >= mLastAnimatedPosition);
 
 			//Execute the animations together
 			AnimatorSet set = new AnimatorSet();
@@ -373,16 +380,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			set.addListener(new HelperAnimatorListener(hashCode));
 			if (mEntryStep) {
 				//Stop stepDelay when screen is filled
-				set.setStartDelay(calculateAnimationDelay2(position));
+				set.setStartDelay(calculateAnimationDelay1(position));
 			}
 			set.start();
 			mAnimators.put(hashCode, set);
 			if (DEBUG) Log.v(TAG, "animateView    Scroll animation on position " + position);
-
-			//Animate only during initial loading?
-			if (onlyEntryAnimation && position >= mMaxChildViews) {
-				shouldAnimate = false;
-			}
 		}
 
 		mAnimatorNotifierObserver.clearNotified();
@@ -428,8 +430,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			set.setDuration(mDuration);
 			set.addListener(new HelperAnimatorListener(itemView.hashCode()));
 			if (mEntryStep) {
-				//set.setStartDelay(calculateAnimationDelay1(position));
-				set.setStartDelay(calculateAnimationDelay2(position));
+				set.setStartDelay(calculateAnimationDelay1(position));
 			}
 			set.start();
 			mAnimators.put(itemView.hashCode(), set);
@@ -452,13 +453,15 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		int firstVisiblePosition = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 		int lastVisiblePosition = Utils.findLastCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 
-		//Use always the max child count reached
-		if (mMaxChildViews < mRecyclerView.getChildCount())
-			mMaxChildViews = mRecyclerView.getChildCount();
+		//Fix for high delay on the first visible item on rotation
+		if (firstVisiblePosition < 0 && position >= 0)
+			firstVisiblePosition = position - 1;
 
-		if (mLastAnimatedPosition > lastVisiblePosition)
-			lastVisiblePosition = mLastAnimatedPosition;
+		//Last visible position is the last animated when initially loading
+		if (position - 1 > lastVisiblePosition)
+			lastVisiblePosition = position - 1;
 
+		//Calculate visible items
 		int visibleItems = lastVisiblePosition - firstVisiblePosition;
 
 //		if (DEBUG) Log.v(TAG, "Position=" + position +
@@ -469,13 +472,21 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 //				" ChildCount=" + mRecyclerView.getChildCount());
 
 		//Stop stepDelay when screen is filled
-		if (mLastAnimatedPosition > visibleItems || //Normal Forward scrolling
-				(firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews)) { //Reverse scrolling
+		if (position - 1 > visibleItems || //Normal Forward scrolling
+				(firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews) || //Reverse scrolling
+				(position > mMaxChildViews && firstVisiblePosition == -1 && mRecyclerView.getChildCount() == 0)) { //Reverse scrolling and click on FastScroller
 			if (DEBUG) Log.v(TAG, "Reset AnimationDelay on position " + position);
 			return 0L;
 		}
-
-		return mInitialDelay += mStepDelay;
+		long delay = mInitialDelay;
+		int numColumns = getSpanCount(mRecyclerView.getLayoutManager());
+		if (numColumns > 1) {
+			delay += mStepDelay * (position % numColumns);
+		} else {
+			delay += position * mStepDelay;
+		}
+//		if (DEBUG) Log.v(TAG, "Delay=" + delay);
+		return delay;
 	}
 
 	/**
@@ -485,25 +496,26 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	private long calculateAnimationDelay2(int position) {
 		long delay;
 		int firstVisiblePosition = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
-		int lastVisiblePosition = Utils.findLastCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+		int lastVisiblePosition = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 
-		if (mLastAnimatedPosition > lastVisiblePosition)
-			lastVisiblePosition = mLastAnimatedPosition;
+		//Fix for high delay on the first visible item on rotation
+//		if (firstVisiblePosition < 0 && position >= 0)
+//			firstVisiblePosition = position - 1;
 
-		int numberOfItemsOnScreen = lastVisiblePosition - firstVisiblePosition;
+		//Last visible position is the last animated when initially loading
+		if (position - 1 > lastVisiblePosition)
+			lastVisiblePosition = position - 1;
+
+		int visibleItems = lastVisiblePosition - firstVisiblePosition;
 		int numberOfAnimatedItems = position - 1;
 
-		//Save max child count reached
-		if (mMaxChildViews < mRecyclerView.getChildCount())
-			mMaxChildViews = mRecyclerView.getChildCount();
-
-		if (numberOfItemsOnScreen == 0 || numberOfItemsOnScreen < numberOfAnimatedItems || //Normal Forward scrolling after max itemOnScreen is reached
+		if (mMaxChildViews == 0 || visibleItems < numberOfAnimatedItems || //Normal Forward scrolling after max itemOnScreen is reached
 				(firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews) || //Reverse scrolling
 				(position > mMaxChildViews && firstVisiblePosition == -1 && mRecyclerView.getChildCount() == 0)) { //Reverse scrolling and click on FastScroller
 
 			//Base delay is step delay
 			delay = mStepDelay;
-			if (numberOfItemsOnScreen <= 1) {
+			if (visibleItems <= 1) {
 				//When RecyclerView is initially loading no items are present
 				//Use InitialDelay only for the first item
 				delay += mInitialDelay;
@@ -511,8 +523,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 				//Reset InitialDelay only when first item is already animated
 				mInitialDelay = 0L;
 			}
-			if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-				int numColumns = ((GridLayoutManager) mRecyclerView.getLayoutManager()).getSpanCount();
+			int numColumns = getSpanCount(mRecyclerView.getLayoutManager());
+			if (numColumns > 1) {
 				delay = mInitialDelay + mStepDelay * (position % numColumns);
 			}
 
@@ -523,9 +535,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 //		if (DEBUG) Log.v(TAG, "Delay[" + position + "]=" + delay +
 //				" FirstVisible=" + firstVisiblePosition +
 //				" LastVisible=" + lastVisiblePosition +
-//				" LastAnimated=" + mLastAnimatedPosition +
-//				" VisibleItems=" + numberOfItemsOnScreen +
-//				" ChildCount=" + mRecyclerView.getChildCount());
+//				" LastAnimated=" + numberOfAnimatedItems +
+//				" VisibleItems=" + visibleItems +
+//				" ChildCount=" + mRecyclerView.getChildCount() +
+//				" MaxChildCount=" + mMaxChildViews);
 
 		return delay;
 	}

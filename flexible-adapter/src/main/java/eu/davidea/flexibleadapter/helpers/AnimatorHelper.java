@@ -67,7 +67,7 @@ public class AnimatorHelper {
 			RecyclerView recyclerView, @FloatRange(from = 0.0, to= 1.0) float percent) {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationX", -recyclerView.getLayoutManager().getWidth() * percent, 0));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added LEFT Animator");
+		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added LEFT Animator");
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class AnimatorHelper {
 			RecyclerView recyclerView, @FloatRange(from = 0.0, to = 1.0) float percent) {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationX", recyclerView.getLayoutManager().getWidth() * percent, 0));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added RIGHT Animator");
+		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added RIGHT Animator");
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class AnimatorHelper {
 			RecyclerView recyclerView) {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationY", -recyclerView.getMeasuredHeight() >> 1, 0));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added TOP Animator");
+		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added TOP Animator");
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class AnimatorHelper {
 			RecyclerView recyclerView) {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationY", recyclerView.getMeasuredHeight() >> 1, 0));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added BOTTOM Animator");
+		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added BOTTOM Animator");
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class AnimatorHelper {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "scaleX", scaleFrom, 1f));
 		animators.add(ObjectAnimator.ofFloat(view, "scaleY", scaleFrom, 1f));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, "Added SCALE Animator");
+		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added SCALE Animator");
 	}
 
 }
