@@ -17,9 +17,10 @@ public abstract class AbstractItem<VH extends FlexibleViewHolder>
 
 	private static final long serialVersionUID = -6882745111884490060L;
 
-	private String id;
-	private String title;
-	private String subtitle;
+	protected String id;
+	protected String title;
+	protected String subtitle = "";
+	protected int updates;
 
 	public AbstractItem(String id) {
 		this.id = id;
@@ -65,6 +66,14 @@ public abstract class AbstractItem<VH extends FlexibleViewHolder>
 
 	public void setSubtitle(String subtitle) {
 		this.subtitle = subtitle;
+	}
+
+	public int getUpdates() {
+		return updates;
+	}
+
+	public void increaseUpdates() {
+		this.updates++;
 	}
 
 	@Override

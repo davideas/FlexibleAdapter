@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
@@ -3515,20 +3516,33 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	private void applyAndAnimateRemovals(List<T> from, List<T> newItems) {
+		//This avoids the call indexOf() later on: newItems.get(newItems.indexOf(item)));
+		// and use the hash for the get
+		Map<T, Integer> existingItems = null;
+		if (notifyChangeOfUnfilteredItems) {
+			//Using Hash for performance
+			mHashItems = new HashSet<>(from);
+			existingItems = new HashMap<>();
+			for (int i = 0; i < newItems.size(); i++) {
+				if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
+				final T item = newItems.get(i);
+				//Save the index of this new item
+				if (mHashItems.contains(item)) existingItems.put(item, i);
+			}
+		}
 		//Using Hash for performance
 		mHashItems = new HashSet<>(newItems);
 		int out = 0, mod = 0;
 		for (int i = from.size() - 1; i >= 0; i--) {
 			if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
 			final T item = from.get(i);
-			boolean isHeader = isHeader(item);
-			if (!mHashItems.contains(item) && (!isHeader || (isHeader && headersShown))) {
+			if (!mHashItems.contains(item)) {
 				//if (DEBUG) Log.v(TAG, "calculateRemovals remove position=" + i + " item=" + item + " searchText=" + mSearchText);
 				from.remove(i);
 				mNotifications.add(new Notification(i, Notification.REMOVE));
 				out++;
 			} else if (notifyChangeOfUnfilteredItems) {
-				from.set(i, newItems.get(newItems.indexOf(item)));
+				from.set(i, newItems.get(existingItems.get(item)));
 				mNotifications.add(new Notification(i, Notification.CHANGE));
 				mod++;
 				//if (DEBUG) Log.v(TAG, "calculateAdditions   keep position=" + i + " item=" + item + " searchText=" + mSearchText);

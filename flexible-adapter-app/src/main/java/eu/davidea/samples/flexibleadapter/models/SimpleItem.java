@@ -53,6 +53,13 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 	}
 
 	@Override
+	public String getSubtitle() {
+		return getId()
+				+ (getHeader() != null ? " - " + getHeader().getId() : "")
+				+ (getUpdates() > 0 ? " - u" + getUpdates() : "");
+	}
+
+	@Override
 	public HeaderItem getHeader() {
 		return header;
 	}
@@ -77,11 +84,10 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
 		//Subtitle
 		if (adapter.isExpandable(this)) {
-			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems");
-		} else {
-			setSubtitle(getId());
+			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems"
+					+ (getHeader() != null ? " - " + getHeader().getId() : "")
+					+ (getUpdates() > 0 ? " - u" + getUpdates() : ""));
 		}
-		setSubtitle(getSubtitle() + (getHeader() != null ? " - " + getHeader().getId() : ""));
 
 		Context context = holder.itemView.getContext();
 		int defColorAccent = context.getResources().getColor(R.color.colorAccent_light);

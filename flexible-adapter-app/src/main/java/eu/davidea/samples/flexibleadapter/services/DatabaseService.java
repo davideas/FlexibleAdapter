@@ -560,6 +560,19 @@ public class DatabaseService {
 	}
 
 	/**
+	 * This demonstrates that new content of existing items are really rebound and
+	 * notified with CHANGE Payload in the Adapter list when refreshed.
+	 */
+	public void updateNewItems() {
+		for (IFlexible item : mItems) {
+			if (item instanceof SimpleItem) {
+				SimpleItem simpleItem = (SimpleItem) item;
+				simpleItem.increaseUpdates();
+			}
+		}
+	}
+
+	/**
 	 * A simple item comparator by Id.
 	 */
 	public static class ItemComparatorById implements Comparator<AbstractFlexibleItem> {

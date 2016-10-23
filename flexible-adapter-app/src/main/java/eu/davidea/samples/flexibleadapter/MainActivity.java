@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements
 			@Override
 			public void onRefresh() {
 				//Passing true as parameter we always animate the changes between the old and the new data set
+				DatabaseService.getInstance().updateNewItems();
 				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), DatabaseConfiguration.animateOnUpdate);
 				mSwipeRefreshLayout.setEnabled(false);
 				mRefreshHandler.sendEmptyMessageDelayed(0, 100L);//Simulate network time
@@ -815,8 +816,8 @@ public class MainActivity extends AppCompatActivity implements
 			fastScroller.setVisibility(View.GONE);
 		}
 		if (mAdapter != null) {
-			String message = (mAdapter.hasSearchText() ? "Filtered " + size + " items in " : "Refreshed list in ");
-			message +=  mAdapter.getTime() + "ms";
+			String message = (mAdapter.hasSearchText() ? "Filtered " : "Refreshed ");
+			message += size + " items in " + mAdapter.getTime() + "ms";
 			Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
 		}
 	}

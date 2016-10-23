@@ -95,7 +95,8 @@ public class FragmentSelectionModes extends AbstractFragment
 		//Initialize Adapter and RecyclerView
 		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
-		mAdapter.setMode(SelectableAdapter.MODE_SINGLE);
+		mAdapter.setNotifyChangeOfUnfilteredItems(true)//This will rebind new item when refreshed
+				.setMode(SelectableAdapter.MODE_SINGLE);
 
 		//Experimenting NEW features (v5.0.0)
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
