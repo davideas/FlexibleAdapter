@@ -98,6 +98,8 @@ items and higher, due to calculate the correct position for each item to shift. 
 	<string name="headers_sections">Headers and Sections</string>
 	<string name="headers_sections_description">Clickable sticky headers for sections + Draggable items with Auto-Linkage + Filter</string>
 
+	<string name="headers_db_sections">Headers and Sections - databinding</string>
+
 	<string name="expandable_sections">Expandable Sections</string>
 	<string name="expandable_sections_description">Sections with [sticky] headers that can expand/collapse + Draggable items + Filter + Scroll Animations</string>
 
