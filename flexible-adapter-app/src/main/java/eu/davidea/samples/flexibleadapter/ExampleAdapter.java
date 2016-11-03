@@ -7,8 +7,8 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.samples.flexibleadapter.models.LayoutItem;
-import eu.davidea.samples.flexibleadapter.models.ULSItem;
+import eu.davidea.samples.flexibleadapter.items.LayoutItem;
+import eu.davidea.samples.flexibleadapter.items.ULSItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 
 /**

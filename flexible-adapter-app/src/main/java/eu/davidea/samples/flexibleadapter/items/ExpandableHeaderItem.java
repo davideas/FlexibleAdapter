@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter.models;
+package eu.davidea.samples.flexibleadapter.items;
 
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -15,7 +15,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem.ExpandableHeaderViewHolder;
+import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem.ExpandableHeaderViewHolder;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**

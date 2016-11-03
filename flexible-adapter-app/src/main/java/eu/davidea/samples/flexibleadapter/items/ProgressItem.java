@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter.models;
+package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
 import android.support.annotation.NonNull;
@@ -13,7 +13,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.ProgressItem.ProgressViewHolder;
+import eu.davidea.samples.flexibleadapter.items.ProgressItem.ProgressViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**

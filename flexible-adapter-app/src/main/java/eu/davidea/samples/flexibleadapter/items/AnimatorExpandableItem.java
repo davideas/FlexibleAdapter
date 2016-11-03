@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter.models;
+package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
 import android.support.annotation.NonNull;
@@ -15,7 +15,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.AnimatorExpandableItem.AnimatorExpandableViewHolder;
+import eu.davidea.samples.flexibleadapter.items.AnimatorExpandableItem.AnimatorExpandableViewHolder;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.viewholders.ExpandableViewHolder;
 

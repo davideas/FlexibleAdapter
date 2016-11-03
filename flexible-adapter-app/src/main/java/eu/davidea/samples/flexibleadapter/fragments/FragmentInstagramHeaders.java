@@ -19,7 +19,7 @@ import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.ProgressItem;
+import eu.davidea.samples.flexibleadapter.items.ProgressItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 /**

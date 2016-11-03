@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import eu.davidea.samples.flexibleadapter.fragments.FragmentViewPager;
+import eu.davidea.samples.flexibleadapter.views.HeaderView;
 
 public class ViewPagerActivity extends AppCompatActivity {
 

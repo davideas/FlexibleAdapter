@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter;
+package eu.davidea.samples.flexibleadapter.views;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import eu.davidea.samples.flexibleadapter.R;
 
 public class HeaderView extends LinearLayout {
 

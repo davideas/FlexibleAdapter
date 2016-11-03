@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter.models;
+package eu.davidea.samples.flexibleadapter.items;
 
 import java.util.ArrayList;
 import java.util.List;

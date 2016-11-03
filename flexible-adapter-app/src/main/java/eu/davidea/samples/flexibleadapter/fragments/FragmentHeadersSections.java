@@ -23,7 +23,7 @@ import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.dialogs.BottomSheetDialog;
 import eu.davidea.samples.flexibleadapter.dialogs.OnParameterSelectedListener;
-import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem;
+import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;

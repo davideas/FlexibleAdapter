@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter.models;
+package eu.davidea.samples.flexibleadapter.holders;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +14,7 @@ import eu.davidea.flexibleadapter.items.AbstractHeaderItem;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IHolder;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.models.HeaderModel;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**

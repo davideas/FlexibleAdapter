@@ -13,8 +13,8 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.samples.flexibleadapter.models.LayoutItem;
-import eu.davidea.samples.flexibleadapter.models.OverallItem;
+import eu.davidea.samples.flexibleadapter.items.LayoutItem;
+import eu.davidea.samples.flexibleadapter.items.OverallItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 

@@ -19,9 +19,9 @@ import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.StaggeredHeaderItem;
-import eu.davidea.samples.flexibleadapter.models.StaggeredItem;
-import eu.davidea.samples.flexibleadapter.models.StaggeredItemStatus;
+import eu.davidea.samples.flexibleadapter.items.StaggeredHeaderItem;
+import eu.davidea.samples.flexibleadapter.items.StaggeredItem;
+import eu.davidea.samples.flexibleadapter.items.StaggeredItemStatus;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 /**

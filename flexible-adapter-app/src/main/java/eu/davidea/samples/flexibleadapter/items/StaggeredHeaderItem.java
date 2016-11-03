@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter.models;
+package eu.davidea.samples.flexibleadapter.items;
 
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;

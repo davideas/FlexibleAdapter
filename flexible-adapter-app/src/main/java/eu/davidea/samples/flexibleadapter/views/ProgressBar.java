@@ -1,4 +1,4 @@
-package eu.davidea.samples.flexibleadapter;
+package eu.davidea.samples.flexibleadapter.views;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -9,6 +9,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Interpolator;
+
+import eu.davidea.samples.flexibleadapter.R;
 
 /**
  * Procedurally-drawn version of a horizontal indeterminate progress bar. Draws faster and more
