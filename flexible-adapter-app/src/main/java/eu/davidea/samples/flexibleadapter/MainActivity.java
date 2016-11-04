@@ -57,6 +57,7 @@ import eu.davidea.samples.flexibleadapter.dialogs.MessageDialog;
 import eu.davidea.samples.flexibleadapter.fragments.AbstractFragment;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentAnimators;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentAsyncFilter;
+import eu.davidea.samples.flexibleadapter.fragments.FragmentDataBindingHeadersSections;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentEndlessScrolling;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableMultiLevel;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentExpandableSections;
@@ -341,6 +342,8 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentEndlessScrolling.newInstance(2);
 		} else if (id == R.id.nav_instagram_headers) {
 			mFragment = FragmentInstagramHeaders.newInstance();
+		} else if (id == R.id.nav_db_headers_and_sections) {
+			mFragment = FragmentDataBindingHeadersSections.newInstance(2);
 		} else if (id == R.id.nav_headers_and_sections) {
 			mFragment = FragmentHeadersSections.newInstance(2);
 			fabBehavior.setEnabled(true);

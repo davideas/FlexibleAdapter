@@ -113,7 +113,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * The main container for ALL items.
 	 */
-	private List<T> mItems, mTempItems;
+	protected List<T> mItems, mTempItems;
 
 	/**
 	 * HashSet, AsyncTask and DiffUtil objects, will increase performance in big list
