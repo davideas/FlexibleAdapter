@@ -52,6 +52,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @see SelectableAdapter
  * @since 10/01/2016 Created
  * <br/>30/01/2016 Class now extends {@link SelectableAdapter}
+ * <br/>13/09/2016 {@link #animateView(RecyclerView.ViewHolder, int)} is now automatically called
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class AnimatorAdapter extends SelectableAdapter {

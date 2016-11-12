@@ -427,17 +427,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 //		return mSelectedPositions;
 //	}
 
-	/**
-	 * Sorts and retrieves the list of selected items.
-	 * <p><b>To call once!</b> Then call {@link #getSelectedPositions()}.</p>
-	 *
-	 * @return Ordered list of selected items ids
-	 */
-//	public List<Integer> getSortedSelectedPositions() {
-//		Collections.sort(mSelectedPositions);
-//		return mSelectedPositions;
-//	}
-
 	/*----------------*/
 	/* INSTANCE STATE */
 	/*----------------*/

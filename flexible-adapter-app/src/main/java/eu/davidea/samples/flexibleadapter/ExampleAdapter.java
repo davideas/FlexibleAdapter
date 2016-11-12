@@ -1,5 +1,8 @@
 package eu.davidea.samples.flexibleadapter;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 
@@ -30,6 +33,10 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public ExampleAdapter(List<AbstractFlexibleItem> items, Object listeners) {
 		//stableIds ? true = Items implement hashCode() so they can have stableIds!
 		super(items, listeners, true);
+
+		//In case you need a Handler, do this:
+		//- Overrides the internal Handler with a custom callback that extends the internal one
+		mHandler = new Handler(Looper.getMainLooper(), new MyHandlerCallback());
 	}
 
 	@Override
@@ -143,6 +150,38 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			return Integer.toString(position);
 		}
 		return super.onCreateBubbleText(position);
+	}
+
+	/**
+	 * <b>Important:</b> In order to preserve the internal calls, this custom Callback
+	 * <u>must</u> extends {@link FlexibleAdapter.HandlerCallback}
+	 * which implements {@link android.os.Handler.Callback},
+	 * therefore you <u>must</u> call {@code super().handleMessage(message)}.
+	 * <p>
+	 * This handler can launch asynchronous tasks and if you catch the reserved "what",
+	 * keep in mind that this code should be executed <u>before</u> that task has been completed.
+	 * </p>
+	 * <p><b>Note:</b> numbers 0-9 are reserved for the Adapter, use others for new values.</p>
+	 */
+	private class MyHandlerCallback extends HandlerCallback {
+		@Override
+		public boolean handleMessage(Message message) {
+			boolean done = super.handleMessage(message);
+			switch (message.what) {
+				//currently reserved
+				case 0://async updateDataSet
+				case 1://async filterItems
+				case 2://confirm delete
+				case 8://onLoadMore remove progress item
+					return done;
+
+				//free to use
+				case 10:
+				case 11:
+					return true;
+			}
+			return false;
+		}
 	}
 
 }
