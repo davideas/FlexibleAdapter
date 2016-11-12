@@ -389,7 +389,6 @@ public class FlexibleAdapter<T extends IFlexible>
 				super.toggleSelection(position);
 			}
 		}
-
 		//Reset flags if necessary, just to be sure
 		if (getSelectedItemCount() == 0) {
 			mSelectedLevel = -1;
@@ -4156,7 +4155,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private boolean hasSubItemsSelected(int startPosition, List<T> subItems) {
 		for (T subItem : subItems) {
 			if (isSelected(++startPosition) ||
-					(isExpandable(subItem) && hasSubItemsSelected(startPosition + 1, getExpandableList((IExpandable) subItem))))
+					(isExpanded(subItem) && hasSubItemsSelected(startPosition, getExpandableList((IExpandable) subItem))))
 				return true;
 		}
 		return false;
