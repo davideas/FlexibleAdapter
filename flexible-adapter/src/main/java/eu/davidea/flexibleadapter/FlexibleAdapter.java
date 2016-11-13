@@ -1050,7 +1050,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private void showAllHeaders(boolean init) {
 		if (init) {
-
 			if (DEBUG) Log.i(TAG, "showAllHeaders at startup");
 			//No notifyItemInserted!
 			showAllHeadersWithReset(true);
@@ -1304,7 +1303,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Returns the ViewType for all Items depends by the provided position.
-	 * <p>You can override this method to return specific values (don't call super) or you can
+	 * <p>You can override this method to return specific values (don't call super) OR you can
 	 * let this method to call the implementation of {@code IFlexible#getLayoutRes()} so ViewTypes
 	 * are automatically mapped (AutoMap).</p>
 	 *
@@ -1323,25 +1322,27 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * You can override this method to create ViewHolder from inside the Adapter or you can let
+	 * You can override this method to create ViewHolder from inside the Adapter OR you can let
 	 * this method to call the implementation of {@code IFlexible#createViewHolder()} to create
 	 * ViewHolder from inside the item (AutoMap).
+	 * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
+	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
+	 * on GitHub.
 	 * <p/>{@inheritDoc}
 	 *
 	 * @return a new ViewHolder that holds a View of the given view type
-	 * @throws IllegalStateException if {@code IFlexible#createViewHolder()} is not implemented and
-	 *                               if this method is not overridden OR if ViewType instance has
-	 *                               not been correctly mapped.
+	 * @throws IllegalStateException if this method is not overridden OR AutoMap is not active
+	 *                               OR if ViewType instance has not been properly mapped.
 	 * @see IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)
 	 * @since 5.0.0-b1
 	 */
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		T item = getViewTypeInstance(viewType);
-		if (item == null) {
+		if (item == null || !autoMap) {
 			//If everything has been set properly, this should never happen ;-)
-			throw new IllegalStateException("ViewType instance has not been correctly mapped for viewType "
-					+ viewType + " or AutoMap is not active: super() cannot be called.");
+			throw new IllegalStateException("ViewType instance not found for viewType " + viewType +
+					". Override this method or implement the AutoMap properly.");
 		}
 		if (mInflater == null) {
 			mInflater = LayoutInflater.from(parent.getContext());
@@ -1351,12 +1352,15 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * You can override this method to bind the items into the corresponding ViewHolder from
-	 * inside the Adapter or you can let this method to call the implementation of
+	 * inside the Adapter OR you can let this method to call the implementation of
 	 * {@code IFlexible#bindViewHolder()} to bind the item inside itself (AutoMap).
+	 * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
+	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
+	 * on GitHub.
 	 * <p/>{@inheritDoc}
 	 *
-	 * @throws IllegalStateException if {@code IFlexible#bindViewHolder()} is not implemented OR
-	 *                               if {@code super()} is called when AutoMap is not active.
+	 * @throws IllegalStateException if this method is not overridden OR AutoMap has not been
+	 *                               properly implemented.
 	 * @see IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)
 	 * @since 5.0.0-b1
 	 */
@@ -1369,8 +1373,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Same concept of {@code #onBindViewHolder()} but with Payload.
 	 * <p/>{@inheritDoc}
 	 *
-	 * @throws IllegalStateException if {@code IFlexible#bindViewHolder()} is not implemented OR
-	 *                               if {@code super()} is called when AutoMap is not active.
+	 * @throws IllegalStateException if this method is not overridden OR AutoMap has not been
+	 *                               properly implemented.
 	 * @see IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)
 	 * @see #onBindViewHolder(RecyclerView.ViewHolder, int)
 	 * @since 5.0.0-b1
@@ -1384,7 +1388,9 @@ public class FlexibleAdapter<T extends IFlexible>
 					" layoutPosition=" + holder.getLayoutPosition());
 		}
 		if (!autoMap) {
-			throw new IllegalStateException("AutoMap is not active: super() cannot be called.");
+			//If everything has been set properly, this should never happen ;-)
+			throw new IllegalStateException("AutoMap is not active, this method cannot be called." +
+					" Override this method or implement the AutoMap properly.");
 		}
 		//When user scrolls, this line binds the correct selection status
 		holder.itemView.setActivated(isSelected(position));
