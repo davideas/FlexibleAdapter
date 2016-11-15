@@ -281,7 +281,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * {@inheritDoc}
-	 * <p>Attaches the StickyHeaderHelper from the RecyclerView when necessary</p>
+	 * <p>Attaches the StickyHeaderHelper from the RecyclerView if necessary.</p>
 	 *
 	 * @since 5.0.0-b6
 	 */
@@ -1151,7 +1151,11 @@ public class FlexibleAdapter<T extends IFlexible>
 					position--;
 				}
 				headersShown = false;
-				setStickyHeaders(false);
+				// Clear the header currently sticky
+				if (mStickyHeaderHelper != null) {
+					mStickyHeaderHelper.clearHeaderWithAnimation();
+				}
+				//setStickyHeaders(false);
 				multiRange = false;
 			}
 		});
