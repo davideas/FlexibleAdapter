@@ -48,6 +48,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 	private FlexibleViewHolder mStickyHeaderViewHolder;
 	private OnStickyHeaderChangeListener mStickyHeaderChangeListener;
 	private int mHeaderPosition = RecyclerView.NO_POSITION;
+	private boolean displayWithAnimation = false;
 
 
 	public StickyHeaderHelper(FlexibleAdapter adapter,
@@ -73,40 +74,15 @@ public class StickyHeaderHelper extends OnScrollListener {
 		mRecyclerView = parent;
 		if (mRecyclerView != null) {
 			mRecyclerView.addOnScrollListener(this);
-			mRecyclerView.post(new Runnable() {
-				@Override
-				public void run() {
-					initStickyHeadersHolder();
-				}
-			});
+			initStickyHeadersHolder();
 		}
 	}
 
 	public void detachFromRecyclerView(RecyclerView parent) {
-		if (mRecyclerView == parent) {
-			mRecyclerView.removeOnScrollListener(this);
-			mRecyclerView = null;
-			mStickyHolderLayout.animate().setListener(new Animator.AnimatorListener() {
-				@Override
-				public void onAnimationStart(Animator animation) {
-				}
-
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					clearHeader();
-				}
-
-				@Override
-				public void onAnimationCancel(Animator animation) {
-				}
-
-				@Override
-				public void onAnimationRepeat(Animator animation) {
-				}
-			});
-			mStickyHolderLayout.animate().alpha(0).start();
-			if (FlexibleAdapter.DEBUG) Log.i(TAG, "StickyHolderLayout detached");
-		}
+		mRecyclerView.removeOnScrollListener(this);
+		mRecyclerView = null;
+		clearHeaderWithAnimation();
+		if (FlexibleAdapter.DEBUG) Log.i(TAG, "StickyHolderLayout detached");
 	}
 
 	private void initStickyHeadersHolder() {
@@ -138,9 +114,9 @@ public class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	public void updateOrClearHeader(boolean updateHeaderContent) {
-		if (mStickyHolderLayout == null || mAdapter.hasSearchText() ||
-				mRecyclerView == null || mRecyclerView.getChildCount() == 0) {
-			clearHeader();
+		if (!mAdapter.areHeadersShown() || mAdapter.hasSearchText() || mAdapter.getItemCount() == 0
+				|| mStickyHolderLayout == null || !isAttachedToRecyclerView()) {
+			clearHeaderWithAnimation();
 			return;
 		}
 		int firstHeaderPosition = getHeaderPosition(RecyclerView.NO_POSITION);
@@ -152,6 +128,12 @@ public class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	private void updateHeader(int headerPosition, boolean updateHeaderContent) {
+		// Animate if headers were hidden
+		if (displayWithAnimation) {
+			displayWithAnimation = false;
+			mStickyHolderLayout.setAlpha(0);
+			mStickyHolderLayout.animate().alpha(1).start();
+		}
 		// Check if there is a new header to be sticky
 		if (mHeaderPosition != headerPosition) {
 			mHeaderPosition = headerPosition;
@@ -171,7 +153,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 		int headerOffsetX = 0, headerOffsetY = 0;
 
-		//Search for the position where the next header item is found and take the new offset
+		//Search for the position where the next header item is found and translate the new offset
 		for (int i = 0; i < mRecyclerView.getChildCount(); i++) {
 			final View nextChild = mRecyclerView.getChildAt(i);
 			if (nextChild != null) {
@@ -182,12 +164,14 @@ public class StickyHeaderHelper extends OnScrollListener {
 						if (nextChild.getLeft() > 0) {
 							int headerWidth = mStickyHolderLayout.getMeasuredWidth();
 							headerOffsetX = Math.min(nextChild.getLeft() - headerWidth, 0);
+							// TODO: AlphaListener = Math.abs((float)nextChild.getLeft()) / headerWidth);
 							if (headerOffsetX < 0) break;
 						}
 					} else {
 						if (nextChild.getTop() > 0) {
 							int headerHeight = mStickyHolderLayout.getMeasuredHeight();
 							headerOffsetY = Math.min(nextChild.getTop() - headerHeight, 0);
+							// TODO: AlphaListener = Math.abs((float)nextChild.getTop()) / headerHeight);
 							if (headerOffsetY < 0) break;
 						}
 					}
@@ -229,6 +213,18 @@ public class StickyHeaderHelper extends OnScrollListener {
 		mStickyHolderLayout.addView(view);
 	}
 
+	private void resetHeader(FlexibleViewHolder header) {
+		final View view = header.getContentView();
+		removeViewFromParent(view);
+		//Reset transformation on removed header
+		view.setTranslationX(0);
+		view.setTranslationY(0);
+		mStickyHeaderViewHolder.itemView.setVisibility(View.VISIBLE);
+		if (!header.itemView.equals(view))
+			((ViewGroup) header.itemView).addView(view);
+		header.setIsRecyclable(true);
+	}
+
 	private void clearHeader() {
 		if (mStickyHeaderViewHolder != null) {
 			if (FlexibleAdapter.DEBUG) Log.d(TAG, "clearHeader");
@@ -240,16 +236,28 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 	}
 
-	private void resetHeader(FlexibleViewHolder header) {
-		final View view = header.getContentView();
-		removeViewFromParent(view);
-		//Reset transformation on removed header
-		view.setTranslationX(0);
-		view.setTranslationY(0);
-		mStickyHeaderViewHolder.itemView.setVisibility(View.VISIBLE);
-		if (!header.itemView.equals(view))
-			((ViewGroup) header.itemView).addView(view);
-		header.setIsRecyclable(true);
+	public void clearHeaderWithAnimation() {
+		mStickyHolderLayout.animate().setListener(new Animator.AnimatorListener() {
+			@Override
+			public void onAnimationStart(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				mStickyHolderLayout.animate().setListener(null);
+				displayWithAnimation = true;
+				clearHeader();
+			}
+
+			@Override
+			public void onAnimationCancel(Animator animation) {
+			}
+
+			@Override
+			public void onAnimationRepeat(Animator animation) {
+			}
+		});
+		mStickyHolderLayout.animate().alpha(0).start();
 	}
 
 	private static void removeViewFromParent(final View view) {
