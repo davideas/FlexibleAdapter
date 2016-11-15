@@ -10,7 +10,6 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.animation.DecelerateInterpolator;
 
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
@@ -51,27 +50,36 @@ public class FragmentOverall extends AbstractFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//Create overall items and Initialize RecyclerView
+		// Create overall items and Initialize RecyclerView
 		DatabaseService.getInstance().createOverallDatabase(getActivity().getResources());
 		initializeRecyclerView(savedInstanceState);
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Initialize Adapter and RecyclerView
-		//OverallAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+		// Initialize Adapter and RecyclerView
+		// OverallAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+
+		// In this example the Adapter make uses of METHOD B and extends FlexibleAdapter: items
+		// don't implement the AutoMap and don't implement create and binding methods: The Adapter
+		// remains responsible to handling all view types.
 		mAdapter = new OverallAdapter(getActivity());
-		//Experimenting NEW features (v5.0.0)
+
+		// Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true)
-				.setAnimationInterpolator(new DecelerateInterpolator())
+				//.setAnimationInterpolator(new DecelerateInterpolator())
 				.setAnimationInitialDelay(500L)
 				.setAnimationDelay(150L);
+
+		// Prepare the RecyclerView and attach the Adapter to it
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setItemViewCacheSize(0);//Setting ViewCache to 0 (default=2) will animate items better while scrolling down+up with LinearLayout
 		mRecyclerView.setLayoutManager(createNewStaggeredGridLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true);//Size of RV will not change
+
+		// After Adapter is attached to RecyclerView
 		mAdapter.setLongPressDragEnabled(true);
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
@@ -86,7 +94,7 @@ public class FragmentOverall extends AbstractFragment {
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		//Add sample HeaderView items on the top (not belongs to the library)
+		// Add sample HeaderView items on the top (not belongs to the library)
 		mAdapter.showLayoutInfo(savedInstanceState == null);
 	}
 
@@ -109,8 +117,8 @@ public class FragmentOverall extends AbstractFragment {
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {
-				//NOTE: If you use simple integer to identify the ViewType,
-				//here, you should use them and not Layout integers
+				// NOTE: If you use simple integer to identify the ViewType,
+				// here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
 					case R.layout.recycler_layout_item:
 						return mColumnCount;
