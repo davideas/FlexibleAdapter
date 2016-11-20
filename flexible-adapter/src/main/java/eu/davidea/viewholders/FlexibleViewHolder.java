@@ -29,6 +29,7 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
 
@@ -226,7 +227,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	/**
 	 * Allows to activate the itemView when Swipe event occurs.
 	 * <p>This method returns always false; Extend with "return true" to Not expand or collapse
-	 * this ItemView onClick events.</p>
+	 * this itemView onClick events.</p>
 	 *
 	 * @return always false, if not overridden
 	 * @since 5.0.0-b2
@@ -237,8 +238,8 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 
 	/**
 	 * Allows to add and keep item selection if ActionMode is active.
-	 * <p>This method returns always false; Extend with "return true" to add item to the ActionMode
-	 * count.</p>
+	 * <p>This method returns always false; Extend with "return true" to add the item to the
+	 * ActionMode count.</p>
 	 *
 	 * @return always false, if not overridden
 	 * @since 5.0.0-b2
@@ -256,12 +257,14 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * actively scrolls the list (forward or backward).
 	 * <p>Implement your logic for different animators based on position, selection and/or
 	 * direction.</p>
-	 * Create your {@link Animator}(s), then add it to the list of animators.
+	 * Use can take one of the predefined Animator from {@link AnimatorHelper} or create your own
+	 * {@link Animator}(s), then add it to the list of animators.
 	 *
+	 * @param animators NonNull list of animators, which you should add new animators
 	 * @param position  can be used to differentiate the Animators based on positions
 	 * @param isForward can be used to separate animation from top/bottom or from left/right scrolling
 	 * @since 5.0.0-b8
-	 * @see eu.davidea.flexibleadapter.helpers.AnimatorHelper
+	 * @see AnimatorHelper
 	 */
 	public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 		//Free to implement
@@ -274,7 +277,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	/**
 	 * Here we handle the event of when the ItemTouchHelper first registers an item as being
 	 * moved or swiped.
-	 * <p>In this implementations, View activation is automatically handled in case of Drag:
+	 * <p>In this implementation, View activation is automatically handled in case of Drag:
 	 * The Item will be added to the selection list if not selected yet and mode MULTI is activated.</p>
 	 *
 	 * @param position    the position of the item touched
@@ -357,6 +360,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	}
 
 	/**
+	 * @return the boolean value from the item flag, true to allow dragging
 	 * @since 5.0.0-b7
 	 */
 	@Override
@@ -366,6 +370,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	}
 
 	/**
+	 * @return the boolean value from the item flag, true to allow swiping
 	 * @since 5.0.0-b7
 	 */
 	@Override

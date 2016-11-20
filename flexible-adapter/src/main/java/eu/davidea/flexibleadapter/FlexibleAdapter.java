@@ -127,7 +127,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/* Header/Section items */
 	private List<IHeader> mOrphanHeaders;
-	private boolean headersShown = false, headersSticky = false, recursive = false;
+	private boolean headersShown = false, recursive = false;
 	private StickyHeaderHelper mStickyHeaderHelper;
 	private ViewGroup mStickyContainer;
 
@@ -302,7 +302,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	@Override
 	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
 		if (mStickyHeaderHelper != null) {
-			mStickyHeaderHelper.detachFromRecyclerView(mRecyclerView);
+			mStickyHeaderHelper.detachFromRecyclerView();
 			mStickyHeaderHelper = null;
 		}
 		super.onDetachedFromRecyclerView(recyclerView);
@@ -912,7 +912,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	public boolean areHeadersSticky() {
-		return headersSticky;
+		return mStickyHeaderHelper != null;
 	}
 
 	/**
@@ -947,17 +947,15 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
-				// Add or Remove the sticky headers
+				// Enable or Disable the sticky headers layout
 				if (sticky) {
-					headersSticky = true;
-					if (mStickyHeaderHelper == null)
+					if (mStickyHeaderHelper == null) {
 						mStickyHeaderHelper = new StickyHeaderHelper(FlexibleAdapter.this, mStickyHeaderChangeListener);
-					if (!mStickyHeaderHelper.isAttachedToRecyclerView())
 						mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
-					if (DEBUG) Log.i(TAG, "Sticky headers enabled");
+						if (DEBUG) Log.i(TAG, "Sticky headers enabled");
+					}
 				} else if (mStickyHeaderHelper != null) {
-					headersSticky = false;
-					mStickyHeaderHelper.detachFromRecyclerView(mRecyclerView);
+					mStickyHeaderHelper.detachFromRecyclerView();
 					mStickyHeaderHelper = null;
 					if (DEBUG) Log.i(TAG, "Sticky headers disabled");
 				}
@@ -998,8 +996,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param stickyContainer custom container for Sticky Headers
 	 * @since 5.0.0-rc1
 	 */
-	public FlexibleAdapter setStickyHeaderContainer(@Nullable ViewGroup stickyContainer) {
-		if (DEBUG)
+	public FlexibleAdapter setStickyHeaderContainer(@NonNull ViewGroup stickyContainer) {
+		if (DEBUG && stickyContainer != null)
 			Log.i(TAG, "Set stickyHeaderContainer=" + stickyContainer.getClass().getSimpleName());
 		this.mStickyContainer = stickyContainer;
 		return this;

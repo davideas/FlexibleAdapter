@@ -62,10 +62,6 @@ public class StickyHeaderHelper extends OnScrollListener {
 		updateOrClearHeader(false);
 	}
 
-	public boolean isAttachedToRecyclerView() {
-		return mRecyclerView != null;
-	}
-
 	public void attachToRecyclerView(RecyclerView parent) {
 		if (mRecyclerView != null) {
 			mRecyclerView.removeOnScrollListener(this);
@@ -78,7 +74,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 		}
 	}
 
-	public void detachFromRecyclerView(RecyclerView parent) {
+	public void detachFromRecyclerView() {
 		mRecyclerView.removeOnScrollListener(this);
 		mRecyclerView = null;
 		clearHeaderWithAnimation();
@@ -98,7 +94,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 			mStickyHolderLayout.animate().alpha(1).start();
 			if (FlexibleAdapter.DEBUG) Log.i(TAG, "StickyHolderLayout initialized");
 		} else {
-			Log.w(TAG, "WARNING! ViewGroup for Sticky Headers unspecified! You must include @layout/sticky_header_layout or implement FlexibleAdapter.getStickySectionHeadersHolder() method");
+			throw new IllegalStateException("ViewGroup for Sticky Headers unspecified! You must either include @layout/sticky_header_layout OR set a custom StickyHeaderContainer");
 		}
 	}
 
@@ -114,8 +110,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	public void updateOrClearHeader(boolean updateHeaderContent) {
-		if (!mAdapter.areHeadersShown() || mAdapter.hasSearchText() || mAdapter.getItemCount() == 0
-				|| mStickyHolderLayout == null || !isAttachedToRecyclerView()) {
+		if (!mAdapter.areHeadersShown() || mAdapter.hasSearchText() || mAdapter.getItemCount() == 0) {
 			clearHeaderWithAnimation();
 			return;
 		}
