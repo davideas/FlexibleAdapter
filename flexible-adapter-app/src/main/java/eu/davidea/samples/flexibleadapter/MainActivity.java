@@ -123,6 +123,11 @@ public class MainActivity extends AppCompatActivity implements
 	 * Bundle key representing the Active Fragment
 	 */
 	private static final String STATE_ACTIVE_FRAGMENT = "active_fragment";
+	/**
+	 * The serialization (saved instance state) Bundle key representing the
+	 * activated item position. Only used on tablets.
+	 */
+	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
 	/**
 	 * FAB
@@ -142,6 +147,12 @@ public class MainActivity extends AppCompatActivity implements
 	private NavigationView mNavigationView;
 	private AbstractFragment mFragment;
 	private SearchView mSearchView;
+
+	/**
+	 * The current activated item position.
+	 */
+	private int mActivatedPosition = RecyclerView.NO_POSITION;
+
 	private final Handler mRefreshHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
 			switch (message.what) {
@@ -205,6 +216,9 @@ public class MainActivity extends AppCompatActivity implements
 			//Selection
 			mAdapter.onRestoreInstanceState(savedInstanceState);
 			mActionModeHelper.restoreSelection(this);
+			//Previously serialized activated item position
+			if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
+				setSelection(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 		}
 	}
 
@@ -654,7 +668,6 @@ public class MainActivity extends AppCompatActivity implements
 
 	/* DIALOG LISTENER IMPLEMENTATION (For the example of onItemClick) */
 	
-
 	@Override
 	public void onTitleModified(int position, String newTitle) {
 		AbstractFlexibleItem abstractItem = mAdapter.getItem(position);
@@ -667,6 +680,27 @@ public class MainActivity extends AppCompatActivity implements
 			headerItem.setTitle(newTitle);
 		}
 		mAdapter.updateItem(position, abstractItem, null);
+	}
+
+	/* LAST SELECTED ITEM */
+
+	private void setActivatedPosition(int position) {
+		Log.d(TAG, "ItemList New mActivatedPosition=" + position);
+		mActivatedPosition = position;
+	}
+
+	//TODO: Should include setActivatedPosition in the library?
+	public void setSelection(final int position) {
+		if (mAdapter.getMode() == FlexibleAdapter.MODE_SINGLE) {
+			Log.v(TAG, "setSelection called!");
+			setActivatedPosition(position);
+			mRecyclerView.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mRecyclerView.smoothScrollToPosition(position);
+				}
+			}, 1000L);
+		}
 	}
 
 	/* FLEXIBLE ADAPTER LISTENERS IMPLEMENTATION */
@@ -683,6 +717,7 @@ public class MainActivity extends AppCompatActivity implements
 
 		//Action on elements are allowed if Mode is IDLE, otherwise selection has priority
 		if (mAdapter.getMode() != SelectableAdapter.MODE_IDLE && mActionModeHelper != null) {
+			if (position != mActivatedPosition) setActivatedPosition(position);
 			return mActionModeHelper.onClick(position);
 		} else {
 			//Notify the active callbacks or implement a custom action onClick
