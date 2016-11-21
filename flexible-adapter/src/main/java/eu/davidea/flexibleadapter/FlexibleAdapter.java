@@ -4201,6 +4201,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	private void adjustSelected(int startPosition, int itemCount) {
 		List<Integer> selectedPositions = getSelectedPositions();
 		boolean adjusted = false;
+		if (itemCount > 0) {
+			// Reverse sorting is necessary because using Set might remove duplicates during adjusting
+			Collections.sort(selectedPositions, new Comparator<Integer>() {
+				@Override
+				public int compare(Integer o1, Integer o2) {
+					return o2 - o1;
+				}
+			});
+		}
 		for (Integer position : selectedPositions) {
 			if (position >= startPosition) {
 				if (DEBUG)
