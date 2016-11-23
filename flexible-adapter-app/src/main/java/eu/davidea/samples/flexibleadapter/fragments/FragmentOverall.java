@@ -120,7 +120,7 @@ public class FragmentOverall extends AbstractFragment {
 				// NOTE: If you use simple integer to identify the ViewType,
 				// here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_layout_item:
+					case R.layout.recycler_scrollable_layout_item:
 						return mColumnCount;
 					default:
 						return 1;

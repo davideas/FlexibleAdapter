@@ -14,27 +14,19 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
+import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Item dedicated only for User Learns Selection view (located always at position 0 in the Adapter).
- * <p>If you don't have many fields in common better to extend directly from
- * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
- * implemented methods (getter and setters).</p>
+ * This item is a Scrollable Footer.
  */
-public class ULSItem extends AbstractItem<ULSItem.ExampleViewHolder> {
+public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.FooterViewHolder> {
 
 	private static final long serialVersionUID = -5041296095060813327L;
 
-	public ULSItem(String id) {
+	public ScrollableFooterItem(String id) {
 		super(id);
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return false;
 	}
 
 	@Override
@@ -44,46 +36,39 @@ public class ULSItem extends AbstractItem<ULSItem.ExampleViewHolder> {
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_uls_item;
+		return R.layout.recycler_scrollable_footer_item;
 	}
 
 	@Override
-	public ExampleViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ExampleViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public FooterViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new FooterViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter, this);
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, ExampleViewHolder holder, int position, List payloads) {
-		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
-		holder.itemView.setActivated(true);
-		holder.mTitle.setSelected(true);//For marquee
+	public void bindViewHolder(FlexibleAdapter adapter, FooterViewHolder holder, int position, List payloads) {
+//		holder.mTitle.setSelected(true);//For marquee
 		holder.mTitle.setText(Html.fromHtml(getTitle()));
 		holder.mSubtitle.setText(Html.fromHtml(getSubtitle()));
 	}
 
-	/**
-	 * Used for UserLearnsSelection.
-	 */
-	static class ExampleViewHolder extends FlexibleViewHolder {
+	class FooterViewHolder extends FlexibleViewHolder {
 
-		public ImageView mImageView;
 		public TextView mTitle;
 		public TextView mSubtitle;
 		public ImageView mDismissIcon;
 
-		public ExampleViewHolder(View view, FlexibleAdapter adapter) {
+		public FooterViewHolder(View view, FlexibleAdapter adapter, final IFlexible item) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-			mImageView = (ImageView) view.findViewById(R.id.image);
 			mDismissIcon = (ImageView) view.findViewById(R.id.dismiss_icon);
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					DatabaseConfiguration.userLearnedSelection = true;
-					mAdapter.setPermanentDelete(true);
-					mAdapter.removeItem(0);
-					mAdapter.setPermanentDelete(false);
+					//Don't need anymore to set permanent for Scrollable Headers and Footers
+					//mAdapter.setPermanentDelete(true);
+					mAdapter.removeScrollableFooter(item);
+					//mAdapter.setPermanentDelete(false);
 				}
 			});
 
@@ -95,13 +80,13 @@ public class ULSItem extends AbstractItem<ULSItem.ExampleViewHolder> {
 
 		@Override
 		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
-			AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
+			AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "ULSItem[" + super.toString() + "]";
+		return "FooterItem[" + super.toString() + "]";
 	}
 
 }

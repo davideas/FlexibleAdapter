@@ -19,8 +19,6 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.items.ULSItem;
-import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -78,17 +76,6 @@ public class FragmentSelectionModes extends AbstractFragment {
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		//Get copy of the Database list
 		List<AbstractFlexibleItem> items = DatabaseService.getInstance().getDatabaseList();
-
-		//TODO: find a solution for delayed items added after the restoring of the selected items
-		//The delayed items must ALREADY exist in the list before restoring the selection, otherwise
-		// the selection CANNOT be adjusted
-		if (savedInstanceState != null && !DatabaseConfiguration.userLearnedSelection) {
-			//Define Example View
-			final ULSItem item = new ULSItem("ULS");
-			item.setTitle(getString(R.string.uls_title));
-			item.setSubtitle(getString(R.string.uls_subtitle));
-			items.add(0, item);
-		}
 
 		//Initialize Adapter and RecyclerView
 		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'

@@ -10,8 +10,9 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.samples.flexibleadapter.items.LayoutItem;
-import eu.davidea.samples.flexibleadapter.items.ULSItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableFooterItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableULSItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 
 /**
@@ -61,7 +62,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public void showLayoutInfo(boolean scrollToPosition) {
 		if (!hasSearchText() && !isEmpty()) {
 			//Define Example View
-			final LayoutItem item = new LayoutItem("LAY-L");
+			final ScrollableLayoutItem item = new ScrollableLayoutItem("LAY-L");
 			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
 				item.setId("LAY-S");
 				item.setTitle(mRecyclerView.getContext().getString(R.string.staggered_layout));
@@ -75,9 +76,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 					R.string.columns,
 					String.valueOf(getSpanCount(mRecyclerView.getLayoutManager())))
 			);
-			addItemWithDelay((getItem(0) instanceof ULSItem ? 1 : 0), item, 0L,
-					(!(getItem(0) instanceof ULSItem) && scrollToPosition));
-			removeItemWithDelay(item, 4000L, true);
+			addScrollableHeader(item);
+			removeScrollableHeaderWithDelay(item, 4000L);
 		}
 	}
 
@@ -88,18 +88,21 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 * The view is represented by a custom Item type to better represent any dynamic content.
 	 */
 	public void addUserLearnedSelection(boolean scrollToPosition) {
-		if (!DatabaseConfiguration.userLearnedSelection && !hasSearchText() && !(getItem(0) instanceof ULSItem)) {
+		if (!DatabaseConfiguration.userLearnedSelection && !hasSearchText() && !(getItem(0) instanceof ScrollableULSItem)) {
 			//Define Example View
-			final ULSItem item = new ULSItem("ULS");
+			final ScrollableULSItem item = new ScrollableULSItem("ULS");
 			item.setTitle(mRecyclerView.getContext().getString(R.string.uls_title));
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.uls_subtitle));
-			addItemWithDelay(0, item, 1500L, scrollToPosition);
+			addScrollableHeaderWithDelay(item, 1000L, scrollToPosition);
 		}
 	}
 
-	@Override
-	protected void onPostFilter() {
-		addUserLearnedSelection(false);
+	public void addScrollableFooter() {
+		//Define Example View
+		final ScrollableFooterItem item = new ScrollableFooterItem("SFI");
+		item.setTitle(mRecyclerView.getContext().getString(R.string.scrollable_footer_title));
+		item.setSubtitle(mRecyclerView.getContext().getString(R.string.scrollable_footer_subtitle));
+		addScrollableFooterWithDelay(item, 1000L, false);
 	}
 
 	/**

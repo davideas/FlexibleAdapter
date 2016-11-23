@@ -109,9 +109,11 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mAdapter.setEndlessScrollListener(this, new ProgressItem());
 		//mAdapter.setEndlessScrollThreshold(1);//Default=1
 
-		//Add sample HeaderView items on the top (not belongs to the library)
+		//Add sample Scrollable Header and Footer items (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.addScrollableFooter();
+
 	}
 
 	@Override
@@ -171,7 +173,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				String message = (newItems.size() > 0 ?
 						"Simulated: " + newItems.size() + " new items arrived :-)" :
 						"Simulated: No more items to load :-(\nRefresh to retry.");
-				Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
 			}
 		}, 2500);
 	}
@@ -214,8 +216,10 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				//NOTE: If you use simple integer to identify the ViewType,
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_layout_item:
-					case R.layout.recycler_uls_item:
+					case R.layout.recycler_scrollable_header_item:
+					case R.layout.recycler_scrollable_footer_item:
+					case R.layout.recycler_scrollable_layout_item:
+					case R.layout.recycler_scrollable_uls_item:
 					case R.layout.progress_item:
 						return mColumnCount;
 					default:

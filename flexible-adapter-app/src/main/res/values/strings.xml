@@ -35,9 +35,13 @@
 	<string name="mode_single">Mode Single</string>
 	<string name="undo">Undo</string>
 
-	<!-- User Learns Selection -->
+	<!-- Scrollable Headers/Footer -->
 	<string name="uls_title"><![CDATA[<i>Click on Image (or LongClick on Item) to select that Item</i>]]></string>
-	<string name="uls_subtitle"><![CDATA[<i>This is an example of 2nd view type</i>]]></string>
+	<string name="uls_subtitle"><![CDATA[<i>This is scrollable header.</i>]]></string>
+	<string name="scrollable_header_title">Scrollable Header Item</string>
+	<string name="scrollable_header_subtitle"><![CDATA[<i>Scrollable Headers are always displayed at the top of all main items.</i>]]></string>
+	<string name="scrollable_footer_title">Scrollable Footer Item</string>
+	<string name="scrollable_footer_subtitle"><![CDATA[<i>Scrollable Footers are always displayed at the bottom of all main items.</i>]]></string>
 
 	<!-- Dialog -->
 	<string name="dialog_edit_title_hint">Title</string>
@@ -87,7 +91,7 @@ items and higher, due to calculate the correct position for each item to shift. 
 	<string name="overall">Overall</string>
 
 	<string name="selection_modes">Selection modes</string>
-	<string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper + UndoHelper</string>
+	<string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper + UndoHelper + Scrollable Headers</string>
 
 	<string name="filter">Async Filter</string>
 	<string name="filter_description">Big list with Asynchronous filter and refresh + Synchronization Animations + Configuration</string>
@@ -96,7 +100,7 @@ items and higher, due to calculate the correct position for each item to shift. 
 	<string name="animator_description">ItemAnimators coherent with ScrollingAnimation</string>
 
 	<string name="headers_sections">Headers and Sections</string>
-	<string name="headers_sections_description">Clickable sticky headers for sections + Draggable items with Auto-Linkage + Filter</string>
+	<string name="headers_sections_description">Clickable sticky headers for sections + Draggable items with Auto-Linkage + Filter + Scrollable Headers and Footers</string>
 
 	<string name="expandable_sections">Expandable Sections</string>
 	<string name="expandable_sections_description">Sections with [sticky] headers that can expand/collapse + Draggable items + Filter + Scroll Animations</string>
@@ -105,7 +109,7 @@ items and higher, due to calculate the correct position for each item to shift. 
 	<string name="multi_level_expandable_description">2 levels of expandable + Selection Coherence + Swipeable &amp; Draggable items + ActionModeHelper + UndoHelper</string>
 
 	<string name="endless_scrolling">Endless Scrolling</string>
-	<string name="endless_scrolling_description">EndlessScrolling + Drag + Swipe-To-Delete w/rear-views + Scroll Animations + ActionModeHelper + UndoHelper</string>
+	<string name="endless_scrolling_description">EndlessScrolling + Drag + Swipe-To-Delete w/rear-views + Scroll Animations + ActionModeHelper + UndoHelper + Scrollable Headers and Footers</string>
 
 	<string name="instagram_headers">Instagram headers</string>
 	<string name="instagram_headers_description"><![CDATA[1 sticky header for each item + Endless Scrolling.<br/><font color="#ff4081"><b>Internet is required.</b></font>]]></string>

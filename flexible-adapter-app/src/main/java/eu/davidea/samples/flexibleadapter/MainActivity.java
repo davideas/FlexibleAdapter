@@ -85,9 +85,9 @@ import eu.davidea.utils.Utils;
  * The Demo application is organized in Fragments with 1 Activity {@code MainActivity}
  * implementing most of the methods. Each Fragment shows a different example and can assemble
  * more functionalities at once.
- *
+ * <p>
  * <p>The Activity implementation is organized in this order:</p>
- *
+ * <p>
  * <ul>
  * <li>Activity management
  * <li>Initialization methods
@@ -100,10 +100,10 @@ import eu.davidea.utils.Utils;
  * <li>ActionMode implementation
  * <li>Extras
  * </ul>
- *
+ * <p>
  * The Fragments <u>may</u> use Activity implementations or may override specific behaviors
  * themselves. Fragments have {@code AbstractFragment} in common to have some methods reusable.
- *
+ * <p>
  * <p>...more on
  * <a href="https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-App">Demo app Wiki page</a>.</p>
  */
@@ -667,7 +667,7 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	/* DIALOG LISTENER IMPLEMENTATION (For the example of onItemClick) */
-	
+
 	@Override
 	public void onTitleModified(int position, String newTitle) {
 		AbstractFlexibleItem abstractItem = mAdapter.getItem(position);

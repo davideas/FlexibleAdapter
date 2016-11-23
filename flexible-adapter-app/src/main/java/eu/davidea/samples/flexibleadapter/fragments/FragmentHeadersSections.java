@@ -112,9 +112,10 @@ public class FragmentHeadersSections extends AbstractFragment
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		//Add sample HeaderView items on the top (not belongs to the library)
+		//Add sample Scrollable Header and Footer items (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.addScrollableFooter();
 	}
 
 	@Override
@@ -189,8 +190,10 @@ public class FragmentHeadersSections extends AbstractFragment
 				//NOTE: If you use simple integer to identify the ViewType,
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_layout_item:
-					case R.layout.recycler_uls_item:
+					case R.layout.recycler_scrollable_header_item:
+					case R.layout.recycler_scrollable_footer_item:
+					case R.layout.recycler_scrollable_layout_item:
+					case R.layout.recycler_scrollable_uls_item:
 					case R.layout.recycler_header_item:
 					case R.layout.recycler_expandable_header_item:
 						return mColumnCount;

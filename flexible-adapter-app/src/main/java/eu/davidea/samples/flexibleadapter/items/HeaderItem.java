@@ -18,9 +18,9 @@ import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * This is a simple item with custom layout for headers.
- * <p>A Section should not contain others Sections!</p>
- * Headers are not Sectionable!
+ * This is a header item with custom layout for section headers.
+ * <p><b>Note:</b> THIS ITEM IS NOT A SCROLLABLE HEADER.</p>
+ * A Section should not contain others Sections and headers are not Sectionable!
  */
 public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> implements IFilterable {
 

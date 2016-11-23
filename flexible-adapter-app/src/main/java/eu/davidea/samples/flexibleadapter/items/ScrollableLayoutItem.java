@@ -17,18 +17,18 @@ import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Item dedicated to display the status of the Layout currently displayed (located always at
- * position 0 in the Adapter).
+ * Item dedicated to display the status of the Layout currently displayed.
+ * This item is a Scrollable Header.
  *
  * <p>If you don't have many fields in common better to extend directly from
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).</p>
  */
-public class LayoutItem extends AbstractItem<LayoutItem.ExampleViewHolder> {
+public class ScrollableLayoutItem extends AbstractItem<ScrollableLayoutItem.LayoutViewHolder> {
 
 	private static final long serialVersionUID = -5041296095060813327L;
 
-	public LayoutItem(String id) {
+	public ScrollableLayoutItem(String id) {
 		super(id);
 	}
 
@@ -44,16 +44,16 @@ public class LayoutItem extends AbstractItem<LayoutItem.ExampleViewHolder> {
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_layout_item;
+		return R.layout.recycler_scrollable_layout_item;
 	}
 
 	@Override
-	public ExampleViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ExampleViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public LayoutViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new LayoutViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, ExampleViewHolder holder, int position, List payloads) {
+	public void bindViewHolder(FlexibleAdapter adapter, LayoutViewHolder holder, int position, List payloads) {
 		holder.mTitle.setSelected(true);//For marquee
 		holder.mTitle.setText(getTitle());
 		holder.mSubtitle.setText(getSubtitle());
@@ -65,15 +65,12 @@ public class LayoutItem extends AbstractItem<LayoutItem.ExampleViewHolder> {
 		}
 	}
 
-	/**
-	 * Used for UserLearnsSelection.
-	 */
-	public static class ExampleViewHolder extends FlexibleViewHolder {
+	public static class LayoutViewHolder extends FlexibleViewHolder {
 
 		public TextView mTitle;
 		public TextView mSubtitle;
 
-		public ExampleViewHolder(View view, FlexibleAdapter adapter) {
+		public LayoutViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);

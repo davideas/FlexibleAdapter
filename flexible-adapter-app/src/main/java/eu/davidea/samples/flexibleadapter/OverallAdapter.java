@@ -13,7 +13,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.samples.flexibleadapter.items.LayoutItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
 import eu.davidea.samples.flexibleadapter.items.OverallItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
@@ -47,7 +47,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public void showLayoutInfo(boolean scrollToPosition) {
 		if (!hasSearchText()) {
 			//Define Example View
-			final LayoutItem item = new LayoutItem("LAY-L");
+			final ScrollableLayoutItem item = new ScrollableLayoutItem("LAY-L");
 			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
 				item.setId("LAY-S");
 				item.setTitle(mRecyclerView.getContext().getString(R.string.staggered_layout));
@@ -61,8 +61,8 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 					R.string.columns,
 					String.valueOf(getSpanCount(mRecyclerView.getLayoutManager())))
 			);
-			addItemWithDelay(0, item, 500L, scrollToPosition);
-			removeItemWithDelay(item, 2000L, true);
+			addScrollableHeaderWithDelay(item, 500L, scrollToPosition);
+			removeScrollableHeaderWithDelay(item, 2000L);
 		}
 	}
 
@@ -73,8 +73,8 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	@Override
 	public int getItemViewType(int position) {
 		IFlexible item = getItem(position);
-		if (item instanceof LayoutItem) return R.layout.recycler_layout_item;
-		else return R.layout.recycler_label_item;
+		if (item instanceof ScrollableLayoutItem) return R.layout.recycler_scrollable_layout_item;
+		else return R.layout.recycler_overall_item;
 	}
 
 	/**
@@ -85,8 +85,8 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		mInflater = LayoutInflater.from(parent.getContext());
 		switch (viewType) {
-			case R.layout.recycler_layout_item:
-				return new LayoutItem.ExampleViewHolder(
+			case R.layout.recycler_scrollable_layout_item:
+				return new ScrollableLayoutItem.LayoutViewHolder(
 						mInflater.inflate(viewType, parent, false), this);
 			default:
 				return new OverallItem.LabelViewHolder(
@@ -103,9 +103,9 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payload) {
 		int viewType = getItemViewType(position);
-		if (viewType == R.layout.recycler_layout_item) {
-			LayoutItem item = (LayoutItem) getItem(position);
-			LayoutItem.ExampleViewHolder vHolder = (LayoutItem.ExampleViewHolder) holder;
+		if (viewType == R.layout.recycler_scrollable_layout_item) {
+			ScrollableLayoutItem item = (ScrollableLayoutItem) getItem(position);
+			ScrollableLayoutItem.LayoutViewHolder vHolder = (ScrollableLayoutItem.LayoutViewHolder) holder;
 			assert item != null;
 
 			vHolder.mTitle.setSelected(true);//For marquee
@@ -118,7 +118,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 				Log.d("LayoutItem", "LayoutItem configured fullSpan for StaggeredGridLayout");
 			}
 
-		} else if (viewType == R.layout.recycler_label_item) {
+		} else if (viewType == R.layout.recycler_overall_item) {
 			OverallItem item = (OverallItem) getItem(position);
 			OverallItem.LabelViewHolder vHolder = (OverallItem.LabelViewHolder) holder;
 			assert item != null;

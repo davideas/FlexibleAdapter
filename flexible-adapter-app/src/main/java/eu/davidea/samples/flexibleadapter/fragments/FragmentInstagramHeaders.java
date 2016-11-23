@@ -118,7 +118,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 
 				//Notify user
 				String message = "Fetched " + newItems.size() + " new items";
-				Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
 			}
 		}, 2000);
 	}
