@@ -102,6 +102,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private static final String EXTRA_HEADERS = TAG + "_headersShown";
 	private static final String EXTRA_LEVEL = TAG + "_selectedLevel";
 	private static final String EXTRA_SEARCH = TAG + "_searchText";
+	private static final String EXTRA_DELAYED_HEADERS = TAG + "_delayedHeaders";
 
 	/* The main container for ALL items */
 	private List<T> mItems, mTempItems;
@@ -119,13 +120,16 @@ public class FlexibleAdapter<T extends IFlexible>
 	protected final int UPDATE = 0, FILTER = 1, CONFIRM_DELETE = 2, LOAD_MORE_COMPLETE = 8;
 	protected Handler mHandler = new Handler(Looper.getMainLooper(), new HandlerCallback());
 
-	/* Used to save deleted items and to recover them (Undo) */
+	/* Deleted items and RestoreList (Undo) */
 	public static final long UNDO_TIMEOUT = 5000L;
 	private List<RestoreInfo> mRestoreList;
 	private boolean restoreSelection = false, multiRange = false, unlinkOnRemoveHeader = false,
 			removeOrphanHeaders = false, permanentDelete = true, adjustSelected = true;
 
-	/* Header/Section items */
+	/* Scrollable Headers/Footers items */
+	private List<T> mScrollableHeaders, mScrollableFooters;
+
+	/* Section items (with sticky headers) */
 	private List<IHeader> mOrphanHeaders;
 	private boolean headersShown = false, recursive = false;
 	private StickyHeaderHelper mStickyHeaderHelper;
@@ -142,7 +146,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	private Set<IExpandable> mExpandedFilterFlags;
 	private boolean notifyChangeOfUnfilteredItems = false, filtering = false,
 			notifyMoveOfFilteredItems = false;
-	private static int mAnimateToLimit = 600;
+	private static int ANIMATE_TO_LIMIT = 700;
+	private int mAnimateToLimit = ANIMATE_TO_LIMIT;
 
 	/* Expandable flags */
 	private int mMinCollapsibleLevel = 0, mSelectedLevel = -1;
@@ -227,6 +232,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		super(stableIds);
 		if (items == null) mItems = new ArrayList<>();
 		else mItems = items;
+		mScrollableHeaders = new ArrayList<>();
+		mScrollableFooters = new ArrayList<>();
 		mRestoreList = new ArrayList<>();
 		mOrphanHeaders = new ArrayList<>();
 
@@ -274,7 +281,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (listener instanceof OnUpdateListener) {
 			if (DEBUG) Log.i(TAG, "- OnUpdateListener");
 			mUpdateListener = (OnUpdateListener) listener;
-			mUpdateListener.onUpdateEmptyView(getItemCount());
+			mUpdateListener.onUpdateEmptyView(getItemCount(false));
 		}
 		return this;
 	}
@@ -321,7 +328,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		int position = 0;
 		setAnimate(true);
 		multiRange = true;
-		while (position < mItems.size()) {
+		while (position < getItemCount()) {
 			T item = getItem(position);
 			if (isExpanded(item)) {
 				expand(position, false, true);
@@ -471,12 +478,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * animated, limited by the value previously set with {@link #setAnimateToLimit(int)}
 	 * to improve performance on very big list. Should provide {@code animate = false} to
 	 * directly invoke {@link #notifyDataSetChanged()} without any animations!
-	 * <p>
+	 * <p><b>Note:</b> Scrollable Headers and Footers (if existent) will be restored in this call.</p>
 	 * <b>Note:</b> The following methods will be also called at the end of the operation:
 	 * <ol><li>{@link #expandItemsAtStartUp()}</li>
 	 * <li>{@link #showAllHeaders()} if headers are shown</li>
 	 * <li>{@link #onPostUpdate()}</li>
-	 * <li>{@link OnUpdateListener#onUpdateEmptyView(int)} if the listener is set</li></ol></p>
+	 * <li>{@link OnUpdateListener#onUpdateEmptyView(int)} if the listener is set</li></ol>
 	 *
 	 * @param items   the new data set
 	 * @param animate true to animate the changes, false for an instant refresh
@@ -488,12 +495,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@CallSuper
 	public void updateDataSet(@Nullable List<T> items, boolean animate) {
+		restoreScrollableHeadersAndFooters(items);
 		if (animate) {
 			mHandler.removeMessages(UPDATE);
 			mHandler.sendMessage(Message.obtain(mHandler, UPDATE, items));
 		} else {
-			if (items == null) mItems = new ArrayList<>();
-			else mItems = new ArrayList<>(items);
+			mItems = (items == null ? new ArrayList<T>() : items);
 			postUpdate(true);
 		}
 	}
@@ -507,11 +514,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 1.0.0
 	 */
 	public final T getItem(@IntRange(from = 0) int position) {
-		if (position < 0 || position >= mItems.size()) return null;
+		if (position < 0 || position >= getItemCount()) return null;
 		return mItems.get(position);
 	}
 
 	/**
+	 * This method is mostly used by the adapter if items have stableIds.
+	 *
 	 * @param position the position of the current item
 	 * @return Hashcode of the item at the specific position
 	 * @since 5.0.0-b1
@@ -523,9 +532,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * This method cannot be overridden since the selection relies on it.
+	 * Returns the total number of items in the data set held by the adapter (headers and footers
+	 * INCLUDED). Use {@link #getItemCount(boolean)} with {@code false} as parameter to retrieve
+	 * only real items excluding headers and footers.
+	 * <p><b>Note:</b> This method cannot be overridden since the selection and the internal
+	 * methods rely on it.</p>
 	 *
-	 * @return the total number of the items currently displayed by the adapter
+	 * @return the total number of items (headers and footers INCLUDED) held by the adapter
+	 * @see #getItemCount(boolean)
 	 * @see #getItemCountOfTypes(Integer...)
 	 * @see #getItemCountOfTypesUntil(int, Integer...)
 	 * @see #isEmpty()
@@ -533,7 +547,28 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public final int getItemCount() {
-		return mItems != null ? mItems.size() : 0;
+		return mItems.size();
+	}
+
+	/**
+	 * Returns the total number of items in the data set held by the adapter.
+	 * <ul>
+	 * <li>Provide {@code true} (default behavior) to count all items, same result of {@link #getItemCount()}.</li>
+	 * <li>Provide {@code false} to count only main items (headers and footers are EXCLUDED).</li>
+	 * </ul>
+	 * <b>Note:</b> This method cannot be overridden since internal methods rely on it.
+	 *
+	 * @param withHeadersFooters true to count also headers and footers, false to count only real items
+	 * @return the total number of items held by the adapter, with or without headers and footers,
+	 * depending by the provided parameter
+	 * @see #getItemCount()
+	 * @see #getItemCountOfTypes(Integer...)
+	 * @see #getItemCountOfTypesUntil(int, Integer...)
+	 * @since 5.0.0-rc1
+	 */
+	public final int getItemCount(boolean withHeadersFooters) {
+		return withHeadersFooters ? getItemCount() :
+				getItemCount() - mScrollableHeaders.size() - mScrollableFooters.size();
 	}
 
 	/**
@@ -542,11 +577,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param viewTypes the viewTypes to count
 	 * @return number of the viewTypes counted
 	 * @see #getItemCount()
+	 * @see #getItemCount(boolean)
 	 * @see #getItemCountOfTypesUntil(int, Integer...)
 	 * @see #isEmpty()
 	 * @since 5.0.0-b1
 	 */
-	public int getItemCountOfTypes(Integer... viewTypes) {
+	public final int getItemCountOfTypes(Integer... viewTypes) {
 		return getItemCountOfTypesUntil(getItemCount(), viewTypes);
 	}
 
@@ -557,12 +593,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position  the position limit where to stop counting (included)
 	 * @param viewTypes the viewTypes to count
 	 * @see #getItemCount()
+	 * @see #getItemCount(boolean)
 	 * @see #getItemCountOfTypes(Integer...)
 	 * @see #isEmpty()
 	 * @since 5.0.0-b5
 	 */
 	//TODO: deprecation?
-	public int getItemCountOfTypesUntil(@IntRange(from = 0) int position, Integer... viewTypes) {
+	public final int getItemCountOfTypesUntil(@IntRange(from = 0) int position, Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
 		int count = 0;
 		for (int i = 0; i < position; i++) {
@@ -586,14 +623,34 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Retrieve the global position of the item in the Adapter list.
+	 * Retrieves the global position of the item in the Adapter list.
+	 * If no scrollable Headers are added, the global position coincides with the cardinal position.
+	 * <p>This method cannot be overridden since the entire library relies on it.</p>
 	 *
 	 * @param item the item to find
 	 * @return the global position in the Adapter if found, -1 otherwise
 	 * @since 5.0.0-b1
 	 */
-	public int getGlobalPositionOf(@NonNull IFlexible item) {
-		return item != null && mItems != null && !mItems.isEmpty() ? mItems.indexOf(item) : -1;
+	public final int getGlobalPositionOf(@NonNull IFlexible item) {
+		return item != null ? mItems.indexOf(item) : -1;
+	}
+
+	/**
+	 * Retrieves the position of the Main item in the Adapter list excluding the scrollable Headers.
+	 * If no scrollable Headers are added, the cardinal position coincides with the global position.
+	 * <p><b>Note:</b>
+	 * <br/>- This method cannot be overridden.
+	 * <br/>- This method is NOT suitable to call when removing items, if so, you should retrieve
+	 * the global position with {@link #getGlobalPositionOf(IFlexible)}.</p>
+	 *
+	 * @param item the item to find
+	 * @return the position in the Adapter excluding the Scrollable Headers, -1 otherwise
+	 * @since 5.0.0-rc1
+	 */
+	public final int getCardinalPositionOf(@NonNull IFlexible item) {
+		int position = getGlobalPositionOf(item);
+		if (position > mScrollableHeaders.size()) position -= mScrollableHeaders.size();
+		return position;
 	}
 
 	/**
@@ -604,7 +661,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 2.0.0
 	 */
 	public boolean contains(@NonNull T item) {
-		return item != null && mItems != null && mItems.contains(item);
+		return item != null && mItems.contains(item);
 	}
 
 	/**
@@ -650,6 +707,130 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (DEBUG)
 			Log.v(TAG, "Calculated position " + Math.max(0, sortedList.indexOf(item)) + " for item=" + item);
 		return Math.max(0, sortedList.indexOf(item));
+	}
+
+	/*------------------------------------*/
+	/* SCROLLABLE HEADERS/FOOTERS METHODS */
+	/*------------------------------------*/
+
+	public final List<T> getScrollableHeaders() {
+		return Collections.unmodifiableList(mScrollableHeaders);
+	}
+
+	public final List<T> getScrollableFooters() {
+		return Collections.unmodifiableList(mScrollableFooters);
+	}
+
+	public final boolean addScrollableHeader(@NonNull T headerItem) {
+		if (DEBUG) Log.d(TAG, "Add scrollable header " + headerItem);
+		if (!mScrollableHeaders.contains(headerItem) && addItem(0, headerItem)) {
+			headerItem.setSelectable(false);
+			return mScrollableHeaders.add(headerItem);
+		}
+		return false;
+	}
+
+	public final boolean addScrollableFooter(@NonNull T footerItem) {
+		if (!mScrollableFooters.contains(footerItem) && addItem(getItemCount(), footerItem)) {
+			if (DEBUG) Log.d(TAG, "Add scrollable footer " + footerItem);
+			footerItem.setSelectable(false);
+			return mScrollableFooters.add(footerItem);
+		}
+		return false;
+	}
+
+	public final void removeScrollableHeader(@NonNull T headerItem) {
+		if (mScrollableHeaders.remove(headerItem)) {
+			if (DEBUG) Log.d(TAG, "Remove scrollable header " + headerItem);
+			performRemove(headerItem, true);
+		}
+	}
+
+	public final void removeScrollableFooter(@NonNull T footerItem) {
+		if (mScrollableFooters.remove(footerItem)) {
+			if (DEBUG) Log.d(TAG, "Remove scrollable footer " + footerItem);
+			performRemove(footerItem, true);
+		}
+	}
+
+	public final void removeAllScrollableHeaders() {
+		if (DEBUG) Log.d(TAG, "Remove all scrollable headers");
+		mScrollableHeaders.clear();
+	}
+
+	public final void removeAllScrollableFooters() {
+		if (DEBUG) Log.d(TAG, "Remove all scrollable footers");
+		mScrollableFooters.clear();
+	}
+
+	public final void addScrollableHeaderWithDelay(@NonNull final T headerItem, @IntRange(from = 0) long delay,
+												   final boolean scrollToPosition) {
+		if (DEBUG) Log.d(TAG, "Enqueued adding scrollable header (" + delay + "ms) " + headerItem);
+		headerItem.setSelectable(false);
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (!mScrollableHeaders.contains(headerItem)) {
+					performDelayedAdd(0, headerItem, scrollToPosition);
+					mScrollableHeaders.add(headerItem);
+					if (DEBUG) Log.v(TAG, "Added scrollable header " + headerItem);
+				}
+			}
+		}, delay);
+	}
+
+	public final void addScrollableFooterWithDelay(@NonNull final T footerItem, @IntRange(from = 0) long delay,
+												   final boolean scrollToPosition) {
+		if (DEBUG) Log.d(TAG, "Enqueued adding scrollable footer (" + delay + "ms) " + footerItem);
+		footerItem.setSelectable(false);
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (!mScrollableFooters.contains(footerItem)) {
+					performDelayedAdd(getItemCount(), footerItem, scrollToPosition);
+					mScrollableFooters.add(footerItem);
+					if (DEBUG) Log.v(TAG, "Added scrollable footer " + footerItem);
+				}
+			}
+		}, delay);
+	}
+
+	public final void removeScrollableHeaderWithDelay(@NonNull final T headerItem, @IntRange(from = 0) long delay) {
+		if (DEBUG)
+			Log.d(TAG, "Enqueued removing scrollable header (" + delay + "ms) " + headerItem);
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (mScrollableHeaders.remove(headerItem)) {
+					performDelayedRemove(headerItem, true);
+					if (DEBUG) Log.v(TAG, "Removed scrollable header " + headerItem);
+				}
+			}
+		}, delay);
+	}
+
+	public final void removeScrollableFooterWithDelay(@NonNull final T footerItem, @IntRange(from = 0) long delay) {
+		if (DEBUG)
+			Log.d(TAG, "Enqueued removing scrollable footer (" + delay + "ms) " + footerItem);
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (mScrollableFooters.remove(footerItem)) {
+					performDelayedRemove(footerItem, true);
+					if (DEBUG) Log.v(TAG, "Removed scrollable footer " + footerItem);
+				}
+			}
+		}, delay);
+	}
+
+	private void restoreScrollableHeadersAndFooters(List<T> items) {
+		if (items != null) {
+			for (T item : mScrollableHeaders)
+				if (items.size() > 0) items.add(0, item);
+				else items.add(item);
+			for (int i = mScrollableFooters.size() - 1; i >= 0; i--)
+				items.add(mScrollableFooters.get(i));
+		}
 	}
 
 	/*--------------------------*/
@@ -917,8 +1098,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Enables the sticky header functionality.
-	 * <p>Headers can be sticky only if they are shown. Command is otherwise ignored!</p>
-	 * <b>NOTE:</b>
+	 * <p>Headers can be sticky only if they are shown.</p>
+	 * <b>Note:</b>
 	 * <br/>- You must read {@link #getStickySectionHeadersHolder()}.
 	 * <br/>- Sticky headers are now clickable as any Views, but cannot be dragged nor swiped.
 	 * <br/>- Content and linkage are automatically updated.
@@ -1083,9 +1264,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private void showAllHeadersWithReset(boolean init) {
 		multiRange = true;
-		int position = 0;
+		int position = Math.max(0, mScrollableHeaders.size() - 1);
 		resetHiddenStatus();//Necessary after the filter and the update
-		while (position < mItems.size()) {
+		while (position < getItemCount() - mScrollableFooters.size()) {
 			if (showHeaderOf(position, mItems.get(position), init))
 				position++;//It's the same element, skip it
 			position++;
@@ -1099,7 +1280,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param position the position where the header will be displayed
 	 * @param item     the item that holds the header
-	 * @param init     for silent initialization
+	 * @param init     for silent initialization: skip notifyItemInserted
 	 * @since 5.0.0-b1
 	 */
 	private boolean showHeaderOf(int position, @NonNull T item, boolean init) {
@@ -1110,16 +1291,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (header.isHidden()) {
 			if (DEBUG) Log.v(TAG, "Showing header at position " + position + " header=" + header);
 			header.setHidden(false);
-			if (init) {//Skip notifyItemInserted!
-				if (position < mItems.size()) {
-					mItems.add(position, (T) header);
-				} else {
-					mItems.add((T) header);
-				}
-				return true;
-			} else {
-				return addItem(position, (T) header);
-			}
+			//Skip notifyItemInserted when init=true and insert the header properly!
+			return (init ? performCardinalInsert(position, Collections.singletonList((T) header)) :
+					addItem(position, (T) header));
 		}
 		return false;
 	}
@@ -1140,9 +1314,9 @@ public class FlexibleAdapter<T extends IFlexible>
 				for (IHeader header : getOrphanHeaders()) {
 					hideHeader(getGlobalPositionOf(header), header);
 				}
-				//Hide linked headers
-				int position = mItems.size() - 1;
-				while (position >= 0) {
+				//Hide linked headers between Scrollable Headers and Footers
+				int position = getItemCount() - mScrollableFooters.size() - 1;
+				while (position >= Math.max(0, mScrollableHeaders.size() - 1)) {
 					T item = mItems.get(position);
 					if (isHeader(item))
 						hideHeader(position, (IHeader) item);
@@ -1286,7 +1460,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	//TODO: deprecation?
 	private boolean isHeaderShared(IHeader header, int positionStart, int itemCount) {
 		int firstElementWithHeader = getGlobalPositionOf(header) + 1;
-		for (int i = firstElementWithHeader; i < mItems.size(); i++) {
+		for (int i = firstElementWithHeader; i < getItemCount() - mScrollableFooters.size(); i++) {
 			T item = getItem(i);
 			//Another header is met, we can stop here
 			if (item instanceof IHeader) break;
@@ -1496,18 +1670,17 @@ public class FlexibleAdapter<T extends IFlexible>
 		} else if (DEBUG) {
 			Log.v(TAG, "onLoadMore     loading=" + mLoading + ", position=" + position
 					+ ", itemCount=" + getItemCount() + ", threshold=" + mEndlessScrollThreshold
-					+ ", inside the threshold? " + (position >= getItemCount() - mEndlessScrollThreshold));
+					+ ", inside the threshold? " + (position >= getItemCount() - mScrollableFooters.size() - mEndlessScrollThreshold));
 		}
 		//Load more if not loading and inside the threshold
-		if (!mLoading && position >= getItemCount() - mEndlessScrollThreshold) {
+		if (!mLoading && position >= getItemCount() - mScrollableFooters.size() - mEndlessScrollThreshold) {
 			mLoading = true;
 			if (DEBUG) Log.d(TAG, "onLoadMore     invoked!");
 			mRecyclerView.post(new Runnable() {
 				@Override
 				public void run() {
 					if (getGlobalPositionOf(mProgressItem) < 0) {
-						mItems.add(mProgressItem);
-						notifyItemInserted(getItemCount());
+						addItem(mProgressItem);
 					}
 					if (mEndlessScrollListener != null) {
 						mEndlessScrollListener.onLoadMore();
@@ -1578,7 +1751,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private void noMoreLoad() {
 		if (DEBUG) Log.i(TAG, "onLoadMore     noMoreLoad!");
-		notifyItemChanged(getItemCount() - 1, Payload.NO_MORE_LOAD);
+		notifyItemChanged(getItemCount() - mScrollableFooters.size() - 1, Payload.NO_MORE_LOAD);
 	}
 
 	/*--------------------*/
@@ -1752,6 +1925,21 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Retrieves the position of a child item in the list where it lays.
+	 * <p>Only for a real child of an expanded parent.</p>
+	 *
+	 * @param child the child item
+	 * @return the position in the parent or -1 if the child is a parent itself or not found
+	 * @see #getExpandableOf(IFlexible)
+	 * @see #getExpandablePositionOf(IFlexible)
+	 * @since 5.0.0-b1
+	 */
+	//TODO: Rename to getSubPositionOf
+	public int getRelativePositionOf(@NonNull T child) {
+		return getSiblingsOf(child).indexOf(child);
+	}
+
+	/**
 	 * Provides the full sub list where the child currently lays.
 	 *
 	 * @param child the child item
@@ -1766,20 +1954,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	public List<T> getSiblingsOf(@NonNull T child) {
 		IExpandable expandable = getExpandableOf(child);
 		return expandable != null ? expandable.getSubItems() : new ArrayList<>();
-	}
-
-	/**
-	 * Retrieves the position of a child item in the list where it lays.
-	 * <p>Only for a real child of an expanded parent.</p>
-	 *
-	 * @param child the child item
-	 * @return the position in the parent or -1 if the child is a parent itself or not found
-	 * @see #getExpandableOf(IFlexible)
-	 * @see #getExpandablePositionOf(IFlexible)
-	 * @since 5.0.0-b1
-	 */
-	public int getRelativePositionOf(@NonNull T child) {
-		return getSiblingsOf(child).indexOf(child);
 	}
 
 	/**
@@ -1811,15 +1985,16 @@ public class FlexibleAdapter<T extends IFlexible>
 	@NonNull
 	public List<Integer> getExpandedPositions() {
 		List<Integer> expandedPositions = new ArrayList<>();
-		for (int i = 0; i < mItems.size() - 1; i++) {
-			if (isExpanded(mItems.get(i)))
-				expandedPositions.add(i);
+		int startPosition = Math.max(0, mScrollableHeaders.size() - 1);
+		int endPosition = getItemCount() - mScrollableFooters.size() - 1;
+		for (int i = startPosition; i < endPosition; i++) {
+			if (isExpanded(mItems.get(i))) expandedPositions.add(i);
 		}
 		return expandedPositions;
 	}
 
 	/**
-	 * Expands an item that is IExpandable type, not yet expanded and if has subItems.
+	 * Expands an item that is {@code IExpandable} type, not yet expanded and if has subItems.
 	 * <p>If configured, automatic smooth scroll will be performed when necessary.</p>
 	 *
 	 * @param position the position of the item to expand
@@ -1953,7 +2128,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	public int expandAll(int level) {
 		int expanded = 0;
 		//More efficient if we expand from First expandable position
-		for (int i = 0; i < mItems.size(); i++) {
+		int startPosition = Math.max(0, mScrollableHeaders.size() - 1);
+		int endPosition = getItemCount() - mScrollableFooters.size() - 1;
+		for (int i = startPosition; i < endPosition; i++) {
 			T item = getItem(i);
 			if (isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
@@ -2096,6 +2273,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.e(TAG, "Cannot updateItem on position out of OutOfBounds!");
 			return;
 		}
+		position += mScrollableHeaders.size();
 		mItems.set(position, item);
 		if (DEBUG) Log.d(TAG, "updateItem notifyItemChanged on position " + position);
 		notifyItemChanged(position, payload);
@@ -2128,14 +2306,17 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				setAnimate(true);
-				if (addItem(position, item) && scrollToPosition && mRecyclerView != null) {
-					mRecyclerView.smoothScrollToPosition(
-							Math.min(Math.max(0, position), getItemCount() - 1));
-				}
-				setAnimate(false);
+				performDelayedAdd(position, item, scrollToPosition);
 			}
 		}, delay);
+	}
+
+	private void performDelayedAdd(int position, T item, boolean scrollToPosition) {
+		setAnimate(true);
+		if (addItem(position, item) && scrollToPosition && mRecyclerView != null) {
+			mRecyclerView.smoothScrollToPosition(Math.min(Math.max(0, position), getItemCount() - 1));
+		}
+		setAnimate(false);
 	}
 
 	/**
@@ -2152,9 +2333,9 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Inserts the given item at the specified position or Adds the item to the end of the list
-	 * (no matters if the new position is out of bounds).
+	 * (no matters if the new position is out of bounds!).
 	 *
-	 * @param position position of the item to add, if negative, items will be added to the end
+	 * @param position position inside the list, if negative, items will be added to the end
 	 * @param item     the item to add
 	 * @return true if the internal list was successfully modified, false otherwise
 	 * @see #addItem(IFlexible)
@@ -2169,16 +2350,16 @@ public class FlexibleAdapter<T extends IFlexible>
 			return false;
 		}
 		if (DEBUG) Log.v(TAG, "addItem delegates addition to addItems!");
-		List<T> items = new ArrayList<>(1);
-		items.add(item);
-		return addItems(position, items);
+		return addItems(position, Collections.singletonList(item));
 	}
 
 	/**
 	 * Inserts a set of items at specified position or Adds the items to the end of the list
-	 * (no matters if the new position is out of bounds).
-	 * <p><b>NOTE:</b> When all headers are shown, if exists, the header of this item will be
-	 * shown as well, unless it's already shown, so it won't be shown twice.</p>
+	 * (no matters if the new position is out of bounds!).
+	 * <p><b>Note:</b>
+	 * <br/>- When all headers are shown, if exists, the header of this item will be shown as well,
+	 * unless it's already shown, so it won't be shown twice.
+	 * <br/>- Items will be always added between any scrollable header and footers.</p>
 	 *
 	 * @param position position inside the list, if negative, items will be added to the end
 	 * @param items    the set of items to add
@@ -2200,12 +2381,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 		if (DEBUG) Log.d(TAG, "addItems on position=" + position + " itemCount=" + items.size());
 
-		//Insert Items
-		if (position < mItems.size()) {
-			mItems.addAll(position, items);
-		} else {
-			mItems.addAll(items);
-		}
+		//Insert the item properly
+		performCardinalInsert(position, items);
 		//Notify range addition
 		notifyItemRangeInserted(position, items.size());
 
@@ -2218,8 +2395,23 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 		//Call listener to update EmptyView
 		if (!recursive && mUpdateListener != null && !multiRange && initialCount == 0 && getItemCount() > 0)
-			mUpdateListener.onUpdateEmptyView(getItemCount());
+			mUpdateListener.onUpdateEmptyView(getItemCount(false));
 		return true;
+	}
+
+	private boolean performCardinalInsert(int position, List<T> items) {
+		int itemCount = getItemCount();
+		// Adjust position according to Headers/Footers size
+		int headersSize = mScrollableHeaders.size();
+		int footersSize = mScrollableFooters.size();
+		if (headersSize > 0 && position < itemCount) {
+			position += headersSize - 1;
+		}
+		if (footersSize > 0 && position >= itemCount) {
+			position -= footersSize;
+		}
+		// Insert Items
+		return (position < itemCount ? mItems.addAll(position, items) : mItems.addAll(items));
 	}
 
 	/**
@@ -2474,8 +2666,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*----------------------*/
 
 	/**
-	 * Convenience method of {@link #removeRange(int, int, Object)} that removes all items, with
-	 * {@code null} payload.</p>
+	 * This method clears <b>everything</b>: main items, Scrollable Headers and Footers and
+	 * everything else is displayed.
 	 *
 	 * @see #clearAllBut(Integer...)
 	 * @see #removeRange(int, int)
@@ -2485,11 +2677,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void clear() {
 		if (DEBUG) Log.d(TAG, "clearAll views");
 		removeRange(0, getItemCount(), null);
+		removeAllScrollableHeaders();
+		removeAllScrollableFooters();
 	}
 
 	/**
-	 * Clears the Adapter list retaining all items of the type provided as parameter.
-	 * <p>This method is opposite of {@link #removeItemsOfType(Integer...)}.</p>
+	 * Clears the Adapter list retaining Scrollable Headers and Footers and all items of the
+	 * type provided as parameter.
+	 * <p><b>Note:</b>- This method is opposite of {@link #removeItemsOfType(Integer...)}.
 	 *
 	 * @param viewTypes the viewTypes to retain
 	 * @see #clear()
@@ -2502,7 +2697,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (viewTypeList.size() > 0) {
 			if (DEBUG) Log.d(TAG, "clearAll retaining views " + viewTypeList);
 			List<Integer> positionsToRemove = new ArrayList<>();
-			for (int i = 0; i < mItems.size(); i++) {
+			int startPosition = Math.max(0, mScrollableHeaders.size() - 1);
+			int endPosition = getItemCount() - mScrollableFooters.size() - 1;
+			for (int i = startPosition; i < endPosition; i++) {
 				if (!viewTypeList.contains(getItemViewType(i)))
 					positionsToRemove.add(i);
 			}
@@ -2545,18 +2742,27 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				setAnimate(true);
-				boolean tempPermanent = permanentDelete;
-				if (permanent) permanentDelete = true;
-				removeItem(getGlobalPositionOf(item));
-				permanentDelete = tempPermanent;
-				setAnimate(false);
+				performDelayedRemove(item, permanent);
 			}
 		}, delay);
 	}
 
+	private void performDelayedRemove(T item, boolean permanent) {
+		setAnimate(true);
+		performRemove(item, permanent);
+		setAnimate(false);
+	}
+
+	private void performRemove(T item, boolean permanent) {
+		boolean tempPermanent = permanentDelete;
+		if (permanent) permanentDelete = true;
+		removeItem(getGlobalPositionOf(item));
+		permanentDelete = tempPermanent;
+	}
+
 	/**
-	 * Convenience method of {@link #removeItem(int, Object)} providing a null payload.
+	 * Convenience method of {@link #removeItem(int, Object)} providing {@link Payload#CHANGE}
+	 * as payload for the parent item.
 	 *
 	 * @param position the position of item to remove
 	 * @see #removeItems(List)
@@ -2666,7 +2872,9 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Selectively removes all items of the type provided as parameter.
-	 * <p>This method is opposite of {@link #clearAllBut(Integer...)}.</p>
+	 * <p><b>Note:</b>
+	 * <br/>- This method is opposite of {@link #clearAllBut(Integer...)}.
+	 * <br/>- View types of Scrollable Headers and Footers are ignored!</p>
 	 *
 	 * @param viewTypes the viewTypes to remove
 	 * @see #clear()
@@ -2679,7 +2887,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void removeItemsOfType(Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
 		List<Integer> itemsToRemove = new ArrayList<>();
-		for (int i = mItems.size() - 1; i >= 0; i--) {
+		int startPosition = Math.max(0, mScrollableHeaders.size() - 1);
+		int endPosition = getItemCount() - mScrollableFooters.size() - 1;
+		for (int i = endPosition; i >= startPosition; i--) {
 			if (viewTypeList.contains(getItemViewType(i)))
 				itemsToRemove.add(i);
 		}
@@ -2748,7 +2958,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 
 		//Handle header linkage
-		IHeader header = getHeaderOf(getItem(positionStart));
+		T item = getItem(positionStart);
+		IHeader header = getHeaderOf(item);
 		int headerPosition = getGlobalPositionOf(header);
 		if (header != null && headerPosition >= 0) {
 			//The header does not represents a group anymore, add it to the Orphan list
@@ -2759,7 +2970,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		int parentPosition = -1;
 		IExpandable parent = null;
 		for (int position = positionStart; position < positionStart + itemCount; position++) {
-			T item = getItem(positionStart);
+			item = getItem(positionStart);
 			if (!permanentDelete) {
 				//When removing a range of children, parent is always the same :-)
 				if (parent == null) parent = getExpandableOf(item);
@@ -2817,7 +3028,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		//Update empty view
 		if (mUpdateListener != null && !multiRange && initialCount > 0 && getItemCount() == 0)
-			mUpdateListener.onUpdateEmptyView(getItemCount());
+			mUpdateListener.onUpdateEmptyView(getItemCount(false));
 	}
 
 	/**
@@ -2918,7 +3129,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Restore items just removed.
-	 * <p><b>NOTE:</b> If filter is active, only items that match that filter will be shown(restored).</p>
+	 * <p><b>Note:</b> If filter is active, only items that match that filter will be shown(restored).</p>
 	 *
 	 * @see #setRestoreSelectionOnUndo(boolean)
 	 * @since 3.0.0
@@ -3001,7 +3212,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Call listener to update EmptyView
 		multiRange = false;
 		if (mUpdateListener != null && initialCount == 0 && getItemCount() > 0)
-			mUpdateListener.onUpdateEmptyView(getItemCount());
+			mUpdateListener.onUpdateEmptyView(getItemCount(false));
 
 		emptyBin();
 	}
@@ -3234,22 +3445,23 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal
 	 * mechanism, items are removed and/or added in order to animate items in the final list.
-	 * <p>This method filters the provided list with the search text previously set with
+	 * <p>This method filters the provided list with the searchText previously set with
 	 * {@link #setSearchText(String)}.</p>
 	 * <b>Important notes:</b>
 	 * <ol>
-	 * <li><b>NEW!</b> The Filter is <u>always</u> executed in background, asynchronously.
+	 * <li>The Filter is <u>always</u> executed in background, asynchronously.
 	 * The method {@link #onPostFilter()} is called after the filter task is completed.</li>
 	 * <li>This method calls {@link #filterObject(IFlexible, String)}.</li>
-	 * <li>If search text is empty or null, the provided list is the current list.</li>
+	 * <li>If searchText is empty or {@code null}, the provided list is the new list plus any
+	 * Scrollable Headers and Footers if existent.</li>
 	 * <li>Any pending deleted items are always filtered out, but if restored, they will be
 	 * displayed according to the current filter and at the right positions.</li>
-	 * <li><b>NEW!</b> Expandable items are picked up and displayed if at least a child is
-	 * collected by the current filter.</li>
-	 * <li><b>NEW!</b> Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit
-	 * of {@value mAnimateToLimit} (default) items is set. <b>NOTE:</b> You can change this limit
-	 * by calling {@link #setAnimateToLimit(int)}. Above this limit {@link #notifyDataSetChanged()}
-	 * will be called to improve performance.</li>
+	 * <li>Expandable items are picked up and displayed if at least a child is collected by
+	 * the current filter.</li>
+	 * <li>Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit of
+	 * {@value ANIMATE_TO_LIMIT} (default) items is set. <b>Note:</b> Above this limit,
+	 * {@link #notifyDataSetChanged()} will be called to improve performance. you can change
+	 * this limit by calling {@link #setAnimateToLimit(int)}.</li>
 	 * </ol>
 	 *
 	 * @param unfilteredItems the list to filter
@@ -3259,6 +3471,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 4.1.0 Created
 	 * <br/>5.0.0-b1 Expandable + Child filtering
 	 * <br/>5.0.0-b8 Synchronization animations limit + AsyncFilter
+	 * <br/>5.0.0-rc1 Scrollable Headers and Footers adaptation
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems) {
 		mHandler.removeMessages(FILTER);
@@ -3266,7 +3479,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	private synchronized void filterItemsAsync(@NonNull List<T> unfilteredItems) {
-		// NOTE: In case user has deleted some items and he changes or applies a filter while
+		// Note: In case user has deleted some items and he changes or applies a filter while
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
 		// the new position in the new list and finally skip those items to avoid they are shown!
 
@@ -3317,6 +3530,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				filteredItems.removeAll(getDeletedItems());
 			}
 			resetFilterFlags(filteredItems);
+			restoreScrollableHeadersAndFooters(filteredItems);
 		}
 
 		//Reset flags
@@ -3371,7 +3585,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * This method checks if the provided object is a type of {@link IFilterable} interface,
 	 * if yes, performs the filter on the implemented method {@link IFilterable#filter(String)}.
-	 * <p><b>NOTE:</b>
+	 * <p><b>Note:</b>
 	 * <br/>- The item will be collected if the implemented method returns true.
 	 * <br/>- {@code IExpandable} items are automatically picked up and displayed if at least a
 	 * child is collected by the current filter. You DON'T NEED to implement the scan for the
@@ -3449,7 +3663,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Tunes the limit after the which the synchronization animations, occurred during
 	 * updateDataSet and filter operations, are skipped and {@link #notifyDataSetChanged()}
 	 * will be called instead.
-	 * <p>Default value is {@value mAnimateToLimit} items, number new items.</p>
+	 * <p>Default value is {@value ANIMATE_TO_LIMIT} items, number new items.</p>
 	 *
 	 * @param limit the number of new items that, when reached, will skip synchronization animations
 	 * @return this Adapter, so the call can be chained
@@ -3771,7 +3985,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Enable / Disable the Drag on LongPress on the entire ViewHolder.
-	 * <p><b>NOTE:</b> This will skip LongClick on the view in order to handle the LongPress,
+	 * <p><b>Note:</b> This will skip LongClick on the view in order to handle the LongPress,
 	 * however the LongClick listener will be called if necessary in the new
 	 * {@link FlexibleViewHolder#onActionStateChanged(int, int)}.</p>
 	 * Default value is {@code false}.
@@ -4201,25 +4415,29 @@ public class FlexibleAdapter<T extends IFlexible>
 	private void adjustSelected(int startPosition, int itemCount) {
 		List<Integer> selectedPositions = getSelectedPositions();
 		boolean adjusted = false;
+		String diff = "";
 		if (itemCount > 0) {
-			// Reverse sorting is necessary because using Set might remove duplicates during adjusting
+			//Reverse sorting is necessary because using Set removes duplicates
+			// during adjusting, so we scan backward.
 			Collections.sort(selectedPositions, new Comparator<Integer>() {
 				@Override
-				public int compare(Integer o1, Integer o2) {
-					return o2 - o1;
+				public int compare(Integer lhs, Integer rhs) {
+					return rhs - lhs;
 				}
 			});
+			diff = "+";
 		}
 		for (Integer position : selectedPositions) {
 			if (position >= startPosition) {
-				if (DEBUG)
-					Log.v(TAG, "Adjust Selected position " + position + " to " + Math.max(position + itemCount, startPosition));
+//				if (DEBUG)
+//					Log.v(TAG, "Adjust Selected position " + position + " to " + Math.max(position + itemCount, startPosition));
 				removeSelection(position);
-				addSelection(Math.max(position + itemCount, startPosition));
+				addAdjustedSelection(Math.max(position + itemCount, startPosition));
 				adjusted = true;
 			}
 		}
-		if (DEBUG && adjusted) Log.v(TAG, "AdjustedSelected=" + getSelectedPositions());
+		if (DEBUG && adjusted)
+			Log.v(TAG, "AdjustedSelected(" + diff + itemCount + ")=" + getSelectedPositions());
 	}
 
 	/*----------------*/
@@ -4235,6 +4453,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void onSaveInstanceState(Bundle outState) {
 		if (outState != null) {
 			//Save selection state
+			if (mScrollableHeaders.size() > 0) {
+				//We need to rollback the added item positions if headers were added
+				adjustSelected(0, -mScrollableHeaders.size());
+			}
 			super.onSaveInstanceState(outState);
 			//Save selection coherence
 			outState.putBoolean(EXTRA_CHILD, this.childSelected);
@@ -4637,7 +4859,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		onPostUpdate();
 		//Update empty view
 		if (mUpdateListener != null) {
-			mUpdateListener.onUpdateEmptyView(getItemCount());
+			mUpdateListener.onUpdateEmptyView(getItemCount(false));
 		}
 	}
 
@@ -4660,7 +4882,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		onPostFilter();
 		//Call listener to update EmptyView, assuming the filter always made a change
 		if (mUpdateListener != null)
-			mUpdateListener.onUpdateEmptyView(getItemCount());
+			mUpdateListener.onUpdateEmptyView(getItemCount(hasSearchText()));
 	}
 
 	/**

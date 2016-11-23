@@ -299,8 +299,19 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @see #isSelectable(int)
 	 * @since 5.0.0-b7
 	 */
-	public boolean addSelection(int position) {
+	public final boolean addSelection(int position) {
 		return isSelectable(position) && mSelectedPositions.add(position);
+	}
+
+	/**
+	 * This method is used only internally to force adjust selection.
+	 *
+	 * @param position Position of the item to add the selection status for.
+	 * @return true if the set is modified, false otherwise
+	 * @since 5.0.0-rc1
+	 */
+	final boolean addAdjustedSelection(int position) {
+		return mSelectedPositions.add(position);
 	}
 
 	/**
@@ -310,7 +321,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @return true if the set is modified, false otherwise
 	 * @since 5.0.0-b7
 	 */
-	public boolean removeSelection(int position) {
+	public final boolean removeSelection(int position) {
 		return mSelectedPositions.remove(position);
 	}
 

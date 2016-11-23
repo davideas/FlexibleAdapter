@@ -381,7 +381,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			set.addListener(new HelperAnimatorListener(hashCode));
 			if (mEntryStep) {
 				//Stop stepDelay when screen is filled
-				set.setStartDelay(calculateAnimationDelay1(position));
+				set.setStartDelay(calculateAnimationDelay2(position));
 			}
 			set.start();
 			mAnimators.put(hashCode, set);
