@@ -111,13 +111,13 @@ public class FragmentSelectionModes extends AbstractFragment {
 
 		//Add sample HeaderView items on the top (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
-		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.showLayoutInfo();
 	}
 
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo(true);
+		mAdapter.showLayoutInfo();
 	}
 
 	@Override

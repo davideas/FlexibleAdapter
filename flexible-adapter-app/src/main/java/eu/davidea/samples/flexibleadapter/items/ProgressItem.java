@@ -42,9 +42,9 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 		//nothing to bind
 	}
 
-	public static class ProgressViewHolder extends FlexibleViewHolder {
+	static class ProgressViewHolder extends FlexibleViewHolder {
 
-		public ProgressBar progressBar;
+		ProgressBar progressBar;
 
 		public ProgressViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);

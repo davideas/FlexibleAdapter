@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -55,11 +56,11 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	/*
 	 * HEADER VIEW
-	 * This method show how to add Header/Footer View as it was for ListView.
-	 * The secret is the position! 0 for Header; itemCount for Footer ;-)
+	 * This method shows how to add Header View as it was for ListView.
+	 * Same Header item is enqueued for removal with a delay.
 	 * The view is represented by a custom Item type to better represent any dynamic content.
 	 */
-	public void showLayoutInfo(boolean scrollToPosition) {
+	public void showLayoutInfo() {
 		if (!hasSearchText() && !isEmpty()) {
 			//Define Example View
 			final ScrollableLayoutItem item = new ScrollableLayoutItem("LAY-L");
@@ -83,8 +84,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	/*
 	 * ANOTHER HEADER VIEW
-	 * This method show how to add Header/Footer View as it was for ListView.
-	 * The secret is the position! 0 for Header; itemCount for Footer ;-)
+	 * This method shows how to add a Header View with a delay.
 	 * The view is represented by a custom Item type to better represent any dynamic content.
 	 */
 	public void addUserLearnedSelection(boolean scrollToPosition) {
@@ -97,6 +97,11 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		}
 	}
 
+	/*
+	 * FOOTER VIEW
+	 * This method shows how to delay add a Footer View.
+	 * The view is represented by a custom Item type to better represent any dynamic content.
+	 */
 	public void addScrollableFooter() {
 		//Define Example View
 		final ScrollableFooterItem item = new ScrollableFooterItem("SFI");
@@ -108,6 +113,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	/**
 	 * This is a customization of the Layout that hosts the header when sticky.
 	 * The code works, but it is commented because not used (default is used).
+	 * <p><b>Note:</b> You now can set a custom container by calling
+	 * {@link #setStickyHeaderContainer(ViewGroup)}</p>
 	 */
 //	@Override
 //	public ViewGroup getStickySectionHeadersHolder() {
@@ -160,10 +167,9 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 * <u>must</u> extends {@link FlexibleAdapter.HandlerCallback}
 	 * which implements {@link android.os.Handler.Callback},
 	 * therefore you <u>must</u> call {@code super().handleMessage(message)}.
-	 * <p>
-	 * This handler can launch asynchronous tasks and if you catch the reserved "what",
-	 * keep in mind that this code should be executed <u>before</u> that task has been completed.
-	 * </p>
+	 * <p>This handler can launch asynchronous tasks.</p>
+	 * If you catch the reserved "what", keep in mind that this code should be executed
+	 * <u>before</u> that task has been completed.
 	 * <p><b>Note:</b> numbers 0-9 are reserved for the Adapter, use others for new values.</p>
 	 */
 	private class MyHandlerCallback extends HandlerCallback {

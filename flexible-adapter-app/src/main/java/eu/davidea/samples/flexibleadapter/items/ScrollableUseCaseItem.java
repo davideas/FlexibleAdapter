@@ -15,24 +15,15 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Item dedicated only for User Learns Selection view (located always at position 0 in the Adapter).
- * <p>If you don't have many fields in common better to extend directly from
- * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
- * implemented methods (getter and setters).</p>
+ * This item is a Scrollable Header.
  */
-public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHolder> {
+public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.HeaderViewHolder> {
 
-	public ScrollableULSItem(String id) {
+	public ScrollableUseCaseItem(String id) {
 		super(id);
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return false;
 	}
 
 	@Override
@@ -42,47 +33,39 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_scrollable_uls_item;
+		return R.layout.recycler_scrollable_usecase_item;
 	}
 
 	@Override
-	public ULSViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ULSViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public HeaderViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new HeaderViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, ULSViewHolder holder, int position, List payloads) {
-		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
-		holder.itemView.setActivated(true);
-		holder.mTitle.setSelected(true);//For marquee
+	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
+//		holder.mTitle.setSelected(true);//For marquee
 		holder.mTitle.setText(Html.fromHtml(getTitle()));
 		holder.mSubtitle.setText(Html.fromHtml(getSubtitle()));
 	}
 
-	/**
-	 * Used for UserLearnsSelection.
-	 */
-	class ULSViewHolder extends FlexibleViewHolder {
+	class HeaderViewHolder extends FlexibleViewHolder {
 
-		ImageView mImageView;
 		TextView mTitle;
 		TextView mSubtitle;
 		ImageView mDismissIcon;
 
-		public ULSViewHolder(View view, FlexibleAdapter adapter) {
+		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-			mImageView = (ImageView) view.findViewById(R.id.image);
 			mDismissIcon = (ImageView) view.findViewById(R.id.dismiss_icon);
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					DatabaseConfiguration.userLearnedSelection = true;
 					//Don't need anymore to set permanent for Scrollable Headers and Footers
 					//mAdapter.setPermanentDelete(true);
 					//noinspection unchecked
-					mAdapter.removeScrollableFooter(ScrollableULSItem.this);
+					mAdapter.removeScrollableHeader(ScrollableUseCaseItem.this);
 					//mAdapter.setPermanentDelete(false);
 				}
 			});
@@ -101,7 +84,7 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 
 	@Override
 	public String toString() {
-		return "ULSItem[" + super.toString() + "]";
+		return "FooterItem[" + super.toString() + "]";
 	}
 
 }

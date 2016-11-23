@@ -101,13 +101,13 @@ public class FragmentExpandableSections extends AbstractFragment {
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		//Add sample HeaderView items on the top (not belongs to the library)
-		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.showLayoutInfo();
 	}
 
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo(true);
+		mAdapter.showLayoutInfo();
 	}
 
 	@Override

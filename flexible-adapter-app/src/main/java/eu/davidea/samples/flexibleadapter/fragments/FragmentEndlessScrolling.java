@@ -111,7 +111,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 		//Add sample Scrollable Header and Footer items (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
-		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.showLayoutInfo();
 		mAdapter.addScrollableFooter();
 
 	}
@@ -119,7 +119,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo(true);
+		mAdapter.showLayoutInfo();
 	}
 
 	/**

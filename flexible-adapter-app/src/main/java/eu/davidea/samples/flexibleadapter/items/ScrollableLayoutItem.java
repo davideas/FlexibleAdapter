@@ -17,7 +17,7 @@ import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Item dedicated to display the status of the Layout currently displayed.
+ * Item dedicated to display which Layout is currently displayed.
  * This item is a Scrollable Header.
  *
  * <p>If you don't have many fields in common better to extend directly from
@@ -25,8 +25,6 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * implemented methods (getter and setters).</p>
  */
 public class ScrollableLayoutItem extends AbstractItem<ScrollableLayoutItem.LayoutViewHolder> {
-
-	private static final long serialVersionUID = -5041296095060813327L;
 
 	public ScrollableLayoutItem(String id) {
 		super(id);
