@@ -35,13 +35,15 @@
 	<string name="mode_single">Mode Single</string>
 	<string name="undo">Undo</string>
 
-	<!-- Scrollable Headers/Footer -->
+	<!-- Scrollable Headers/Footer/ProgressItem -->
 	<string name="uls_title"><![CDATA[<i>Click on Image (or LongClick on Item) to select that Item</i>]]></string>
 	<string name="uls_subtitle"><![CDATA[<i>This is scrollable header.</i>]]></string>
 	<string name="scrollable_header_title">Scrollable Header Item</string>
 	<string name="scrollable_header_subtitle"><![CDATA[<i>Scrollable Headers are always displayed at the top of all main items.</i>]]></string>
 	<string name="scrollable_footer_title">Scrollable Footer Item</string>
 	<string name="scrollable_footer_subtitle"><![CDATA[<i>Scrollable Footers are always displayed at the bottom of all main items.</i>]]></string>
+	<string name="no_more_load">No more items to load. Refresh to retry.</string>
+	<string name="endless_finished">No more items to load.</string>
 
 	<!-- Dialog -->
 	<string name="dialog_edit_title_hint">Title</string>

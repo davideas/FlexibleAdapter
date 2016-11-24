@@ -107,13 +107,13 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 		//EndlessScrollListener - OnLoadMore (v5.0.0)
 		mAdapter.setEndlessScrollListener(this, new ProgressItem());
-		//mAdapter.setEndlessScrollThreshold(1);//Default=1
+//				.setEndlessTargetCount(10)
+//				.setEndlessScrollThreshold(1);//Default=1
 
 		//Add sample Scrollable Header and Footer items (not belongs to the library)
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.showLayoutInfo();
 		mAdapter.addScrollableFooter();
-
 	}
 
 	@Override
@@ -144,17 +144,18 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				int count = new Random().nextInt(3);
 				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item);
 				for (int i = 1; i <= count; i++) {
-					if (i % 2 != 0) {
+//					if (i % 2 != 0) {
 						newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
-					} else {
-						newItems.add(DatabaseService.newExpandableItem(totalItemsOfType + i, null));
-					}
+//					} else {
+//						newItems.add(DatabaseService.newExpandableItem(totalItemsOfType + i, null));
+//					}
 				}
 
 				//Callback the Adapter to notify the change:
 				//- New items will be added to the end of the list
-				//- When list is null or empty, ProgressItem will be hidden
-				mAdapter.onLoadMoreComplete(newItems);
+				//- When list is null or empty, ProgressItem will be reset to null and endless
+				//  scroll disabled
+				mAdapter.onLoadMoreComplete(newItems, 5000L);
 				DatabaseService.getInstance().addAll(newItems);
 
 				//Expand all Expandable items: Not Expandable items are automatically skipped/ignored!
@@ -175,7 +176,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 						"Simulated: No more items to load :-(\nRefresh to retry.");
 				Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
 			}
-		}, 2500);
+		}, 2000);
 	}
 
 	@Override

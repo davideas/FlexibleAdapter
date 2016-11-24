@@ -105,9 +105,9 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 
 	static class HeaderViewHolder extends FlexibleViewHolder {
 
-		public TextView mTitle;
-		public TextView mSubtitle;
-		public ImageView mHandleView;
+		TextView mTitle;
+		TextView mSubtitle;
+		ImageView mHandleView;
 
 		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);//True for sticky

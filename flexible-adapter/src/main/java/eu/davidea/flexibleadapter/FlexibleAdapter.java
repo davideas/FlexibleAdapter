@@ -159,7 +159,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private ItemTouchHelper mItemTouchHelper;
 
 	/* EndlessScroll */
-	private int mEndlessScrollThreshold = 1;
+	private int mEndlessScrollThreshold = 1, mEndlessTargetCount = 0;
 	private boolean mLoading = false;
 	private T mProgressItem;
 
@@ -1292,8 +1292,12 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (DEBUG) Log.v(TAG, "Showing header at position " + position + " header=" + header);
 			header.setHidden(false);
 			//Skip notifyItemInserted when init=true and insert the header properly!
-			return (init ? performCardinalInsert(position, Collections.singletonList((T) header)) :
-					addItem(position, (T) header));
+			if (init) {
+				performCardinalInsert(position, Collections.singletonList((T) header));
+			} else {
+				addItem(position, (T) header);
+			}
+			return true;
 		}
 		return false;
 	}
@@ -1596,6 +1600,21 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*------------------------*/
 
 	/**
+	 * Evaluates if the Adapter is in Endless Scroll mode. When no more load, the ProgressItem
+	 * will be set to {@code null} and this method will return {@code false}.
+	 *
+	 * @return true if the progress item is set, false otherwise
+	 */
+	public boolean isEndlessScrollEnabled() {
+		return mProgressItem != null;
+	}
+
+//	public FlexibleAdapter setEndlessTargetCount(@IntRange(from = 1) int endlessTargetCount) {
+//		mEndlessTargetCount = endlessTargetCount;
+//		return this;
+//	}
+
+	/**
 	 * Sets the ProgressItem to be displayed at the end of the list and activate the Loading More
 	 * functionality.
 	 * <p>Using this method, the {@link EndlessScrollListener} won't be called so that you can
@@ -1664,30 +1683,34 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position the current binding position
 	 */
 	protected void onLoadMore(int position) {
-		//Skip everything when no loading more
-		if (mProgressItem == null || position == getGlobalPositionOf(mProgressItem)) {
+		// Skip everything when no loading more
+		int footersSize = mScrollableFooters.size();
+		int limit = getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : footersSize);
+		if (mProgressItem == null || position == getGlobalPositionOf(mProgressItem)
+				|| position < limit || mLoading) {
 			return;
 		} else if (DEBUG) {
 			Log.v(TAG, "onLoadMore     loading=" + mLoading + ", position=" + position
 					+ ", itemCount=" + getItemCount() + ", threshold=" + mEndlessScrollThreshold
-					+ ", inside the threshold? " + (position >= getItemCount() - mScrollableFooters.size() - mEndlessScrollThreshold));
+					+ ", inside the threshold? " + (position >= getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableFooters.size())));
 		}
-		//Load more if not loading and inside the threshold
-		if (!mLoading && position >= getItemCount() - mScrollableFooters.size() - mEndlessScrollThreshold) {
-			mLoading = true;
-			if (DEBUG) Log.d(TAG, "onLoadMore     invoked!");
-			mRecyclerView.post(new Runnable() {
-				@Override
-				public void run() {
-					if (getGlobalPositionOf(mProgressItem) < 0) {
-						addItem(mProgressItem);
-					}
-					if (mEndlessScrollListener != null) {
-						mEndlessScrollListener.onLoadMore();
-					}
+		// Load more if not loading and inside the threshold
+		mLoading = true;
+		if (DEBUG) Log.d(TAG, "onLoadMore     invoked!");
+		// Insertion in post is suggested by Android because: java.lang.IllegalStateException:
+		// Cannot call notifyItemInserted while RecyclerView is computing a layout or scrolling
+		mHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				if (getGlobalPositionOf(mProgressItem) < 0) {
+					addItem(mProgressItem);
 				}
-			});
-		}
+				// When the listener is not set, loading more is called upon a user request
+				if (mEndlessScrollListener != null) {
+					mEndlessScrollListener.onLoadMore();
+				}
+			}
+		});
 	}
 
 	/**
@@ -1716,7 +1739,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b8
 	 */
 	public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
-		//Handling the delay
 		if (delay < 0) {
 			//Disable the Automatic Endless functionality and keep the item
 			mProgressItem = null;
@@ -1729,6 +1751,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (newItems != null && newItems.size() > 0) {
 			if (DEBUG)
 				Log.i(TAG, "onLoadMore     performing adding " + newItems.size() + " new Items!");
+			//Delete the progress
+			mHandler.sendEmptyMessage(LOAD_MORE_COMPLETE);
 			addItems(getItemCount(), newItems);
 		} else {
 			noMoreLoad();
@@ -1751,7 +1775,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private void noMoreLoad() {
 		if (DEBUG) Log.i(TAG, "onLoadMore     noMoreLoad!");
-		notifyItemChanged(getItemCount() - mScrollableFooters.size() - 1, Payload.NO_MORE_LOAD);
+		notifyItemChanged(getGlobalPositionOf(mProgressItem), Payload.NO_MORE_LOAD);
 	}
 
 	/*--------------------*/
@@ -2382,7 +2406,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (DEBUG) Log.d(TAG, "addItems on position=" + position + " itemCount=" + items.size());
 
 		//Insert the item properly
-		performCardinalInsert(position, items);
+		position = performCardinalInsert(position, items);
 		//Notify range addition
 		notifyItemRangeInserted(position, items.size());
 
@@ -2399,7 +2423,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		return true;
 	}
 
-	private boolean performCardinalInsert(int position, List<T> items) {
+	private int performCardinalInsert(int position, List<T> items) {
 		int itemCount = getItemCount();
 		// Adjust position according to Headers/Footers size
 		int headersSize = mScrollableHeaders.size();
@@ -2411,7 +2435,13 @@ public class FlexibleAdapter<T extends IFlexible>
 			position -= footersSize;
 		}
 		// Insert Items
-		return (position < itemCount ? mItems.addAll(position, items) : mItems.addAll(items));
+		if (position < itemCount) {
+			mItems.addAll(position, items);
+		} else {
+			mItems.addAll(items);
+		}
+		//return the new position
+		return position;
 	}
 
 	/**

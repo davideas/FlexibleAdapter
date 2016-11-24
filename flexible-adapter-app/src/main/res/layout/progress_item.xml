@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<FrameLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:padding="@dimen/margin_small">
 
 	<ProgressBar
@@ -10,7 +11,15 @@
 		style="@style/Widget.AppCompat.ProgressBar"
 		android:layout_width="24dp"
 		android:layout_height="24dp"
-		android:layout_centerHorizontal="true"
-		android:layout_centerVertical="true"/>
+		android:layout_gravity="center"/>
 
-</RelativeLayout>
+	<TextView
+		android:id="@+id/progress_message"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="@string/no_more_load"
+		android:layout_gravity="center"
+		android:visibility="gone"
+		tools:visibility="visible"/>
+
+</FrameLayout>
