@@ -117,7 +117,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private DiffUtilCallback diffUtilCallback;
 
 	/* Handler for delayed actions */
-	protected final int UPDATE = 0, FILTER = 1, CONFIRM_DELETE = 2, LOAD_MORE_COMPLETE = 8;
+	protected final int UPDATE = 0, FILTER = 1, CONFIRM_DELETE = 2, LOAD_MORE_COMPLETE = 8, LOAD_MORE_DISABLE = 9;
 	protected Handler mHandler = new Handler(Looper.getMainLooper(), new HandlerCallback());
 
 	/* Deleted items and RestoreList (Undo) */
@@ -159,7 +159,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	private ItemTouchHelper mItemTouchHelper;
 
 	/* EndlessScroll */
-	private int mEndlessScrollThreshold = 1, mEndlessTargetCount = 0;
+	private int mEndlessScrollThreshold = 1, mEndlessTargetCount = 0,
+			mEndlessPageSize = 0, mCurrentPage = 1;
 	private boolean mLoading = false;
 	private T mProgressItem;
 
@@ -1609,10 +1610,15 @@ public class FlexibleAdapter<T extends IFlexible>
 		return mProgressItem != null;
 	}
 
-//	public FlexibleAdapter setEndlessTargetCount(@IntRange(from = 1) int endlessTargetCount) {
-//		mEndlessTargetCount = endlessTargetCount;
-//		return this;
-//	}
+	public FlexibleAdapter setEndlessTargetCount(@IntRange(from = 1) int endlessTargetCount) {
+		mEndlessTargetCount = endlessTargetCount;
+		return this;
+	}
+
+	public FlexibleAdapter setEndlessPageSize(@IntRange(from = 1) int endlessPageSize) {
+		mEndlessPageSize = endlessPageSize;
+		return this;
+	}
 
 	/**
 	 * Sets the ProgressItem to be displayed at the end of the list and activate the Loading More
@@ -1628,11 +1634,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public FlexibleAdapter setEndlessProgressItem(@NonNull T progressItem) {
 		if (progressItem != null) {
-			if (DEBUG) Log.i(TAG, "Set progressItem=" + progressItem.getClass().getSimpleName());
 			setEndlessScrollThreshold(mEndlessScrollThreshold);
-			progressItem.setEnabled(false);
-			mProgressItem = progressItem;
+			if (DEBUG) {
+				Log.i(TAG, "Set progressItem=" + progressItem.getClass().getSimpleName());
+				Log.i(TAG, "Enabled EndlessScrolling");
+			}
+		} else if (DEBUG) {
+			Log.i(TAG, "Disabled EndlessScrolling");
 		}
+		mProgressItem = progressItem;
 		return this;
 	}
 
@@ -1683,11 +1693,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position the current binding position
 	 */
 	protected void onLoadMore(int position) {
-		// Skip everything when no loading more
+		// Skip everything when loading more is unused OR currently loading OR all items are loaded
+		if (mProgressItem == null || mLoading ||
+				(mEndlessTargetCount > 0 && getItemCount(false) >= mEndlessTargetCount))
+			return;
+
+		// Check next loading threshold
 		int footersSize = mScrollableFooters.size();
 		int limit = getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : footersSize);
-		if (mProgressItem == null || position == getGlobalPositionOf(mProgressItem)
-				|| position < limit || mLoading) {
+		if (position == getGlobalPositionOf(mProgressItem) || position < limit) {
 			return;
 		} else if (DEBUG) {
 			Log.v(TAG, "onLoadMore     loading=" + mLoading + ", position=" + position
@@ -1696,18 +1710,19 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 		// Load more if not loading and inside the threshold
 		mLoading = true;
-		if (DEBUG) Log.d(TAG, "onLoadMore     invoked!");
 		// Insertion in post is suggested by Android because: java.lang.IllegalStateException:
 		// Cannot call notifyItemInserted while RecyclerView is computing a layout or scrolling
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
-				if (getGlobalPositionOf(mProgressItem) < 0) {
+				int lastPosition = getGlobalPositionOf(mProgressItem) - 1;
+				if (lastPosition < 0) {
 					addItem(mProgressItem);
 				}
 				// When the listener is not set, loading more is called upon a user request
 				if (mEndlessScrollListener != null) {
-					mEndlessScrollListener.onLoadMore();
+					if (DEBUG) Log.d(TAG, "onLoadMore     invoked!");
+					mEndlessScrollListener.onLoadMore(lastPosition, mCurrentPage);
 				}
 			}
 		});
@@ -1739,23 +1754,48 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b8
 	 */
 	public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
-		if (delay < 0) {
-			//Disable the Automatic Endless functionality and keep the item
-			mProgressItem = null;
-		} else {
-			//Delete the progress item with delay
-			mHandler.sendEmptyMessageDelayed(LOAD_MORE_COMPLETE, delay);
-		}
-		//Add the new items or reset the loading status
+		// Reset the loading status
 		mLoading = false;
-		if (newItems != null && newItems.size() > 0) {
+		// Check if something has been loaded
+		int newItemSize = newItems == null ? 0 : newItems.size();
+		int totalItemCount = newItemSize + getItemCount(false) + 1; //+1 for the progress item
+		int positionToNotify = getGlobalPositionOf(mProgressItem);
+		boolean alreadyDisabled = false;
+
+		// Check if features are enabled and limits are reached
+		if (mEndlessPageSize > 0 && newItemSize < mEndlessPageSize || // Is feature enabled and Not enough items?
+				mEndlessTargetCount > 0 && totalItemCount >= mEndlessTargetCount) { // Is feature enabled and Max limit has been reached?
+			if (DEBUG) Log.v(TAG, "onLoadMore     keep and disable the progressItem");
+			// Keep the item and DISABLE the EndlessScroll feature
+			if (delay > 0) {
+				mHandler.sendEmptyMessageDelayed(LOAD_MORE_DISABLE, delay);
+			} else {
+				setEndlessProgressItem(null);
+			}
+			noMoreLoad(positionToNotify);// TODO: cannot notify with negative position??
+			alreadyDisabled = true;
+		} else if (newItemSize > 0) {
+			delay = 0; // Reset the delay when loading more should continue
+		}
+		// DELETE the progress Item
+		if (!alreadyDisabled) {
+			if (delay > 0) {
+				mHandler.sendEmptyMessageDelayed(LOAD_MORE_COMPLETE, delay);
+			} else {
+				mHandler.sendEmptyMessage(LOAD_MORE_COMPLETE);
+			}
+		}
+		// Finally Add any new items
+		if (newItemSize > 0) {
+			// Calculate the current page
+			if (mEndlessTargetCount > 0) {
+				mCurrentPage = mEndlessTargetCount % totalItemCount;
+			}
 			if (DEBUG)
-				Log.i(TAG, "onLoadMore     performing adding " + newItems.size() + " new Items!");
-			//Delete the progress
-			mHandler.sendEmptyMessage(LOAD_MORE_COMPLETE);
+				Log.v(TAG, "onLoadMore     performing adding " + newItemSize + " new items on Page=" + mCurrentPage);
 			addItems(getItemCount(), newItems);
-		} else {
-			noMoreLoad();
+		} else if (!alreadyDisabled) {
+			noMoreLoad(positionToNotify);
 		}
 	}
 
@@ -1763,19 +1803,24 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Called when loading more should continue.
 	 */
 	private void deleteProgressItem() {
-		int progressPosition = getGlobalPositionOf(mProgressItem);
-		if (progressPosition >= 0) {
+		int positionToNotify = getGlobalPositionOf(mProgressItem);
+		if (positionToNotify >= 0) {
+			if (DEBUG) Log.v(TAG, "onLoadMore     remove progressItem");
 			mItems.remove(mProgressItem);
-			notifyItemRemoved(progressPosition);
+			notifyItemRemoved(positionToNotify);
 		}
 	}
 
 	/**
 	 * Called when no more items are loaded.
 	 */
-	private void noMoreLoad() {
-		if (DEBUG) Log.i(TAG, "onLoadMore     noMoreLoad!");
-		notifyItemChanged(getGlobalPositionOf(mProgressItem), Payload.NO_MORE_LOAD);
+	private void noMoreLoad(int positionToNotify) {
+		if (DEBUG) Log.d(TAG, "onLoadMore     noMoreLoad!");
+		if (positionToNotify >= 0)
+			notifyItemChanged(positionToNotify, Payload.NO_MORE_LOAD);
+		if (mEndlessScrollListener != null) {
+			mEndlessScrollListener.noMoreLoad();
+		}
 	}
 
 	/*--------------------*/
@@ -4677,13 +4722,20 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * @since 22/04/2016
 	 */
-	public interface EndlessScrollListener {
+	public interface EndlessScrollListener<T> {
 		/**
 		 * Loads more data.
 		 *
-		 * @since 5.0.0-b6
+		 * @since 5.0.0-rc1
 		 */
-		void onLoadMore();
+		void onLoadMore(int lastPosition, int currentPage);
+
+		/**
+		 * No more data to load.
+		 *
+		 * @since 5.0.0-rc1
+		 */
+		void noMoreLoad();
 	}
 
 	/**
@@ -4932,6 +4984,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>1 = async call for filterItems, optionally delayed.
 	 * <br/>2 = deleteConfirmed when Undo timeout is over.
 	 * <br/>8 = remove the progress item from the list, optionally delayed.
+	 * <br/>9 = remove the progress item from the list and DISABLE the EndlessScroll.
 	 * <p><b>Note:</b> numbers 0-9 are reserved for the Adapter, use others.</p>
 	 *
 	 * @since 5.0.0-rc1
@@ -4953,8 +5006,12 @@ public class FlexibleAdapter<T extends IFlexible>
 					if (listener != null) listener.onDeleteConfirmed();
 					emptyBin();
 					return true;
-				case LOAD_MORE_COMPLETE: //onLoadMore remove progress item
+				case LOAD_MORE_COMPLETE: //remove progress item
 					deleteProgressItem();
+					return true;
+				case LOAD_MORE_DISABLE: //remove progress item and DISABLE the EndlessScroll
+					deleteProgressItem();
+					setEndlessProgressItem(null);
 					return true;
 			}
 			return false;

@@ -123,10 +123,24 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	}
 
 	/**
-	 * Loads more data.
+	 * No more data to load.
+	 *
+	 * @since 5.0.0-rc1
 	 */
 	@Override
-	public void onLoadMore() {
+	public void noMoreLoad() {
+
+	}
+
+	/**
+	 * Loads more data.
+	 *
+	 * @param lastPosition
+	 * @param currentPage
+	 * @since 5.0.0-rc1
+	 */
+	@Override
+	public void onLoadMore(int lastPosition, int currentPage) {
 		//We don't want load more items when searching into the current Collection!
 		//Alternatively, for a special filter, if we want load more items when filter is active, the
 		// new items that arrive from remote, should be already filtered, before adding them to the Adapter!
@@ -155,6 +169,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				//- New items will be added to the end of the list
 				//- When list is null or empty, ProgressItem will be reset to null and endless
 				//  scroll disabled
+				mAdapter.setEndlessTargetCount(10);
 				mAdapter.onLoadMoreComplete(newItems, 5000L);
 				DatabaseService.getInstance().addAll(newItems);
 

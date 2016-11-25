@@ -94,10 +94,24 @@ public class FragmentInstagramHeaders extends AbstractFragment
 	}
 
 	/**
-	 * Loads more data.
+	 * No more data to load.
+	 *
+	 * @since 5.0.0-rc1
 	 */
 	@Override
-	public void onLoadMore() {
+	public void noMoreLoad() {
+
+	}
+
+	/**
+	 * Loads more data.
+	 *
+	 * @param lastPosition
+	 * @param currentPage
+	 * @since 5.0.0-rc1
+	 */
+	@Override
+	public void onLoadMore(int lastPosition, int currentPage) {
 		Log.i(TAG, "onLoadMore invoked!");
 		//Simulating asynchronous call
 		new Handler().postDelayed(new Runnable() {
@@ -120,7 +134,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 				String message = "Fetched " + newItems.size() + " new items";
 				Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
 			}
-		}, 2000);
+		}, 3000);
 	}
 
 	@Override
