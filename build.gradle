@@ -6,7 +6,7 @@ ext {
 	developerEmail = "dave.dna@gmail.com"
 
 	//Library
-	libraryCode = 18
+	libraryCode = 19
 	libraryVersion = "5.0.0-SNAPSHOT"
 	libraryDate = " built on " + getDate()
 	libraryDescription = "1 Adapter for SelectionMode, Undo, ViewHolders, Filter, FastScroller, Animations, Sticky Headers, Expandable, Draggable, Swipeable, EndlessScroll :-)"
@@ -23,9 +23,9 @@ ext {
 
 	//Support and Build tools version
 	minSdk = 14
-	targetSdk = 24
-	buildTools = "24.0.3"
-	supportLib = "24.2.1"
+	targetSdk = 25
+	buildTools = "25.0.1"
+	supportLib = "25.0.1"
 
 	//Support Libraries dependencies
 	supportDependencies = [
