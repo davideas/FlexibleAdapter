@@ -15,6 +15,7 @@
  */
 package eu.davidea.flexibleadapter.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -36,6 +37,7 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import eu.davidea.flexibleadapter.R;
+import eu.davidea.flexibleadapter.SelectableAdapter;
 
 /**
  * @author Davide Steduto
@@ -193,6 +195,28 @@ public final class Utils {
 			return scanForActivity(((ContextWrapper) context).getBaseContext());
 
 		return null;
+	}
+
+	/**
+	 * @return the string representation of the provided {@link SelectableAdapter.Mode}
+	 */
+	@SuppressLint("SwitchIntDef")
+	public static String getModeName(@SelectableAdapter.Mode int mode) {
+		switch (mode) {
+			case SelectableAdapter.MODE_SINGLE:
+				return "MODE_SINGLE";
+			case SelectableAdapter.MODE_MULTI:
+				return "MODE_MULTI";
+			default:
+				return "MODE_IDLE";
+		}
+	}
+
+	/**
+	 * @return the SimpleClassName of the provided object
+	 */
+	public static String getClassName(@NonNull Object o) {
+		return o.getClass().getSimpleName();
 	}
 
 }

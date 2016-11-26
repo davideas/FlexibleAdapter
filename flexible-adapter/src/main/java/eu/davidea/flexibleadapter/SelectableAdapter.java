@@ -64,7 +64,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	public static final int MODE_IDLE = 0, MODE_SINGLE = 1, MODE_MULTI = 2;
 
 	/**
-	 * Annotation interface for selection modes.
+	 * Annotation interface for selection modes:
+	 * {@link #MODE_IDLE}, {@link #MODE_SINGLE}, {@link #MODE_MULTI}
 	 */
 	@IntDef({MODE_IDLE, MODE_SINGLE, MODE_MULTI})
 	@Retention(RetentionPolicy.SOURCE)
@@ -181,19 +182,11 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 2.0.0
 	 */
 	public void setMode(@Mode int mode) {
-		if (DEBUG) Log.i(TAG, getModeName(mode) + " enabled");
+		if (DEBUG) Log.i(TAG, Utils.getModeName(mode) + " enabled");
 		if (mMode == MODE_SINGLE && mode == MODE_IDLE)
 			clearSelection();
 		this.mMode = mode;
 		mLastItemInActionMode = (mode == MODE_IDLE);
-	}
-
-	private String getModeName(int mode) {
-		switch (mode) {
-			case 1: return "MODE_SINGLE";
-			case 2: return "MODE_MULTI";
-			default: return "MODE_IDLE";
-		}
 	}
 
 	/**
