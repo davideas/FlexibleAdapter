@@ -28,7 +28,7 @@
 			<!-- Needed by FlexibleAdapter for headers to be sticky.
 				 This little layout is included in the library.
 				 If you need to drag items, SwipeRefreshLayout must be disabled!-->
-			<!--<include layout="@layout/sticky_header_layout"/>-->
+			<include layout="@layout/sticky_header_layout"/>
 
 		</FrameLayout>
 
