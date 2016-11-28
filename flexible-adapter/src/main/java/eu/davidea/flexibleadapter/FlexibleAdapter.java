@@ -2716,10 +2716,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			return false;
 		}
 		//Build a new list with 1 item to chain the methods of addSubItems
-		List<T> subItems = new ArrayList<>(1);
-		subItems.add(item);
-		//Reuse the method for subItems
-		return addSubItems(parentPosition, subPosition, subItems, expandParent, payload);
+		return addSubItems(parentPosition, subPosition, Collections.singletonList(item), expandParent, payload);
 	}
 
 	/**
@@ -2741,6 +2738,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
 	 * @since 5.0.0-b1
 	 */
+	//TODO: Deprecation, this is like a command to expand
 	public int addAllSubItemsFrom(@IntRange(from = 0) int parentPosition,
 								  @NonNull IExpandable parent, boolean expandParent,
 								  @Nullable Object payload) {
@@ -2774,7 +2772,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			IExpandable expandable = (IExpandable) parent;
 			return addSubItems(parentPosition, subPosition, expandable, items, expandParent, payload);
 		}
-		Log.e(TAG, "Passed parentPosition doesn't belong to an Expandable item!");
+		Log.e(TAG, "Provided parentPosition doesn't belong to an Expandable item!");
 		return false;
 	}
 
@@ -2809,7 +2807,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			expand(parentPosition);
 		}
 		//Notify the adapter of the new addition to display it and animate it.
-		//If parent is collapsed there's no need to notify about the change.
+		//If parent is collapsed there's no need to add sub items.
 		if (parent.isExpanded()) {
 			added = addItems(parentPosition + 1 + Math.max(0, subPosition), items);
 		}
@@ -3934,6 +3932,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return true to calculate animation changes with DiffUtil, false to use default calculation.
 	 * @see #setAnimateChangesWithDiffUtil(boolean)
 	 */
+	//TODO: Deprecation: DiffUtil is slower than the internal implementation
 	public boolean isAnimateChangesWithDiffUtil() {
 		return useDiffUtil;
 	}
@@ -3950,6 +3949,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @see #setDiffUtilCallback(DiffUtilCallback)
 	 */
+	//TODO: Deprecation: DiffUtil is slower than the internal implementation
 	public FlexibleAdapter setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
 		this.useDiffUtil = useDiffUtil;
 		return this;
@@ -3963,11 +3963,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @see #setAnimateChangesWithDiffUtil(boolean)
 	 */
+	//TODO: Deprecation: DiffUtil is slower than the internal implementation
 	public FlexibleAdapter setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
 		this.diffUtilCallback = diffUtilCallback;
 		return this;
 	}
 
+	//TODO: Deprecation: DiffUtil is slower than the internal implementation
 	private synchronized void animateDiff(@Nullable List<T> newItems, Payload payloadChange) {
 		if (useDiffUtil) {
 			Log.v(TAG, "Animate changes with DiffUtils! oldSize=" + getItemCount() + " newSize=" + newItems.size());
@@ -5224,6 +5226,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>- {@code protected List<T> oldItems;}
 	 * <br/>- {@code protected List<T> newItems;}
 	 */
+	//TODO: Deprecation: DiffUtil is slower than the internal implementation
 	public static class DiffUtilCallback<T> extends DiffUtil.Callback {
 
 		protected List<T> oldItems;
