@@ -1745,34 +1745,85 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Evaluates if the Adapter is in Endless Scroll mode. When no more load, this method will
-	 * return {@code false}. To enable again the progress item you MUST set again the progressItem.
+	 * return {@code false}. To enable again the progress item you MUST be set again.
 	 *
 	 * @return true if the progress item is set, false otherwise
 	 * @see #setEndlessProgressItem(IFlexible)
+	 * @since 5.0.0-rc1
 	 */
 	public boolean isEndlessScrollEnabled() {
 		return endlessScrollEnabled;
 	}
 
-	//TODO: add javaDocs
+	/**
+	 * Provides the current endless page if the page size limit is set, if not set the returned
+	 * value is always 1.
+	 *
+	 * @return the current endless page
+	 * @see #getEndlessPageSize()
+	 * @see #setEndlessPageSize(int)
+	 * @since 5.0.0-rc1
+	 */
 	public int getEndlessCurrentPage() {
 		return Math.max(1, mEndlessPageSize > 0 ? getItemCount(false) / mEndlessPageSize : 0);
 	}
 
+	/**
+	 * The current setting for the endless page size limit.
+	 * <p><b>Note:</b> This limit is ignored if value is 0.</p>
+	 *
+	 * @return the page size limit, if the limit is not set, 0 is returned.
+	 * @see #getEndlessCurrentPage()
+	 * @see #setEndlessPageSize(int)
+	 * @since 5.0.0-rc1
+	 */
 	public int getEndlessPageSize() {
 		return mEndlessPageSize;
 	}
 
-	public FlexibleAdapter setEndlessPageSize(@IntRange(from = 1) int endlessPageSize) {
+	/**
+	 * Sets the limit to automatically disable the endless feature when coming items size is less
+	 * than the <i>page size</i>.
+	 * <p>When endless feature is disabled a {@link #notifyItemChanged(int, Object)} with payload
+	 * {@link Payload#NO_MORE_LOAD} will be triggered on the progressItem, so you can display a
+	 * message or change the views in this item.</p>
+	 * Default value is 0 (limit is ignored).
+	 *
+	 * @param endlessPageSize the size limit for each page
+	 * @return this Adapter, so the call can be chained
+	 * @since 5.0.0-rc1
+	 */
+	public FlexibleAdapter setEndlessPageSize(@IntRange(from = 0) int endlessPageSize) {
 		mEndlessPageSize = endlessPageSize;
 		return this;
 	}
 
+	/**
+	 * The current setting for the endless target item count limit.
+	 * <p><b>Note:</b> This limit is ignored if value is 0.</p>
+	 *
+	 * @return the target items count limit, if the limit is not set, 0 is returned.
+	 * @see #setEndlessTargetCount(int)
+	 * @since 5.0.0-rc1
+	 */
 	public int getEndlessTargetCount() {
 		return mEndlessTargetCount;
 	}
 
-	public FlexibleAdapter setEndlessTargetCount(@IntRange(from = 1) int endlessTargetCount) {
+	/**
+	 * Sets the limit to automatically disable the endless feature when the total items count in
+	 * the Adapter is equals or bigger than the <i>target count</i>.
+	 * <p>When endless feature is disabled a {@link #notifyItemChanged(int, Object)} with payload
+	 * {@link Payload#NO_MORE_LOAD} will be triggered on the progressItem, so you can display a
+	 * message or change the views in this item.</p>
+	 * Default value is 0 (limit is ignored).
+	 *
+	 * @param endlessTargetCount the total items count limit
+	 * @return this Adapter, so the call can be chained
+	 * @see #getEndlessTargetCount()
+	 * @since 5.0.0-rc1
+	 */
+	public FlexibleAdapter setEndlessTargetCount(@IntRange(from = 0) int endlessTargetCount) {
 		mEndlessTargetCount = endlessTargetCount;
 		return this;
 	}
