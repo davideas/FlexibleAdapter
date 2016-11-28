@@ -717,15 +717,46 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* SCROLLABLE HEADERS/FOOTERS METHODS */
 	/*------------------------------------*/
 
-	//TODO: add javaDocs
+	/**
+	 * @return unmodifiable list of Scrollable Headers currently held by the Adapter
+	 * @see #addScrollableHeader(IFlexible)
+	 * @see #addScrollableHeaderWithDelay(IFlexible, long, boolean)
+	 * @since 5.0.0-rc1
+	 */
 	public final List<T> getScrollableHeaders() {
 		return Collections.unmodifiableList(mScrollableHeaders);
 	}
 
+	/**
+	 * @return unmodifiable list of Scrollable Footers currently held by the Adapter
+	 * @see #addScrollableFooter(IFlexible)
+	 * @see #addScrollableFooterWithDelay(IFlexible, long, boolean)
+	 * @since 5.0.0-rc1
+	 */
 	public final List<T> getScrollableFooters() {
 		return Collections.unmodifiableList(mScrollableFooters);
 	}
 
+	/**
+	 * Adds a Scrollable Header.
+	 * <p><b>Scrollable Headers</b> have the following characteristic:
+	 * <ul>
+	 * <li>lay always before any main item.</li>
+	 * <li>cannot be selectable.</li>
+	 * <li>cannot be inserted twice, but many can be inserted.</li>
+	 * <li>any new header will be inserted before the existent.</li>
+	 * <li>can be of any type so they can be bound at runtime with any data inside.</li>
+	 * <li>won't be filtered because they won't be part of the main list, but added separately
+	 * at the initialization phase</li>
+	 * <li>can be added and removed with certain delay.</li>
+	 * </ul></p>
+	 *
+	 * @param headerItem the header item to be added
+	 * @return true if the header has been successfully added, false if the header already exists
+	 * @see #getScrollableHeaders()
+	 * @see #addScrollableHeaderWithDelay(IFlexible, long, boolean)
+	 * @since 5.0.0-rc1
+	 */
 	public final boolean addScrollableHeader(@NonNull T headerItem) {
 		if (DEBUG) Log.d(TAG, "Add scrollable header " + getClassName(headerItem));
 		if (!mScrollableHeaders.contains(headerItem)) {
@@ -740,6 +771,28 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
+	/**
+	 * Adds a Scrollable Footer.
+	 * <p><b>Scrollable Footers</b> have the following characteristic:
+	 * <ul>
+	 * <li>lay always after any main item.</li>
+	 * <li>cannot be selectable.</li>
+	 * <li>cannot be inserted twice, but many can be inserted.</li>
+	 * <li>any new footer will be inserted after the existent.</li>
+	 * <li>can be of any type so they can be bound at runtime with any data inside.</li>
+	 * <li>won't be filtered because they won't be part of the main list, but added separately
+	 * at the initialization phase</li>
+	 * <li>can be added and removed with certain delay.</li>
+	 * <li>endless {@code progressItem} is handled as a Scrollable Footer, but it will be always
+	 * displayed between the main items and the others footers.</li>
+	 * </ul></p>
+	 *
+	 * @param footerItem the footer item to be added
+	 * @return true if the footer has been successfully added, false if the footer already exists
+	 * @see #getScrollableFooters()
+	 * @see #addScrollableFooterWithDelay(IFlexible, long, boolean)
+	 * @since 5.0.0-rc1
+	 */
 	public final boolean addScrollableFooter(@NonNull T footerItem) {
 		if (!mScrollableFooters.contains(footerItem)) {
 			if (DEBUG) Log.d(TAG, "Add scrollable footer " + getClassName(footerItem));
@@ -759,6 +812,14 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
+	/**
+	 * Removes the provided Scrollable Header.
+	 *
+	 * @param headerItem the header to remove
+	 * @see #removeScrollableHeaderWithDelay(IFlexible, long)
+	 * @see #removeAllScrollableHeaders()
+	 * @since 5.0.0-rc1
+	 */
 	public final void removeScrollableHeader(@NonNull T headerItem) {
 		if (mScrollableHeaders.remove(headerItem)) {
 			if (DEBUG) Log.d(TAG, "Remove scrollable header " + getClassName(headerItem));
@@ -766,6 +827,14 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
+	/**
+	 * Removes the provided Scrollable Footer.
+	 *
+	 * @param footerItem the footer to remove
+	 * @see #removeScrollableFooterWithDelay(IFlexible, long)
+	 * @see #removeAllScrollableFooters()
+	 * @since 5.0.0-rc1
+	 */
 	public final void removeScrollableFooter(@NonNull T footerItem) {
 		if (mScrollableFooters.remove(footerItem)) {
 			if (DEBUG) Log.d(TAG, "Remove scrollable footer " + getClassName(footerItem));
@@ -773,6 +842,13 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
+	/**
+	 * Removes all Scrollable Headers at once.
+	 *
+	 * @see #removeScrollableHeader(IFlexible)
+	 * @see #removeScrollableHeaderWithDelay(IFlexible, long)
+	 * @since 5.0.0-rc1
+	 */
 	public final void removeAllScrollableHeaders() {
 		if (mScrollableHeaders.size() > 0) {
 			if (DEBUG) Log.d(TAG, "Remove all scrollable headers");
@@ -782,6 +858,13 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
+	/**
+	 * Removes all Scrollable Footers at once.
+	 *
+	 * @see #removeScrollableFooter(IFlexible)
+	 * @see #removeScrollableFooterWithDelay(IFlexible, long)
+	 * @since 5.0.0-rc1
+	 */
 	public final void removeAllScrollableFooters() {
 		if (mScrollableFooters.size() > 0) {
 			if (DEBUG) Log.d(TAG, "Remove all scrollable footers");
@@ -791,6 +874,16 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
+	/**
+	 * Same as {@link #addScrollableHeader(IFlexible)} but with a delay and the possibility to
+	 * scroll to it.
+	 *
+	 * @param headerItem       the header item to be added
+	 * @param delay            the delay in ms
+	 * @param scrollToPosition true to scroll to the header item position once it has been added
+	 * @see #addScrollableHeader(IFlexible)
+	 * @since 5.0.0-rc1
+	 */
 	public final void addScrollableHeaderWithDelay(@NonNull final T headerItem, @IntRange(from = 0) long delay,
 												   final boolean scrollToPosition) {
 		if (DEBUG)
@@ -804,6 +897,16 @@ public class FlexibleAdapter<T extends IFlexible>
 		}, delay);
 	}
 
+	/**
+	 * Same as {@link #addScrollableFooter(IFlexible)} but with a delay and the possibility to
+	 * scroll to it.
+	 *
+	 * @param footerItem       the footer item to be added
+	 * @param delay            the delay in ms
+	 * @param scrollToPosition true to scroll to the footer item position once it has been added
+	 * @see #addScrollableFooter(IFlexible)
+	 * @since 5.0.0-rc1
+	 */
 	public final void addScrollableFooterWithDelay(@NonNull final T footerItem, @IntRange(from = 0) long delay,
 												   final boolean scrollToPosition) {
 		if (DEBUG)
@@ -817,6 +920,15 @@ public class FlexibleAdapter<T extends IFlexible>
 		}, delay);
 	}
 
+	/**
+	 * Same as {@link #removeScrollableHeader(IFlexible)} but with a delay.
+	 *
+	 * @param headerItem the header item to be removed
+	 * @param delay      the delay in ms
+	 * @see #removeScrollableHeader(IFlexible)
+	 * @see #removeAllScrollableHeaders()
+	 * @since 5.0.0-rc1
+	 */
 	public final void removeScrollableHeaderWithDelay(@NonNull final T headerItem, @IntRange(from = 0) long delay) {
 		if (DEBUG)
 			Log.d(TAG, "Enqueued removing scrollable header (" + delay + "ms) " + headerItem);
@@ -828,6 +940,15 @@ public class FlexibleAdapter<T extends IFlexible>
 		}, delay);
 	}
 
+	/**
+	 * Same as {@link #removeScrollableFooter(IFlexible)} but with a delay.
+	 *
+	 * @param footerItem the footer item to be removed
+	 * @param delay      the delay in ms
+	 * @see #removeScrollableFooter(IFlexible)
+	 * @see #removeAllScrollableFooters()
+	 * @since 5.0.0-rc1
+	 */
 	public final void removeScrollableFooterWithDelay(@NonNull final T footerItem, @IntRange(from = 0) long delay) {
 		if (DEBUG)
 			Log.d(TAG, "Enqueued removing scrollable footer (" + delay + "ms) " + getClassName(footerItem));
@@ -839,6 +960,10 @@ public class FlexibleAdapter<T extends IFlexible>
 		}, delay);
 	}
 
+	/**
+	 * Helper method to restore the scrollable headers/footers along with the main items.
+	 * After the update and the filter operations.
+	 */
 	private void restoreScrollableHeadersAndFooters(List<T> items) {
 		for (T item : mScrollableHeaders)
 			if (items.size() > 0) items.add(0, item);
@@ -1692,7 +1817,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setEndlessProgressItem(IFlexible)
 	 * @since 5.0.0-b6
 	 */
-	//TODO: Deprecation? use setProgressItem + setEndlessScrollListener
 	public FlexibleAdapter setEndlessScrollListener(@Nullable EndlessScrollListener endlessScrollListener,
 													@NonNull T progressItem) {
 		if (DEBUG) Log.i(TAG, "Set endlessScrollListener=" + getClassName(endlessScrollListener));
