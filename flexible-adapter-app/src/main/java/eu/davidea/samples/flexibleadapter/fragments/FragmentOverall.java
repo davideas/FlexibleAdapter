@@ -74,17 +74,17 @@ public class FragmentOverall extends AbstractFragment {
 
 		// Prepare the RecyclerView and attach the Adapter to it
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
-		mRecyclerView.setItemViewCacheSize(0);//Setting ViewCache to 0 (default=2) will animate items better while scrolling down+up with LinearLayout
+		mRecyclerView.setItemViewCacheSize(0); //Setting ViewCache to 0 (default=2) will animate items better while scrolling down+up with LinearLayout
 		mRecyclerView.setLayoutManager(createNewStaggeredGridLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
-		mRecyclerView.setHasFixedSize(true);//Size of RV will not change
+		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 
 		// After Adapter is attached to RecyclerView
 		mAdapter.setLongPressDragEnabled(true);
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (getView() != null) {//Fix NPE when closing app before the execution of Runnable
+				if (getView() != null) { //Fix NPE when closing app before the execution of Runnable
 					Snackbar.make(getView(), "Long press drag is enabled", Snackbar.LENGTH_SHORT).show();
 				}
 			}
@@ -94,7 +94,7 @@ public class FragmentOverall extends AbstractFragment {
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		// Add sample HeaderView items on the top (not belongs to the library)
+		// Add 1 Scrollable Header
 		mAdapter.showLayoutInfo(savedInstanceState == null);
 	}
 
@@ -117,7 +117,7 @@ public class FragmentOverall extends AbstractFragment {
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {
-				// NOTE: If you use simple integer to identify the ViewType,
+				// NOTE: If you use simple integers to identify the ViewType,
 				// here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
 					case R.layout.recycler_scrollable_layout_item:

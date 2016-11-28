@@ -69,7 +69,7 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 		TextView mSubtitle;
 		ImageView mDismissIcon;
 
-		public ULSViewHolder(View view, FlexibleAdapter adapter) {
+		ULSViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
@@ -82,7 +82,7 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 					//Don't need anymore to set permanent for Scrollable Headers and Footers
 					//mAdapter.setPermanentDelete(true);
 					//noinspection unchecked
-					mAdapter.removeScrollableFooter(ScrollableULSItem.this);
+					mAdapter.removeScrollableHeader(ScrollableULSItem.this);
 					//mAdapter.setPermanentDelete(false);
 				}
 			});

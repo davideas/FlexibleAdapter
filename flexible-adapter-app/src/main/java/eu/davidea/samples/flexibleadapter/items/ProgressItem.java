@@ -47,16 +47,15 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 		if (!payloads.contains(Payload.NO_MORE_LOAD) && adapter.isEndlessScrollEnabled()) {
 			holder.progressBar.setVisibility(View.VISIBLE);
 			holder.progressMessage.setVisibility(View.GONE);
-		} else if (!adapter.isEndlessScrollEnabled()) {
+		} else {
 			holder.progressBar.setVisibility(View.GONE);
 			holder.progressMessage.setVisibility(View.VISIBLE);
 			Context context = holder.itemView.getContext();
-			holder.progressMessage.setText(context.getString(R.string.endless_finished));
-		} else if (payloads.contains(Payload.NO_MORE_LOAD)) {
-			holder.progressBar.setVisibility(View.GONE);
-			holder.progressMessage.setVisibility(View.VISIBLE);
-			Context context = holder.itemView.getContext();
-			holder.progressMessage.setText(context.getString(R.string.no_more_load));
+			if (!adapter.isEndlessScrollEnabled()) {
+				holder.progressMessage.setText(context.getString(R.string.endless_disabled));
+			} else if (payloads.contains(Payload.NO_MORE_LOAD)) {
+				holder.progressMessage.setText(context.getString(R.string.no_more_load_retry));
+			}
 		}
 	}
 
@@ -67,7 +66,7 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 		@BindView(R.id.progress_message)
 		TextView progressMessage;
 
-		public ProgressViewHolder(View view, FlexibleAdapter adapter) {
+		ProgressViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			ButterKnife.bind(this, view);
 		}

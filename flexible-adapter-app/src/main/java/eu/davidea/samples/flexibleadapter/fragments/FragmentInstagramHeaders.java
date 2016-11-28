@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
@@ -52,19 +53,19 @@ public class FragmentInstagramHeaders extends AbstractFragment
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
-		//Create New Database and Initialize RecyclerView
+		// Create New Database and Initialize RecyclerView
 		DatabaseService.getInstance().createInstagramHeadersDatabase(15);
-		initializeRecyclerView(savedInstanceState);
+		initializeRecyclerView();
 
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"unchecked", "ConstantConditions"})
-	private void initializeRecyclerView(Bundle savedInstanceState) {
+	private void initializeRecyclerView() {
 		//Initialize Adapter and RecyclerView
 		//true = it makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity(), true);
@@ -76,17 +77,17 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-		//Custom divider item decorator with 24dpi as empty space between sections
+		// Custom divider item decorator with 24dpi as empty space between sections
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 0, 24));
 
-		mAdapter.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!
-				.enableStickyHeaders()//Make headers sticky
-				//Endless scroll with 1 item threshold
+		mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
+				.enableStickyHeaders() //Make headers sticky
+				// Endless scroll with 1 item threshold
 				.setEndlessScrollListener(this, new ProgressItem())
-				.setEndlessScrollThreshold(1);//Default=1
+				.setEndlessScrollThreshold(1); //Default=1
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
@@ -95,25 +96,36 @@ public class FragmentInstagramHeaders extends AbstractFragment
 
 	/**
 	 * No more data to load.
+	 * <p>This method is called if any limit is reached (<b>targetCount</b> or <b>pageSize</b>
+	 * must be set) AND if new data is <u>temporary</u> unavailable (ex. no connection or no
+	 * new updates remotely). If no new data, a {@link FlexibleAdapter#notifyItemChanged(int, Object)}
+	 * with a payload {@link Payload#NO_MORE_LOAD} is triggered on the <i>progressItem</i>.</p>
 	 *
+	 * @param newItemsSize the last size of the new items loaded
+	 * @see FlexibleAdapter#setEndlessTargetCount(int)
+	 * @see FlexibleAdapter#setEndlessPageSize(int)
 	 * @since 5.0.0-rc1
 	 */
 	@Override
-	public void noMoreLoad() {
-
+	public void noMoreLoad(int newItemsSize) {
+		// This method will never be called if No limits are set and loading more will always
+		// produce new items (as this example does)
 	}
 
 	/**
 	 * Loads more data.
+	 * <p>Use {@code lastPosition} and {@code currentPage} to know what to load next.</p>
+	 * {@code lastPosition} is the count of the main items without Scrollable Headers.
 	 *
-	 * @param lastPosition
-	 * @param currentPage
-	 * @since 5.0.0-rc1
+	 * @param lastPosition the position of the last main item in the adapter
+	 * @param currentPage  the current page
+	 * @since 5.0.0-b6
+	 * <br/>5.0.0-rc1 added {@code lastPosition} and {@code currentPage} as parameters
 	 */
 	@Override
 	public void onLoadMore(int lastPosition, int currentPage) {
 		Log.i(TAG, "onLoadMore invoked!");
-		//Simulating asynchronous call
+		// Simulating asynchronous call
 		new Handler().postDelayed(new Runnable() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -126,13 +138,20 @@ public class FragmentInstagramHeaders extends AbstractFragment
 					newItems.add(DatabaseService.newInstagramItem(totalItemsOfType + i));
 				}
 
-				//Callback the Adapter to notify the change
-				//Items will be added to the end of the list
+				// Callback the Adapter to notify the change
+				// Items will be added to the end of the main list
 				mAdapter.onLoadMoreComplete(newItems);
+				Log.d(TAG, "newItemsSize=" + newItems.size());
+				Log.d(TAG, "EndlessCurrentPage=" + mAdapter.getEndlessCurrentPage());
+				Log.d(TAG, "EndlessPageSize=" + mAdapter.getEndlessPageSize());
+				Log.d(TAG, "EndlessTargetCount=" + mAdapter.getEndlessTargetCount());
 
-				//Notify user
-				String message = "Fetched " + newItems.size() + " new items";
-				Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+				// Notify user
+				if (getActivity() != null && newItems.size() > 0) {
+					Toast.makeText(getActivity(),
+							"Fetched " + newItems.size() + " new items",
+							Toast.LENGTH_SHORT).show();
+				}
 			}
 		}, 3000);
 	}

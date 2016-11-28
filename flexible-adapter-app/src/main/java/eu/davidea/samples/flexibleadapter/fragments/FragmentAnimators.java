@@ -67,29 +67,29 @@ public class FragmentAnimators extends AbstractFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
-		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createAnimatorsDatabase(20);//N. of sections
+		// Create New Database and Initialize RecyclerView
+		DatabaseService.getInstance().createAnimatorsDatabase(20); //N. of sections
 		initializeRecyclerView(savedInstanceState);
 
-		//Restore FAB button and icon
+		// Restore FAB button and icon
 		initializeFab();
 
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
-		//Experimenting NEW features (v5.0.0)
+		// Experimenting NEW features (v5.0.0)
 		mAdapter.expandItemsAtStartUp()
 				.setAutoCollapseOnExpand(false)
 				.setAutoScrollOnExpand(true)
 				.setOnlyEntryAnimation(false)
-				.setAnimationEntryStep(true)//In Overall, watch the effect at initial loading when Grid Layout is set
+				.setAnimationEntryStep(true) //In Overall, watch the effect at initial loading when Grid Layout is set
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
 				.setAnimationOnReverseScrolling(true)
 				.setAnimationInterpolator(new DecelerateInterpolator())
@@ -99,23 +99,23 @@ public class FragmentAnimators extends AbstractFragment {
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 
-		//NOTE: Custom item animators inherit 'canReuseUpdatedViewHolder()' from Default Item
+		// NOTE: Custom item animators inherit 'canReuseUpdatedViewHolder()' from Default Item
 		// Animator. It will return true if a Payload is provided. FlexibleAdapter is actually
 		// sending Payloads onItemChange notifications.
 		mRecyclerView.setItemAnimator(new FlexibleItemAnimator());
 		initializeSpinnerItemAnimators();
 		initializeSpinnerScrollAnimators();
 
-		//Experimenting NEW features (v5.0.0)
+		// Experimenting NEW features (v5.0.0)
 		mAdapter.setSwipeEnabled(true)
 				.getItemTouchHelperCallback()
-				.setSwipeFlags(ItemTouchHelper.RIGHT);//Enable swipe
+				.setSwipeFlags(ItemTouchHelper.RIGHT); //Enable swipe
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(false);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		//Add sample HeaderView items on the top (not belongs to the library)
+		// Add 1 Scrollable Header
 		mAdapter.showLayoutInfo();
 	}
 
@@ -238,7 +238,7 @@ public class FragmentAnimators extends AbstractFragment {
 		FadeInRight(new FadeInRightAnimator(new OvershootInterpolator(1f))),
 		Landing(new LandingAnimator(new OvershootInterpolator(1f))),
 		ScaleIn(new ScaleInAnimator(new OvershootInterpolator(1f))),
-		FlipInTopX(new FlipInTopXAnimator(new DecelerateInterpolator(1f))),//Makes use of index inside
+		FlipInTopX(new FlipInTopXAnimator(new DecelerateInterpolator(1f))), //Makes use of index inside
 		FlipInBottomX(new FlipInBottomXAnimator(new OvershootInterpolator(1f))),
 		SlideInLeft(new SlideInLeftAnimator(new OvershootInterpolator(1f))),
 		SlideInRight(new SlideInRightAnimator(new OvershootInterpolator(1f))),

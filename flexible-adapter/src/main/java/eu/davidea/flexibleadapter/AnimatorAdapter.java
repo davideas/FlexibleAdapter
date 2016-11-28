@@ -40,6 +40,8 @@ import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
+import static eu.davidea.flexibleadapter.utils.Utils.getClassName;
+
 /**
  * This class is responsible to animate items. Bounded items are animated initially and also
  * when user starts to scroll the list.
@@ -193,7 +195,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @return this AnimatorAdapter, so the call can be chained
 	 */
 	public AnimatorAdapter setAnimationInterpolator(@NonNull Interpolator interpolator) {
-		if (DEBUG) Log.i(TAG, "Set animationInterpolator=" + interpolator.getClass().getSimpleName());
+		if (DEBUG) Log.i(TAG, "Set animationInterpolator=" + getClassName(interpolator));
 		mInterpolator = interpolator;
 		return this;
 	}
@@ -342,6 +344,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param position the current item position
 	 */
 	protected void animateView(final RecyclerView.ViewHolder holder, final int position) {
+		if (mRecyclerView == null) return;
+
 		//Use always the max child count reached
 		if (mMaxChildViews < mRecyclerView.getChildCount()) {
 			mMaxChildViews = mRecyclerView.getChildCount();
@@ -362,7 +366,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 //		}
 		if (holder instanceof FlexibleViewHolder && shouldAnimate && !isFastScroll &&
 				!mAnimatorNotifierObserver.isPositionNotified() &&
-				(isReverseEnabled || position > mLastAnimatedPosition || (position == 0 && mRecyclerView.getChildCount() == 0)) ) {
+				(isReverseEnabled || position > mLastAnimatedPosition || (position == 0 && mRecyclerView.getChildCount() == 0))) {
 
 			//Cancel animation is necessary when fling
 			int hashCode = holder.itemView.hashCode();
@@ -752,7 +756,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 		@Override
 		public void onAnimationStart(Animator animation) {
-
 		}
 
 		@Override

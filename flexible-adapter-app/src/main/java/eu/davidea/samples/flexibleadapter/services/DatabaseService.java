@@ -55,7 +55,7 @@ public class DatabaseService {
 	private Map<StaggeredItemStatus, StaggeredHeaderItem> headers;
 
 
-	DatabaseService() {
+	private DatabaseService() {
 	}
 
 	public static DatabaseService getInstance() {
@@ -81,6 +81,8 @@ public class DatabaseService {
 	 * List of CardView as entry list, showing the functionality of the library.
 	 * It also shows how adapter animation can be configured.
 	 */
+	//TODO: Review the description of all examples
+	//TODO: Add ScrollableUseCaseItem header for each database
 	public void createOverallDatabase(Resources resources) {
 		databaseType = DatabaseType.OVERALL;
 		mItems.clear();

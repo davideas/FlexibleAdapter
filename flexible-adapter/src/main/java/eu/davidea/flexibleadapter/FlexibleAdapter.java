@@ -60,6 +60,8 @@ import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
+import static eu.davidea.flexibleadapter.utils.Utils.getClassName;
+
 /**
  * This Adapter is backed by an ArrayList of arbitrary objects of class <b>T</b>, where <b>T</b>
  * is your adapter/model object containing the data of a single item. This Adapter simplifies the
@@ -100,9 +102,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	private static final String EXTRA_PARENT = TAG + "_parentSelected";
 	private static final String EXTRA_CHILD = TAG + "_childSelected";
 	private static final String EXTRA_HEADERS = TAG + "_headersShown";
+	//private static final String EXTRA_STICKY = TAG + "_stickyHeaders";
 	private static final String EXTRA_LEVEL = TAG + "_selectedLevel";
 	private static final String EXTRA_SEARCH = TAG + "_searchText";
-	private static final String EXTRA_DELAYED_HEADERS = TAG + "_delayedHeaders";
 
 	/* The main container for ALL items */
 	private List<T> mItems, mTempItems;
@@ -117,7 +119,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private DiffUtilCallback diffUtilCallback;
 
 	/* Handler for delayed actions */
-	protected final int UPDATE = 0, FILTER = 1, CONFIRM_DELETE = 2, LOAD_MORE_COMPLETE = 8, LOAD_MORE_DISABLE = 9;
+	protected final int UPDATE = 0, FILTER = 1, CONFIRM_DELETE = 2, LOAD_MORE_COMPLETE = 8;
 	protected Handler mHandler = new Handler(Looper.getMainLooper(), new HandlerCallback());
 
 	/* Deleted items and RestoreList (Undo) */
@@ -159,9 +161,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	private ItemTouchHelper mItemTouchHelper;
 
 	/* EndlessScroll */
-	private int mEndlessScrollThreshold = 1, mEndlessTargetCount = 0,
-			mEndlessPageSize = 0, mCurrentPage = 1;
-	private boolean mLoading = false;
+	private int mEndlessScrollThreshold = 1, mEndlessTargetCount = 0, mEndlessPageSize = 0;
+	private boolean endlessLoading = false, endlessScrollEnabled = false;
 	private T mProgressItem;
 
 	/* Listeners */
@@ -257,7 +258,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	@CallSuper
 	public FlexibleAdapter initializeListeners(@Nullable Object listener) {
 		if (DEBUG && listener != null) {
-			Log.i(TAG, "Initialize Class " + listener.getClass().getSimpleName() + " as:");
+			Log.i(TAG, "Initialize Class " + getClassName(listener) + " as:");
 		}
 		if (listener instanceof OnItemClickListener) {
 			if (DEBUG) Log.i(TAG, "- OnItemClickListener");
@@ -496,12 +497,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@CallSuper
 	public void updateDataSet(@Nullable List<T> items, boolean animate) {
+		if (items == null) items = new ArrayList<>();
 		restoreScrollableHeadersAndFooters(items);
 		if (animate) {
 			mHandler.removeMessages(UPDATE);
 			mHandler.sendMessage(Message.obtain(mHandler, UPDATE, items));
 		} else {
-			mItems = (items == null ? new ArrayList<T>() : items);
+			mItems = items;
 			postUpdate(true);
 		}
 	}
@@ -567,6 +569,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getItemCountOfTypesUntil(int, Integer...)
 	 * @since 5.0.0-rc1
 	 */
+	//TODO: Rename to getMainItemCount?
 	public final int getItemCount(boolean withHeadersFooters) {
 		return withHeadersFooters ? getItemCount() :
 				getItemCount() - mScrollableHeaders.size() - mScrollableFooters.size();
@@ -640,9 +643,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Retrieves the position of the Main item in the Adapter list excluding the scrollable Headers.
 	 * If no scrollable Headers are added, the cardinal position coincides with the global position.
 	 * <p><b>Note:</b>
-	 * <br/>- This method cannot be overridden.
-	 * <br/>- This method is NOT suitable to call when removing items, if so, you should retrieve
-	 * the global position with {@link #getGlobalPositionOf(IFlexible)}.</p>
+	 * <br/>- This method is NOT suitable to call when managing items: ALL insert, remove, move and
+	 * swap operations, should done with global position {@link #getGlobalPositionOf(IFlexible)}.
+	 * <br/>- This method cannot be overridden.</p>
 	 *
 	 * @param item the item to find
 	 * @return the position in the Adapter excluding the Scrollable Headers, -1 otherwise
@@ -714,6 +717,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* SCROLLABLE HEADERS/FOOTERS METHODS */
 	/*------------------------------------*/
 
+	//TODO: add javaDocs
 	public final List<T> getScrollableHeaders() {
 		return Collections.unmodifiableList(mScrollableHeaders);
 	}
@@ -723,75 +727,92 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	public final boolean addScrollableHeader(@NonNull T headerItem) {
-		if (DEBUG) Log.d(TAG, "Add scrollable header " + headerItem);
-		if (!mScrollableHeaders.contains(headerItem) && addItem(0, headerItem)) {
+		if (DEBUG) Log.d(TAG, "Add scrollable header " + getClassName(headerItem));
+		if (!mScrollableHeaders.contains(headerItem)) {
 			headerItem.setSelectable(false);
-			return mScrollableHeaders.add(headerItem);
+			int progressFix = 0;//(headerItem == mProgressItem) ? mScrollableHeaders.size() : 0;
+			mScrollableHeaders.add(headerItem);
+			performInsert(progressFix, Collections.singletonList(headerItem), true);
+			return true;
+		} else {
+			Log.w(TAG, "Scrollable header " + getClassName(headerItem) + " already exists");
+			return false;
 		}
-		return false;
 	}
 
 	public final boolean addScrollableFooter(@NonNull T footerItem) {
-		if (!mScrollableFooters.contains(footerItem) && addItem(getItemCount(), footerItem)) {
-			if (DEBUG) Log.d(TAG, "Add scrollable footer " + footerItem);
+		if (!mScrollableFooters.contains(footerItem)) {
+			if (DEBUG) Log.d(TAG, "Add scrollable footer " + getClassName(footerItem));
 			footerItem.setSelectable(false);
-			return mScrollableFooters.add(footerItem);
+			int progressFix = (footerItem == mProgressItem) ? mScrollableFooters.size() : 0;
+			//Prevent wrong position after a possible updateDataSet
+			if (progressFix > 0 && mScrollableFooters.size() > 0) {
+				mScrollableFooters.add(0, footerItem);
+			} else {
+				mScrollableFooters.add(footerItem);
+			}
+			performInsert(getItemCount() - progressFix, Collections.singletonList(footerItem), true);
+			return true;
+		} else {
+			Log.w(TAG, "Scrollable footer " + getClassName(footerItem) + " already exists");
+			return false;
 		}
-		return false;
 	}
 
 	public final void removeScrollableHeader(@NonNull T headerItem) {
 		if (mScrollableHeaders.remove(headerItem)) {
-			if (DEBUG) Log.d(TAG, "Remove scrollable header " + headerItem);
+			if (DEBUG) Log.d(TAG, "Remove scrollable header " + getClassName(headerItem));
 			performRemove(headerItem, true);
 		}
 	}
 
 	public final void removeScrollableFooter(@NonNull T footerItem) {
 		if (mScrollableFooters.remove(footerItem)) {
-			if (DEBUG) Log.d(TAG, "Remove scrollable footer " + footerItem);
+			if (DEBUG) Log.d(TAG, "Remove scrollable footer " + getClassName(footerItem));
 			performRemove(footerItem, true);
 		}
 	}
 
 	public final void removeAllScrollableHeaders() {
-		if (DEBUG) Log.d(TAG, "Remove all scrollable headers");
-		mScrollableHeaders.clear();
+		if (mScrollableHeaders.size() > 0) {
+			if (DEBUG) Log.d(TAG, "Remove all scrollable headers");
+			mItems.removeAll(mScrollableHeaders);
+			notifyItemRangeRemoved(0, mScrollableHeaders.size());
+			mScrollableHeaders.clear();
+		}
 	}
 
 	public final void removeAllScrollableFooters() {
-		if (DEBUG) Log.d(TAG, "Remove all scrollable footers");
-		mScrollableFooters.clear();
+		if (mScrollableFooters.size() > 0) {
+			if (DEBUG) Log.d(TAG, "Remove all scrollable footers");
+			mItems.removeAll(mScrollableFooters);
+			notifyItemRangeRemoved(getItemCount() - 1 - mScrollableHeaders.size(), mScrollableFooters.size());
+			mScrollableFooters.clear();
+		}
 	}
 
 	public final void addScrollableHeaderWithDelay(@NonNull final T headerItem, @IntRange(from = 0) long delay,
 												   final boolean scrollToPosition) {
-		if (DEBUG) Log.d(TAG, "Enqueued adding scrollable header (" + delay + "ms) " + headerItem);
-		headerItem.setSelectable(false);
+		if (DEBUG)
+			Log.d(TAG, "Enqueued adding scrollable header (" + delay + "ms) " + getClassName(headerItem));
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (!mScrollableHeaders.contains(headerItem)) {
-					performDelayedAdd(0, headerItem, scrollToPosition);
-					mScrollableHeaders.add(headerItem);
-					if (DEBUG) Log.v(TAG, "Added scrollable header " + headerItem);
-				}
+				if (addScrollableHeader(headerItem) && scrollToPosition)
+					performScroll(getGlobalPositionOf(headerItem));
 			}
 		}, delay);
 	}
 
 	public final void addScrollableFooterWithDelay(@NonNull final T footerItem, @IntRange(from = 0) long delay,
 												   final boolean scrollToPosition) {
-		if (DEBUG) Log.d(TAG, "Enqueued adding scrollable footer (" + delay + "ms) " + footerItem);
-		footerItem.setSelectable(false);
+		if (DEBUG)
+			Log.d(TAG, "Enqueued adding scrollable footer (" + delay + "ms) " + getClassName(footerItem));
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (!mScrollableFooters.contains(footerItem)) {
-					performDelayedAdd(getItemCount(), footerItem, scrollToPosition);
-					mScrollableFooters.add(footerItem);
-					if (DEBUG) Log.v(TAG, "Added scrollable footer " + footerItem);
-				}
+				if (addScrollableFooter(footerItem) && scrollToPosition)
+					performScroll(getGlobalPositionOf(footerItem));
 			}
 		}, delay);
 	}
@@ -802,36 +823,28 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (mScrollableHeaders.remove(headerItem)) {
-					performDelayedRemove(headerItem, true);
-					if (DEBUG) Log.v(TAG, "Removed scrollable header " + headerItem);
-				}
+				removeScrollableHeader(headerItem);
 			}
 		}, delay);
 	}
 
 	public final void removeScrollableFooterWithDelay(@NonNull final T footerItem, @IntRange(from = 0) long delay) {
 		if (DEBUG)
-			Log.d(TAG, "Enqueued removing scrollable footer (" + delay + "ms) " + footerItem);
+			Log.d(TAG, "Enqueued removing scrollable footer (" + delay + "ms) " + getClassName(footerItem));
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (mScrollableFooters.remove(footerItem)) {
-					performDelayedRemove(footerItem, true);
-					if (DEBUG) Log.v(TAG, "Removed scrollable footer " + footerItem);
-				}
+				removeScrollableFooter(footerItem);
 			}
 		}, delay);
 	}
 
 	private void restoreScrollableHeadersAndFooters(List<T> items) {
-		if (items != null) {
-			for (T item : mScrollableHeaders)
-				if (items.size() > 0) items.add(0, item);
-				else items.add(item);
-			for (int i = mScrollableFooters.size() - 1; i >= 0; i--)
-				items.add(mScrollableFooters.get(i));
-		}
+		for (T item : mScrollableHeaders)
+			if (items.size() > 0) items.add(0, item);
+			else items.add(item);
+		for (T item : mScrollableFooters)
+			items.add(item);
 	}
 
 	/*--------------------------*/
@@ -1161,6 +1174,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return ViewGroup layout that will hold the sticky header ItemViews
 	 * @since 5.0.0-b6
 	 */
+	//TODO: Review the comment for the new stickyHeaders helper
 	//TODO: Rename the method to getStickyHeaderContainer
 	public ViewGroup getStickySectionHeadersHolder() {
 		if (mStickyContainer == null) {
@@ -1180,7 +1194,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public FlexibleAdapter setStickyHeaderContainer(@NonNull ViewGroup stickyContainer) {
 		if (DEBUG && stickyContainer != null)
-			Log.i(TAG, "Set stickyHeaderContainer=" + stickyContainer.getClass().getSimpleName());
+			Log.i(TAG, "Set stickyHeaderContainer=" + getClassName(stickyContainer));
 		this.mStickyContainer = stickyContainer;
 		return this;
 	}
@@ -1241,7 +1255,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				public void run() {
 					//#144 - Check if headers are already shown, discard the call to not duplicate headers
 					if (headersShown) {
-						Log.w(TAG, "Headers already shown OR the method setDisplayHeadersAtStartUp() was already called!");
+						Log.w(TAG, "Double call detected! Headers already shown OR the method setDisplayHeadersAtStartUp() was already called!");
 						return;
 					}
 					showAllHeadersWithReset(false);
@@ -1265,10 +1279,17 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private void showAllHeadersWithReset(boolean init) {
 		multiRange = true;
-		int position = Math.max(0, mScrollableHeaders.size() - 1);
-		resetHiddenStatus();//Necessary after the filter and the update
+		int position = 0;
+		IHeader sameHeader = null;
+		//resetHiddenStatus();//Necessary after the filter and the update
 		while (position < getItemCount() - mScrollableFooters.size()) {
-			if (showHeaderOf(position, mItems.get(position), init))
+			T item = mItems.get(position);
+			IHeader header = getHeaderOf(item);
+			if (header != sameHeader && header != null && !isExpandable((T) header)) {
+				sameHeader = header;
+				header.setHidden(true);
+			}
+			if (showHeaderOf(position, item, init))
 				position++;//It's the same element, skip it
 			position++;
 		}
@@ -1293,11 +1314,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (DEBUG) Log.v(TAG, "Showing header at position " + position + " header=" + header);
 			header.setHidden(false);
 			//Skip notifyItemInserted when init=true and insert the header properly!
-			if (init) {
-				performCardinalInsert(position, Collections.singletonList((T) header));
-			} else {
-				addItem(position, (T) header);
-			}
+			if (init) performInsert(position, Collections.singletonList((T) header), false);
+			else addItem(position, (T) header);
 			return true;
 		}
 		return false;
@@ -1329,7 +1347,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				}
 				headersShown = false;
 				// Clear the header currently sticky
-				if (mStickyHeaderHelper != null) {
+				if (areHeadersSticky()) {
 					mStickyHeaderHelper.clearHeaderWithAnimation();
 				}
 				//setStickyHeaders(false);
@@ -1371,7 +1389,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * the process is very fast.
 	 *
 	 * @since 5.0.0-b6
+	 * @deprecated Not used anymore.
 	 */
+	@Deprecated
 	private void resetHiddenStatus() {
 		for (T item : mItems) {
 			IHeader header = getHeaderOf(item);
@@ -1563,10 +1583,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
 		if (DEBUG) {
-			Log.v(TAG, "onViewBound    Holder=" + holder.getClass().getSimpleName() +
-					" position=" + position +
-					" itemId=" + holder.getItemId() +
-					" layoutPosition=" + holder.getLayoutPosition());
+			Log.v(TAG, "onViewBound    Holder=" + getClassName(holder) + " position=" + position +
+					" itemId=" + holder.getItemId() + " layoutPosition=" + holder.getLayoutPosition());
 		}
 		if (!autoMap) {
 			//If everything has been set properly, this should never happen ;-)
@@ -1601,18 +1619,23 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*------------------------*/
 
 	/**
-	 * Evaluates if the Adapter is in Endless Scroll mode. When no more load, the ProgressItem
-	 * will be set to {@code null} and this method will return {@code false}.
+	 * Evaluates if the Adapter is in Endless Scroll mode. When no more load, this method will
+	 * return {@code false}. To enable again the progress item you MUST set again the progressItem.
 	 *
 	 * @return true if the progress item is set, false otherwise
+	 * @see #setEndlessProgressItem(IFlexible)
 	 */
 	public boolean isEndlessScrollEnabled() {
-		return mProgressItem != null;
+		return endlessScrollEnabled;
 	}
 
-	public FlexibleAdapter setEndlessTargetCount(@IntRange(from = 1) int endlessTargetCount) {
-		mEndlessTargetCount = endlessTargetCount;
-		return this;
+	//TODO: add javaDocs
+	public int getEndlessCurrentPage() {
+		return Math.max(1, mEndlessPageSize > 0 ? getItemCount(false) / mEndlessPageSize : 0);
+	}
+
+	public int getEndlessPageSize() {
+		return mEndlessPageSize;
 	}
 
 	public FlexibleAdapter setEndlessPageSize(@IntRange(from = 1) int endlessPageSize) {
@@ -1620,48 +1643,59 @@ public class FlexibleAdapter<T extends IFlexible>
 		return this;
 	}
 
+	public int getEndlessTargetCount() {
+		return mEndlessTargetCount;
+	}
+
+	public FlexibleAdapter setEndlessTargetCount(@IntRange(from = 1) int endlessTargetCount) {
+		mEndlessTargetCount = endlessTargetCount;
+		return this;
+	}
+
 	/**
-	 * Sets the ProgressItem to be displayed at the end of the list and activate the Loading More
-	 * functionality.
+	 * Sets the progressItem to be displayed at the end of the list and activate the Loading More
+	 * feature.
 	 * <p>Using this method, the {@link EndlessScrollListener} won't be called so that you can
 	 * handle a click event to load more items upon a user request.</p>
 	 * To correctly implement "Load more upon a user request" check the Wiki page of this library.
 	 *
 	 * @param progressItem the item representing the progress bar
 	 * @return this Adapter, so the call can be chained
+	 * @see #isEndlessScrollEnabled()
 	 * @see #setEndlessScrollListener(EndlessScrollListener, IFlexible)
 	 * @since 5.0.0-b8
 	 */
-	public FlexibleAdapter setEndlessProgressItem(@NonNull T progressItem) {
+	public FlexibleAdapter setEndlessProgressItem(@Nullable T progressItem) {
+		endlessScrollEnabled = progressItem != null;
 		if (progressItem != null) {
 			setEndlessScrollThreshold(mEndlessScrollThreshold);
+			mProgressItem = progressItem;
 			if (DEBUG) {
-				Log.i(TAG, "Set progressItem=" + progressItem.getClass().getSimpleName());
+				Log.i(TAG, "Set progressItem=" + getClassName(progressItem));
 				Log.i(TAG, "Enabled EndlessScrolling");
 			}
 		} else if (DEBUG) {
 			Log.i(TAG, "Disabled EndlessScrolling");
 		}
-		mProgressItem = progressItem;
 		return this;
 	}
 
 	/**
-	 * Sets the ProgressItem to be displayed at the end of the list and Sets the callback to
-	 * automatically load more items asynchronously (no further user action is needed but the
-	 * scroll).
+	 * Sets the progressItem to be displayed at the end of the list and Sets the callback to
+	 * automatically load more items asynchronously(your duty) (no further user action is needed
+	 * but the scroll).
 	 *
 	 * @param endlessScrollListener the callback to invoke the asynchronous loading
 	 * @param progressItem          the item representing the progress bar
 	 * @return this Adapter, so the call can be chained
+	 * @see #isEndlessScrollEnabled()
 	 * @see #setEndlessProgressItem(IFlexible)
 	 * @since 5.0.0-b6
 	 */
 	//TODO: Deprecation? use setProgressItem + setEndlessScrollListener
 	public FlexibleAdapter setEndlessScrollListener(@Nullable EndlessScrollListener endlessScrollListener,
 													@NonNull T progressItem) {
-		if (DEBUG)
-			Log.i(TAG, "Set endlessScrollListener=" + endlessScrollListener.getClass().getSimpleName());
+		if (DEBUG) Log.i(TAG, "Set endlessScrollListener=" + getClassName(endlessScrollListener));
 		mEndlessScrollListener = endlessScrollListener;
 		return setEndlessProgressItem(progressItem);
 	}
@@ -1691,38 +1725,38 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * at the end of {@code onBindViewHolder()}.
 	 *
 	 * @param position the current binding position
+	 * @since 5.0.0-b6
+	 * <br/>5.0.0-rc1 Added limits check and progressItem with Scrollable Footers
 	 */
 	protected void onLoadMore(int position) {
-		// Skip everything when loading more is unused OR currently loading OR all items are loaded
-		if (mProgressItem == null || mLoading ||
-				(mEndlessTargetCount > 0 && getItemCount(false) >= mEndlessTargetCount))
+		// Skip everything when loading more is unused OR currently loading
+		if (!isEndlessScrollEnabled() || endlessLoading)
 			return;
 
 		// Check next loading threshold
-		int footersSize = mScrollableFooters.size();
-		int limit = getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : footersSize);
-		if (position == getGlobalPositionOf(mProgressItem) || position < limit) {
+		int threshold = getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableFooters.size());
+		if (position == getGlobalPositionOf(mProgressItem) || position < threshold) {
 			return;
 		} else if (DEBUG) {
-			Log.v(TAG, "onLoadMore     loading=" + mLoading + ", position=" + position
+			Log.v(TAG, "onLoadMore     loading=" + endlessLoading + ", position=" + position
 					+ ", itemCount=" + getItemCount() + ", threshold=" + mEndlessScrollThreshold
 					+ ", inside the threshold? " + (position >= getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableFooters.size())));
 		}
 		// Load more if not loading and inside the threshold
-		mLoading = true;
-		// Insertion in post is suggested by Android because: java.lang.IllegalStateException:
+		endlessLoading = true;
+		// Insertion is in post, as suggested by Android because: java.lang.IllegalStateException:
 		// Cannot call notifyItemInserted while RecyclerView is computing a layout or scrolling
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
-				int lastPosition = getGlobalPositionOf(mProgressItem) - 1;
-				if (lastPosition < 0) {
-					addItem(mProgressItem);
-				}
+				// Clear previous delayed message
+				mHandler.removeMessages(LOAD_MORE_COMPLETE);
+				// Add progressItem if not already shown
+				addScrollableFooter(mProgressItem);
 				// When the listener is not set, loading more is called upon a user request
 				if (mEndlessScrollListener != null) {
 					if (DEBUG) Log.d(TAG, "onLoadMore     invoked!");
-					mEndlessScrollListener.onLoadMore(lastPosition, mCurrentPage);
+					mEndlessScrollListener.onLoadMore(getItemCount(false), getEndlessCurrentPage());
 				}
 			}
 		});
@@ -1742,84 +1776,76 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * To call to complete the action of the Loading more items.
+	 * Call this method to complete the action of the Loading more items.
 	 * <p>When noMoreLoad OR onError OR onCancel, pass empty list or null to hide the
 	 * progressItem.</p>
 	 * Optionally you can pass a delay time to still display the item with the latest information
-	 * inside. The message has to be handled inside the bindViewHolder of the item.
+	 * inside. The message has to be handled inside the {@code bindViewHolder} of the item.
+	 * <p>A {@link #notifyItemChanged(int, Object)} with payload {@link Payload#NO_MORE_LOAD}
+	 * will be triggered on the progressItem, so you can display a message or change the views in
+	 * this item.</p>
 	 *
 	 * @param newItems the list of the new items, can be empty or null
 	 * @param delay    the delay used to remove the progress item or -1 to disable the
 	 *                 loading forever and to keep the progress item visible.
 	 * @since 5.0.0-b8
+	 * <br/>5.0.0-rc1 Added limits check and changed progressItem to Scrollable Footer
 	 */
+	//TODO: Endless Top Scrolling
 	public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
-		// Reset the loading status
-		mLoading = false;
-		// Check if something has been loaded
-		int newItemSize = newItems == null ? 0 : newItems.size();
-		int totalItemCount = newItemSize + getItemCount(false) + 1; //+1 for the progress item
-		int positionToNotify = getGlobalPositionOf(mProgressItem);
-		boolean alreadyDisabled = false;
-
-		// Check if features are enabled and limits are reached
-		if (mEndlessPageSize > 0 && newItemSize < mEndlessPageSize || // Is feature enabled and Not enough items?
-				mEndlessTargetCount > 0 && totalItemCount >= mEndlessTargetCount) { // Is feature enabled and Max limit has been reached?
-			if (DEBUG) Log.v(TAG, "onLoadMore     keep and disable the progressItem");
-			// Keep the item and DISABLE the EndlessScroll feature
-			if (delay > 0) {
-				mHandler.sendEmptyMessageDelayed(LOAD_MORE_DISABLE, delay);
-			} else {
-				setEndlessProgressItem(null);
-			}
-			noMoreLoad(positionToNotify);// TODO: cannot notify with negative position??
-			alreadyDisabled = true;
-		} else if (newItemSize > 0) {
-			delay = 0; // Reset the delay when loading more should continue
-		}
-		// DELETE the progress Item
-		if (!alreadyDisabled) {
-			if (delay > 0) {
-				mHandler.sendEmptyMessageDelayed(LOAD_MORE_COMPLETE, delay);
-			} else {
-				mHandler.sendEmptyMessage(LOAD_MORE_COMPLETE);
-			}
-		}
-		// Finally Add any new items
-		if (newItemSize > 0) {
-			// Calculate the current page
-			if (mEndlessTargetCount > 0) {
-				mCurrentPage = mEndlessTargetCount % totalItemCount;
-			}
+		// 1. Calculate new items count
+		int newItemsSize = newItems == null ? 0 : newItems.size();
+		int totalItemCount = newItemsSize + getItemCount(false);
+		// 2. Add any new items
+		if (newItemsSize > 0) {
 			if (DEBUG)
-				Log.v(TAG, "onLoadMore     performing adding " + newItemSize + " new items on Page=" + mCurrentPage);
-			addItems(getItemCount(), newItems);
-		} else if (!alreadyDisabled) {
-			noMoreLoad(positionToNotify);
+				Log.v(TAG, "onLoadMore     performing adding " + newItemsSize + " new items on Page=" + getEndlessCurrentPage());
+			//TODO: 0 + headers for Endless Top Scrolling
+			addItems(getGlobalPositionOf(mProgressItem), newItems);
+		}
+		// 3. Check if features are enabled and the limits have been reached
+		if (mEndlessPageSize > 0 && newItemsSize < mEndlessPageSize || // Is feature enabled and Not enough items?
+				mEndlessTargetCount > 0 && totalItemCount >= mEndlessTargetCount) { // Is feature enabled and Max limit has been reached?
+			// Disable the EndlessScroll feature
+			setEndlessProgressItem(null);
+		}
+		// 4. Remove the progressItem if needed
+		if (delay > 0 && (newItemsSize == 0 || !isEndlessScrollEnabled())) {
+			if (DEBUG)
+				Log.v(TAG, "onLoadMore     enqueued removing progressItem (" + delay + "ms)");
+			mHandler.sendEmptyMessageDelayed(LOAD_MORE_COMPLETE, delay);
+		} else if (isEndlessScrollEnabled()) {
+			hideProgressItem();
+		}
+		// 5. Reset the loading status
+		endlessLoading = false;
+		// 6. Eventually notify noMoreLoad
+		if (newItemsSize == 0 || !isEndlessScrollEnabled()) {
+			noMoreLoad(newItemsSize);
 		}
 	}
 
 	/**
 	 * Called when loading more should continue.
 	 */
-	private void deleteProgressItem() {
+	private void hideProgressItem() {
 		int positionToNotify = getGlobalPositionOf(mProgressItem);
 		if (positionToNotify >= 0) {
 			if (DEBUG) Log.v(TAG, "onLoadMore     remove progressItem");
-			mItems.remove(mProgressItem);
-			notifyItemRemoved(positionToNotify);
+			removeScrollableFooter(mProgressItem);
 		}
 	}
 
 	/**
 	 * Called when no more items are loaded.
 	 */
-	private void noMoreLoad(int positionToNotify) {
-		if (DEBUG) Log.d(TAG, "onLoadMore     noMoreLoad!");
+	private void noMoreLoad(int newItemsSize) {
+		if (DEBUG) Log.i(TAG, "noMoreLoad!");
+		int positionToNotify = getGlobalPositionOf(mProgressItem);
 		if (positionToNotify >= 0)
 			notifyItemChanged(positionToNotify, Payload.NO_MORE_LOAD);
 		if (mEndlessScrollListener != null) {
-			mEndlessScrollListener.noMoreLoad();
+			mEndlessScrollListener.noMoreLoad(newItemsSize);
 		}
 	}
 
@@ -2127,7 +2153,7 @@ public class FlexibleAdapter<T extends IFlexible>
 						" expanded " + expandable.isExpanded());
 			return 0;
 		}
-		if (DEBUG && !init) {
+		if (DEBUG && !init && !expandAll) {
 			Log.v(TAG, "Request to Expand on position=" + position +
 					" expanded=" + expandable.isExpanded() +
 					" anyParentSelected=" + parentSelected);
@@ -2149,6 +2175,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			subItemsCount = subItems.size();
 			//Save expanded state
 			expandable.setExpanded(true);
+
+			//TODO: Check if the expandable is a Scrollable Header/Footer, add all the subItems to that list
 
 			//Automatically smooth scroll the current expandable item to show as much
 			// children as possible
@@ -2198,12 +2226,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		int expanded = 0;
 		//More efficient if we expand from First expandable position
 		int startPosition = Math.max(0, mScrollableHeaders.size() - 1);
-		int endPosition = getItemCount() - mScrollableFooters.size() - 1;
-		for (int i = startPosition; i < endPosition; i++) {
+		for (int i = startPosition; i < (getItemCount() - mScrollableFooters.size()); i++) {
 			T item = getItem(i);
 			if (isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
 				if (expandable.getExpansionLevel() <= level && expand(i, true, false) > 0) {
+					i += expandable.getSubItems().size();
 					expanded++;
 				}
 			}
@@ -2247,6 +2275,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			subItemsCount = subItems.size();
 			//Save expanded state
 			expandable.setExpanded(false);
+
+			//TODO: Check if the expandable is a Scrollable Header/Footer, remove all the subItems from that list
 
 			//Collapse!
 			notifyItemRangeRemoved(position + 1, subItemsCount);
@@ -2299,6 +2329,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	public int collapseAll(int level) {
+		//Use hashSet to increase performance while removing subItems
 		mHashItems = new LinkedHashSet<>(mItems);
 		int collapsed = recursiveCollapse(0, mItems, level);
 		mItems = new ArrayList<>(mHashItems);
@@ -2338,11 +2369,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void updateItem(@IntRange(from = 0) int position, @NonNull T item,
 						   @Nullable Object payload) {
-		if (position < 0 || position >= getItemCount()) {
+		int itemCount = getItemCount();
+		if (position < 0 || position >= itemCount) {
 			Log.e(TAG, "Cannot updateItem on position out of OutOfBounds!");
 			return;
 		}
-		position += mScrollableHeaders.size();
 		mItems.set(position, item);
 		if (DEBUG) Log.d(TAG, "updateItem notifyItemChanged on position " + position);
 		notifyItemChanged(position, payload);
@@ -2375,17 +2406,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				performDelayedAdd(position, item, scrollToPosition);
+				if (addItem(position, item) && scrollToPosition) performScroll(position);
 			}
 		}, delay);
-	}
-
-	private void performDelayedAdd(int position, T item, boolean scrollToPosition) {
-		setAnimate(true);
-		if (addItem(position, item) && scrollToPosition && mRecyclerView != null) {
-			mRecyclerView.smoothScrollToPosition(Math.min(Math.max(0, position), getItemCount() - 1));
-		}
-		setAnimate(false);
 	}
 
 	/**
@@ -2443,17 +2466,13 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.e(TAG, "addItems No items to add!");
 			return false;
 		}
-		int initialCount = getItemCount();
+		int initialCount = getItemCount(false);//Count only main items!
 		if (position < 0) {
 			Log.w(TAG, "addItems Position is negative! adding items to the end");
 			position = initialCount;
 		}
-		if (DEBUG) Log.d(TAG, "addItems on position=" + position + " itemCount=" + items.size());
-
 		//Insert the item properly
-		position = performCardinalInsert(position, items);
-		//Notify range addition
-		notifyItemRangeInserted(position, items.size());
+		performInsert(position, items, true);
 
 		//Show the headers of these items if all headers are already visible
 		if (headersShown && !recursive) {
@@ -2468,25 +2487,20 @@ public class FlexibleAdapter<T extends IFlexible>
 		return true;
 	}
 
-	private int performCardinalInsert(int position, List<T> items) {
+	private void performInsert(int position, List<T> items, boolean notify) {
 		int itemCount = getItemCount();
-		// Adjust position according to Headers/Footers size
-		int headersSize = mScrollableHeaders.size();
-		int footersSize = mScrollableFooters.size();
-		if (headersSize > 0 && position < itemCount) {
-			position += headersSize - 1;
-		}
-		if (footersSize > 0 && position >= itemCount) {
-			position -= footersSize;
-		}
-		// Insert Items
 		if (position < itemCount) {
 			mItems.addAll(position, items);
 		} else {
 			mItems.addAll(items);
+			position = itemCount;
 		}
-		//return the new position
-		return position;
+		//Notify range addition
+		if (notify) {
+			if (DEBUG)
+				Log.d(TAG, "addItems on position=" + position + " itemCount=" + items.size());
+			notifyItemRangeInserted(position, items.size());
+		}
 	}
 
 	/**
@@ -2751,9 +2765,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void clear() {
 		if (DEBUG) Log.d(TAG, "clearAll views");
-		removeRange(0, getItemCount(), null);
 		removeAllScrollableHeaders();
 		removeAllScrollableFooters();
+		removeRange(0, getItemCount(), null);
 	}
 
 	/**
@@ -2817,15 +2831,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				performDelayedRemove(item, permanent);
+				performRemove(item, permanent);
 			}
 		}, delay);
-	}
-
-	private void performDelayedRemove(T item, boolean permanent) {
-		setAnimate(true);
-		performRemove(item, permanent);
-		setAnimate(false);
 	}
 
 	private void performRemove(T item, boolean permanent) {
@@ -3022,6 +3030,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #emptyBin()
 	 * @since 5.0.0-b1
 	 */
+	//FIXME: Fix payload message if customized
 	public void removeRange(@IntRange(from = 0) int positionStart,
 							@IntRange(from = 0) int itemCount, @Nullable Object payload) {
 		int initialCount = getItemCount();
@@ -3075,15 +3084,11 @@ public class FlexibleAdapter<T extends IFlexible>
 			removeSelection(position);
 		}
 
-		//Notify removals
-		if (parentPosition >= 0) {
-			//Notify the Children removal only if Parent is expanded
-			notifyItemRangeRemoved(positionStart, itemCount);
-			//Notify the Parent about the change if requested
-			if (payload != null) notifyItemChanged(parentPosition, payload);
-		} else {
-			//Notify range removal
-			notifyItemRangeRemoved(positionStart, itemCount);
+		//Notify range removal
+		notifyItemRangeRemoved(positionStart, itemCount);
+		//Notify the Parent about the change if requested
+		if (parentPosition >= 0 && payload != null) {
+			notifyItemChanged(parentPosition, payload);
 		}
 
 		//Remove orphan headers
@@ -3676,11 +3681,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>5.0.0-b1 Expandable + Child filtering
 	 */
 	protected boolean filterObject(T item, String constraint) {
-		if (item instanceof IFilterable) {
-			IFilterable filterable = (IFilterable) item;
-			return filterable.filter(constraint);
-		}
-		return false;
+		return item instanceof IFilterable && ((IFilterable) item).filter(constraint);
 	}
 
 	/**
@@ -3821,7 +3822,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br>5.0.0-b8 Synchronization animation limit
 	 */
 	private synchronized void animateTo(@Nullable List<T> newItems, Payload payloadChange) {
-		if (newItems == null) newItems = new ArrayList<>();
 		mNotifications = new ArrayList<>();
 		if (newItems.size() <= mAnimateToLimit) {
 			if (DEBUG)
@@ -4175,8 +4175,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (expanded) collapse(toPosition);
 		//Move item!
 		mItems.remove(fromPosition);
-		if (toPosition < getItemCount()) mItems.add(toPosition, item);
-		else mItems.add(item);
+		performInsert(toPosition, Collections.singletonList(item), false);
 		notifyItemMoved(fromPosition, toPosition);
 		if (payload != null) notifyItemChanged(toPosition, payload);
 		//Eventually display the new Header
@@ -4355,7 +4354,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (item != null && !mTypeInstances.containsKey(item.getLayoutRes())) {
 			mTypeInstances.put(item.getLayoutRes(), item);
 			if (DEBUG)
-				Log.i(TAG, "Mapped viewType " + item.getLayoutRes() + " from " + item.getClass().getSimpleName());
+				Log.i(TAG, "Mapped viewType " + item.getLayoutRes() + " from " + getClassName(item));
 		}
 	}
 
@@ -4458,6 +4457,12 @@ public class FlexibleAdapter<T extends IFlexible>
 		return false;
 	}
 
+	private void performScroll(final int position) {
+		if (mRecyclerView != null) {
+			mRecyclerView.smoothScrollToPosition(Math.min(Math.max(0, position), getItemCount() - 1));
+		}
+	}
+
 	private void autoScrollWithDelay(final int position, final int subItemsCount, final long delay) {
 		//Must be delayed to give time at RecyclerView to recalculate positions after an automatic collapse
 		new Handler(Looper.getMainLooper(), new Handler.Callback() {
@@ -4478,9 +4483,9 @@ public class FlexibleAdapter<T extends IFlexible>
 					int scrollTo = firstVisibleItem + scrollBy;
 //					if (DEBUG)
 //						Log.v(TAG, "autoScroll scrollMin=" + scrollMin + " scrollMax=" + scrollMax + " scrollBy=" + scrollBy + " scrollTo=" + scrollTo);
-					mRecyclerView.smoothScrollToPosition(scrollTo);
+					performScroll(scrollTo);
 				} else if (position < firstVisibleItem) {
-					mRecyclerView.smoothScrollToPosition(position);
+					performScroll(position);
 				}
 				return true;
 			}
@@ -4529,7 +4534,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (outState != null) {
 			//Save selection state
 			if (mScrollableHeaders.size() > 0) {
-				//We need to rollback the added item positions if headers were added
+				//We need to rollback the added item positions if headers were added lately
 				adjustSelected(0, -mScrollableHeaders.size());
 			}
 			super.onSaveInstanceState(outState);
@@ -4541,6 +4546,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			outState.putString(EXTRA_SEARCH, this.mSearchText);
 			//Save headers shown status
 			outState.putBoolean(EXTRA_HEADERS, this.headersShown);
+			//TODO: enableStickyHeaders
+			//outState.putBoolean(EXTRA_STICKY, areHeadersSticky());
 		}
 	}
 
@@ -4560,8 +4567,16 @@ public class FlexibleAdapter<T extends IFlexible>
 				showAllHeadersWithReset(true);
 			}
 			this.headersShown = headersShown;
+			//TODO: enableStickyHeaders
+//			if (savedInstanceState.getBoolean(EXTRA_STICKY) && !areHeadersSticky()) {
+//				setStickyHeaders(true);
+//			}
 			//Restore selection state
 			super.onRestoreInstanceState(savedInstanceState);
+			if (mScrollableHeaders.size() > 0) {
+				//We need to restore the added item positions if headers were added early
+				adjustSelected(0, mScrollableHeaders.size());
+			}
 			//Restore selection coherence
 			this.parentSelected = savedInstanceState.getBoolean(EXTRA_PARENT);
 			this.childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
@@ -4580,9 +4595,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public interface OnUpdateListener {
 		/**
-		 * Called at startup and every time an item is inserted, removed or filtered.
+		 * Called at startup and every time a main item is inserted, removed or filtered.
+		 * <p><b>Note:</b> Having any Scrollable Headers/Footers visible, the {@code size}
+		 * will represents only the main items.</p>
 		 *
-		 * @param size the current number of items in the adapter, result of {@link #getItemCount()}
+		 * @param size the current number of main items in the adapter, result of
+		 *             {@link FlexibleAdapter#getItemCount(boolean)}
 		 * @since 5.0.0-b1
 		 */
 		void onUpdateEmptyView(int size);
@@ -4595,8 +4613,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		/**
 		 * Called when Undo timeout is over and removal must be committed in the user Database.
 		 * <p>Due to Java Generic, it's too complicated and not
-		 * well manageable if we pass the List&lt;T&gt; object.<br/>
-		 * To get deleted items, use {@link #getDeletedItems()} from the
+		 * well manageable if we pass the List&lt;<b>T</b>&gt; object.<br/>
+		 * To get deleted items, use {@link FlexibleAdapter#getDeletedItems()} from the
 		 * implementation of this method.</p>
 		 *
 		 * @since 5.0.0-b1
@@ -4644,8 +4662,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public interface OnActionStateListener {
 		/**
-		 * Called when the {@link ItemTouchHelper} first registers an item as being moved or swiped
-		 * or when has been released.
+		 * Called when the {@link ItemTouchHelper} first registers an item as being moved
+		 * or swiped or when has been released.
 		 * <p>Override this method to receive touch events with its state.</p>
 		 *
 		 * @param viewHolder  the viewHolder touched
@@ -4669,7 +4687,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * @param toPosition   the potential resolved position of the swapped item
 		 * @return return true if the items can swap ({@code onItemMove()} will be called),
 		 * false otherwise (nothing happens)
-		 * @see #onItemMove(int, int)
+		 * @see FlexibleAdapter#onItemMove(int, int)
 		 * @since 5.0.0-b8
 		 */
 		boolean shouldMoveItem(int fromPosition, int toPosition);
@@ -4682,7 +4700,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
-		 * @see #shouldMoveItem(int, int)
+		 * @see FlexibleAdapter#shouldMove(int, int)
 		 * @since 5.0.0-b1
 		 */
 		void onItemMove(int fromPosition, int toPosition);
@@ -4723,19 +4741,32 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 22/04/2016
 	 */
 	public interface EndlessScrollListener<T> {
-		/**
-		 * Loads more data.
-		 *
-		 * @since 5.0.0-rc1
-		 */
-		void onLoadMore(int lastPosition, int currentPage);
 
 		/**
 		 * No more data to load.
+		 * <p>This method is called if any limit is reached (<b>targetCount</b> or <b>pageSize</b>
+		 * must be set) AND if new data is <u>temporary</u> unavailable (ex. no connection or no
+		 * new updates remotely). If no new data, a {@link FlexibleAdapter#notifyItemChanged(int, Object)}
+		 * with a payload {@link Payload#NO_MORE_LOAD} is triggered on the <i>progressItem</i>.</p>
 		 *
+		 * @param newItemsSize the last size of the new items loaded
+		 * @see FlexibleAdapter#setEndlessTargetCount(int)
+		 * @see FlexibleAdapter#setEndlessPageSize(int)
 		 * @since 5.0.0-rc1
 		 */
-		void noMoreLoad();
+		void noMoreLoad(int newItemsSize);
+
+		/**
+		 * Loads more data.
+		 * <p>Use {@code lastPosition} and {@code currentPage} to know what to load next.</p>
+		 * {@code lastPosition} is the count of the main items without Scrollable Headers.
+		 *
+		 * @param lastPosition the position of the last main item in the adapter
+		 * @param currentPage  the current page
+		 * @since 5.0.0-b6
+		 * <br/>5.0.0-rc1 added {@code lastPosition} and {@code currentPage} as parameters
+		 */
+		void onLoadMore(int lastPosition, int currentPage);
 	}
 
 	/**
@@ -4983,8 +5014,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * 0 = async call for updateDataSet.
 	 * <br/>1 = async call for filterItems, optionally delayed.
 	 * <br/>2 = deleteConfirmed when Undo timeout is over.
-	 * <br/>8 = remove the progress item from the list, optionally delayed.
-	 * <br/>9 = remove the progress item from the list and DISABLE the EndlessScroll.
+	 * <br/>8 = hide the progress item from the list, optionally delayed.
 	 * <p><b>Note:</b> numbers 0-9 are reserved for the Adapter, use others.</p>
 	 *
 	 * @since 5.0.0-rc1
@@ -5006,12 +5036,8 @@ public class FlexibleAdapter<T extends IFlexible>
 					if (listener != null) listener.onDeleteConfirmed();
 					emptyBin();
 					return true;
-				case LOAD_MORE_COMPLETE: //remove progress item
-					deleteProgressItem();
-					return true;
-				case LOAD_MORE_DISABLE: //remove progress item and DISABLE the EndlessScroll
-					deleteProgressItem();
-					setEndlessProgressItem(null);
+				case LOAD_MORE_COMPLETE: //hide progress item
+					hideProgressItem();
 					return true;
 			}
 			return false;

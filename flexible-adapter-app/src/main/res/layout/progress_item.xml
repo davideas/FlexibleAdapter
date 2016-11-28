@@ -17,7 +17,7 @@
 		android:id="@+id/progress_message"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="@string/no_more_load"
+		android:text="@string/no_more_load_retry"
 		android:layout_gravity="center"
 		android:visibility="gone"
 		tools:visibility="visible"/>

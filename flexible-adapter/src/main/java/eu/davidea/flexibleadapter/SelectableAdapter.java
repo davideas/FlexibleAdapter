@@ -443,6 +443,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putIntegerArrayList(TAG, new ArrayList<>(mSelectedPositions));
+		if (DEBUG && getSelectedItemCount() > 0)
+			Log.d(TAG, "Saving selection " + mSelectedPositions);
 	}
 
 	/**
@@ -453,7 +455,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		mSelectedPositions.addAll(savedInstanceState.getIntegerArrayList(TAG));
-		Log.d(TAG, "Restore selection " + mSelectedPositions);
+		if (DEBUG && getSelectedItemCount() > 0)
+			Log.d(TAG, "Restore selection " + mSelectedPositions);
 	}
 
 	/*---------------*/

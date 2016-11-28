@@ -61,14 +61,14 @@ public class FragmentSelectionModes extends AbstractFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
-		//Create New Database and Initialize RecyclerView
+		// Create New Database and Initialize RecyclerView
 		DatabaseService.getInstance().createEndlessDatabase(200);
 		initializeRecyclerView(savedInstanceState);
 
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
@@ -77,21 +77,21 @@ public class FragmentSelectionModes extends AbstractFragment {
 		//Get copy of the Database list
 		List<AbstractFlexibleItem> items = DatabaseService.getInstance().getDatabaseList();
 
-		//Initialize Adapter and RecyclerView
-		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+		// Initialize Adapter and RecyclerView
+		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(items, getActivity());
-		mAdapter.setNotifyChangeOfUnfilteredItems(true)//This will rebind new item when refreshed
+		mAdapter.setNotifyChangeOfUnfilteredItems(true) //This will rebind new item when refreshed
 				.setMode(SelectableAdapter.MODE_SINGLE);
 
-		//Experimenting NEW features (v5.0.0)
+		// Experimenting NEW features (v5.0.0)
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-		//Divider item decorator with DrawOver enabled
+		// Divider item decorator with DrawOver enabled
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider)
 				.withDrawOver(true));
 		mRecyclerView.postDelayed(new Runnable() {
@@ -101,7 +101,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 			}
 		}, 1500L);
 
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
+		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 
@@ -109,7 +109,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_SINGLE);
 
-		//Add sample HeaderView items on the top (not belongs to the library)
+		// Add 2 Scrollable Headers
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.showLayoutInfo();
 	}

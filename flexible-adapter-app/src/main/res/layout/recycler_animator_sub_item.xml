@@ -6,7 +6,7 @@
 	android:layout_height="?android:attr/listPreferredItemHeight"
 	android:paddingTop="@dimen/margin_top"
 	android:paddingBottom="@dimen/margin_bottom"
-	android:background="@drawable/selector_item_grey">
+	android:background="?attr/selectableItemBackground">
 
 	<LinearLayout
 		android:id="@+id/title_container"

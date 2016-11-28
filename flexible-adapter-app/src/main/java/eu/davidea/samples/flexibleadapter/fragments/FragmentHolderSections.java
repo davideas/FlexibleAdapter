@@ -74,7 +74,7 @@ public class FragmentHolderSections extends AbstractFragment {
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		//Add sample HeaderView items on the top (not belongs to the library)
+		//Add 1 Scrollable Header
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 	}
 

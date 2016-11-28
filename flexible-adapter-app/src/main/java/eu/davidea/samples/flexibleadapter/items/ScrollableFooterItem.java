@@ -2,11 +2,14 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,6 +18,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.viewholders.AnimatedViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -48,13 +52,13 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 		holder.mSubtitle.setText(Html.fromHtml(getSubtitle()));
 	}
 
-	class FooterViewHolder extends FlexibleViewHolder {
+	class FooterViewHolder extends FlexibleViewHolder implements AnimatedViewHolder {
 
 		TextView mTitle;
 		TextView mSubtitle;
 		ImageView mDismissIcon;
 
-		public FooterViewHolder(View view, FlexibleAdapter adapter) {
+		FooterViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
@@ -79,6 +83,35 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 		@Override
 		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 			AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
+		}
+
+		@Override
+		public boolean preAnimateAddImpl() {
+			ViewCompat.setTranslationY(itemView, itemView.getHeight());
+			ViewCompat.setAlpha(itemView, 0);
+			return true;
+		}
+
+		@Override
+		public boolean preAnimateRemoveImpl() {
+			return false;
+		}
+
+		@Override
+		public boolean animateAddImpl(ViewPropertyAnimatorListener listener, long addDuration, int index) {
+			ViewCompat.animate(itemView)
+					.translationY(0)
+					.alpha(1)
+					.setDuration(addDuration)
+					.setInterpolator(new DecelerateInterpolator())
+					.setListener(listener)
+					.start();
+			return true;
+		}
+
+		@Override
+		public boolean animateRemoveImpl(ViewPropertyAnimatorListener listener, long removeDuration, int index) {
+			return false;
 		}
 	}
 
