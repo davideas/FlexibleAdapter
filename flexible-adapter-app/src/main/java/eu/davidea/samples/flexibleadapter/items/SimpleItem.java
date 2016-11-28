@@ -2,6 +2,7 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -21,6 +22,7 @@ import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.ISectionable;
+import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
@@ -41,7 +43,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 	 */
 	HeaderItem header;
 
-	public SimpleItem(String id) {
+	SimpleItem(String id) {
 		super(id);
 		setDraggable(true);
 		setSwipeable(true);
@@ -89,6 +91,8 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 					+ (getUpdates() > 0 ? " - u" + getUpdates() : ""));
 		}
 
+		DrawableUtils.setBackground(holder.frontView, DrawableUtils.getSelectableBackgroundCompat(
+				Color.LTGRAY, Color.WHITE, Color.LTGRAY));
 		Context context = holder.itemView.getContext();
 		int defColorAccent = context.getResources().getColor(R.color.colorAccent_light);
 
@@ -145,16 +149,16 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 	 */
 	static final class ParentViewHolder extends ExpandableViewHolder {
 
-		public FlipView mFlipView;
-		public TextView mTitle;
-		public TextView mSubtitle;
-		public ImageView mHandleView;
-		public Context mContext;
-		private View frontView;
+		FlipView mFlipView;
+		TextView mTitle;
+		TextView mSubtitle;
+		ImageView mHandleView;
+		Context mContext;
+		View frontView;
 		private View rearLeftView;
 		private View rearRightView;
 
-		public ParentViewHolder(View view, FlexibleAdapter adapter) {
+		ParentViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			this.mContext = view.getContext();
 			this.mTitle = (TextView) view.findViewById(R.id.title);

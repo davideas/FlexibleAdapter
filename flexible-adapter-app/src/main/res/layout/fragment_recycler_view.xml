@@ -10,7 +10,7 @@
 		android:id="@+id/swipeRefreshLayout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:enabled="true"><!-- To restore to false when bug is fixed by Android team -->
+		android:enabled="false">
 
 		<!-- This FrameLayout is needed ONLY IF sticky headers are used, in order to
 			 display the refresh circle on the top of sticky_header_layout.
@@ -28,7 +28,7 @@
 			<!-- Needed by FlexibleAdapter for headers to be sticky.
 				 This little layout is included in the library.
 				 If you need to drag items, SwipeRefreshLayout must be disabled!-->
-			<include layout="@layout/sticky_header_layout"/>
+			<!--<include layout="@layout/sticky_header_layout"/>-->
 
 		</FrameLayout>
 

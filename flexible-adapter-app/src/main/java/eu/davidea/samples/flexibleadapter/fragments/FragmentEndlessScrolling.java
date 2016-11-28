@@ -108,7 +108,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 		// EndlessScrollListener - OnLoadMore (v5.0.0)
 		mAdapter.setEndlessScrollListener(this, new ProgressItem())
-				.setEndlessPageSize(3)
+//				.setEndlessPageSize(3)
 				.setEndlessTargetCount(15);
 //				.setEndlessScrollThreshold(1); //Default=1
 
@@ -116,6 +116,8 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.showLayoutInfo();
 		mAdapter.addScrollableFooter();
+		mAdapter.addScrollableHeaderWithDelay(DatabaseService.newExpandableSectionItem(111), 5000L, true);
+		mAdapter.addScrollableFooterWithDelay(DatabaseService.newExpandableSectionItem(999), 5000L, false);
 	}
 
 	@Override
@@ -170,7 +172,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				final List<AbstractFlexibleItem> newItems = new ArrayList<>();
 
 				// Simulating success/failure with Random
-				int count = new Random().nextInt(10);
+				int count = new Random().nextInt(7);
 				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item);
 				for (int i = 1; i <= count; i++) {
 					newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
@@ -179,7 +181,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				// Callback the Adapter to notify the change:
 				// - New items will be added to the end of the main list
 				// - When list is null or empty and limits are reached, Endless scroll will be disabled
-				mAdapter.onLoadMoreComplete(newItems);
+				mAdapter.onLoadMoreComplete(newItems, 5000L);
 				DatabaseService.getInstance().addAll(newItems);
 				// It's better to read the page after adding new items!
 				Log.d(TAG, "EndlessCurrentPage=" + mAdapter.getEndlessCurrentPage());

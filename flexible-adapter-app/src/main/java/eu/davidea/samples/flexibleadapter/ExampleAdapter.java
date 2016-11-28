@@ -55,13 +55,22 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	}
 
 	/*
+	 * You can override this method to define your own concept of "Empty". This method is never
+	 * called internally.
+	 */
+	@Override
+	public boolean isEmpty() {
+		return super.isEmpty();
+	}
+
+	/*
 	 * HEADER VIEW
 	 * This method shows how to add Header View as it was for ListView.
 	 * Same Header item is enqueued for removal with a delay.
 	 * The view is represented by a custom Item type to better represent any dynamic content.
 	 */
 	public void showLayoutInfo() {
-		if (!hasSearchText() && !isEmpty()) {
+		if (!hasSearchText()) {
 			//Define Example View
 			final ScrollableLayoutItem item = new ScrollableLayoutItem("LAY-L");
 			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
@@ -152,7 +161,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 //		//Not implemented: METHOD A is used
 //	}
-
 	@Override
 	public String onCreateBubbleText(int position) {
 		if (!DatabaseConfiguration.userLearnedSelection && position == 0) {//This 'if' is for my example only

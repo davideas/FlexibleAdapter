@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements
 		//Swipe down to force synchronize
 		//mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
 		mSwipeRefreshLayout.setDistanceToTriggerSync(390);
-		//mSwipeRefreshLayout.setEnabled(true); Controlled by fragments!
+		//mSwipeRefreshLayout.setEnabled(true); //Controlled by fragments!
 		mSwipeRefreshLayout.setColorSchemeResources(
 				android.R.color.holo_purple, android.R.color.holo_blue_light,
 				android.R.color.holo_green_light, android.R.color.holo_orange_light);

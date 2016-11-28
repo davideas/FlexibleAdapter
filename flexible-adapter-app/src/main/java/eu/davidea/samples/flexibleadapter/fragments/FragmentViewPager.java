@@ -81,13 +81,13 @@ public class FragmentViewPager extends Fragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Initialize RecyclerView
-		initializeRecyclerView(savedInstanceState);
+		initializeRecyclerView();
 
 		//Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
-	private void initializeRecyclerView(Bundle savedInstanceState) {
+	private void initializeRecyclerView() {
 		//Initialize Adapter and RecyclerView
 		//Use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new FlexibleAdapter<>(createList(50, 5), getActivity(), true);
@@ -108,7 +108,7 @@ public class FragmentViewPager extends Fragment {
 		mAdapter.toggleFastScroller();
 
 		//Sticky Headers
-		mAdapter.setStickyHeaderContainer((ViewGroup) getView().findViewById(R.id.sticky_header_container))
+		mAdapter//.setStickyHeaderContainer((ViewGroup) getView().findViewById(R.id.sticky_header_container))
 				.setDisplayHeadersAtStartUp(true)
 				.enableStickyHeaders();
 	}

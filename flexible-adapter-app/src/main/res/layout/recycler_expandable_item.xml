@@ -10,8 +10,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:paddingBottom="@dimen/margin_bottom"
-		android:paddingTop="@dimen/margin_top"
-		android:background="@drawable/selector_item_white">
+		android:paddingTop="@dimen/margin_top">
 
 		<eu.davidea.flipview.FlipView
 			android:id="@+id/image"

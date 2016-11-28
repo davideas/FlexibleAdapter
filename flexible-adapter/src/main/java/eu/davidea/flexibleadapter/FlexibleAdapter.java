@@ -378,6 +378,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position position of the item to toggle the selection status for.
 	 * @since 5.0.0-b1
 	 */
+	//TODO: Review the logic of selection coherence
 	@Override
 	public void toggleSelection(@IntRange(from = 0) int position) {
 		T item = getItem(position);
@@ -2351,8 +2352,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Save expanded state
 			expandable.setExpanded(true);
 
-			//TODO: Check if the expandable is a Scrollable Header/Footer, add all the subItems to that list
-
 			//Automatically smooth scroll the current expandable item to show as much
 			// children as possible
 			if (!init && scrollOnExpand && !expandAll) {
@@ -2368,12 +2367,29 @@ public class FlexibleAdapter<T extends IFlexible>
 					if (showHeaderOf(position + (++count), subItem, false)) count++;
 				}
 			}
+
+			//Expandable as a Scrollable Header/Footer
+			if (!expandSHF(mScrollableHeaders, expandable))
+				expandSHF(mScrollableFooters, expandable);
+
 			if (DEBUG) {
 				Log.v(TAG, (init ? "Initially expanded " : "Expanded ") +
 						subItemsCount + " subItems on position=" + position);
 			}
 		}
 		return subItemsCount;
+	}
+
+	private boolean expandSHF(List<T> scrollables, IExpandable expandable) {
+		int index = scrollables.indexOf(expandable);
+		if (index >= 0) {
+			if (index + 1 < scrollables.size()) {
+				return scrollables.addAll(index + 1, expandable.getSubItems());
+			} else {
+				return scrollables.addAll(expandable.getSubItems());
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -2451,8 +2467,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			//Save expanded state
 			expandable.setExpanded(false);
 
-			//TODO: Check if the expandable is a Scrollable Header/Footer, remove all the subItems from that list
-
 			//Collapse!
 			notifyItemRangeRemoved(position + 1, subItemsCount);
 			//Hide also the headers of the subItems
@@ -2461,10 +2475,19 @@ public class FlexibleAdapter<T extends IFlexible>
 					hideHeaderOf(subItem);
 				}
 			}
+
+			//Expandable as a Scrollable Header/Footer
+			if (!collapseSHF(mScrollableHeaders, expandable))
+				collapseSHF(mScrollableFooters, expandable);
+
 			if (DEBUG)
 				Log.v(TAG, "Collapsed " + subItemsCount + " subItems on position " + position);
 		}
 		return subItemsCount + recursiveCount;
+	}
+
+	private boolean collapseSHF(List<T> scrollables, IExpandable expandable) {
+		return scrollables.contains(expandable) && scrollables.removeAll(expandable.getSubItems());
 	}
 
 	private int recursiveCollapse(int startPosition, List<T> subItems, int level) {
