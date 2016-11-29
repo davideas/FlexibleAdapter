@@ -1,5 +1,6 @@
 package eu.davidea.samples.flexibleadapter;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -11,8 +12,10 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableExpandableItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableFooterItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableSubItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableULSItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 
@@ -31,6 +34,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 
 	private AbstractFlexibleItem mUseCaseItem;
+	private Context mContext;
 
 	public ExampleAdapter(List<AbstractFlexibleItem> items, Object listeners) {
 		//stableIds ? true = Items implement hashCode() so they can have stableIds!
@@ -43,20 +47,20 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	@Override
 	public void updateDataSet(List<AbstractFlexibleItem> items, boolean animate) {
-		//NOTE: To have views/items not changed, set them into "items" before passing the final
+		// NOTE: To have views/items not changed, set them into "items" before passing the final
 		// list to the Adapter.
 
-		//Overwrite the list and fully notify the change, pass false to not animate changes.
-		//Watch out! The original list must a copy
+		// Overwrite the list and fully notify the change, pass false to not animate changes.
+		// Watch out! The original list must a copy.
 		super.updateDataSet(items, animate);
 
-		//onPostUpdate() will be automatically called at the end of the Asynchronous update process.
-		// Manipulate the list inside that method only or you won't see the changes.
+		// onPostUpdate() will automatically be called at the end of the Asynchronous update
+		// process. Manipulate the list inside that method only or you won't see the changes.
 	}
 
 	/*
-	 * You can override this method to define your own concept of "Empty". This method is never
-	 * called internally.
+	 * You can override this method to define your own concept of "Empty".
+	 * This method is never called internally.
 	 */
 	@Override
 	public boolean isEmpty() {
@@ -71,7 +75,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 */
 	public void showLayoutInfo() {
 		if (!hasSearchText()) {
-			//Define Example View
 			final ScrollableLayoutItem item = new ScrollableLayoutItem("LAY-L");
 			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
 				item.setId("LAY-S");
@@ -93,12 +96,11 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	/*
 	 * ANOTHER HEADER VIEW
-	 * This method shows how to add a Header View with a delay.
+	 * This method showcases how to add a Header View with a delay.
 	 * The view is represented by a custom Item type to better represent any dynamic content.
 	 */
 	public void addUserLearnedSelection(boolean scrollToPosition) {
 		if (!DatabaseConfiguration.userLearnedSelection && !hasSearchText() && !(getItem(0) instanceof ScrollableULSItem)) {
-			//Define Example View
 			final ScrollableULSItem item = new ScrollableULSItem("ULS");
 			item.setTitle(mRecyclerView.getContext().getString(R.string.uls_title));
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.uls_subtitle));
@@ -108,15 +110,38 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	/*
 	 * FOOTER VIEW
-	 * This method shows how to delay add a Footer View.
+	 * This method showcases how to delay add a Footer View.
 	 * The view is represented by a custom Item type to better represent any dynamic content.
 	 */
 	public void addScrollableFooter() {
-		//Define Example View
 		final ScrollableFooterItem item = new ScrollableFooterItem("SFI");
 		item.setTitle(mRecyclerView.getContext().getString(R.string.scrollable_footer_title));
 		item.setSubtitle(mRecyclerView.getContext().getString(R.string.scrollable_footer_subtitle));
 		addScrollableFooterWithDelay(item, 1000L, false);
+	}
+
+	/*
+	 * Showcase for EXPANDABLE HEADER VIEW
+	 */
+	public void addScrollableExpandableAsHeader() {
+		final ScrollableExpandableItem expandable = new ScrollableExpandableItem("SEHI");
+		expandable.setTitle(mRecyclerView.getContext().getString(R.string.scrollable_expandable_header_title));
+		expandable.setSubtitle(mRecyclerView.getContext().getString(R.string.scrollable_expandable_header_subtitle));
+		expandable.addSubItem(new ScrollableSubItem("SEHI_1"));
+		expandable.addSubItem(new ScrollableSubItem("SEHI_2"));
+		addScrollableHeaderWithDelay(expandable, 1500L, false);
+	}
+
+	/*
+	 * Showcase for EXPANDABLE FOOTER VIEW
+	 */
+	public void addScrollableExpandableAsFooter() {
+		final ScrollableExpandableItem expandable = new ScrollableExpandableItem("SEFI");
+		expandable.setTitle(mRecyclerView.getContext().getString(R.string.scrollable_expandable_footer_title));
+		expandable.setSubtitle(mRecyclerView.getContext().getString(R.string.scrollable_expandable_footer_subtitle));
+		expandable.addSubItem(new ScrollableSubItem("SEFI_1"));
+		expandable.addSubItem(new ScrollableSubItem("SEFI_2"));
+		addScrollableFooterWithDelay(expandable, 1500L, false);
 	}
 
 	/**
@@ -129,9 +154,9 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //	public ViewGroup getStickySectionHeadersHolder() {
 //		FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
 //		frameLayout.setLayoutParams(new ViewGroup.LayoutParams(
-//				ViewGroup.LayoutParams.WRAP_CONTENT,//or MATCH_PARENT
+//				ViewGroup.LayoutParams.WRAP_CONTENT, //or MATCH_PARENT
 //				ViewGroup.LayoutParams.WRAP_CONTENT));
-//		((ViewGroup) mRecyclerView.getParent()).addView(frameLayout);//This is important otherwise the Header disappears!
+//		((ViewGroup) mRecyclerView.getParent()).addView(frameLayout); //This is important otherwise the Header disappears!
 //		return (ViewGroup) mInflater.inflate(R.layout.sticky_header_layout, frameLayout);
 //	}
 
@@ -150,7 +175,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 */
 //	@Override
 //	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//		//Not implemented: METHOD A is used
+//		// Not implemented: METHOD A is used
 //	}
 
 	/**
@@ -159,19 +184,24 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 */
 //	@Override
 //	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-//		//Not implemented: METHOD A is used
+//		// Not implemented: METHOD A is used
 //	}
 	@Override
 	public String onCreateBubbleText(int position) {
-		if (!DatabaseConfiguration.userLearnedSelection && position == 0) {//This 'if' is for my example only
-			//TODO FOR YOU: This is the normal line you should use: Usually it's the first letter
-			return Integer.toString(position);
+		if (position < getScrollableHeaders().size()) {
+			return "Top";
+		} else if (position >= getItemCount() - getScrollableFooters().size()){
+			return "Bottom";
+		} else {
+			position -= getScrollableHeaders().size() + 1;
 		}
+		// TODO FOR YOU: The basic value, usually, is the first letter
+		// For me is the position
 		return super.onCreateBubbleText(position);
 	}
 
 	/**
-	 * <b>Important:</b> In order to preserve the internal calls, this custom Callback
+	 * <b>IMPORTANT:</b> In order to preserve the internal calls, this custom Callback
 	 * <u>must</u> extends {@link FlexibleAdapter.HandlerCallback}
 	 * which implements {@link android.os.Handler.Callback},
 	 * therefore you <u>must</u> call {@code super().handleMessage(message)}.
@@ -185,14 +215,14 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 		public boolean handleMessage(Message message) {
 			boolean done = super.handleMessage(message);
 			switch (message.what) {
-				//currently reserved
-				case 0://async updateDataSet
-				case 1://async filterItems
-				case 2://confirm delete
-				case 8://onLoadMore remove progress item
+				// Currently reserved (you don't need to check these numbers!)
+				case 0: //async updateDataSet
+				case 1: //async filterItems
+				case 2: //confirm delete
+				case 8: //onLoadMore remove progress item
 					return done;
 
-				//free to use
+				// Free to use, example:
 				case 10:
 				case 11:
 					return true;

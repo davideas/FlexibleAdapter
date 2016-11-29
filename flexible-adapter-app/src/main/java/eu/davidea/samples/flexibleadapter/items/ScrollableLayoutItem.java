@@ -14,30 +14,17 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * Item dedicated to display which Layout is currently displayed.
  * This item is a Scrollable Header.
- *
- * <p>If you don't have many fields in common better to extend directly from
- * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
- * implemented methods (getter and setters).</p>
  */
 public class ScrollableLayoutItem extends AbstractItem<ScrollableLayoutItem.LayoutViewHolder> {
 
 	public ScrollableLayoutItem(String id) {
 		super(id);
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return false;
-	}
-
-	@Override
-	public boolean isSelectable() {
-		return false;
 	}
 
 	@Override
@@ -52,14 +39,13 @@ public class ScrollableLayoutItem extends AbstractItem<ScrollableLayoutItem.Layo
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, LayoutViewHolder holder, int position, List payloads) {
-		holder.mTitle.setSelected(true);//For marquee
-		holder.mTitle.setText(getTitle());
-		holder.mSubtitle.setText(getSubtitle());
+		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
+		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
 
 		//Support for StaggeredGridLayoutManager
 		if (holder.itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
 			((StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams()).setFullSpan(true);
-			Log.d("LayoutItem", "LayoutItem configured fullSpan for StaggeredGridLayout");
+			Log.d("ScrollableLayoutItem", "LayoutItem configured fullSpan for StaggeredGridLayout");
 		}
 	}
 

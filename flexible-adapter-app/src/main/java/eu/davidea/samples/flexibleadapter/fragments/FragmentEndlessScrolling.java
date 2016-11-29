@@ -66,15 +66,17 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		// Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createEndlessDatabase(0); //N. of items
-		initializeRecyclerView(savedInstanceState);
+		if (DatabaseService.getInstance().getDatabaseList().size() == 0) {
+			DatabaseService.getInstance().createEndlessDatabase(0); //N. of items
+		}
+		initializeRecyclerView();
 
 		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
-	private void initializeRecyclerView(Bundle savedInstanceState) {
+	private void initializeRecyclerView() {
 		// Initialize Adapter and RecyclerView
 		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
@@ -112,12 +114,9 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				.setEndlessTargetCount(15);
 //				.setEndlessScrollThreshold(1); //Default=1
 
-		// Add 2 Scrollable Headers and 1 Footer items
-		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		// Add 1 Scrollable Header and 1 Footer items
 		mAdapter.showLayoutInfo();
 		mAdapter.addScrollableFooter();
-		mAdapter.addScrollableHeaderWithDelay(DatabaseService.newExpandableSectionItem(111), 5000L, true);
-		mAdapter.addScrollableFooterWithDelay(DatabaseService.newExpandableSectionItem(999), 5000L, false);
 	}
 
 	@Override
@@ -125,7 +124,6 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		super.showNewLayoutInfo(item);
 		mAdapter.showLayoutInfo();
 	}
-
 
 	/**
 	 * No more data to load.
@@ -171,43 +169,45 @@ public class FragmentEndlessScrolling extends AbstractFragment
 			public void run() {
 				final List<AbstractFlexibleItem> newItems = new ArrayList<>();
 
-				// Simulating success/failure with Random
+				// 1. Simulating success/failure with Random
 				int count = new Random().nextInt(7);
 				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item);
 				for (int i = 1; i <= count; i++) {
 					newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
 				}
 
-				// Callback the Adapter to notify the change:
+				// 2. Callback the Adapter to notify the change:
 				// - New items will be added to the end of the main list
 				// - When list is null or empty and limits are reached, Endless scroll will be disabled
 				mAdapter.onLoadMoreComplete(newItems, 5000L);
 				DatabaseService.getInstance().addAll(newItems);
-				// It's better to read the page after adding new items!
+				// - Retrieve the new page number after adding new items!
 				Log.d(TAG, "EndlessCurrentPage=" + mAdapter.getEndlessCurrentPage());
 				Log.d(TAG, "EndlessPageSize=" + mAdapter.getEndlessPageSize());
 				Log.d(TAG, "EndlessTargetCount=" + mAdapter.getEndlessTargetCount());
 
-				// Expand all Expandable items: Not Expandable items are automatically skipped/ignored!
+				// 3. If you have new Expandable and you want expand them, do as following:
+				// Note: normal items are automatically skipped/ignored because they do not
+				//       implement IExpandable interface! So don't care about them.
 				for (AbstractFlexibleItem item : newItems) {
-					// Simple expansion is performed:
-					// - Automatic scroll is performed
-					//mAdapter.expand(item);
-
-					// Initialization is performed:
-					// - Expanded status is ignored(WARNING: possible subItem duplication)
+					// Option A. (Best use case) Initialization is performed:
+					// - Expanded status is ignored. WARNING: possible subItems duplication!
 					// - Automatic scroll is skipped
 					mAdapter.expand(item, true);
+
+					// Option B. Simple expansion is performed:
+					// - WARNING: Automatic scroll is performed!
+					//mAdapter.expand(item);
 				}
 
-				// Notify user
+				// 4. Notify user
 				if (getActivity() != null && newItems.size() > 0) {
 					Toast.makeText(getActivity(),
 							"Simulated: " + newItems.size() + " new items arrived :-)",
 							Toast.LENGTH_SHORT).show();
 				}
 			}
-		}, 2000);
+		}, 5000L);
 	}
 
 	@Override
@@ -248,6 +248,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				// NOTE: If you use simple integers to identify the ViewType,
 				// here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
+					case R.layout.recycler_scrollable_expandable_item:
 					case R.layout.recycler_scrollable_header_item:
 					case R.layout.recycler_scrollable_footer_item:
 					case R.layout.recycler_scrollable_layout_item:

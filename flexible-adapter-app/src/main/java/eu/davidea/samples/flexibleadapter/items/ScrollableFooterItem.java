@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.AnimatedViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -28,11 +28,6 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 
 	public ScrollableFooterItem(String id) {
 		super(id);
-	}
-
-	@Override
-	public boolean isSelectable() {
-		return false;
 	}
 
 	@Override
@@ -47,9 +42,8 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, FooterViewHolder holder, int position, List payloads) {
-//		holder.mTitle.setSelected(true);//For marquee
-		holder.mTitle.setText(Html.fromHtml(getTitle()));
-		holder.mSubtitle.setText(Html.fromHtml(getSubtitle()));
+		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
+		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
 	}
 
 	class FooterViewHolder extends FlexibleViewHolder implements AnimatedViewHolder {

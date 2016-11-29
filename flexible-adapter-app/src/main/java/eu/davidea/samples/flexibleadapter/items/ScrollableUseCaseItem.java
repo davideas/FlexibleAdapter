@@ -3,7 +3,6 @@ package eu.davidea.samples.flexibleadapter.items;
 import android.animation.Animator;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +14,13 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * This item is a Scrollable Header.
  */
-public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.HeaderViewHolder> {
+public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UCViewHolder> {
 
 	public ScrollableUseCaseItem(String id) {
 		super(id);
@@ -37,24 +37,23 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.He
 	}
 
 	@Override
-	public HeaderViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new HeaderViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public UCViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new UCViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
-//		holder.mTitle.setSelected(true);//For marquee
-		holder.mTitle.setText(Html.fromHtml(getTitle()));
-		holder.mSubtitle.setText(Html.fromHtml(getSubtitle()));
+	public void bindViewHolder(FlexibleAdapter adapter, UCViewHolder holder, int position, List payloads) {
+		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
+		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
 	}
 
-	class HeaderViewHolder extends FlexibleViewHolder {
+	class UCViewHolder extends FlexibleViewHolder {
 
 		TextView mTitle;
 		TextView mSubtitle;
 		ImageView mDismissIcon;
 
-		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
+		UCViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);

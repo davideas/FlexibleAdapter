@@ -1551,6 +1551,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 			if (sectionable.getHeader() == null && header != null) {
 				if (DEBUG) Log.v(TAG, "Link header " + header + " to " + sectionable);
+				//TODO: try-catch for when sectionable item has a different header class signature, if so, they just can't accept that header!
 				sectionable.setHeader(header);
 				linked = true;
 				removeFromOrphanList(header);

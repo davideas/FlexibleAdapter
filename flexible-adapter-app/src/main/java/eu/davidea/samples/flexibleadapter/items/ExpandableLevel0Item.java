@@ -29,8 +29,6 @@ public class ExpandableLevel0Item
 		extends AbstractItem<L0ViewHolder>
 		implements IExpandable<L0ViewHolder, ExpandableLevel1Item>, IHeader<L0ViewHolder> {
 
-	private static final long serialVersionUID = -1882711111814491060L;
-
 	/* Flags for FlexibleAdapter */
 	private boolean mExpanded = false;
 

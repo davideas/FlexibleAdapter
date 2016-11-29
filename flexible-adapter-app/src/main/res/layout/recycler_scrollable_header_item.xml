@@ -15,8 +15,8 @@
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentRight="true"
 		android:layout_centerInParent="true"
-		android:layout_marginEnd="@dimen/margin_small"
-		android:layout_marginRight="@dimen/margin_small">
+		android:layout_marginEnd="@dimen/margin_right"
+		android:layout_marginRight="@dimen/margin_right">
 
 		<ImageView
 			android:id="@+id/dismiss_icon"
@@ -45,13 +45,14 @@
 		android:layout_toStartOf="@id/image_util_container"
 		android:orientation="vertical">
 
+		<!-- For marquee singleLine="true" is mandatory. Don't care about the deprecation! -->
 		<TextView
 			android:id="@+id/title"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:ellipsize="marquee"
 			android:marqueeRepeatLimit="marquee_forever"
-			android:maxLines="1"
+			android:singleLine="true"
 			android:text="@string/scrollable_header_title"
 			android:textAppearance="@style/TextAppearance.AppCompat.Title"
 			android:textColor="?primaryTextSelector"/>

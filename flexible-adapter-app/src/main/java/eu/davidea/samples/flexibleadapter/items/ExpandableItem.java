@@ -13,8 +13,6 @@ import eu.davidea.flexibleadapter.items.IExpandable;
 public class ExpandableItem extends SimpleItem
 		implements IExpandable<SimpleItem.ParentViewHolder, SubItem> {
 
-	private static final long serialVersionUID = -6882745111884490060L;
-
 	/* Flags for FlexibleAdapter */
 	private boolean mExpanded = false;
 
@@ -68,7 +66,7 @@ public class ExpandableItem extends SimpleItem
 
 	public void addSubItem(SubItem subItem) {
 		if (mSubItems == null)
-			mSubItems = new ArrayList<SubItem>();
+			mSubItems = new ArrayList<>();
 		mSubItems.add(subItem);
 	}
 

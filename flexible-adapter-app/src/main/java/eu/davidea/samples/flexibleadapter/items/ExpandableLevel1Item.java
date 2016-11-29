@@ -20,8 +20,6 @@ public class ExpandableLevel1Item
 		extends AbstractItem<SimpleItem.ParentViewHolder>
 		implements IExpandable<SimpleItem.ParentViewHolder, SubItem> {
 
-	private static final long serialVersionUID = -1882711111814491060L;
-
 	/* Flags for FlexibleAdapter */
 	private boolean mExpanded = false;
 

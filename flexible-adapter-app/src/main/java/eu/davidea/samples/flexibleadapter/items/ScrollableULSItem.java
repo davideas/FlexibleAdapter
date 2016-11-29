@@ -3,7 +3,6 @@ package eu.davidea.samples.flexibleadapter.items;
 import android.animation.Animator;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,28 +15,17 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
+import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * Item dedicated only for User Learns Selection view (located always at position 0 in the Adapter).
- * <p>If you don't have many fields in common better to extend directly from
- * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
- * implemented methods (getter and setters).</p>
+ * This item is a Scrollable Header.
  */
 public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHolder> {
 
 	public ScrollableULSItem(String id) {
 		super(id);
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return false;
-	}
-
-	@Override
-	public boolean isSelectable() {
-		return false;
 	}
 
 	@Override
@@ -54,9 +42,9 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 	public void bindViewHolder(FlexibleAdapter adapter, ULSViewHolder holder, int position, List payloads) {
 		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 		holder.itemView.setActivated(true);
-		holder.mTitle.setSelected(true);//For marquee
-		holder.mTitle.setText(Html.fromHtml(getTitle()));
-		holder.mSubtitle.setText(Html.fromHtml(getSubtitle()));
+		holder.mTitle.setSelected(true);//For marquee!!
+		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
+		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
 	}
 
 	/**

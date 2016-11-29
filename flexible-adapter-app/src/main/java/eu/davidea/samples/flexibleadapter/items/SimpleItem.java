@@ -36,8 +36,6 @@ import eu.davidea.viewholders.ExpandableViewHolder;
 public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 		implements ISectionable<SimpleItem.ParentViewHolder, HeaderItem>, IFilterable, Serializable {
 
-	private static final long serialVersionUID = -6882745111884490060L;
-
 	/**
 	 * The header of this item
 	 */

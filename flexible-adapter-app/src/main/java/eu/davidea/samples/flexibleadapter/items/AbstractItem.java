@@ -15,6 +15,7 @@ public abstract class AbstractItem<VH extends FlexibleViewHolder>
 	protected String id;
 	protected String title;
 	protected String subtitle = "";
+	/* number of times this item has been refreshed */
 	protected int updates;
 
 	public AbstractItem(String id) {

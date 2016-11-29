@@ -28,8 +28,6 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
 		implements ISectionable<SubItem.ChildViewHolder, IHeader>, IFilterable {
 
-	private static final long serialVersionUID = 2519281529221244210L;
-
 	/**
 	 * The header of this item
 	 */

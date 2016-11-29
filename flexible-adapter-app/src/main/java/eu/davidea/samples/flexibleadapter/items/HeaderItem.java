@@ -24,8 +24,6 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  */
 public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> implements IFilterable {
 
-	private static final long serialVersionUID = -7408637077727563374L;
-
 	private String id;
 	private String title;
 	private String subtitle;
@@ -109,7 +107,7 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 		TextView mSubtitle;
 		ImageView mHandleView;
 
-		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
+		HeaderViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);//True for sticky
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
