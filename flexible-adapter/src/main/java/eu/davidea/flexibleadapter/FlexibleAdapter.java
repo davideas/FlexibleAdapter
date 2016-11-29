@@ -743,7 +743,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p><b>Scrollable Headers</b> have the following characteristic:
 	 * <ul>
 	 * <li>lay always before any main item.</li>
-	 * <li>cannot be selectable.</li>
+	 * <li>cannot be selectable nor draggable.</li>
 	 * <li>cannot be inserted twice, but many can be inserted.</li>
 	 * <li>any new header will be inserted before the existent.</li>
 	 * <li>can be of any type so they can be bound at runtime with any data inside.</li>
@@ -762,6 +762,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (DEBUG) Log.d(TAG, "Add scrollable header " + getClassName(headerItem));
 		if (!mScrollableHeaders.contains(headerItem)) {
 			headerItem.setSelectable(false);
+			headerItem.setDraggable(false);
 			int progressFix = 0;//(headerItem == mProgressItem) ? mScrollableHeaders.size() : 0;
 			mScrollableHeaders.add(headerItem);
 			performInsert(progressFix, Collections.singletonList(headerItem), true);
@@ -777,7 +778,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p><b>Scrollable Footers</b> have the following characteristic:
 	 * <ul>
 	 * <li>lay always after any main item.</li>
-	 * <li>cannot be selectable.</li>
+	 * <li>cannot be selectable nor draggable.</li>
 	 * <li>cannot be inserted twice, but many can be inserted.</li>
 	 * <li>any new footer will be inserted after the existent.</li>
 	 * <li>can be of any type so they can be bound at runtime with any data inside.</li>
@@ -798,6 +799,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (!mScrollableFooters.contains(footerItem)) {
 			if (DEBUG) Log.d(TAG, "Add scrollable footer " + getClassName(footerItem));
 			footerItem.setSelectable(false);
+			footerItem.setDraggable(false);
 			int progressFix = (footerItem == mProgressItem) ? mScrollableFooters.size() : 0;
 			//Prevent wrong position after a possible updateDataSet
 			if (progressFix > 0 && mScrollableFooters.size() > 0) {
@@ -4506,8 +4508,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public boolean shouldMove(int fromPosition, int toPosition) {
-		return (mItemMoveListener == null || mItemMoveListener.shouldMoveItem(fromPosition, toPosition));// &&
-		//!(isExpandable(getItem(fromPosition)) && getExpandableOf(toPosition) != null);
+		T toItem = getItem(toPosition);
+		return !(mScrollableHeaders.contains(toItem) || mScrollableFooters.contains(toItem)) &&
+				(mItemMoveListener == null || mItemMoveListener.shouldMoveItem(fromPosition, toPosition));
 	}
 
 	/**

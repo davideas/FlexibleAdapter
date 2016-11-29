@@ -160,7 +160,10 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
 		int position = getFlexibleAdapterPosition();
-		if (!mAdapter.isEnabled(position)) return false;
+		if (!mAdapter.isEnabled(position) || !isDraggable()) {
+			Log.w(TAG, "Can't start drag: Item is not enabled or draggable!");
+			return false;
+		}
 		if (FlexibleAdapter.DEBUG)
 			Log.v(TAG, "onTouch with DragHandleView on position " + position + " mode=" + mAdapter.getMode());
 		if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN &&
@@ -364,7 +367,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * @since 5.0.0-b7
 	 */
 	@Override
-	public boolean isDraggable() {
+	public final boolean isDraggable() {
 		IFlexible item = mAdapter.getItem(getFlexibleAdapterPosition());
 		return item != null && item.isDraggable();
 	}
@@ -374,7 +377,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * @since 5.0.0-b7
 	 */
 	@Override
-	public boolean isSwipeable() {
+	public final boolean isSwipeable() {
 		IFlexible item = mAdapter.getItem(getFlexibleAdapterPosition());
 		return item != null && item.isSwipeable();
 	}
