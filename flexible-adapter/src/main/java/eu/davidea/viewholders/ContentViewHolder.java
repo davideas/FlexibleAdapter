@@ -41,14 +41,14 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
 	 * @param stickyHeader true if the ViewHolder is a header to be sticky
 	 * @since 5.0.0-b7
 	 */
-	public ContentViewHolder(View view, FlexibleAdapter adapter, boolean stickyHeader) {
-		//Since itemView is declared "final", the split is done before the View is initialized
+	ContentViewHolder(View view, FlexibleAdapter adapter, boolean stickyHeader) {
+		// Since itemView is declared "final", the split is done before the View is initialized
 		super(stickyHeader ? new FrameLayout(view.getContext()) : view);
 
 		if (stickyHeader) {
 			itemView.setLayoutParams(adapter.getRecyclerView().getLayoutManager()
 					.generateLayoutParams(view.getLayoutParams()));
-			((FrameLayout) itemView).addView(view);//Add View after setLayoutParams
+			((FrameLayout) itemView).addView(view); //Add View after setLayoutParams
 			contentView = view;
 		}
 	}
@@ -64,7 +64,7 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
 	 * @return the real contentView
 	 * @since 5.0.0-b7
 	 */
-	public View getContentView() {
+	public final View getContentView() {
 		return contentView != null ? contentView : itemView;
 	}
 
@@ -79,7 +79,7 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
 	 * @see #setBackupPosition(int)
 	 * @since 5.0.0-b6
 	 */
-	public int getFlexibleAdapterPosition() {
+	public final int getFlexibleAdapterPosition() {
 		int position = getAdapterPosition();
 		if (position == RecyclerView.NO_POSITION) {
 			position = mBackupPosition;
@@ -94,7 +94,7 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
 	 * @param backupPosition the known position of this ViewHolder
 	 * @since 5.0.0-b6
 	 */
-	public void setBackupPosition(int backupPosition) {
+	public final void setBackupPosition(int backupPosition) {
 		mBackupPosition = backupPosition;
 	}
 
