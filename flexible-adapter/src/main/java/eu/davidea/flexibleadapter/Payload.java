@@ -17,8 +17,8 @@ package eu.davidea.flexibleadapter;
 
 /**
  * Payload occurs only for {@code notifyItemChanged()}.
- * <p>The value of this enumeration will be passed to the bind method to optimize the view binding
- * in order to update only the inner views interested for the change.</p>
+ * <p>The value of this enumeration will be provided to the bind method to optimize the view
+ * binding in order to update only the inner views interested for the change.</p>
  * You can still pass your own <i>Object</i> instead of one of these values.
  *
  * @author Davide Steduto
@@ -46,5 +46,9 @@ public enum Payload {
 	/** when items are notified due to Selecting All items / Clearing Selection) */
 	SELECTION,
 	/** when items are notified after a split */
-	SPLIT
+	SPLIT,
+	/** when an item is expanded by the user */
+	EXPANDED,
+	/** when an item is collapsed by the user */
+	COLLAPSED
 }
