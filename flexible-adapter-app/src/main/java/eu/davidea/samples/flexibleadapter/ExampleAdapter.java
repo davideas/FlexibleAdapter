@@ -12,6 +12,7 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.samples.flexibleadapter.items.ScrollableExpandableItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableFooterItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
@@ -87,7 +88,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(
 					R.string.columns,
-					String.valueOf(getSpanCount(mRecyclerView.getLayoutManager())))
+					String.valueOf(Utils.getSpanCount(mRecyclerView.getLayoutManager())))
 			);
 			addScrollableHeader(item);
 			removeScrollableHeaderWithDelay(item, 4000L);

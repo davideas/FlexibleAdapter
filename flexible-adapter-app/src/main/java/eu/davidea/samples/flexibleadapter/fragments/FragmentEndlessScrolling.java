@@ -66,7 +66,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		// Create New Database and Initialize RecyclerView
-		if (DatabaseService.getInstance().getDatabaseList().size() == 0) {
+		if (savedInstanceState == null) {
 			DatabaseService.getInstance().createEndlessDatabase(0); //N. of items
 		}
 		initializeRecyclerView();
@@ -207,7 +207,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 							Toast.LENGTH_SHORT).show();
 				}
 			}
-		}, 5000L);
+		}, 4000L);
 	}
 
 	@Override

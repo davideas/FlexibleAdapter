@@ -328,7 +328,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public FlexibleAdapter expandItemsAtStartUp() {
 		int position = 0;
-		setAnimate(true);
+		setScrollAnimate(true);
 		multiRange = true;
 		while (position < getItemCount()) {
 			T item = getItem(position);
@@ -340,7 +340,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			position++;
 		}
 		multiRange = false;
-		setAnimate(false);
+		setScrollAnimate(false);
 		return this;
 	}
 
@@ -758,6 +758,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #addScrollableHeaderWithDelay(IFlexible, long, boolean)
 	 * @since 5.0.0-rc1
 	 */
+	//TODO: Endless Top Scrolling
 	public final boolean addScrollableHeader(@NonNull T headerItem) {
 		if (DEBUG) Log.d(TAG, "Add scrollable header " + getClassName(headerItem));
 		if (!mScrollableHeaders.contains(headerItem)) {
@@ -765,7 +766,9 @@ public class FlexibleAdapter<T extends IFlexible>
 			headerItem.setDraggable(false);
 			int progressFix = 0;//(headerItem == mProgressItem) ? mScrollableHeaders.size() : 0;
 			mScrollableHeaders.add(headerItem);
+			setScrollAnimate(true); //Headers will scroll animate
 			performInsert(progressFix, Collections.singletonList(headerItem), true);
+			setScrollAnimate(false);
 			return true;
 		} else {
 			Log.w(TAG, "Scrollable header " + getClassName(headerItem) + " already exists");
@@ -780,6 +783,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <li>lay always after any main item.</li>
 	 * <li>cannot be selectable nor draggable.</li>
 	 * <li>cannot be inserted twice, but many can be inserted.</li>
+	 * <li>cannot scroll animate, when inserted for the first time.</li>
 	 * <li>any new footer will be inserted after the existent.</li>
 	 * <li>can be of any type so they can be bound at runtime with any data inside.</li>
 	 * <li>won't be filtered because they won't be part of the main list, but added separately
@@ -1344,7 +1348,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setAnimationOnScrolling(boolean)
 	 * @since 5.0.0-b6
 	 */
-	//TODO: deprecation, rename to displayHeadersAtStartUp() with no parameters?
+	//TODO: deprecation, rename to displayHeadersAtStartUp() with animate on loading parameter?
 	public FlexibleAdapter setDisplayHeadersAtStartUp(boolean displayHeaders) {
 		if (!headersShown && displayHeaders) {
 			showAllHeaders(isAnimationOnScrollingEnabled());
@@ -1890,7 +1894,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public FlexibleAdapter setEndlessScrollThreshold(@IntRange(from = 1) int thresholdItems) {
 		//Increase visible threshold based on number of columns
 		if (mRecyclerView != null) {
-			int spanCount = getSpanCount(mRecyclerView.getLayoutManager());
+			int spanCount = Utils.getSpanCount(mRecyclerView.getLayoutManager());
 			thresholdItems = thresholdItems * spanCount;
 		}
 		mEndlessScrollThreshold = thresholdItems;
@@ -4145,13 +4149,13 @@ public class FlexibleAdapter<T extends IFlexible>
 	private synchronized void executeNotifications(Payload payloadChange) {
 		if (diffResult != null) {
 			if (DEBUG) Log.i(TAG, "Dispatching notifications");
-			mItems = diffUtilCallback.getNewItems();// Update mItems in the UI Thread
+			mItems = diffUtilCallback.getNewItems(); //Update mItems in the UI Thread
 			diffResult.dispatchUpdatesTo(this);
 			diffResult = null;
 		} else {
 			if (DEBUG) Log.i(TAG, "Performing " + mNotifications.size() + " notifications");
-			mItems = mTempItems;// Update mItems in the UI Thread
-			setAnimate(false);//Disable scroll animation
+			mItems = mTempItems; //Update mItems in the UI Thread
+			setScrollAnimate(false); //Disable scroll animation
 			for (Notification notification : mNotifications) {
 				switch (notification.operation) {
 					case Notification.ADD:
@@ -4680,7 +4684,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					int scrollMax = position - firstVisibleItem;
 					int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
 					int scrollBy = Math.min(scrollMax, scrollMin);
-					int spanCount = getSpanCount(mRecyclerView.getLayoutManager());
+					int spanCount = Utils.getSpanCount(mRecyclerView.getLayoutManager());
 					if (spanCount > 1) {
 						scrollBy = scrollBy % spanCount + spanCount;
 					}
