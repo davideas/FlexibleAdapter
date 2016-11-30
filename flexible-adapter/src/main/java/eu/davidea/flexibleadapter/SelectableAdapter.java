@@ -18,9 +18,7 @@ package eu.davidea.flexibleadapter;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 
@@ -148,24 +146,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public RecyclerView getRecyclerView() {
 		return mRecyclerView;
-	}
-
-	/**
-	 * Helper method to return the number of the columns (span count) of the given LayoutManager.
-	 * <p>All Layouts are supported.</p>
-	 *
-	 * @param layoutManager the layout manager to check
-	 * @return the span count
-	 * @since 5.0.0-b7
-	 */
-	//TODO: Deprecated? move to Utils
-	public static int getSpanCount(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof GridLayoutManager) {
-			return ((GridLayoutManager) layoutManager).getSpanCount();
-		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
-		}
-		return 1;
 	}
 
 	/**

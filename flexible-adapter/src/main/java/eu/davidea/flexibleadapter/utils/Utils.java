@@ -25,6 +25,7 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -67,6 +68,29 @@ public final class Utils {
 	}
 
 	/**
+	 * @return the string representation of the provided {@link SelectableAdapter.Mode}
+	 */
+	@SuppressLint("SwitchIntDef")
+	public static String getModeName(@SelectableAdapter.Mode int mode) {
+		switch (mode) {
+			case SelectableAdapter.MODE_SINGLE:
+				return "MODE_SINGLE";
+			case SelectableAdapter.MODE_MULTI:
+				return "MODE_MULTI";
+			default:
+				return "MODE_IDLE";
+		}
+	}
+
+	/**
+	 * @return the SimpleClassName of the provided object
+	 */
+	public static String getClassName(@NonNull Object o) {
+		return o.getClass().getSimpleName();
+	}
+
+
+	/**
 	 * Sets a spannable text with the accent color (if available) into the provided TextView.
 	 * <p>Internally calls {@link #fetchAccentColor(Context, int)}.</p>
 	 *
@@ -96,6 +120,23 @@ public final class Utils {
 	}
 
 	/**
+	 * Resolves bug #161. Necessary when {@code theme} attribute is used in the layout.
+	 * Used by {@code FlexibleAdapter.getStickySectionHeadersHolder()} method.
+	 */
+	public static Activity scanForActivity(Context context) {
+		if (context instanceof Activity)
+			return (Activity) context;
+		else if (context instanceof ContextWrapper)
+			return scanForActivity(((ContextWrapper) context).getBaseContext());
+
+		return null;
+	}
+
+	/*------------------------------*/
+	/* ACCENT COLOR UTILITY METHODS */
+	/*------------------------------*/
+
+	/**
 	 * Reset the internal accent color to {@link #INVALID_COLOR}, to give the possibility
 	 * to re-fetch it at runtime, since once it is fetched it cannot be changed.
 	 */
@@ -120,6 +161,10 @@ public final class Utils {
 		}
 		return colorAccent;
 	}
+
+	/*-------------------------------*/
+	/* RECYCLER-VIEW UTILITY METHODS */
+	/*-------------------------------*/
 
 	/**
 	 * Finds the layout orientation of the RecyclerView.
@@ -149,13 +194,30 @@ public final class Utils {
 	}
 
 	/**
-	 * Helper method to find the adapter position of the First completely visible view [for each
-	 * span], no matter which Layout is.
+	 * Helper method to retrieve the number of the columns (span count) of the given LayoutManager.
+	 * <p>All Layouts are supported.</p>
+	 *
+	 * @param layoutManager the layout manager to check
+	 * @return the span count
+	 * @since 5.0.0-b7
+	 */
+	public static int getSpanCount(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof GridLayoutManager) {
+			return ((GridLayoutManager) layoutManager).getSpanCount();
+		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
+		}
+		return 1;
+	}
+
+	/**
+	 * Helper method to find the adapter position of the <b>first completely</b> visible view
+	 * [for each span], no matter which Layout is.
 	 *
 	 * @param layoutManager the layout manager in use
-	 * @return the adapter position of the first fully visible item or {@code RecyclerView.NO_POSITION}
+	 * @return the adapter position of the <b>first fully</b> visible item or {@code RecyclerView.NO_POSITION}
 	 * if there aren't any visible items.
-	 * @see #findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @see #findFirstVisibleItemPosition(RecyclerView.LayoutManager)
 	 * @since 5.0.0-b8
 	 */
 	public static int findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
@@ -167,13 +229,31 @@ public final class Utils {
 	}
 
 	/**
-	 * Helper method to find the adapter position of the Last completely visible view [for each
-	 * span], no matter which Layout is.
+	 * Helper method to find the adapter position of the <b>first partially</b> visible view
+	 * [for each span], no matter which Layout is.
 	 *
 	 * @param layoutManager the layout manager in use
-	 * @return the adapter position of the last fully visible item or {@code RecyclerView.NO_POSITION}
+	 * @return the adapter position of the <b>first partially</b> visible item or {@code RecyclerView.NO_POSITION}
 	 * if there aren't any visible items.
 	 * @see #findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @since 5.0.0-rc1
+	 */
+	public static int findFirstVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
+		} else {
+			return ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+		}
+	}
+
+	/**
+	 * Helper method to find the adapter position of the <b>last completely</b> visible view
+	 * [for each span], no matter which Layout is.
+	 *
+	 * @param layoutManager the layout manager in use
+	 * @return the adapter position of the <b>last fully</b> visible item or {@code RecyclerView.NO_POSITION}
+	 * if there aren't any visible items.
+	 * @see #findLastVisibleItemPosition(RecyclerView.LayoutManager)
 	 * @since 5.0.0-b8
 	 */
 	public static int findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
@@ -185,38 +265,21 @@ public final class Utils {
 	}
 
 	/**
-	 * Resolves bug #161. Necessary when {@code theme} attribute is used in the layout.
-	 * Used by {@code FlexibleAdapter.getStickySectionHeadersHolder()} method.
+	 * Helper method to find the adapter position of the <b>last partially</b> visible view
+	 * [for each span], no matter which Layout is.
+	 *
+	 * @param layoutManager the layout manager in use
+	 * @return the adapter position of the <b>last partially</b> visible item or {@code RecyclerView.NO_POSITION}
+	 * if there aren't any visible items.
+	 * @see #findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @since 5.0.0-rc1
 	 */
-	public static Activity scanForActivity(Context context) {
-		if (context instanceof Activity)
-			return (Activity) context;
-		else if (context instanceof ContextWrapper)
-			return scanForActivity(((ContextWrapper) context).getBaseContext());
-
-		return null;
-	}
-
-	/**
-	 * @return the string representation of the provided {@link SelectableAdapter.Mode}
-	 */
-	@SuppressLint("SwitchIntDef")
-	public static String getModeName(@SelectableAdapter.Mode int mode) {
-		switch (mode) {
-			case SelectableAdapter.MODE_SINGLE:
-				return "MODE_SINGLE";
-			case SelectableAdapter.MODE_MULTI:
-				return "MODE_MULTI";
-			default:
-				return "MODE_IDLE";
+	public static int findLastVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null)[0];
+		} else {
+			return ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
 		}
-	}
-
-	/**
-	 * @return the SimpleClassName of the provided object
-	 */
-	public static String getClassName(@NonNull Object o) {
-		return o.getClass().getSimpleName();
 	}
 
 }
