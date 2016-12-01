@@ -16,18 +16,23 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.animation.Animator;
+import android.graphics.Color;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.FrameLayout;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnStickyHeaderChangeListener;
+import eu.davidea.flexibleadapter.R;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -59,6 +64,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 	@Override
 	public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+		displayWithAnimation = mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE;
 		updateOrClearHeader(false);
 	}
 
@@ -81,24 +87,46 @@ public class StickyHeaderHelper extends OnScrollListener {
 		if (FlexibleAdapter.DEBUG) Log.i(TAG, "StickyHolderLayout detached");
 	}
 
-	private void initStickyHeadersHolder() {
-		//Initialize Holder Layout and show sticky header if exists already
-		mStickyHolderLayout = mAdapter.getStickySectionHeadersHolder();
-		if (mStickyHolderLayout != null) {
-			if (mStickyHolderLayout.getLayoutParams() == null) {
-				throw new IllegalStateException("The ViewGroup provided, doesn't have LayoutParams correctly set, please initialize the ViewGroup accordingly");
-			}
-			mStickyHolderLayout.setClipToPadding(false);
-			mStickyHolderLayout.setAlpha(0);
-			updateOrClearHeader(false);
-			mStickyHolderLayout.animate().alpha(1).start();
-			if (FlexibleAdapter.DEBUG) Log.i(TAG, "StickyHolderLayout initialized");
-		} else {
-			throw new IllegalStateException("ViewGroup for Sticky Headers unspecified! You must either include @layout/sticky_header_layout OR set a custom StickyHeaderContainer");
-		}
+//	private FrameLayout createContainer(int width, int height) {
+//		FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
+//		frameLayout.setLayoutParams(new ViewGroup.LayoutParams(width, height));
+//		return frameLayout;
+//	}
+
+	private static ViewGroup getParent(View view) {
+		return (ViewGroup)view.getParent();
 	}
 
-	public boolean hasStickyHeaderTranslated(int position) {
+	private void initStickyHeadersHolder() {
+		// Create stickyContainer for shadow elevation
+		FrameLayout stickyContainer = new FrameLayout(mRecyclerView.getContext());
+		stickyContainer.setLayoutParams(new ViewGroup.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT));
+		ViewGroup oldParentLayout = getParent(mRecyclerView);
+		oldParentLayout.addView(stickyContainer);
+
+		// Initialize Holder Layout
+		mStickyHolderLayout = (ViewGroup) LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.sticky_header_layout, stickyContainer);
+
+//		mStickyHolderLayout = mAdapter.getStickySectionHeadersHolder();
+//		if (mStickyHolderLayout != null) {
+//			if (mStickyHolderLayout.getLayoutParams() == null) {
+//				throw new IllegalStateException("The ViewGroup provided, doesn't have LayoutParams correctly set, please initialize the ViewGroup accordingly");
+//			}
+
+		// Show sticky header if exists already
+		updateOrClearHeader(false);
+		mStickyHolderLayout.setAlpha(0);
+		mStickyHolderLayout.animate().alpha(1).start();
+		if (FlexibleAdapter.DEBUG) Log.i(TAG, "StickyHolderLayout initialized");
+
+//		} else {
+//			throw new IllegalStateException("ViewGroup for Sticky Headers unspecified! You must either include @layout/sticky_header_layout OR set a custom StickyHeaderContainer");
+//		}
+	}
+
+	private boolean hasStickyHeaderTranslated(int position) {
 		RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(position);
 		return vh != null && (vh.itemView.getX() < 0 || vh.itemView.getY() < 0);
 	}
@@ -123,14 +151,16 @@ public class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	private void updateHeader(int headerPosition, boolean updateHeaderContent) {
-		// Animate if headers were hidden
-		if (displayWithAnimation) {
-			displayWithAnimation = false;
-			mStickyHolderLayout.setAlpha(0);
-			mStickyHolderLayout.animate().alpha(1).start();
-		}
 		// Check if there is a new header to be sticky
 		if (mHeaderPosition != headerPosition) {
+			// Animate if headers were hidden, but don't if configuration changed (rotation)
+			if (displayWithAnimation && mHeaderPosition == RecyclerView.NO_POSITION) {
+				displayWithAnimation = false;
+				mStickyHolderLayout.setAlpha(0);
+				mStickyHolderLayout.animate().alpha(1).start();
+			} else {
+				mStickyHolderLayout.setAlpha(1);
+			}
 			mHeaderPosition = headerPosition;
 			FlexibleViewHolder holder = getHeaderViewHolder(headerPosition);
 			if (FlexibleAdapter.DEBUG)
@@ -144,11 +174,12 @@ public class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	private void translateHeader() {
-		if (mStickyHeaderViewHolder == null) return;
-
 		int headerOffsetX = 0, headerOffsetY = 0;
+		float elevation = 21f; //Default elevation 6dp = 3.5 for each dp
+		if (Utils.hasLollipop())
+			elevation = mStickyHeaderViewHolder.getContentView().getElevation();
 
-		//Search for the position where the next header item is found and translate the new offset
+		// Search for the position where the next header item is found and translate the new offset
 		for (int i = 0; i < mRecyclerView.getChildCount(); i++) {
 			final View nextChild = mRecyclerView.getChildAt(i);
 			if (nextChild != null) {
@@ -158,27 +189,33 @@ public class StickyHeaderHelper extends OnScrollListener {
 					if (Utils.getOrientation(mRecyclerView.getLayoutManager()) == OrientationHelper.HORIZONTAL) {
 						if (nextChild.getLeft() > 0) {
 							int headerWidth = mStickyHolderLayout.getMeasuredWidth();
-							headerOffsetX = Math.min(nextChild.getLeft() - headerWidth, 0);
+							int nextHeaderOffsetX = nextChild.getLeft() - headerWidth;
+							headerOffsetX = Math.min(nextHeaderOffsetX, 0);
 							// TODO: AlphaListener = Math.abs((float)nextChild.getLeft()) / headerWidth);
+							// Early remove the elevation/shadow to match with the next view
+							if (nextHeaderOffsetX < 5) elevation = 0f;
 							if (headerOffsetX < 0) break;
 						}
 					} else {
 						if (nextChild.getTop() > 0) {
 							int headerHeight = mStickyHolderLayout.getMeasuredHeight();
-							headerOffsetY = Math.min(nextChild.getTop() - headerHeight, 0);
+							int nextHeaderOffsetY = nextChild.getTop() - headerHeight;
+							headerOffsetY = Math.min(nextHeaderOffsetY, 0);
 							// TODO: AlphaListener = Math.abs((float)nextChild.getTop()) / headerHeight);
+							// Early remove the elevation/shadow to match with the next view
+							if (nextHeaderOffsetY < 5) elevation = 0f;
 							if (headerOffsetY < 0) break;
 						}
 					}
 				}
 			}
 		}
-		//Fix to remove unnecessary shadow
-		//ViewCompat.setElevation(mStickyHeaderViewHolder.getContentView(), 0f);
-		//Apply translation
+		// Apply the calculated elevation
+		ViewCompat.setElevation(mStickyHolderLayout, elevation);
+		// Apply translation
 		mStickyHolderLayout.setTranslationX(headerOffsetX);
 		mStickyHolderLayout.setTranslationY(headerOffsetY);
-		//Log.v(TAG, "TranslationX=" + headerOffsetX + " TranslationY=" + headerOffsetY);
+//		Log.v(TAG, "TranslationX=" + headerOffsetX + " TranslationY=" + headerOffsetY);
 	}
 
 	private void swapHeader(FlexibleViewHolder newHeader) {
@@ -195,26 +232,26 @@ public class StickyHeaderHelper extends OnScrollListener {
 
 	private void ensureHeaderParent() {
 		final View view = mStickyHeaderViewHolder.getContentView();
-		//#121 - Make sure the measured height (width for horizontal layout) is kept if
+		// #121 - Make sure the measured height (width for horizontal layout) is kept if
 		// WRAP_CONTENT has been set for the Header View
 		mStickyHeaderViewHolder.itemView.getLayoutParams().width = view.getMeasuredWidth();
 		mStickyHeaderViewHolder.itemView.getLayoutParams().height = view.getMeasuredHeight();
-		//#139 - Copy xml params instead of Measured params
+		// #139 - Copy xml params instead of Measured params
 		ViewGroup.LayoutParams params = mStickyHolderLayout.getLayoutParams();
 		params.width = view.getLayoutParams().width;
 		params.height = view.getLayoutParams().height;
 		removeViewFromParent(view);
-		mStickyHolderLayout.setClipToPadding(false);
 		mStickyHolderLayout.addView(view);
+		//TODO: set custom background for transparency (elevation will be lost!)
+		mStickyHolderLayout.setBackgroundColor(Color.WHITE);// Needed to elevate the view
 	}
 
 	private void resetHeader(FlexibleViewHolder header) {
 		final View view = header.getContentView();
 		removeViewFromParent(view);
-		//Reset transformation on removed header
+		// Reset transformation on removed header
 		view.setTranslationX(0);
 		view.setTranslationY(0);
-		mStickyHeaderViewHolder.itemView.setVisibility(View.VISIBLE);
 		if (!header.itemView.equals(view))
 			((ViewGroup) header.itemView).addView(view);
 		header.setIsRecyclable(true);
@@ -224,7 +261,8 @@ public class StickyHeaderHelper extends OnScrollListener {
 		if (mStickyHeaderViewHolder != null) {
 			if (FlexibleAdapter.DEBUG) Log.d(TAG, "clearHeader");
 			resetHeader(mStickyHeaderViewHolder);
-			mStickyHolderLayout.setAlpha(1);
+			mStickyHolderLayout.setBackgroundColor(Color.TRANSPARENT);
+			mStickyHolderLayout.animate().setListener(null);
 			mStickyHeaderViewHolder = null;
 			mHeaderPosition = RecyclerView.NO_POSITION;
 			onStickyHeaderChange(mHeaderPosition);
@@ -232,27 +270,29 @@ public class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	public void clearHeaderWithAnimation() {
-		mStickyHolderLayout.animate().setListener(new Animator.AnimatorListener() {
-			@Override
-			public void onAnimationStart(Animator animation) {
-			}
+		if (mStickyHeaderViewHolder != null && mHeaderPosition != RecyclerView.NO_POSITION) {
+			mStickyHolderLayout.animate().setListener(new Animator.AnimatorListener() {
+				@Override
+				public void onAnimationStart(Animator animation) {
+					mHeaderPosition = RecyclerView.NO_POSITION;
+				}
 
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				mStickyHolderLayout.animate().setListener(null);
-				displayWithAnimation = true;
-				clearHeader();
-			}
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					mStickyHolderLayout.setAlpha(0);
+					clearHeader();
+				}
 
-			@Override
-			public void onAnimationCancel(Animator animation) {
-			}
+				@Override
+				public void onAnimationCancel(Animator animation) {
+				}
 
-			@Override
-			public void onAnimationRepeat(Animator animation) {
-			}
-		});
-		mStickyHolderLayout.animate().alpha(0).start();
+				@Override
+				public void onAnimationRepeat(Animator animation) {
+				}
+			});
+			mStickyHolderLayout.animate().alpha(0).start();
+		}
 	}
 
 	private static void removeViewFromParent(final View view) {
@@ -265,7 +305,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 	@SuppressWarnings("unchecked")
 	private int getHeaderPosition(int adapterPosHere) {
 		if (adapterPosHere == RecyclerView.NO_POSITION) {
-			//Fix to display correct sticky header (especially after the searchText is cleared out)
+			// Fix to display correct sticky header (especially after the searchText is cleared out)
 			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
 				adapterPosHere = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstVisibleItemPositions(null)[0];
 			} else {
@@ -276,7 +316,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 			}
 		}
 		IHeader header = mAdapter.getSectionHeader(adapterPosHere);
-		//Header cannot be sticky if it's also an Expandable in collapsed status, RV will raise an exception
+		// Header cannot be sticky if it's also an Expandable in collapsed status, RV will raise an exception
 		if (header == null || mAdapter.isExpandable(header) && !mAdapter.isExpanded(header)) {
 			return RecyclerView.NO_POSITION;
 		}
@@ -292,17 +332,17 @@ public class StickyHeaderHelper extends OnScrollListener {
 	 */
 	@SuppressWarnings("unchecked")
 	private FlexibleViewHolder getHeaderViewHolder(int position) {
-		//Find existing ViewHolder
+		// Find existing ViewHolder
 		FlexibleViewHolder holder = (FlexibleViewHolder) mRecyclerView.findViewHolderForAdapterPosition(position);
 		if (holder == null) {
-			//Create and binds a new ViewHolder
+			// Create and binds a new ViewHolder
 			holder = (FlexibleViewHolder) mAdapter.createViewHolder(mRecyclerView, mAdapter.getItemViewType(position));
 			mAdapter.bindViewHolder(holder, position);
 
-			//Restore the Adapter position
+			// Restore the Adapter position
 			holder.setBackupPosition(position);
 
-			//Calculate width and height
+			// Calculate width and height
 			int widthSpec;
 			int heightSpec;
 			if (Utils.getOrientation(mRecyclerView.getLayoutManager()) == OrientationHelper.VERTICAL) {
@@ -313,7 +353,7 @@ public class StickyHeaderHelper extends OnScrollListener {
 				heightSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getHeight(), View.MeasureSpec.EXACTLY);
 			}
 
-			//Measure and Layout the stickyView
+			// Measure and Layout the stickyView
 			final View headerView = holder.getContentView();
 			int childWidth = ViewGroup.getChildMeasureSpec(widthSpec,
 					mRecyclerView.getPaddingLeft() + mRecyclerView.getPaddingRight(),

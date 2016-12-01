@@ -102,7 +102,6 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 			// We stop the process here, we only want to update the subtitle
 
 		} else {
-			FlipView.enableLogs(true);
 			// DemoApp: INNER ANIMATION EXAMPLE! ImageView - Handle Flip Animation on
 			// Select ALL and Deselect ALL
 			if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {

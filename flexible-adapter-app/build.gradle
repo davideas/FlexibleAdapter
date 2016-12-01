@@ -51,7 +51,7 @@ dependencies {
 	compile project (":flexible-adapter")
 
 	//FlipView
-	compile "eu.davidea:flipview:1.1.1"
+	compile "eu.davidea:flipview:1.1.2"
 
 	//ButterKnife
 	compile 'com.jakewharton:butterknife:8.0.1'
