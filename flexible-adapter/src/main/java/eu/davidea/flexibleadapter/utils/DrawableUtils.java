@@ -15,7 +15,6 @@
  */
 package eu.davidea.flexibleadapter.utils;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
@@ -46,8 +45,8 @@ public final class DrawableUtils {
 	 * @param drawable drawable object
 	 * @since 5.0.0-b7
 	 */
+	//TODO: Rename to setBackgroundCompat
 	@SuppressWarnings("deprecation")
-	@SuppressLint("NewApi")
 	public static void setBackground(View view, Drawable drawable) {
 		if (Utils.hasJellyBean()) {
 			view.setBackground(drawable);
@@ -63,6 +62,7 @@ public final class DrawableUtils {
 	 * @param drawableRes drawable resource id
 	 * @since 5.0.0-b7
 	 */
+	//TODO: Rename to setBackgroundCompat
 	public static void setBackground(View view, @DrawableRes int drawableRes) {
 		setBackground(view, getDrawableCompat(view.getContext(), drawableRes));
 	}
@@ -89,12 +89,14 @@ public final class DrawableUtils {
 	}
 
 	/**
-	 * Helper to get the system default Selectable Background.
+	 * Helper to get the default Selectable Background.
+	 * Returns the resourceId of the {@code R.attr.selectableItemBackground} attribute in your style.
 	 *
 	 * @param context the context
 	 * @return Default selectable background resId
 	 * @since 5.0.0-b7
 	 */
+	//TODO: Rename to getDefaultSelectableBackground ?
 	public static int getSelectableBackground(Context context) {
 		TypedValue outValue = new TypedValue();
 		//it is important here to not use the android.R because this wouldn't add the latest drawable
@@ -104,6 +106,7 @@ public final class DrawableUtils {
 
 	/**
 	 * Helper to get the system default Color Control Highlight.
+	 * Returns the resourceId of the {@code R.attr.colorControlHighlight} attribute in your style.
 	 *
 	 * @param context the context
 	 * @return Default Color Control Highlight resId
@@ -126,10 +129,12 @@ public final class DrawableUtils {
 	 * StateListDrawable otherwise
 	 * @since 5.0.0-b7
 	 */
+	//TODO: Deprecate? change the method name and put the rippleColor to the end
 	public static Drawable getSelectableBackgroundCompat(@ColorInt int rippleColor,
 														 @ColorInt int normalColor,
 														 @ColorInt int pressedColor) {
 		if (Utils.hasLollipop()) {
+			//TODO: create a color state list for ripple based on state
 			return new RippleDrawable(ColorStateList.valueOf(rippleColor),
 					getStateListDrawable(normalColor, pressedColor, true),
 					getRippleMask(normalColor));
@@ -156,12 +161,10 @@ public final class DrawableUtils {
 			states.addState(new int[]{android.R.attr.state_pressed}, getColorDrawable(pressedColor));
 		states.addState(new int[]{android.R.attr.state_activated}, getColorDrawable(pressedColor));
 		states.addState(new int[]{}, getColorDrawable(normalColor));
-		//if possible we enable animating across states
-		if (!withRipple) {
-			int duration = 200; //android.R.integer.config_shortAnimTime
-			states.setEnterFadeDuration(duration);
-			states.setExitFadeDuration(duration);
-		}
+		//Animating across states
+		int duration = 200; //android.R.integer.config_shortAnimTime
+		states.setEnterFadeDuration(duration);
+		states.setExitFadeDuration(duration);
 		return states;
 	}
 
