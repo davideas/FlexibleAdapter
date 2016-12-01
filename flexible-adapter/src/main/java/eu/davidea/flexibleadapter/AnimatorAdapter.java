@@ -206,7 +206,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 *
 	 * @param start non negative minimum position to start animation.
 	 * @since 5.0.0-b1
+	 * @deprecated Can't be supported anymore due to the new internal condition of non-animations.
 	 */
+	@Deprecated
 	public AnimatorAdapter setAnimationStartPosition(@IntRange(from = 0) int start) {
 		if (DEBUG) Log.i(TAG, "Set animationStartPosition=" + start);
 		mLastAnimatedPosition = start;
@@ -234,7 +236,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		return this;
 	}
 
-	//TODO: Rename to isAnimationOnScrolling()
 	public boolean isAnimationOnScrollingEnabled() {
 		return shouldAnimate;
 	}
@@ -258,8 +259,18 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/**
 	 * @return true if items are animated also on reverse scrolling, false only forward
 	 * @since 5.0.0-b1
+	 * @deprecated use {@link #isAnimationOnReverseScrollingEnabled()}
 	 */
+	@Deprecated
 	public boolean isAnimationOnReverseScrolling() {
+		return isReverseEnabled;
+	}
+
+	/**
+	 * @return true if items are animated also on reverse scrolling, false only forward
+	 * @since 5.0.0-b1
+	 */
+	public boolean isAnimationOnReverseScrollingEnabled() {
 		return isReverseEnabled;
 	}
 
@@ -674,7 +685,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 		private void markNotified() {
 			notified = !animateFromObserver;
-			if (DEBUG) Log.v(TAG, "animateFromObserver=" + animateFromObserver + " notified=" + notified);
+			if (DEBUG)
+				Log.v(TAG, "animateFromObserver=" + animateFromObserver + " notified=" + notified);
 		}
 
 		@Override

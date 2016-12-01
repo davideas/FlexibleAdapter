@@ -104,13 +104,6 @@ public class ExpandableLevel1Item
 
 		//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
 		if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
-			//Reset the flags with delay
-			holder.itemView.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					adapter.resetActionModeFlags();
-				}
-			}, 200L);
 			//Consume the Animation
 			holder.mFlipView.flip(adapter.isSelected(position), 200L);
 		} else {

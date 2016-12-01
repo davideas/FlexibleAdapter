@@ -25,6 +25,7 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -69,6 +70,7 @@ public final class Utils {
 
 	/**
 	 * @return the string representation of the provided {@link SelectableAdapter.Mode}
+	 * @since 5.0.0-rc1
 	 */
 	@SuppressLint("SwitchIntDef")
 	public static String getModeName(@SelectableAdapter.Mode int mode) {
@@ -84,11 +86,11 @@ public final class Utils {
 
 	/**
 	 * @return the SimpleClassName of the provided object
+	 * @since 5.0.0-rc1
 	 */
 	public static String getClassName(@NonNull Object o) {
 		return o.getClass().getSimpleName();
 	}
-
 
 	/**
 	 * Sets a spannable text with the accent color (if available) into the provided TextView.
@@ -100,8 +102,11 @@ public final class Utils {
 	 * @param constraint   the text to highlight
 	 * @param defColor     the default color in case accentColor is not found
 	 * @see #fetchAccentColor(Context, int)
+	 * @deprecated Use
+	 * {@link #highlightText(TextView, String, String, int)} OR
+	 * {@link #highlightText(TextView, String, String)}
 	 */
-	//TODO: Deprecate defColor?
+	@Deprecated
 	public static void highlightText(@NonNull Context context, @NonNull TextView textView,
 									 String originalText, String constraint, @ColorInt int defColor) {
 		if (originalText == null) originalText = "";
@@ -110,6 +115,50 @@ public final class Utils {
 		if (i != -1) {
 			Spannable spanText = Spannable.Factory.getInstance().newSpannable(originalText);
 			spanText.setSpan(new ForegroundColorSpan(fetchAccentColor(context, defColor)), i,
+					i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			spanText.setSpan(new StyleSpan(Typeface.BOLD), i,
+					i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			textView.setText(spanText, TextView.BufferType.SPANNABLE);
+		} else {
+			textView.setText(originalText, TextView.BufferType.NORMAL);
+		}
+	}
+
+	/**
+	 * Sets a spannable text with the accent color (if available) into the provided TextView.
+	 * <p>Internally calls {@link #fetchAccentColor(Context, int)}.</p>
+	 *
+	 * @param textView     the TextView to transform
+	 * @param originalText the original text which the transformation is applied to
+	 * @param constraint   the text to highlight
+	 * @see #highlightText(TextView, String, String, int)
+	 * @since 5.0.0-rc1
+	 */
+	public static void highlightText(@NonNull TextView textView,
+									 @Nullable String originalText, @Nullable String constraint) {
+		int accentColor = fetchAccentColor(textView.getContext(), 1);
+		highlightText(textView, originalText, constraint, accentColor);
+	}
+
+	/**
+	 * Sets a spannable text with any highlight color into the provided TextView.
+	 *
+	 * @param textView     the TextView to transform
+	 * @param originalText the original text which the transformation is applied to
+	 * @param constraint   the text to highlight
+	 * @param color        the highlight color
+	 * @see #fetchAccentColor(Context, int)
+	 * @see #highlightText(TextView, String, String)
+	 * @since 5.0.0-rc1
+	 */
+	public static void highlightText(@NonNull TextView textView, @Nullable String originalText,
+									 @Nullable String constraint, @ColorInt int color) {
+		if (originalText == null) originalText = "";
+		if (constraint == null) constraint = "";
+		int i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()));
+		if (i != -1) {
+			Spannable spanText = Spannable.Factory.getInstance().newSpannable(originalText);
+			spanText.setSpan(new ForegroundColorSpan(color), i,
 					i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			spanText.setSpan(new StyleSpan(Typeface.BOLD), i,
 					i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

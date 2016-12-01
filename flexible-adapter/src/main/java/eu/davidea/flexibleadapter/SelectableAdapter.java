@@ -166,7 +166,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		if (mMode == MODE_SINGLE && mode == MODE_IDLE)
 			clearSelection();
 		this.mMode = mode;
-		mLastItemInActionMode = (mode == MODE_IDLE);
+		this.mLastItemInActionMode = (mode != MODE_MULTI);
 	}
 
 	/**
@@ -188,26 +188,37 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 5.0.0-b1
 	 */
 	public boolean isSelectAll() {
+		// Reset the flags with delay
+		resetActionModeFlags();
 		return mSelectAll;
 	}
 
 	/**
-	 * @return true if user returns to {@link #MODE_IDLE} and no selection is active, false otherwise
+	 * @return true if user returns to {@link #MODE_IDLE} or {@link #MODE_SINGLE} and no
+	 * selection is active, false otherwise
 	 * @since 5.0.0-b1
 	 */
 	public boolean isLastItemInActionMode() {
+		// Reset the flags with delay
+		resetActionModeFlags();
 		return mLastItemInActionMode;
 	}
 
 	/**
-	 * Reset to false the ActionMode flags: {@code SelectAll} and {@code LastItemInActionMode}.
-	 * <p><b>IMPORTANT:</b> To be called with <u>delay</u> in {@code holder.itemView.postDelayed()}.</p>
+	 * Resets to false the ActionMode flags: {@code SelectAll} and {@code LastItemInActionMode}.
 	 *
 	 * @since 5.0.0-b1
 	 */
-	public void resetActionModeFlags() {
-		this.mSelectAll = false;
-		this.mLastItemInActionMode = false;
+	private void resetActionModeFlags() {
+		if (mSelectAll || mLastItemInActionMode) {
+			mRecyclerView.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mSelectAll = false;
+					mLastItemInActionMode = false;
+				}
+			}, 200L);
+		}
 	}
 
 	/**

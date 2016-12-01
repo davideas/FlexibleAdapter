@@ -80,9 +80,9 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked", "deprecation"})
+	@SuppressWarnings({"unchecked"})
 	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
-		//Subtitle
+		// Subtitle
 		if (adapter.isExpandable(this)) {
 			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems"
 					+ (getHeader() != null ? " - " + getHeader().getId() : "")
@@ -91,44 +91,33 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 
 		DrawableUtils.setBackground(holder.frontView, DrawableUtils.getSelectableBackgroundCompat(
 				Color.LTGRAY, Color.WHITE, Color.LTGRAY));
-		Context context = holder.itemView.getContext();
-		int defColorAccent = context.getResources().getColor(R.color.colorAccent_light);
 
 		if (adapter.isExpandable(this) && payloads.size() > 0) {
 			Log.d(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
 			if (adapter.hasSearchText()) {
-				Utils.highlightText(holder.itemView.getContext(), holder.mSubtitle,
-						getSubtitle(), adapter.getSearchText(), defColorAccent);
+				Utils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
 			} else {
 				holder.mSubtitle.setText(getSubtitle());
 			}
-			//We stop the process here, we only want to update the subtitle
+			// We stop the process here, we only want to update the subtitle
 
 		} else {
-			//DemoApp: INNER ANIMATION EXAMPLE! ImageView - Handle Flip Animation on Select ALL
-			// and Deselect ALL
+			FlipView.enableLogs(true);
+			// DemoApp: INNER ANIMATION EXAMPLE! ImageView - Handle Flip Animation on
+			// Select ALL and Deselect ALL
 			if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
-				//Reset the flags with delay
-				holder.itemView.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						adapter.resetActionModeFlags();
-					}
-				}, 200L);
-				//Consume the Animation
+				// Consume the Animation
 				holder.mFlipView.flip(adapter.isSelected(position), 200L);
 			} else {
-				//Display the current flip status
+				// Display the current flip status
 				holder.mFlipView.flipSilently(adapter.isSelected(position));
 			}
 
-			//In case of searchText matches with Title or with an SimpleItem's field
+			// In case of searchText matches with Title or with an SimpleItem's field
 			// this will be highlighted
 			if (adapter.hasSearchText()) {
-				Utils.highlightText(context, holder.mTitle,
-						getTitle(), adapter.getSearchText(), defColorAccent);
-				Utils.highlightText(context, holder.mSubtitle,
-						getSubtitle(), adapter.getSearchText(), defColorAccent);
+				Utils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText());
+				Utils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
 			} else {
 				holder.mTitle.setText(getTitle());
 				holder.mSubtitle.setText(getSubtitle());
