@@ -3961,8 +3961,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * @return true to calculate animation changes with DiffUtil, false to use default calculation.
 	 * @see #setAnimateChangesWithDiffUtil(boolean)
+	 * @deprecated DiffUtil is slower than the internal implementation, you can use it until
+	 * final release.
 	 */
-	//TODO: Deprecation: DiffUtil is slower than the internal implementation
+	@Deprecated
 	public boolean isAnimateChangesWithDiffUtil() {
 		return useDiffUtil;
 	}
@@ -3978,8 +3980,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                    calculation.
 	 * @return this Adapter, so the call can be chained
 	 * @see #setDiffUtilCallback(DiffUtilCallback)
+	 * @deprecated DiffUtil is slower than the internal implementation, you can use it until
+	 * final release.
 	 */
-	//TODO: Deprecation: DiffUtil is slower than the internal implementation
+	@Deprecated
 	public FlexibleAdapter setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
 		this.useDiffUtil = useDiffUtil;
 		return this;
@@ -3992,14 +3996,16 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param diffUtilCallback the custom callback that DiffUtil will call
 	 * @return this Adapter, so the call can be chained
 	 * @see #setAnimateChangesWithDiffUtil(boolean)
+	 * @deprecated DiffUtil is slower than the internal implementation, you can use it until
+	 * final release.
 	 */
-	//TODO: Deprecation: DiffUtil is slower than the internal implementation
+	@Deprecated
 	public FlexibleAdapter setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
 		this.diffUtilCallback = diffUtilCallback;
 		return this;
 	}
 
-	//TODO: Deprecation: DiffUtil is slower than the internal implementation
+	@Deprecated //TODO: Call animateTo instead.
 	private synchronized void animateDiff(@Nullable List<T> newItems, Payload payloadChange) {
 		if (useDiffUtil) {
 			Log.v(TAG, "Animate changes with DiffUtils! oldSize=" + getItemCount() + " newSize=" + newItems.size());
@@ -5256,8 +5262,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * The old and new lists are available as:
 	 * <p>- {@code protected List<T> oldItems;}
 	 * <br/>- {@code protected List<T> newItems;}
+	 *
+	 * @deprecated DiffUtil is slower than the internal implementation, you can use it until
+	 * final release.
 	 */
-	//TODO: Deprecation: DiffUtil is slower than the internal implementation
+	@Deprecated
 	public static class DiffUtilCallback<T> extends DiffUtil.Callback {
 
 		protected List<T> oldItems;
