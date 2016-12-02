@@ -123,10 +123,8 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
 
 		//Item Status
 		holder.statusTextView.setText(status.getResId());
-		DrawableUtils.setBackground(holder.itemView,
-				DrawableUtils.getSelectableBackgroundCompat(
-				Color.WHITE, status.getColor(),
-				Utils.getColorAccent(holder.itemView.getContext())));
+		DrawableUtils.setBackground(holder.itemView, DrawableUtils.getSelectableBackgroundCompat(
+				Color.WHITE, status.getColor(), Utils.getColorAccent(holder.itemView.getContext())));
 
 		//Blink after moving the item
 		for (Object payload : payloads) {

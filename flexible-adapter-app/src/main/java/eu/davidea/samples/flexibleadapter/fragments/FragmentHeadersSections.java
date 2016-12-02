@@ -116,6 +116,15 @@ public class FragmentHeadersSections extends AbstractFragment
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.showLayoutInfo();
 		mAdapter.addScrollableFooter();
+
+//		mRecyclerView.postDelayed(new Runnable() {
+//			@Override
+//			public void run() {
+//				IHeader newHeader = DatabaseService.newHeader(555);
+//				SimpleItem iSectionable = DatabaseService.newSimpleItem(999, newHeader);
+//				mAdapter.addItem(0, iSectionable);
+//			}
+//		}, 5000L);
 	}
 
 	@Override

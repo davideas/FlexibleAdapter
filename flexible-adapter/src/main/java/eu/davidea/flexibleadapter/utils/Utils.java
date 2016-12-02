@@ -170,8 +170,9 @@ public final class Utils {
 
 	/**
 	 * Resolves bug #161. Necessary when {@code theme} attribute is used in the layout.
-	 * Used by {@code FlexibleAdapter.getStickySectionHeadersHolder()} method.
+	 * Used by {@code FlexibleAdapter.getStickyHeaderContainer()} method.
 	 */
+	//TODO: review comment
 	public static Activity scanForActivity(Context context) {
 		if (context instanceof Activity)
 			return (Activity) context;

@@ -37,7 +37,7 @@ public class ScrollableSubItem extends AbstractItem<ScrollableSubItem.ChildViewH
 	@Override
 	@SuppressWarnings("unchecked")
 	public void bindViewHolder(FlexibleAdapter adapter, ChildViewHolder holder, int position, List payloads) {
-		String title = "Scrollable SubItem " + adapter.getRelativePositionOf(this);
+		String title = "Scrollable SubItem " + adapter.getSubPositionOf(this);
 		holder.mTitle.setText(title);
 	}
 

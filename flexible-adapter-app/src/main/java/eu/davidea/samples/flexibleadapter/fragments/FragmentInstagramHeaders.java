@@ -69,7 +69,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		//Initialize Adapter and RecyclerView
 		//true = it makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity(), true);
-		mAdapter.initializeListeners(getActivity())
+		mAdapter.addListener(getActivity())
 				//Experimenting NEW features (v5.0.0)
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true);

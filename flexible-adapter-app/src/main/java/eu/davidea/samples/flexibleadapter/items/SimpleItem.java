@@ -89,7 +89,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 					+ (getUpdates() > 0 ? " - u" + getUpdates() : ""));
 		}
 
-		DrawableUtils.setBackground(holder.frontView, DrawableUtils.getSelectableBackgroundCompat(
+		DrawableUtils.setBackground(holder.itemView, DrawableUtils.getSelectableBackgroundCompat(
 				Color.LTGRAY, Color.WHITE, Color.LTGRAY));
 
 		if (adapter.isExpandable(this) && payloads.size() > 0) {

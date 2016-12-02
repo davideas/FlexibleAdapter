@@ -152,7 +152,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 * {@link #setStickyHeaderContainer(ViewGroup)}</p>
 	 */
 //	@Override
-//	public ViewGroup getStickySectionHeadersHolder() {
+//	public ViewGroup getStickyHeaderContainer() {
 //		FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
 //		frameLayout.setLayoutParams(new ViewGroup.LayoutParams(
 //				ViewGroup.LayoutParams.WRAP_CONTENT, //or MATCH_PARENT

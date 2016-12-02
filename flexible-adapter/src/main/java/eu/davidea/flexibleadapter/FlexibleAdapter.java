@@ -209,7 +209,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                  </ul>
 	 * @see #FlexibleAdapter(List)
 	 * @see #FlexibleAdapter(List, Object, boolean)
-	 * @see #initializeListeners(Object)
+	 * @see #addListener(Object)
 	 * @since 5.0.0-b1
 	 */
 	public FlexibleAdapter(@Nullable List<T> items, @Nullable Object listeners) {
@@ -227,7 +227,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param stableIds set {@code true} if item implements {@code hashcode()} and have stable ids.
 	 * @see #FlexibleAdapter(List)
 	 * @see #FlexibleAdapter(List, Object)
-	 * @see #initializeListeners(Object)
+	 * @see #addListener(Object)
 	 * @since 5.0.0-b8
 	 */
 	public FlexibleAdapter(@Nullable List<T> items, @Nullable Object listeners, boolean stableIds) {
@@ -240,7 +240,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		mOrphanHeaders = new ArrayList<>();
 
 		//Create listeners instances
-		initializeListeners(listeners);
+		addListener(listeners);
 
 		//Get notified when items are inserted or removed (it adjusts selected positions)
 		registerAdapterDataObserver(new AdapterDataObserver());
@@ -252,13 +252,25 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param listener the object(s) instance(s) of any listener
 	 * @return this Adapter, so the call can be chained
+	 * @deprecated Use {@link #addListener(Object)}
+	 */
+	@Deprecated
+	public FlexibleAdapter initializeListeners(@Nullable Object listener) {
+		return addListener(listener);
+	}
+
+	/**
+	 * Initializes the listener(s) of this Adapter.
+	 * <p>This method is automatically called from the Constructor.</p>
+	 *
+	 * @param listener the object(s) instance(s) of any listener
+	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
-	//TODO: Rename to addListener?
 	@CallSuper
-	public FlexibleAdapter initializeListeners(@Nullable Object listener) {
+	public FlexibleAdapter addListener(@Nullable Object listener) {
 		if (DEBUG && listener != null) {
-			Log.i(TAG, "Initialize Class " + getClassName(listener) + " as:");
+			Log.i(TAG, "Add listener class " + getClassName(listener) + " as:");
 		}
 		if (listener instanceof OnItemClickListener) {
 			if (DEBUG) Log.i(TAG, "- OnItemClickListener");
@@ -297,6 +309,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	@Override
 	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
+		//TODO is this necessary?
 		if (mStickyHeaderHelper != null && headersShown) {
 			mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
 		}
@@ -310,6 +323,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+		//TODO is this necessary?
 		if (mStickyHeaderHelper != null) {
 			mStickyHeaderHelper.detachFromRecyclerView();
 			mStickyHeaderHelper = null;
@@ -1246,12 +1260,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Enables the sticky header functionality.
 	 * <p>Headers can be sticky only if they are shown.</p>
 	 * <b>Note:</b>
-	 * <br/>- You must read {@link #getStickySectionHeadersHolder()}.
+	 * <br/>- You must read {@link #getStickyHeaderContainer()}.
 	 * <br/>- Sticky headers are now clickable as any Views, but cannot be dragged nor swiped.
 	 * <br/>- Content and linkage are automatically updated.
 	 *
 	 * @return this Adapter, so the call can be chained
-	 * @see #getStickySectionHeadersHolder()
+	 * @see #getStickyHeaderContainer()
 	 * @since 5.0.0-b6
 	 */
 	//TODO: deprecation use setStickyHeaders(true)?
@@ -1305,9 +1319,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return ViewGroup layout that will hold the sticky header ItemViews
 	 * @since 5.0.0-b6
+	 * @deprecated Use {@link #getStickyHeaderContainer()}
 	 */
-	//TODO: Review the comment for the new stickyHeaders helper
-	//TODO: Rename the method to getStickyHeaderContainer
+	@Deprecated
 	public ViewGroup getStickySectionHeadersHolder() {
 		if (mStickyContainer == null) {
 			mStickyContainer = (ViewGroup) Utils
@@ -1318,13 +1332,29 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Sets a custom {@link ViewGroup} for Sticky Headers when the default can't be used.
-	 * <p>Useful in conjunction with ViewPager.</p>
+	 * Returns the ViewGroup (FrameLayout) that will hold the headers when sticky.
+	 * Set a custom container with {@link #setStickyHeaderContainer(ViewGroup)} before enabling
+	 * sticky headers.
+	 *
+	 * @return ViewGroup layout that will hold the sticky header itemViews
+	 * @since 5.0.0-rc1
+	 */
+	//TODO: Integrate the usage of the custom container in the new StickyHeaderHelper
+	//TODO: Review the comment for the new StickyHeaderHelper: layout is not needed anymore
+	public final ViewGroup getStickyHeaderContainer() {
+		return mStickyContainer;
+	}
+
+	/**
+	 * Sets a custom {@link ViewGroup} container for Sticky Headers when the default can't be used.
 	 *
 	 * @param stickyContainer custom container for Sticky Headers
 	 * @since 5.0.0-rc1
 	 */
 	public FlexibleAdapter setStickyHeaderContainer(@NonNull ViewGroup stickyContainer) {
+		if (mStickyHeaderHelper != null) {
+			Log.w(TAG, "StickyHeaderHelper has been already initialized! Call this method before enabling StickyHeaders");
+		}
 		if (DEBUG && stickyContainer != null)
 			Log.i(TAG, "Set stickyHeaderContainer=" + getClassName(stickyContainer));
 		this.mStickyContainer = stickyContainer;
@@ -2168,7 +2198,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param child the child item
 	 * @return the parent of this child item or null if item has no parent
 	 * @see #getExpandablePositionOf(IFlexible)
-	 * @see #getRelativePositionOf(IFlexible)
+	 * @see #getSubPositionOf(IFlexible)
 	 * @since 5.0.0-b1
 	 */
 	public IExpandable getExpandableOf(@NonNull T child) {
@@ -2195,7 +2225,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param child the child item
 	 * @return the parent position of this child item or -1 if not found
 	 * @see #getExpandableOf(IFlexible)
-	 * @see #getRelativePositionOf(IFlexible)
+	 * @see #getSubPositionOf(IFlexible)
 	 * @since 5.0.0-b1
 	 */
 	public int getExpandablePositionOf(@NonNull T child) {
@@ -2211,9 +2241,24 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getExpandableOf(IFlexible)
 	 * @see #getExpandablePositionOf(IFlexible)
 	 * @since 5.0.0-b1
+	 * @deprecated Use {@link #getSubPositionOf(IFlexible)}
 	 */
-	//TODO: Rename to getSubPositionOf
+	@Deprecated
 	public int getRelativePositionOf(@NonNull T child) {
+		return getSiblingsOf(child).indexOf(child);
+	}
+
+	/**
+	 * Retrieves the position of a child item in the list where it lays.
+	 * <p>Only for a real child of an expanded parent.</p>
+	 *
+	 * @param child the child item
+	 * @return the position in the parent or -1 if the child is a parent itself or not found
+	 * @see #getExpandableOf(IFlexible)
+	 * @see #getExpandablePositionOf(IFlexible)
+	 * @since 5.0.0-b1
+	 */
+	public int getSubPositionOf(@NonNull T child) {
 		return getSiblingsOf(child).indexOf(child);
 	}
 
@@ -2224,7 +2269,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the list of the child element, or an empty list if the child item has no parent
 	 * @see #getExpandableOf(IFlexible)
 	 * @see #getExpandablePositionOf(IFlexible)
-	 * @see #getRelativePositionOf(IFlexible)
+	 * @see #getSubPositionOf(IFlexible)
 	 * @see #getExpandedItems()
 	 * @since 5.0.0-b1
 	 */
