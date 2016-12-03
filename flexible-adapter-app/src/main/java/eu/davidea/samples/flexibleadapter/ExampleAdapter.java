@@ -90,7 +90,10 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 					R.string.columns,
 					String.valueOf(Utils.getSpanCount(mRecyclerView.getLayoutManager())))
 			);
-			addScrollableHeader(item);
+			// NOTE: If you have to change at runtime the LayoutManager and add
+			// Scrollable Headers, consider to add them in post, using a delay >= 0
+			// otherwise scroll animations on all items will not start correctly.
+			addScrollableHeaderWithDelay(item, 0L, true);
 			removeScrollableHeaderWithDelay(item, 4000L);
 		}
 	}

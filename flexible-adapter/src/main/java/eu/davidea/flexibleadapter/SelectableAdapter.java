@@ -95,6 +95,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 1.0.0
 	 */
 	public SelectableAdapter() {
+		Log.i("FlexibleAdapter", "Running version " + BuildConfig.VERSION_NAME);
 		mSelectedPositions = new TreeSet<>();
 		mMode = MODE_IDLE;
 	}

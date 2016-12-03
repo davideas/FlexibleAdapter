@@ -270,7 +270,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	@CallSuper
 	public FlexibleAdapter addListener(@Nullable Object listener) {
 		if (DEBUG && listener != null) {
-			Log.i(TAG, "Add listener class " + getClassName(listener) + " as:");
+			Log.i(TAG, "Adding listener class " + getClassName(listener) + " as:");
 		}
 		if (listener instanceof OnItemClickListener) {
 			if (DEBUG) Log.i(TAG, "- OnItemClickListener");
@@ -4252,8 +4252,8 @@ public class FlexibleAdapter<T extends IFlexible>
 				throw new IllegalStateException("RecyclerView cannot be null. Enabling LongPressDrag or Swipe must be done after the Adapter is added to the RecyclerView.");
 			}
 			if (mItemTouchHelperCallback == null) {
-				if (DEBUG) Log.i(TAG, "Initialize default ItemTouchHelperCallback");
 				mItemTouchHelperCallback = new ItemTouchHelperCallback(this);
+				if (DEBUG) Log.i(TAG, "Initialized default ItemTouchHelperCallback");
 			}
 			mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
 			mItemTouchHelper.attachToRecyclerView(mRecyclerView);
@@ -4295,10 +4295,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-rc1
 	 */
 	public final FlexibleAdapter setItemTouchHelperCallback(ItemTouchHelperCallback itemTouchHelperCallback) {
-		if (DEBUG) Log.i(TAG, "Initialize custom ItemTouchHelperCallback");
 		mItemTouchHelperCallback = itemTouchHelperCallback;
 		mItemTouchHelper = null;
 		initializeItemTouchHelper();
+		if (DEBUG) Log.i(TAG, "Initialized custom ItemTouchHelperCallback");
 		return this;
 	}
 

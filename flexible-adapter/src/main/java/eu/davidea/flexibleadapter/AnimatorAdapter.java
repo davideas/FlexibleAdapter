@@ -107,8 +107,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 */
 	AnimatorAdapter(boolean stableIds) {
 		super();
-		if (stableIds && DEBUG) Log.i("FlexibleAdapter", "initialize with StableIds");
 		setHasStableIds(stableIds);
+		if (DEBUG) Log.i("FlexibleAdapter", "Initialized with StableIds=" + stableIds);
 
 		//Get notified when an item is changed (should skip animation)
 		mAnimatorNotifierObserver = new AnimatorAdapterDataObserver();
@@ -351,6 +351,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	/**
 	 * Performs checks to scroll animate the itemView and in case, it animates the view.
+	 * <p><b>Note:</b> If you have to change at runtime the LayoutManager <i>and</i> add
+	 * Scrollable Headers too, consider to add them in post, using a {@code delay >= 0},
+	 * otherwise scroll animations on all items will not start correctly.</p>
 	 *
 	 * @param holder   the ViewHolder just bound
 	 * @param position the current item position
