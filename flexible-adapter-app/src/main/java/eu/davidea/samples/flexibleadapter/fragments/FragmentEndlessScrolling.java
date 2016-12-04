@@ -140,7 +140,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	public void noMoreLoad(int newItemsSize) {
 		Log.d(TAG, "newItemsSize=" + newItemsSize);
 		Log.d(TAG, "Total pages loaded=" + mAdapter.getEndlessCurrentPage());
-		Log.d(TAG, "Total items loaded=" + mAdapter.getItemCount(false));
+		Log.d(TAG, "Total items loaded=" + mAdapter.getMainItemCount());
 	}
 
 	/**

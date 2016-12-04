@@ -295,7 +295,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (listener instanceof OnUpdateListener) {
 			if (DEBUG) Log.i(TAG, "- OnUpdateListener");
 			mUpdateListener = (OnUpdateListener) listener;
-			mUpdateListener.onUpdateEmptyView(getItemCount(false));
+			mUpdateListener.onUpdateEmptyView(getMainItemCount());
 		}
 		return this;
 	}
@@ -475,8 +475,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*--------------*/
 
 	/**
-	 * Convenience method of {@link #updateDataSet(List, boolean)}.
-	 * <p>In this case changes will NOT be animated: <b>Warning!</b>
+	 * Convenience method of {@link #updateDataSet(List, boolean)} (You should read the comments
+	 * of this method).
+	 * <p>In this call, changes will NOT be animated: <b>Warning!</b>
 	 * {@link #notifyDataSetChanged()} will be invoked.</p>
 	 *
 	 * @param items the new data set
@@ -491,9 +492,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * This method will refresh the entire data set content. Optionally, all changes can be
 	 * animated, limited by the value previously set with {@link #setAnimateToLimit(int)}
-	 * to improve performance on very big list. Should provide {@code animate = false} to
-	 * directly invoke {@link #notifyDataSetChanged()} without any animations!
-	 * <p><b>Note:</b> Scrollable Headers and Footers (if existent) will be restored in this call.</p>
+	 * to improve performance on very big list. Should provide {@code animate=false} to
+	 * directly invoke {@link #notifyDataSetChanged()} without any animations, if {@code stableIds}
+	 * is not set!
+	 * <p><b>Note:</b>
+	 * <ul><li>Scrollable Headers and Footers (if existent) will be restored in this call.</li>
+	 * <li>I strongly recommend to implement {@link #hashCode()} to all adapter items along with
+	 * {@link #equals(Object)}: This Adapter is making use of HashSet to improve performance.</li>
+	 * </ul></p>
 	 * <b>Note:</b> The following methods will be also called at the end of the operation:
 	 * <ol><li>{@link #expandItemsAtStartUp()}</li>
 	 * <li>{@link #showAllHeaders()} if headers are shown</li>
@@ -549,13 +555,13 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Returns the total number of items in the data set held by the adapter (headers and footers
-	 * INCLUDED). Use {@link #getItemCount(boolean)} with {@code false} as parameter to retrieve
+	 * INCLUDED). Use {@link #getMainItemCount()} with {@code false} as parameter to retrieve
 	 * only real items excluding headers and footers.
 	 * <p><b>Note:</b> This method cannot be overridden since the selection and the internal
 	 * methods rely on it.</p>
 	 *
 	 * @return the total number of items (headers and footers INCLUDED) held by the adapter
-	 * @see #getItemCount(boolean)
+	 * @see #getMainItemCount()
 	 * @see #getItemCountOfTypes(Integer...)
 	 * @see #isEmpty()
 	 * @since 1.0.0
@@ -573,17 +579,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * </ul>
 	 * <b>Note:</b> This method cannot be overridden since internal methods rely on it.
 	 *
-	 * @param withHeadersFooters true to count also headers and footers, false to count only real items
 	 * @return the total number of items held by the adapter, with or without headers and footers,
 	 * depending by the provided parameter
 	 * @see #getItemCount()
 	 * @see #getItemCountOfTypes(Integer...))
 	 * @since 5.0.0-rc1
 	 */
-	//TODO: Rename to getMainItemCount?
-	public final int getItemCount(boolean withHeadersFooters) {
-		return withHeadersFooters ? getItemCount() :
-				getItemCount() - mScrollableHeaders.size() - mScrollableFooters.size();
+	public final int getMainItemCount() {
+		return getItemCount() - mScrollableHeaders.size() - mScrollableFooters.size();
 	}
 
 	/**
@@ -592,7 +595,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param viewTypes the viewTypes to count
 	 * @return number of the viewTypes counted
 	 * @see #getItemCount()
-	 * @see #getItemCount(boolean)
+	 * @see #getMainItemCount()
 	 * @see #isEmpty()
 	 * @since 5.0.0-b1
 	 */
@@ -613,7 +616,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position  the position limit where to stop counting (included)
 	 * @param viewTypes the viewTypes to count
 	 * @see #getItemCount()
-	 * @see #getItemCount(boolean)
+	 * @see #getMainItemCount()
 	 * @see #getItemCountOfTypes(Integer...)
 	 * @see #isEmpty()
 	 * @since 5.0.0-b5
@@ -1860,7 +1863,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-rc1
 	 */
 	public int getEndlessCurrentPage() {
-		return Math.max(1, mEndlessPageSize > 0 ? getItemCount(false) / mEndlessPageSize : 0);
+		return Math.max(1, mEndlessPageSize > 0 ? getMainItemCount() / mEndlessPageSize : 0);
 	}
 
 	/**
@@ -2026,7 +2029,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				// When the listener is not set, loading more is called upon a user request
 				if (mEndlessScrollListener != null) {
 					if (DEBUG) Log.d(TAG, "onLoadMore     invoked!");
-					mEndlessScrollListener.onLoadMore(getItemCount(false), getEndlessCurrentPage());
+					mEndlessScrollListener.onLoadMore(getMainItemCount(), getEndlessCurrentPage());
 				}
 			}
 		});
@@ -2065,7 +2068,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
 		// 1. Calculate new items count
 		int newItemsSize = newItems == null ? 0 : newItems.size();
-		int totalItemCount = newItemsSize + getItemCount(false);
+		int totalItemCount = newItemsSize + getMainItemCount();
 		// 2. Add any new items
 		if (newItemsSize > 0) {
 			if (DEBUG)
@@ -2721,7 +2724,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Simply append the provided item to the end of the list.
 	 * <p>Convenience method of {@link #addItem(int, IFlexible)} with
-	 * {@code position = getItemCount()}.</p>
+	 * {@code position = getMainItemCount()}.</p>
 	 *
 	 * @param item the item to add
 	 * @return true if the internal list was successfully modified, false otherwise
@@ -2773,7 +2776,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.e(TAG, "addItems No items to add!");
 			return false;
 		}
-		int initialCount = getItemCount(false);//Count only main items!
+		int initialCount = getMainItemCount();//Count only main items!
 		if (position < 0) {
 			Log.w(TAG, "addItems Position is negative! adding items to the end");
 			position = initialCount;
@@ -2790,7 +2793,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 		//Call listener to update EmptyView
 		if (!recursive && mUpdateListener != null && !multiRange && initialCount == 0 && getItemCount() > 0)
-			mUpdateListener.onUpdateEmptyView(getItemCount(false));
+			mUpdateListener.onUpdateEmptyView(getMainItemCount());
 		return true;
 	}
 
@@ -3415,7 +3418,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		//Update empty view
 		if (mUpdateListener != null && !multiRange && initialCount > 0 && getItemCount() == 0)
-			mUpdateListener.onUpdateEmptyView(getItemCount(false));
+			mUpdateListener.onUpdateEmptyView(getMainItemCount());
 	}
 
 	/**
@@ -3599,7 +3602,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		//Call listener to update EmptyView
 		multiRange = false;
 		if (mUpdateListener != null && initialCount == 0 && getItemCount() > 0)
-			mUpdateListener.onUpdateEmptyView(getItemCount(false));
+			mUpdateListener.onUpdateEmptyView(getMainItemCount());
 
 		emptyBin();
 	}
@@ -4916,7 +4919,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * will represents only the main items.</p>
 		 *
 		 * @param size the current number of main items in the adapter, result of
-		 *             {@link FlexibleAdapter#getItemCount(boolean)}
+		 *             {@link FlexibleAdapter#getMainItemCount()}
 		 * @since 5.0.0-b1
 		 */
 		void onUpdateEmptyView(int size);
@@ -5288,7 +5291,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		onPostUpdate();
 		//Update empty view
 		if (mUpdateListener != null) {
-			mUpdateListener.onUpdateEmptyView(getItemCount(false));
+			mUpdateListener.onUpdateEmptyView(getMainItemCount());
 		}
 	}
 
@@ -5311,7 +5314,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		onPostFilter();
 		//Call listener to update EmptyView, assuming the filter always made a change
 		if (mUpdateListener != null)
-			mUpdateListener.onUpdateEmptyView(getItemCount(hasSearchText()));
+			mUpdateListener.onUpdateEmptyView(getMainItemCount());
 	}
 
 	/**
