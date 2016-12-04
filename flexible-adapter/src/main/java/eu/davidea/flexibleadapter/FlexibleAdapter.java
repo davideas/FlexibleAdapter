@@ -557,7 +557,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the total number of items (headers and footers INCLUDED) held by the adapter
 	 * @see #getItemCount(boolean)
 	 * @see #getItemCountOfTypes(Integer...)
-	 * @see #getItemCountOfTypesUntil(int, Integer...)
 	 * @see #isEmpty()
 	 * @since 1.0.0
 	 */
@@ -578,8 +577,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the total number of items held by the adapter, with or without headers and footers,
 	 * depending by the provided parameter
 	 * @see #getItemCount()
-	 * @see #getItemCountOfTypes(Integer...)
-	 * @see #getItemCountOfTypesUntil(int, Integer...)
+	 * @see #getItemCountOfTypes(Integer...))
 	 * @since 5.0.0-rc1
 	 */
 	//TODO: Rename to getMainItemCount?
@@ -595,12 +593,17 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return number of the viewTypes counted
 	 * @see #getItemCount()
 	 * @see #getItemCount(boolean)
-	 * @see #getItemCountOfTypesUntil(int, Integer...)
 	 * @see #isEmpty()
 	 * @since 5.0.0-b1
 	 */
 	public final int getItemCountOfTypes(Integer... viewTypes) {
-		return getItemCountOfTypesUntil(getItemCount(), viewTypes);
+		List<Integer> viewTypeList = Arrays.asList(viewTypes);
+		int count = 0;
+		for (int i = 0; i < getItemCount(); i++) {
+			if (viewTypeList.contains(getItemViewType(i)))
+				count++;
+		}
+		return count;
 	}
 
 	/**
@@ -614,8 +617,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getItemCountOfTypes(Integer...)
 	 * @see #isEmpty()
 	 * @since 5.0.0-b5
+	 * @deprecated Not used anymore.
 	 */
-	//TODO: deprecation?
+	@Deprecated
 	public final int getItemCountOfTypesUntil(@IntRange(from = 0) int position, Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
 		int count = 0;
@@ -999,8 +1003,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return true if orphan headers will be removed when unlinked, false if are kept unlinked
 	 * @see #setRemoveOrphanHeaders(boolean)
 	 * @since 5.0.0-b6
+	 * @deprecated Orphan headers methods series: There's no advantage to keep in the adapter such
+	 * references, most of the time, user has the control on the items to remove, headers as well.
 	 */
-	//TODO: deprecation?
+	@Deprecated
 	public boolean isRemoveOrphanHeaders() {
 		return removeOrphanHeaders;
 	}
@@ -1013,8 +1019,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @see #getOrphanHeaders()
 	 * @since 5.0.0-b6
+	 * @deprecated Orphan headers methods series: There's no advantage to keep in the adapter such
+	 * references, most of the time, user has the control on the items to remove, headers as well.
 	 */
-	//TODO: deprecation?
+	@Deprecated
 	public FlexibleAdapter setRemoveOrphanHeaders(boolean removeOrphanHeaders) {
 		if (DEBUG) Log.i(TAG, "Set removeOrphanHeaders=" + removeOrphanHeaders);
 		this.removeOrphanHeaders = removeOrphanHeaders;
@@ -1043,8 +1051,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the list of the orphan headers collected until this moment
 	 * @see #setRemoveOrphanHeaders(boolean)
 	 * @since 5.0.0-b6
+	 * @deprecated Orphan headers methods series: There's no advantage to keep in the adapter such
+	 * references, most of the time, user has the control on the items to remove, headers as well.
 	 */
-	//TODO: deprecation?
+	@Deprecated
 	@NonNull
 	public List<IHeader> getOrphanHeaders() {
 		return mOrphanHeaders;
@@ -1059,8 +1069,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param header the header item
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
+	 * @deprecated We simply can use {@code item.setHeader(header)}. Also, it was not obvious
+	 * this method also show header, for that we should use add item or section.
 	 */
-	//TODO: deprecation?
+	@Deprecated
 	public FlexibleAdapter linkHeaderTo(@NonNull T item, @NonNull IHeader header) {
 		linkHeaderTo(item, header, Payload.LINK);
 		if (header.isHidden() && headersShown) {
@@ -1075,8 +1087,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param item the item that holds the header
 	 * @since 5.0.0-b6
+	 * @deprecated We simply can use {@code item.setHeader(null)}. Also, it was not obvious
+	 * this method also hide header, for that we should use remove item or section.
 	 */
-	//TODO: deprecation?
+	@Deprecated
 	public IHeader unlinkHeaderFrom(@NonNull T item) {
 		IHeader header = unlinkHeaderFrom(item, Payload.UNLINK);
 		if (header != null && !header.isHidden()) {
@@ -1173,8 +1187,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param header the header/section item
 	 * @return the index of the specified header/section
 	 * @since 5.0.0-b6
+	 * @deprecated The library doesn't use the concept of "Section index": we don't add sections
+	 * using "Section index".
 	 */
-	//TODO: deprecation?
+	@Deprecated
 	public int getSectionIndex(@NonNull IHeader header) {
 		int position = getGlobalPositionOf(header);
 		return getSectionIndex(position);
@@ -1187,8 +1203,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param position any item position
 	 * @return the index of the specified item position
 	 * @since 5.0.0-b6
+	 * @deprecated The library doesn't use the concept of "Section index": we don't add sections
+	 * using "Section index".
 	 */
-	//TODO: deprecation?
+	@Deprecated
 	public int getSectionIndex(@IntRange(from = 0) int position) {
 		int sectionIndex = 0;
 		for (int i = 0; i <= position; i++) {
@@ -1557,10 +1575,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			@Override
 			public void run() {
 				multiRange = true;
-				//Hide orphan headers first
-				for (IHeader header : getOrphanHeaders()) {
-					hideHeader(getGlobalPositionOf(header), header);
-				}
 				//Hide linked headers between Scrollable Headers and Footers
 				int position = getItemCount() - mScrollableFooters.size() - 1;
 				while (position >= Math.max(0, mScrollableHeaders.size() - 1)) {
@@ -1672,7 +1686,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		return null;
 	}
 
-	//TODO: deprecation?
+	@Deprecated
 	private void addToOrphanListIfNeeded(IHeader header, int positionStart, int itemCount) {
 		//Check if the header is not already added (happens after un-linkage with un-success linkage)
 		if (!mOrphanHeaders.contains(header) && !isHeaderShared(header, positionStart, itemCount)) {
@@ -1682,13 +1696,13 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
-	//TODO: deprecation?
+	@Deprecated
 	private void removeFromOrphanList(IHeader header) {
 		if (mOrphanHeaders.remove(header) && DEBUG)
 			Log.v(TAG, "Removed from orphan list [" + mOrphanHeaders.size() + "] Header " + header);
 	}
 
-	//TODO: deprecation?
+	@Deprecated
 	private boolean isHeaderShared(IHeader header, int positionStart, int itemCount) {
 		int firstElementWithHeader = getGlobalPositionOf(header) + 1;
 		for (int i = firstElementWithHeader; i < getItemCount() - mScrollableFooters.size(); i++) {
@@ -2855,8 +2869,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return true if the internal list was successfully modified, false otherwise
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
 	 * @since 5.0.0-b1
+	 * @deprecated This is like a command to expand an expandable. We should add items to
+	 * expandable ourselves, then call expand!
 	 */
-	//TODO: Deprecation, this is like a command to expand
+	@Deprecated
 	public int addAllSubItemsFrom(@IntRange(from = 0) int parentPosition,
 								  @NonNull IExpandable parent, boolean expandParent,
 								  @Nullable Object payload) {
@@ -3332,7 +3348,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			return;
 		}
 
-		//Handle header linkage
+		// Update content of the header linked to first item of the range
 		T item = getItem(positionStart);
 		IHeader header = getHeaderOf(item);
 		int headerPosition = getGlobalPositionOf(header);
@@ -3360,14 +3376,14 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (isHeader(item)) {
 				header = (IHeader) item;
 				header.setHidden(true);
-			}
-			//If item is a Header, remove linkage from ALL Sectionable items if exist
-			if (unlinkOnRemoveHeader && isHeader(item)) {
-				List<ISectionable> sectionableList = getSectionItems(header);
-				for (ISectionable sectionable : sectionableList) {
-					sectionable.setHeader(null);
-					if (payload != null)
-						notifyItemChanged(getGlobalPositionOf(sectionable), Payload.UNLINK);
+				//If item is a Header, remove linkage from ALL Sectionable items if exist
+				if (unlinkOnRemoveHeader) {
+					List<ISectionable> sectionableList = getSectionItems(header);
+					for (ISectionable sectionable : sectionableList) {
+						sectionable.setHeader(null);
+						if (payload != null)
+							notifyItemChanged(getGlobalPositionOf(sectionable), Payload.UNLINK);
+					}
 				}
 			}
 			//Remove item from internal list
