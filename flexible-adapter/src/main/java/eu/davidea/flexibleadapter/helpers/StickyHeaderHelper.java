@@ -54,7 +54,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 	private OnStickyHeaderChangeListener mStickyHeaderChangeListener;
 	private int mHeaderPosition = RecyclerView.NO_POSITION;
 	private boolean displayWithAnimation = false;
-
+	private float mElevation;
 
 	public StickyHeaderHelper(FlexibleAdapter adapter,
 							  OnStickyHeaderChangeListener stickyHeaderChangeListener,
@@ -169,11 +169,23 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		translateHeader();
 	}
 
+	private void configureLayoutElevation() {
+		// Needed to elevate the view
+		//TODO: set custom background for transparency (elevation will be lost!)
+		mStickyHolderLayout.setBackgroundColor(Color.WHITE);
+		// 1. Take elevation from header item layout (most important)
+		mElevation = ViewCompat.getElevation(mStickyHeaderViewHolder.getContentView());
+		if (mElevation == 0f) {
+			// 2. Default elevation
+			mElevation = 21f;
+		}
+	}
+
 	private void translateHeader() {
 		// Sticky at zero offset (no translation)
 		int headerOffsetX = 0, headerOffsetY = 0;
-		// Get user defined elevation
-		float elevation = ViewCompat.getElevation(mStickyHeaderViewHolder.getContentView());
+		// Get calculated elevation
+		float elevation = mElevation;
 
 		// Search for the position where the next header item is found and translate the new offset
 		for (int i = 0; i < mRecyclerView.getChildCount(); i++) {
@@ -238,8 +250,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		params.height = view.getLayoutParams().height;
 		removeViewFromParent(view);
 		mStickyHolderLayout.addView(view);
-		//TODO: set custom background for transparency (elevation will be lost!)
-		mStickyHolderLayout.setBackgroundColor(Color.WHITE);// Needed to elevate the view
+		configureLayoutElevation();
 	}
 
 	private void resetHeader(FlexibleViewHolder header) {

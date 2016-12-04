@@ -1310,10 +1310,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <li>You should consider to display headers with {@link #setDisplayHeadersAtStartUp(boolean)}:
 	 * Feature can enabled/disabled freely, but if headers are hidden nothing will happen.</li>
 	 * <li>Only in case of "Sticky Header" items you must <u>provide</u> {@code true} to the
-	 * constructor of the {@code FlexibleViewHolder}.</li>
-	 * <li>Optionally, you can set a custom sticky layout container that must be already
-	 * <u>inflated</u>.
+	 * constructor: {@link FlexibleViewHolder#FlexibleViewHolder(View, FlexibleAdapter, boolean)}.</li>
+	 * <li>Optionally, you can set a custom sticky layout container that must be <u>already
+	 * inflated</u>.
 	 * <br/>Check {@link #setStickyHeaders(boolean, ViewGroup)}.</li>
+	 * <li>Optionally, you can set a layout <u>elevation</u>: Header item elevation is used first,
+	 * if not set, default elevation of {@code 21f} pixel is used.
 	 * <li>Sticky headers are clickable as any views, but cannot be dragged nor swiped.</li>
 	 * <li>Content and linkage are automatically updated.</li>
 	 * <li>Sticky layout container is <i>fade-in</i> and <i>fade-out</i> animated when feature
@@ -1344,7 +1346,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setDisplayHeadersAtStartUp(boolean)
 	 * @since 5.0.0-rc1
 	 */
-	public FlexibleAdapter setStickyHeaders(final boolean sticky) {
+	public FlexibleAdapter setStickyHeaders(boolean sticky) {
 		return setStickyHeaders(sticky, mStickyContainer);
 	}
 
