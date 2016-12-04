@@ -74,7 +74,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	 * Same Header item is enqueued for removal with a delay.
 	 * The view is represented by a custom Item type to better represent any dynamic content.
 	 */
-	public void showLayoutInfo() {
+	public void showLayoutInfo(boolean scrollToPosition) {
 		if (!hasSearchText()) {
 			final ScrollableLayoutItem item = new ScrollableLayoutItem("LAY-L");
 			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
@@ -90,10 +90,10 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 					R.string.columns,
 					String.valueOf(Utils.getSpanCount(mRecyclerView.getLayoutManager())))
 			);
-			// NOTE: If you have to change at runtime the LayoutManager and add
+			// NOTE: If you have to change at runtime the LayoutManager AND add
 			// Scrollable Headers, consider to add them in post, using a delay >= 0
 			// otherwise scroll animations on all items will not start correctly.
-			addScrollableHeaderWithDelay(item, 0L, true);
+			addScrollableHeaderWithDelay(item, 0L, scrollToPosition);
 			removeScrollableHeaderWithDelay(item, 4000L);
 		}
 	}

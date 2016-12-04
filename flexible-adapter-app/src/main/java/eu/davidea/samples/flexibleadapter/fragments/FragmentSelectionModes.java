@@ -111,13 +111,13 @@ public class FragmentSelectionModes extends AbstractFragment {
 
 		// Add 2 Scrollable Headers
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(savedInstanceState == null);
 	}
 
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(false);
 	}
 
 	@Override

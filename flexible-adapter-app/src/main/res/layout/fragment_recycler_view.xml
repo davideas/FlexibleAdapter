@@ -13,7 +13,7 @@
 		android:enabled="false">
 
 		<!-- This FrameLayout is needed ONLY IF sticky headers are used, in order to
-			 display the refresh circle on the top of sticky_header_layout.
+			 display the Refresh circle AND the FastScroll on the top of sticky_header_layout.
 			 If you need to drag items, SwipeRefreshLayout must be disabled! -->
 		<FrameLayout
 			android:layout_width="match_parent"

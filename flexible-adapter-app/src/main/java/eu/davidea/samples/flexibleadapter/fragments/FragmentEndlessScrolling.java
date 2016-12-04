@@ -69,14 +69,14 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		if (savedInstanceState == null) {
 			DatabaseService.getInstance().createEndlessDatabase(0); //N. of items
 		}
-		initializeRecyclerView();
+		initializeRecyclerView(savedInstanceState);
 
 		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
-	private void initializeRecyclerView() {
+	private void initializeRecyclerView(Bundle savedInstanceState) {
 		// Initialize Adapter and RecyclerView
 		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
@@ -101,8 +101,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
 				.setHandleDragEnabled(true) //Enable drag using handle view
-				.setSwipeEnabled(true) //Enable swipe items
-				.setDisplayHeadersAtStartUp(true); //Show Headers at startUp!
+				.setSwipeEnabled(true); //Enable swipe items
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
@@ -110,19 +109,19 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 		// EndlessScrollListener - OnLoadMore (v5.0.0)
 		mAdapter.setEndlessScrollListener(this, new ProgressItem())
-//				.setEndlessPageSize(3)
-				.setEndlessTargetCount(15);
-//				.setEndlessScrollThreshold(1); //Default=1
+				//.setEndlessPageSize(3) //Endless is automatically disabled if newItems < 3
+				.setEndlessTargetCount(15); //Endless is automatically disabled if totalItems >= 15
+				//.setEndlessScrollThreshold(1); //Default=1
 
 		// Add 1 Scrollable Header and 1 Footer items
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(savedInstanceState == null);
 		mAdapter.addScrollableFooter();
 	}
 
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(false);
 	}
 
 	/**

@@ -83,7 +83,7 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UC
 
 	@Override
 	public String toString() {
-		return "FooterItem[" + super.toString() + "]";
+		return "ScrollableUseCaseItem[" + super.toString() + "]";
 	}
 
 }

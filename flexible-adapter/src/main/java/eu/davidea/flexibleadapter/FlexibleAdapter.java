@@ -102,7 +102,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private static final String EXTRA_PARENT = TAG + "_parentSelected";
 	private static final String EXTRA_CHILD = TAG + "_childSelected";
 	private static final String EXTRA_HEADERS = TAG + "_headersShown";
-	//private static final String EXTRA_STICKY = TAG + "_stickyHeaders";
+	private static final String EXTRA_STICKY = TAG + "_stickyHeaders";
 	private static final String EXTRA_LEVEL = TAG + "_selectedLevel";
 	private static final String EXTRA_SEARCH = TAG + "_searchText";
 
@@ -309,7 +309,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	@Override
 	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
-		//TODO is this necessary?
 		if (mStickyHeaderHelper != null && headersShown) {
 			mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
 		}
@@ -323,7 +322,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
-		//TODO is this necessary?
 		if (mStickyHeaderHelper != null) {
 			mStickyHeaderHelper.detachFromRecyclerView();
 			mStickyHeaderHelper = null;
@@ -952,7 +950,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public final void removeScrollableHeaderWithDelay(@NonNull final T headerItem, @IntRange(from = 0) long delay) {
 		if (DEBUG)
-			Log.d(TAG, "Enqueued removing scrollable header (" + delay + "ms) " + headerItem);
+			Log.d(TAG, "Enqueued removing scrollable header (" + delay + "ms) " + getClassName(headerItem));
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -1157,7 +1155,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the IHeader item linked to the specified item position
 	 * @since 5.0.0-b6
 	 */
-	//TODO: rename to getSectionHeaderByPosition?
 	public IHeader getSectionHeader(@IntRange(from = 0) int position) {
 		//Headers are not visible nor sticky
 		if (!headersShown) return null;
@@ -1267,9 +1264,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @see #getStickyHeaderContainer()
 	 * @since 5.0.0-b6
+	 * @deprecated Use {@link #setStickyHeaders(boolean)} with {@code true} as parameter.
 	 */
-	//TODO: deprecation use setStickyHeaders(true)?
-	public FlexibleAdapter enableStickyHeaders() {
+	@Deprecated
+	public FlexibleAdapter enableStickyHeader() {
 		return setStickyHeaders(true);
 	}
 
@@ -1277,21 +1275,87 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Disables the sticky header functionality.
 	 *
 	 * @since 5.0.0-b6
+	 * @deprecated Use {@link #setStickyHeaders(boolean)} with {@code false} as parameter.
 	 */
-	//TODO: deprecation use setStickyHeaders(false)?
+	@Deprecated
 	public void disableStickyHeaders() {
 		setStickyHeaders(false);
 	}
 
-	private FlexibleAdapter setStickyHeaders(final boolean sticky) {
-		if (DEBUG) Log.i(TAG, "Set stickyHeaders=" + sticky + " (in Post!)");
+	/**
+	 * Enables/Disables the sticky header feature with <u>default</u> sticky layout container.
+	 * <p><b>Note:</b>
+	 * <ul>
+	 * <li>You should consider to display headers with {@link #setDisplayHeadersAtStartUp(boolean)}:
+	 * Feature can enabled/disabled freely, but if headers are hidden nothing will happen.</li>
+	 * <li>Only in case of "Sticky Header" items you must <u>provide</u> {@code true} to the
+	 * constructor of the {@code FlexibleViewHolder}.</li>
+	 * <li>Optionally, you can set a custom sticky layout container that must be already
+	 * <u>inflated</u>.
+	 * <br/>Check {@link #setStickyHeaders(boolean, ViewGroup)}.</li>
+	 * <li>Sticky headers are clickable as any views, but cannot be dragged nor swiped.</li>
+	 * <li>Content and linkage are automatically updated.</li>
+	 * <li>Sticky layout container is <i>fade-in</i> and <i>fade-out</i> animated when feature
+	 * is respectively enabled and disabled.</li>
+	 * <li>Sticky container can be elevated only if the header item layout has elevation (Do not
+	 * exaggerate with elevation).</li>
+	 * </ul>
+	 * </p>
+	 * <b>Important!</b> In order to display the Refresh circle AND the FastScroller on the Top of
+	 * the sticky container, the RecyclerView must be wrapped with a {@code FrameLayout} as following:
+	 * <pre>
+	 * &lt;FrameLayout
+	 *     android:layout_width="match_parent"
+	 *     android:layout_height="match_parent"&gt;
+	 *
+	 *     &lt;android.support.v7.widget.RecyclerView
+	 *         android:id="@+id/recycler_view"
+	 *         android:layout_width="match_parent"
+	 *         android:layout_height="match_parent"/&gt;
+	 *
+	 * &lt;/FrameLayout&gt;
+	 * </pre>
+	 *
+	 * @param sticky true to initialize sticky headers with default container, false to disable them
+	 * @return this Adapter, so the call can be chained
+	 * @throws IllegalStateException if this Adapter was not attached to the RecyclerView
+	 * @see #setStickyHeaders(boolean, ViewGroup)
+	 * @see #setDisplayHeadersAtStartUp(boolean)
+	 * @since 5.0.0-rc1
+	 */
+	public FlexibleAdapter setStickyHeaders(final boolean sticky) {
+		return setStickyHeaders(sticky, mStickyContainer);
+	}
+
+	/**
+	 * Enables/Disables the sticky header feature with a <u>custom</u> sticky layout container.
+	 * <p><b>Important:</b> Read the javaDoc of the overloaded method {@link #setStickyHeaders(boolean)}.</p>
+	 *
+	 * @param sticky          true to initialize sticky headers, false to disable them
+	 * @param stickyContainer user defined and already <u>inflated</u> sticky layout that will
+	 *                        hold the sticky header itemViews
+	 * @return this Adapter, so the call can be chained
+	 * @throws IllegalStateException if this Adapter was not attached to the RecyclerView
+	 * @see #setStickyHeaders(boolean)
+	 * @see #setDisplayHeadersAtStartUp(boolean)
+	 * @since 5.0.0-rc1
+	 */
+	public FlexibleAdapter setStickyHeaders(final boolean sticky, @NonNull ViewGroup stickyContainer) {
+		if (DEBUG) Log.i(TAG, "Set stickyHeaders=" + sticky + " (in Post!)" +
+				(stickyContainer != null ? " with user defined Sticky Container" : ""));
+
+		// With user defined container
+		mStickyContainer = stickyContainer;
+
+		// Run in post to be sure about the RecyclerView initialization
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
 				// Enable or Disable the sticky headers layout
 				if (sticky) {
 					if (mStickyHeaderHelper == null) {
-						mStickyHeaderHelper = new StickyHeaderHelper(FlexibleAdapter.this, mStickyHeaderChangeListener);
+						mStickyHeaderHelper = new StickyHeaderHelper(FlexibleAdapter.this,
+								mStickyHeaderChangeListener, mStickyContainer);
 						mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
 						if (DEBUG) Log.i(TAG, "Sticky headers enabled");
 					}
@@ -1319,7 +1383,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return ViewGroup layout that will hold the sticky header ItemViews
 	 * @since 5.0.0-b6
-	 * @deprecated Use {@link #getStickyHeaderContainer()}
+	 * @deprecated Unused. Use {@link #setStickyHeaders(boolean, ViewGroup)}.
 	 */
 	@Deprecated
 	public ViewGroup getStickySectionHeadersHolder() {
@@ -1338,10 +1402,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @return ViewGroup layout that will hold the sticky header itemViews
 	 * @since 5.0.0-rc1
+	 * @deprecated Unused, not needed anymore.
 	 */
-	//TODO: Integrate the usage of the custom container in the new StickyHeaderHelper
-	//TODO: Review the comment for the new StickyHeaderHelper: layout is not needed anymore
-	public final ViewGroup getStickyHeaderContainer() {
+	@Deprecated
+	public ViewGroup getStickyHeaderContainer() {
 		return mStickyContainer;
 	}
 
@@ -1350,10 +1414,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param stickyContainer custom container for Sticky Headers
 	 * @since 5.0.0-rc1
+	 * @deprecated Use {@link #setStickyHeaders(boolean, ViewGroup)}.
 	 */
+	@Deprecated
 	public FlexibleAdapter setStickyHeaderContainer(@NonNull ViewGroup stickyContainer) {
 		if (mStickyHeaderHelper != null) {
-			Log.w(TAG, "StickyHeaderHelper has been already initialized! Call this method before enabling StickyHeaders");
+			Log.w(TAG, "StickyHeader has been already initialized! Call this method before enabling StickyHeaders");
 		}
 		if (DEBUG && stickyContainer != null)
 			Log.i(TAG, "Set stickyHeaderContainer=" + getClassName(stickyContainer));
@@ -1362,14 +1428,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Sets if all headers should be shown at startup. 2 effects are possible depending by
-	 * the current flag of scrolling animation:
-	 * <p>- if <b>enabled</b>, scrolling animations are performed as configured for the header item;
-	 * <br/>- if <b>disabled</b>, {@code notifyItemInserted()} is instead performed for each header
-	 * item.</p>
-	 * <b>Note:</b>
-	 * <br/>- {@code showAllHeaders()} is already called by this method.
-	 * <br/>- You should call this method before enabling sticky headers!
+	 * Sets if all headers should be shown at startup.
+	 * <p>If called, this method won't trigger {@code notifyItemInserted()} and scrolling
+	 * animations are instead performed if the header item was configured with animation:
+	 * <u>Headers will be loaded/bound along with others items.</u></p>
+	 * <b>Note:</b> Headers can only be shown or hidden all together.
 	 * <p>Default value is {@code false} (headers are <u>not</u> shown at startup).</p>
 	 *
 	 * @param displayHeaders true to display headers, false to keep them hidden
@@ -1378,53 +1441,54 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setAnimationOnScrolling(boolean)
 	 * @since 5.0.0-b6
 	 */
-	//TODO: deprecation, rename to displayHeadersAtStartUp() with animate on loading parameter?
 	public FlexibleAdapter setDisplayHeadersAtStartUp(boolean displayHeaders) {
 		if (!headersShown && displayHeaders) {
-			showAllHeaders(isAnimationOnScrollingEnabled());
+			showAllHeaders(true);
 		}
 		return this;
 	}
 
 	/**
-	 * Shows all headers in the RecyclerView at their linked position. Not intended to be called at
-	 * startup.
-	 * <br/>To display headers at startup please use {@code setDisplayHeadersAtStartUp()} instead.
-	 * <p><b>Note:</b> Headers can only be shown or hidden all together.</p>
+	 * Shows all headers in the RecyclerView at their linked position.
+	 * <p>If called at startup, this method will trigger {@code notifyItemInserted} for a
+	 * different loading effect: <u>Headers will be inserted after the items!</u></p>
+	 * <b>Note:</b> Headers can only be shown or hidden all together.
 	 *
+	 * @return this Adapter, so the call can be chained
 	 * @see #hideAllHeaders()
 	 * @see #setDisplayHeadersAtStartUp(boolean)
 	 * @since 5.0.0-b1
 	 */
-	public void showAllHeaders() {
+	public FlexibleAdapter showAllHeaders() {
 		showAllHeaders(false);
+		return this;
 	}
 
 	/**
-	 * @param init true to skip {@code notifyItemInserted}, false to make the call in Post and
-	 *             notify single insertion
+	 * @param init true to skip {@code notifyItemInserted}, false to make the call in Post
+	 *             and notify single insertion
 	 */
 	private void showAllHeaders(boolean init) {
 		if (init) {
 			if (DEBUG) Log.i(TAG, "showAllHeaders at startup");
-			//No notifyItemInserted!
+			// No notifyItemInserted!
 			showAllHeadersWithReset(true);
 		} else {
 			if (DEBUG) Log.i(TAG, "showAllHeaders with insert notification (in Post!)");
-			//In post, let's notifyItemInserted!
+			// In post, let's notifyItemInserted!
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					//#144 - Check if headers are already shown, discard the call to not duplicate headers
+					// #144 - Check if headers are already shown, discard the call to not duplicate headers
 					if (headersShown) {
-						Log.w(TAG, "Double call detected! Headers already shown OR the method setDisplayHeadersAtStartUp() was already called!");
+						Log.w(TAG, "Double call detected! Headers already shown OR the method showAllHeaders() was already called!");
 						return;
 					}
 					showAllHeadersWithReset(false);
-					//#142 - At startup, when scrolling animation is disabled, insert notifications
-					// are performed to show headers for the first time. Header item is not visible
-					// at position 0: it has to be displayed by scrolling to it. This resolves the
-					// first item below sticky header when enabled as well.
+					// #142 - At startup, when insert notifications are performed to show headers
+					// for the first time. Header item is not visible at position 0: it has to be
+					// displayed by scrolling to it. This resolves the first item below sticky
+					// header when enabled as well.
 					if (mRecyclerView != null) {
 						int firstVisibleItem = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
 						if (firstVisibleItem == 0 && isHeader(getItem(0)) && !isHeader(getItem(1))) {
@@ -1440,23 +1504,21 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param init true to skip the call to notifyItemInserted, false otherwise
 	 */
 	private void showAllHeadersWithReset(boolean init) {
-		multiRange = true;
 		int position = 0;
 		IHeader sameHeader = null;
-		//resetHiddenStatus();//Necessary after the filter and the update
 		while (position < getItemCount() - mScrollableFooters.size()) {
 			T item = mItems.get(position);
+			// Reset hidden status! Necessary after the filter and the update
 			IHeader header = getHeaderOf(item);
 			if (header != sameHeader && header != null && !isExpandable((T) header)) {
 				sameHeader = header;
 				header.setHidden(true);
 			}
 			if (showHeaderOf(position, item, init))
-				position++;//It's the same element, skip it
+				position++; //It's the same element, skip it
 			position++;
 		}
 		headersShown = true;
-		multiRange = false;
 	}
 
 	/**
@@ -1475,9 +1537,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (header.isHidden()) {
 			if (DEBUG) Log.v(TAG, "Showing header at position " + position + " header=" + header);
 			header.setHidden(false);
-			//Skip notifyItemInserted when init=true and insert the header properly!
-			if (init) performInsert(position, Collections.singletonList((T) header), false);
-			else addItem(position, (T) header);
+			//Insert header, but skip notifyItemInserted when init=true!
+			performInsert(position, Collections.singletonList((T) header), !init);
 			return true;
 		}
 		return false;
@@ -1488,6 +1549,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>Headers can be shown or hidden all together.</p>
 	 *
 	 * @see #showAllHeaders()
+	 * @see #setDisplayHeadersAtStartUp(boolean)
 	 * @since 5.0.0-b1
 	 */
 	public void hideAllHeaders() {
@@ -1541,25 +1603,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Helper method to ensure that all current headers are hidden before they are shown again.
-	 * <p>This method is already called inside {@link #showAllHeadersWithReset(boolean)}.</p>
-	 * This is necessary when {@link #setDisplayHeadersAtStartUp(boolean)} is set true and also
-	 * if an Activity/Fragment has been closed and then reopened. We need to reset hidden status,
-	 * the process is very fast.
-	 *
-	 * @since 5.0.0-b6
-	 * @deprecated Not used anymore.
-	 */
-	@Deprecated
-	private void resetHiddenStatus() {
-		for (T item : mItems) {
-			IHeader header = getHeaderOf(item);
-			if (header != null && !isExpandable((T) header))
-				header.setHidden(true);
-		}
 	}
 
 	/**
@@ -4805,8 +4848,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			outState.putString(EXTRA_SEARCH, this.mSearchText);
 			//Save headers shown status
 			outState.putBoolean(EXTRA_HEADERS, this.headersShown);
-			//TODO: enableStickyHeaders
-			//outState.putBoolean(EXTRA_STICKY, areHeadersSticky());
+			outState.putBoolean(EXTRA_STICKY, areHeadersSticky());
 		}
 	}
 
@@ -4826,10 +4868,9 @@ public class FlexibleAdapter<T extends IFlexible>
 				showAllHeadersWithReset(true);
 			}
 			this.headersShown = headersShown;
-			//TODO: enableStickyHeaders
-//			if (savedInstanceState.getBoolean(EXTRA_STICKY) && !areHeadersSticky()) {
-//				setStickyHeaders(true);
-//			}
+			if (savedInstanceState.getBoolean(EXTRA_STICKY) && !areHeadersSticky()) {
+				setStickyHeaders(true);
+			}
 			//Restore selection state
 			super.onRestoreInstanceState(savedInstanceState);
 			if (mScrollableHeaders.size() > 0) {

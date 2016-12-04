@@ -85,8 +85,8 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
 				.setHandleDragEnabled(true) //Enable handle drag
-				.setSwipeEnabled(true) //Enable swipe items
-				.setDisplayHeadersAtStartUp(true); //Show Headers at startUp!
+				.setSwipeEnabled(true); //Enable swipe items
+				//.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable)
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
@@ -94,13 +94,13 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 
 		// Add 2 Scrollable Headers
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(savedInstanceState == null);
 	}
 
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(false);
 	}
 
 	@Override

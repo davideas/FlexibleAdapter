@@ -111,7 +111,7 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 
 	@Override
 	public String toString() {
-		return "FooterItem[" + super.toString() + "]";
+		return "ScrollableFooterItem[" + super.toString() + "]";
 	}
 
 }

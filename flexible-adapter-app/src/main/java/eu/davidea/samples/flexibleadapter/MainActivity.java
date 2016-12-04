@@ -633,15 +633,10 @@ public class MainActivity extends AppCompatActivity implements
 				item.setTitle(R.string.hide_headers);
 			}
 		} else if (id == R.id.action_sticky_headers) {
-			if (mAdapter.areHeadersSticky()) {
-				mAdapter.disableStickyHeaders();
-				item.setChecked(false);
-				Snackbar.make(findViewById(R.id.main_view), "Sticky headers disabled", Snackbar.LENGTH_SHORT).show();
-			} else {
-				mAdapter.enableStickyHeaders();
-				item.setChecked(true);
-				Snackbar.make(findViewById(R.id.main_view), "Sticky headers enabled", Snackbar.LENGTH_SHORT).show();
-			}
+			mAdapter.setStickyHeaders(!mAdapter.areHeadersSticky());
+			item.setChecked(!mAdapter.areHeadersSticky());
+			Snackbar.make(findViewById(R.id.main_view), "Sticky headers " +
+					(mAdapter.areHeadersSticky() ? "disabled" : "enabled"), Snackbar.LENGTH_SHORT).show();
 		} else if (id == R.id.action_selection_mode) {
 			if (mAdapter.getMode() == SelectableAdapter.MODE_IDLE) {
 				mAdapter.setMode(SelectableAdapter.MODE_SINGLE);

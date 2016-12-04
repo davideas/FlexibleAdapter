@@ -107,6 +107,6 @@ public class ScrollableExpandableItem extends AbstractItem<ScrollableExpandableV
 
 	@Override
 	public String toString() {
-		return "LayoutItem[" + super.toString() + "]";
+		return "ScrollableExpandableItem[" + super.toString() + "]";
 	}
 }

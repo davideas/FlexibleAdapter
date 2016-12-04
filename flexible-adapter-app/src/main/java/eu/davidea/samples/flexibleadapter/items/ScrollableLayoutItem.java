@@ -68,6 +68,6 @@ public class ScrollableLayoutItem extends AbstractItem<ScrollableLayoutItem.Layo
 
 	@Override
 	public String toString() {
-		return "LayoutItem[" + super.toString() + "]";
+		return "ScrollableLayoutItem[" + super.toString() + "]";
 	}
 }

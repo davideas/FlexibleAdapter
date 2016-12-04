@@ -94,20 +94,20 @@ public class FragmentExpandableSections extends AbstractFragment {
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
 				.setHandleDragEnabled(true); //Enable handle drag
-				//.setDisplayHeadersAtStartUp(true); //Show Headers at startUp! (not necessary if Headers are also Expandable)
+				//.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable)
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		// Add 1 Scrollable Header
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(savedInstanceState == null);
 	}
 
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(false);
 	}
 
 	@Override

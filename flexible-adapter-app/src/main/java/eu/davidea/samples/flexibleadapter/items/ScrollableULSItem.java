@@ -89,7 +89,7 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 
 	@Override
 	public String toString() {
-		return "ULSItem[" + super.toString() + "]";
+		return "ScrollableULSItem[" + super.toString() + "]";
 	}
 
 }

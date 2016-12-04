@@ -102,7 +102,7 @@ public class FragmentHeadersSections extends AbstractFragment
 				.setUnlinkAllItemsOnRemoveHeaders(true)
 				// Show Headers at startUp, 1st call, correctly executed, no warning log message!
 				.setDisplayHeadersAtStartUp(true)
-				.enableStickyHeaders()
+				.setStickyHeaders(true)
 				// Simulate developer 2nd call mistake, now it's safe, not executed, no warning log message!
 				.setDisplayHeadersAtStartUp(true)
 				// Simulate developer 3rd call mistake, still safe, not executed, warning log message displayed!
@@ -114,17 +114,8 @@ public class FragmentHeadersSections extends AbstractFragment
 
 		// Add 2 Scrollable Headers and 1 Footer
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(savedInstanceState == null);
 		mAdapter.addScrollableFooter();
-
-//		mRecyclerView.postDelayed(new Runnable() {
-//			@Override
-//			public void run() {
-//				IHeader newHeader = DatabaseService.newHeader(555);
-//				SimpleItem iSectionable = DatabaseService.newSimpleItem(999, newHeader);
-//				mAdapter.addItem(0, iSectionable);
-//			}
-//		}, 5000L);
 	}
 
 	@Override
@@ -136,7 +127,7 @@ public class FragmentHeadersSections extends AbstractFragment
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(false);
 	}
 
 	@Override

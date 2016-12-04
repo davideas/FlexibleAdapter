@@ -129,7 +129,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Customize the initial delay for the first item animation.
+	 * Sets the initial delay for the first item animation.
 	 * <p>Default value is {@code 0ms}.</p>
 	 *
 	 * @param initialDelay any non negative delay
@@ -143,7 +143,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Customize the step delay between an animation and the next to be added to the initial delay.
+	 * Sets the step delay between an animation and the next to be added to the initial delay.
 	 * <p>The delay is added on top of the previous delay.</p>
 	 * Default value is {@code 100ms}.
 	 *
@@ -174,7 +174,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Customize the duration of the animation for ALL items.
+	 * Sets the duration of the animation for ALL items.
 	 * <p>Default value is {@code 300ms}.</p>
 	 *
 	 * @param duration any positive time
@@ -188,7 +188,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Define a custom interpolator for ALL items.
+	 * Sets a custom interpolator for ALL items.
 	 * <p>Default value is {@link LinearInterpolator}.</p>
 	 *
 	 * @param interpolator any valid non null interpolator
@@ -201,7 +201,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Define an initial start animation adapter position.
+	 * Sets an initial start animation adapter position.
 	 * <p>Default value is {@code 0} (1st position).</p>
 	 *
 	 * @param start non negative minimum position to start animation.
@@ -216,12 +216,12 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Enable/Disable item animation while scrolling and on loading.
+	 * Enables/Disables item animation while scrolling and on loading.
 	 * <p>Enabling scrolling will disable onlyEntryAnimation.<br/>
-	 * Disabling scrolling will disable also reverse scrolling!</p>
+	 * Disabling scrolling will disable also reverse scrolling.</p>
 	 * Default value is {@code false}.
-	 * <b>Note:</b> Loading animation can only be performed if the Adapter is initialized
-	 * with some items using the constructor.
+	 * <p><b>Note:</b> Loading animation can only be performed if the Adapter is initialized
+	 * with some items using the constructor.</p>
 	 *
 	 * @param enabled true to enable item animation, false to disable them all.
 	 * @return this AnimatorAdapter, so the call can be chained
@@ -241,7 +241,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Enable reverse scrolling animation if AnimationOnScrolling is also enabled!
+	 * Enables reverse scrolling animation if AnimationOnScrolling is also enabled!
 	 * <p>Value is ignored if basic animation on scrolling is disabled.</p>
 	 * Default value is {@code false} (only forward).
 	 *
@@ -359,7 +359,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param position the current item position
 	 */
 	@SuppressWarnings("ConstantConditions")
-	protected void animateView(final RecyclerView.ViewHolder holder, final int position) {
+	protected final void animateView(final RecyclerView.ViewHolder holder, final int position) {
 		if (mRecyclerView == null) return;
 
 		// Use always the max child count reached

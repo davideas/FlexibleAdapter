@@ -116,7 +116,7 @@ public class FragmentAnimators extends AbstractFragment {
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		// Add 1 Scrollable Header
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(savedInstanceState == null);
 	}
 
 	@Override
@@ -130,7 +130,7 @@ public class FragmentAnimators extends AbstractFragment {
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo();
+		mAdapter.showLayoutInfo(false);
 	}
 
 	@Override

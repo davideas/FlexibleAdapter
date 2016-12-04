@@ -66,11 +66,11 @@ public class FragmentInstagramHeaders extends AbstractFragment
 
 	@SuppressWarnings({"unchecked", "ConstantConditions"})
 	private void initializeRecyclerView() {
-		//Initialize Adapter and RecyclerView
-		//true = it makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+		// Initialize Adapter and RecyclerView
+		// true = it makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity(), true);
 		mAdapter.addListener(getActivity())
-				//Experimenting NEW features (v5.0.0)
+				// Experimenting NEW features (v5.0.0)
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
@@ -84,7 +84,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 0, 24));
 
 		mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
-				.enableStickyHeaders() //Make headers sticky
+				.setStickyHeaders(true) //Make headers sticky
 				// Endless scroll with 1 item threshold
 				.setEndlessScrollListener(this, new ProgressItem())
 				.setEndlessScrollThreshold(1); //Default=1
@@ -132,7 +132,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 			public void run() {
 				final List<AbstractFlexibleItem> newItems = new ArrayList<>(3);
 
-				//Simulating success/failure
+				// Simulating success/failure
 				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_instagram_item);
 				for (int i = 1; i <= 3; i++) {
 					newItems.add(DatabaseService.newInstagramItem(totalItemsOfType + i));
