@@ -2053,7 +2053,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Call this method to complete the action of the Loading more items.
 	 * <p>When noMoreLoad OR onError OR onCancel, pass empty list or null to hide the
-	 * progressItem.</p>
+	 * progressItem. When limits are set, endless feature will be <u>disabled</u>. To enable
+	 * again call {@link #setEndlessProgressItem(IFlexible)}.</p>
 	 * Optionally you can pass a delay time to still display the item with the latest information
 	 * inside. The message has to be handled inside the {@code bindViewHolder} of the item.
 	 * <p>A {@link #notifyItemChanged(int, Object)} with payload {@link Payload#NO_MORE_LOAD}

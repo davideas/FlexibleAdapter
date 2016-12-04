@@ -551,7 +551,7 @@ public class MainActivity extends AppCompatActivity implements
 		MenuItem reverseMenuItem = menu.findItem(R.id.action_reverse);
 		if (reverseMenuItem != null) {
 			reverseMenuItem.setEnabled(mAdapter.isAnimationOnScrollingEnabled());
-			reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrolling());
+			reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrollingEnabled());
 		}
 		//DiffUtil?
 		MenuItem diffUtilItem = menu.findItem(R.id.action_diff_util);
@@ -582,7 +582,7 @@ public class MainActivity extends AppCompatActivity implements
 				Snackbar.make(findViewById(R.id.main_view), "Enabled scrolling animation, now reopen the page\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_reverse) {
-			if (mAdapter.isAnimationOnReverseScrolling()) {
+			if (mAdapter.isAnimationOnReverseScrollingEnabled()) {
 				mAdapter.setAnimationOnReverseScrolling(false);
 				item.setChecked(false);
 				Snackbar.make(findViewById(R.id.main_view), "Disabled reverse scrolling animation", Snackbar.LENGTH_SHORT).show();

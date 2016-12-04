@@ -177,7 +177,8 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 				// 2. Callback the Adapter to notify the change:
 				// - New items will be added to the end of the main list
-				// - When list is null or empty and limits are reached, Endless scroll will be disabled
+				// - When list is null or empty and limits are reached, Endless scroll will be disabled.
+				//   To enable again, you must call setEndlessProgressItem(@Nullable T progressItem).
 				mAdapter.onLoadMoreComplete(newItems, 5000L);
 				DatabaseService.getInstance().addAll(newItems);
 				// - Retrieve the new page number after adding new items!
