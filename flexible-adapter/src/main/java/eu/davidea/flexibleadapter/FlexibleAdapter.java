@@ -3331,7 +3331,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #removeRange(int, int)
 	 * @see #removeAllSelectedItems(Object)
 	 * @see #setPermanentDelete(boolean)
-	 * @see #setRemoveOrphanHeaders(boolean)
 	 * @see #setRestoreSelectionOnUndo(boolean)
 	 * @see #getDeletedItems()
 	 * @see #getDeletedChildren(IExpandable)

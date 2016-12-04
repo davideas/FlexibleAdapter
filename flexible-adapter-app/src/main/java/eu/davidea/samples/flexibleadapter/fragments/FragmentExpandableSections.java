@@ -74,7 +74,6 @@ public class FragmentExpandableSections extends AbstractFragment {
 				.setAnimateToLimit(Integer.MAX_VALUE) //Size limit = MAX_VALUE will always animate the changes
 				.setNotifyMoveOfFilteredItems(false) //When true, filtering on big list is very slow!
 				.setNotifyChangeOfUnfilteredItems(true) //We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
-				.setRemoveOrphanHeaders(false)
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
 				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);

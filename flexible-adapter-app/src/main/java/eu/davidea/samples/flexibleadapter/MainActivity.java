@@ -51,7 +51,6 @@ import eu.davidea.flexibleadapter.helpers.UndoHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.dialogs.EditItemDialog;
 import eu.davidea.samples.flexibleadapter.dialogs.MessageDialog;
 import eu.davidea.samples.flexibleadapter.fragments.AbstractFragment;
@@ -811,7 +810,6 @@ public class MainActivity extends AppCompatActivity implements
 					.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.SimpleActionListener() {
 						@Override
 						public void onPostAction() {
-							logOrphanHeaders();
 							//Handle ActionMode title
 							if (mAdapter.getSelectedItemCount() == 0)
 								mActionModeHelper.destroyActionModeIfCan();
@@ -976,7 +974,6 @@ public class MainActivity extends AppCompatActivity implements
 								mRefreshHandler.sendEmptyMessageDelayed(0, 20000);
 								//Finish the action mode
 								mActionModeHelper.destroyActionModeIfCan();
-								logOrphanHeaders();
 							}
 						})
 						.remove(mAdapter.getSelectedPositions(),
@@ -1072,14 +1069,6 @@ public class MainActivity extends AppCompatActivity implements
 		//Close the App
 		DatabaseService.onDestroy();
 		super.onBackPressed();
-	}
-
-	private void logOrphanHeaders() {
-		//If removeOrphanHeader is set false, once hidden the Orphan Headers are not shown
-		// anymore, but you can recover them using getOrphanHeaders()
-		for (IHeader header : mAdapter.getOrphanHeaders()) {
-			Log.w(TAG, "Logging orphan header " + header);
-		}
 	}
 
 	private String extractTitleFrom(IFlexible flexibleItem) {
