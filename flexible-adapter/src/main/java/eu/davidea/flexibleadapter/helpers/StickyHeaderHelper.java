@@ -176,8 +176,8 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		// 1. Take elevation from header item layout (most important)
 		mElevation = ViewCompat.getElevation(mStickyHeaderViewHolder.getContentView());
 		if (mElevation == 0f) {
-			// 2. Default elevation
-			mElevation = 21f;
+			// 2. Take elevation settings
+			mElevation = mAdapter.getStickyHeaderElevation();
 		}
 	}
 
