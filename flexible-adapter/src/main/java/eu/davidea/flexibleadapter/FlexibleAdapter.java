@@ -93,6 +93,7 @@ import static eu.davidea.flexibleadapter.utils.Utils.getClassName;
  * <br/>20/02/2016 Sticky headers
  * <br/>22/04/2016 Endless Scrolling
  * <br/>13/07/2016 Update and Filter operations are executed asynchronously (high performance on big list)
+ * <br/>25/11/2016 Scrollable Headers and Footers; Reviewed EndlessScroll
  */
 @SuppressWarnings({"Range", "unused", "unchecked", "ConstantConditions", "SuspiciousMethodCalls", "WeakerAccess"})
 public class FlexibleAdapter<T extends IFlexible>
