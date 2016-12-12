@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="?android:attr/listPreferredItemHeightLarge"
+	android:layout_height="match_parent">
+
+	<RelativeLayout
+		android:id="@+id/front_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:paddingBottom="@dimen/margin_bottom"
+		android:paddingTop="@dimen/margin_top">
+
+		<eu.davidea.flipview.FlipView
+			android:id="@+id/image"
+			xmlns:app="http://schemas.android.com/apk/res-auto"
+			android:layout_width="@dimen/icon_width"
+			android:layout_height="@dimen/icon_height"
+			android:layout_alignParentTop="true"
+			android:layout_centerInParent="true"
+			android:clickable="true"
+			app:animationDuration="170"
+			app:checked="false"
+			app:enableInitialAnimation="true"
+			app:frontBackgroundColor="@color/colorPrimary_light"
+			app:frontImage="@drawable/ic_touch_app_white_24dp"
+			app:rearBackgroundColor="@color/colorAccent_light"/>
+
+		<ImageView
+			android:id="@+id/row_handle"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_centerInParent="true"
+			android:src="@drawable/ic_drag_vertical_grey600_24dp"/>
+
+		<LinearLayout
+			android:id="@+id/title_container"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_marginTop="16dp"
+			android:layout_marginBottom="16dp"
+			android:layout_centerInParent="true"
+			android:orientation="horizontal">
+
+			<TextView
+				android:id="@+id/title"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="bottom"
+				android:rotation="270"
+				android:ellipsize="end"
+				android:maxLines="1"
+				android:textAppearance="@style/TextAppearance.AppCompat.Title"
+				android:textColor="?primaryTextSelector"
+				tools:text="Title"/>
+
+			<TextView
+				android:id="@+id/subtitle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:rotation="-90"
+				android:ellipsize="end"
+				android:maxLines="1"
+				android:textAppearance="@style/TextAppearance.AppCompat.Small"
+				android:textColor="?primaryTextSelector"
+				tools:text="Subtitle"/>
+
+		</LinearLayout>
+
+	</RelativeLayout>
+
+</FrameLayout>
