@@ -69,7 +69,7 @@ public final class Utils {
 	}
 
 	/**
-	 * @return the string representation of the provided {@link SelectableAdapter.Mode}
+	 * @return the string representation of the provided {@link eu.davidea.flexibleadapter.SelectableAdapter.Mode}
 	 * @since 5.0.0-rc1
 	 */
 	@SuppressLint("SwitchIntDef")

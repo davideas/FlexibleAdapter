@@ -585,7 +585,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the total number of items held by the adapter, with or without headers and footers,
 	 * depending by the provided parameter
 	 * @see #getItemCount()
-	 * @see #getItemCountOfTypes(Integer...))
+	 * @see #getItemCountOfTypes(Integer...)
 	 * @since 5.0.0-rc1
 	 */
 	public final int getMainItemCount() {
