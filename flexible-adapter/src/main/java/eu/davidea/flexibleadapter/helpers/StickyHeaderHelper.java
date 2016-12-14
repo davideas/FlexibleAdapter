@@ -96,7 +96,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 //	}
 
 	private static ViewGroup getParent(View view) {
-		return (ViewGroup)view.getParent();
+		return (ViewGroup) view.getParent();
 	}
 
 	private void initStickyHeadersHolder() {
@@ -203,7 +203,6 @@ public final class StickyHeaderHelper extends OnScrollListener {
 							int headerWidth = mStickyHolderLayout.getMeasuredWidth();
 							int nextHeaderOffsetX = nextChild.getLeft() - headerWidth;
 							headerOffsetX = Math.min(nextHeaderOffsetX, 0);
-							// TODO: AlphaListener = Math.abs((float)nextChild.getLeft()) / headerWidth);
 							// Early remove the elevation/shadow to match with the next view
 							if (nextHeaderOffsetX < 5) elevation = 0f;
 							if (headerOffsetX < 0) break;
@@ -213,7 +212,6 @@ public final class StickyHeaderHelper extends OnScrollListener {
 							int headerHeight = mStickyHolderLayout.getMeasuredHeight();
 							int nextHeaderOffsetY = nextChild.getTop() - headerHeight;
 							headerOffsetY = Math.min(nextHeaderOffsetY, 0);
-							// TODO: AlphaListener = Math.abs((float)nextChild.getTop()) / headerHeight);
 							// Early remove the elevation/shadow to match with the next view
 							if (nextHeaderOffsetY < 5) elevation = 0f;
 							if (headerOffsetY < 0) break;
@@ -259,15 +257,25 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		configureLayoutElevation();
 	}
 
-	private void restoreHeaderItemVisibility(int child) {
-		// Restore the visibility to first header
-		if (mRecyclerView != null) {
-			View oldHeader = mRecyclerView.getChildAt(child);
-			if (oldHeader != null) oldHeader.setVisibility(View.VISIBLE);
+	/**
+	 * On swing and on fast scroll some header items might still be invisible. We need
+	 * to identify them and restore visibility.
+	 */
+	@SuppressWarnings("unchecked")
+	private void restoreHeaderItemVisibility() {
+		if (mRecyclerView == null) return;
+		// Restore every header item visibility
+		for (int i = 0; i < mRecyclerView.getChildCount(); i++) {
+			View oldHeader = mRecyclerView.getChildAt(i);
+			int headerPos = mRecyclerView.getChildAdapterPosition(oldHeader);
+			if (mAdapter.isHeader(mAdapter.getItem(headerPos))) {
+				oldHeader.setVisibility(View.VISIBLE);
+			}
 		}
 	}
+
 	private void resetHeader(FlexibleViewHolder header) {
-		restoreHeaderItemVisibility(1);
+		restoreHeaderItemVisibility();
 		// Clean the header container
 		final View view = header.getContentView();
 		removeViewFromParent(view);
@@ -284,9 +292,10 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			if (FlexibleAdapter.DEBUG) Log.d(TAG, "clearHeader");
 			resetHeader(mStickyHeaderViewHolder);
 			mStickyHolderLayout.setAlpha(0);
+			mStickyHolderLayout.animate().cancel();
 			mStickyHolderLayout.animate().setListener(null);
 			mStickyHeaderViewHolder = null;
-			restoreHeaderItemVisibility(0);
+			restoreHeaderItemVisibility();
 			mHeaderPosition = RecyclerView.NO_POSITION;
 			onStickyHeaderChange(mHeaderPosition);
 		}
