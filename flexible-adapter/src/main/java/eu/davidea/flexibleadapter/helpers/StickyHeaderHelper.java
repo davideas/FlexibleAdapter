@@ -118,6 +118,10 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		updateOrClearHeader(false);
 	}
 
+	public int getStickyPosition() {
+		return mHeaderPosition;
+	}
+
 	private boolean hasStickyHeaderTranslated(int position) {
 		RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(position);
 		return vh != null && (vh.itemView.getX() < 0 || vh.itemView.getY() < 0);
@@ -134,7 +138,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			clearHeaderWithAnimation();
 			return;
 		}
-		int firstHeaderPosition = getHeaderPosition(RecyclerView.NO_POSITION);
+		int firstHeaderPosition = getStickyPosition(RecyclerView.NO_POSITION);
 		if (firstHeaderPosition >= 0) {
 			updateHeader(firstHeaderPosition, updateHeaderContent);
 		} else {
@@ -192,7 +196,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			final View nextChild = mRecyclerView.getChildAt(i);
 			if (nextChild != null) {
 				int adapterPos = mRecyclerView.getChildAdapterPosition(nextChild);
-				int nextHeaderPosition = getHeaderPosition(adapterPos);
+				int nextHeaderPosition = getStickyPosition(adapterPos);
 				if (mHeaderPosition != nextHeaderPosition) {
 					if (Utils.getOrientation(mRecyclerView.getLayoutManager()) == OrientationHelper.HORIZONTAL) {
 						if (nextChild.getLeft() > 0) {
@@ -223,7 +227,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		// Apply translation (pushed up by another header)
 		mStickyHolderLayout.setTranslationX(headerOffsetX);
 		mStickyHolderLayout.setTranslationY(headerOffsetY);
-//		Log.v(TAG, "TranslationX=" + headerOffsetX + " TranslationY=" + headerOffsetY);
+		//Log.v(TAG, "TranslationX=" + headerOffsetX + " TranslationY=" + headerOffsetY);
 	}
 
 	private void swapHeader(FlexibleViewHolder newHeader) {
@@ -244,6 +248,8 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		// WRAP_CONTENT has been set for the Header View
 		mStickyHeaderViewHolder.itemView.getLayoutParams().width = view.getMeasuredWidth();
 		mStickyHeaderViewHolder.itemView.getLayoutParams().height = view.getMeasuredHeight();
+		// Ensure the itemView is hidden to avoid double background
+		mStickyHeaderViewHolder.itemView.setVisibility(View.INVISIBLE);
 		// #139 - Copy xml params instead of Measured params
 		ViewGroup.LayoutParams params = mStickyHolderLayout.getLayoutParams();
 		params.width = view.getLayoutParams().width;
@@ -253,7 +259,16 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		configureLayoutElevation();
 	}
 
+	private void restoreHeaderItemVisibility(int child) {
+		// Restore the visibility to first header
+		if (mRecyclerView != null) {
+			View oldHeader = mRecyclerView.getChildAt(child);
+			if (oldHeader != null) oldHeader.setVisibility(View.VISIBLE);
+		}
+	}
 	private void resetHeader(FlexibleViewHolder header) {
+		restoreHeaderItemVisibility(1);
+		// Clean the header container
 		final View view = header.getContentView();
 		removeViewFromParent(view);
 		// Reset translation on removed header
@@ -271,6 +286,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			mStickyHolderLayout.setAlpha(0);
 			mStickyHolderLayout.animate().setListener(null);
 			mStickyHeaderViewHolder = null;
+			restoreHeaderItemVisibility(0);
 			mHeaderPosition = RecyclerView.NO_POSITION;
 			onStickyHeaderChange(mHeaderPosition);
 		}
@@ -311,7 +327,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	@SuppressWarnings("unchecked")
-	private int getHeaderPosition(int adapterPosHere) {
+	private int getStickyPosition(int adapterPosHere) {
 		if (adapterPosHere == RecyclerView.NO_POSITION) {
 			// Fix to display correct sticky header (especially after the searchText is cleared out)
 			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {

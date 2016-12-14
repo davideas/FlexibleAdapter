@@ -1866,6 +1866,13 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (item != null) {
 			holder.itemView.setEnabled(item.isEnabled());
 			item.bindViewHolder(this, holder, position, payloads);
+			// Avoid to show the double background in case header has transparency
+			// The visibility will be restored when header is reset
+			if (areHeadersSticky() && !isFastScroll && mStickyHeaderHelper.getStickyPosition() >= 0 && payloads.isEmpty()) {
+				int headerPos = Utils.findFirstVisibleItemPosition(mRecyclerView.getLayoutManager()) - 1;
+				if (headerPos == position && isHeader(item))
+					holder.itemView.setVisibility(View.INVISIBLE);
+			}
 		}
 		//Endless Scroll
 		onLoadMore(position);

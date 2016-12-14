@@ -90,7 +90,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	private EnumSet<AnimatorEnum> animatorsUsed = EnumSet.noneOf(AnimatorEnum.class);
 
 	private boolean isReverseEnabled = false, shouldAnimate = false,
-			onlyEntryAnimation = false, isFastScroll = false, animateFromObserver = false;
+			onlyEntryAnimation = false, animateFromObserver = false;
 
 	private long mInitialDelay = 0L,
 			mStepDelay = 100L,
@@ -300,18 +300,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 */
 	public boolean isOnlyEntryAnimation() {
 		return onlyEntryAnimation;
-	}
-
-	/**
-	 * Triggered by the FastScroller when handle is touched
-	 *
-	 * @param scrolling boolean to indicate that the handle is being fast scrolled
-	 * @since 5.0.0-b1
-	 */
-	@Override
-	public void onFastScrollerStateChange(boolean scrolling) {
-		super.onFastScrollerStateChange(scrolling);
-		isFastScroll = scrolling;
 	}
 
 	/*--------------*/

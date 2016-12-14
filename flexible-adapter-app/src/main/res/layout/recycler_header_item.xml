@@ -3,7 +3,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="?android:attr/listPreferredItemHeightSmall"
-	android:background="#dd7e57c2"
+	android:background="#aa7e57c2"
 	android:elevation="5dp">
 
 	<LinearLayout

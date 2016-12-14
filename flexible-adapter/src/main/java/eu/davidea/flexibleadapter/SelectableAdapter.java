@@ -76,6 +76,12 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	protected FastScroller mFastScroller;
 
 	/**
+	 * Flag when fast scrolling is active.
+	 * <p>Used to know if user is fast scrolling.</p>
+	 */
+	protected boolean isFastScroll = false;
+
+	/**
 	 * ActionMode selection flag SelectAll.
 	 * <p>Used when user click on selectAll action button in ActionMode.</p>
 	 */
@@ -544,7 +550,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	@Override
 	public void onFastScrollerStateChange(boolean scrolling) {
-		//nothing
+		isFastScroll = scrolling;
 	}
 
 }
