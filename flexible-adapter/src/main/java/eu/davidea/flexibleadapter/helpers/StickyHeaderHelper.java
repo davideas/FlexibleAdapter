@@ -16,7 +16,6 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.animation.Animator;
-import android.graphics.Color;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -170,14 +169,15 @@ public final class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	private void configureLayoutElevation() {
-		// Needed to elevate the view
-		//TODO: set custom background for transparency (elevation will be lost!)
-		mStickyHolderLayout.setBackgroundColor(Color.WHITE);
 		// 1. Take elevation from header item layout (most important)
 		mElevation = ViewCompat.getElevation(mStickyHeaderViewHolder.getContentView());
 		if (mElevation == 0f) {
 			// 2. Take elevation settings
 			mElevation = mAdapter.getStickyHeaderElevation();
+		}
+		if (mElevation > 0) {
+			// Needed to elevate the view
+			ViewCompat.setBackground(mStickyHolderLayout, mStickyHeaderViewHolder.getContentView().getBackground());
 		}
 	}
 
@@ -268,7 +268,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		if (mStickyHeaderViewHolder != null) {
 			if (FlexibleAdapter.DEBUG) Log.d(TAG, "clearHeader");
 			resetHeader(mStickyHeaderViewHolder);
-			mStickyHolderLayout.setBackgroundColor(Color.TRANSPARENT);
+			mStickyHolderLayout.setAlpha(0);
 			mStickyHolderLayout.animate().setListener(null);
 			mStickyHeaderViewHolder = null;
 			mHeaderPosition = RecyclerView.NO_POSITION;

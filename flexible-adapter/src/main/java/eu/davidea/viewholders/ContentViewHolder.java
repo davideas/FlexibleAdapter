@@ -15,7 +15,6 @@
  */
 package eu.davidea.viewholders;
 
-import android.graphics.Color;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -51,8 +50,11 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
 			itemView.setLayoutParams(adapter.getRecyclerView().getLayoutManager()
 					.generateLayoutParams(view.getLayoutParams()));
 			((FrameLayout) itemView).addView(view); //Add View after setLayoutParams
-			itemView.setBackgroundColor(Color.WHITE);
-			ViewCompat.setElevation(itemView, ViewCompat.getElevation(view));
+			float elevation = ViewCompat.getElevation(view);
+			if (elevation > 0) {
+				ViewCompat.setBackground(itemView, view.getBackground());
+				ViewCompat.setElevation(itemView, elevation);
+			}
 			contentView = view;
 		}
 	}
