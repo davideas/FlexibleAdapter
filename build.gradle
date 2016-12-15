@@ -24,8 +24,8 @@ ext {
 	//Support and Build tools version
 	minSdk = 14
 	targetSdk = 25
-	buildTools = "25.0.1"
-	supportLib = "25.0.1"
+	buildTools = "25.0.2"
+	supportLib = "25.1.0"
 
 	//Support Libraries dependencies
 	supportDependencies = [
