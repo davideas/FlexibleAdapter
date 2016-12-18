@@ -51,6 +51,22 @@ public final class Utils {
 	public static int colorAccent = INVALID_COLOR;
 
 	/**
+	 * API 24
+	 * @see VERSION_CODES#N
+	 */
+	public static boolean hasNougat() {
+		return Build.VERSION.SDK_INT >= VERSION_CODES.N;
+	}
+
+	/**
+	 * API 23
+	 * @see VERSION_CODES#M
+	 */
+	public static boolean hasMarshmallow() {
+		return Build.VERSION.SDK_INT >= VERSION_CODES.M;
+	}
+
+	/**
 	 * API 21
 	 *
 	 * @see VERSION_CODES#LOLLIPOP

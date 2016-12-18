@@ -3,9 +3,11 @@ package eu.davidea.samples.flexibleadapter.items;
 import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,6 +84,8 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 	@Override
 	@SuppressWarnings({"unchecked"})
 	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
+		Context context = holder.itemView.getContext();
+
 		// Subtitle
 		if (adapter.isExpandable(this)) {
 			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems"
@@ -89,8 +93,12 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 					+ (getUpdates() > 0 ? " - u" + getUpdates() : ""));
 		}
 
-		DrawableUtils.setBackground(holder.itemView, DrawableUtils.getSelectableBackgroundCompat(
-				Color.LTGRAY, Color.WHITE, Color.LTGRAY));
+		if (payloads.size() == 0) {
+			Drawable drawable = DrawableUtils.getSelectableBackgroundCompat(
+					Color.WHITE, Color.parseColor("#dddddd"), DrawableUtils.getColorControlHighlight(context));
+			DrawableUtils.setBackgroundCompat(holder.itemView, drawable);
+			DrawableUtils.setBackgroundCompat(holder.frontView, drawable);
+		}
 
 		if (adapter.isExpandable(this) && payloads.size() > 0) {
 			Log.d(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
@@ -141,8 +149,10 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 		ImageView mHandleView;
 		Context mContext;
 		View frontView;
-		private View rearLeftView;
-		private View rearRightView;
+		View rearLeftView;
+		View rearRightView;
+
+		public boolean swiped = false;
 
 		ParentViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
@@ -191,7 +201,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 		}
 
 		@Override
-		protected void toggleActivation() {
+		public void toggleActivation() {
 			super.toggleActivation();
 			//Here we use a custom Animation inside the ItemView
 			mFlipView.flip(mAdapter.isSelected(getAdapterPosition()));
@@ -242,6 +252,12 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 				else
 					AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
 			}
+		}
+
+		@Override
+		public void onItemReleased(int position) {
+			swiped = (mActionState == ItemTouchHelper.ACTION_STATE_SWIPE);
+			super.onItemReleased(position);
 		}
 	}
 

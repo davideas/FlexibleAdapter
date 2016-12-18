@@ -116,15 +116,15 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
 
 	@Override
 	public void bindViewHolder(final FlexibleAdapter adapter, final ViewHolder holder, int position, List payloads) {
-		Context context = holder.itemTextView.getContext();
+		Context context = holder.itemView.getContext();
 
 		//Item Id
 		holder.itemTextView.setText(toString());
 
 		//Item Status
 		holder.statusTextView.setText(status.getResId());
-		DrawableUtils.setBackground(holder.itemView, DrawableUtils.getSelectableBackgroundCompat(
-				Color.WHITE, status.getColor(), Utils.getColorAccent(holder.itemView.getContext())));
+		DrawableUtils.setBackgroundCompat(holder.itemView, DrawableUtils.getSelectableBackgroundCompat(
+				status.getColor(), Utils.getColorAccent(context), Color.WHITE));
 
 		//Blink after moving the item
 		for (Object payload : payloads) {

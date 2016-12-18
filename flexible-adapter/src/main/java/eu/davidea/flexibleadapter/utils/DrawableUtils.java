@@ -25,6 +25,7 @@ import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
+import android.support.v4.view.ViewCompat;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -36,6 +37,7 @@ import eu.davidea.flexibleadapter.R;
  * @author Davide Steduto
  * @since 14/06/2016 Created
  */
+@SuppressWarnings("deprecation")
 public final class DrawableUtils {
 
 	/**
@@ -44,15 +46,11 @@ public final class DrawableUtils {
 	 * @param view     the view to apply the drawable
 	 * @param drawable drawable object
 	 * @since 5.0.0-b7
+	 * @deprecated Use {@link #setBackgroundCompat(View, Drawable)} instead.
 	 */
-	//TODO: Rename to setBackgroundCompat
-	@SuppressWarnings("deprecation")
+	@Deprecated
 	public static void setBackground(View view, Drawable drawable) {
-		if (Utils.hasJellyBean()) {
-			view.setBackground(drawable);
-		} else {
-			view.setBackgroundDrawable(drawable);
-		}
+		setBackgroundCompat(view, drawable);
 	}
 
 	/**
@@ -61,10 +59,33 @@ public final class DrawableUtils {
 	 * @param view        the view to apply the drawable
 	 * @param drawableRes drawable resource id
 	 * @since 5.0.0-b7
+	 * @deprecated Use {@link #setBackgroundCompat(View, int)} instead.
 	 */
-	//TODO: Rename to setBackgroundCompat
+	@Deprecated
 	public static void setBackground(View view, @DrawableRes int drawableRes) {
-		setBackground(view, getDrawableCompat(view.getContext(), drawableRes));
+		setBackgroundCompat(view, getDrawableCompat(view.getContext(), drawableRes));
+	}
+
+	/**
+	 * Helper method to set the background depending on the android version.
+	 *
+	 * @param view     the view to apply the drawable
+	 * @param drawable drawable object
+	 * @since 5.0.0-rc1
+	 */
+	public static void setBackgroundCompat(View view, Drawable drawable) {
+		ViewCompat.setBackground(view, drawable);
+	}
+
+	/**
+	 * Helper method to set the background depending on the android version
+	 *
+	 * @param view        the view to apply the drawable
+	 * @param drawableRes drawable resource id
+	 * @since 5.0.0-rc1
+	 */
+	public static void setBackgroundCompat(View view, @DrawableRes int drawableRes) {
+		setBackgroundCompat(view, getDrawableCompat(view.getContext(), drawableRes));
 	}
 
 	/**
@@ -75,7 +96,6 @@ public final class DrawableUtils {
 	 * @return the drawable object
 	 * @since 5.0.0-b7
 	 */
-	@SuppressWarnings("deprecation")
 	public static Drawable getDrawableCompat(Context context, @DrawableRes int drawableRes) {
 		try {
 			if (Utils.hasLollipop()) {
@@ -89,63 +109,81 @@ public final class DrawableUtils {
 	}
 
 	/**
-	 * Helper to get the default Selectable Background.
-	 * Returns the resourceId of the {@code R.attr.selectableItemBackground} attribute in your style.
+	 * Helper to get the default Selectable Background. Returns the resourceId of the
+	 * {@code R.attr.selectableItemBackground} attribute of the overridden style.
 	 *
 	 * @param context the context
 	 * @return Default selectable background resId
 	 * @since 5.0.0-b7
+	 * @deprecated Use {@link #getSelectableItemBackground(Context)} instead.
 	 */
-	//TODO: Rename to getDefaultSelectableBackground ?
+	@Deprecated
 	public static int getSelectableBackground(Context context) {
 		TypedValue outValue = new TypedValue();
-		//it is important here to not use the android.R because this wouldn't add the latest drawable
+		// It's important to not use the android.R because this wouldn't add the overridden drawable
 		context.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
 		return outValue.resourceId;
 	}
 
 	/**
-	 * Helper to get the system default Color Control Highlight.
-	 * Returns the resourceId of the {@code R.attr.colorControlHighlight} attribute in your style.
+	 * Helper to get the default selectableItemBackground drawable of the
+	 * {@code R.attr.selectableItemBackground} attribute of the overridden style.
 	 *
 	 * @param context the context
-	 * @return Default Color Control Highlight resId
-	 * @since 5.0.0-b7
+	 * @return Default selectable item background drawable
+	 * @since 5.0.0-rc1
 	 */
+	public static Drawable getSelectableItemBackground(Context context) {
+		TypedValue outValue = new TypedValue();
+		// It's important to not use the android.R because this wouldn't add the overridden drawable
+		context.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
+		return getDrawableCompat(context, outValue.resourceId);
+	}
+
+	/**
+	 * Helper to get the system default Color Control Highlight. Returns the color of the
+	 * {@code R.attr.colorControlHighlight} attribute in the overridden style.
+	 *
+	 * @param context the context
+	 * @return Default Color Control Highlight
+	 * @since 5.0.0-b7 Created, returns the resourceId
+	 * <br/> 5.0.0-rc1 Now returns the real color (not the resourceId)
+	 */
+	@ColorInt
 	public static int getColorControlHighlight(Context context) {
 		TypedValue outValue = new TypedValue();
-		//it is important here to not use the android.R because this wouldn't add the latest drawable
+		// It's important to not use the android.R because this wouldn't add the overridden drawable
 		context.getTheme().resolveAttribute(R.attr.colorControlHighlight, outValue, true);
-		return outValue.resourceId;
+		if (Utils.hasMarshmallow()) return context.getColor(outValue.resourceId);
+		else return context.getResources().getColor(outValue.resourceId);
 	}
 
 	/**
 	 * Helper to get a custom selectable background with Ripple if device has at least Lollipop.
 	 *
-	 * @param rippleColor  the color of the ripple
 	 * @param normalColor  the color in normal state
 	 * @param pressedColor the pressed color
+	 * @param rippleColor  the color of the ripple
 	 * @return the RippleDrawable with StateListDrawable if at least Lollipop, the normal
 	 * StateListDrawable otherwise
-	 * @since 5.0.0-b7
+	 * @since 5.0.0-b7 Created
+	 * <br/>5.0.0-rc1 RippleColor becomes the 3rd parameter
 	 */
-	//TODO: Deprecate? change the method name and put the rippleColor to the end
-	public static Drawable getSelectableBackgroundCompat(@ColorInt int rippleColor,
-														 @ColorInt int normalColor,
-														 @ColorInt int pressedColor) {
+	public static Drawable getSelectableBackgroundCompat(@ColorInt int normalColor,
+														 @ColorInt int pressedColor,
+														 @ColorInt int rippleColor) {
 		if (Utils.hasLollipop()) {
-			//TODO: create a color state list for ripple based on state
 			return new RippleDrawable(ColorStateList.valueOf(rippleColor),
-					getStateListDrawable(normalColor, pressedColor, true),
+					getStateListDrawable(normalColor, pressedColor),
 					getRippleMask(normalColor));
 		} else {
-			return getStateListDrawable(normalColor, pressedColor, false);
+			return getStateListDrawable(normalColor, pressedColor);
 		}
 	}
 
 	private static Drawable getRippleMask(@ColorInt int color) {
 		float[] outerRadii = new float[8];
-		//3 is the radius of final ripple, instead of 3 we can give required final radius
+		// 3 is the radius of final ripple, instead of 3 we can give required final radius
 		Arrays.fill(outerRadii, 3);
 		RoundRectShape r = new RoundRectShape(outerRadii, null, null);
 		ShapeDrawable shapeDrawable = new ShapeDrawable(r);
@@ -154,21 +192,28 @@ public final class DrawableUtils {
 	}
 
 	private static StateListDrawable getStateListDrawable(@ColorInt int normalColor,
-														  @ColorInt int pressedColor,
-														  boolean withRipple) {
+														  @ColorInt int pressedColor) {
 		StateListDrawable states = new StateListDrawable();
-		if (!withRipple)
-			states.addState(new int[]{android.R.attr.state_pressed}, getColorDrawable(pressedColor));
 		states.addState(new int[]{android.R.attr.state_activated}, getColorDrawable(pressedColor));
 		states.addState(new int[]{}, getColorDrawable(normalColor));
-		//Animating across states
-		int duration = 200; //android.R.integer.config_shortAnimTime
-		states.setEnterFadeDuration(duration);
-		states.setExitFadeDuration(duration);
+		// Animating across states.
+		// It seems item background is lost on scrolling out of the screen, 21 <= API <= 23
+		if (!Utils.hasLollipop() || Utils.hasNougat()) {
+			int duration = 200; //android.R.integer.config_shortAnimTime
+			states.setEnterFadeDuration(duration);
+			states.setExitFadeDuration(duration);
+		}
 		return states;
 	}
 
-	private static ColorDrawable getColorDrawable(@ColorInt int color) {
+	/**
+	 * Generate the {@code ColorDrawable} object from the provided Color.
+	 *
+	 * @param color the color
+	 * @return the {@code ColorDrawable} object
+	 * @since 5.0.0-rc1
+	 */
+	public static ColorDrawable getColorDrawable(@ColorInt int color) {
 		return new ColorDrawable(color);
 	}
 
