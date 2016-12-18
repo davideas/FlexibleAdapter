@@ -43,6 +43,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	private int defaultMode = SelectableAdapter.MODE_IDLE;
 	@MenuRes
 	private int mCabMenu;
+	private int mActivatedPosition;
 	private FlexibleAdapter mAdapter;
 	private ActionMode.Callback mCallback;
 	protected ActionMode mActionMode;
@@ -58,6 +59,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	public ActionModeHelper(@NonNull FlexibleAdapter adapter, @MenuRes int cabMenu) {
 		this.mAdapter = adapter;
 		this.mCabMenu = cabMenu;
+		this.mActivatedPosition = RecyclerView.NO_POSITION;
 	}
 
 	/**
@@ -100,6 +102,16 @@ public class ActionModeHelper implements ActionMode.Callback {
 	}
 
 	/**
+	 * Gets the last activated position, especially useful in {@code MODE_SINGLE}.
+	 *
+	 * @return the last activated position, -1 if no item is selected
+	 * @since 5.0.0-rc1
+	 */
+	public int getActivatedPosition() {
+		return mActivatedPosition;
+	}
+
+	/**
 	 * Implements the basic behavior of a CAB and multi select behavior.
 	 *
 	 * @param position the current item position
@@ -125,11 +137,11 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 */
 	@NonNull
 	public ActionMode onLongClick(AppCompatActivity activity, int position) {
-		//Activate ActionMode
+		// Activate ActionMode
 		if (mActionMode == null) {
 			mActionMode = activity.startSupportActionMode(this);
 		}
-		//we have to select this on our own as we will consume the event
+		// We have to select this on our own as we will consume the event
 		toggleSelection(position);
 		return mActionMode;
 	}
@@ -143,11 +155,13 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * @since 5.0.0-b6
 	 */
 	public void toggleSelection(int position) {
-		if (position >= 0 && (mAdapter.getMode() == SelectableAdapter.MODE_SINGLE ||
+		if (position >= 0 && (
+				(mAdapter.getMode() == SelectableAdapter.MODE_SINGLE && position != mActivatedPosition) ||
 				mAdapter.getMode() == SelectableAdapter.MODE_MULTI)) {
+			mActivatedPosition = position;
 			mAdapter.toggleSelection(position);
 		}
-		//If MODE_SINGLE is active then ActionMode can be null
+		// If MODE_SINGLE is active then ActionMode can be null
 		if (mActionMode == null) return;
 
 		int count = mAdapter.getSelectedItemCount();
@@ -172,11 +186,11 @@ public class ActionModeHelper implements ActionMode.Callback {
 	}
 
 	/**
-	 * Helper method to restart the action mode after a restoration of deleted items. The
-	 * ActionMode will be activated only if {@link FlexibleAdapter#getSelectedItemCount()}
-	 * has selection.
-	 * <p>To be called in the <i>onUndo</i> method after the restoration is done or in the
-	 * <i>onRestoreInstanceState</i>.</p>
+	 * Helper method to restart the action mode after a restoration of deleted items and after
+	 * screen rotation. The ActionMode will be activated only if
+	 * {@link FlexibleAdapter#getSelectedItemCount()} has selections.
+	 * <p>To be called in the {@code onUndo} method after the restoration is done or at the end
+	 * of {@code onRestoreInstanceState}.</p>
 	 *
 	 * @param activity the current Activity
 	 * @since 5.0.0-b6
@@ -191,12 +205,12 @@ public class ActionModeHelper implements ActionMode.Callback {
 	@CallSuper
 	@Override
 	public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-		//Inflate the Context Menu
+		// Inflate the Context Menu
 		actionMode.getMenuInflater().inflate(mCabMenu, menu);
 		if (SelectableAdapter.DEBUG) Log.i(TAG, "ActionMode is active!");
-		//Activate the ActionMode Multi
+		// Activate the ActionMode Multi
 		mAdapter.setMode(SelectableAdapter.MODE_MULTI);
-		//Notify the provided callback
+		// Notify the provided callback
 		return mCallback == null || mCallback.onCreateActionMode(actionMode, menu);
 	}
 
@@ -214,7 +228,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 			consumed = mCallback.onActionItemClicked(actionMode, item);
 		}
 		if (!consumed) {
-			//Finish the actionMode
+			// Finish the actionMode
 			actionMode.finish();
 		}
 		return consumed;
@@ -230,11 +244,12 @@ public class ActionModeHelper implements ActionMode.Callback {
 	public void onDestroyActionMode(ActionMode actionMode) {
 		if (SelectableAdapter.DEBUG)
 			Log.i(TAG, "ActionMode is about to be destroyed! New mode will be " + defaultMode);
-		//Change mode and deselect everything
+		// Change mode and deselect everything
 		mAdapter.setMode(defaultMode);
+		mActivatedPosition = RecyclerView.NO_POSITION;
 		mAdapter.clearSelection();
 		mActionMode = null;
-		//Notify the provided callback
+		// Notify the provided callback
 		if (mCallback != null) {
 			mCallback.onDestroyActionMode(actionMode);
 		}
