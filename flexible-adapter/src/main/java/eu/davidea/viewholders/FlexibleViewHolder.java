@@ -214,12 +214,15 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	 * @since 5.0.0-b1
 	 */
 	@CallSuper
-	protected void toggleActivation() {
-		itemView.setActivated(mAdapter.isSelected(getFlexibleAdapterPosition()));
-		if (itemView.isActivated() && getActivationElevation() > 0)
-			ViewCompat.setElevation(itemView, getActivationElevation());
-		else if (getActivationElevation() > 0) //Leave unaltered the default elevation
-			ViewCompat.setElevation(itemView, 0);
+	public void toggleActivation() {
+		boolean selected = mAdapter.isSelected(getFlexibleAdapterPosition());
+		if (itemView.isActivated() && !selected || !itemView.isActivated() && selected) {
+			itemView.setActivated(selected);
+			if (itemView.isActivated() && getActivationElevation() > 0)
+				ViewCompat.setElevation(itemView, getActivationElevation());
+			else if (getActivationElevation() > 0) //Leave unaltered the default elevation
+				ViewCompat.setElevation(itemView, 0);
+		}
 	}
 
 	/**

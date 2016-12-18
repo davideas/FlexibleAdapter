@@ -26,6 +26,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -71,6 +73,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	private Set<Integer> mSelectedPositions;
+	private Set<FlexibleViewHolder> mBoundViewHolders;
 	private int mMode;
 	protected RecyclerView mRecyclerView;
 	protected FastScroller mFastScroller;
@@ -103,6 +106,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	public SelectableAdapter() {
 		Log.i("FlexibleAdapter", "Running version " + BuildConfig.VERSION_NAME);
 		mSelectedPositions = new TreeSet<>();
+		mBoundViewHolders = new HashSet<>();
 		mMode = MODE_IDLE;
 	}
 
@@ -351,7 +355,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 				mSelectedPositions.add(i);
 				itemCount++;
 			} else {
-				//Optimization for ItemRangeChanged
+				// Optimization for ItemRangeChanged
 				if (positionStart + itemCount == i) {
 					notifySelectionChanged(positionStart, itemCount);
 					itemCount = 0;
@@ -376,26 +380,63 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		if (DEBUG) Log.d(TAG, "clearSelection " + mSelectedPositions);
 		Iterator<Integer> iterator = mSelectedPositions.iterator();
 		int positionStart = 0, itemCount = 0;
-		//The notification is done only on items that are currently selected.
+		// The notification is done only on items that are currently selected.
 		while (iterator.hasNext()) {
 			int position = iterator.next();
 			iterator.remove();
-			//Optimization for ItemRangeChanged
+			// Optimization for ItemRangeChanged
 			if (positionStart + itemCount == position) {
 				itemCount++;
 			} else {
-				//Notify previous items in range
+				// Notify previous items in range
 				notifySelectionChanged(positionStart, itemCount);
 				positionStart = position;
 				itemCount = 1;
 			}
 		}
-		//Notify remaining items in range
+		// Notify remaining items in range
 		notifySelectionChanged(positionStart, itemCount);
 	}
 
 	private void notifySelectionChanged(int positionStart, int itemCount) {
-		if (itemCount > 0) notifyItemRangeChanged(positionStart, itemCount, Payload.SELECTION);
+		if (itemCount > 0) {
+			// Avoid to rebind the VH, direct call to the itemView activation
+			for (FlexibleViewHolder holder : mBoundViewHolders) {
+				if (isSelectable(holder.getAdapterPosition()))
+					holder.toggleActivation();
+			}
+			// Use classic notification, in case FlexibleViewHolder is not implemented
+			if (mBoundViewHolders.isEmpty())
+				notifyItemRangeChanged(positionStart, itemCount, Payload.SELECTION);
+		}
+	}
+
+	@Override
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+		// When user scrolls, this line binds the correct selection status
+		holder.itemView.setActivated(isSelected(position));
+		// Bind the correct view elevation
+		if (holder instanceof FlexibleViewHolder) {
+			FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
+			flexHolder.toggleActivation();
+			mBoundViewHolders.add(flexHolder);
+		}
+	}
+
+	@Override
+	public void onViewRecycled(RecyclerView.ViewHolder holder) {
+		if (holder instanceof FlexibleViewHolder)
+			mBoundViewHolders.remove(holder);
+	}
+
+	/**
+	 * Usually {@code RecyclerView} binds 3 items more than the visible items.
+	 *
+	 * @return a Set with all bound FlexibleViewHolders
+	 * @since 5.0.0-rc1
+	 */
+	public Set<FlexibleViewHolder> getAllBoundViewHolders() {
+		return Collections.unmodifiableSet(mBoundViewHolders);
 	}
 
 	/**

@@ -26,7 +26,6 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -1840,7 +1839,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	@Override
-	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+	public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position, List payloads) {
 		if (DEBUG) {
 			Log.v(TAG, "onViewBound    Holder=" + getClassName(holder) + " position=" + position +
 					" itemId=" + holder.getItemId() + " layoutPosition=" + holder.getLayoutPosition());
@@ -1850,24 +1849,15 @@ public class FlexibleAdapter<T extends IFlexible>
 			throw new IllegalStateException("AutoMap is not active, this method cannot be called." +
 					" Override this method or implement the AutoMap properly.");
 		}
-		// When user scrolls, this line binds the correct selection status
-		holder.itemView.setActivated(isSelected(position));
-		// Bind the correct view elevation
-		if (holder instanceof FlexibleViewHolder) {
-			FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
-			float elevation = flexHolder.getActivationElevation();
-			if (holder.itemView.isActivated() && elevation > 0)
-				ViewCompat.setElevation(holder.itemView, elevation);
-			else if (elevation > 0)//Leave unaltered the default elevation
-				ViewCompat.setElevation(holder.itemView, 0);
-		}
+		// Bind view activation with current selection
+		super.onBindViewHolder(holder, position, payloads);
 		// Bind the item
 		T item = getItem(position);
 		if (item != null) {
 			holder.itemView.setEnabled(item.isEnabled());
 			item.bindViewHolder(this, holder, position, payloads);
 			// Avoid to show the double background in case header has transparency
-			// The visibility will be restored when header is reset
+			// The visibility will be restored when header is reset in StickyHeaderHelper
 			if (areHeadersSticky() && !isFastScroll && mStickyHeaderHelper.getStickyPosition() >= 0 && payloads.isEmpty()) {
 				int headerPos = Utils.findFirstVisibleItemPosition(mRecyclerView.getLayoutManager()) - 1;
 				if (headerPos == position && isHeader(item))
