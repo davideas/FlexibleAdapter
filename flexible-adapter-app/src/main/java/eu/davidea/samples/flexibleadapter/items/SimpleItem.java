@@ -93,9 +93,11 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 					+ (getUpdates() > 0 ? " - u" + getUpdates() : ""));
 		}
 
+		// Background, when bound the first time
 		if (payloads.size() == 0) {
 			Drawable drawable = DrawableUtils.getSelectableBackgroundCompat(
-					Color.WHITE, Color.parseColor("#dddddd"), DrawableUtils.getColorControlHighlight(context));
+					Color.WHITE, Color.parseColor("#dddddd"), //Same color of divider
+					DrawableUtils.getColorControlHighlight(context));
 			DrawableUtils.setBackgroundCompat(holder.itemView, drawable);
 			DrawableUtils.setBackgroundCompat(holder.frontView, drawable);
 		}
@@ -110,15 +112,14 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 			// We stop the process here, we only want to update the subtitle
 
 		} else {
-			// DemoApp: INNER ANIMATION EXAMPLE! ImageView - Handle Flip Animation on
-			// Select ALL and Deselect ALL
-			if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
-				// Consume the Animation
-				holder.mFlipView.flip(adapter.isSelected(position), 200L);
-			} else {
+			// DemoApp: INNER ANIMATION EXAMPLE! ImageView - Handle Flip Animation
+//			if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
+//				// Consume the Animation
+//				holder.mFlipView.flip(adapter.isSelected(position), 200L);
+//			} else {
 				// Display the current flip status
 				holder.mFlipView.flipSilently(adapter.isSelected(position));
-			}
+//			}
 
 			// In case of searchText matches with Title or with an SimpleItem's field
 			// this will be highlighted

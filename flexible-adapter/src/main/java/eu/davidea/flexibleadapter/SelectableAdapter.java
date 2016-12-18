@@ -18,6 +18,7 @@ package eu.davidea.flexibleadapter;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -418,7 +419,10 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		// Bind the correct view elevation
 		if (holder instanceof FlexibleViewHolder) {
 			FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
-			flexHolder.toggleActivation();
+			if (holder.itemView.isActivated() && flexHolder.getActivationElevation() > 0)
+				ViewCompat.setElevation(holder.itemView, flexHolder.getActivationElevation());
+			else if (flexHolder.getActivationElevation() > 0) //Leave unaltered the default elevation
+				ViewCompat.setElevation(holder.itemView, 0);
 			mBoundViewHolders.add(flexHolder);
 		}
 	}
