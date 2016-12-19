@@ -138,6 +138,7 @@ Special thanks goes to Martin Guillon ([Akylas](https://github.com/Akylas)) to h
 It will be a pleasure to add your App here.
 - [Socio - Shake and Connect!](https://play.google.com/store/apps/details?id=com.atsocio.socio)<br/>
 - [BNVR Client](https://play.google.com/store/apps/details?id=ru.beward.bnvr)<br/>
+- [Module.org](https://play.google.com/store/apps/details?id=org.module.app)<br/>
 
 # License
 
