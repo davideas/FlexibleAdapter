@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="?android:attr/listPreferredItemHeightLarge">
+
+	<RelativeLayout
+		android:id="@+id/front_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:paddingBottom="@dimen/margin_bottom"
+		android:paddingTop="@dimen/margin_top">
+
+		<eu.davidea.flipview.FlipView
+			android:id="@+id/image"
+			xmlns:app="http://schemas.android.com/apk/res-auto"
+			android:layout_width="@dimen/icon_width"
+			android:layout_height="@dimen/icon_height"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentStart="true"
+			android:layout_centerInParent="true"
+			android:layout_marginLeft="@dimen/margin_left"
+			android:layout_marginStart="@dimen/margin_left"
+			android:clickable="true"
+			app:animationDuration="170"
+			app:checked="false"
+			app:enableInitialAnimation="true"
+			app:frontBackgroundColor="@color/colorPrimary_light"
+			app:frontImage="@drawable/ic_touch_app_white_24dp"
+			app:rearBackgroundColor="@color/colorAccent_light"/>
+
+		<ImageView
+			android:id="@+id/row_handle"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentEnd="true"
+			android:layout_alignParentRight="true"
+			android:layout_centerInParent="true"
+			android:layout_marginEnd="@dimen/margin_right_handle"
+			android:layout_marginLeft="@dimen/margin_left"
+			android:layout_marginRight="@dimen/margin_right_handle"
+			android:layout_marginStart="@dimen/margin_left"
+			android:src="@drawable/ic_drag_vertical_grey600_24dp"/>
+
+		<LinearLayout
+			android:id="@+id/title_container"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_centerInParent="true"
+			android:layout_marginLeft="@dimen/margin_left"
+			android:layout_marginStart="@dimen/margin_left"
+			android:layout_toEndOf="@id/image"
+			android:layout_toLeftOf="@id/row_handle"
+			android:layout_toRightOf="@id/image"
+			android:layout_toStartOf="@id/row_handle"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/title"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:ellipsize="end"
+				android:maxLines="1"
+				android:textAppearance="@style/TextAppearance.AppCompat.Title"
+				android:textColor="?primaryTextSelector"
+				tools:text="Title"/>
+
+			<TextView
+				android:id="@+id/subtitle"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="2dp"
+				android:ellipsize="end"
+				android:maxLines="1"
+				android:textAppearance="@style/TextAppearance.AppCompat.Small"
+				android:textColor="?primaryTextSelector"
+				tools:text="Subtitle"/>
+
+		</LinearLayout>
+
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:id="@+id/rear_left_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@color/material_color_red_600"
+		android:visibility="gone">
+
+		<ImageView
+			android:id="@+id/left_image"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentStart="true"
+			android:layout_centerVertical="true"
+			android:layout_marginLeft="@dimen/margin_left"
+			android:layout_marginStart="@dimen/margin_left"
+			android:src="@drawable/ic_action_delete"/>
+
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:id="@+id/rear_right_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@color/material_color_orange_500"
+		android:visibility="gone">
+
+		<ImageView
+			android:id="@+id/right_image"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_alignParentEnd="true"
+			android:layout_centerVertical="true"
+			android:layout_marginEnd="@dimen/margin_right_handle"
+			android:layout_marginRight="@dimen/margin_right_handle"
+			android:src="@drawable/ic_archive_white_24dp"/>
+
+	</RelativeLayout>
+
+</FrameLayout>

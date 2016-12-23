@@ -480,7 +480,7 @@ public class DatabaseService {
 	public void addSubItem(int position, IExpandable parent, SubItem subItem) {
 		//This split is for my examples
 		if (parent instanceof ExpandableItem)
-			((ExpandableItem) parent).removeSubItem(subItem);
+			((ExpandableItem) parent).addSubItem(subItem);
 		else if (parent instanceof ExpandableHeaderItem)
 			((ExpandableHeaderItem) parent).addSubItem(subItem);
 	}
@@ -566,10 +566,10 @@ public class DatabaseService {
 	 * notified with CHANGE Payload in the Adapter list when refreshed.
 	 */
 	public void updateNewItems() {
-		for (IFlexible item : mItems) {
-			if (item instanceof SimpleItem) {
-				SimpleItem simpleItem = (SimpleItem) item;
-				simpleItem.increaseUpdates();
+		for (IFlexible iFlexible : mItems) {
+			if (iFlexible instanceof AbstractItem) {
+				AbstractItem item = (AbstractItem) iFlexible;
+				item.increaseUpdates();
 			}
 		}
 	}

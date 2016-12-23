@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,29 +20,26 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
-import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.viewholders.ExpandableViewHolder;
+import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * You should extend directly from
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
-		implements ISectionable<SimpleItem.ParentViewHolder, HeaderItem>, IFilterable, Serializable {
+public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
+		implements ISectionable<SimpleItem.SimpleViewHolder, HeaderItem>, IFilterable, Serializable {
 
-	/**
-	 * The header of this item
-	 */
+	/* The header of this item */
 	HeaderItem header;
 
-	SimpleItem(String id) {
+	private SimpleItem(String id) {
 		super(id);
 		setDraggable(true);
 		setSwipeable(true);
@@ -73,25 +69,18 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 
 	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_expandable_item;
+		return R.layout.recycler_simple_item;
 	}
 
 	@Override
-	public ParentViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ParentViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public SimpleViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new SimpleViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
 	@Override
 	@SuppressWarnings({"unchecked"})
-	public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
+	public void bindViewHolder(final FlexibleAdapter adapter, SimpleViewHolder holder, int position, List payloads) {
 		Context context = holder.itemView.getContext();
-
-		// Subtitle
-		if (adapter.isExpandable(this)) {
-			setSubtitle(adapter.getCurrentChildren((IExpandable) this).size() + " subItems"
-					+ (getHeader() != null ? " - " + getHeader().getId() : "")
-					+ (getUpdates() > 0 ? " - u" + getUpdates() : ""));
-		}
 
 		// Background, when bound the first time
 		if (payloads.size() == 0) {
@@ -102,34 +91,22 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 			DrawableUtils.setBackgroundCompat(holder.frontView, drawable);
 		}
 
-		if (adapter.isExpandable(this) && payloads.size() > 0) {
-			Log.d(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
-			if (adapter.hasSearchText()) {
-				Utils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
-			} else {
-				holder.mSubtitle.setText(getSubtitle());
-			}
-			// We stop the process here, we only want to update the subtitle
+		// DemoApp: INNER ANIMATION EXAMPLE! ImageView - Handle Flip Animation
+//		if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
+//			// Consume the Animation
+//			holder.mFlipView.flip(adapter.isSelected(position), 200L);
+//		} else {
+			// Display the current flip status
+			holder.mFlipView.flipSilently(adapter.isSelected(position));
+//		}
 
+		// In case of searchText matches with Title or with a field this will be highlighted
+		if (adapter.hasSearchText()) {
+			Utils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText());
+			Utils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
 		} else {
-			// DemoApp: INNER ANIMATION EXAMPLE! ImageView - Handle Flip Animation
-//			if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
-//				// Consume the Animation
-//				holder.mFlipView.flip(adapter.isSelected(position), 200L);
-//			} else {
-				// Display the current flip status
-				holder.mFlipView.flipSilently(adapter.isSelected(position));
-//			}
-
-			// In case of searchText matches with Title or with an SimpleItem's field
-			// this will be highlighted
-			if (adapter.hasSearchText()) {
-				Utils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText());
-				Utils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
-			} else {
-				holder.mTitle.setText(getTitle());
-				holder.mSubtitle.setText(getSubtitle());
-			}
+			holder.mTitle.setText(getTitle());
+			holder.mSubtitle.setText(getSubtitle());
 		}
 	}
 
@@ -139,10 +116,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 				getSubtitle() != null && getSubtitle().toLowerCase().trim().contains(constraint);
 	}
 
-	/**
-	 * This ViewHolder is expandable and collapsible.
-	 */
-	static final class ParentViewHolder extends ExpandableViewHolder {
+	static final class SimpleViewHolder extends FlexibleViewHolder {
 
 		FlipView mFlipView;
 		TextView mTitle;
@@ -155,7 +129,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 
 		public boolean swiped = false;
 
-		ParentViewHolder(View view, FlexibleAdapter adapter) {
+		SimpleViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			this.mContext = view.getContext();
 			this.mTitle = (TextView) view.findViewById(R.id.title);
@@ -204,7 +178,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 		@Override
 		public void toggleActivation() {
 			super.toggleActivation();
-			//Here we use a custom Animation inside the ItemView
+			// Here we use a custom Animation inside the ItemView
 			mFlipView.flip(mAdapter.isSelected(getAdapterPosition()));
 		}
 
@@ -264,8 +238,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.ParentViewHolder>
 
 	@Override
 	public String toString() {
-		return this instanceof ExpandableItem ? super.toString() :
-				"SimpleItem[" + super.toString() + "]";
+		return "SimpleItem[" + super.toString() + "]";
 	}
 
 }

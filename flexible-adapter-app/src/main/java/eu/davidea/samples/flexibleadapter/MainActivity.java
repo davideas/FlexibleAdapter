@@ -682,8 +682,7 @@ public class MainActivity extends AppCompatActivity implements
 			return activate;
 		} else {
 			// Notify the active callbacks or implement a custom action onClick
-			if (!(flexibleItem instanceof ExpandableItem) && flexibleItem instanceof SimpleItem
-					|| flexibleItem instanceof SubItem) {
+			if (flexibleItem instanceof SimpleItem || flexibleItem instanceof SubItem) {
 				//TODO FOR YOU: call your custom Action on item click
 				String title = extractTitleFrom(flexibleItem);
 				EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
@@ -874,8 +873,7 @@ public class MainActivity extends AppCompatActivity implements
 					IExpandable expandable = mAdapter.getExpandableOf(subItem);
 					DatabaseService.getInstance().removeSubItem(expandable, subItem);
 					Log.d(TAG, "Confirm removed " + subItem.getTitle());
-				} else if (adapterItem instanceof SimpleItem) {
-					// SimpleItem or ExpandableItem(extends SimpleItem)
+				} else if (adapterItem instanceof SimpleItem || adapterItem instanceof ExpandableItem) {
 					DatabaseService.getInstance().removeItem(adapterItem);
 					Log.d(TAG, "Confirm removed " + adapterItem);
 				}
