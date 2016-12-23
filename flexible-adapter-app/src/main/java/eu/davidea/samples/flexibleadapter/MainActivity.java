@@ -3,7 +3,6 @@ package eu.davidea.samples.flexibleadapter;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -145,15 +144,13 @@ public class MainActivity extends AppCompatActivity implements
 	private final Handler mRefreshHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
 			switch (message.what) {
-				case 0: //Stop
+				case 0: // Stop
 					mSwipeRefreshLayout.setRefreshing(false);
-					mSwipeRefreshLayout.setEnabled(true);
 					return true;
-				case 1: //Start
+				case 1: // Start
 					mSwipeRefreshLayout.setRefreshing(true);
-					mSwipeRefreshLayout.setEnabled(false);
 					return true;
-				case 2: //Show empty view
+				case 2: // Show empty view
 					ViewCompat.animate(findViewById(R.id.empty_view)).alpha(1);
 					return true;
 				default:
@@ -258,8 +255,8 @@ public class MainActivity extends AppCompatActivity implements
 				// Passing true as parameter we always animate the changes between the old and the new data set
 				DatabaseService.getInstance().updateNewItems();
 				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), DatabaseConfiguration.animateOnUpdate);
-				mSwipeRefreshLayout.setEnabled(false);
-				mRefreshHandler.sendEmptyMessageDelayed(0, 100L);//Simulate network time
+				mSwipeRefreshLayout.setRefreshing(true);
+				mRefreshHandler.sendEmptyMessageDelayed(0, 1500L); //Simulate network time
 				mActionModeHelper.destroyActionModeIfCan();
 			}
 		});
@@ -746,10 +743,11 @@ public class MainActivity extends AppCompatActivity implements
 			message.append(getString(R.string.action_archived));
 
 			// Example of UNDO color
-			int actionTextColor = Color.TRANSPARENT;
+			int actionTextColor;
 			if (Utils.hasMarshmallow()) {
-				actionTextColor = getResources().getColor(R.color.material_color_orange_500, this.getTheme());
-			} else if (Utils.hasLollipop()) {
+				actionTextColor = getColor(R.color.material_color_orange_500);
+			} else {
+				//noinspection deprecation
 				actionTextColor = getResources().getColor(R.color.material_color_orange_500);
 			}
 
@@ -771,6 +769,7 @@ public class MainActivity extends AppCompatActivity implements
 			//Here, option 1B) is implemented
 		} else if (direction == ItemTouchHelper.RIGHT) {
 			message.append(getString(R.string.action_deleted));
+			mSwipeRefreshLayout.setRefreshing(true);
 			new UndoHelper(mAdapter, this)
 					.withPayload(null) //You can pass any custom object (in this case Boolean is enough)
 					.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.SimpleActionListener() {
@@ -836,8 +835,8 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (action == UndoHelper.ACTION_REMOVE) {
 			// Custom action is restore deleted items
 			mAdapter.restoreDeletedItems();
-			// Enable SwipeRefresh
-			mRefreshHandler.sendEmptyMessage(0);
+			// Disable Refreshing
+			mSwipeRefreshLayout.setRefreshing(false);
 			// Check also selection restoration
 			if (mAdapter.isRestoreWithSelection()) {
 				mActionModeHelper.restoreSelection(this);
@@ -847,8 +846,8 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onDeleteConfirmed(int action) {
-		// Enable SwipeRefresh
-		mRefreshHandler.sendEmptyMessage(0);
+		// Disable Refreshing
+		mSwipeRefreshLayout.setRefreshing(false);
 		// Removing items from Database. Example:
 		for (AbstractFlexibleItem adapterItem : mAdapter.getDeletedItems()) {
 			try {
@@ -934,16 +933,16 @@ public class MainActivity extends AppCompatActivity implements
 
 							@Override
 							public void onPostAction() {
-								// Disable SwipeRefresh
+								// Enable Refreshing
 								mRefreshHandler.sendEmptyMessage(1);
-								mRefreshHandler.sendEmptyMessageDelayed(0, 20000);
+								mRefreshHandler.sendEmptyMessageDelayed(0, 7000);
 								// Finish the action mode
 								mActionModeHelper.destroyActionModeIfCan();
 							}
 						})
 						.remove(mAdapter.getSelectedPositions(),
 								findViewById(R.id.main_view), message,
-								getString(R.string.undo), 20000);
+								getString(R.string.undo), 7000);
 
 				// We consume the event
 				return true;
@@ -967,7 +966,7 @@ public class MainActivity extends AppCompatActivity implements
 					// New title for context
 					mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
 				}
-				//We consume always the event, never finish the ActionMode
+				// We consume always the event, never finish the ActionMode
 				return true;
 
 			case R.id.action_split:
