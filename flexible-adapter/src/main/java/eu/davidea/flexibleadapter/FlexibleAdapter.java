@@ -760,6 +760,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final boolean isScrollableHeaderOrFooter(int position) {
+		T item = getItem(position);
+		return item != null && mScrollableHeaders.contains(item) || mScrollableFooters.contains(item);
+	}
+
+	/**
 	 * Adds a Scrollable Header.
 	 * <p><b>Scrollable Headers</b> have the following characteristic:
 	 * <ul>

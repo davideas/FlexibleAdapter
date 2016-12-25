@@ -338,6 +338,14 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
+	 * Checks if at the provided position, the item is a Header or Footer
+	 *
+	 * @param position the position to check
+	 * @return true if is a scrollable item
+	 */
+	public abstract boolean isScrollableHeaderOrFooter(int position);
+
+	/**
 	 * Performs checks to scroll animate the itemView and in case, it animates the view.
 	 * <p><b>Note:</b> If you have to change at runtime the LayoutManager <i>and</i> add
 	 * Scrollable Headers too, consider to add them in post, using a {@code delay >= 0},
@@ -355,23 +363,23 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			mMaxChildViews = mRecyclerView.getChildCount();
 		}
 		// Animate only during initial loading?
-		if (onlyEntryAnimation && mLastAnimatedPosition == mMaxChildViews) {
+		if (onlyEntryAnimation && mLastAnimatedPosition >= mMaxChildViews) {
 			shouldAnimate = false;
 		}
 		int lastVisiblePosition = Utils.findLastVisibleItemPosition(mRecyclerView.getLayoutManager());
-//		if (DEBUG) {
-//			Log.v(TAG, "shouldAnimate=" + shouldAnimate
-//					+ " isFastScroll=" + isFastScroll
-//					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
-//					+ " isReverseEnabled=" + isReverseEnabled
-//					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
-//					+ (!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : "")
-//					+ " mMaxChildViews=" + mMaxChildViews
-//			);
-//		}
+		if (DEBUG) {
+			Log.v(TAG, "shouldAnimate=" + shouldAnimate
+					+ " isFastScroll=" + isFastScroll
+					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
+					+ " isReverseEnabled=" + isReverseEnabled
+					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
+					+ (!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : "")
+					+ " mMaxChildViews=" + mMaxChildViews
+			);
+		}
 		if (holder instanceof FlexibleViewHolder && shouldAnimate && !isFastScroll &&
 				!mAnimatorNotifierObserver.isPositionNotified() &&
-				(position > lastVisiblePosition || isReverseEnabled || (position == 0 && mMaxChildViews == 0))) {
+				(position > lastVisiblePosition || isReverseEnabled || isScrollableHeaderOrFooter(position) || (position == 0 && mMaxChildViews == 0))) {
 
 			// Cancel animation is necessary when fling
 			int hashCode = holder.itemView.hashCode();
@@ -386,10 +394,18 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			AnimatorSet set = new AnimatorSet();
 			set.playTogether(animators);
 			set.setInterpolator(mInterpolator);
-			set.setDuration(mDuration);
+			// Single view duration
+			long duration = 0L;
+			for (Animator animator : animators) {
+				if (animator.getDuration() != mDuration) {
+					duration = animator.getDuration();
+				}
+			}
+			Log.v(TAG, "duration=" + duration);
+			set.setDuration(duration > 0 ? duration : mDuration);
 			set.addListener(new HelperAnimatorListener(hashCode));
 			if (mEntryStep) {
-				//Stop stepDelay when screen is filled
+				// Stop stepDelay when screen is filled
 				set.setStartDelay(calculateAnimationDelay(position));
 			}
 			set.start();
