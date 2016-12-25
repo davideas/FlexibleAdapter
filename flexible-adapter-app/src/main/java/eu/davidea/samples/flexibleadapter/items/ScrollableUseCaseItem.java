@@ -13,6 +13,7 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
+import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -20,15 +21,13 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 /**
  * This item is a Scrollable Header.
  */
-public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UCViewHolder> {
+public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UCViewHolder>
+		implements IHeader<ScrollableUseCaseItem.UCViewHolder> {
 
-	public ScrollableUseCaseItem(String id) {
-		super(id);
-	}
-
-	@Override
-	public boolean isSelectable() {
-		return false;
+	public ScrollableUseCaseItem(String title, String subTitle) {
+		super("UC");
+		setTitle(title);
+		setSubtitle(subTitle);
 	}
 
 	@Override
@@ -47,13 +46,13 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UC
 		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
 	}
 
-	class UCViewHolder extends FlexibleViewHolder {
+	public static class UCViewHolder extends FlexibleViewHolder {
 
-		TextView mTitle;
-		TextView mSubtitle;
+		public TextView mTitle;
+		public TextView mSubtitle;
 		ImageView mDismissIcon;
 
-		UCViewHolder(View view, FlexibleAdapter adapter) {
+		public UCViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
@@ -61,10 +60,10 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UC
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					//Don't need anymore to set permanent for Scrollable Headers and Footers
+					//Don't need anymore to set permanent deletion for Scrollable Headers and Footers
 					//mAdapter.setPermanentDelete(true);
-					//noinspection unchecked
-					mAdapter.removeScrollableHeader(ScrollableUseCaseItem.this);
+					//noinspection unchecked, ConstantConditions
+					mAdapter.removeScrollableHeader(mAdapter.getItem(getAdapterPosition()));
 					//mAdapter.setPermanentDelete(false);
 				}
 			});
@@ -77,7 +76,8 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UC
 
 		@Override
 		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
-			AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
+			AnimatorHelper.flipAnimator(animators, itemView);
+			AnimatorHelper.setDuration(animators, 500L);
 		}
 	}
 

@@ -60,7 +60,7 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					//Don't need anymore to set permanent for Scrollable Headers and Footers
+					//Don't need anymore to set permanent deletion for Scrollable Headers and Footers
 					//mAdapter.setPermanentDelete(true);
 					//noinspection unchecked
 					mAdapter.removeScrollableFooter(ScrollableFooterItem.this);

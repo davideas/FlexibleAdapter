@@ -32,11 +32,6 @@ public class FragmentSelectionModes extends AbstractFragment {
 	public static final String TAG = FragmentSelectionModes.class.getSimpleName();
 
 	/**
-	 * The current activated item position.
-	 */
-	private int mActivatedPosition = RecyclerView.NO_POSITION;
-
-	/**
 	 * Custom implementation of FlexibleAdapter
 	 */
 	private ExampleAdapter mAdapter;

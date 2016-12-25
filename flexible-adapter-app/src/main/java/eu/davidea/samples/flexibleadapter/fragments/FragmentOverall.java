@@ -10,11 +10,13 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.animation.DecelerateInterpolator;
 
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.samples.flexibleadapter.OverallAdapter;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 /**
@@ -66,11 +68,10 @@ public class FragmentOverall extends AbstractFragment {
 		mAdapter = new OverallAdapter(getActivity());
 
 		// Experimenting NEW features (v5.0.0)
-		mAdapter.setAnimationOnScrolling(true)
-				.setAnimationOnReverseScrolling(true)
-				//.setAnimationInterpolator(new DecelerateInterpolator())
+		mAdapter.setOnlyEntryAnimation(true)
+				.setAnimationInterpolator(new DecelerateInterpolator())
 				.setAnimationInitialDelay(500L)
-				.setAnimationDelay(150L);
+				.setAnimationDelay(70L);
 
 		// Prepare the RecyclerView and attach the Adapter to it
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
@@ -88,7 +89,7 @@ public class FragmentOverall extends AbstractFragment {
 					Snackbar.make(getView(), "Long press drag is enabled", Snackbar.LENGTH_SHORT).show();
 				}
 			}
-		}, 1500L);
+		}, 3000L);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
@@ -96,6 +97,10 @@ public class FragmentOverall extends AbstractFragment {
 
 		// Add 1 Scrollable Header
 		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.addScrollableHeader(
+				new ScrollableUseCaseItem(
+						getString(R.string.overall_use_case_title),
+						getString(R.string.overall_use_case_description)));
 	}
 
 	@Override
@@ -120,6 +125,7 @@ public class FragmentOverall extends AbstractFragment {
 				// NOTE: If you use simple integers to identify the ViewType,
 				// here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
+					case R.layout.recycler_scrollable_usecase_item:
 					case R.layout.recycler_scrollable_layout_item:
 						return mColumnCount;
 					default:

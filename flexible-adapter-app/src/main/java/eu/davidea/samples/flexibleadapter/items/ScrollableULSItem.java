@@ -19,7 +19,7 @@ import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Item dedicated only for User Learns Selection view (located always at position 0 in the Adapter).
+ * Item dedicated only for User Learns Selection view (located always at the top in the Adapter).
  * This item is a Scrollable Header.
  */
 public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHolder> {
@@ -67,7 +67,7 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 				@Override
 				public void onClick(View v) {
 					DatabaseConfiguration.userLearnedSelection = true;
-					//Don't need anymore to set permanent for Scrollable Headers and Footers
+					//Don't need anymore to set permanent deletion for Scrollable Headers and Footers
 					//mAdapter.setPermanentDelete(true);
 					//noinspection unchecked
 					mAdapter.removeScrollableHeader(ScrollableULSItem.this);

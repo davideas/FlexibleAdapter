@@ -34,7 +34,6 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 
-	private AbstractFlexibleItem mUseCaseItem;
 	private Context mContext;
 
 	public ExampleAdapter(List<AbstractFlexibleItem> items, Object listeners) {

@@ -35,9 +35,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_centerInParent="true"
-		android:layout_marginEnd="@dimen/margin_right"
 		android:layout_marginLeft="@dimen/margin_left"
-		android:layout_marginRight="@dimen/margin_right"
 		android:layout_marginStart="@dimen/margin_left"
 		android:layout_toEndOf="@id/image"
 		android:layout_toLeftOf="@id/image_util_container"
@@ -52,7 +50,7 @@
 			android:ellipsize="marquee"
 			android:marqueeRepeatLimit="marquee_forever"
 			android:maxLines="1"
-			android:text="@string/endless_scrolling"
+			android:text="@string/overall_use_case_title"
 			android:textAppearance="@style/TextAppearance.AppCompat.Title"
 			android:textColor="?primaryTextSelector"/>
 
@@ -61,8 +59,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="2dp"
-			android:text="@string/endless_scrolling_description"
-			android:textAppearance="@style/TextAppearance.AppCompat.Small"
+			android:text="@string/overall_use_case_description"
+			android:textAppearance="@style/TextAppearance.AppCompat.Notification.Info"
 			android:textColor="?primaryTextSelector"/>
 
 	</LinearLayout>

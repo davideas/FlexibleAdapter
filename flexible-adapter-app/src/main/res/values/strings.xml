@@ -71,6 +71,7 @@
 	<string name="status_e">STATUS E</string>
 	<string name="scrolling_animations">Scrolling Animations</string>
 	<string name="item_animators">Item Animators</string>
+	<string name="intent_chooser">Complete action using</string>
 
 	<!-- Configuration for Dynamic List -->
 	<string name="config_title">Configure the list ...</string>
@@ -95,6 +96,10 @@ items and higher, due to calculate the correct position for each item to shift. 
 
 	<!-- Menu Drawers -->
 	<string name="overall">Overall</string>
+	<string name="overall_use_case_title">Showcase of the library capabilities</string>
+	<string name="overall_use_case_description"><![CDATA[The demo is organized in <b>fragments</b> where the
+	<i>RecyclerView</i> and the <i>Adapter</i> are reinitialized in each fragment which can use
+	several features, but the <i>MainActivity</i> implements and reuses the common listeners.]]></string>
 
 	<string name="selection_modes">Selection modes</string>
 	<string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper + UndoHelper + Scrollable Headers</string>
@@ -136,7 +141,7 @@ items and higher, due to calculate the correct position for each item to shift. 
 
 	<!-- About -->
 	<string name="app_name">Flexible Adapter</string>
-	<string name="github">GitHub page</string>
+	<string name="github">GitHub page…</string>
 	<string name="about_title">About</string>
 	<string name="about_version">%1$s #%2$s</string>
 	<string name="about_body"><![CDATA[

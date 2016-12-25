@@ -15,6 +15,7 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
 import eu.davidea.samples.flexibleadapter.items.OverallItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -62,7 +63,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 					String.valueOf(eu.davidea.flexibleadapter.utils.Utils.getSpanCount(mRecyclerView.getLayoutManager())))
 			);
 			addScrollableHeaderWithDelay(item, 500L, scrollToPosition);
-			removeScrollableHeaderWithDelay(item, 2000L);
+			removeScrollableHeaderWithDelay(item, 3000L);
 		}
 	}
 
@@ -73,7 +74,8 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	@Override
 	public int getItemViewType(int position) {
 		IFlexible item = getItem(position);
-		if (item instanceof ScrollableLayoutItem) return R.layout.recycler_scrollable_layout_item;
+		if (item instanceof ScrollableUseCaseItem) return R.layout.recycler_scrollable_usecase_item;
+		else if (item instanceof ScrollableLayoutItem) return R.layout.recycler_scrollable_layout_item;
 		else return R.layout.recycler_overall_item;
 	}
 
@@ -85,6 +87,10 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		mInflater = LayoutInflater.from(parent.getContext());
 		switch (viewType) {
+			case R.layout.recycler_scrollable_usecase_item:
+				return new ScrollableUseCaseItem.UCViewHolder(
+						mInflater.inflate(viewType, parent, false), this);
+
 			case R.layout.recycler_scrollable_layout_item:
 				return new ScrollableLayoutItem.LayoutViewHolder(
 						mInflater.inflate(viewType, parent, false), this);
@@ -103,7 +109,22 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payload) {
 		int viewType = getItemViewType(position);
-		if (viewType == R.layout.recycler_scrollable_layout_item) {
+
+		if (viewType == R.layout.recycler_scrollable_usecase_item) {
+			ScrollableUseCaseItem item = (ScrollableUseCaseItem) getItem(position);
+			ScrollableUseCaseItem.UCViewHolder vHolder = (ScrollableUseCaseItem.UCViewHolder) holder;
+			assert item != null;
+
+			vHolder.mTitle.setText(Utils.fromHtmlCompat(item.getTitle()));
+			vHolder.mSubtitle.setText(Utils.fromHtmlCompat(item.getSubtitle()));
+
+			//Support for StaggeredGridLayoutManager
+			if (holder.itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
+				((StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams()).setFullSpan(true);
+				Log.d("LayoutItem", "LayoutItem configured fullSpan for StaggeredGridLayout");
+			}
+
+		} else if (viewType == R.layout.recycler_scrollable_layout_item) {
 			ScrollableLayoutItem item = (ScrollableLayoutItem) getItem(position);
 			ScrollableLayoutItem.LayoutViewHolder vHolder = (ScrollableLayoutItem.LayoutViewHolder) holder;
 			assert item != null;
@@ -134,15 +155,15 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			if (item.getIcon() != null) {
 				vHolder.mIcon.setImageDrawable(item.getIcon());
 			}
-
-			// IMPORTANT!!!
-			// With method B, animateView() needs to be called by the user!
-			// With method A, the call is handled by the Adapter
-			animateView(holder, position);
-			// Same concept for EndlessScrolling and View activation:
-			// - onLoadMore(position);
-			// - holder.itemView.setActivated(isSelected(position));
 		}
+
+		// IMPORTANT!!!
+		// With method B, animateView() needs to be called by the user!
+		// With method A, the call is handled by the Adapter
+		animateView(holder, position);
+		// Same concept for EndlessScrolling and View activation:
+		// - onLoadMore(position);
+		// - holder.itemView.setActivated(isSelected(position));
 	}
 
 }

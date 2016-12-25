@@ -3,6 +3,7 @@ package eu.davidea.samples.flexibleadapter;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -159,7 +160,9 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	});
 
-	/* ACTIVITY MANAGEMENT */
+	/* ===================
+	 * ACTIVITY MANAGEMENT
+	 * =================== */
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -214,7 +217,9 @@ public class MainActivity extends AppCompatActivity implements
 		initializeActionModeHelper(mode);
 	}
 
-	/* INITIALIZATION METHODS */
+	/* ======================
+	 * INITIALIZATION METHODS
+	 * ====================== */
 
 	private void initializeActionModeHelper(int mode) {
 		mActionModeHelper = new ActionModeHelper(mAdapter, mFragment.getContextMenuResId(), this) {
@@ -311,7 +316,9 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	/* NAVIGATION DRAWER & FRAGMENT MANAGEMENT */
+	/* =======================================
+	 * NAVIGATION DRAWER & FRAGMENT MANAGEMENT
+	 * ======================================= */
 
 	/**
 	 * IMPORTANT!! READ THE COMMENT FOR THE FRAGMENT REPLACE
@@ -371,7 +378,10 @@ public class MainActivity extends AppCompatActivity implements
 					.show(getFragmentManager(), MessageDialog.TAG);
 			return true;
 		} else if (id == R.id.nav_github) {
-
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setData(Uri.parse("https://github.com/davideas/FlexibleAdapter"));
+			startActivity(Intent.createChooser(intent, getString(R.string.intent_chooser)));
+			return true;
 		}
 		// Insert the fragment by replacing any existing fragment
 		if (mFragment != null) {
@@ -402,7 +412,9 @@ public class MainActivity extends AppCompatActivity implements
 		return false;
 	}
 
-	/* FLOATING ACTION BUTTON */
+	/* ======================
+	 * FLOATING ACTION BUTTON
+	 * ====================== */
 
 	private void hideFabSilently() {
 		mFab.setAlpha(0f);
@@ -427,7 +439,9 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	/* SEARCH VIEW */
+	/* ===========
+	 * SEARCH VIEW
+	 * =========== */
 
 	@Override
 	public void initSearchView(final Menu menu) {
@@ -485,7 +499,9 @@ public class MainActivity extends AppCompatActivity implements
 		return onQueryTextChange(query);
 	}
 
-	/* OPTION MENU PREPARATION & MANAGEMENT */
+	/* ====================================
+	 * OPTION MENU PREPARATION & MANAGEMENT
+	 * ==================================== */
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -644,7 +660,9 @@ public class MainActivity extends AppCompatActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 
-	/* DIALOG LISTENER IMPLEMENTATION (For the example of onItemClick) */
+	/* ===============================================================
+	 * DIALOG LISTENER IMPLEMENTATION (For the example of onItemClick)
+	 * =============================================================== */
 
 	@Override
 	public void onTitleModified(int position, String newTitle) {
@@ -660,7 +678,11 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.updateItem(position, abstractItem, null);
 	}
 
-	/* FLEXIBLE ADAPTER LISTENERS IMPLEMENTATION */
+	/* ========================================================================
+	 * FLEXIBLE ADAPTER LISTENERS IMPLEMENTATION
+	 * Listeners implementation are in MainActivity to easily reuse the common
+	 * components like SwipeToRefresh, ActionMode, NavigationView, etc...
+	 * ======================================================================== */
 
 	@Override
 	public boolean onItemClick(int position) {
@@ -880,7 +902,9 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	/* ACTION MODE IMPLEMENTATION */
+	/* ==========================
+	 * ACTION MODE IMPLEMENTATION
+	 * ========================== */
 
 	@Override
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -1008,7 +1032,9 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 	
-	/* EXTRAS */
+	/* ======
+	 * EXTRAS
+	 * ====== */
 
 	@Override
 	public void onBackPressed() {

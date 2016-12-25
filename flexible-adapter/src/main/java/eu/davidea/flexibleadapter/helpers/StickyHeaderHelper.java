@@ -89,23 +89,22 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		if (FlexibleAdapter.DEBUG) Log.i(TAG, "StickyHolderLayout detached");
 	}
 
-//	private FrameLayout createContainer(int width, int height) {
-//		FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
-//		frameLayout.setLayoutParams(new ViewGroup.LayoutParams(width, height));
-//		return frameLayout;
-//	}
+	private FrameLayout createContainer(int width, int height) {
+		FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
+		frameLayout.setLayoutParams(new ViewGroup.LayoutParams(width, height));
+		return frameLayout;
+	}
 
-	private static ViewGroup getParent(View view) {
+	private ViewGroup getParent(View view) {
 		return (ViewGroup) view.getParent();
 	}
 
 	private void initStickyHeadersHolder() {
 		if (mStickyHolderLayout == null) {
 			// Create stickyContainer for shadow elevation
-			FrameLayout stickyContainer = new FrameLayout(mRecyclerView.getContext());
-			stickyContainer.setLayoutParams(new ViewGroup.LayoutParams(
+			FrameLayout stickyContainer = createContainer(
 					ViewGroup.LayoutParams.WRAP_CONTENT,
-					ViewGroup.LayoutParams.WRAP_CONTENT));
+					ViewGroup.LayoutParams.WRAP_CONTENT);
 			ViewGroup oldParentLayout = getParent(mRecyclerView);
 			oldParentLayout.addView(stickyContainer);
 			// Initialize Holder Layout
@@ -134,6 +133,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	public void updateOrClearHeader(boolean updateHeaderContent) {
+		//
 		if (!mAdapter.areHeadersShown() || mAdapter.hasSearchText() || mAdapter.getItemCount() == 0) {
 			clearHeaderWithAnimation();
 			return;
