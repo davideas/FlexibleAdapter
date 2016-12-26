@@ -25,6 +25,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.List;
+
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
@@ -43,7 +45,6 @@ public class ActionModeHelper implements ActionMode.Callback {
 	private int defaultMode = SelectableAdapter.MODE_IDLE;
 	@MenuRes
 	private int mCabMenu;
-	private int mActivatedPosition;
 	private FlexibleAdapter mAdapter;
 	private ActionMode.Callback mCallback;
 	protected ActionMode mActionMode;
@@ -59,7 +60,6 @@ public class ActionModeHelper implements ActionMode.Callback {
 	public ActionModeHelper(@NonNull FlexibleAdapter adapter, @MenuRes int cabMenu) {
 		this.mAdapter = adapter;
 		this.mCabMenu = cabMenu;
-		this.mActivatedPosition = RecyclerView.NO_POSITION;
 	}
 
 	/**
@@ -102,13 +102,18 @@ public class ActionModeHelper implements ActionMode.Callback {
 	}
 
 	/**
-	 * Gets the last activated position, especially useful in {@code MODE_SINGLE}.
+	 * Gets the activated position only when mode is {@code MODE_SINGLE}.
 	 *
-	 * @return the last activated position, -1 if no item is selected
+	 * @return the activated position when {@code MODE_SINGLE}. -1 if no item is selected
 	 * @since 5.0.0-rc1
 	 */
 	public int getActivatedPosition() {
-		return mActivatedPosition;
+		List<Integer> selectedPositions = mAdapter.getSelectedPositions();
+		if (mAdapter.getMode() == SelectableAdapter.MODE_SINGLE &&
+				selectedPositions.size() == 1) {
+			return selectedPositions.get(0);
+		}
+		return RecyclerView.NO_POSITION;
 	}
 
 	/**
@@ -156,9 +161,8 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 */
 	public void toggleSelection(int position) {
 		if (position >= 0 && (
-				(mAdapter.getMode() == SelectableAdapter.MODE_SINGLE && position != mActivatedPosition) ||
+				(mAdapter.getMode() == SelectableAdapter.MODE_SINGLE && !mAdapter.isSelected(position)) ||
 				mAdapter.getMode() == SelectableAdapter.MODE_MULTI)) {
-			mActivatedPosition = position;
 			mAdapter.toggleSelection(position);
 		}
 		// If MODE_SINGLE is active then ActionMode can be null
@@ -246,7 +250,6 @@ public class ActionModeHelper implements ActionMode.Callback {
 			Log.i(TAG, "ActionMode is about to be destroyed! New mode will be " + defaultMode);
 		// Change mode and deselect everything
 		mAdapter.setMode(defaultMode);
-		mActivatedPosition = RecyclerView.NO_POSITION;
 		mAdapter.clearSelection();
 		mActionMode = null;
 		// Notify the provided callback
