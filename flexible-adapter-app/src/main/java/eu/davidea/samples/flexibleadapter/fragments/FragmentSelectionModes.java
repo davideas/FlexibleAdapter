@@ -19,6 +19,7 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -106,7 +107,10 @@ public class FragmentSelectionModes extends AbstractFragment {
 
 		// Add 2 Scrollable Headers
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
-		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.addScrollableHeaderWithDelay(new ScrollableUseCaseItem(
+				getString(R.string.selection_modes_use_case_title),
+				getString(R.string.selection_modes_use_case_description)), 1100L, true
+		);
 	}
 
 	@Override

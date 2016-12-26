@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -13,6 +14,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
+import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
 import eu.davidea.samples.flexibleadapter.items.OverallItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
@@ -109,12 +111,18 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payload) {
 		int viewType = getItemViewType(position);
+		Context context = holder.itemView.getContext();
+
 
 		if (viewType == R.layout.recycler_scrollable_usecase_item) {
 			ScrollableUseCaseItem item = (ScrollableUseCaseItem) getItem(position);
 			ScrollableUseCaseItem.UCViewHolder vHolder = (ScrollableUseCaseItem.UCViewHolder) holder;
 			assert item != null;
 
+			DrawableUtils.setBackgroundCompat(holder.itemView, DrawableUtils.getRippleDrawable(
+					DrawableUtils.getColorDrawable(context.getResources().getColor(R.color.material_color_blue_grey_50)),
+					DrawableUtils.getColorControlHighlight(context))
+			);
 			vHolder.mTitle.setText(Utils.fromHtmlCompat(item.getTitle()));
 			vHolder.mSubtitle.setText(Utils.fromHtmlCompat(item.getSubtitle()));
 

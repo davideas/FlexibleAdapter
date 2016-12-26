@@ -95,12 +95,11 @@ public class FragmentOverall extends AbstractFragment {
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		// Add 1 Scrollable Header
+		// Add 2 Scrollable Headers
 		mAdapter.showLayoutInfo(savedInstanceState == null);
-		mAdapter.addScrollableHeader(
-				new ScrollableUseCaseItem(
-						getString(R.string.overall_use_case_title),
-						getString(R.string.overall_use_case_description)));
+		mAdapter.addScrollableHeader(new ScrollableUseCaseItem(
+				getString(R.string.overall_use_case_title),
+				getString(R.string.overall_use_case_description)));
 	}
 
 	@Override

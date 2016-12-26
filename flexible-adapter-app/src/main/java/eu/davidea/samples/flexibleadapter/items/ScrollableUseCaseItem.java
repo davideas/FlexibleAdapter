@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IHeader;
+import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -42,6 +44,11 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UC
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, UCViewHolder holder, int position, List payloads) {
+		Context context = holder.itemView.getContext();
+		DrawableUtils.setBackgroundCompat(holder.itemView, DrawableUtils.getRippleDrawable(
+				DrawableUtils.getColorDrawable(context.getResources().getColor(R.color.material_color_blue_grey_50)),
+				DrawableUtils.getColorControlHighlight(context))
+		);
 		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
 		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
 	}

@@ -92,7 +92,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			// NOTE: If you have to change at runtime the LayoutManager AND add
 			// Scrollable Headers, consider to add them in post, using a delay >= 0
 			// otherwise scroll animations on all items will not start correctly.
-			addScrollableHeaderWithDelay(item, 0L, scrollToPosition);
+			addScrollableHeaderWithDelay(item, 1200L, scrollToPosition);
 			removeScrollableHeaderWithDelay(item, 4000L);
 		}
 	}
@@ -107,7 +107,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			final ScrollableULSItem item = new ScrollableULSItem("ULS");
 			item.setTitle(mRecyclerView.getContext().getString(R.string.uls_title));
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.uls_subtitle));
-			addScrollableHeaderWithDelay(item, 1000L, scrollToPosition);
+			addScrollableHeaderWithDelay(item, 1000L, false);
 		}
 	}
 

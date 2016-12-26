@@ -97,12 +97,16 @@ items and higher, due to calculate the correct position for each item to shift. 
 	<!-- Menu Drawers -->
 	<string name="overall">Overall</string>
 	<string name="overall_use_case_title">Showcase of the library capabilities</string>
-	<string name="overall_use_case_description"><![CDATA[The demo is organized in <b>fragments</b> where the
-	<i>RecyclerView</i> and the <i>Adapter</i> are reinitialized in each fragment which can use
-	several features, but the <i>MainActivity</i> implements and reuses the common listeners.]]></string>
+	<string name="overall_use_case_description"><![CDATA[The demoApp is organized in <b>fragments</b> where the
+<i>RecyclerView</i> and the <i>Adapter</i> are reinitialized. Each example implements several features of
+the library. Common listeners are instead implemented in the <i>MainActivity</i>.]]></string>
 
 	<string name="selection_modes">Selection modes</string>
 	<string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper + UndoHelper + Scrollable Headers</string>
+	<string name="selection_modes_use_case_title">IDLE, SINGLE, MULTI</string>
+	<string name="selection_modes_use_case_description"><![CDATA[The 3 selection modes are managed with the new
+	<b>ActionModeHelper</b>. You can experiment the MULTI selection starting from the SINGLE and from IDLE mode.<br/>
+	Screen rotation is also supported. <i>ActionMode</i> is implemented in the <i>MainActivity</i>.]]></string>
 
 	<string name="filter">Async Filter</string>
 	<string name="filter_description">Big list with Asynchronous filter and refresh + Synchronization Animations + Configuration</string>
