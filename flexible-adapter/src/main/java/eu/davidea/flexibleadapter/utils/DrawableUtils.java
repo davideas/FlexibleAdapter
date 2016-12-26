@@ -17,6 +17,7 @@ package eu.davidea.flexibleadapter.utils;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
@@ -178,6 +179,24 @@ public final class DrawableUtils {
 					getRippleMask(normalColor));
 		} else {
 			return getStateListDrawable(normalColor, pressedColor);
+		}
+	}
+
+	/**
+	 * Adds a ripple effect to any background.
+	 *
+	 * @param drawable    any background drawable
+	 * @param rippleColor the color of the ripple
+	 * @return the RippleDrawable with the chosen background drawable if at least Lollipop,
+	 * the provided drawable otherwise
+	 * @since 5.0.0-rc1
+	 */
+	public static Drawable getRippleDrawable(Drawable drawable, @ColorInt int rippleColor) {
+		if (Utils.hasLollipop()) {
+			return new RippleDrawable(ColorStateList.valueOf(rippleColor),
+					drawable, getRippleMask(Color.BLACK));
+		} else {
+			return drawable;
 		}
 	}
 
