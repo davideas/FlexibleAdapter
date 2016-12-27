@@ -91,8 +91,8 @@ text back to normal. This happens systematically when searchText is reduced in l
 	<string name="config_notify_move">Notify move of filtered items (Nicely animate the moved items)</string>
 	<string name="config_notify_move_description"><![CDATA[Performs a further step to nicely
 animate the moved items.<br/>The process is <b>very slow</b> on big list of the order of ~3-5000
-items and higher, due to calculate the correct position for each item to shift. Use with caution!
-<br/>The slowness is higher when the searchText is cleared out. Try to disable to improve performance]]></string>
+items and higher, due to the calculation of the correct position for each item to shift. Use with caution!
+<br/>The slowness is higher when the searchText is cleared out. Try to disable to improve performance.]]></string>
 
 	<!-- Menu Drawers -->
 	<string name="overall">Overall</string>
@@ -159,7 +159,7 @@ the library. Common listeners are instead implemented in the <i>MainActivity</i>
 <a href="https://github.com/davideas">Github Profile</a>
 
 <br/><br/><b>Licence</b><br/>
-Copyright © 2015-2016 Davide Steduto.
+Copyright © 2015-2017 Davide Steduto.
 <br/><br/>Licensed under the Apache License, Version 2.0 (the "License");
 You may not use this file except in compliance with the License.
 You may obtain a copy of the License at

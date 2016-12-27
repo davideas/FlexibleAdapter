@@ -7,9 +7,9 @@ ext {
 
 	//Library
 	libraryCode = 19
-	libraryVersion = "5.0.0-SNAPSHOT"
+	libraryVersion = "5.0.0-rc1"
 	libraryDate = " built on " + getDate()
-	libraryDescription = "1 Adapter for SelectionMode, ViewHolders, AsyncFilter, FastScroller, Animations, Undo, Sections, Headers, Footers, EndlessScroll, Expandable, Draggable, Swipeable :-)"
+	libraryDescription = "1 Adapter for SelectionMode, ViewHolders, AsyncFilter, FastScroller, Animations, Undo, Sections, Sticky Headers, Scrollable Headers and Footers, EndlessScroll, Expandable, Draggable, Swipeable :-)"
 	libraryName = "FlexibleAdapter"
 	packageExt = "aar"
 

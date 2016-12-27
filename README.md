@@ -8,7 +8,7 @@
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
 ###### Fast and versatile Adapter for your RecyclerView
-- **NEW!** First release candidate: [v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) built on 2016.12.xx (157KB)
+- **NEW!** First release candidate: [v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) built on 2016.12.29 (159KB)
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 
 > When initially Android team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.<br/>
@@ -18,7 +18,7 @@ Since I created this library, it has become easy to configure how views will be 
 The idea behind is to regroup multiple features in a unique library, without the need to customize and import several third libraries not compatible among them.
 
 The FlexibleAdapter helps developers to simplify this process without worrying too much about the Adapter anymore. It's easy to extend, it has predefined logic for different situations and prevents common mistakes.<br/>
-This library is configurable and it guides the developers to create a better user experience and now, even more with the new ViewHolders and new actions.
+This library is configurable and it guides the developers to create a better user experience and now, even more with the new ViewHolders and new features.
 
 #### Main features
 * Simple item selection with ripple effect, Single & Multi selection mode.
@@ -30,7 +30,7 @@ This library is configurable and it guides the developers to create a better use
 * **NEW!** [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) updates and filter on big list.
 * **NEW!** Auto mapping multi view types with [Item interfaces](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Item-Interfaces).
 * **NEW!** Predefined [ViewHolders](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ViewHolders) with callbacks.
-* **NEW!** [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behaviour fully clickable and collapsible, with elevation and automatic linkage!
+* **NEW!** [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behaviour fully clickable and collapsible, with elevation, transparency and automatic linkage!
 * **NEW!** [Scrollable Headers and Footers](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Scrollable-Headers-and-Footers) items that lay respectively at the top and at the bottom of the main items.
 * **NEW!** Expandable items with _Selection Coherence_ and multi-level expansion.
 * **NEW!** [Drag&Drop and Swipe-To-Dismiss](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Drag&Drop-and-Swipe#swiping-the-front-view) with Leave-Behind pattern and with _Selection Coherence_.
@@ -101,7 +101,7 @@ You can download the latest demo App from the latest release page OR run it with
 
 # Change Log
 ###### Latest release
-[v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) - 2016.12.xx
+[v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) - 2016.12.29
 
 ###### Old releases
 [v5.0.0-b8](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-b8) - 2016.09.17 |
@@ -141,6 +141,7 @@ Special thanks goes to Martin Guillon ([Akylas](https://github.com/Akylas)) to h
 # Apps that use this Adapter
 It will be a pleasure to add your App here, once it is published.
 
+[Module.org](https://play.google.com/store/apps/details?id=org.module.app) |
 [Socio - Shake and Connect!](https://play.google.com/store/apps/details?id=com.atsocio.socio) |
 [Shibagram](https://play.google.com/store/apps/details?id=com.apripachkin.shibagram) |
 [BNVR Client](https://play.google.com/store/apps/details?id=ru.beward.bnvr)
