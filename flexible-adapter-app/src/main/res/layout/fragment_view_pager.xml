@@ -9,11 +9,11 @@
 	<!--<android.support.v4.widget.SwipeRefreshLayout-->
 		<!--android:id="@+id/swipeRefreshLayout"-->
 		<!--android:layout_width="match_parent"-->
-		<!--android:layout_height="match_parent"-->
-		<!--android:enabled="false">-->
+		<!--android:layout_height="match_parent">-->
 
-		<!-- This FrameLayout is needed ONLY IF sticky headers are used, in order to
-			 display the Refresh circle AND the FastScroll on the top of sticky_header_layout.
+		<!-- This FrameLayout is still mandatory ONLY IF sticky header is enabled. This
+			 layout will help to receive the inflated layout at runtime and to display the
+			 Refresh circle AND the FastScroll on the top of sticky_header_layout.
 			 If you need to drag items, SwipeRefreshLayout must be disabled! -->
 		<FrameLayout
 			android:layout_width="match_parent"
@@ -25,26 +25,16 @@
 				android:layout_height="match_parent"
 				tools:listitem="@layout/recycler_expandable_item"/>
 
-			<!-- Needed by FlexibleAdapter for headers to be sticky.
-				 This little layout is included in the library.
-				 If you need to drag items, SwipeRefreshLayout must be disabled!-->
+			<!-- NOT NEEDED ANYMORE!! This layout is generated at runtime when
+                 sticky headers are enabled. So you can safely remove it. -->
 			<!--<include layout="@layout/sticky_header_layout"/>-->
 
 		</FrameLayout>
 
 	<!--</android.support.v4.widget.SwipeRefreshLayout>-->
 
-	<!-- Needed by FlexibleAdapter for headers to be sticky.
-		 This little layout is included in the library.
-		 Declared here, only in combination with SwipeRefreshLayout,
-		 the refresh circle will appear below the sticky header!! -->
-	<include layout="@layout/sticky_header_layout"/>
-
 	<!-- Custom EmptyView for RV when empty-->
 	<include layout="@layout/empty_view"/>
-
-	<!-- Custom ProgressBar (at the moment not used) -->
-	<!--<include layout="@layout/progress_bar"/>-->
 
 	<!-- FastScroller Layout must be at the end of ViewHierarchy
 		 in order to be displayed at the top of every views -->

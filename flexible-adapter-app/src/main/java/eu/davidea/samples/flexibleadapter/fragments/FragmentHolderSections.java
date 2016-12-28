@@ -13,6 +13,7 @@ import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -68,14 +69,17 @@ public class FragmentHolderSections extends AbstractFragment {
 		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		mAdapter.setDisplayHeadersAtStartUp(true)
-				.setStickyHeaders(true);
+				.setStickyHeaders(true)
+				.setOnlyEntryAnimation(true);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		// Add 1 Scrollable Header
-		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		mAdapter.addScrollableHeader(new ScrollableUseCaseItem(
+				getString(R.string.model_holders_use_case_title),
+				getString(R.string.model_holders_use_case_description)));
 	}
 
 	@Override

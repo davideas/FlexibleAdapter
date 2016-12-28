@@ -89,7 +89,7 @@ public class FragmentOverall extends AbstractFragment {
 					Snackbar.make(getView(), "Long press drag is enabled", Snackbar.LENGTH_SHORT).show();
 				}
 			}
-		}, 3000L);
+		}, 4000L);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);

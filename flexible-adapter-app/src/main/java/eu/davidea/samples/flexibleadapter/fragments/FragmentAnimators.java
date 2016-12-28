@@ -37,6 +37,7 @@ import eu.davidea.samples.flexibleadapter.animators.SlideInDownAnimator;
 import eu.davidea.samples.flexibleadapter.animators.SlideInLeftAnimator;
 import eu.davidea.samples.flexibleadapter.animators.SlideInRightAnimator;
 import eu.davidea.samples.flexibleadapter.animators.SlideInUpAnimator;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
@@ -116,7 +117,9 @@ public class FragmentAnimators extends AbstractFragment {
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		// Add 1 Scrollable Header
-		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.addScrollableHeader(new ScrollableUseCaseItem(
+				getString(R.string.animator_use_case_title),
+				getString(R.string.animator_use_case_description)));
 	}
 
 	@Override

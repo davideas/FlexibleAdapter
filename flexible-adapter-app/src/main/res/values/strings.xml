@@ -37,7 +37,7 @@
 
 	<!-- Scrollable Headers/Footer/ProgressItem -->
 	<string name="uls_title"><![CDATA[<i>Click on Image (or LongClick on Item) to select that Item</i>]]></string>
-	<string name="uls_subtitle"><![CDATA[<i>This is scrollable header.</i>]]></string>
+	<string name="uls_subtitle"><![CDATA[<i>This is a scrollable header.</i>]]></string>
 	<string name="scrollable_header_title">Scrollable Header Item</string>
 	<string name="scrollable_header_subtitle"><![CDATA[<i>Scrollable Headers are always displayed at the top of all main items.</i>]]></string>
 	<string name="scrollable_expandable_header_title">Scrollable Expandable Header Item</string>
@@ -105,17 +105,27 @@ the library. Common listeners are instead implemented in the <i>MainActivity</i>
 	<string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper + UndoHelper + Scrollable Headers</string>
 	<string name="selection_modes_use_case_title">IDLE, SINGLE, MULTI</string>
 	<string name="selection_modes_use_case_description"><![CDATA[The 3 selection modes are managed with the new
-	<b>ActionModeHelper</b>. You can experiment the MULTI selection starting from the SINGLE and from IDLE mode.<br/>
-	Screen rotation is also supported. <i>ActionMode</i> is implemented in the <i>MainActivity</i>.]]></string>
+<b>ActionModeHelper</b>. You can experiment the MULTI selection starting from the SINGLE and from IDLE mode.<br/>
+Screen rotation is also supported. <i>ActionMode</i> is implemented in the <i>MainActivity</i>.]]></string>
 
 	<string name="filter">Async Filter</string>
 	<string name="filter_description">Big list with Asynchronous filter and refresh + Synchronization Animations + Configuration</string>
 
 	<string name="animator">Item Animators</string>
 	<string name="animator_description">ItemAnimators coherent with ScrollingAnimation</string>
+	<string name="animator_use_case_title">ItemAnimator coherent with ScrollingAnimation</string>
+	<string name="animator_use_case_description"><![CDATA[Items can have common animation for inserting/deletion but some
+can be unique if <b>AnimatedViewHolder</b> is implemented.<br/>
+Index of section items is also provided to give a cascade effect when expanding/collapsing items.<br/>
+ScrollingAnimation gives an unique touch of animations when filling the RecyclerView or scrolling it.]]></string>
 
 	<string name="headers_sections">Headers and Sections</string>
 	<string name="headers_sections_description">Clickable sticky headers for sections + Draggable items with Auto-Linkage + Filter + Scrollable Headers and Footers</string>
+	<string name="headers_sections_use_case_title"><![CDATA[Sticky headers showcase (<i>IHeader</i>)]]></string>
+	<string name="headers_sections_use_case_description"><![CDATA[Headers can be displayed and hidden all together.<br/>
+Sticky header is a real view and it\'s fully clickable, elevation and transparency are supported too.<br/>
+Using filter will disable the sticky header.<br/>
+Follow the steps in the <b>Wiki</b> page of the library.]]></string>
 
 	<string name="expandable_sections">Expandable Sections</string>
 	<string name="expandable_sections_description">Sections with [sticky] headers that can expand/collapse + Draggable items + Filter + Scroll Animations</string>
@@ -131,11 +141,18 @@ the library. Common listeners are instead implemented in the <i>MainActivity</i>
 
 	<string name="model_holders">Item Model Holder</string>
 	<string name="model_holders_description"><![CDATA[A representation of Items holding the model object.<br/><font color="#ff4081"><b>Check the code!</b></font>]]></string>
+	<string name="model_holders_use_case_title"><![CDATA[<i>IHolder</i> item interface]]></string>
+	<string name="model_holders_use_case_description"><![CDATA[Adapter item holding the model object.<br/>
+Use can use <i>IHolder</i> interface when you have to serialize/deserialize the model object coming from
+a network or from a different layer. <font color="#ff4081"><b>Check the code!</b></font>]]></string>
 
 	<string name="horizontal">Horizontal Layout</string>
 	<string name="horizontal_description">Items are disposed in vertical</string>
 
 	<string name="staggered_description">Cards with Sticky Headers disposed in Staggered Layout, dynamic background, insertion and sorting</string>
+	<string name="staggered_use_case_title">Support for Staggered Layout</string>
+	<string name="staggered_use_case_description"><![CDATA[Easy and predefined method for runtime item insertion and sorting in sections: <i>calculatePositionFor()</i>.<br/>
+Example of dynamic background with ripple effect without XML configuration.]]></string>
 
 	<string name="viewpager">View Pager</string>
 	<string name="viewpager_description">Example usage with Sticky Headers in ViewPager layout</string>

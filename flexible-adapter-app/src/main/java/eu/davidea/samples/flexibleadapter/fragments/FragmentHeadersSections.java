@@ -24,6 +24,7 @@ import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.dialogs.BottomSheetDialog;
 import eu.davidea.samples.flexibleadapter.dialogs.OnParameterSelectedListener;
 import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
@@ -111,8 +112,11 @@ public class FragmentHeadersSections extends AbstractFragment
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		// Add 2 Scrollable Headers and 1 Footer
+		// Add 3 Scrollable Headers and 1 Footer
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		mAdapter.addScrollableHeaderWithDelay(new ScrollableUseCaseItem(
+				getString(R.string.headers_sections_use_case_title),
+				getString(R.string.headers_sections_use_case_description)), 900L, false);
 		mAdapter.showLayoutInfo(savedInstanceState == null);
 		mAdapter.addScrollableFooter();
 	}
@@ -189,6 +193,7 @@ public class FragmentHeadersSections extends AbstractFragment
 				// NOTE: If you use simple integers to identify the ViewType,
 				// here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
+					case R.layout.recycler_scrollable_usecase_item:
 					case R.layout.recycler_scrollable_header_item:
 					case R.layout.recycler_scrollable_footer_item:
 					case R.layout.recycler_scrollable_layout_item:

@@ -73,8 +73,6 @@ public class StaggeredHeaderItem extends AbstractHeaderItem<StaggeredHeaderItem.
 
 		@BindView(R.id.title)
 		TextView title;
-		@BindView(R.id.layout_elevation)
-		View elevationView;
 
 		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);//True for sticky

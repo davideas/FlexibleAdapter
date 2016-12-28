@@ -12,13 +12,15 @@ import android.view.MenuItem;
 
 import java.util.Random;
 
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.TopSnappedSmoothScroller;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.utils.Utils;
-import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredHeaderItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredItemStatus;
@@ -34,7 +36,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 
 	public static final String TAG = FragmentStaggeredLayout.class.getSimpleName();
 
-	private ExampleAdapter mAdapter;
+	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
 
 	public static FragmentStaggeredLayout newInstance(int columnCount) {
 		FragmentStaggeredLayout fragment = new FragmentStaggeredLayout();
@@ -67,7 +69,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		// Initialize Adapter and RecyclerView
 		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
-		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
+		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		// Customize the speed of the smooth scroll.
 		// NOTE: Every time you change this value you MUST recreate the LayoutManager instance
@@ -88,25 +90,22 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
 				.setNotifyMoveOfFilteredItems(true)
-				.setPermanentDelete(true); //Default=true
+				.setPermanentDelete(true) //Default=true
+				.setOnlyEntryAnimation(true);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		// Add 1 Scrollable Header
-		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.addScrollableHeader(new ScrollableUseCaseItem(
+				getString(R.string.staggered_use_case_title),
+				getString(R.string.staggered_use_case_description)));
 	}
 
 	@Override
 	public int getContextMenuResId() {
 		return R.menu.menu_staggered_context;
-	}
-
-	@Override
-	public void showNewLayoutInfo(MenuItem item) {
-		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo(false);
 	}
 
 	@Override

@@ -14,7 +14,6 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
-import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.utils.Utils;
@@ -23,8 +22,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 /**
  * This item is a Scrollable Header.
  */
-public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UCViewHolder>
-		implements IHeader<ScrollableUseCaseItem.UCViewHolder> {
+public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UCViewHolder> {
 
 	public ScrollableUseCaseItem(String title, String subTitle) {
 		super("UC");

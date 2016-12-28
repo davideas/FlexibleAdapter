@@ -83,7 +83,7 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
 
 	public void mergeItem(StaggeredItem staggeredItem) {
 		if (mergedItems == null) {
-			mergedItems = new ArrayList<StaggeredItem>(1);
+			mergedItems = new ArrayList<>(1);
 		}
 		mergedItems.add(staggeredItem);
 	}
