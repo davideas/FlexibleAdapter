@@ -2,30 +2,6 @@ apply plugin: 'com.jfrog.bintray'
 
 version = libraryVersion
 
-task clean(type: Delete) {
-	delete rootProject.buildDir
-}
-
-task sourcesJar(type: Jar) {
-	from android.sourceSets.main.java.srcDirs
-	classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-	source = android.sourceSets.main.java.srcDirs
-	classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier = 'javadoc'
-	from javadoc.getDestinationDir()
-}
-
-artifacts {
-	archives javadocJar
-	archives sourcesJar
-}
-
 def getRepositoryUsername() {
 	return getProperties().get('bintray.user')
 }
