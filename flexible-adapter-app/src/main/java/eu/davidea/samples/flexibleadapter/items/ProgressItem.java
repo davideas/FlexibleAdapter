@@ -27,9 +27,19 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  */
 public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 
+	private StatusEnum status = StatusEnum.MORE_TO_LOAD;
+
 	@Override
 	public boolean equals(Object o) {
 		return this == o;//The default implementation
+	}
+
+	public StatusEnum getStatus() {
+		return status;
+	}
+
+	public void setStatus(StatusEnum status) {
+		this.status = status;
 	}
 
 	@Override
@@ -43,19 +53,43 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, ProgressViewHolder holder, int position, List payloads) {
-		if (!payloads.contains(Payload.NO_MORE_LOAD) && adapter.isEndlessScrollEnabled()) {
+	public void bindViewHolder(FlexibleAdapter adapter, ProgressViewHolder holder,
+							   int position, List payloads) {
+
+		Context context = holder.itemView.getContext();
+		holder.progressBar.setVisibility(View.GONE);
+		holder.progressMessage.setVisibility(View.VISIBLE);
+
+		if (!adapter.isEndlessScrollEnabled()) {
+			setStatus(StatusEnum.DISABLE_ENDLESS);
+		} else if (payloads.contains(Payload.NO_MORE_LOAD)) {
+			setStatus(StatusEnum.NO_MORE_LOAD);
+		}
+
+		switch (this.status) {
+		case NO_MORE_LOAD:
+			holder.progressMessage.setText(
+					context.getString(R.string.no_more_load_retry));
+			// Reset to default status for next binding
+			setStatus(StatusEnum.MORE_TO_LOAD);
+			break;
+		case DISABLE_ENDLESS:
+			holder.progressMessage.setText(context.getString(R.string.endless_disabled));
+			break;
+		case ON_CANCEL:
+			holder.progressMessage.setText(context.getString(R.string.endless_cancel));
+			// Reset to default status for next binding
+			setStatus(StatusEnum.MORE_TO_LOAD);
+			break;
+		case ON_ERROR:
+			holder.progressMessage.setText(context.getString(R.string.endless_error));
+			// Reset to default status for next binding
+			setStatus(StatusEnum.MORE_TO_LOAD);
+			break;
+		default:
 			holder.progressBar.setVisibility(View.VISIBLE);
 			holder.progressMessage.setVisibility(View.GONE);
-		} else {
-			holder.progressBar.setVisibility(View.GONE);
-			holder.progressMessage.setVisibility(View.VISIBLE);
-			Context context = holder.itemView.getContext();
-			if (!adapter.isEndlessScrollEnabled()) {
-				holder.progressMessage.setText(context.getString(R.string.endless_disabled));
-			} else if (payloads.contains(Payload.NO_MORE_LOAD)) {
-				holder.progressMessage.setText(context.getString(R.string.no_more_load_retry));
-			}
+			break;
 		}
 	}
 
@@ -74,6 +108,14 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 		public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
 			AnimatorHelper.scaleAnimator(animators, itemView, 0f);
 		}
+	}
+
+	public enum StatusEnum {
+		MORE_TO_LOAD, //Default = should have an empty Payload
+		DISABLE_ENDLESS, //Endless is disabled because user has set limits
+		NO_MORE_LOAD, //Non-empty Payload = Payload.NO_MORE_LOAD
+		ON_CANCEL,
+		ON_ERROR
 	}
 
 }

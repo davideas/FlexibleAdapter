@@ -43,6 +43,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	public static final String TAG = FragmentEndlessScrolling.class.getSimpleName();
 
 	private ExampleAdapter mAdapter;
+	private ProgressItem mProgressItem = new ProgressItem();
 
 	public static FragmentEndlessScrolling newInstance(int columnCount) {
 		FragmentEndlessScrolling fragment = new FragmentEndlessScrolling();
@@ -108,7 +109,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		// EndlessScrollListener - OnLoadMore (v5.0.0)
-		mAdapter.setEndlessScrollListener(this, new ProgressItem())
+		mAdapter.setEndlessScrollListener(this, mProgressItem)
 				//.setEndlessPageSize(3) //Endless is automatically disabled if newItems < 3
 				.setEndlessTargetCount(15); //Endless is automatically disabled if totalItems >= 15
 				//.setEndlessScrollThreshold(1); //Default=1
@@ -124,24 +125,24 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mAdapter.showLayoutInfo(false);
 	}
 
-	/**
-	 * No more data to load.
-	 * <p>This method is called if any limit is reached (<b>targetCount</b> or <b>pageSize</b>
-	 * must be set) AND if new data is <u>temporary</u> unavailable (ex. no connection or no
-	 * new updates remotely). If no new data, a {@link FlexibleAdapter#notifyItemChanged(int, Object)}
-	 * with a payload {@link Payload#NO_MORE_LOAD} is triggered on the <i>progressItem</i>.</p>
-	 *
-	 * @param newItemsSize the last size of the new items loaded
-	 * @see FlexibleAdapter#setEndlessTargetCount(int)
-	 * @see FlexibleAdapter#setEndlessPageSize(int)
-	 * @since 5.0.0-rc1
-	 */
-	@Override
-	public void noMoreLoad(int newItemsSize) {
-		Log.d(TAG, "newItemsSize=" + newItemsSize);
-		Log.d(TAG, "Total pages loaded=" + mAdapter.getEndlessCurrentPage());
-		Log.d(TAG, "Total items loaded=" + mAdapter.getMainItemCount());
-	}
+/**
+ * No more data to load.
+ * <p>This method is called if any limit is reached (<b>targetCount</b> or <b>pageSize</b>
+ * must be set) AND if new data is <u>temporary</u> unavailable (ex. no connection or no
+ * new updates remotely). If no new data, a {@link FlexibleAdapter#notifyItemChanged(int, Object)}
+ * with a payload {@link Payload#NO_MORE_LOAD} is triggered on the <i>progressItem</i>.</p>
+ *
+ * @param newItemsSize the last size of the new items loaded
+ * @see FlexibleAdapter#setEndlessTargetCount(int)
+ * @see FlexibleAdapter#setEndlessPageSize(int)
+ * @since 5.0.0-rc1
+ */
+@Override
+public void noMoreLoad(int newItemsSize) {
+	Log.d(TAG, "newItemsSize=" + newItemsSize);
+	Log.d(TAG, "Total pages loaded=" + mAdapter.getEndlessCurrentPage());
+	Log.d(TAG, "Total items loaded=" + mAdapter.getMainItemCount());
+}
 
 	/**
 	 * Loads more data.
@@ -170,7 +171,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 				// 1. Simulating success/failure with Random
 				int count = new Random().nextInt(7);
-				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item);
+				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_simple_item);
 				for (int i = 1; i <= count; i++) {
 					newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
 				}

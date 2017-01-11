@@ -367,16 +367,16 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			shouldAnimate = false;
 		}
 		int lastVisiblePosition = Utils.findLastVisibleItemPosition(mRecyclerView.getLayoutManager());
-		if (DEBUG) {
-			Log.v(TAG, "shouldAnimate=" + shouldAnimate
-					+ " isFastScroll=" + isFastScroll
-					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
-					+ " isReverseEnabled=" + isReverseEnabled
-					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
-					+ (!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : "")
-					+ " mMaxChildViews=" + mMaxChildViews
-			);
-		}
+//		if (DEBUG) {
+//			Log.v(TAG, "shouldAnimate=" + shouldAnimate
+//					+ " isFastScroll=" + isFastScroll
+//					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
+//					+ " isReverseEnabled=" + isReverseEnabled
+//					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
+//					+ (!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : "")
+//					+ " mMaxChildViews=" + mMaxChildViews
+//			);
+//		}
 		if (holder instanceof FlexibleViewHolder && shouldAnimate && !isFastScroll &&
 				!mAnimatorNotifierObserver.isPositionNotified() &&
 				(position > lastVisiblePosition || isReverseEnabled || isScrollableHeaderOrFooter(position) || (position == 0 && mMaxChildViews == 0))) {
@@ -401,7 +401,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 					duration = animator.getDuration();
 				}
 			}
-			Log.v(TAG, "duration=" + duration);
+			//Log.v(TAG, "duration=" + duration);
 			set.setDuration(duration > 0 ? duration : mDuration);
 			set.addListener(new HelperAnimatorListener(hashCode));
 			if (mEntryStep) {
@@ -692,8 +692,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 		private void markNotified() {
 			notified = !animateFromObserver;
-			if (DEBUG)
-				Log.v(TAG, "animateFromObserver=" + animateFromObserver + " notified=" + notified);
+//			if (DEBUG)
+//				Log.v(TAG, "animateFromObserver=" + animateFromObserver + " notified=" + notified);
 		}
 
 		@Override

@@ -47,7 +47,9 @@
 	<string name="scrollable_footer_title">Scrollable Footer Item</string>
 	<string name="scrollable_footer_subtitle"><![CDATA[<i>Scrollable Footers are always displayed at the bottom of all main items.</i>]]></string>
 	<string name="no_more_load_retry">No more items to load. Refresh to retry.</string>
-	<string name="endless_disabled">No more items to load.</string>
+	<string name="endless_disabled">No more items to load (max reached).</string>
+	<string name="endless_cancel">Cancelled by the user.</string>
+	<string name="endless_error">An error occurred while loading more items.</string>
 
 	<!-- Dialog -->
 	<string name="dialog_edit_title_hint">Title</string>
