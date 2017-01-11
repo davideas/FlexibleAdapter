@@ -2,13 +2,14 @@
 [![Download](https://api.bintray.com/packages/davideas/maven/flexible-adapter/images/download.svg) ](https://bintray.com/davideas/maven/flexible-adapter/_latestVersion)
 [![API](https://img.shields.io/badge/API-14%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=14)
 [![Licence](https://img.shields.io/badge/Licence-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Methods and Size](https://img.shields.io/badge/Methods%20and%20Size-core:%201162%20|%20deps:%2021349%20|%20159%20KB-e91e63.svg)](http://www.methodscount.com/?lib=eu.davidea%3Aflexible-adapter%3A5.0.0-rc1)
 
 # FlexibleAdapter
 
 ####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
 ###### Fast and versatile Adapter for your RecyclerView
-- **NEW!** First release candidate: [v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) built on 2016.12.29 (159KB)
+- **NEW!** First release candidate: [v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) built on 2016.12.29
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 
 > When initially Android team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.<br/>
