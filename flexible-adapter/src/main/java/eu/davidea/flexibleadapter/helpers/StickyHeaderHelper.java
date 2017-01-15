@@ -133,7 +133,6 @@ public final class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	public void updateOrClearHeader(boolean updateHeaderContent) {
-		//
 		if (!mAdapter.areHeadersShown() || mAdapter.hasSearchText() || mAdapter.getItemCount() == 0) {
 			clearHeaderWithAnimation();
 			return;
