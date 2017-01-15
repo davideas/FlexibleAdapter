@@ -15,21 +15,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
-
 import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.flexibleadapter.databinding.BindingFlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
+import eu.davidea.flexibleadapter.databinding.BindingFlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.flexibleadapter.items.IHeader;
-import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.databinding.FragmentDatabindingRecyclerViewBinding;
-import eu.davidea.samples.flexibleadapter.dialogs.OnParameterSelectedListener;
-import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
+import eu.davidea.samples.flexibleadapter.databinding.FragmentRecyclerViewDataBinding;
 import eu.davidea.samples.flexibleadapter.items.HeaderItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -40,13 +34,11 @@ import eu.davidea.utils.Utils;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class FragmentDataBindingHeadersSections extends AbstractFragment
-		implements OnParameterSelectedListener {
+public class FragmentDataBinding extends AbstractFragment {
 
-	public static final String TAG = FragmentDataBindingHeadersSections.class.getSimpleName();
+	public static final String TAG = FragmentDataBinding.class.getSimpleName();
 
 	private ObservableArrayList<AbstractFlexibleItem> items = new ObservableArrayList<>();
-	private FragmentDatabindingRecyclerViewBinding binding;
 
 	private int fabClickedTimes = 0;
 	/**
@@ -55,8 +47,8 @@ public class FragmentDataBindingHeadersSections extends AbstractFragment
 	private BindingFlexibleAdapter<AbstractFlexibleItem> mAdapter;
 
 
-	public static FragmentDataBindingHeadersSections newInstance(int columnCount) {
-		FragmentDataBindingHeadersSections fragment = new FragmentDataBindingHeadersSections();
+	public static FragmentDataBinding newInstance(int columnCount) {
+		FragmentDataBinding fragment = new FragmentDataBinding();
 		Bundle args = new Bundle();
 		args.putInt(ARG_COLUMN_COUNT, columnCount);
 		fragment.setArguments(args);
@@ -67,14 +59,14 @@ public class FragmentDataBindingHeadersSections extends AbstractFragment
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
 	 */
-	public FragmentDataBindingHeadersSections() {
+	public FragmentDataBinding() {
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = DataBindingUtil.inflate(inflater, R.layout.fragment_databinding_recycler_view, container, false);
+		FragmentRecyclerViewDataBinding binding = DataBindingUtil
+				.inflate(inflater, R.layout.fragment_recycler_view_data, container, false);
 		binding.setItems(items);
-
 		return binding.getRoot();
 	}
 
@@ -85,7 +77,7 @@ public class FragmentDataBindingHeadersSections extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createHeadersSectionsDatabase(20, 5);
+		DatabaseService.getInstance().createHeadersSectionsDatabase(12, 4);
 		initializeRecyclerView(savedInstanceState);
 
 		//Restore FAB button and icon
@@ -99,7 +91,7 @@ public class FragmentDataBindingHeadersSections extends AbstractFragment
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		//Initialize Adapter and RecyclerView
 		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
-		mAdapter = new BindingFlexibleAdapter<>(getActivity());
+		mAdapter = new BindingFlexibleAdapter<>(getActivity(), true);
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
@@ -117,14 +109,8 @@ public class FragmentDataBindingHeadersSections extends AbstractFragment
 		mAdapter.setLongPressDragEnabled(true)
 				.setHandleDragEnabled(true)
 				.setSwipeEnabled(true)
-				.setUnlinkAllItemsOnRemoveHeaders(true)
-				//Show Headers at startUp, 1st call, correctly executed, no warning log message!
 				.setDisplayHeadersAtStartUp(true)
-				.setStickyHeaders(true)
-				//Simulate developer 2nd call mistake, now it's safe, not executed, no warning log message!
-				.setDisplayHeadersAtStartUp(true)
-				//Simulate developer 3rd call mistake, still safe, not executed, warning log message displayed!
-				.showAllHeaders();
+				.setStickyHeaders(true);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
@@ -149,57 +135,6 @@ public class FragmentDataBindingHeadersSections extends AbstractFragment
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-	}
-
-	@Override
-	public void onParameterSelected(int itemType, int referencePosition, int childPosition) {
-		if (referencePosition < 0) return;
-		int scrollTo, id;
-		IHeader referenceHeader = getReferenceList().get(referencePosition);
-		Log.d(TAG, "Adding New Item: ItemType=" + itemType +
-				" referencePosition=" + referencePosition +
-				" childPosition=" + childPosition);
-		switch (itemType) {
-			case 1: //Expandable
-				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item) + 1;
-				ISectionable sectionableExpandable = DatabaseService.newExpandableItem(id, referenceHeader);
-				mAdapter.addItemToSection(sectionableExpandable, referenceHeader, childPosition);
-				scrollTo = mAdapter.getGlobalPositionOf(referenceHeader);
-				break;
-			case 2: //Expandable Header
-				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_header_item) + 1;
-				ExpandableHeaderItem expandableHeader = DatabaseService.newExpandableSectionItem(id);
-				expandableHeader.setExpanded(false);
-				mAdapter.addSection(expandableHeader, referenceHeader);
-				scrollTo = mAdapter.getGlobalPositionOf(expandableHeader);
-				break;
-			case 3: //Header
-				id = mAdapter.getItemCountOfTypes(R.layout.recycler_header_item) + 1;
-				IHeader header = DatabaseService.newHeader(id);
-				mAdapter.addSection(header, referenceHeader);
-				scrollTo = mAdapter.getGlobalPositionOf(header);
-				break;
-			default: //case 0 = Simple Item
-				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item) + 1;
-				ISectionable sectionable = DatabaseService.newSimpleItem(id, referenceHeader);
-				mAdapter.addItemToSection(sectionable, referenceHeader, childPosition);
-				scrollTo = mAdapter.getGlobalPositionOf(referenceHeader);
-		}
-
-		//With Sticky Headers enabled, this seems necessary to give
-		// time at the RV to be in correct state before scrolling
-		final int scrollToFinal = scrollTo;
-		mRecyclerView.post(new Runnable() {
-			@Override
-			public void run() {
-				mRecyclerView.smoothScrollToPosition(scrollToFinal);
-			}
-		});
-	}
-
-	@Override
-	public List<IHeader> getReferenceList() {
-		return mAdapter.getHeaderItems();
 	}
 
 	@Override
