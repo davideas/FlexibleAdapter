@@ -791,14 +791,10 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 	 * If the payload list is not empty, DefaultItemAnimator returns <code>true</code>.
 	 * When this is the case:
 	 * <ul>
-	 * <li>If you override {@link #animateChange(ViewHolder, ViewHolder, int, int, int, int)}, both
-	 * ViewHolder arguments will be the same instance.
-	 * </li>
-	 * <li>
-	 * If you are not overriding {@link #animateChange(ViewHolder, ViewHolder, int, int, int, int)},
-	 * then DefaultItemAnimator will call {@link #animateMove(ViewHolder, int, int, int, int)} and
-	 * run a move animation instead.
-	 * </li>
+	 * <li>If you override {@code animateChange()}, both ViewHolder arguments will be the same
+	 * instance.</li>
+	 * <li>If you are not overriding {@code animateChange()}, then DefaultItemAnimator will call
+	 * {@code animateMove()} and run a move animation instead.</li>
 	 * </ul>
 	 */
 	@Override

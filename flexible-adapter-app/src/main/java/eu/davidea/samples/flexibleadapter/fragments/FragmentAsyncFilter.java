@@ -101,9 +101,13 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setAnimateToLimit(DatabaseConfiguration.animateToLimit)//Size limit = MAX_VALUE will always animate the changes
+		mAdapter.setAnimateChangesWithDiffUtil(DatabaseConfiguration.animateWithDiffUtil)
+				.setAnimateToLimit(DatabaseConfiguration.animateToLimit)//Size limit = MAX_VALUE will always animate the changes
 				.setNotifyMoveOfFilteredItems(DatabaseConfiguration.notifyMove)//When true, filtering on big list is very slow!
 				.setNotifyChangeOfUnfilteredItems(DatabaseConfiguration.notifyChange)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
+				.setAnimationInitialDelay(100L)
+				.setAnimationOnScrolling(true)
+				.setAnimationOnReverseScrolling(true)
 				.setOnlyEntryAnimation(true);
 		if (mRecyclerView == null) {
 			mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
@@ -128,7 +132,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		} else {
 			mFab.setImageResource(R.drawable.ic_settings_white_24dp);
 			mRecyclerView.removeItemDecoration(mDivider);
-			mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
+			mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 					Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		}
 

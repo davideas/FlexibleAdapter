@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<eu.davidea.samples.flexibleadapter.HeaderView
+<eu.davidea.samples.flexibleadapter.views.HeaderView
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/toolbar_header_view"
@@ -29,4 +29,4 @@
 		android:marqueeRepeatLimit="marquee_forever"
 		tools:text="Subtitle"/>
 
-</eu.davidea.samples.flexibleadapter.HeaderView>
+</eu.davidea.samples.flexibleadapter.views.HeaderView>

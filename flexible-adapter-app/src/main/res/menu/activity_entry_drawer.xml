@@ -42,7 +42,6 @@
 			android:title="@string/instagram_headers"/>
 		<item
 			android:id="@+id/nav_model_holders"
-			android:enabled="false"
 			android:icon="@drawable/ic_select_inverse_grey600_24dp"
 			android:title="@string/model_holders"/>
 		<item
@@ -54,27 +53,27 @@
 			android:enabled="false"
 			android:icon="@drawable/ic_view_column_grey600_24dp"
 			android:title="@string/horizontal"/>
-		<item
-			android:id="@+id/nav_viewpager"
-			android:enabled="false"
-			android:icon="@drawable/ic_view_carousel_grey600_24dp"
-			android:title="@string/viewpager"/>
-		<item
-			android:id="@+id/nav_dialogs"
-			android:enabled="false"
-			android:icon="@drawable/ic_comment_grey600_24dp"
-			android:title="@string/dialogs"/>
+
 	</group>
 
-	<!--<item android:title="Options">-->
-		<!--<menu>-->
+	<item android:title="Special Layouts">
+		<menu>
+			<item
+				android:id="@+id/nav_viewpager"
+				android:icon="@drawable/ic_view_carousel_grey600_24dp"
+				android:title="@string/viewpager"/>
+			<item
+				android:id="@+id/nav_dialogs"
+				android:enabled="false"
+				android:icon="@drawable/ic_comment_grey600_24dp"
+				android:title="@string/dialogs"/>
 			<!--<item-->
 				<!--android:id="@+id/nav_switch"-->
 				<!--android:enabled="false"-->
 				<!--android:title="Grid Layout"-->
 				<!--app:actionLayout="@layout/action_view_switch"/>-->
-		<!--</menu>-->
-	<!--</item>-->
+		</menu>
+	</item>
 
 	<item android:title="@string/about_title">
 		<menu>
@@ -84,7 +83,6 @@
 				android:title="@string/about_title"/>
 			<item
 				android:id="@+id/nav_github"
-				android:enabled="false"
 				android:icon="@drawable/ic_github_circle_grey600_24dp"
 				android:title="@string/github"/>
 			<!--<item-->

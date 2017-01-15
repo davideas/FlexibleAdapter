@@ -32,21 +32,22 @@ import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * This class is an implementation of {@link Callback} that enables drag & drop
- * and swipe actions. Drag and Swipe events are started depending by its configuration.
+ * This class is an implementation of {@link Callback} that enables Drag & Drop
+ * and Swipe actions. Drag and Swipe events are started depending by the configuration.
  *
  * @author Davide Steduto
  * @since 23/01/2016 Created
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class ItemTouchHelperCallback extends Callback {
 
-	private static final float ALPHA_FULL = 1.0f;
+	protected static final float ALPHA_FULL = 1.0f;
 
-	private AdapterCallback mItemTouchCallback;
-	private boolean mIsLongPressDragEnabled = false, mIsSwipeEnabled = false;
-	private long mSwipeAnimationDuration = 300L, mDragAnimationDuration = 400L;
-	private float mSwipeThreshold = 0.5f, mMoveThreshold = 0.5f;
-	private int mSwipeFlags = -1;
+	protected AdapterCallback mItemTouchCallback;
+	protected boolean longPressDragEnabled = false, handleDragEnabled = false, swipeEnabled = false;
+	protected long mSwipeAnimationDuration = 300L, mDragAnimationDuration = 400L;
+	protected float mSwipeThreshold = 0.5f, mMoveThreshold = 0.5f;
+	protected int mSwipeFlags = -1;
 
 	/*-------------*/
 	/* CONSTRUCTOR */
@@ -59,16 +60,17 @@ public class ItemTouchHelperCallback extends Callback {
 	/*-----------------------*/
 	/* CONFIGURATION SETTERS */
 	/*-----------------------*/
+
 	/* DRAG */
 
 	/**
-	 * Enable / disable the drag operation with long press on the ViewHolder.
+	 * Enable / Disable the drag operation with long press on the ViewHolder.
 	 * <p>Default value is {@code false}.</p>
 	 *
 	 * @param isLongPressDragEnabled true to enable, false to disable
 	 */
 	public void setLongPressDragEnabled(boolean isLongPressDragEnabled) {
-		this.mIsLongPressDragEnabled = isLongPressDragEnabled;
+		this.longPressDragEnabled = isLongPressDragEnabled;
 	}
 
 	/**
@@ -76,7 +78,25 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public boolean isLongPressDragEnabled() {
-		return mIsLongPressDragEnabled;
+		return longPressDragEnabled;
+	}
+
+	/**
+	 * @return true if handle drag is enabled, false otherwise
+	 */
+	public boolean isHandleDragEnabled() {
+		return handleDragEnabled;
+	}
+
+	/**
+	 * Enable / Disable the drag of the itemView with a handle view.
+	 * <p>Default value is {@code false}.</p>
+	 *
+	 * @param handleDragEnabled true to activate, false to disable
+	 * @since 5.0.0-b1
+	 */
+	public void setHandleDragEnabled(boolean handleDragEnabled) {
+		this.handleDragEnabled = handleDragEnabled;
 	}
 
 	/**
@@ -84,7 +104,7 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public boolean canDropOver(RecyclerView recyclerView, RecyclerView.ViewHolder current, RecyclerView.ViewHolder target) {
-		return current.getItemViewType() == target.getItemViewType();
+		return true;
 	}
 
 	/**
@@ -116,7 +136,7 @@ public class ItemTouchHelperCallback extends Callback {
 	 * @param isSwipeEnabled true to enable swipe, false to disable
 	 */
 	public void setSwipeEnabled(boolean isSwipeEnabled) {
-		this.mIsSwipeEnabled = isSwipeEnabled;
+		this.swipeEnabled = isSwipeEnabled;
 	}
 
 	/**
@@ -124,7 +144,7 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public boolean isItemViewSwipeEnabled() {
-		return mIsSwipeEnabled;
+		return swipeEnabled;
 	}
 
 	/**

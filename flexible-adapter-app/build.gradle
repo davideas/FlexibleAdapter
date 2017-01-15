@@ -41,9 +41,9 @@ android {
 dependencies {
 	//Testing
 	androidTestCompile supportDependencies.annotations
-	androidTestCompile 'com.android.support.test:runner:0.4.1'
-	androidTestCompile 'com.android.support.test:rules:0.4.1'
-	testCompile 'org.robolectric:robolectric:3.1.1'
+	androidTestCompile 'com.android.support.test:runner:0.5'
+	androidTestCompile 'com.android.support.test:rules:0.5'
+	testCompile 'org.robolectric:robolectric:3.1.2'
 	testCompile 'junit:junit:4.12'
 	testCompile 'org.mockito:mockito-core:2.0.71-beta'
 
@@ -51,7 +51,7 @@ dependencies {
 	compile project (":flexible-adapter")
 
 	//FlipView
-	compile "eu.davidea:flipview:1.1.1"
+	compile "eu.davidea:flipview:1.1.2"
 
 	//ButterKnife
 	compile 'com.jakewharton:butterknife:8.0.1'

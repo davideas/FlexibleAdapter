@@ -5,20 +5,21 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.AdapterView;
+
+import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.DividerItemDecoration;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -27,21 +28,9 @@ import eu.davidea.utils.Utils;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class FragmentSelectionModes extends AbstractFragment
-	implements FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
+public class FragmentSelectionModes extends AbstractFragment {
 
 	public static final String TAG = FragmentSelectionModes.class.getSimpleName();
-
-	/**
-	 * The serialization (saved instance state) Bundle key representing the
-	 * activated item position. Only used on tablets.
-	 */
-	private static final String STATE_ACTIVATED_POSITION = "activated_position";
-
-	/**
-	 * The current activated item position.
-	 */
-	private int mActivatedPosition = RecyclerView.NO_POSITION;
 
 	/**
 	 * Custom implementation of FlexibleAdapter
@@ -66,46 +55,39 @@ public class FragmentSelectionModes extends AbstractFragment
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		if (savedInstanceState != null) {
-			//Previously serialized activated item position
-			if (savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
-				setSelection(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-		}
-	}
-
-	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
-		//Create New Database and Initialize RecyclerView
+		// Create New Database and Initialize RecyclerView
 		DatabaseService.getInstance().createEndlessDatabase(200);
 		initializeRecyclerView(savedInstanceState);
 
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Initialize Adapter and RecyclerView
-		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
-		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
-		mAdapter.setMode(SelectableAdapter.MODE_SINGLE);
+		//Get copy of the Database list
+		List<AbstractFlexibleItem> items = DatabaseService.getInstance().getDatabaseList();
 
-		//Experimenting NEW features (v5.0.0)
+		// Initialize Adapter and RecyclerView
+		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+		mAdapter = new ExampleAdapter(items, getActivity());
+		mAdapter.setNotifyChangeOfUnfilteredItems(true) //This will rebind new item when refreshed
+				.setMode(SelectableAdapter.MODE_SINGLE);
+
+		// Experimenting NEW features (v5.0.0)
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-		//Divider item decorator with DrawOver enabled
+		// Divider item decorator with DrawOver enabled
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider)
 				.withDrawOver(true));
 		mRecyclerView.postDelayed(new Runnable() {
@@ -115,75 +97,26 @@ public class FragmentSelectionModes extends AbstractFragment
 			}
 		}, 1500L);
 
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
+		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
+		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_SINGLE);
 
-		//Add sample HeaderView items on the top (not belongs to the library)
+		// Add 2 Scrollable Headers
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
-		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.addScrollableHeaderWithDelay(new ScrollableUseCaseItem(
+				getString(R.string.selection_modes_use_case_title),
+				getString(R.string.selection_modes_use_case_description)), 1100L, true
+		);
 	}
 
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo(true);
-	}
-
-	//TODO: Should include setActivatedPosition in the library?
-	public void setSelection(final int position) {
-		if (mAdapter.getMode() == FlexibleAdapter.MODE_SINGLE) {
-			Log.v(TAG, "setSelection called!");
-			setActivatedPosition(position);
-			mRecyclerView.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					mRecyclerView.smoothScrollToPosition(position);
-				}
-			}, 1000L);
-		}
-	}
-
-	private void setActivatedPosition(int position) {
-		Log.d(TAG, "ItemList New mActivatedPosition=" + position);
-		mActivatedPosition = position;
-	}
-
-	/**
-	 * Called when single tap occurs.
-	 *
-	 * @param position the adapter position of the item clicked
-	 * @return true if the click should activate the ItemView, false for no change.
-	 */
-	@Override
-	public boolean onItemClick(int position) {
-		if (position != mActivatedPosition)
-			setActivatedPosition(position);
-		return true;
-	}
-
-	/**
-	 * Called when long tap occurs.
-	 *
-	 * @param position the adapter position of the item clicked
-	 */
-	@Override
-	public void onItemLongClick(int position) {
-		//TODO: Handling ActionMode
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		if (mActivatedPosition != AdapterView.INVALID_POSITION) {
-			//Serialize and persist the activated item position.
-			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
-			Log.d(TAG, STATE_ACTIVATED_POSITION + "=" + mActivatedPosition);
-		}
-		super.onSaveInstanceState(outState);
+		mAdapter.showLayoutInfo(false);
 	}
 
 	@Override

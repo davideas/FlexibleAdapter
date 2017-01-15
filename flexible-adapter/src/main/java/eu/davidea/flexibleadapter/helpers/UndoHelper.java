@@ -16,6 +16,8 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -35,6 +37,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @author Davide Steduto
  * @since 30/04/2016
  */
+@SuppressWarnings("WeakerAccess")
 public class UndoHelper extends Snackbar.Callback {
 
 	/**
@@ -65,12 +68,13 @@ public class UndoHelper extends Snackbar.Callback {
 	private FlexibleAdapter mAdapter;
 	private OnActionListener mActionListener;
 	private OnUndoListener mUndoListener;
+	private @ColorInt int mActionTextColor = Color.TRANSPARENT;
 
 
 	/**
 	 * Default constructor.
-	 * <p>Only from version 5.0.0-b8, by calling this constructor,
-	 * {@link FlexibleAdapter#setPermanentDelete(boolean)} is set {@code false} automatically.
+	 * <p>By calling this constructor, {@link FlexibleAdapter#setPermanentDelete(boolean)}
+	 * is set {@code false} automatically.
 	 *
 	 * @param adapter      the instance of {@code FlexibleAdapter}
 	 * @param undoListener the callback for the Undo and Delete confirmation
@@ -108,14 +112,25 @@ public class UndoHelper extends Snackbar.Callback {
 	}
 
 	/**
+	 * Sets the text color of the action.
+	 *
+	 * @param color the color for the action button
+	 * @return this object, so it can be chained
+	 */
+	public UndoHelper withActionTextColor(@ColorInt int color) {
+		this.mActionTextColor = color;
+		return this;
+	}
+
+	/**
 	 * As {@link #remove(List, View, CharSequence, CharSequence, int)} but with String
 	 * resources instead of CharSequence.
 	 */
-	public Snackbar remove(List<Integer> positions, @NonNull View mainView,
-						   @StringRes int messageStringResId, @StringRes int actionStringResId,
-						   @IntRange(from = 0) int undoTime) {
+	public void remove(List<Integer> positions, @NonNull View mainView,
+					   @StringRes int messageStringResId, @StringRes int actionStringResId,
+					   @IntRange(from = -1) int undoTime) {
 		Context context = mainView.getContext();
-		return remove(positions, mainView, context.getString(messageStringResId),
+		remove(positions, mainView, context.getString(messageStringResId),
 				context.getString(actionStringResId), undoTime);
 	}
 
@@ -131,18 +146,16 @@ public class UndoHelper extends Snackbar.Callback {
 	 * @param actionText the action text to display
 	 * @param undoTime   How long to display the message. Either {@link Snackbar#LENGTH_SHORT} or
 	 *                   {@link Snackbar#LENGTH_LONG} or any custom Integer.
-	 * @return The SnackBar instance to be customized again
 	 * @see #remove(List, View, int, int, int)
 	 */
 	@SuppressWarnings("WrongConstant")
-	public Snackbar remove(List<Integer> positions, @NonNull View mainView,
-						   CharSequence message, CharSequence actionText,
-						   @IntRange(from = 0) int undoTime) {
+	public void remove(List<Integer> positions, @NonNull View mainView,
+					   CharSequence message, CharSequence actionText,
+					   @IntRange(from = -1) int undoTime) {
 		this.mPositions = positions;
 		Snackbar snackbar;
 		if (!mAdapter.isPermanentDelete()) {
-			snackbar = Snackbar.make(mainView, message, undoTime + 400)//More time due to the animation
-					.setCallback(this)
+			snackbar = Snackbar.make(mainView, message, undoTime > 0 ? undoTime + 400 : undoTime)
 					.setAction(actionText, new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
@@ -150,14 +163,14 @@ public class UndoHelper extends Snackbar.Callback {
 								mUndoListener.onUndoConfirmed(mAction);
 						}
 					});
-			snackbar.show();
-			return snackbar;
 		} else {
-			snackbar = Snackbar.make(mainView, message, undoTime)
-					.setCallback(this);
-			snackbar.show();
-			return snackbar;
+			snackbar = Snackbar.make(mainView, message, undoTime);
 		}
+		if (mActionTextColor != Color.TRANSPARENT) {
+			snackbar.setActionTextColor(mActionTextColor);
+		}
+		snackbar.addCallback(this);
+		snackbar.show();
 	}
 
 	/**
@@ -167,15 +180,15 @@ public class UndoHelper extends Snackbar.Callback {
 	public void onDismissed(Snackbar snackbar, int event) {
 		if (mAdapter.isPermanentDelete()) return;
 		switch (event) {
-			case DISMISS_EVENT_ACTION:
-				//We ignore it, action is performed already
-				break;
 			case DISMISS_EVENT_SWIPE:
 			case DISMISS_EVENT_MANUAL:
 			case DISMISS_EVENT_TIMEOUT:
 				if (mUndoListener != null)
 					mUndoListener.onDeleteConfirmed(mAction);
 				mAdapter.emptyBin();
+			case DISMISS_EVENT_CONSECUTIVE:
+			case DISMISS_EVENT_ACTION:
+			default:
 				break;
 		}
 	}
@@ -186,13 +199,13 @@ public class UndoHelper extends Snackbar.Callback {
 	@Override
 	public void onShown(Snackbar snackbar) {
 		boolean consumed = false;
-		//Perform the action before deletion
+		// Perform the action before deletion
 		if (mActionListener != null) consumed = mActionListener.onPreAction();
-		//Remove selected items from Adapter list after SnackBar is shown
+		// Remove selected items from Adapter list after SnackBar is shown
 		if (!consumed) mAdapter.removeItems(mPositions, mPayload);
-		//Perform the action after the deletion
+		// Perform the action after the deletion
 		if (mActionListener != null) mActionListener.onPostAction();
-		//Here, we can notify the callback only in case of permanent deletion
+		// Here, we can notify the callback only in case of permanent deletion
 		if (mAdapter.isPermanentDelete() && mUndoListener != null)
 			mUndoListener.onDeleteConfirmed(mAction);
 	}
@@ -246,7 +259,7 @@ public class UndoHelper extends Snackbar.Callback {
 		 * Called when Undo timeout is over and action must be committed in the user Database.
 		 * <p>Due to Java Generic, it's too complicated and not well manageable if we pass the
 		 * List&lt;T&gt; object.<br/>
-		 * To get deleted items, use {@link FlexibleAdapter#getDeletedItems()} from the
+		 * So, to get deleted items, use {@link FlexibleAdapter#getDeletedItems()} from the
 		 * implementation of this method.</p>
 		 *
 		 * @param action one of {@link UndoHelper#ACTION_REMOVE}, {@link UndoHelper#ACTION_UPDATE}

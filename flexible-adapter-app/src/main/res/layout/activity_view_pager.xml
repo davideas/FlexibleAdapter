@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+	android:id="@+id/main_view"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fitsSystemWindows="true"
+	tools:context="eu.davidea.samples.flexibleadapter.ViewPagerActivity">
+
+	<!-- Toolbar -->
+	<android.support.design.widget.AppBarLayout
+		android:id="@+id/app_bar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:theme="@style/AppTheme.AppBarOverlay">
+
+		<android.support.design.widget.CollapsingToolbarLayout
+			android:id="@+id/toolbar_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			app:popupTheme="@style/AppTheme.PopupOverlay">
+
+			<include layout="@layout/toolbar"/>
+
+			<android.support.design.widget.TabLayout
+				android:id="@+id/tabs"
+				android:layout_width="match_parent"
+				android:layout_height="?attr/actionBarSize"
+				android:layout_marginTop="?attr/actionBarSize"
+				app:tabIndicatorHeight="5dp"
+				app:tabGravity="fill"
+				app:tabMode="fixed"/>
+
+		</android.support.design.widget.CollapsingToolbarLayout>
+
+	</android.support.design.widget.AppBarLayout>
+
+	<!-- Main Content -->
+	<android.support.v4.view.ViewPager
+		android:id="@+id/view_pager"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+</android.support.design.widget.CoordinatorLayout>

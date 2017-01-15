@@ -17,23 +17,27 @@ import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.models.AbstractModelItem;
-import eu.davidea.samples.flexibleadapter.models.AnimatorExpandableItem;
-import eu.davidea.samples.flexibleadapter.models.AnimatorSubItem;
-import eu.davidea.samples.flexibleadapter.models.ConfigurationItem;
-import eu.davidea.samples.flexibleadapter.models.ExpandableHeaderItem;
-import eu.davidea.samples.flexibleadapter.models.ExpandableItem;
-import eu.davidea.samples.flexibleadapter.models.ExpandableLevel0Item;
-import eu.davidea.samples.flexibleadapter.models.ExpandableLevel1Item;
-import eu.davidea.samples.flexibleadapter.models.HeaderItem;
-import eu.davidea.samples.flexibleadapter.models.InstagramHeaderItem;
-import eu.davidea.samples.flexibleadapter.models.InstagramItem;
-import eu.davidea.samples.flexibleadapter.models.OverallItem;
-import eu.davidea.samples.flexibleadapter.models.SimpleItem;
-import eu.davidea.samples.flexibleadapter.models.StaggeredHeaderItem;
-import eu.davidea.samples.flexibleadapter.models.StaggeredItem;
-import eu.davidea.samples.flexibleadapter.models.StaggeredItemStatus;
-import eu.davidea.samples.flexibleadapter.models.SubItem;
+import eu.davidea.samples.flexibleadapter.items.AbstractItem;
+import eu.davidea.samples.flexibleadapter.items.AnimatorExpandableItem;
+import eu.davidea.samples.flexibleadapter.items.AnimatorSubItem;
+import eu.davidea.samples.flexibleadapter.items.ConfigurationItem;
+import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
+import eu.davidea.samples.flexibleadapter.items.ExpandableItem;
+import eu.davidea.samples.flexibleadapter.items.ExpandableLevel0Item;
+import eu.davidea.samples.flexibleadapter.items.ExpandableLevel1Item;
+import eu.davidea.samples.flexibleadapter.holders.HeaderHolder;
+import eu.davidea.samples.flexibleadapter.items.HeaderItem;
+import eu.davidea.samples.flexibleadapter.models.HeaderModel;
+import eu.davidea.samples.flexibleadapter.items.InstagramHeaderItem;
+import eu.davidea.samples.flexibleadapter.items.InstagramItem;
+import eu.davidea.samples.flexibleadapter.holders.ItemHolder;
+import eu.davidea.samples.flexibleadapter.models.ItemModel;
+import eu.davidea.samples.flexibleadapter.items.OverallItem;
+import eu.davidea.samples.flexibleadapter.items.SimpleItem;
+import eu.davidea.samples.flexibleadapter.items.StaggeredHeaderItem;
+import eu.davidea.samples.flexibleadapter.items.StaggeredItem;
+import eu.davidea.samples.flexibleadapter.items.StaggeredItemStatus;
+import eu.davidea.samples.flexibleadapter.items.SubItem;
 
 /**
  * Created by Davide Steduto on 23/11/2015.
@@ -51,7 +55,7 @@ public class DatabaseService {
 	private Map<StaggeredItemStatus, StaggeredHeaderItem> headers;
 
 
-	DatabaseService() {
+	private DatabaseService() {
 	}
 
 	public static DatabaseService getInstance() {
@@ -77,6 +81,8 @@ public class DatabaseService {
 	 * List of CardView as entry list, showing the functionality of the library.
 	 * It also shows how adapter animation can be configured.
 	 */
+	//TODO: Review the description of all examples
+	//TODO: Add ScrollableUseCaseItem header for each database
 	public void createOverallDatabase(Resources resources) {
 		databaseType = DatabaseType.OVERALL;
 		mItems.clear();
@@ -116,12 +122,15 @@ public class DatabaseService {
 
 		mItems.add(new OverallItem(R.id.nav_model_holders, resources.getString(R.string.model_holders))
 				.withDescription(resources.getString(R.string.model_holders_description))
-				.withIcon(resources.getDrawable(R.drawable.ic_select_inverse_grey600_24dp))
-				.withEnabled(false));
+				.withIcon(resources.getDrawable(R.drawable.ic_select_inverse_grey600_24dp)));
 
 		mItems.add(new OverallItem(R.id.nav_staggered, resources.getString(R.string.staggered_layout))
 				.withDescription(resources.getString(R.string.staggered_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_dashboard_grey600_24dp)));
+
+		mItems.add(new OverallItem(R.id.nav_viewpager, resources.getString(R.string.viewpager))
+				.withDescription(resources.getString(R.string.viewpager_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_view_carousel_grey600_24dp)));
 	}
 
 	/*
@@ -200,6 +209,21 @@ public class DatabaseService {
 		for (int i = 0; i < size; i++) {
 			header = i % Math.round(size / headers) == 0 ? newHeader(++lastHeaderId) : header;
 			mItems.add(newSimpleItem(i + 1, header));
+		}
+	}
+
+	/*
+	 * List of Holder Items and Header. Only Holder Simple Items will be
+	 * added to the list. IHolder items hold the model data inside.
+	 */
+	public void createHolderSectionsDatabase(int size, int headers) {
+		databaseType = DatabaseType.MODEL_HOLDERS;
+		HeaderHolder header = null;
+		mItems.clear();
+		int lastHeaderId = 0;
+		for (int i = 0; i < size; i++) {
+			header = i % Math.round(size / headers) == 0 ? newHeaderHolder(++lastHeaderId) : header;
+			mItems.add(newItemHolder(i + 1, header));
 		}
 	}
 
@@ -387,6 +411,19 @@ public class DatabaseService {
 		return new StaggeredItem(i, header);
 	}
 
+	private HeaderHolder newHeaderHolder(int i) {
+		HeaderModel model = new HeaderModel("H" + i);
+		model.setTitle("Header " + i);
+		return new HeaderHolder(model);
+	}
+
+	private ItemHolder newItemHolder(int i, HeaderHolder header) {
+		ItemModel model = new ItemModel("I" + i);
+		model.setTitle("Holder Item " + i);
+		model.setSubtitle("Subtitle " + i);
+		return new ItemHolder(model, header);
+	}
+
 	/*-----------------------*/
 	/* MAIN DATABASE METHODS */
 	/*-----------------------*/
@@ -424,7 +461,7 @@ public class DatabaseService {
 		mItems.addAll(newItems);
 	}
 
-	public void addItem(int position, AbstractModelItem item) {
+	public void addItem(int position, AbstractItem item) {
 		if (position < mItems.size())
 			mItems.add(position, item);
 		else
@@ -443,7 +480,7 @@ public class DatabaseService {
 	public void addSubItem(int position, IExpandable parent, SubItem subItem) {
 		//This split is for my examples
 		if (parent instanceof ExpandableItem)
-			((ExpandableItem) parent).removeSubItem(subItem);
+			((ExpandableItem) parent).addSubItem(subItem);
 		else if (parent instanceof ExpandableHeaderItem)
 			((ExpandableHeaderItem) parent).addSubItem(subItem);
 	}
@@ -522,6 +559,19 @@ public class DatabaseService {
 			mItems.addAll(mainItem.splitAllItems());
 		}
 		Collections.sort(mItems, new ItemComparatorById());
+	}
+
+	/**
+	 * This demonstrates that new content of existing items are really rebound and
+	 * notified with CHANGE Payload in the Adapter list when refreshed.
+	 */
+	public void updateNewItems() {
+		for (IFlexible iFlexible : mItems) {
+			if (iFlexible instanceof AbstractItem) {
+				AbstractItem item = (AbstractItem) iFlexible;
+				item.increaseUpdates();
+			}
+		}
 	}
 
 	/**

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:background="@color/material_color_blue_grey_50"
+	android:descendantFocusability="blocksDescendants"
+	android:paddingBottom="@dimen/margin_bottom"
+	android:paddingTop="@dimen/margin_top">
+
+	<FrameLayout
+		android:id="@+id/image_util_container"
+		android:layout_width="@dimen/icon_touchable_component_mini"
+		android:layout_height="@dimen/icon_touchable_component_mini"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentRight="true"
+		android:layout_centerInParent="true"
+		android:layout_marginEnd="@dimen/margin_right"
+		android:layout_marginRight="@dimen/margin_right">
+
+		<ImageView
+			android:id="@+id/dismiss_icon"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:background="@drawable/button_mini_oval"
+			android:clickable="true"
+			android:contentDescription="@null"
+			android:scaleType="center"
+			android:src="@drawable/ic_cancel_grey600_24dp"/>
+
+	</FrameLayout>
+
+	<LinearLayout
+		android:id="@+id/title_container"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_centerInParent="true"
+		android:layout_marginEnd="@dimen/margin_right"
+		android:layout_marginLeft="@dimen/margin_left"
+		android:layout_marginRight="@dimen/margin_right"
+		android:layout_marginStart="@dimen/margin_left"
+		android:layout_toEndOf="@id/image"
+		android:layout_toLeftOf="@id/image_util_container"
+		android:layout_toRightOf="@id/image"
+		android:layout_toStartOf="@id/image_util_container"
+		android:orientation="vertical">
+
+		<!-- For marquee singleLine="true" is mandatory. Don't care about the deprecation! -->
+		<TextView
+			android:id="@+id/title"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:ellipsize="marquee"
+			android:marqueeRepeatLimit="marquee_forever"
+			android:singleLine="true"
+			android:text="@string/scrollable_header_title"
+			android:textAppearance="@style/TextAppearance.AppCompat.Title"
+			android:textColor="?primaryTextSelector"/>
+
+		<TextView
+			android:id="@+id/subtitle"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="2dp"
+			android:maxLines="2"
+			android:text="@string/scrollable_header_subtitle"
+			android:textAppearance="@style/TextAppearance.AppCompat.Small"
+			android:textColor="?primaryTextSelector"/>
+
+	</LinearLayout>
+
+</RelativeLayout>

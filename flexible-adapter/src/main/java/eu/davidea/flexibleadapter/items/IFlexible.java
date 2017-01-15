@@ -107,11 +107,11 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	/*---------------------*/
 
 	/**
-	 * Returns the layout resource Id to auto-map a specific ViewType on this Item.
+	 * Returns the layout resource ID to AutoMap a specific ViewType on this Item.
 	 * <p><b>NOTE:</b> Should identify a resource Layout reference {@link android.R.layout} used
-	 * by FlexibleAdapter to auto-map the ViewTypes.</p>
-	 * <b>HELP:</b> To know how to implement auto-map for ViewTypes please refer to the
-	 * <a href="https://github.com/davideas/FlexibleAdapter/wiki">FlexibleAdapter WikiPage</a>
+	 * by FlexibleAdapter to AutoMap the ViewTypes.</p>
+	 * <b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
+	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
 	 * on GitHub.
 	 *
 	 * @return Layout identifier
@@ -120,9 +120,9 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	int getLayoutRes();
 
 	/**
-	 * Delegates the creation of the ViewHolder to the user, if auto-map has been implemented.
-	 * <p><b>HELP:</b> To know how to implement auto-map for ViewTypes please refer to the
-	 * <a href="https://github.com/davideas/FlexibleAdapter/wiki">FlexibleAdapter WikiPage</a>
+	 * Delegates the creation of the ViewHolder to the user if AutoMap has been implemented.
+	 * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
+	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
 	 * on GitHub.</p>
 	 *
 	 * @param adapter  the Adapter instance extending {@link FlexibleAdapter}
@@ -134,9 +134,9 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent);
 
 	/**
-	 * Binds the data of this item to the given Layout, if auto-map has been implemented.
-	 * <p><b>HELP:</b> To know how to implement auto-map for ViewTypes please refer to the
-	 * <a href="https://github.com/davideas/FlexibleAdapter/wiki">FlexibleAdapter WikiPage</a>
+	 * Binds the data of this item to the given Layout if AutoMap has been implemented.
+	 * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
+	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
 	 * on GitHub.</p>
 	 * How to use Payload, please refer to
 	 * {@link android.support.v7.widget.RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}.

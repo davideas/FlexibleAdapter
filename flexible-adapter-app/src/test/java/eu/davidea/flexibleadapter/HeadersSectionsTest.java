@@ -3,7 +3,7 @@ package eu.davidea.flexibleadapter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
  * @author Davide Steduto
  * @since 23/06/2016
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 23)
 public class HeadersSectionsTest {
 

@@ -47,7 +47,7 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	/**
 	 * You <b>must</b> implement this method to compare items identifiers.
 	 * <p>Adapter needs this method to distinguish them and pick up correct items.</p>
-	 * See <a href="http://developer.android.com/reference/java/lang/Object.html#writing_equals">
+	 * See <a href="http://developer.android.com/reference/java/lang/Object.html#equals(java.lang.Object)">
 	 * Writing a correct {@code equals} method</a> to implement your own {@code equals} method.
 	 * <p>Basic Java implementation:
 	 * <pre>

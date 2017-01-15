@@ -49,50 +49,49 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
-		//Create New Database and Initialize RecyclerView
+		// Create New Database and Initialize RecyclerView
 		DatabaseService.getInstance().createExpandableMultiLevelDatabase(50);
 		initializeRecyclerView(savedInstanceState);
 
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Initialize Adapter and RecyclerView
-		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+		// Initialize Adapter and RecyclerView
+		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
-		//Experimenting NEW features (v5.0.0)
+		// Experimenting NEW features (v5.0.0)
 		mAdapter.expandItemsAtStartUp()
 				.setAutoCollapseOnExpand(false)
-				.setMinCollapsibleLevel(1)//Auto-collapse only items with level >= 1 (avoid to collapse also sections!)
-				.setAutoScrollOnExpand(true)
-				.setRemoveOrphanHeaders(false);
+				.setMinCollapsibleLevel(1) //Auto-collapse only items with level >= 1 (avoid to collapse also sections!)
+				.setAutoScrollOnExpand(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getActivity().findViewById(R.id.fast_scroller),
+		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
+		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
-		//Experimenting NEW features (v5.0.0)
-		mAdapter.setLongPressDragEnabled(true)//Enable long press to drag items
-				.setHandleDragEnabled(true)//Enable handle drag
-				.setSwipeEnabled(true)//Enable swipe items
-				.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
+		// Experimenting NEW features (v5.0.0)
+		mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
+				.setHandleDragEnabled(true) //Enable handle drag
+				.setSwipeEnabled(true); //Enable swipe items
+				//.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable)
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		//Add sample HeaderView items on the top (not belongs to the library)
+		// Add 2 Scrollable Headers
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.showLayoutInfo(savedInstanceState == null);
 	}
@@ -100,7 +99,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo(true);
+		mAdapter.showLayoutInfo(false);
 	}
 
 	@Override
@@ -109,11 +108,11 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {
-				//NOTE: If you use simple integer to identify the ViewType,
-				//here, you should use them and not Layout integers
+				// NOTE: If you use simple integers to identify the ViewType,
+				// here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_layout_item:
-					case R.layout.recycler_uls_item:
+					case R.layout.recycler_scrollable_layout_item:
+					case R.layout.recycler_scrollable_uls_item:
 					case R.layout.recycler_header_item:
 					case R.layout.recycler_expandable_header_item:
 					case R.layout.recycler_expandable_item:
