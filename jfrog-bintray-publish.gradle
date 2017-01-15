@@ -1,5 +1,9 @@
 apply plugin: 'com.jfrog.bintray'
 
+if (gradle.getStartParameter().getTaskNames().contains("bintray")) {
+	println("> Publishing: " + libraryName + " v" + libraryVersion)
+}
+
 version = libraryVersion
 
 def getRepositoryUsername() {
@@ -26,45 +30,18 @@ bintray {
 		websiteUrl = siteUrl
 		licenses = allLicenses
 		vcsUrl = gitUrl
-		labels = ['android', 'recyclerview', 'list', 'adapter', 'selection', 'actionmode', 'undo', 'viewholder', 'ripple', 'search', 'filter', 'filtering', 'async', 'asynchrnous', 'item', 'item animator', 'itemanimator', 'animator' ,'animation', 'expand', 'expandable', 'collapse', 'collapsible', 'section', 'sections', 'sticky', 'header', 'headers', 'category', 'footer', 'footers', 'drag', 'draggable', 'swipe', 'swipeable', 'leave behind', 'fastscroll', 'fastscroller', 'endless', 'endless scroll', 'load more']
+		labels = libraryLabels
 		publish = true
 		publicDownloadNumbers = true
-		//noinspection GroovyAssignabilityCheck
 		version {
 			name = libraryVersion
 			desc = libraryDescription
 			vcsTag = libraryVersion
+			released = new Date()
 			gpg {
 				sign = true //Determines whether to GPG sign the files. The default is false
 				passphrase = getRepositoryPassphrase()
-				//Optional. The passphrase for GPG signing'
 			}
-		}
-	}
-}
-
-apply plugin: 'com.jfrog.artifactory'
-
-artifactory {
-	contextUrl = 'http://localhost:8081/artifactory'
-	publish {
-		repository {
-			// The Artifactory repository key to publish to
-			repoKey = 'libs-release-local'
-
-			username = getProperties().get('bintray.user')
-			password = getProperties().get('bintray.gpg.password')
-		}
-		//noinspection GroovyAssignabilityCheck
-		defaults {
-			// Tell the Artifactory Plugin which artifacts should be published to Artifactory.
-			//publications('aar')
-			publishArtifacts = true
-
-			// Properties to be attached to the published artifacts.
-			//properties = ['qa.level': 'basic', 'dev.team': 'core']
-			// Publish generated POM files to Artifactory (true by default)
-			publishPom = true
 		}
 	}
 }

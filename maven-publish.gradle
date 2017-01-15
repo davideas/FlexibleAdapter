@@ -17,6 +17,10 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+if (gradle.getStartParameter().getTaskNames().contains("uploadArchives")) {
+	println("> Publishing: " + libraryName + " v" + libraryVersion)
+}
+
 def hasProxy() { return hasProperty('systemProp.http.proxyUser')}
 def getProxyType() { return "http" }
 def getProxyHost() { return getProperties().get("systemProp.http.proxyHost") }

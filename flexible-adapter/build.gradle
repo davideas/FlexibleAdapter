@@ -1,5 +1,14 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.jakewharton.hugo'
+
+ext {
+	// Library Settings
+	libraryDescription = "1 Adapter for SelectionMode, ViewHolders, AsyncFilter, FastScroller, Animations, Undo, Sections, Sticky Headers, Scrollable Headers and Footers, EndlessScroll, Expandable, Draggable, Swipeable :-)"
+	libraryLabels = ['android', 'recyclerview', 'list', 'adapter', 'selection', 'actionmode', 'undo', 'viewholder', 'ripple', 'search', 'filter', 'filtering', 'async', 'asynchronous', 'item', 'item animator', 'itemanimator', 'animator' ,'animation', 'expand', 'expandable', 'collapse', 'collapsible', 'section', 'sections', 'sticky', 'header', 'headers', 'category', 'footer', 'footers', 'drag', 'draggable', 'swipe', 'swipeable', 'leave behind', 'fastscroll', 'fastscroller', 'endless', 'endless scroll', 'load more']
+
+	publishedGroupId = "eu.davidea"
+	bintrayName = "flexible-adapter"
+	artifact = bintrayName
+}
 
 android {
 	compileSdkVersion targetSdk
@@ -17,10 +26,6 @@ android {
 			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 		}
 	}
-
-	dataBinding {
-		enabled = true
-	}
 }
 
 dependencies {
@@ -28,7 +33,9 @@ dependencies {
 	compile supportDependencies.design
 }
 
-//apply from: '../maven-install.gradle'
-//apply from: '../maven-publish.gradle'
-//apply from: '../jfrog-bintray-publish.gradle'
-//apply from: '../jfrog-artifactory-publish.gradle'
+if (project.hasProperty('all') || project.hasProperty('adapter')) {
+	apply from: '../maven-install.gradle'
+	apply from: '../maven-publish.gradle'
+	apply from: '../jfrog-bintray-publish.gradle'
+	//apply from: '../jfrog-artifactory-publish.gradle'
+}

@@ -1,33 +1,27 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 ext {
-	//Author
+	// Author
 	developerId = "davideas"
 	developerName = "Davide Steduto"
 	developerEmail = "dave.dna@gmail.com"
 
-	//Library
+	// Library Repository
+	libraryName = "FlexibleAdapter"
 	libraryCode = 19
 	libraryVersion = "5.0.0-rc1"
 	libraryDate = " built on " + getDate()
-	libraryDescription = "1 Adapter for SelectionMode, ViewHolders, AsyncFilter, FastScroller, Animations, Undo, Sections, Sticky Headers, Scrollable Headers and Footers, EndlessScroll, Expandable, Draggable, Swipeable :-)"
-	libraryName = "FlexibleAdapter"
-	packageExt = "aar"
-
-	//Library Repository
 	bintrayRepo = "maven"
-	bintrayName = "flexible-adapter"
-	publishedGroupId = "eu.davidea"
-	artifact = bintrayName
+	packageExt = "aar"
 	siteUrl = "https://github.com/davideas/FlexibleAdapter"
 	gitUrl = "https://github.com/davideas/FlexibleAdapter.git"
 
-	//Support and Build tools version
+	// Support and Build tools version
 	minSdk = 14
 	targetSdk = 25
 	buildTools = "25.0.2"
 	supportLib = "25.1.0"
 
-	//Support Libraries dependencies
+	// Support Libraries dependencies
 	supportDependencies = [
 		design       : "com.android.support:design:${supportLib}",
 		recyclerview : "com.android.support:recyclerview-v7:${supportLib}",
@@ -49,7 +43,7 @@ def getDate() {
 	return date.format('yyyy.MM.dd')
 }
 
-//Avoid JavaDoc Lint failures when using Java8
+// Avoid JavaDoc Lint failures when using Java8
 if (JavaVersion.current().isJava8Compatible()) {
 	allprojects {
 		tasks.withType(Javadoc) {
@@ -68,9 +62,8 @@ buildscript {
 		classpath 'com.android.tools.build:gradle:2.2.3'
 		classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 		classpath "com.github.dcendents:android-maven-gradle-plugin:1.5"
-		classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7"
+		classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
 		classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1"
-		classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
 		// NOTE: Do not place your application dependencies here; they belong
 		// in the individual module build.gradle files
 	}
