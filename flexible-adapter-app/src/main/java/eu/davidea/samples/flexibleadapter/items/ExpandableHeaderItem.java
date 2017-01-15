@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
@@ -27,8 +28,6 @@ public class ExpandableHeaderItem
 		extends AbstractItem<ExpandableHeaderViewHolder>
 		implements IExpandable<ExpandableHeaderViewHolder, SubItem>,
 		IHeader<ExpandableHeaderViewHolder> {
-
-	private static final long serialVersionUID = -1882711111814491060L;
 
 	/* Flags for FlexibleAdapter */
 	private boolean mExpanded = false;
@@ -125,11 +124,11 @@ public class ExpandableHeaderItem
 	 */
 	static class ExpandableHeaderViewHolder extends ExpandableViewHolder {
 
-		public TextView mTitle;
-		public TextView mSubtitle;
-		public ImageView mHandleView;
+		TextView mTitle;
+		TextView mSubtitle;
+		ImageView mHandleView;
 
-		public ExpandableHeaderViewHolder(View view, FlexibleAdapter adapter) {
+		ExpandableHeaderViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);//True for sticky
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
@@ -147,23 +146,93 @@ public class ExpandableHeaderItem
 			}
 		}
 
+		/**
+		 * Allows to expand or collapse child views of this itemView when {@link View.OnClickListener}
+		 * event occurs on the entire view.
+		 * <p>This method returns always true; Extend with "return false" to Not expand or collapse
+		 * this ItemView onClick events.</p>
+		 *
+		 * @return always true, if not overridden
+		 * @since 5.0.0-b1
+		 */
 		@Override
 		protected boolean isViewExpandableOnClick() {
-			return true;//true by default
+			return true;//default=true
 		}
 
+		/**
+		 * Allows to collapse child views of this ItemView when {@link View.OnLongClickListener}
+		 * event occurs on the entire view.
+		 * <p>This method returns always true; Extend with "return false" to Not collapse this
+		 * ItemView onLongClick events.</p>
+		 *
+		 * @return always true, if not overridden
+		 * @since 5.0.0-b1
+		 */
+		protected boolean isViewCollapsibleOnLongClick() {
+			return true;//default=true
+		}
+
+		/**
+		 * Allows to notify change and rebound this itemView on expanding and collapsing events,
+		 * in order to update the content (so, user can decide to display the current expanding status).
+		 * <p>This method returns always false; Override with {@code "return true"} to trigger the
+		 * notification.</p>
+		 *
+		 * @return true to rebound the content of this itemView on expanding and collapsing events,
+		 * false to ignore the events
+		 * @see #expandView(int)
+		 * @see #collapseView(int)
+		 * @since 5.0.0-rc1
+		 */
+		@Override
+		protected boolean shouldNotifyParentOnClick() {
+			return true;//default=false
+		}
+
+		/**
+		 * Expands or Collapses based on the current state.
+		 *
+		 * @see #shouldNotifyParentOnClick()
+		 * @see #expandView(int)
+		 * @see #collapseView(int)
+		 * @since 5.0.0-b1
+		 */
+		@Override
+		protected void toggleExpansion() {
+			super.toggleExpansion(); //If overridden, you must call the super method
+		}
+
+		/**
+		 * Triggers expansion of this itemView.
+		 * <p>If {@link #shouldNotifyParentOnClick()} returns {@code true}, this view is rebound
+		 * with payload {@link Payload#EXPANDED}.</p>
+		 *
+		 * @see #shouldNotifyParentOnClick()
+		 * @since 5.0.0-b1
+		 */
 		@Override
 		protected void expandView(int position) {
-			super.expandView(position);
-			//Let's notify the item has been expanded
-			if (mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
+			super.expandView(position); //If overridden, you must call the super method
+			// Let's notify the item has been expanded. Note: from 5.0.0-rc1 the next line becomes
+			// obsolete, override the new method shouldNotifyParentOnClick() as showcased here
+			//if (mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
 		}
 
+		/**
+		 * Triggers collapse of this itemView.
+		 * <p>If {@link #shouldNotifyParentOnClick()} returns {@code true}, this view is rebound
+		 * with payload {@link Payload#COLLAPSED}.</p>
+		 *
+		 * @see #shouldNotifyParentOnClick()
+		 * @since 5.0.0-b1
+		 */
 		@Override
 		protected void collapseView(int position) {
-			super.collapseView(position);
-			//Let's notify the item has been collapsed
-			if (!mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
+			super.collapseView(position); //If overridden, you must call the super method
+			// Let's notify the item has been collapsed. Note: from 5.0.0-rc1 the next line becomes
+			// obsolete, override the new method shouldNotifyParentOnClick() as showcased here
+			//if (!mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
 		}
 
 	}

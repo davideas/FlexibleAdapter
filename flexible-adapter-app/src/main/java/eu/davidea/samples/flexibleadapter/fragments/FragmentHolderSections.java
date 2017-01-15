@@ -13,6 +13,7 @@ import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -45,37 +46,40 @@ public class FragmentHolderSections extends AbstractFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//Create New Database and Initialize RecyclerView
+		// Create New Database and Initialize RecyclerView
 		DatabaseService.getInstance().createHolderSectionsDatabase(50, 10);
 		initializeRecyclerView(savedInstanceState);
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Initialize Adapter and RecyclerView
-		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+		// Initialize Adapter and RecyclerView
+		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
+		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		mAdapter.setDisplayHeadersAtStartUp(true)
-				.enableStickyHeaders();
+				.setStickyHeaders(true)
+				.setOnlyEntryAnimation(true);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		//Add sample HeaderView items on the top (not belongs to the library)
-		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		// Add 1 Scrollable Header
+		mAdapter.addScrollableHeader(new ScrollableUseCaseItem(
+				getString(R.string.model_holders_use_case_title),
+				getString(R.string.model_holders_use_case_description)));
 	}
 
 	@Override

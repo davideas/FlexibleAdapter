@@ -87,7 +87,6 @@
 				android:title="@string/about_title"/>
 			<item
 				android:id="@+id/nav_github"
-				android:enabled="false"
 				android:icon="@drawable/ic_github_circle_grey600_24dp"
 				android:title="@string/github"/>
 			<!--<item-->

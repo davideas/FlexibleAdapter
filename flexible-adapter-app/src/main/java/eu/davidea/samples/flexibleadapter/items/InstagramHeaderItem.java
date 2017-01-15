@@ -82,9 +82,9 @@ public class InstagramHeaderItem extends AbstractHeaderItem<InstagramHeaderItem.
 
 	static class HeaderViewHolder extends FlexibleViewHolder {
 
-		public FlipView mAccountImage;
-		public TextView mTitle;
-		public TextView mSubtitle;
+		FlipView mAccountImage;
+		TextView mTitle;
+		TextView mSubtitle;
 
 		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);//True for sticky

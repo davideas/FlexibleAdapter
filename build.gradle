@@ -6,10 +6,10 @@ ext {
 	developerEmail = "dave.dna@gmail.com"
 
 	//Library
-	libraryCode = 18
-	libraryVersion = "5.0.0-SNAPSHOT"
+	libraryCode = 19
+	libraryVersion = "5.0.0-rc1"
 	libraryDate = " built on " + getDate()
-	libraryDescription = "1 Adapter for SelectionMode, Undo, ViewHolders, Filter, FastScroller, Animations, Sticky Headers, Expandable, Draggable, Swipeable, EndlessScroll :-)"
+	libraryDescription = "1 Adapter for SelectionMode, ViewHolders, AsyncFilter, FastScroller, Animations, Undo, Sections, Sticky Headers, Scrollable Headers and Footers, EndlessScroll, Expandable, Draggable, Swipeable :-)"
 	libraryName = "FlexibleAdapter"
 	packageExt = "aar"
 
@@ -23,9 +23,9 @@ ext {
 
 	//Support and Build tools version
 	minSdk = 14
-	targetSdk = 24
-	buildTools = "24.0.3"
-	supportLib = "24.2.1"
+	targetSdk = 25
+	buildTools = "25.0.2"
+	supportLib = "25.1.0"
 
 	//Support Libraries dependencies
 	supportDependencies = [
@@ -65,7 +65,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:2.2.2'
+		classpath 'com.android.tools.build:gradle:2.2.3'
 		classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 		classpath "com.github.dcendents:android-maven-gradle-plugin:1.5"
 		classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7"

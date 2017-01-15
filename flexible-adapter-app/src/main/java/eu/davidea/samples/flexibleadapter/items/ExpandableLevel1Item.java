@@ -1,5 +1,8 @@
 package eu.davidea.samples.flexibleadapter.items;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -7,6 +10,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IExpandable;
@@ -17,10 +21,8 @@ import eu.davidea.flexibleadapter.items.IExpandable;
  * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
  */
 public class ExpandableLevel1Item
-		extends AbstractItem<SimpleItem.ParentViewHolder>
-		implements IExpandable<SimpleItem.ParentViewHolder, SubItem> {
-
-	private static final long serialVersionUID = -1882711111814491060L;
+		extends AbstractItem<ExpandableItem.ParentViewHolder>
+		implements IExpandable<ExpandableItem.ParentViewHolder, SubItem> {
 
 	/* Flags for FlexibleAdapter */
 	private boolean mExpanded = false;
@@ -73,7 +75,7 @@ public class ExpandableLevel1Item
 
 	public void addSubItem(SubItem subItem) {
 		if (mSubItems == null)
-			mSubItems = new ArrayList<SubItem>();
+			mSubItems = new ArrayList<>();
 		mSubItems.add(subItem);
 	}
 
@@ -90,33 +92,36 @@ public class ExpandableLevel1Item
 	}
 
 	@Override
-	public SimpleItem.ParentViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new SimpleItem.ParentViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ExpandableItem.ParentViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new ExpandableItem.ParentViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
 	@Override
-	public void bindViewHolder(final FlexibleAdapter adapter, SimpleItem.ParentViewHolder holder, int position, List payloads) {
-		if (payloads.size() > 0) {
-			Log.d(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads);
-		} else {
-			holder.mTitle.setText(getTitle());
-		}
+	public void bindViewHolder(final FlexibleAdapter adapter, ExpandableItem.ParentViewHolder holder, int position, List payloads) {
+		Context context = holder.itemView.getContext();
+
 		setSubtitle(adapter.getCurrentChildren(this).size() + " subItems");
 		holder.mSubtitle.setText(getSubtitle());
 
-		//ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
+		// Background, when bound the first time
+		if (payloads.size() == 0) {
+			holder.mTitle.setText(getTitle());
+
+			Drawable drawable = DrawableUtils.getSelectableBackgroundCompat(
+					Color.WHITE, Color.parseColor("#dddddd"), // Same color of divider
+					DrawableUtils.getColorControlHighlight(context));
+			DrawableUtils.setBackgroundCompat(holder.itemView, drawable);
+			DrawableUtils.setBackgroundCompat(holder.frontView, drawable);
+		} else {
+			Log.d(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads);
+		}
+
+		// ANIMATION EXAMPLE!! ImageView - Handle Flip Animation on Select ALL and Deselect ALL
 		if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
-			//Reset the flags with delay
-			holder.itemView.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					adapter.resetActionModeFlags();
-				}
-			}, 200L);
-			//Consume the Animation
+			// Consume the Animation
 			holder.mFlipView.flip(adapter.isSelected(position), 200L);
 		} else {
-			//Display the current flip status
+			// Display the current flip status
 			holder.mFlipView.flipSilently(adapter.isSelected(position));
 		}
 	}

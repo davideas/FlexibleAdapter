@@ -86,11 +86,11 @@ public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHol
 
 	static final class ViewHolder extends FlexibleViewHolder {
 
-		public ImageView mImage;
-		public FlipView mImageFavourite;
-		public ImageView mImageComment;
-		public ImageView mImageShare;
-		public TextView mQuantityLikes;
+		ImageView mImage;
+		FlipView mImageFavourite;
+		ImageView mImageComment;
+		ImageView mImageShare;
+		TextView mQuantityLikes;
 
 		public ViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);

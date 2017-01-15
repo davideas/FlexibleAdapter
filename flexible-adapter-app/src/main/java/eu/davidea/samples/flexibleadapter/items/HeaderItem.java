@@ -18,13 +18,11 @@ import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * This is a simple item with custom layout for headers.
- * <p>A Section should not contain others Sections!</p>
- * Headers are not Sectionable!
+ * This is a header item with custom layout for section headers.
+ * <p><b>Note:</b> THIS ITEM IS NOT A SCROLLABLE HEADER.</p>
+ * A Section should not contain others Sections and headers are not Sectionable!
  */
 public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> implements IFilterable {
-
-	private static final long serialVersionUID = -7408637077727563374L;
 
 	private String id;
 	private String title;
@@ -105,11 +103,11 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 
 	static class HeaderViewHolder extends FlexibleViewHolder {
 
-		public TextView mTitle;
-		public TextView mSubtitle;
-		public ImageView mHandleView;
+		TextView mTitle;
+		TextView mSubtitle;
+		ImageView mHandleView;
 
-		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
+		HeaderViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);//True for sticky
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);

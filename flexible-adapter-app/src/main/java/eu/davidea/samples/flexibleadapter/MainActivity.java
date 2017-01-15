@@ -3,7 +3,7 @@ package eu.davidea.samples.flexibleadapter;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -51,7 +51,6 @@ import eu.davidea.flexibleadapter.helpers.UndoHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.dialogs.EditItemDialog;
 import eu.davidea.samples.flexibleadapter.dialogs.MessageDialog;
 import eu.davidea.samples.flexibleadapter.fragments.AbstractFragment;
@@ -86,9 +85,9 @@ import eu.davidea.utils.Utils;
  * The Demo application is organized in Fragments with 1 Activity {@code MainActivity}
  * implementing most of the methods. Each Fragment shows a different example and can assemble
  * more functionalities at once.
- *
+ * <p>
  * <p>The Activity implementation is organized in this order:</p>
- *
+ * <p>
  * <ul>
  * <li>Activity management
  * <li>Initialization methods
@@ -101,10 +100,10 @@ import eu.davidea.utils.Utils;
  * <li>ActionMode implementation
  * <li>Extras
  * </ul>
- *
+ * <p>
  * The Fragments <u>may</u> use Activity implementations or may override specific behaviors
  * themselves. Fragments have {@code AbstractFragment} in common to have some methods reusable.
- *
+ * <p>
  * <p>...more on
  * <a href="https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-App">Demo app Wiki page</a>.</p>
  */
@@ -143,18 +142,17 @@ public class MainActivity extends AppCompatActivity implements
 	private NavigationView mNavigationView;
 	private AbstractFragment mFragment;
 	private SearchView mSearchView;
+
 	private final Handler mRefreshHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
 			switch (message.what) {
-				case 0: //Stop
+				case 0: // Stop
 					mSwipeRefreshLayout.setRefreshing(false);
-					mSwipeRefreshLayout.setEnabled(true);
 					return true;
-				case 1: //Start
+				case 1: // Start
 					mSwipeRefreshLayout.setRefreshing(true);
-					mSwipeRefreshLayout.setEnabled(false);
 					return true;
-				case 2: //Show empty view
+				case 2: // Show empty view
 					ViewCompat.animate(findViewById(R.id.empty_view)).alpha(1);
 					return true;
 				default:
@@ -163,7 +161,9 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	});
 
-	/* ACTIVITY MANAGEMENT */
+	/* ===================
+	 * ACTIVITY MANAGEMENT
+	 * =================== */
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -178,15 +178,15 @@ public class MainActivity extends AppCompatActivity implements
 		Log.d(TAG, "onCreate");
 		FlexibleAdapter.enableLogs(true);
 
-		//Initialize Toolbar, Drawer & FAB
+		// Initialize Toolbar, Drawer & FAB
 		initializeToolbar();
 		initializeDrawer();
 		initializeFab();
-		//Initialize Fragment containing Adapter & RecyclerView
+		// Initialize Fragment containing Adapter & RecyclerView
 		initializeFragment(savedInstanceState);
 
-		//With FlexibleAdapter v5.0.0 we don't need to call this function anymore
-		//It is automatically called if Activity implements FlexibleAdapter.OnUpdateListener
+		// With FlexibleAdapter v5.0.0 we don't need to call this function anymore
+		// It is automatically called if Activity implements FlexibleAdapter.OnUpdateListener
 		//updateEmptyView();
 	}
 
@@ -201,9 +201,9 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		//Restore previous state
+		// Restore previous state
 		if (savedInstanceState != null && mAdapter != null) {
-			//Selection
+			// Selection
 			mAdapter.onRestoreInstanceState(savedInstanceState);
 			mActionModeHelper.restoreSelection(this);
 		}
@@ -218,7 +218,9 @@ public class MainActivity extends AppCompatActivity implements
 		initializeActionModeHelper(mode);
 	}
 
-	/* INITIALIZATION METHODS */
+	/* ======================
+	 * INITIALIZATION METHODS
+	 * ====================== */
 
 	private void initializeActionModeHelper(int mode) {
 		mActionModeHelper = new ActionModeHelper(mAdapter, mFragment.getContextMenuResId(), this) {
@@ -246,21 +248,21 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private void initializeSwipeToRefresh() {
-		//Swipe down to force synchronize
+		// Swipe down to force synchronize
 		//mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
 		mSwipeRefreshLayout.setDistanceToTriggerSync(390);
-		//mSwipeRefreshLayout.setEnabled(true); Controlled by fragments!
+		//mSwipeRefreshLayout.setEnabled(true); //Controlled by fragments!
 		mSwipeRefreshLayout.setColorSchemeResources(
 				android.R.color.holo_purple, android.R.color.holo_blue_light,
 				android.R.color.holo_green_light, android.R.color.holo_orange_light);
 		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				//Passing true as parameter we always animate the changes between the old and the new data set
+				// Passing true as parameter we always animate the changes between the old and the new data set
 				DatabaseService.getInstance().updateNewItems();
 				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), DatabaseConfiguration.animateOnUpdate);
-				mSwipeRefreshLayout.setEnabled(false);
-				mRefreshHandler.sendEmptyMessageDelayed(0, 100L);//Simulate network time
+				mSwipeRefreshLayout.setRefreshing(true);
+				mRefreshHandler.sendEmptyMessageDelayed(0, 1500L); //Simulate network time
 				mActionModeHelper.destroyActionModeIfCan();
 			}
 		});
@@ -272,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements
 		mHeaderView = (HeaderView) findViewById(R.id.toolbar_header_view);
 		mHeaderView.bindTo(getString(R.string.app_name), getString(R.string.overall));
 		//mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
-		//Toolbar will now take on default Action Bar characteristics
+		// Toolbar will now take on default Action Bar characteristics
 		setSupportActionBar(mToolbar);
 	}
 
@@ -286,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements
 		mNavigationView = (NavigationView) findViewById(R.id.nav_view);
 		mNavigationView.setNavigationItemSelectedListener(this);
 
-		//Version
+		// Version
 		TextView appVersion = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.app_version);
 		appVersion.setText(getString(R.string.about_version,
 				Utils.getVersionName(this),
@@ -302,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements
 				mFragment.performFabAction();
 			}
 		});
-		//No Fab on 1st fragment
+		// No Fab on 1st fragment
 		hideFabSilently();
 	}
 
@@ -315,7 +317,9 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	/* NAVIGATION DRAWER & FRAGMENT MANAGEMENT */
+	/* =======================================
+	 * NAVIGATION DRAWER & FRAGMENT MANAGEMENT
+	 * ======================================= */
 
 	/**
 	 * IMPORTANT!! READ THE COMMENT FOR THE FRAGMENT REPLACE
@@ -328,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements
 		ScrollAwareFABBehavior fabBehavior = ((ScrollAwareFABBehavior) layoutParams.getBehavior());
 		fabBehavior.setEnabled(false);
 
-		//Handle navigation view item clicks
+		// Handle navigation view item clicks
 		int id = item.getItemId();
 		if (id == R.id.nav_overall) {
 			mFragment = FragmentOverall.newInstance(2);
@@ -359,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements
 			Intent intent = new Intent(this, ViewPagerActivity.class);
 			ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeBasic();
 			ActivityCompat.startActivity(this, intent, activityOptionsCompat.toBundle());
-			//Close drawer
+			// Close drawer
 			mRecyclerView.post(new Runnable() {
 				@Override
 				public void run() {
@@ -377,22 +381,25 @@ public class MainActivity extends AppCompatActivity implements
 					.show(getFragmentManager(), MessageDialog.TAG);
 			return true;
 		} else if (id == R.id.nav_github) {
-
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setData(Uri.parse("https://github.com/davideas/FlexibleAdapter"));
+			startActivity(Intent.createChooser(intent, getString(R.string.intent_chooser)));
+			return true;
 		}
 		// Insert the fragment by replacing any existing fragment
 		if (mFragment != null) {
-			//Highlight the selected item has been done by NavigationView
+			// Highlight the selected item has been done by NavigationView
 			item.setChecked(true);
-			//THIS IS VERY IMPORTANT. Because you are going to inflate a new RecyclerView, its
-			//Adapter will be null, therefore the following method cannot be called automatically!
-			//If your StickyHeaderContainer is in the main view, you must call this method to clean
-			//the previous sticky view. Alternatively you can move the <include> of StickyHeaderLayout
-			//in the Fragment view.
+			// THIS IS VERY IMPORTANT. Because you are going to inflate a new RecyclerView, its
+			// Adapter will be null, therefore the following method cannot be called automatically!
+			// If your StickyHeaderContainer is in the main view, you must call this method to clean
+			// the previous sticky view. Alternatively you can move the <include> of StickyHeaderLayout
+			// in the Fragment view.
 			mAdapter.onDetachedFromRecyclerView(mRecyclerView);
-			//Inflate the new Fragment with the new RecyclerView and a new Adapter
+			// Inflate the new Fragment with the new RecyclerView and a new Adapter
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			fragmentManager.beginTransaction().replace(R.id.recycler_view_container, mFragment).commit();
-			//Close drawer
+			// Close drawer
 			mRecyclerView.post(new Runnable() {
 				@Override
 				public void run() {
@@ -408,7 +415,9 @@ public class MainActivity extends AppCompatActivity implements
 		return false;
 	}
 
-	/* FLOATING ACTION BUTTON */
+	/* ======================
+	 * FLOATING ACTION BUTTON
+	 * ====================== */
 
 	private void hideFabSilently() {
 		mFab.setAlpha(0f);
@@ -433,11 +442,13 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	/* SEARCH VIEW */
+	/* ===========
+	 * SEARCH VIEW
+	 * =========== */
 
 	@Override
 	public void initSearchView(final Menu menu) {
-		//Associate searchable configuration with the SearchView
+		// Associate searchable configuration with the SearchView
 		Log.d(TAG, "onCreateOptionsMenu setup SearchView!");
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -476,11 +487,11 @@ public class MainActivity extends AppCompatActivity implements
 		if (mAdapter.hasNewSearchText(newText)) {
 			Log.d(TAG, "onQueryTextChange newText: " + newText);
 			mAdapter.setSearchText(newText);
-			//Fill and Filter mItems with your custom list and automatically animate the changes
-			//Watch out! The original list must be a copy
+			// Fill and Filter mItems with your custom list and automatically animate the changes
+			// Watch out! The original list must be a copy
 			mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), DatabaseConfiguration.delay);
 		}
-		//Disable SwipeRefresh if search is active!!
+		// Disable SwipeRefresh if search is active!!
 		mSwipeRefreshLayout.setEnabled(!mAdapter.hasSearchText());
 		return true;
 	}
@@ -491,7 +502,9 @@ public class MainActivity extends AppCompatActivity implements
 		return onQueryTextChange(query);
 	}
 
-	/* OPTION MENU PREPARATION & MANAGEMENT */
+	/* ====================================
+	 * OPTION MENU PREPARATION & MANAGEMENT
+	 * ==================================== */
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -511,39 +524,39 @@ public class MainActivity extends AppCompatActivity implements
 				//mSearchView.setIconified(false);//This is not necessary
 			}
 		}
-		//Fast Scroller
+		// Fast Scroller
 		MenuItem fastScrollerItem = menu.findItem(R.id.action_fast_scroller);
 		if (fastScrollerItem != null) {
 			fastScrollerItem.setChecked(mAdapter.isFastScrollerEnabled());
 		}
-		//Animate on update?
+		// Animate on update?
 		MenuItem animateUpdateMenuItem = menu.findItem(R.id.action_animate_on_update);
 		if (animateUpdateMenuItem != null) {
 			animateUpdateMenuItem.setChecked(DatabaseConfiguration.animateOnUpdate);
 		}
-		//Headers are shown?
+		// Headers are shown?
 		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
 		if (headersMenuItem != null) {
 			headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
 		}
-		//Sticky Header item?
+		// Sticky Header item?
 		MenuItem stickyItem = menu.findItem(R.id.action_sticky_headers);
 		if (stickyItem != null) {
 			stickyItem.setEnabled(mAdapter.areHeadersShown());
 			stickyItem.setChecked(mAdapter.areHeadersSticky());
 		}
-		//Scrolling Animations?
+		// Scrolling Animations?
 		MenuItem animationMenuItem = menu.findItem(R.id.action_animation);
 		if (animationMenuItem != null) {
 			animationMenuItem.setChecked(DatabaseConfiguration.animateOnScrolling);
 		}
-		//Reverse scrolling animation?
+		// Reverse scrolling animation?
 		MenuItem reverseMenuItem = menu.findItem(R.id.action_reverse);
 		if (reverseMenuItem != null) {
 			reverseMenuItem.setEnabled(mAdapter.isAnimationOnScrollingEnabled());
-			reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrolling());
+			reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrollingEnabled());
 		}
-		//DiffUtil?
+		// DiffUtil?
 		MenuItem diffUtilItem = menu.findItem(R.id.action_diff_util);
 		if (diffUtilItem != null) {
 			diffUtilItem.setChecked(DatabaseConfiguration.animateWithDiffUtil);
@@ -572,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements
 				Snackbar.make(findViewById(R.id.main_view), "Enabled scrolling animation, now reopen the page\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_reverse) {
-			if (mAdapter.isAnimationOnReverseScrolling()) {
+			if (mAdapter.isAnimationOnReverseScrollingEnabled()) {
 				mAdapter.setAnimationOnReverseScrolling(false);
 				item.setChecked(false);
 				Snackbar.make(findViewById(R.id.main_view), "Disabled reverse scrolling animation", Snackbar.LENGTH_SHORT).show();
@@ -622,15 +635,10 @@ public class MainActivity extends AppCompatActivity implements
 				item.setTitle(R.string.hide_headers);
 			}
 		} else if (id == R.id.action_sticky_headers) {
-			if (mAdapter.areHeadersSticky()) {
-				mAdapter.disableStickyHeaders();
-				item.setChecked(false);
-				Snackbar.make(findViewById(R.id.main_view), "Sticky headers disabled", Snackbar.LENGTH_SHORT).show();
-			} else {
-				mAdapter.enableStickyHeaders();
-				item.setChecked(true);
-				Snackbar.make(findViewById(R.id.main_view), "Sticky headers enabled", Snackbar.LENGTH_SHORT).show();
-			}
+			mAdapter.setStickyHeaders(!mAdapter.areHeadersSticky());
+			item.setChecked(!mAdapter.areHeadersSticky());
+			Snackbar.make(findViewById(R.id.main_view), "Sticky headers " +
+					(mAdapter.areHeadersSticky() ? "disabled" : "enabled"), Snackbar.LENGTH_SHORT).show();
 		} else if (id == R.id.action_selection_mode) {
 			if (mAdapter.getMode() == SelectableAdapter.MODE_IDLE) {
 				mAdapter.setMode(SelectableAdapter.MODE_SINGLE);
@@ -655,8 +663,9 @@ public class MainActivity extends AppCompatActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 
-	/* DIALOG LISTENER IMPLEMENTATION (For the example of onItemClick) */
-	
+	/* ===============================================================
+	 * DIALOG LISTENER IMPLEMENTATION (For the example of onItemClick)
+	 * =============================================================== */
 
 	@Override
 	public void onTitleModified(int position, String newTitle) {
@@ -672,7 +681,11 @@ public class MainActivity extends AppCompatActivity implements
 		mAdapter.updateItem(position, abstractItem, null);
 	}
 
-	/* FLEXIBLE ADAPTER LISTENERS IMPLEMENTATION */
+	/* ========================================================================
+	 * FLEXIBLE ADAPTER LISTENERS IMPLEMENTATION
+	 * Listeners implementation are in MainActivity to easily reuse the common
+	 * components like SwipeToRefresh, ActionMode, NavigationView, etc...
+	 * ======================================================================== */
 
 	@Override
 	public boolean onItemClick(int position) {
@@ -684,13 +697,14 @@ public class MainActivity extends AppCompatActivity implements
 			return false;
 		}
 
-		//Action on elements are allowed if Mode is IDLE, otherwise selection has priority
+		// Action on elements are allowed if Mode is IDLE, otherwise selection has priority
 		if (mAdapter.getMode() != SelectableAdapter.MODE_IDLE && mActionModeHelper != null) {
-			return mActionModeHelper.onClick(position);
+			boolean activate = mActionModeHelper.onClick(position);
+			Log.d(TAG, "Last activated position " + mActionModeHelper.getActivatedPosition());
+			return activate;
 		} else {
-			//Notify the active callbacks or implement a custom action onClick
-			if (!(flexibleItem instanceof ExpandableItem) && flexibleItem instanceof SimpleItem
-					|| flexibleItem instanceof SubItem) {
+			// Notify the active callbacks or implement a custom action onClick
+			if (flexibleItem instanceof SimpleItem || flexibleItem instanceof SubItem) {
 				//TODO FOR YOU: call your custom Action on item click
 				String title = extractTitleFrom(flexibleItem);
 				EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
@@ -728,47 +742,48 @@ public class MainActivity extends AppCompatActivity implements
 		Log.i(TAG, "onItemSwipe position=" + position +
 				" direction=" + (direction == ItemTouchHelper.LEFT ? "LEFT" : "RIGHT"));
 
-		//Option 1 FULL_SWIPE: Direct action no Undo Action
-		//Do something based on direction when item has been swiped:
+		// Option 1 FULL_SWIPE: Direct action no Undo Action
+		// Do something based on direction when item has been swiped:
 		//   A) update item, set "read" if an email etc.
 		//   B) remove the item from the adapter;
 
-		//Option 2 FULL_SWIPE: Delayed action with Undo Action
-		//Show action button and start a new Handler:
+		// Option 2 FULL_SWIPE: Delayed action with Undo Action
+		// Show action button and start a new Handler:
 		//   A) on time out do something based on direction (open dialog with options);
 
-		//Create list for single position (only in onItemSwipe)
+		// Create list for single position (only in onItemSwipe)
 		List<Integer> positions = new ArrayList<>(1);
 		positions.add(position);
-		//Build the message
+		// Build the message
 		IFlexible abstractItem = mAdapter.getItem(position);
 		StringBuilder message = new StringBuilder();
 		message.append(extractTitleFrom(abstractItem)).append(" ");
-		//Experimenting NEW feature
+		// Experimenting NEW feature
 		if (abstractItem.isSelectable())
 			mAdapter.setRestoreSelectionOnUndo(false);
 
-		//Perform different actions
-		//Here, option 2A) is implemented
+		// Perform different actions
+		// Here, option 2A) is implemented
 		if (direction == ItemTouchHelper.LEFT) {
 			message.append(getString(R.string.action_archived));
 
-			//Example of UNDO color
-			int actionTextColor = Color.TRANSPARENT;
+			// Example of UNDO color
+			int actionTextColor;
 			if (Utils.hasMarshmallow()) {
-				actionTextColor = getResources().getColor(R.color.material_color_orange_500, this.getTheme());
-			} else if (Utils.hasLollipop()) {
+				actionTextColor = getColor(R.color.material_color_orange_500);
+			} else {
+				//noinspection deprecation
 				actionTextColor = getResources().getColor(R.color.material_color_orange_500);
 			}
 
 			new UndoHelper(mAdapter, this)
-					.withPayload(null)//You can pass any custom object (in this case Boolean is enough)
+					.withPayload(null) //You can pass any custom object (in this case Boolean is enough)
 					.withAction(UndoHelper.ACTION_UPDATE, new UndoHelper.SimpleActionListener() {
 						@Override
 						public boolean onPreAction() {
-							//Return true to avoid default immediate deletion.
-							//Ask to the user what to do, open a custom dialog. On option chosen,
-							//remove the item from Adapter list as usual.
+							// Return true to avoid default immediate deletion.
+							// Ask to the user what to do, open a custom dialog. On option chosen,
+							// remove the item from Adapter list as usual.
 							return true;
 						}
 					})
@@ -779,13 +794,13 @@ public class MainActivity extends AppCompatActivity implements
 			//Here, option 1B) is implemented
 		} else if (direction == ItemTouchHelper.RIGHT) {
 			message.append(getString(R.string.action_deleted));
+			mSwipeRefreshLayout.setRefreshing(true);
 			new UndoHelper(mAdapter, this)
-					.withPayload(null)//You can pass any custom object (in this case Boolean is enough)
+					.withPayload(null) //You can pass any custom object (in this case Boolean is enough)
 					.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.SimpleActionListener() {
 						@Override
 						public void onPostAction() {
-							logOrphanHeaders();
-							//Handle ActionMode title
+							// Handle ActionMode title
 							if (mAdapter.getSelectedItemCount() == 0)
 								mActionModeHelper.destroyActionModeIfCan();
 							else
@@ -829,7 +844,7 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onUndoConfirmed(int action) {
 		if (action == UndoHelper.ACTION_UPDATE) {
-			//FIXME: Adjust click animation on swiped item
+			//TODO: Complete click animation on swiped item
 //			final RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForLayoutPosition(mSwipedPosition);
 //			if (holder instanceof ItemTouchHelperCallback.ViewHolderCallback) {
 //				final View view = ((ItemTouchHelperCallback.ViewHolderCallback) holder).getFrontView();
@@ -843,11 +858,11 @@ public class MainActivity extends AppCompatActivity implements
 //				animator.start();
 //			}
 		} else if (action == UndoHelper.ACTION_REMOVE) {
-			//Custom action is restore deleted items
+			// Custom action is restore deleted items
 			mAdapter.restoreDeletedItems();
-			//Enable SwipeRefresh
-			mRefreshHandler.sendEmptyMessage(0);
-			//Check also selection restoration
+			// Disable Refreshing
+			mSwipeRefreshLayout.setRefreshing(false);
+			// Check also selection restoration
 			if (mAdapter.isRestoreWithSelection()) {
 				mActionModeHelper.restoreSelection(this);
 			}
@@ -856,12 +871,12 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onDeleteConfirmed(int action) {
-		//Enable SwipeRefresh
-		mRefreshHandler.sendEmptyMessage(0);
-		//Removing items from Database. Example:
+		// Disable Refreshing
+		mSwipeRefreshLayout.setRefreshing(false);
+		// Removing items from Database. Example:
 		for (AbstractFlexibleItem adapterItem : mAdapter.getDeletedItems()) {
 			try {
-				//NEW! You can take advantage of AutoMap and differentiate logic by viewType using "switch" statement
+				// NEW! You can take advantage of AutoMap and differentiate logic by viewType using "switch" statement
 				switch (adapterItem.getLayoutRes()) {
 					case R.layout.recycler_sub_item:
 						SubItem subItem = (SubItem) adapterItem;
@@ -875,15 +890,14 @@ public class MainActivity extends AppCompatActivity implements
 				}
 
 			} catch (IllegalStateException e) {
-				//AutoMap is disabled, fallback to if-else with "instanceof" statement
+				// AutoMap is disabled, fallback to if-else with "instanceof" statement
 				if (adapterItem instanceof SubItem) {
-					//SubItem
+					// SubItem
 					SubItem subItem = (SubItem) adapterItem;
 					IExpandable expandable = mAdapter.getExpandableOf(subItem);
 					DatabaseService.getInstance().removeSubItem(expandable, subItem);
 					Log.d(TAG, "Confirm removed " + subItem.getTitle());
-				} else if (adapterItem instanceof SimpleItem) {
-					//SimpleItem or ExpandableItem(extends SimpleItem)
+				} else if (adapterItem instanceof SimpleItem || adapterItem instanceof ExpandableItem) {
 					DatabaseService.getInstance().removeItem(adapterItem);
 					Log.d(TAG, "Confirm removed " + adapterItem);
 				}
@@ -891,7 +905,9 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 
-	/* ACTION MODE IMPLEMENTATION */
+	/* ==========================
+	 * ACTION MODE IMPLEMENTATION
+	 * ========================== */
 
 	@Override
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -915,11 +931,11 @@ public class MainActivity extends AppCompatActivity implements
 			case R.id.action_select_all:
 				mAdapter.selectAll();
 				mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
-				//We consume the event
+				// We consume the event
 				return true;
 
 			case R.id.action_delete:
-				//Build message before delete, for the SnackBar
+				// Build message before delete, for the SnackBar
 				StringBuilder message = new StringBuilder();
 				message.append(getString(R.string.action_deleted)).append(" ");
 				for (Integer pos : mAdapter.getSelectedPositions()) {
@@ -928,57 +944,56 @@ public class MainActivity extends AppCompatActivity implements
 						message.append(", ");
 				}
 
-				//Experimenting NEW feature
+				// Experimenting NEW feature
 				mAdapter.setRestoreSelectionOnUndo(true);
 
-				//New Undo Helper
+				// New Undo Helper
 				new UndoHelper(mAdapter, this)
 						.withPayload(Payload.CHANGE)
 						.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.OnActionListener() {
 							@Override
 							public boolean onPreAction() {
-								//Don't consume the event
-								//OR use UndoHelper.SimpleActionListener and Override only onPostAction()
+								// Don't consume the event
+								// OR use UndoHelper.SimpleActionListener and Override only onPostAction()
 								return false;
 							}
 
 							@Override
 							public void onPostAction() {
-								//Disable SwipeRefresh
+								// Enable Refreshing
 								mRefreshHandler.sendEmptyMessage(1);
-								mRefreshHandler.sendEmptyMessageDelayed(0, 20000);
-								//Finish the action mode
+								mRefreshHandler.sendEmptyMessageDelayed(0, 7000);
+								// Finish the action mode
 								mActionModeHelper.destroyActionModeIfCan();
-								logOrphanHeaders();
 							}
 						})
 						.remove(mAdapter.getSelectedPositions(),
 								findViewById(R.id.main_view), message,
-								getString(R.string.undo), 20000);
+								getString(R.string.undo), 7000);
 
-				//We consume the event
+				// We consume the event
 				return true;
 
 			case R.id.action_merge:
 				if (mAdapter.getSelectedItemCount() > 1) {
-					//Selected positions are sorted by default, we take the first item of the set
+					// Selected positions are sorted by default, we take the first item of the set
 					int mainPosition = mAdapter.getSelectedPositions().get(0);
 					mAdapter.removeSelection(mainPosition);
 					StaggeredItem mainItem = (StaggeredItem) mAdapter.getItem(mainPosition);
 					for (Integer position : mAdapter.getSelectedPositions()) {
-						//Merge item - Save the modification in the memory for next refresh
+						// Merge item - Save the modification in the memory for next refresh
 						DatabaseService.getInstance().mergeItem(mainItem, (StaggeredItem) mAdapter.getItem(position));
 					}
-					//Remove merged item from the list
+					// Remove merged item from the list
 					mAdapter.removeAllSelectedItems();
-					//Keep selection on mainItem & Skip default notification by calling addSelection
+					// Keep selection on mainItem & Skip default notification by calling addSelection
 					mAdapter.addSelection(mainPosition);
-					//Custom notification to bind again (ripple only)
+					// Custom notification to bind again (ripple only)
 					mAdapter.notifyItemChanged(mainPosition, "blink");
-					//New title for context
+					// New title for context
 					mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
 				}
-				//We consume always the event, never finish the ActionMode
+				// We consume always the event, never finish the ActionMode
 				return true;
 
 			case R.id.action_split:
@@ -987,25 +1002,25 @@ public class MainActivity extends AppCompatActivity implements
 					if (mainItem.getMergedItems() != null) {
 						List<StaggeredItem> itemsToSplit = new ArrayList<>(mainItem.getMergedItems());
 						for (StaggeredItem itemToSplit : itemsToSplit) {
-							//Split item - Save the modification in the memory for next refresh
+							// Split item - Save the modification in the memory for next refresh
 							DatabaseService.getInstance().splitItem(mainItem, itemToSplit);
-							//We know the section object, so we can insert directly the item at the right position
-							//The calculated position is then returned
+							// We know the section object, so we can insert directly the item at the right position
+							// The calculated position is then returned
 							int position = mAdapter.addItemToSection(itemToSplit, mainItem.getHeader(), new DatabaseService.ItemComparatorById());
-							mAdapter.toggleSelection(position);//Execute default notification
+							mAdapter.toggleSelection(position); //Execute default notification
 							mAdapter.notifyItemChanged(position, "blink");
 						}
-						//Custom notification to bind again (ripple only)
+						// Custom notification to bind again (ripple only)
 						mAdapter.notifyItemChanged(mAdapter.getGlobalPositionOf(mainItem), "blink");
-						//New title for context
+						// New title for context
 						mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
 					}
 				}
-				//We consume always the event, never finish the ActionMode
+				// We consume always the event, never finish the ActionMode
 				return true;
 
 			default:
-				//If an item is not implemented we don't consume the event, so we finish the ActionMode
+				// If an item is not implemented we don't consume the event, so we finish the ActionMode
 				return false;
 		}
 	}
@@ -1020,39 +1035,33 @@ public class MainActivity extends AppCompatActivity implements
 		}
 	}
 	
-	/* EXTRAS */
+	/* ======
+	 * EXTRAS
+	 * ====== */
 
 	@Override
 	public void onBackPressed() {
-		//If Drawer is open, back key closes it
+		// If Drawer is open, back key closes it
 		if (mDrawer.isDrawerOpen(GravityCompat.START)) {
 			mDrawer.closeDrawer(GravityCompat.START);
 			return;
 		}
-		//If ActionMode is active, back key closes it
+		// If ActionMode is active, back key closes it
 		if (mActionModeHelper.destroyActionModeIfCan()) return;
-		//If SearchView is visible, back key cancels search and iconify it
+		// If SearchView is visible, back key cancels search and iconify it
 		if (mSearchView != null && !mSearchView.isIconified()) {
 			mSearchView.setIconified(true);
 			return;
 		}
-		//Return to Overall View
+		// Return to Overall View
 		if (DatabaseService.getInstance().getDatabaseType() != DatabaseType.OVERALL) {
 			MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.nav_overall);
 			onNavigationItemSelected(menuItem);
 			return;
 		}
-		//Close the App
+		// Close the App
 		DatabaseService.onDestroy();
 		super.onBackPressed();
-	}
-
-	private void logOrphanHeaders() {
-		//If removeOrphanHeader is set false, once hidden the Orphan Headers are not shown
-		// anymore, but you can recover them using getOrphanHeaders()
-		for (IHeader header : mAdapter.getOrphanHeaders()) {
-			Log.w(TAG, "Logging orphan header " + header);
-		}
 	}
 
 	private String extractTitleFrom(IFlexible flexibleItem) {
@@ -1070,7 +1079,7 @@ public class MainActivity extends AppCompatActivity implements
 			HeaderItem headerItem = (HeaderItem) flexibleItem;
 			return headerItem.getTitle();
 		}
-		//We already covered all situations with instanceof
+		// We already covered all situations with instanceof
 		return "";
 	}
 

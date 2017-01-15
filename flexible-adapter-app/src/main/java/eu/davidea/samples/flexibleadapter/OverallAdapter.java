@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -13,8 +14,10 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.samples.flexibleadapter.items.LayoutItem;
+import eu.davidea.flexibleadapter.utils.DrawableUtils;
+import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
 import eu.davidea.samples.flexibleadapter.items.OverallItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.utils.Utils;
 
@@ -47,7 +50,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public void showLayoutInfo(boolean scrollToPosition) {
 		if (!hasSearchText()) {
 			//Define Example View
-			final LayoutItem item = new LayoutItem("LAY-L");
+			final ScrollableLayoutItem item = new ScrollableLayoutItem("LAY-L");
 			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
 				item.setId("LAY-S");
 				item.setTitle(mRecyclerView.getContext().getString(R.string.staggered_layout));
@@ -59,10 +62,10 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(
 					R.string.columns,
-					String.valueOf(getSpanCount(mRecyclerView.getLayoutManager())))
+					String.valueOf(eu.davidea.flexibleadapter.utils.Utils.getSpanCount(mRecyclerView.getLayoutManager())))
 			);
-			addItemWithDelay(0, item, 500L, scrollToPosition);
-			removeItemWithDelay(item, 2000L, true);
+			addScrollableHeaderWithDelay(item, 500L, scrollToPosition);
+			removeScrollableHeaderWithDelay(item, 3000L);
 		}
 	}
 
@@ -73,8 +76,9 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	@Override
 	public int getItemViewType(int position) {
 		IFlexible item = getItem(position);
-		if (item instanceof LayoutItem) return R.layout.recycler_layout_item;
-		else return R.layout.recycler_label_item;
+		if (item instanceof ScrollableUseCaseItem) return R.layout.recycler_scrollable_usecase_item;
+		else if (item instanceof ScrollableLayoutItem) return R.layout.recycler_scrollable_layout_item;
+		else return R.layout.recycler_overall_item;
 	}
 
 	/**
@@ -85,8 +89,12 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		mInflater = LayoutInflater.from(parent.getContext());
 		switch (viewType) {
-			case R.layout.recycler_layout_item:
-				return new LayoutItem.ExampleViewHolder(
+			case R.layout.recycler_scrollable_usecase_item:
+				return new ScrollableUseCaseItem.UCViewHolder(
+						mInflater.inflate(viewType, parent, false), this);
+
+			case R.layout.recycler_scrollable_layout_item:
+				return new ScrollableLayoutItem.LayoutViewHolder(
 						mInflater.inflate(viewType, parent, false), this);
 			default:
 				return new OverallItem.LabelViewHolder(
@@ -103,9 +111,30 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payload) {
 		int viewType = getItemViewType(position);
-		if (viewType == R.layout.recycler_layout_item) {
-			LayoutItem item = (LayoutItem) getItem(position);
-			LayoutItem.ExampleViewHolder vHolder = (LayoutItem.ExampleViewHolder) holder;
+		Context context = holder.itemView.getContext();
+
+
+		if (viewType == R.layout.recycler_scrollable_usecase_item) {
+			ScrollableUseCaseItem item = (ScrollableUseCaseItem) getItem(position);
+			ScrollableUseCaseItem.UCViewHolder vHolder = (ScrollableUseCaseItem.UCViewHolder) holder;
+			assert item != null;
+
+			DrawableUtils.setBackgroundCompat(holder.itemView, DrawableUtils.getRippleDrawable(
+					DrawableUtils.getColorDrawable(context.getResources().getColor(R.color.material_color_blue_grey_50)),
+					DrawableUtils.getColorControlHighlight(context))
+			);
+			vHolder.mTitle.setText(Utils.fromHtmlCompat(item.getTitle()));
+			vHolder.mSubtitle.setText(Utils.fromHtmlCompat(item.getSubtitle()));
+
+			//Support for StaggeredGridLayoutManager
+			if (holder.itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
+				((StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams()).setFullSpan(true);
+				Log.d("LayoutItem", "LayoutItem configured fullSpan for StaggeredGridLayout");
+			}
+
+		} else if (viewType == R.layout.recycler_scrollable_layout_item) {
+			ScrollableLayoutItem item = (ScrollableLayoutItem) getItem(position);
+			ScrollableLayoutItem.LayoutViewHolder vHolder = (ScrollableLayoutItem.LayoutViewHolder) holder;
 			assert item != null;
 
 			vHolder.mTitle.setSelected(true);//For marquee
@@ -118,7 +147,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 				Log.d("LayoutItem", "LayoutItem configured fullSpan for StaggeredGridLayout");
 			}
 
-		} else if (viewType == R.layout.recycler_label_item) {
+		} else if (viewType == R.layout.recycler_overall_item) {
 			OverallItem item = (OverallItem) getItem(position);
 			OverallItem.LabelViewHolder vHolder = (OverallItem.LabelViewHolder) holder;
 			assert item != null;
@@ -134,15 +163,15 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			if (item.getIcon() != null) {
 				vHolder.mIcon.setImageDrawable(item.getIcon());
 			}
-
-			// IMPORTANT!!!
-			// With method B, animateView() needs to be called by the user!
-			// With method A, the call is handled by the Adapter
-			animateView(holder, position);
-			// Same concept for EndlessScrolling and View activation:
-			// - onLoadMore(position);
-			// - holder.itemView.setActivated(isSelected(position));
 		}
+
+		// IMPORTANT!!!
+		// With method B, animateView() needs to be called by the user!
+		// With method A, the call is handled by the Adapter
+		animateView(holder, position);
+		// Same concept for EndlessScrolling and View activation:
+		// - onLoadMore(position);
+		// - holder.itemView.setActivated(isSelected(position));
 	}
 
 }

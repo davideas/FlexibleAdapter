@@ -3,7 +3,6 @@ package eu.davidea.samples.flexibleadapter.fragments;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,6 +17,7 @@ import java.util.Random;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
@@ -25,6 +25,7 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.animators.FadeInDownAnimator;
 import eu.davidea.samples.flexibleadapter.items.ProgressItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -42,6 +43,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	public static final String TAG = FragmentEndlessScrolling.class.getSimpleName();
 
 	private ExampleAdapter mAdapter;
+	private ProgressItem mProgressItem = new ProgressItem();
 
 	public static FragmentEndlessScrolling newInstance(int columnCount) {
 		FragmentEndlessScrolling fragment = new FragmentEndlessScrolling();
@@ -61,119 +63,152 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
-		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createEndlessDatabase(1);//N. of items
+		// Create New Database and Initialize RecyclerView
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createEndlessDatabase(0); //N. of items
+		}
 		initializeRecyclerView(savedInstanceState);
 
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Initialize Adapter and RecyclerView
-		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+		// Initialize Adapter and RecyclerView
+		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
-		//Experimenting NEW features (v5.0.0)
+		// Experimenting NEW features (v5.0.0)
 		mAdapter.setAutoScrollOnExpand(true)
-				//.setAnimateToLimit(Integer.MAX_VALUE)//Use the default value
-				.setNotifyMoveOfFilteredItems(true)//When true, filtering on big list is very slow, not in this case!
-				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
+				//.setAnimateToLimit(Integer.MAX_VALUE) //Use the default value
+				.setNotifyMoveOfFilteredItems(true) //When true, filtering on big list is very slow, not in this case!
+				.setNotifyChangeOfUnfilteredItems(true) //We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
 				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
-		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
-		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+		// NOTE: Use the custom FadeInDownAnimator for ALL notifications for ALL items,
+		// but ScrollableFooterItem implements AnimatedViewHolder with a unique animation: SlideInUp!
+		mRecyclerView.setItemAnimator(new FadeInDownAnimator());
 
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
+		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
-		//Experimenting NEW features (v5.0.0)
-		mAdapter.setLongPressDragEnabled(true)//Enable long press to drag items
-				.setHandleDragEnabled(true)//Enable drag using handle view
-				.setSwipeEnabled(true)//Enable swipe items
-				.setDisplayHeadersAtStartUp(true);//Show Headers at startUp!
+		// Experimenting NEW features (v5.0.0)
+		mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
+				.setHandleDragEnabled(true) //Enable drag using handle view
+				.setSwipeEnabled(true); //Enable swipe items
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		//EndlessScrollListener - OnLoadMore (v5.0.0)
-		mAdapter.setEndlessScrollListener(this, new ProgressItem());
-		//mAdapter.setEndlessScrollThreshold(1);//Default=1
+		// EndlessScrollListener - OnLoadMore (v5.0.0)
+		mAdapter.setEndlessScrollListener(this, mProgressItem)
+				//.setEndlessPageSize(3) //Endless is automatically disabled if newItems < 3
+				.setEndlessTargetCount(15); //Endless is automatically disabled if totalItems >= 15
+				//.setEndlessScrollThreshold(1); //Default=1
 
-		//Add sample HeaderView items on the top (not belongs to the library)
-		mAdapter.addUserLearnedSelection(savedInstanceState == null);
+		// Add 1 Scrollable Header and 1 Footer items
 		mAdapter.showLayoutInfo(savedInstanceState == null);
+		mAdapter.addScrollableFooter();
 	}
 
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo(true);
+		mAdapter.showLayoutInfo(false);
+	}
+
+	/**
+	 * No more data to load.
+	 * <p>This method is called if any limit is reached (<b>targetCount</b> or <b>pageSize</b>
+	 * must be set) AND if new data is <u>temporary</u> unavailable (ex. no connection or no
+	 * new updates remotely). If no new data, a {@link FlexibleAdapter#notifyItemChanged(int, Object)}
+	 * with a payload {@link Payload#NO_MORE_LOAD} is triggered on the <i>progressItem</i>.</p>
+	 *
+	 * @param newItemsSize the last size of the new items loaded
+	 * @see FlexibleAdapter#setEndlessTargetCount(int)
+	 * @see FlexibleAdapter#setEndlessPageSize(int)
+	 * @since 5.0.0-rc1
+	 */
+	@Override
+	public void noMoreLoad(int newItemsSize) {
+		Log.d(TAG, "newItemsSize=" + newItemsSize);
+		Log.d(TAG, "Total pages loaded=" + mAdapter.getEndlessCurrentPage());
+		Log.d(TAG, "Total items loaded=" + mAdapter.getMainItemCount());
 	}
 
 	/**
 	 * Loads more data.
+	 * <p>Use {@code lastPosition} and {@code currentPage} to know what to load next.</p>
+	 * {@code lastPosition} is the count of the main items without Scrollable Headers.
+	 *
+	 * @param lastPosition the position of the last main item in the adapter
+	 * @param currentPage  the current page
+	 * @since 5.0.0-b6
+	 * <br/>5.0.0-rc1 added {@code lastPosition} and {@code currentPage} as parameters
 	 */
 	@Override
-	public void onLoadMore() {
-		//We don't want load more items when searching into the current Collection!
-		//Alternatively, for a special filter, if we want load more items when filter is active, the
+	public void onLoadMore(int lastPosition, int currentPage) {
+		// We don't want load more items when searching into the current Collection!
+		// Alternatively, for a special filter, if we want load more items when filter is active, the
 		// new items that arrive from remote, should be already filtered, before adding them to the Adapter!
 		if (mAdapter.hasSearchText()) {
 			mAdapter.onLoadMoreComplete(null);
 			return;
 		}
-		//Simulating asynchronous call
+		// Simulating asynchronous call
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				final List<AbstractFlexibleItem> newItems = new ArrayList<>();
 
-				//Simulating success/failure
-				int count = new Random().nextInt(3);
-				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item);
+				// 1. Simulating success/failure with Random
+				int count = new Random().nextInt(7);
+				int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_simple_item);
 				for (int i = 1; i <= count; i++) {
-					if (i % 2 != 0) {
-						newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
-					} else {
-						newItems.add(DatabaseService.newExpandableItem(totalItemsOfType + i, null));
-					}
+					newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
 				}
 
-				//Callback the Adapter to notify the change:
-				//- New items will be added to the end of the list
-				//- When list is null or empty, ProgressItem will be hidden
-				mAdapter.onLoadMoreComplete(newItems);
+				// 2. Callback the Adapter to notify the change:
+				// - New items will be added to the end of the main list
+				// - When list is null or empty and limits are reached, Endless scroll will be disabled.
+				//   To enable again, you must call setEndlessProgressItem(@Nullable T progressItem).
+				mAdapter.onLoadMoreComplete(newItems, 5000L);
 				DatabaseService.getInstance().addAll(newItems);
+				// - Retrieve the new page number after adding new items!
+				Log.d(TAG, "EndlessCurrentPage=" + mAdapter.getEndlessCurrentPage());
+				Log.d(TAG, "EndlessPageSize=" + mAdapter.getEndlessPageSize());
+				Log.d(TAG, "EndlessTargetCount=" + mAdapter.getEndlessTargetCount());
 
-				//Expand all Expandable items: Not Expandable items are automatically skipped/ignored!
+				// 3. If you have new Expandable and you want expand them, do as following:
+				// Note: normal items are automatically skipped/ignored because they do not
+				//       implement IExpandable interface! So don't care about them.
 				for (AbstractFlexibleItem item : newItems) {
-					//Simple expansion is performed:
-					// - Automatic scroll is performed
-					//mAdapter.expand(item);
-
-					//Initialization is performed:
-					// - Expanded status is ignored(WARNING: possible subItem duplication)
+					// Option A. (Best use case) Initialization is performed:
+					// - Expanded status is ignored. WARNING: possible subItems duplication!
 					// - Automatic scroll is skipped
 					mAdapter.expand(item, true);
+
+					// Option B. Simple expansion is performed:
+					// - WARNING: Automatic scroll is performed!
+					//mAdapter.expand(item);
 				}
 
-				//Notify user
-				String message = (newItems.size() > 0 ?
-						"Simulated: " + newItems.size() + " new items arrived :-)" :
-						"Simulated: No more items to load :-(\nRefresh to retry.");
-				Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+				// 4. Notify user
+				if (getActivity() != null && newItems.size() > 0) {
+					Toast.makeText(getActivity(),
+							"Simulated: " + newItems.size() + " new items arrived :-)",
+							Toast.LENGTH_SHORT).show();
+				}
 			}
-		}, 2500);
+		}, 4000L);
 	}
 
 	@Override
@@ -211,11 +246,14 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {
-				//NOTE: If you use simple integer to identify the ViewType,
-				//here, you should use them and not Layout integers
+				// NOTE: If you use simple integers to identify the ViewType,
+				// here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_layout_item:
-					case R.layout.recycler_uls_item:
+					case R.layout.recycler_scrollable_expandable_item:
+					case R.layout.recycler_scrollable_header_item:
+					case R.layout.recycler_scrollable_footer_item:
+					case R.layout.recycler_scrollable_layout_item:
+					case R.layout.recycler_scrollable_uls_item:
 					case R.layout.progress_item:
 						return mColumnCount;
 					default:

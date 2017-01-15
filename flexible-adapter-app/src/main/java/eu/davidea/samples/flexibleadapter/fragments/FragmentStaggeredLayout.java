@@ -12,13 +12,15 @@ import android.view.MenuItem;
 
 import java.util.Random;
 
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.TopSnappedSmoothScroller;
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.utils.Utils;
-import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredHeaderItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredItemStatus;
@@ -34,7 +36,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 
 	public static final String TAG = FragmentStaggeredLayout.class.getSimpleName();
 
-	private ExampleAdapter mAdapter;
+	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
 
 	public static FragmentStaggeredLayout newInstance(int columnCount) {
 		FragmentStaggeredLayout fragment = new FragmentStaggeredLayout();
@@ -55,59 +57,55 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		//Create New Database and Initialize RecyclerView
+		// Create New Database and Initialize RecyclerView
 		DatabaseService.getInstance().createStaggeredDatabase(getActivity());
 		initializeRecyclerView(savedInstanceState);
 
-		//Restore FAB button and icon
+		// Restore FAB button and icon
 		initializeFab();
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Initialize Adapter and RecyclerView
-		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
-		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
-		mAdapter.setNotifyMoveOfFilteredItems(true);
+		// Initialize Adapter and RecyclerView
+		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
-
-		//Customize the speed of the smooth scroll.
-		//NOTE: Every time you change this value you MUST recreate the LayoutManager instance
+		// Customize the speed of the smooth scroll.
+		// NOTE: Every time you change this value you MUST recreate the LayoutManager instance
 		// and to assign it again to the RecyclerView!
 		TopSnappedSmoothScroller.MILLISECONDS_PER_INCH = 33f;
 		mRecyclerView.setLayoutManager(createNewStaggeredGridLayoutManager());
-		//This value is restored to 100f (default) right here, because it is used in the constructor
-		// by Android. If we don't change it now, others LayoutManager will be impacted too by the
-		// above modification!
+		// This value is restored to 100f (default) right here, because it is used in the
+		// constructor by Android. If we don't change it now, others LayoutManager will be
+		// impacted too by the above modification!
 		TopSnappedSmoothScroller.MILLISECONDS_PER_INCH = 100f;
 
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-		//Experimenting NEW features (v5.0.0)
-		mAdapter.setDisplayHeadersAtStartUp(true)//Show Headers at startUp!
-				.setPermanentDelete(true);
+		// Experimenting NEW features (v5.0.0)
+		mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
+				.setNotifyMoveOfFilteredItems(true)
+				.setPermanentDelete(true) //Default=true
+				.setOnlyEntryAnimation(true);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		//Add sample HeaderView items on the top (not belongs to the library)
-		mAdapter.showLayoutInfo(savedInstanceState == null);
+		// Add 1 Scrollable Header
+		mAdapter.addScrollableHeader(new ScrollableUseCaseItem(
+				getString(R.string.staggered_use_case_title),
+				getString(R.string.staggered_use_case_description)));
 	}
 
 	@Override
 	public int getContextMenuResId() {
 		return R.menu.menu_staggered_context;
-	}
-
-	@Override
-	public void showNewLayoutInfo(MenuItem item) {
-		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo(true);
 	}
 
 	@Override
@@ -127,9 +125,9 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		} else if (id == R.id.action_delete) {
 			DatabaseService.getInstance().removeAll();
 			mAdapter.updateDataSet(null, true);
-			//This is necessary if we call updateDataSet() and not removeItems
+			// This is necessary if we call updateDataSet() and not removeItems
 			DatabaseService.getInstance().resetHeaders();
-			//Change fab action (ADD NEW ITEM UNTIL 15)
+			// Change fab action (ADD NEW ITEM UNTIL 15)
 			FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
 			fab.setImageResource(R.drawable.fab_add);
 		}
@@ -143,34 +141,34 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		StaggeredHeaderItem headerItem = DatabaseService.getInstance().getHeaderByStatus(status);
 		int scrollTo;
 
-		//CALCULATE POSITION FOR
-		//- Useful in ALL situations of moving/adding an item.
-		//- Position is calculated based on the custom Comparator implementation.
-		//- Comparator object should sort the Section (in the eventuality the header is hidden)
-		//  and the Item into the Section (see the Class ItemComparatorByGroup for an
-		//  example of implementation).
-		//- It respects the custom sort, also for a non-displayed section!
-		//- When moving/adding, the relative header item will be automatically displayed too
-		//  if not yet visible.
+		// CALCULATE POSITION FOR
+		// - Useful in ALL situations of moving/adding an item.
+		// - Position is calculated based on the custom Comparator implementation.
+		// - Comparator object should sort the Section (in the eventuality the header is hidden)
+		//   and the Item into the Section (see the Class ItemComparatorByGroup for an
+		//   example of implementation).
+		// - It respects the custom sort, also for a non-displayed section!
+		// - When moving/adding, the relative header item will be automatically displayed too
+		//   if not yet visible.
 		if (mAdapter.getItemCountOfTypes(R.layout.recycler_staggered_item) >= 15) {
 			//FAB Action: Move Item
 			scrollTo = moveItem(status, headerItem);
 		}
 
-		//ADD ITEM TO SECTION
-		//- Useful only to add new items of every type
-		//- Comparator object should sort the Section (in the eventuality the header is hidden)
-		//  and the Item into the Section (see the Class ItemComparatorByGroup for an
-		//  example of implementation).
-		//- The relative header will be automatically displayed too if not yet visible.
-		//- if you already know the relative index of the new item, then call the correct
-		//  method without the Comparator object.
+		// ADD ITEM TO SECTION
+		// - Useful only to add new items of every type
+		// - Comparator object should sort the Section (in the eventuality the header is hidden)
+		//   and the Item into the Section (see the Class ItemComparatorByGroup for an
+		//   example of implementation).
+		// - The relative header will be automatically displayed too if not yet visible.
+		// - if you already know the relative index of the new item, then call the correct
+		//   method without the Comparator object.
 		else {
-			//FAB Action: Add Item
+			// FAB Action: Add Item
 			scrollTo = addItem(status, headerItem);
 		}
 
-		//Show to the user the result of the addition/changes
+		// Show to the user the result of the addition/changes
 		smoothScrollTo(scrollTo, headerItem);
 		refreshItem(scrollTo);
 		clearEmptySections();
@@ -181,19 +179,19 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 				DatabaseService.getInstance().getMaxStaggeredId(), headerItem);
 		staggeredItem.setStatus(status);//!!!
 
-		//The section object is known
+		// The section object is known
 		mAdapter.addItemToSection(staggeredItem, staggeredItem.getHeader(),
 				new DatabaseService.ItemComparatorByGroup());
-		//Add Item to the Database as well for next refresh
+		// Add Item to the Database as well for next refresh
 		DatabaseService.getInstance().addItem(staggeredItem, new DatabaseService.ItemComparatorById());
 
-		//Change fab action (MOVE ITEM)
+		// Change fab action (MOVE ITEM)
 		if (mAdapter.getItemCountOfTypes(R.layout.recycler_staggered_item) >= 15) {
 			FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
 			fab.setImageResource(R.drawable.ic_sort_white_24dp);
 		}
 
-		//Retrieve the final position due to a possible hidden header became now visible!
+		// Retrieve the final position due to a possible hidden header became now visible!
 		int scrollTo = mAdapter.getGlobalPositionOf(staggeredItem);
 		Log.d(TAG, "Creating New Item " + staggeredItem + " at position " + scrollTo);
 		return scrollTo;
@@ -202,22 +200,22 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 	private int moveItem(StaggeredItemStatus status, StaggeredHeaderItem headerItem) {
 		StaggeredItem staggeredItem = DatabaseService.getInstance().getRandomStaggeredItem();
 		if (!staggeredItem.getHeader().equals(headerItem)) {
-			//Before calculate the position, change header/section
+			// Before calculate the position, change header/section
 			staggeredItem.setStatus(status);//!!!
 			staggeredItem.setHeader(headerItem);
 
 			int toPosition = mAdapter.calculatePositionFor(staggeredItem, new DatabaseService.ItemComparatorByGroup());
-			//Move item to just calculated position under the correct section
+			// Move item to just calculated position under the correct section
 			mAdapter.moveItem(mAdapter.getGlobalPositionOf(staggeredItem), toPosition, Payload.MOVE);
 		}
-		//Retrieve the final position due to a possible hidden header became now visible!
+		// Retrieve the final position due to a possible hidden header became now visible!
 		int scrollTo = mAdapter.getGlobalPositionOf(staggeredItem);
 		Log.d(TAG, "Moving Item to position" + scrollTo);
 		return scrollTo;
 	}
 
 	private void smoothScrollTo(final int scrollTo, final StaggeredHeaderItem headerItem) {
-		//Smooth scrolling should be delayed because the just added item could not be yet
+		// Smooth scrolling should be delayed because the just added item could not be yet
 		// animated/rendered by the LayoutManager
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
@@ -237,7 +235,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 	}
 
 	private void refreshItem(final int position) {
-		//We notify the item that it is changed, bind it again (change color)
+		// We notify the item that it is changed, bind it again (change color)
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -247,7 +245,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 	}
 
 	private void clearEmptySections() {
-		//We remove the header item that is without items (empty sections)
+		// We remove the header item that is without items (empty sections)
 		for (final IHeader header : mAdapter.getHeaderItems()) {
 			Log.d(TAG, "Header=" + header.toString() + " Items=" + mAdapter.getSectionItems(header).size());
 			if (mAdapter.getSectionItems(header).size() == 0) {

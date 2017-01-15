@@ -64,7 +64,7 @@ public class FragmentViewPager extends Fragment {
 			Log.d(TAG, "Creating new Fragment for Section " + mSection);
 		}
 
-		//Contribution for specific action buttons in the Toolbar
+		// Contribution for specific action buttons in the Toolbar
 		setHasOptionsMenu(true);
 	}
 
@@ -77,40 +77,39 @@ public class FragmentViewPager extends Fragment {
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
-		//Initialize RecyclerView
-		initializeRecyclerView(savedInstanceState);
+		// Initialize RecyclerView
+		initializeRecyclerView();
 
-		//Settings for FlipView
+		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
 	}
 
-	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Initialize Adapter and RecyclerView
-		//Use of stableIds, I strongly suggest to implement 'item.hashCode()'
+	private void initializeRecyclerView() {
+		// Initialize Adapter and RecyclerView
+		// Use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new FlexibleAdapter<>(createList(50, 5), getActivity(), true);
-		//Experimenting NEW features (v5.0.0)
+		// Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
 
 		RecyclerView mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity()));
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
+		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
 		mAdapter.setFastScroller(fastScroller, Utils.getColorAccent(getActivity()));
 		mAdapter.toggleFastScroller();
 
-		//Sticky Headers
-		mAdapter.setStickyHeaderContainer((ViewGroup) getView().findViewById(R.id.sticky_header_container))
-				.setDisplayHeadersAtStartUp(true)
-				.enableStickyHeaders();
+		// Sticky Headers
+		mAdapter.setDisplayHeadersAtStartUp(true)
+				.setStickyHeaders(true);
 	}
 
 	private List<IFlexible> createList(int size, int headers) {
@@ -127,12 +126,12 @@ public class FragmentViewPager extends Fragment {
 
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
-		//Headers are shown?
+		// Headers are shown?
 		MenuItem headersMenuItem = menu.findItem(R.id.action_show_hide_headers);
 		if (headersMenuItem != null) {
 			headersMenuItem.setTitle(mAdapter.areHeadersShown() ? R.string.hide_headers : R.string.show_headers);
 		}
-		//Sticky Header item?
+		// Sticky Header item?
 		MenuItem stickyItem = menu.findItem(R.id.action_sticky_headers);
 		if (stickyItem != null) {
 			stickyItem.setEnabled(mAdapter.areHeadersShown());
@@ -145,13 +144,8 @@ public class FragmentViewPager extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_sticky_headers) {
-			if (mAdapter.areHeadersSticky()) {
-				item.setChecked(false);
-				mAdapter.disableStickyHeaders();
-			} else {
-				item.setChecked(true);
-				mAdapter.enableStickyHeaders();
-			}
+			item.setChecked(!mAdapter.areHeadersSticky());
+			mAdapter.setStickyHeaders(!mAdapter.areHeadersSticky());
 		} else if (id == R.id.action_show_hide_headers) {
 			if (mAdapter.areHeadersShown()) {
 				mAdapter.hideAllHeaders();

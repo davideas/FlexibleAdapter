@@ -55,7 +55,7 @@ public class DatabaseService {
 	private Map<StaggeredItemStatus, StaggeredHeaderItem> headers;
 
 
-	DatabaseService() {
+	private DatabaseService() {
 	}
 
 	public static DatabaseService getInstance() {
@@ -81,6 +81,8 @@ public class DatabaseService {
 	 * List of CardView as entry list, showing the functionality of the library.
 	 * It also shows how adapter animation can be configured.
 	 */
+	//TODO: Review the description of all examples
+	//TODO: Add ScrollableUseCaseItem header for each database
 	public void createOverallDatabase(Resources resources) {
 		databaseType = DatabaseType.OVERALL;
 		mItems.clear();
@@ -478,7 +480,7 @@ public class DatabaseService {
 	public void addSubItem(int position, IExpandable parent, SubItem subItem) {
 		//This split is for my examples
 		if (parent instanceof ExpandableItem)
-			((ExpandableItem) parent).removeSubItem(subItem);
+			((ExpandableItem) parent).addSubItem(subItem);
 		else if (parent instanceof ExpandableHeaderItem)
 			((ExpandableHeaderItem) parent).addSubItem(subItem);
 	}
@@ -564,10 +566,10 @@ public class DatabaseService {
 	 * notified with CHANGE Payload in the Adapter list when refreshed.
 	 */
 	public void updateNewItems() {
-		for (IFlexible item : mItems) {
-			if (item instanceof SimpleItem) {
-				SimpleItem simpleItem = (SimpleItem) item;
-				simpleItem.increaseUpdates();
+		for (IFlexible iFlexible : mItems) {
+			if (iFlexible instanceof AbstractItem) {
+				AbstractItem item = (AbstractItem) iFlexible;
+				item.increaseUpdates();
 			}
 		}
 	}

@@ -18,9 +18,8 @@ package eu.davidea.flexibleadapter;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 
@@ -28,6 +27,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +65,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	public static final int MODE_IDLE = 0, MODE_SINGLE = 1, MODE_MULTI = 2;
 
 	/**
-	 * Annotation interface for selection modes.
+	 * Annotation interface for selection modes:
+	 * {@link #MODE_IDLE}, {@link #MODE_SINGLE}, {@link #MODE_MULTI}
 	 */
 	@IntDef({MODE_IDLE, MODE_SINGLE, MODE_MULTI})
 	@Retention(RetentionPolicy.SOURCE)
@@ -72,9 +74,16 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	private Set<Integer> mSelectedPositions;
+	private Set<FlexibleViewHolder> mBoundViewHolders;
 	private int mMode;
 	protected RecyclerView mRecyclerView;
 	protected FastScroller mFastScroller;
+
+	/**
+	 * Flag when fast scrolling is active.
+	 * <p>Used to know if user is fast scrolling.</p>
+	 */
+	protected boolean isFastScroll = false;
 
 	/**
 	 * ActionMode selection flag SelectAll.
@@ -96,7 +105,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 1.0.0
 	 */
 	public SelectableAdapter() {
+		Log.i("FlexibleAdapter", "Running version " + BuildConfig.VERSION_NAME);
 		mSelectedPositions = new TreeSet<>();
+		mBoundViewHolders = new HashSet<>();
 		mMode = MODE_IDLE;
 	}
 
@@ -150,24 +161,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	/**
-	 * Helper method to return the number of the columns (span count) of the given LayoutManager.
-	 * <p>All Layouts are supported.</p>
-	 *
-	 * @param layoutManager the layout manager to check
-	 * @return the span count
-	 * @since 5.0.0-b7
-	 */
-	//TODO: Deprecated? move to Utils
-	public static int getSpanCount(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof GridLayoutManager) {
-			return ((GridLayoutManager) layoutManager).getSpanCount();
-		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
-		}
-		return 1;
-	}
-
-	/**
 	 * Sets the mode of the selection:
 	 * <ul>
 	 * <li>{@link #MODE_IDLE} Default. Configures the adapter so that no item can be selected;
@@ -181,19 +174,11 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 2.0.0
 	 */
 	public void setMode(@Mode int mode) {
-		if (DEBUG) Log.i(TAG, getModeName(mode) + " enabled");
+		if (DEBUG) Log.i(TAG, Utils.getModeName(mode) + " enabled");
 		if (mMode == MODE_SINGLE && mode == MODE_IDLE)
 			clearSelection();
 		this.mMode = mode;
-		mLastItemInActionMode = (mode == MODE_IDLE);
-	}
-
-	private String getModeName(int mode) {
-		switch (mode) {
-			case 1: return "MODE_SINGLE";
-			case 2: return "MODE_MULTI";
-			default: return "MODE_IDLE";
-		}
+		this.mLastItemInActionMode = (mode != MODE_MULTI);
 	}
 
 	/**
@@ -215,26 +200,37 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 5.0.0-b1
 	 */
 	public boolean isSelectAll() {
+		// Reset the flags with delay
+		resetActionModeFlags();
 		return mSelectAll;
 	}
 
 	/**
-	 * @return true if user returns to {@link #MODE_IDLE} and no selection is active, false otherwise
+	 * @return true if user returns to {@link #MODE_IDLE} or {@link #MODE_SINGLE} and no
+	 * selection is active, false otherwise
 	 * @since 5.0.0-b1
 	 */
 	public boolean isLastItemInActionMode() {
+		// Reset the flags with delay
+		resetActionModeFlags();
 		return mLastItemInActionMode;
 	}
 
 	/**
-	 * Reset to false the ActionMode flags: {@code SelectAll} and {@code LastItemInActionMode}.
-	 * <p><b>IMPORTANT:</b> To be called with <u>delay</u> in {@code holder.itemView.postDelayed()}.</p>
+	 * Resets to false the ActionMode flags: {@code SelectAll} and {@code LastItemInActionMode}.
 	 *
 	 * @since 5.0.0-b1
 	 */
-	public void resetActionModeFlags() {
-		this.mSelectAll = false;
-		this.mLastItemInActionMode = false;
+	private void resetActionModeFlags() {
+		if (mSelectAll || mLastItemInActionMode) {
+			mRecyclerView.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mSelectAll = false;
+					mLastItemInActionMode = false;
+				}
+			}, 200L);
+		}
 	}
 
 	/**
@@ -299,8 +295,19 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @see #isSelectable(int)
 	 * @since 5.0.0-b7
 	 */
-	public boolean addSelection(int position) {
+	public final boolean addSelection(int position) {
 		return isSelectable(position) && mSelectedPositions.add(position);
+	}
+
+	/**
+	 * This method is used only internally to force adjust selection.
+	 *
+	 * @param position Position of the item to add the selection status for.
+	 * @return true if the set is modified, false otherwise
+	 * @since 5.0.0-rc1
+	 */
+	final boolean addAdjustedSelection(int position) {
+		return mSelectedPositions.add(position);
 	}
 
 	/**
@@ -310,7 +317,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @return true if the set is modified, false otherwise
 	 * @since 5.0.0-b7
 	 */
-	public boolean removeSelection(int position) {
+	public final boolean removeSelection(int position) {
 		return mSelectedPositions.remove(position);
 	}
 
@@ -349,7 +356,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 				mSelectedPositions.add(i);
 				itemCount++;
 			} else {
-				//Optimization for ItemRangeChanged
+				// Optimization for ItemRangeChanged
 				if (positionStart + itemCount == i) {
 					notifySelectionChanged(positionStart, itemCount);
 					itemCount = 0;
@@ -374,26 +381,66 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		if (DEBUG) Log.d(TAG, "clearSelection " + mSelectedPositions);
 		Iterator<Integer> iterator = mSelectedPositions.iterator();
 		int positionStart = 0, itemCount = 0;
-		//The notification is done only on items that are currently selected.
+		// The notification is done only on items that are currently selected.
 		while (iterator.hasNext()) {
 			int position = iterator.next();
 			iterator.remove();
-			//Optimization for ItemRangeChanged
+			// Optimization for ItemRangeChanged
 			if (positionStart + itemCount == position) {
 				itemCount++;
 			} else {
-				//Notify previous items in range
+				// Notify previous items in range
 				notifySelectionChanged(positionStart, itemCount);
 				positionStart = position;
 				itemCount = 1;
 			}
 		}
-		//Notify remaining items in range
+		// Notify remaining items in range
 		notifySelectionChanged(positionStart, itemCount);
 	}
 
 	private void notifySelectionChanged(int positionStart, int itemCount) {
-		if (itemCount > 0) notifyItemRangeChanged(positionStart, itemCount, Payload.SELECTION);
+		if (itemCount > 0) {
+			// Avoid to rebind the VH, direct call to the itemView activation
+			for (FlexibleViewHolder holder : mBoundViewHolders) {
+				if (isSelectable(holder.getAdapterPosition()))
+					holder.toggleActivation();
+			}
+			// Use classic notification, in case FlexibleViewHolder is not implemented
+			if (mBoundViewHolders.isEmpty())
+				notifyItemRangeChanged(positionStart, itemCount, Payload.SELECTION);
+		}
+	}
+
+	@Override
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+		// When user scrolls, this line binds the correct selection status
+		holder.itemView.setActivated(isSelected(position));
+		// Bind the correct view elevation
+		if (holder instanceof FlexibleViewHolder) {
+			FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
+			if (holder.itemView.isActivated() && flexHolder.getActivationElevation() > 0)
+				ViewCompat.setElevation(holder.itemView, flexHolder.getActivationElevation());
+			else if (flexHolder.getActivationElevation() > 0) //Leave unaltered the default elevation
+				ViewCompat.setElevation(holder.itemView, 0);
+			mBoundViewHolders.add(flexHolder);
+		}
+	}
+
+	@Override
+	public void onViewRecycled(RecyclerView.ViewHolder holder) {
+		if (holder instanceof FlexibleViewHolder)
+			mBoundViewHolders.remove(holder);
+	}
+
+	/**
+	 * Usually {@code RecyclerView} binds 3 items more than the visible items.
+	 *
+	 * @return a Set with all bound FlexibleViewHolders
+	 * @since 5.0.0-rc1
+	 */
+	public Set<FlexibleViewHolder> getAllBoundViewHolders() {
+		return Collections.unmodifiableSet(mBoundViewHolders);
 	}
 
 	/**
@@ -427,17 +474,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 //		return mSelectedPositions;
 //	}
 
-	/**
-	 * Sorts and retrieves the list of selected items.
-	 * <p><b>To call once!</b> Then call {@link #getSelectedPositions()}.</p>
-	 *
-	 * @return Ordered list of selected items ids
-	 */
-//	public List<Integer> getSortedSelectedPositions() {
-//		Collections.sort(mSelectedPositions);
-//		return mSelectedPositions;
-//	}
-
 	/*----------------*/
 	/* INSTANCE STATE */
 	/*----------------*/
@@ -450,6 +486,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putIntegerArrayList(TAG, new ArrayList<>(mSelectedPositions));
+		if (DEBUG && getSelectedItemCount() > 0)
+			Log.d(TAG, "Saving selection " + mSelectedPositions);
 	}
 
 	/**
@@ -460,7 +498,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		mSelectedPositions.addAll(savedInstanceState.getIntegerArrayList(TAG));
-		Log.d(TAG, "Restore selection " + mSelectedPositions);
+		if (DEBUG && getSelectedItemCount() > 0)
+			Log.d(TAG, "Restore selection " + mSelectedPositions);
 	}
 
 	/*---------------*/
@@ -556,7 +595,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	@Override
 	public void onFastScrollerStateChange(boolean scrolling) {
-		//nothing
+		isFastScroll = scrolling;
 	}
 
 }

@@ -3,7 +3,6 @@ package eu.davidea.samples.flexibleadapter.items;
 import android.animation.Animator;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,62 +15,49 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
+import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * Item dedicated only for User Learns Selection view (located always at position 0 in the Adapter).
- * <p>If you don't have many fields in common better to extend directly from
- * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
- * implemented methods (getter and setters).</p>
+ * Item dedicated only for User Learns Selection view (located always at the top in the Adapter).
+ * This item is a Scrollable Header.
  */
-public class ULSItem extends AbstractItem<ULSItem.ExampleViewHolder> {
+public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHolder> {
 
-	private static final long serialVersionUID = -5041296095060813327L;
-
-	public ULSItem(String id) {
+	public ScrollableULSItem(String id) {
 		super(id);
 	}
 
 	@Override
-	public boolean isEnabled() {
-		return false;
-	}
-
-	@Override
-	public boolean isSelectable() {
-		return false;
-	}
-
-	@Override
 	public int getLayoutRes() {
-		return R.layout.recycler_uls_item;
+		return R.layout.recycler_scrollable_uls_item;
 	}
 
 	@Override
-	public ExampleViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ExampleViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ULSViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new ULSViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
 	}
 
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, ExampleViewHolder holder, int position, List payloads) {
+	public void bindViewHolder(FlexibleAdapter adapter, ULSViewHolder holder, int position, List payloads) {
 		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 		holder.itemView.setActivated(true);
-		holder.mTitle.setSelected(true);//For marquee
-		holder.mTitle.setText(Html.fromHtml(getTitle()));
-		holder.mSubtitle.setText(Html.fromHtml(getSubtitle()));
+		holder.mTitle.setSelected(true);//For marquee!!
+		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
+		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
 	}
 
 	/**
 	 * Used for UserLearnsSelection.
 	 */
-	static class ExampleViewHolder extends FlexibleViewHolder {
+	class ULSViewHolder extends FlexibleViewHolder {
 
-		public ImageView mImageView;
-		public TextView mTitle;
-		public TextView mSubtitle;
-		public ImageView mDismissIcon;
+		ImageView mImageView;
+		TextView mTitle;
+		TextView mSubtitle;
+		ImageView mDismissIcon;
 
-		public ExampleViewHolder(View view, FlexibleAdapter adapter) {
+		ULSViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
@@ -81,9 +67,11 @@ public class ULSItem extends AbstractItem<ULSItem.ExampleViewHolder> {
 				@Override
 				public void onClick(View v) {
 					DatabaseConfiguration.userLearnedSelection = true;
-					mAdapter.setPermanentDelete(true);
-					mAdapter.removeItem(0);
-					mAdapter.setPermanentDelete(false);
+					//Don't need anymore to set permanent deletion for Scrollable Headers and Footers
+					//mAdapter.setPermanentDelete(true);
+					//noinspection unchecked
+					mAdapter.removeScrollableHeader(ScrollableULSItem.this);
+					//mAdapter.setPermanentDelete(false);
 				}
 			});
 
@@ -101,7 +89,7 @@ public class ULSItem extends AbstractItem<ULSItem.ExampleViewHolder> {
 
 	@Override
 	public String toString() {
-		return "ULSItem[" + super.toString() + "]";
+		return "ScrollableULSItem[" + super.toString() + "]";
 	}
 
 }

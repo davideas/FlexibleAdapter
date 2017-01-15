@@ -15,6 +15,7 @@
  */
 package eu.davidea.flexibleadapter.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -24,6 +25,8 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -36,6 +39,7 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import eu.davidea.flexibleadapter.R;
+import eu.davidea.flexibleadapter.SelectableAdapter;
 
 /**
  * @author Davide Steduto
@@ -45,6 +49,22 @@ public final class Utils {
 
 	public static final int INVALID_COLOR = -1;
 	public static int colorAccent = INVALID_COLOR;
+
+	/**
+	 * API 24
+	 * @see VERSION_CODES#N
+	 */
+	public static boolean hasNougat() {
+		return Build.VERSION.SDK_INT >= VERSION_CODES.N;
+	}
+
+	/**
+	 * API 23
+	 * @see VERSION_CODES#M
+	 */
+	public static boolean hasMarshmallow() {
+		return Build.VERSION.SDK_INT >= VERSION_CODES.M;
+	}
 
 	/**
 	 * API 21
@@ -65,6 +85,30 @@ public final class Utils {
 	}
 
 	/**
+	 * @return the string representation of the provided {@link eu.davidea.flexibleadapter.SelectableAdapter.Mode}
+	 * @since 5.0.0-rc1
+	 */
+	@SuppressLint("SwitchIntDef")
+	public static String getModeName(@SelectableAdapter.Mode int mode) {
+		switch (mode) {
+			case SelectableAdapter.MODE_SINGLE:
+				return "MODE_SINGLE";
+			case SelectableAdapter.MODE_MULTI:
+				return "MODE_MULTI";
+			default:
+				return "MODE_IDLE";
+		}
+	}
+
+	/**
+	 * @return the SimpleClassName of the provided object
+	 * @since 5.0.0-rc1
+	 */
+	public static String getClassName(@NonNull Object o) {
+		return o.getClass().getSimpleName();
+	}
+
+	/**
 	 * Sets a spannable text with the accent color (if available) into the provided TextView.
 	 * <p>Internally calls {@link #fetchAccentColor(Context, int)}.</p>
 	 *
@@ -74,8 +118,11 @@ public final class Utils {
 	 * @param constraint   the text to highlight
 	 * @param defColor     the default color in case accentColor is not found
 	 * @see #fetchAccentColor(Context, int)
+	 * @deprecated Use
+	 * {@link #highlightText(TextView, String, String, int)} OR
+	 * {@link #highlightText(TextView, String, String)}
 	 */
-	//TODO: Deprecate defColor?
+	@Deprecated
 	public static void highlightText(@NonNull Context context, @NonNull TextView textView,
 									 String originalText, String constraint, @ColorInt int defColor) {
 		if (originalText == null) originalText = "";
@@ -92,6 +139,68 @@ public final class Utils {
 			textView.setText(originalText, TextView.BufferType.NORMAL);
 		}
 	}
+
+	/**
+	 * Sets a spannable text with the accent color (if available) into the provided TextView.
+	 * <p>Internally calls {@link #fetchAccentColor(Context, int)}.</p>
+	 *
+	 * @param textView     the TextView to transform
+	 * @param originalText the original text which the transformation is applied to
+	 * @param constraint   the text to highlight
+	 * @see #highlightText(TextView, String, String, int)
+	 * @since 5.0.0-rc1
+	 */
+	public static void highlightText(@NonNull TextView textView,
+									 @Nullable String originalText, @Nullable String constraint) {
+		int accentColor = fetchAccentColor(textView.getContext(), 1);
+		highlightText(textView, originalText, constraint, accentColor);
+	}
+
+	/**
+	 * Sets a spannable text with any highlight color into the provided TextView.
+	 *
+	 * @param textView     the TextView to transform
+	 * @param originalText the original text which the transformation is applied to
+	 * @param constraint   the text to highlight
+	 * @param color        the highlight color
+	 * @see #fetchAccentColor(Context, int)
+	 * @see #highlightText(TextView, String, String)
+	 * @since 5.0.0-rc1
+	 */
+	public static void highlightText(@NonNull TextView textView, @Nullable String originalText,
+									 @Nullable String constraint, @ColorInt int color) {
+		if (originalText == null) originalText = "";
+		if (constraint == null) constraint = "";
+		int i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()));
+		if (i != -1) {
+			Spannable spanText = Spannable.Factory.getInstance().newSpannable(originalText);
+			spanText.setSpan(new ForegroundColorSpan(color), i,
+					i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			spanText.setSpan(new StyleSpan(Typeface.BOLD), i,
+					i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			textView.setText(spanText, TextView.BufferType.SPANNABLE);
+		} else {
+			textView.setText(originalText, TextView.BufferType.NORMAL);
+		}
+	}
+
+	/**
+	 * Resolves bug #161. Necessary when {@code theme} attribute is used in the layout.
+	 * Used by {@code FlexibleAdapter.getStickyHeaderContainer()} method.
+	 */
+	//TODO: review comment
+	public static Activity scanForActivity(Context context) {
+		if (context instanceof Activity)
+			return (Activity) context;
+		else if (context instanceof ContextWrapper)
+			return scanForActivity(((ContextWrapper) context).getBaseContext());
+
+		return null;
+	}
+
+	/*------------------------------*/
+	/* ACCENT COLOR UTILITY METHODS */
+	/*------------------------------*/
 
 	/**
 	 * Reset the internal accent color to {@link #INVALID_COLOR}, to give the possibility
@@ -118,6 +227,10 @@ public final class Utils {
 		}
 		return colorAccent;
 	}
+
+	/*-------------------------------*/
+	/* RECYCLER-VIEW UTILITY METHODS */
+	/*-------------------------------*/
 
 	/**
 	 * Finds the layout orientation of the RecyclerView.
@@ -147,13 +260,30 @@ public final class Utils {
 	}
 
 	/**
-	 * Helper method to find the adapter position of the First completely visible view [for each
-	 * span], no matter which Layout is.
+	 * Helper method to retrieve the number of the columns (span count) of the given LayoutManager.
+	 * <p>All Layouts are supported.</p>
+	 *
+	 * @param layoutManager the layout manager to check
+	 * @return the span count
+	 * @since 5.0.0-b7
+	 */
+	public static int getSpanCount(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof GridLayoutManager) {
+			return ((GridLayoutManager) layoutManager).getSpanCount();
+		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
+		}
+		return 1;
+	}
+
+	/**
+	 * Helper method to find the adapter position of the <b>first completely</b> visible view
+	 * [for each span], no matter which Layout is.
 	 *
 	 * @param layoutManager the layout manager in use
-	 * @return the adapter position of the first fully visible item or {@code RecyclerView.NO_POSITION}
+	 * @return the adapter position of the <b>first fully</b> visible item or {@code RecyclerView.NO_POSITION}
 	 * if there aren't any visible items.
-	 * @see #findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @see #findFirstVisibleItemPosition(RecyclerView.LayoutManager)
 	 * @since 5.0.0-b8
 	 */
 	public static int findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
@@ -165,13 +295,31 @@ public final class Utils {
 	}
 
 	/**
-	 * Helper method to find the adapter position of the Last completely visible view [for each
-	 * span], no matter which Layout is.
+	 * Helper method to find the adapter position of the <b>first partially</b> visible view
+	 * [for each span], no matter which Layout is.
 	 *
 	 * @param layoutManager the layout manager in use
-	 * @return the adapter position of the last fully visible item or {@code RecyclerView.NO_POSITION}
+	 * @return the adapter position of the <b>first partially</b> visible item or {@code RecyclerView.NO_POSITION}
 	 * if there aren't any visible items.
 	 * @see #findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @since 5.0.0-rc1
+	 */
+	public static int findFirstVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
+		} else {
+			return ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+		}
+	}
+
+	/**
+	 * Helper method to find the adapter position of the <b>last completely</b> visible view
+	 * [for each span], no matter which Layout is.
+	 *
+	 * @param layoutManager the layout manager in use
+	 * @return the adapter position of the <b>last fully</b> visible item or {@code RecyclerView.NO_POSITION}
+	 * if there aren't any visible items.
+	 * @see #findLastVisibleItemPosition(RecyclerView.LayoutManager)
 	 * @since 5.0.0-b8
 	 */
 	public static int findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
@@ -183,16 +331,21 @@ public final class Utils {
 	}
 
 	/**
-	 * Resolves bug #161. Necessary when {@code theme} attribute is used in the layout.
-	 * Used by {@code FlexibleAdapter.getStickySectionHeadersHolder()} method.
+	 * Helper method to find the adapter position of the <b>last partially</b> visible view
+	 * [for each span], no matter which Layout is.
+	 *
+	 * @param layoutManager the layout manager in use
+	 * @return the adapter position of the <b>last partially</b> visible item or {@code RecyclerView.NO_POSITION}
+	 * if there aren't any visible items.
+	 * @see #findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @since 5.0.0-rc1
 	 */
-	public static Activity scanForActivity(Context context) {
-		if (context instanceof Activity)
-			return (Activity) context;
-		else if (context instanceof ContextWrapper)
-			return scanForActivity(((ContextWrapper) context).getBaseContext());
-
-		return null;
+	public static int findLastVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null)[0];
+		} else {
+			return ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
+		}
 	}
 
 }

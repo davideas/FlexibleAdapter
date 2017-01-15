@@ -1,7 +1,5 @@
 package eu.davidea.samples.flexibleadapter.items;
 
-import java.io.Serializable;
-
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -12,14 +10,12 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * It is used as base item for all example models.
  */
 public abstract class AbstractItem<VH extends FlexibleViewHolder>
-		extends AbstractFlexibleItem<VH>
-		implements Serializable {
-
-	private static final long serialVersionUID = -6882745111884490060L;
+		extends AbstractFlexibleItem<VH> {
 
 	protected String id;
 	protected String title;
 	protected String subtitle = "";
+	/* number of times this item has been refreshed */
 	protected int updates;
 
 	public AbstractItem(String id) {
