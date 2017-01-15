@@ -101,8 +101,7 @@ public class FragmentDataBindingHeadersSections extends AbstractFragment
 		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new BindingFlexibleAdapter<>(getActivity());
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setRemoveOrphanHeaders(false)
-				.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
+		mAdapter.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
@@ -121,7 +120,7 @@ public class FragmentDataBindingHeadersSections extends AbstractFragment
 				.setUnlinkAllItemsOnRemoveHeaders(true)
 				//Show Headers at startUp, 1st call, correctly executed, no warning log message!
 				.setDisplayHeadersAtStartUp(true)
-				.enableStickyHeaders()
+				.setStickyHeaders(true)
 				//Simulate developer 2nd call mistake, now it's safe, not executed, no warning log message!
 				.setDisplayHeadersAtStartUp(true)
 				//Simulate developer 3rd call mistake, still safe, not executed, warning log message displayed!
@@ -130,8 +129,6 @@ public class FragmentDataBindingHeadersSections extends AbstractFragment
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
-
-		//Add sample HeaderView items on the top (not belongs to the library)
 	}
 
 	@Override
@@ -214,8 +211,8 @@ public class FragmentDataBindingHeadersSections extends AbstractFragment
 				//NOTE: If you use simple integer to identify the ViewType,
 				//here, you should use them and not Layout integers
 				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_layout_item:
-					case R.layout.recycler_uls_item:
+					case R.layout.recycler_scrollable_layout_item:
+					case R.layout.recycler_scrollable_uls_item:
 					case R.layout.recycler_header_item:
 					case R.layout.recycler_expandable_header_item:
 						return mColumnCount;

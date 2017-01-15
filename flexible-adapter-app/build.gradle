@@ -1,6 +1,5 @@
 apply plugin: "com.android.application"
 apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'com.jakewharton.hugo'
 
 android {
 	compileSdkVersion targetSdk
@@ -43,25 +42,32 @@ android {
 }
 
 dependencies {
-	//Testing
+	compile fileTree(dir: 'libs', include: ['*.jar'])
+
+	// Testing
 	androidTestCompile supportDependencies.annotations
 	androidTestCompile 'com.android.support.test:runner:0.5'
 	androidTestCompile 'com.android.support.test:rules:0.5'
+	androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+		exclude group: 'com.android.support', module: 'support-annotations'
+	})
 	testCompile 'org.robolectric:robolectric:3.1.2'
 	testCompile 'junit:junit:4.12'
 	testCompile 'org.mockito:mockito-core:2.0.71-beta'
 
-	//FlexibleAdapter
+	// FlexibleAdapter + extensions
 	compile project (":flexible-adapter")
+	compile project (":flexible-adapter-ui")
+	compile project (":flexible-adapter-databinding")
 
-	//FlipView
+	// FlipView
 	compile "eu.davidea:flipview:1.1.2"
 
-	//ButterKnife
+	// ButterKnife
 	compile 'com.jakewharton:butterknife:8.0.1'
 	apt 'com.jakewharton:butterknife-compiler:8.0.1'
 
-	//Support Libraries
+	// Support Libraries
 	compile supportDependencies.appcompat
 	compile supportDependencies.cardview
 	compile (supportDependencies.design) {
@@ -73,10 +79,10 @@ dependencies {
 		exclude module: "support-annotations"
 	}
 
-	//Glide (Image Loader)
+	// Glide (Image Loader)
 	compile 'com.github.bumptech.glide:glide:3.7.0'
 
-	//Smooth-app-bar-layout
+	// Smooth-app-bar-layout
 	compile ('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
 		exclude group: "com.android.support"
 	}

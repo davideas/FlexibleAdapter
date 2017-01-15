@@ -27,7 +27,7 @@
 		<item
 			android:id="@+id/nav_db_headers_and_sections"
 			android:icon="@drawable/ic_sections_grey600_24dp"
-			android:title="@string/headers_db_sections"/>
+			android:title="@string/headers_sections_databinding"/>
 		<item
 			android:id="@+id/nav_expandable_sections"
 			android:icon="@drawable/ic_expandable_grey_600_24dp"

@@ -2,7 +2,6 @@ package eu.davidea.flexibleadapter.databinding;
 
 import android.databinding.BindingAdapter;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import java.util.List;
 

@@ -103,6 +103,10 @@ public class DatabaseService {
 				.withDescription(resources.getString(R.string.headers_sections_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_sections_grey600_24dp)));
 
+		mItems.add(new OverallItem(R.id.nav_db_headers_and_sections, resources.getString(R.string.headers_sections_databinding))
+				.withDescription(resources.getString(R.string.headers_sections_databinding_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_sections_grey600_24dp)));
+
 		mItems.add(new OverallItem(R.id.nav_expandable_sections, resources.getString(R.string.expandable_sections))
 				.withDescription(resources.getString(R.string.expandable_sections_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_expandable_grey_600_24dp)));

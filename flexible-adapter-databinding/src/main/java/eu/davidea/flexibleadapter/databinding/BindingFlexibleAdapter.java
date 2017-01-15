@@ -28,10 +28,12 @@ public class BindingFlexibleAdapter<T extends IFlexible> extends FlexibleAdapter
 
     @Override
     public void updateDataSet(List<T> items) {
-        if (mItems instanceof ObservableList) {
+        // Removal and Changes are automatically done in UpdateDataSet method!!
+        // We only need to add new items.
+        //if (mItems instanceof ObservableList) {
             // TODO: mItems are wrapped into ArrayList in FlexibleAdapter and thus we don't remove the callback on changes.
-            ((ObservableList<T>) this.mItems).removeOnListChangedCallback(callback);
-        }
+            //((ObservableList<T>) this.mItems).removeOnListChangedCallback(callback);
+        //}
         if (items instanceof ObservableList) {
             ((ObservableList<T>) items).addOnListChangedCallback(callback);
         }
