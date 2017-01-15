@@ -92,8 +92,9 @@ public class FragmentExpandableSections extends AbstractFragment {
 				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
-				.setHandleDragEnabled(true); //Enable handle drag
-				//.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable)
+				.setHandleDragEnabled(true) //Enable handle drag
+				//.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable AND expanded at startup)
+				.setStickyHeaders(true);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
