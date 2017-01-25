@@ -257,7 +257,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @deprecated Use {@link #addListener(Object)}
 	 */
 	@Deprecated
-	public FlexibleAdapter initializeListeners(@Nullable Object listener) {
+	public FlexibleAdapter<T> initializeListeners(@Nullable Object listener) {
 		return addListener(listener);
 	}
 
@@ -270,7 +270,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	@CallSuper
-	public FlexibleAdapter addListener(@Nullable Object listener) {
+	public FlexibleAdapter<T> addListener(@Nullable Object listener) {
 		if (DEBUG && listener != null) {
 			Log.i(TAG, "Adding listener class " + getClassName(listener) + " as:");
 		}
@@ -340,7 +340,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
-	public FlexibleAdapter expandItemsAtStartUp() {
+	public FlexibleAdapter<T> expandItemsAtStartUp() {
 		int position = 0;
 		setScrollAnimate(true);
 		multiRange = true;
@@ -1038,7 +1038,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * references, most of the time, user has the control on the items to remove, headers as well.
 	 */
 	@Deprecated
-	public FlexibleAdapter setRemoveOrphanHeaders(boolean removeOrphanHeaders) {
+	public FlexibleAdapter<T> setRemoveOrphanHeaders(boolean removeOrphanHeaders) {
 		if (DEBUG) Log.i(TAG, "Set removeOrphanHeaders=" + removeOrphanHeaders);
 		this.removeOrphanHeaders = removeOrphanHeaders;
 		return this;
@@ -1053,7 +1053,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
-	public FlexibleAdapter setUnlinkAllItemsOnRemoveHeaders(boolean unlinkOnRemoveHeader) {
+	public FlexibleAdapter<T> setUnlinkAllItemsOnRemoveHeaders(boolean unlinkOnRemoveHeader) {
 		if (DEBUG) Log.i(TAG, "Set unlinkOnRemoveHeader=" + unlinkOnRemoveHeader);
 		this.unlinkOnRemoveHeader = unlinkOnRemoveHeader;
 		return this;
@@ -1088,7 +1088,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * this method also show header, for that we should use add item or section.
 	 */
 	@Deprecated
-	public FlexibleAdapter linkHeaderTo(@NonNull T item, @NonNull IHeader header) {
+	public FlexibleAdapter<T> linkHeaderTo(@NonNull T item, @NonNull IHeader header) {
 		linkHeaderTo(item, header, Payload.LINK);
 		if (header.isHidden() && headersShown) {
 			showHeaderOf(getGlobalPositionOf(item), item, false);
@@ -1300,7 +1300,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @deprecated Use {@link #setStickyHeaders(boolean)} with {@code true} as parameter.
 	 */
 	@Deprecated
-	public FlexibleAdapter enableStickyHeader() {
+	public FlexibleAdapter<T> enableStickyHeader() {
 		return setStickyHeaders(true);
 	}
 
@@ -1359,7 +1359,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setStickyHeaderElevation(float)
 	 * @since 5.0.0-rc1
 	 */
-	public FlexibleAdapter setStickyHeaders(boolean sticky) {
+	public FlexibleAdapter<T> setStickyHeaders(boolean sticky) {
 		return setStickyHeaders(sticky, mStickyContainer);
 	}
 
@@ -1377,7 +1377,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setStickyHeaderElevation(float)
 	 * @since 5.0.0-rc1
 	 */
-	public FlexibleAdapter setStickyHeaders(final boolean sticky, @NonNull ViewGroup stickyContainer) {
+	public FlexibleAdapter<T> setStickyHeaders(final boolean sticky, @NonNull ViewGroup stickyContainer) {
 		if (DEBUG) Log.i(TAG, "Set stickyHeaders=" + sticky + " (in Post!)" +
 				(stickyContainer != null ? " with user defined Sticky Container" : ""));
 
@@ -1430,7 +1430,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getStickyHeaderElevation()
 	 * @since 5.0.0-rc1
 	 */
-	public FlexibleAdapter setStickyHeaderElevation(@FloatRange(from = 0) float stickyElevation) {
+	public FlexibleAdapter<T> setStickyHeaderElevation(@FloatRange(from = 0) float stickyElevation) {
 		mStickyElevation = stickyElevation;
 		return this;
 	}
@@ -1483,7 +1483,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @deprecated Use {@link #setStickyHeaders(boolean, ViewGroup)}.
 	 */
 	@Deprecated
-	public FlexibleAdapter setStickyHeaderContainer(@NonNull ViewGroup stickyContainer) {
+	public FlexibleAdapter<T> setStickyHeaderContainer(@NonNull ViewGroup stickyContainer) {
 		if (mStickyHeaderHelper != null) {
 			Log.w(TAG, "StickyHeader has been already initialized! Call this method before enabling StickyHeaders");
 		}
@@ -1507,7 +1507,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setAnimationOnScrolling(boolean)
 	 * @since 5.0.0-b6
 	 */
-	public FlexibleAdapter setDisplayHeadersAtStartUp(boolean displayHeaders) {
+	public FlexibleAdapter<T> setDisplayHeadersAtStartUp(boolean displayHeaders) {
 		if (!headersShown && displayHeaders) {
 			showAllHeaders(true);
 		}
@@ -1525,7 +1525,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setDisplayHeadersAtStartUp(boolean)
 	 * @since 5.0.0-b1
 	 */
-	public FlexibleAdapter showAllHeaders() {
+	public FlexibleAdapter<T> showAllHeaders() {
 		showAllHeaders(false);
 		return this;
 	}
@@ -1934,7 +1934,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-rc1
 	 */
-	public FlexibleAdapter setEndlessPageSize(@IntRange(from = 0) int endlessPageSize) {
+	public FlexibleAdapter<T> setEndlessPageSize(@IntRange(from = 0) int endlessPageSize) {
+		if (DEBUG) Log.i(TAG, "Set endlessPageSize=" + endlessPageSize);
 		mEndlessPageSize = endlessPageSize;
 		return this;
 	}
@@ -1964,8 +1965,30 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getEndlessTargetCount()
 	 * @since 5.0.0-rc1
 	 */
-	public FlexibleAdapter setEndlessTargetCount(@IntRange(from = 0) int endlessTargetCount) {
+	public FlexibleAdapter<T> setEndlessTargetCount(@IntRange(from = 0) int endlessTargetCount) {
+		if (DEBUG) Log.i(TAG, "Set endlessTargetCount=" + endlessTargetCount);
 		mEndlessTargetCount = endlessTargetCount;
+		return this;
+	}
+
+	/**
+	 * Sets if Endless / Loading More should be triggered at start-up, especially when the
+	 * list is empty.
+	 * <p>Default value is {@code false}.</p>
+	 *
+	 * @param enable true to trigger a loading at start up, false to trigger loading with binding
+	 * @return this Adapter, so the call can be chained
+	 */
+	public FlexibleAdapter<T> setLoadingMoreAtStartUp(boolean enable) {
+		if (DEBUG) Log.i(TAG, "Set loadingAtStartup=" + enable);
+		if (enable) {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					onLoadMore(0);
+				}
+			});
+		}
 		return this;
 	}
 
@@ -1982,7 +2005,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setEndlessScrollListener(EndlessScrollListener, IFlexible)
 	 * @since 5.0.0-b8
 	 */
-	public FlexibleAdapter setEndlessProgressItem(@Nullable T progressItem) {
+	public FlexibleAdapter<T> setEndlessProgressItem(@Nullable T progressItem) {
 		endlessScrollEnabled = progressItem != null;
 		if (progressItem != null) {
 			setEndlessScrollThreshold(mEndlessScrollThreshold);
@@ -2009,7 +2032,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setEndlessProgressItem(IFlexible)
 	 * @since 5.0.0-b6
 	 */
-	public FlexibleAdapter setEndlessScrollListener(@Nullable EndlessScrollListener endlessScrollListener,
+	public FlexibleAdapter<T> setEndlessScrollListener(@Nullable EndlessScrollListener endlessScrollListener,
 													@NonNull T progressItem) {
 		if (DEBUG) Log.i(TAG, "Set endlessScrollListener=" + getClassName(endlessScrollListener));
 		mEndlessScrollListener = endlessScrollListener;
@@ -2024,7 +2047,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
-	public FlexibleAdapter setEndlessScrollThreshold(@IntRange(from = 1) int thresholdItems) {
+	public FlexibleAdapter<T> setEndlessScrollThreshold(@IntRange(from = 1) int thresholdItems) {
 		// Increase visible threshold based on number of columns
 		if (mRecyclerView != null) {
 			int spanCount = Utils.getSpanCount(mRecyclerView.getLayoutManager());
@@ -2186,7 +2209,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b1
 	 */
-	public FlexibleAdapter setAutoCollapseOnExpand(boolean collapseOnExpand) {
+	public FlexibleAdapter<T> setAutoCollapseOnExpand(boolean collapseOnExpand) {
 		if (DEBUG) Log.i(TAG, "Set autoCollapseOnExpand=" + collapseOnExpand);
 		this.collapseOnExpand = collapseOnExpand;
 		return this;
@@ -2210,7 +2233,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b1
 	 */
-	public FlexibleAdapter setAutoScrollOnExpand(boolean scrollOnExpand) {
+	public FlexibleAdapter<T> setAutoScrollOnExpand(boolean scrollOnExpand) {
 		if (DEBUG) Log.i(TAG, "Set setAutoScrollOnExpand=" + scrollOnExpand);
 		this.scrollOnExpand = scrollOnExpand;
 		return this;
@@ -2265,7 +2288,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
-	public FlexibleAdapter setMinCollapsibleLevel(int minCollapsibleLevel) {
+	public FlexibleAdapter<T> setMinCollapsibleLevel(int minCollapsibleLevel) {
 		if (DEBUG) Log.i(TAG, "Set minCollapsibleLevel=" + minCollapsibleLevel);
 		this.mMinCollapsibleLevel = minCollapsibleLevel;
 		return this;
@@ -3526,7 +3549,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
 	 */
-	public FlexibleAdapter setPermanentDelete(boolean permanentDelete) {
+	public FlexibleAdapter<T> setPermanentDelete(boolean permanentDelete) {
 		if (DEBUG) Log.i(TAG, "Set permanentDelete=" + permanentDelete);
 		this.permanentDelete = permanentDelete;
 		return this;
@@ -3554,7 +3577,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b1
 	 */
-	public FlexibleAdapter setRestoreSelectionOnUndo(boolean restoreSelection) {
+	public FlexibleAdapter<T> setRestoreSelectionOnUndo(boolean restoreSelection) {
 		if (DEBUG) Log.i(TAG, "Set restoreSelectionOnUndo=" + restoreSelection);
 		this.restoreSelection = restoreSelection;
 		return this;
@@ -4098,7 +4121,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b8
 	 */
-	public FlexibleAdapter setAnimateToLimit(int limit) {
+	public FlexibleAdapter<T> setAnimateToLimit(int limit) {
 		if (DEBUG) Log.i(TAG, "Set animateToLimit=" + limit);
 		mAnimateToLimit = limit;
 		return this;
@@ -4134,7 +4157,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * final release.
 	 */
 	@Deprecated
-	public FlexibleAdapter setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
+	public FlexibleAdapter<T> setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
 		this.useDiffUtil = useDiffUtil;
 		return this;
 	}
@@ -4150,7 +4173,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * final release.
 	 */
 	@Deprecated
-	public FlexibleAdapter setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
+	public FlexibleAdapter<T> setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
 		this.diffUtilCallback = diffUtilCallback;
 		return this;
 	}
