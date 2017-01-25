@@ -109,10 +109,11 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		// EndlessScrollListener - OnLoadMore (v5.0.0)
-		mAdapter.setEndlessScrollListener(this, mProgressItem)
+		mAdapter//.setLoadingMoreAtStartUp(true) //To call only if the list is empty
 				//.setEndlessPageSize(3) //Endless is automatically disabled if newItems < 3
-				.setEndlessTargetCount(15); //Endless is automatically disabled if totalItems >= 15
+				.setEndlessTargetCount(15) //Endless is automatically disabled if totalItems >= 15
 				//.setEndlessScrollThreshold(1); //Default=1
+				.setEndlessScrollListener(this, mProgressItem);
 
 		// Add 1 Scrollable Header and 1 Footer items
 		mAdapter.showLayoutInfo(savedInstanceState == null);

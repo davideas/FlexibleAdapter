@@ -1934,6 +1934,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-rc1
 	 */
 	public FlexibleAdapter setEndlessPageSize(@IntRange(from = 0) int endlessPageSize) {
+		if (DEBUG) Log.i(TAG, "Set endlessPageSize=" + endlessPageSize);
 		mEndlessPageSize = endlessPageSize;
 		return this;
 	}
@@ -1964,7 +1965,29 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-rc1
 	 */
 	public FlexibleAdapter setEndlessTargetCount(@IntRange(from = 0) int endlessTargetCount) {
+		if (DEBUG) Log.i(TAG, "Set endlessTargetCount=" + endlessTargetCount);
 		mEndlessTargetCount = endlessTargetCount;
+		return this;
+	}
+
+	/**
+	 * Sets if Endless / Loading More should be triggered at start-up, especially when the
+	 * list is empty.
+	 * <p>Default value is {@code false}.</p>
+	 *
+	 * @param enable true to trigger a loading at start up, false to trigger loading with binding
+	 * @return this Adapter, so the call can be chained
+	 */
+	public FlexibleAdapter setLoadingMoreAtStartUp(boolean enable) {
+		if (DEBUG) Log.i(TAG, "Set loadingAtStartup=" + enable);
+		if (enable) {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					onLoadMore(0);
+				}
+			});
+		}
 		return this;
 	}
 
