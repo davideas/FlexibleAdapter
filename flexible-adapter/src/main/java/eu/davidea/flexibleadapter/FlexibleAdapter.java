@@ -906,7 +906,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (mScrollableFooters.size() > 0) {
 			if (DEBUG) Log.d(TAG, "Remove all scrollable footers");
 			mItems.removeAll(mScrollableFooters);
-			notifyItemRangeRemoved(getItemCount() - 1 - mScrollableHeaders.size(), mScrollableFooters.size());
+			notifyItemRangeRemoved(getItemCount() - mScrollableFooters.size(), mScrollableFooters.size());
 			mScrollableFooters.clear();
 		}
 	}
