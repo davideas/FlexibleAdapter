@@ -190,20 +190,8 @@ public class FragmentHeadersSections extends AbstractFragment
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {
-				// NOTE: If you use simple integers to identify the ViewType,
-				// here, you should use them and not Layout integers
-				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_scrollable_usecase_item:
-					case R.layout.recycler_scrollable_header_item:
-					case R.layout.recycler_scrollable_footer_item:
-					case R.layout.recycler_scrollable_layout_item:
-					case R.layout.recycler_scrollable_uls_item:
-					case R.layout.recycler_header_item:
-					case R.layout.recycler_expandable_header_item:
-						return mColumnCount;
-					default:
-						return 1;
-				}
+				//noinspection ConstantConditions
+				return mAdapter.getItem(position).getSpanSize(mColumnCount, position);
 			}
 		});
 		return gridLayoutManager;

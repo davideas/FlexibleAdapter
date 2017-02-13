@@ -28,6 +28,11 @@ public class ScrollableLayoutItem extends AbstractItem<ScrollableLayoutItem.Layo
 	}
 
 	@Override
+	public int getSpanSize(int spanCount, int position) {
+		return spanCount;
+	}
+
+	@Override
 	public int getLayoutRes() {
 		return R.layout.recycler_scrollable_layout_item;
 	}

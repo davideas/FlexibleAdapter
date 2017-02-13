@@ -86,6 +86,11 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 		mHidden = hidden;
 	}
 
+	@Override
+	public int getSpanSize(int spanCount, int position) {
+		return 1;
+	}
+
 	/*--------------------*/
 	/* SELECTABLE METHODS */
 	/*--------------------*/

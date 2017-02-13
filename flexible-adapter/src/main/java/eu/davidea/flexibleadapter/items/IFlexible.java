@@ -71,6 +71,15 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	 */
 	void setHidden(boolean hidden);
 
+	/**
+	 * Individual item's span size.
+	 *
+	 * @param spanCount current column count
+	 * @param position  the adapter position of the item
+	 * @return the number of span occupied by the item at position.
+	 */
+	int getSpanSize(int spanCount, int position);
+
 	/*--------------------*/
 	/* SELECTABLE METHODS */
 	/*--------------------*/
@@ -92,7 +101,6 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	/*-------------------*/
 	/* TOUCHABLE METHODS */
 	/*-------------------*/
-	//TODO: All these methods could be deprecated in favour of the same methods in FlexibleViewHolder
 
 	boolean isDraggable();
 
