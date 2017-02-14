@@ -18,7 +18,7 @@ public class BindingAdapters {
 		if (adapter != null && adapter instanceof FlexibleAdapter) {
 			((FlexibleAdapter<T>) adapter).updateDataSet(new ArrayList<>(items));
 		} else {
-			// TODO: Creation of adapter, maybe through other binding variable or factory.
+			throw new IllegalStateException("Binding works only with FlexibleAdapter");
 		}
 	}
 

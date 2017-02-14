@@ -22,21 +22,21 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.animators.FadeInAnimator;
-import eu.davidea.samples.flexibleadapter.animators.FadeInDownAnimator;
-import eu.davidea.samples.flexibleadapter.animators.FadeInLeftAnimator;
-import eu.davidea.samples.flexibleadapter.animators.FadeInRightAnimator;
-import eu.davidea.samples.flexibleadapter.animators.FadeInUpAnimator;
-import eu.davidea.samples.flexibleadapter.animators.FlipInBottomXAnimator;
-import eu.davidea.samples.flexibleadapter.animators.FlipInTopXAnimator;
-import eu.davidea.samples.flexibleadapter.animators.LandingAnimator;
-import eu.davidea.samples.flexibleadapter.animators.OvershootInLeftAnimator;
-import eu.davidea.samples.flexibleadapter.animators.OvershootInRightAnimator;
-import eu.davidea.samples.flexibleadapter.animators.ScaleInAnimator;
-import eu.davidea.samples.flexibleadapter.animators.SlideInDownAnimator;
-import eu.davidea.samples.flexibleadapter.animators.SlideInLeftAnimator;
-import eu.davidea.samples.flexibleadapter.animators.SlideInRightAnimator;
-import eu.davidea.samples.flexibleadapter.animators.SlideInUpAnimator;
+import eu.davidea.samples.flexibleadapter.animators.FadeInItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.FadeInDownItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.FadeInLeftItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.FadeInRightItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.FadeInUpItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.FlipInBottomXItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.FlipInTopXItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.LandingItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.OvershootInLeftItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.OvershootInRightItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.ScaleInItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.SlideInDownItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.SlideInLeftItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.SlideInRightItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.SlideInUpItemAnimator;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -234,21 +234,21 @@ public class FragmentAnimators extends AbstractFragment {
 	}
 
 	public enum AnimatorType {
-		FadeIn(new FadeInAnimator(new OvershootInterpolator(1f))),
-		FadeInDown(new FadeInDownAnimator(new OvershootInterpolator(1f))),
-		FadeInUp(new FadeInUpAnimator(new OvershootInterpolator(1f))),
-		FadeInLeft(new FadeInLeftAnimator(new OvershootInterpolator(1f))),
-		FadeInRight(new FadeInRightAnimator(new OvershootInterpolator(1f))),
-		Landing(new LandingAnimator(new OvershootInterpolator(1f))),
-		ScaleIn(new ScaleInAnimator(new OvershootInterpolator(1f))),
-		FlipInTopX(new FlipInTopXAnimator(new DecelerateInterpolator(1f))), //Makes use of index inside
-		FlipInBottomX(new FlipInBottomXAnimator(new OvershootInterpolator(1f))),
-		SlideInLeft(new SlideInLeftAnimator(new OvershootInterpolator(1f))),
-		SlideInRight(new SlideInRightAnimator(new OvershootInterpolator(1f))),
-		SlideInDown(new SlideInDownAnimator(new OvershootInterpolator(1f))),
-		SlideInUp(new SlideInUpAnimator(new OvershootInterpolator(1f))),
-		OvershootInRight(new OvershootInRightAnimator(1f)),
-		OvershootInLeft(new OvershootInLeftAnimator(1f));
+		FadeIn(new FadeInItemAnimator(new OvershootInterpolator(1f))),
+		FadeInDown(new FadeInDownItemAnimator(new OvershootInterpolator(1f))),
+		FadeInUp(new FadeInUpItemAnimator(new OvershootInterpolator(1f))),
+		FadeInLeft(new FadeInLeftItemAnimator(new OvershootInterpolator(1f))),
+		FadeInRight(new FadeInRightItemAnimator(new OvershootInterpolator(1f))),
+		Landing(new LandingItemAnimator(new OvershootInterpolator(1f))),
+		ScaleIn(new ScaleInItemAnimator(new OvershootInterpolator(1f))),
+		FlipInTopX(new FlipInTopXItemAnimator(new DecelerateInterpolator(1f))), //Makes use of index inside
+		FlipInBottomX(new FlipInBottomXItemAnimator(new OvershootInterpolator(1f))),
+		SlideInLeft(new SlideInLeftItemAnimator(new OvershootInterpolator(1f))),
+		SlideInRight(new SlideInRightItemAnimator(new OvershootInterpolator(1f))),
+		SlideInDown(new SlideInDownItemAnimator(new OvershootInterpolator(1f))),
+		SlideInUp(new SlideInUpItemAnimator(new OvershootInterpolator(1f))),
+		OvershootInRight(new OvershootInRightItemAnimator(1f)),
+		OvershootInLeft(new OvershootInLeftItemAnimator(1f));
 
 		private FlexibleItemAnimator mAnimator;
 

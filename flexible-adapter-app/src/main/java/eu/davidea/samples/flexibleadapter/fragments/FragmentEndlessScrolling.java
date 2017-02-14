@@ -25,7 +25,7 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.animators.FadeInDownAnimator;
+import eu.davidea.samples.flexibleadapter.animators.FadeInDownItemAnimator;
 import eu.davidea.samples.flexibleadapter.items.ProgressItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -94,7 +94,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		// NOTE: Use the custom FadeInDownAnimator for ALL notifications for ALL items,
 		// but ScrollableFooterItem implements AnimatedViewHolder with a unique animation: SlideInUp!
-		mRecyclerView.setItemAnimator(new FadeInDownAnimator());
+		mRecyclerView.setItemAnimator(new FadeInDownItemAnimator());
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),

@@ -4,7 +4,6 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ObservableArrayList;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,7 +22,7 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.databinding.FragmentRecyclerViewDataBinding;
+import eu.davidea.samples.flexibleadapter.animators.GarageDoorItemAnimator;
 import eu.davidea.samples.flexibleadapter.items.HeaderItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -64,7 +63,7 @@ public class FragmentDataBinding extends AbstractFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		FragmentRecyclerViewDataBinding binding = DataBindingUtil
+		eu.davidea.samples.flexibleadapter.databinding.FragmentRecyclerViewDataBinding binding = DataBindingUtil
 				.inflate(inflater, R.layout.fragment_recycler_view_data, container, false);
 		binding.setItems(items);
 		return binding.getRoot();
@@ -101,7 +100,7 @@ public class FragmentDataBinding extends AbstractFragment {
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
-		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+		mRecyclerView.setItemAnimator(new GarageDoorItemAnimator());
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
@@ -121,13 +120,11 @@ public class FragmentDataBinding extends AbstractFragment {
 	public void performFabAction() {
 		if (fabClickedTimes == 0) {
 			items.addAll(DatabaseService.getInstance().getDatabaseList());
-		} else if (fabClickedTimes == 1) {
-			items.add(0, DatabaseService.newSimpleItem(fabClickedTimes * 111, null));
 		} else if (fabClickedTimes == 2) {
-			HeaderItem headerItem = DatabaseService.newHeader(1);
+			HeaderItem headerItem = DatabaseService.newHeader(mAdapter.getItemCountOfTypes(R.layout.recycler_header_item) + 1);
 			items.add(1, DatabaseService.newSimpleItem(fabClickedTimes * 111, headerItem));
 		} else {
-			items.add(1, DatabaseService.newSimpleItem(fabClickedTimes * 111, null));
+			items.add(0, DatabaseService.newSimpleItem(fabClickedTimes * 111, null));
 		}
 		++fabClickedTimes;
 	}
