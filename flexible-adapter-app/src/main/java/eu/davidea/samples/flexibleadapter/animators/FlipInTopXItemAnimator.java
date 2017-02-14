@@ -21,28 +21,29 @@ import android.view.animation.Interpolator;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
-public class FlipInBottomXAnimator extends FlexibleItemAnimator {
+public class FlipInTopXItemAnimator extends FlexibleItemAnimator {
 
-	public FlipInBottomXAnimator() {
+	public FlipInTopXItemAnimator() {
 	}
 
-	public FlipInBottomXAnimator(Interpolator interpolator) {
+	public FlipInTopXItemAnimator(Interpolator interpolator) {
 		mInterpolator = interpolator;
 	}
 
 	@Override
 	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
 		ViewCompat.animate(holder.itemView)
-				.rotationX(-90)
+				.rotationX(90)
 				.setDuration(getRemoveDuration())
 				.setInterpolator(mInterpolator)
 				.setListener(new DefaultRemoveVpaListener(holder))
+				.setStartDelay(index * 20L)
 				.start();
 	}
 
 	@Override
 	protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-		ViewCompat.setRotationX(holder.itemView, -90);
+		ViewCompat.setRotationX(holder.itemView, 90);
 		return true;
 	}
 
@@ -53,6 +54,7 @@ public class FlipInBottomXAnimator extends FlexibleItemAnimator {
 				.setDuration(getAddDuration())
 				.setInterpolator(mInterpolator)
 				.setListener(new DefaultAddVpaListener(holder))
+				.setStartDelay(index * 150L)
 				.start();
 	}
 

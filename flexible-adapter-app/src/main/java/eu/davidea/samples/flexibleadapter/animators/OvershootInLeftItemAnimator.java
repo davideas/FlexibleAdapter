@@ -21,15 +21,15 @@ import android.view.animation.OvershootInterpolator;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
-public class OvershootInLeftAnimator extends FlexibleItemAnimator {
+public class OvershootInLeftItemAnimator extends FlexibleItemAnimator {
 
 	private final float mTension;
 
-	public OvershootInLeftAnimator() {
+	public OvershootInLeftItemAnimator() {
 		mTension = 2.0f;
 	}
 
-	public OvershootInLeftAnimator(float mTension) {
+	public OvershootInLeftItemAnimator(float mTension) {
 		this.mTension = mTension;
 	}
 

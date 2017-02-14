@@ -17,34 +17,34 @@ package eu.davidea.samples.flexibleadapter.animators;
 
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.view.animation.Interpolator;
+import android.view.animation.OvershootInterpolator;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
-public class FadeInLeftAnimator extends FlexibleItemAnimator {
+public class OvershootInRightItemAnimator extends FlexibleItemAnimator {
 
-	public FadeInLeftAnimator() {
+	private final float mTension;
+
+	public OvershootInRightItemAnimator() {
+		mTension = 2.0f;
 	}
 
-	public FadeInLeftAnimator(Interpolator interpolator) {
-		mInterpolator = interpolator;
+	public OvershootInRightItemAnimator(float mTension) {
+		this.mTension = mTension;
 	}
 
 	@Override
 	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
 		ViewCompat.animate(holder.itemView)
-				.translationX(-holder.itemView.getRootView().getWidth() * .25f)
-				.alpha(0)
+				.translationX(holder.itemView.getRootView().getWidth())
 				.setDuration(getRemoveDuration())
-				.setInterpolator(mInterpolator)
 				.setListener(new DefaultRemoveVpaListener(holder))
 				.start();
 	}
 
 	@Override
 	protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-		ViewCompat.setTranslationX(holder.itemView, -holder.itemView.getRootView().getWidth() * .25f);
-		ViewCompat.setAlpha(holder.itemView, 0);
+		ViewCompat.setTranslationX(holder.itemView, holder.itemView.getRootView().getWidth());
 		return true;
 	}
 
@@ -52,9 +52,8 @@ public class FadeInLeftAnimator extends FlexibleItemAnimator {
 	protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
 		ViewCompat.animate(holder.itemView)
 				.translationX(0)
-				.alpha(1)
 				.setDuration(getAddDuration())
-				.setInterpolator(mInterpolator)
+				.setInterpolator(new OvershootInterpolator(mTension))
 				.setListener(new DefaultAddVpaListener(holder))
 				.start();
 	}

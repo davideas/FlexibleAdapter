@@ -21,12 +21,12 @@ import android.view.animation.Interpolator;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
-public class FadeInAnimator extends FlexibleItemAnimator {
+public class LandingItemAnimator extends FlexibleItemAnimator {
 
-	public FadeInAnimator() {
+	public LandingItemAnimator() {
 	}
 
-	public FadeInAnimator(Interpolator interpolator) {
+	public LandingItemAnimator(Interpolator interpolator) {
 		mInterpolator = interpolator;
 	}
 
@@ -34,6 +34,8 @@ public class FadeInAnimator extends FlexibleItemAnimator {
 	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
 		ViewCompat.animate(holder.itemView)
 				.alpha(0)
+				.scaleX(1.5f)
+				.scaleY(1.5f)
 				.setDuration(getRemoveDuration())
 				.setInterpolator(mInterpolator)
 				.setListener(new DefaultRemoveVpaListener(holder))
@@ -43,6 +45,8 @@ public class FadeInAnimator extends FlexibleItemAnimator {
 	@Override
 	protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
 		ViewCompat.setAlpha(holder.itemView, 0);
+		ViewCompat.setScaleX(holder.itemView, 1.5f);
+		ViewCompat.setScaleY(holder.itemView, 1.5f);
 		return true;
 	}
 
@@ -50,6 +54,8 @@ public class FadeInAnimator extends FlexibleItemAnimator {
 	protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
 		ViewCompat.animate(holder.itemView)
 				.alpha(1)
+				.scaleX(1)
+				.scaleY(1)
 				.setDuration(getAddDuration())
 				.setInterpolator(mInterpolator)
 				.setListener(new DefaultAddVpaListener(holder))

@@ -21,19 +21,19 @@ import android.view.animation.Interpolator;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
-public class FadeInUpAnimator extends FlexibleItemAnimator {
+public class FadeInLeftItemAnimator extends FlexibleItemAnimator {
 
-	public FadeInUpAnimator() {
+	public FadeInLeftItemAnimator() {
 	}
 
-	public FadeInUpAnimator(Interpolator interpolator) {
+	public FadeInLeftItemAnimator(Interpolator interpolator) {
 		mInterpolator = interpolator;
 	}
 
 	@Override
 	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
 		ViewCompat.animate(holder.itemView)
-				.translationY(holder.itemView.getHeight() * .25f)
+				.translationX(-holder.itemView.getRootView().getWidth() * .25f)
 				.alpha(0)
 				.setDuration(getRemoveDuration())
 				.setInterpolator(mInterpolator)
@@ -43,7 +43,7 @@ public class FadeInUpAnimator extends FlexibleItemAnimator {
 
 	@Override
 	protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-		ViewCompat.setTranslationY(holder.itemView, holder.itemView.getHeight() * .25f);
+		ViewCompat.setTranslationX(holder.itemView, -holder.itemView.getRootView().getWidth() * .25f);
 		ViewCompat.setAlpha(holder.itemView, 0);
 		return true;
 	}
@@ -51,7 +51,7 @@ public class FadeInUpAnimator extends FlexibleItemAnimator {
 	@Override
 	protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
 		ViewCompat.animate(holder.itemView)
-				.translationY(0)
+				.translationX(0)
 				.alpha(1)
 				.setDuration(getAddDuration())
 				.setInterpolator(mInterpolator)

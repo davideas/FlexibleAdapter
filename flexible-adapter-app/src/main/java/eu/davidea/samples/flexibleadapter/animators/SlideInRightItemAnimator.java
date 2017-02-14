@@ -21,21 +21,20 @@ import android.view.animation.Interpolator;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
-public class SlideInDownAnimator extends FlexibleItemAnimator {
+public class SlideInRightItemAnimator extends FlexibleItemAnimator {
 
-	public SlideInDownAnimator() {
+	public SlideInRightItemAnimator() {
 
 	}
 
-	public SlideInDownAnimator(Interpolator interpolator) {
+	public SlideInRightItemAnimator(Interpolator interpolator) {
 		mInterpolator = interpolator;
 	}
 
 	@Override
 	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
 		ViewCompat.animate(holder.itemView)
-				.translationY(-holder.itemView.getHeight())
-				.alpha(0)
+				.translationX(holder.itemView.getRootView().getWidth())
 				.setDuration(getRemoveDuration())
 				.setInterpolator(mInterpolator)
 				.setListener(new DefaultRemoveVpaListener(holder))
@@ -44,16 +43,14 @@ public class SlideInDownAnimator extends FlexibleItemAnimator {
 
 	@Override
 	protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-		ViewCompat.setTranslationY(holder.itemView, -holder.itemView.getHeight());
-		ViewCompat.setAlpha(holder.itemView, 0);
+		ViewCompat.setTranslationX(holder.itemView, holder.itemView.getRootView().getWidth());
 		return true;
 	}
 
 	@Override
 	protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
 		ViewCompat.animate(holder.itemView)
-				.translationY(0)
-				.alpha(1)
+				.translationX(0)
 				.setDuration(getAddDuration())
 				.setInterpolator(mInterpolator)
 				.setListener(new DefaultAddVpaListener(holder))
