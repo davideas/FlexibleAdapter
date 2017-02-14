@@ -31,6 +31,11 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 	}
 
 	@Override
+	public int getSpanSize(int spanCount, int position) {
+		return spanCount;
+	}
+
+	@Override
 	public int getLayoutRes() {
 		return R.layout.recycler_scrollable_footer_item;
 	}

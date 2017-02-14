@@ -73,6 +73,11 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 	}
 
 	@Override
+	public int getSpanSize(int spanCount, int position) {
+		return spanCount;
+	}
+
+	@Override
 	public int getLayoutRes() {
 		return R.layout.recycler_header_item;
 	}

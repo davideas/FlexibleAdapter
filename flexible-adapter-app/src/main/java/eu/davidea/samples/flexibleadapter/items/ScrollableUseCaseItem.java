@@ -31,6 +31,11 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UC
 	}
 
 	@Override
+	public int getSpanSize(int spanCount, int position) {
+		return spanCount;
+	}
+
+	@Override
 	public int getLayoutRes() {
 		return R.layout.recycler_scrollable_usecase_item;
 	}

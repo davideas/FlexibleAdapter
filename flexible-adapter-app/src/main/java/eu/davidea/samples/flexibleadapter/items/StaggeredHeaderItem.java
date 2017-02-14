@@ -49,6 +49,11 @@ public class StaggeredHeaderItem extends AbstractHeaderItem<StaggeredHeaderItem.
 	}
 
 	@Override
+	public int getSpanSize(int spanCount, int position) {
+		return spanCount;
+	}
+
+	@Override
 	public int getLayoutRes() {
 		return R.layout.recycler_staggered_header_item;
 	}

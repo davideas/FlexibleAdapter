@@ -96,6 +96,11 @@ public class ExpandableHeaderItem
 	}
 
 	@Override
+	public int getSpanSize(int spanCount, int position) {
+		return spanCount;
+	}
+
+	@Override
 	public int getLayoutRes() {
 		return R.layout.recycler_expandable_header_item;
 	}
