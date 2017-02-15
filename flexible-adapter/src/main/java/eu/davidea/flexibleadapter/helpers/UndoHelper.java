@@ -126,11 +126,11 @@ public class UndoHelper extends Snackbar.Callback {
 	 * As {@link #remove(List, View, CharSequence, CharSequence, int)} but with String
 	 * resources instead of CharSequence.
 	 */
-	public void remove(List<Integer> positions, @NonNull View mainView,
+	public Snackbar remove(List<Integer> positions, @NonNull View mainView,
 					   @StringRes int messageStringResId, @StringRes int actionStringResId,
 					   @IntRange(from = -1) int undoTime) {
 		Context context = mainView.getContext();
-		remove(positions, mainView, context.getString(messageStringResId),
+		return remove(positions, mainView, context.getString(messageStringResId),
 				context.getString(actionStringResId), undoTime);
 	}
 
@@ -146,10 +146,11 @@ public class UndoHelper extends Snackbar.Callback {
 	 * @param actionText the action text to display
 	 * @param undoTime   How long to display the message. Either {@link Snackbar#LENGTH_SHORT} or
 	 *                   {@link Snackbar#LENGTH_LONG} or any custom Integer.
+	 * @return The SnackBar instance
 	 * @see #remove(List, View, int, int, int)
 	 */
 	@SuppressWarnings("WrongConstant")
-	public void remove(List<Integer> positions, @NonNull View mainView,
+	public Snackbar remove(List<Integer> positions, @NonNull View mainView,
 					   CharSequence message, CharSequence actionText,
 					   @IntRange(from = -1) int undoTime) {
 		this.mPositions = positions;
@@ -171,6 +172,7 @@ public class UndoHelper extends Snackbar.Callback {
 		}
 		snackbar.addCallback(this);
 		snackbar.show();
+		return snackbar;
 	}
 
 	/**
