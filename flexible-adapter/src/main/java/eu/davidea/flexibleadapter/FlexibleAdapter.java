@@ -347,7 +347,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		while (position < getItemCount()) {
 			T item = getItem(position);
 			if (isExpanded(item)) {
-				expand(position, false, true);
+				expand(position, false, true, false);
 				if (!headersShown && isHeader(item) && !item.isHidden())
 					headersShown = true;
 			}
@@ -2035,7 +2035,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter<T> setEndlessScrollListener(@Nullable EndlessScrollListener endlessScrollListener,
-													@NonNull T progressItem) {
+													   @NonNull T progressItem) {
 		if (DEBUG) Log.i(TAG, "Set endlessScrollListener=" + getClassName(endlessScrollListener));
 		mEndlessScrollListener = endlessScrollListener;
 		return setEndlessProgressItem(progressItem);
@@ -2448,20 +2448,39 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Expands an item that is {@code IExpandable} type, not yet expanded and if has subItems.
 	 * <p>If configured, automatic smooth scroll will be performed when necessary.</p>
+	 * Parent won't be notified.
 	 *
 	 * @param position the position of the item to expand
 	 * @return the number of subItems expanded
+	 * @see #expand(int, boolean)
 	 * @see #expand(IFlexible)
 	 * @see #expand(IFlexible, boolean)
 	 * @see #expandAll()
 	 * @since 5.0.0-b1
 	 */
 	public int expand(@IntRange(from = 0) int position) {
-		return expand(position, false, false);
+		return expand(position, false);
 	}
 
 	/**
-	 * Convenience method to expand a single item.
+	 * Expands an item that is {@code IExpandable} type, not yet expanded and if has subItems.
+	 * <p>If configured, automatic smooth scroll will be performed when necessary.</p>
+	 *
+	 * @param position     the position of the item to expand
+	 * @param notifyParent true to notify the parent with {@link Payload#EXPANDED}
+	 * @return the number of subItems expanded
+	 * @see #expand(int)
+	 * @see #expand(IFlexible)
+	 * @see #expand(IFlexible, boolean)
+	 * @see #expandAll()
+	 * @since 5.0.0-b1
+	 */
+	public int expand(@IntRange(from = 0) int position, boolean notifyParent) {
+		return expand(position, false, false, notifyParent);
+	}
+
+	/**
+	 * Convenience method to expand a single item. Parent will be notified.
 	 * <p>Expands an item that is Expandable, not yet expanded, that has subItems and
 	 * no child is selected.</p>
 	 * If configured, automatic smooth scroll will be performed.
@@ -2469,16 +2488,17 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param item the item to expand, must be an Expandable and present in the list
 	 * @return the number of subItems expanded
 	 * @see #expand(int)
+	 * @see #expand(int, boolean)
 	 * @see #expand(IFlexible, boolean)
 	 * @see #expandAll()
 	 * @since 5.0.0-b6
 	 */
 	public int expand(T item) {
-		return expand(getGlobalPositionOf(item), false, false);
+		return expand(getGlobalPositionOf(item), false, false, true);
 	}
 
 	/**
-	 * Convenience method to initially expand a single item.
+	 * Convenience method to initially expand a single item. Parent won't be notified.
 	 * <p><b>Note:</b> Must be used in combination with adding new items that require to be
 	 * initially expanded.</p>
 	 * <b>WARNING!</b>
@@ -2490,15 +2510,31 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param init true to initially expand item
 	 * @return the number of subItems expanded
 	 * @see #expand(int)
+	 * @see #expand(int, boolean)
 	 * @see #expand(IFlexible)
 	 * @see #expandAll()
 	 * @since 5.0.0-b7
 	 */
 	public int expand(T item, boolean init) {
-		return expand(getGlobalPositionOf(item), false, init);
+		return expand(getGlobalPositionOf(item), false, init, false);
 	}
 
-	private int expand(int position, boolean expandAll, boolean init) {
+	/**
+	 * Convenience method to initially expand a single item.
+	 * <p><b>Note:</b> Must be used in combination with adding new items that require to be
+	 * initially expanded.</p>
+	 * <b>WARNING!</b>
+	 * <br/>Expanded status is ignored if {@code init = true}: it will always attempt to expand
+	 * the item: If subItems are already visible <u>and</u> the new item has status expanded, the
+	 * subItems will appear duplicated(!) and the automatic smooth scroll will be skipped!
+	 *
+	 * @param position     the position of the item to expand
+	 * @param init         true to initially expand item
+	 * @param notifyParent true to notify the parent with {@link Payload#EXPANDED}
+	 * @return the number of subItems expanded
+	 * @since 5.0.0-rc2
+	 */
+	private int expand(int position, boolean expandAll, boolean init, boolean notifyParent) {
 		T item = getItem(position);
 		if (!isExpandable(item)) return 0;
 
@@ -2540,7 +2576,9 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 
 			// Expand!
+			if (notifyParent) notifyItemChanged(position, Payload.EXPANDED);
 			notifyItemRangeInserted(position + 1, subItemsCount);
+
 			// Show also the headers of the subItems
 			if (!init && headersShown) {
 				int count = 0;
@@ -2587,6 +2625,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Expands all IExpandable items with at least the specified level.
+	 * <p>Parent will be notified.</p>
 	 *
 	 * @param level the minimum level to expand the sub expandable items
 	 * @return the number of parent successfully expanded
@@ -2602,7 +2641,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			T item = getItem(i);
 			if (isExpandable(item)) {
 				IExpandable expandable = (IExpandable) item;
-				if (expandable.getExpansionLevel() <= level && expand(i, true, false) > 0) {
+				if (expandable.getExpansionLevel() <= level && expand(i, true, false, true) > 0) {
 					i += expandable.getSubItems().size();
 					expanded++;
 				}
@@ -2615,6 +2654,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Collapses an {@code IExpandable} item that is already expanded, if no subItem is selected.
 	 * <p>Multilevel behaviour: all {@code IExpandable} subItem, that are expanded, are recursively
 	 * collapsed.</p>
+	 * Parent won't be notified.
 	 *
 	 * @param position the position of the item to collapse
 	 * @return the number of subItems collapsed
@@ -2622,6 +2662,21 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	public int collapse(@IntRange(from = 0) int position) {
+		return collapse(position, false);
+	}
+
+	/**
+	 * Collapses an {@code IExpandable} item that is already expanded, if no subItem is selected.
+	 * <p>Multilevel behaviour: all {@code IExpandable} subItem, that are expanded, are recursively
+	 * collapsed.</p>
+	 *
+	 * @param position     the position of the item to collapse
+	 * @param notifyParent notify the parent with {@link Payload#COLLAPSED}
+	 * @return the number of subItems collapsed
+	 * @see #collapseAll()
+	 * @since 5.0.0-b1
+	 */
+	public int collapse(@IntRange(from = 0) int position, boolean notifyParent) {
 		T item = getItem(position);
 		if (!isExpandable(item)) return 0;
 
@@ -2649,7 +2704,9 @@ public class FlexibleAdapter<T extends IFlexible>
 			expandable.setExpanded(false);
 
 			// Collapse!
+			if (notifyParent) notifyItemChanged(position, Payload.COLLAPSED);
 			notifyItemRangeRemoved(position + 1, subItemsCount);
+
 			// Hide also the headers of the subItems
 			if (headersShown && !isHeader(item)) {
 				for (T subItem : subItems) {
@@ -2678,7 +2735,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (isExpanded(subItem)) {
 				IExpandable expandable = (IExpandable) subItem;
 				if (expandable.getExpansionLevel() >= level &&
-						collapse(startPosition + i) > 0) {
+						collapse(startPosition + i, true) > 0) {
 					collapsed++;
 				}
 			}
@@ -2690,7 +2747,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Collapses all expandable items with the minimum level of {@link #mMinCollapsibleLevel}.
 	 *
 	 * @return the number of parent successfully collapsed
-	 * @see #collapse(int)
+	 * @see #collapse(int, boolean)
 	 * @see #collapseAll(int)
 	 * @see #setMinCollapsibleLevel(int)
 	 * @since 5.0.0-b1
@@ -2701,6 +2758,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Collapses all expandable items with the level equals-higher than the specified level.
+	 * <p>Parents will be notified.</p>
 	 *
 	 * @param level the level to start collapse sub expandable items
 	 * @return the number of parent successfully collapsed

@@ -137,8 +137,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@CallSuper
 	protected void expandView(int position) {
-		mAdapter.expand(position);
-		if (shouldNotifyParentOnClick()) mAdapter.notifyItemChanged(position, Payload.EXPANDED);
+		mAdapter.expand(position, shouldNotifyParentOnClick());
 	}
 
 	/**
@@ -151,8 +150,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@CallSuper
 	protected void collapseView(int position) {
-		mAdapter.collapse(position);
-		if (shouldNotifyParentOnClick()) mAdapter.notifyItemChanged(position, Payload.COLLAPSED);
+		mAdapter.collapse(position, shouldNotifyParentOnClick());
 	}
 
 	/*---------------------------------*/
