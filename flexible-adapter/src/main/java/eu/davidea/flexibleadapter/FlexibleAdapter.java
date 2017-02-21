@@ -120,7 +120,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private DiffUtilCallback diffUtilCallback;
 
 	/* Handler for delayed actions */
-	protected final int UPDATE = 0, FILTER = 1, CONFIRM_DELETE = 2, LOAD_MORE_COMPLETE = 8;
+	protected final int UPDATE = 1, FILTER = 2, CONFIRM_DELETE = 3, LOAD_MORE_COMPLETE = 8;
 	protected Handler mHandler = new Handler(Looper.getMainLooper(), new HandlerCallback());
 
 	/* Deleted items and RestoreList (Undo) */
@@ -5398,9 +5398,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Handler callback for delayed actions.
 	 * <p>You can use and override this Callback, current values used by the Adapter:</p>
-	 * 0 = async call for updateDataSet.
-	 * <br/>1 = async call for filterItems, optionally delayed.
-	 * <br/>2 = deleteConfirmed when Undo timeout is over.
+	 * 1 = async call for updateDataSet.
+	 * <br/>2 = async call for filterItems, optionally delayed.
+	 * <br/>3 = deleteConfirmed when Undo timeout is over.
 	 * <br/>8 = hide the progress item from the list, optionally delayed.
 	 * <p><b>Note:</b> numbers 0-9 are reserved for the Adapter, use others.</p>
 	 *

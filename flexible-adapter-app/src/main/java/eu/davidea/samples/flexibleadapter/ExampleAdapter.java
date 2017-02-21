@@ -189,6 +189,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 //		// Not implemented: METHOD A is used
 //	}
+
 	@Override
 	public String onCreateBubbleText(int position) {
 		if (position < getScrollableHeaders().size()) {
@@ -219,9 +220,9 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			boolean done = super.handleMessage(message);
 			switch (message.what) {
 				// Currently reserved (you don't need to check these numbers!)
-				case 0: //async updateDataSet
-				case 1: //async filterItems
-				case 2: //confirm delete
+				case 1: //async updateDataSet
+				case 2: //async filterItems
+				case 3: //confirm delete
 				case 8: //onLoadMore remove progress item
 					return done;
 
