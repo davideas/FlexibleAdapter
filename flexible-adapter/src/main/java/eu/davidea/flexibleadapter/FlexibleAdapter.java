@@ -1783,6 +1783,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	@Override
 	public int getItemViewType(int position) {
 		T item = getItem(position);
+		if (item == null) {
+			return 0;
+		}
 		// Map the view type if not done yet
 		mapViewTypeFrom(item);
 		autoMap = true;
