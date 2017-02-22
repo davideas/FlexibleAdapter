@@ -2576,8 +2576,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 
 			// Expand!
-			if (notifyParent) notifyItemChanged(position, Payload.EXPANDED);
 			notifyItemRangeInserted(position + 1, subItemsCount);
+			if (notifyParent) notifyItemChanged(position, Payload.EXPANDED);
 
 			// Show also the headers of the subItems
 			if (!init && headersShown) {
@@ -2704,8 +2704,8 @@ public class FlexibleAdapter<T extends IFlexible>
 			expandable.setExpanded(false);
 
 			// Collapse!
-			if (notifyParent) notifyItemChanged(position, Payload.COLLAPSED);
 			notifyItemRangeRemoved(position + 1, subItemsCount);
+			if (notifyParent) notifyItemChanged(position, Payload.COLLAPSED);
 
 			// Hide also the headers of the subItems
 			if (headersShown && !isHeader(item)) {
