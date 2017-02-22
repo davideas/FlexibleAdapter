@@ -41,7 +41,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -2566,7 +2565,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			List<T> subItems = getExpandableList(expandable);
 			mItems.addAll(position + 1, subItems);
 			subItemsCount = subItems.size();
-			//Save expanded state
+			// Save expanded state
 			expandable.setExpanded(true);
 
 			// Automatically smooth scroll the current expandable item to show as much
@@ -2696,9 +2695,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 			// Recursive collapse of all sub expandable
 			recursiveCount = recursiveCollapse(position + 1, subItems, expandable.getExpansionLevel());
-			// Use HashSet (will improve the performance when collapseAll)
-			if (mHashItems != null) mHashItems.removeAll(subItems);
-			else mItems.removeAll(subItems);
+			mItems.removeAll(subItems);
 			subItemsCount = subItems.size();
 			// Save expanded state
 			expandable.setExpanded(false);
@@ -2766,12 +2763,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b6
 	 */
 	public int collapseAll(int level) {
-		// Use hashSet to increase performance while removing subItems
-		mHashItems = new LinkedHashSet<>(mItems);
-		int collapsed = recursiveCollapse(0, mItems, level);
-		mItems = new ArrayList<>(mHashItems);
-		mHashItems = null;
-		return collapsed;
+		return recursiveCollapse(0, mItems, level);
 	}
 
 	/*----------------*/
