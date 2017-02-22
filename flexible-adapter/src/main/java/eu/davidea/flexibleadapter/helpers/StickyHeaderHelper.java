@@ -17,11 +17,9 @@ package eu.davidea.flexibleadapter.helpers;
 
 import android.animation.Animator;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -133,7 +131,6 @@ public final class StickyHeaderHelper extends OnScrollListener {
 	}
 
 	public void updateOrClearHeader(boolean updateHeaderContent) {
-		//
 		if (!mAdapter.areHeadersShown() || mAdapter.hasSearchText() || mAdapter.getItemCount() == 0) {
 			clearHeaderWithAnimation();
 			return;
@@ -165,9 +162,13 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			if (FlexibleAdapter.DEBUG)
 				Log.d(TAG, "swapHeader newHeaderPosition=" + mHeaderPosition);
 			swapHeader(holder);
-		} else if (updateHeaderContent && mStickyHeaderViewHolder != null) {
-			mAdapter.onBindViewHolder(mStickyHeaderViewHolder, mHeaderPosition);
-			ensureHeaderParent();
+		} else if (updateHeaderContent) {
+			// #299 - ClassCastException after click on expanded sticky header when AutoCollapse is enabled
+//			mStickyHeaderViewHolder = getHeaderViewHolder(headerPosition);
+//			mStickyHeaderViewHolder.setBackupPosition(headerPosition);
+//			mAdapter.onBindViewHolder(mStickyHeaderViewHolder, headerPosition);
+//			ensureHeaderParent();
+			//FIXME: update viewHolder when sticky
 		}
 		translateHeader();
 	}
@@ -338,12 +339,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 	@SuppressWarnings("unchecked")
 	private int getStickyPosition(int adapterPosHere) {
 		if (adapterPosHere == RecyclerView.NO_POSITION) {
-			// Fix to display correct sticky header (especially after the searchText is cleared out)
-			if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-				adapterPosHere = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstVisibleItemPositions(null)[0];
-			} else {
-				adapterPosHere = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstVisibleItemPosition();
-			}
+			adapterPosHere = Utils.findFirstVisibleItemPosition(mRecyclerView.getLayoutManager());
 			if (adapterPosHere == 0 && !hasStickyHeaderTranslated(0)) {
 				return RecyclerView.NO_POSITION;
 			}
