@@ -2,10 +2,6 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 group = publishedGroupId // Maven Group ID for the artifact
 
-task clean(type: Delete) {
-	delete rootProject.buildDir
-}
-
 task sourcesJar(type: Jar) {
 	from android.sourceSets.main.java.srcDirs
 	classifier = 'sources'
