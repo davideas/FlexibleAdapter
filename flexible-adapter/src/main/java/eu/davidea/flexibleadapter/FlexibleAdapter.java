@@ -1882,6 +1882,16 @@ public class FlexibleAdapter<T extends IFlexible>
 		animateView(holder, position);
 	}
 
+	@CallSuper
+	@Override
+	public void onViewRecycled(RecyclerView.ViewHolder holder) {
+		if (areHeadersSticky()) {
+			// #297 - Empty (Invisible) Header Item when Using Sticky Headers
+			holder.itemView.setVisibility(View.VISIBLE);
+		}
+		super.onViewRecycled(holder);
+	}
+
 	/*------------------------*/
 	/* ENDLESS SCROLL METHODS */
 	/*------------------------*/
