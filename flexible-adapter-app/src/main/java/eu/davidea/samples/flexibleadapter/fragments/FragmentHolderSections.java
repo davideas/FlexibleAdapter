@@ -47,7 +47,9 @@ public class FragmentHolderSections extends AbstractFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		// Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createHolderSectionsDatabase(50, 10);
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createHolderSectionsDatabase(50, 10);
+		}
 		initializeRecyclerView(savedInstanceState);
 	}
 

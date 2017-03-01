@@ -345,12 +345,13 @@ public class FlexibleAdapter<T extends IFlexible>
 		multiRange = true;
 		while (position < getItemCount()) {
 			T item = getItem(position);
+			if (!headersShown && isHeader(item) && !item.isHidden()) {
+				headersShown = true;
+			}
 			if (isExpanded(item)) {
 				expand(position, false, true, false);
-				if (!headersShown && isHeader(item) && !item.isHidden())
-					headersShown = true;
 			}
-			position++;
+			position++; //+1 Check also subItems with expanded = true
 		}
 		multiRange = false;
 		setScrollAnimate(false);

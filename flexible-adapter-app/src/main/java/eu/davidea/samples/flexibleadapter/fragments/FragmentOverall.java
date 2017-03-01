@@ -53,7 +53,9 @@ public class FragmentOverall extends AbstractFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		// Create overall items and Initialize RecyclerView
-		DatabaseService.getInstance().createOverallDatabase(getActivity().getResources());
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createOverallDatabase(getActivity().getResources());
+		}
 		initializeRecyclerView(savedInstanceState);
 	}
 

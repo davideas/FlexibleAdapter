@@ -67,7 +67,9 @@ public class FragmentHeadersSections extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		// Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createHeadersSectionsDatabase(400, 100);
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createHeadersSectionsDatabase(400, 100);
+		}
 		initializeRecyclerView(savedInstanceState);
 
 		// Restore FAB button and icon

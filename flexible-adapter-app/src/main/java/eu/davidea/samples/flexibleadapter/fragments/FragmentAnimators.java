@@ -72,7 +72,9 @@ public class FragmentAnimators extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		// Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createAnimatorsDatabase(20); //N. of sections
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createAnimatorsDatabase(20); //N. of sections
+		}
 		initializeRecyclerView(savedInstanceState);
 
 		// Restore FAB button and icon
@@ -98,7 +100,7 @@ public class FragmentAnimators extends AbstractFragment {
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
-		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
+		//mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 
 		// NOTE: Custom item animators inherit 'canReuseUpdatedViewHolder()' from Default Item
 		// Animator. It will return true if a Payload is provided. FlexibleAdapter is actually

@@ -57,7 +57,9 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		// Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createInstagramHeadersDatabase(15);
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createInstagramHeadersDatabase(15);
+		}
 		initializeRecyclerView();
 
 		// Settings for FlipView

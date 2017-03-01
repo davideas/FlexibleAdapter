@@ -92,9 +92,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	private boolean isReverseEnabled = false, shouldAnimate = false,
 			onlyEntryAnimation = false, animateFromObserver = false;
 
+	private static long DEFAULT_DURATION = 300L;
 	private long mInitialDelay = 0L,
 			mStepDelay = 100L,
-			mDuration = 300L;
+			mDuration = DEFAULT_DURATION;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -395,14 +396,14 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			set.playTogether(animators);
 			set.setInterpolator(mInterpolator);
 			// Single view duration
-			long duration = 0L;
+			long duration = mDuration;
 			for (Animator animator : animators) {
-				if (animator.getDuration() != mDuration) {
+				if (animator.getDuration() != DEFAULT_DURATION) {
 					duration = animator.getDuration();
 				}
 			}
 			//Log.v(TAG, "duration=" + duration);
-			set.setDuration(duration > 0 ? duration : mDuration);
+			set.setDuration(duration);
 			set.addListener(new HelperAnimatorListener(hashCode));
 			if (mEntryStep) {
 				// Stop stepDelay when screen is filled

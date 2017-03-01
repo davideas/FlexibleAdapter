@@ -58,7 +58,9 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		super.onActivityCreated(savedInstanceState);
 
 		// Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createStaggeredDatabase(getActivity());
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createStaggeredDatabase(getActivity());
+		}
 		initializeRecyclerView(savedInstanceState);
 
 		// Restore FAB button and icon
