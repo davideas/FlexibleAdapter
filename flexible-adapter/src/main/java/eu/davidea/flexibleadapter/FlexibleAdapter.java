@@ -2166,7 +2166,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (DEBUG)
 				Log.v(TAG, "onLoadMore     enqueued removing progressItem (" + delay + "ms)");
 			mHandler.sendEmptyMessageDelayed(LOAD_MORE_COMPLETE, delay);
-		} else if (isEndlessScrollEnabled()) {
+		} else {
 			hideProgressItem();
 		}
 		// 5. Reset the loading status
