@@ -285,6 +285,8 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		view.setTranslationY(0);
 		if (!header.itemView.equals(view))
 			((ViewGroup) header.itemView).addView(view);
+		header.itemView.getLayoutParams().width = view.getLayoutParams().width;
+		header.itemView.getLayoutParams().height = view.getLayoutParams().height;
 		header.setIsRecyclable(true);
 	}
 
