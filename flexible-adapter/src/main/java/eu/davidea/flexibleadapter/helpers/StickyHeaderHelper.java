@@ -285,9 +285,10 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		view.setTranslationY(0);
 		if (!header.itemView.equals(view))
 			((ViewGroup) header.itemView).addView(view);
+		header.setIsRecyclable(true);
+		// #294 - Expandable header is not resized / redrawn on automatic configuration change when sticky headers are enabled
 		header.itemView.getLayoutParams().width = view.getLayoutParams().width;
 		header.itemView.getLayoutParams().height = view.getLayoutParams().height;
-		header.setIsRecyclable(true);
 	}
 
 	private void clearHeader() {
