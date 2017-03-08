@@ -10,6 +10,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.support.annotation.IdRes;
+import android.support.annotation.IntDef;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
@@ -25,11 +26,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.lang.annotation.Retention;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.R;
+
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Class taken from GitHub, customized and optimized for FlexibleAdapter project.
@@ -48,10 +52,21 @@ public class FastScroller extends FrameLayout {
 	private static final boolean DEFAULT_AUTOHIDE_ENABLED = true;
 	private static final int DEFAULT_AUTOHIDE_DELAY_IN_MILLIS = 1000;
 
+	@Retention(SOURCE)
+	@IntDef({FastScrollerBubblePosition.ADJACENT, FastScrollerBubblePosition.CENTER})
+	protected @interface FastScrollerBubblePosition {
+		int ADJACENT = 0;
+		int CENTER = 1;
+	}
+
+	@FastScrollerBubblePosition
+	private static final int DEFAULT_BUBBLE_POSITION = FastScrollerBubblePosition.ADJACENT;
+
 	private TextView bubble;
 	private ImageView handle;
 	private View bar;
 	private int height;
+	private int width;
 	private boolean isInitialized = false;
 	private ObjectAnimator currentAnimator;
 	private RecyclerView recyclerView;
@@ -61,6 +76,8 @@ public class FastScroller extends FrameLayout {
 
 	private boolean autoHideEnabled;
 	private long autoHideDelayInMillis;
+	@FastScrollerBubblePosition
+	private int bubblePosition;
 
 	private AnimatorSet scrollbarAnimator;
 
@@ -96,6 +113,9 @@ public class FastScroller extends FrameLayout {
 			if (autoHideEnabled) {
 				autoHideDelayInMillis = a.getInteger(R.styleable.FastScroller_fastScrollerAutoHideDelayInMillis, DEFAULT_AUTOHIDE_DELAY_IN_MILLIS);
 			}
+
+			//noinspection WrongConstant
+			bubblePosition = a.getInteger(R.styleable.FastScroller_fastScrollerBubblePosition, DEFAULT_BUBBLE_POSITION);
 		} finally {
 			a.recycle();
 		}
@@ -227,6 +247,7 @@ public class FastScroller extends FrameLayout {
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
 		height = h;
+		width = w;
 	}
 
 	@Override
@@ -309,7 +330,13 @@ public class FastScroller extends FrameLayout {
 		handle.setY(getValueInRange(0, height - handleHeight, (int) (y - handleHeight / 2)));
 		if (bubble != null) {
 			int bubbleHeight = bubble.getHeight();
-			bubble.setY(getValueInRange(0, height - bubbleHeight - handleHeight / 2, (int) (y - bubbleHeight)));
+			if (bubblePosition == FastScrollerBubblePosition.ADJACENT) {
+				bubble.setY(getValueInRange(0, height - bubbleHeight - handleHeight / 2, (int) (y - bubbleHeight)));
+			} else {
+				bubble.setY(Math.max(0, (height - bubble.getHeight()) / 2));
+				bubble.setX(Math.max(0, (width - bubble.getWidth()) / 2));
+			}
+
 		}
 	}
 

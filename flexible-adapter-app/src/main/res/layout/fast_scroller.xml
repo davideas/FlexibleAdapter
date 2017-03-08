@@ -12,5 +12,6 @@
 	android:layout_alignParentRight="true"
 	app:fastScrollerAutoHideEnabled="true"
 	app:fastScrollerAutoHideDelayInMillis="1000"
+	app:fastScrollerBubblePosition="adjacent"
 	android:visibility="gone"
 	tools:visibility="visible"/>
