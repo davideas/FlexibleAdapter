@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FastScroller">
+        <attr name="fastScrollerAutoHideEnabled" format="boolean"/>
+        <attr name="fastScrollerAutoHideDelayInMillis" format="integer"/>
+    </declare-styleable>
+</resources>
