@@ -2,12 +2,15 @@ package eu.davidea.fastscroller;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.support.annotation.IdRes;
+import android.support.annotation.IntDef;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
@@ -23,11 +26,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.lang.annotation.Retention;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.R;
+
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Class taken from GitHub, customized and optimized for FlexibleAdapter project.
@@ -42,15 +48,38 @@ public class FastScroller extends FrameLayout {
 	private static final int BUBBLE_ANIMATION_DURATION = 300;
 	private static final int TRACK_SNAP_RANGE = 5;
 
+	private static final int AUTOHIDE_ANIMATION_DURATION = 300;
+	private static final boolean DEFAULT_AUTOHIDE_ENABLED = true;
+	private static final int DEFAULT_AUTOHIDE_DELAY_IN_MILLIS = 1000;
+
+	@Retention(SOURCE)
+	@IntDef({FastScrollerBubblePosition.ADJACENT, FastScrollerBubblePosition.CENTER})
+	protected @interface FastScrollerBubblePosition {
+		int ADJACENT = 0;
+		int CENTER = 1;
+	}
+
+	@FastScrollerBubblePosition
+	private static final int DEFAULT_BUBBLE_POSITION = FastScrollerBubblePosition.ADJACENT;
+
 	private TextView bubble;
 	private ImageView handle;
+	private View bar;
 	private int height;
+	private int width;
 	private boolean isInitialized = false;
 	private ObjectAnimator currentAnimator;
 	private RecyclerView recyclerView;
 	private RecyclerView.LayoutManager layoutManager;
 	private BubbleTextCreator bubbleTextCreator;
 	private List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<OnScrollStateChangeListener>();
+
+	private boolean autoHideEnabled;
+	private long autoHideDelayInMillis;
+	@FastScrollerBubblePosition
+	private int bubblePosition;
+
+	private AnimatorSet scrollbarAnimator;
 
 	private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
 		@Override
@@ -61,6 +90,8 @@ public class FastScroller extends FrameLayout {
 			int verticalScrollRange = recyclerView.computeVerticalScrollRange();
 			float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
 			setBubbleAndHandlePosition(height * proportion);
+			showScrollbar();
+			hideScrollbar();
 		}
 	};
 
@@ -75,6 +106,20 @@ public class FastScroller extends FrameLayout {
 
 	public FastScroller(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+
+		TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.FastScroller, 0, 0);
+		try {
+			autoHideEnabled = a.getBoolean(R.styleable.FastScroller_fastScrollerAutoHideEnabled, DEFAULT_AUTOHIDE_ENABLED);
+			if (autoHideEnabled) {
+				autoHideDelayInMillis = a.getInteger(R.styleable.FastScroller_fastScrollerAutoHideDelayInMillis, DEFAULT_AUTOHIDE_DELAY_IN_MILLIS);
+			}
+
+			//noinspection WrongConstant
+			bubblePosition = a.getInteger(R.styleable.FastScroller_fastScrollerBubblePosition, DEFAULT_BUBBLE_POSITION);
+		} finally {
+			a.recycle();
+		}
+
 		init();
 	}
 
@@ -143,6 +188,7 @@ public class FastScroller extends FrameLayout {
 		bubble = (TextView) findViewById(bubbleResId);
 		if (bubble != null) bubble.setVisibility(INVISIBLE);
 		handle = (ImageView) findViewById(handleResId);
+		bar = findViewById(R.id.fast_scroller_bar);
 	}
 
 	/**
@@ -201,10 +247,15 @@ public class FastScroller extends FrameLayout {
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
 		height = h;
+		width = w;
 	}
 
 	@Override
 	public boolean onTouchEvent(@NonNull MotionEvent event) {
+		if (recyclerView.getAdapter().getItemCount() == 0) {
+			return super.onTouchEvent(event);
+		}
+
 		int action = event.getAction();
 		switch (action) {
 			case MotionEvent.ACTION_DOWN:
@@ -213,6 +264,7 @@ public class FastScroller extends FrameLayout {
 				handle.setSelected(true);
 				notifyScrollStateChange(true);
 				showBubble();
+				showScrollbar();
 			case MotionEvent.ACTION_MOVE:
 				float y = event.getY();
 				setBubbleAndHandlePosition(y);
@@ -223,6 +275,7 @@ public class FastScroller extends FrameLayout {
 				handle.setSelected(false);
 				notifyScrollStateChange(false);
 				hideBubble();
+				hideScrollbar();
 				return true;
 		}
 		return super.onTouchEvent(event);
@@ -277,7 +330,13 @@ public class FastScroller extends FrameLayout {
 		handle.setY(getValueInRange(0, height - handleHeight, (int) (y - handleHeight / 2)));
 		if (bubble != null) {
 			int bubbleHeight = bubble.getHeight();
-			bubble.setY(getValueInRange(0, height - bubbleHeight - handleHeight / 2, (int) (y - bubbleHeight)));
+			if (bubblePosition == FastScrollerBubblePosition.ADJACENT) {
+				bubble.setY(getValueInRange(0, height - bubbleHeight - handleHeight / 2, (int) (y - bubbleHeight)));
+			} else {
+				bubble.setY(Math.max(0, (height - bubble.getHeight()) / 2));
+				bubble.setX(Math.max(0, (width - bubble.getWidth()) / 2));
+			}
+
 		}
 	}
 
@@ -313,6 +372,83 @@ public class FastScroller extends FrameLayout {
 			}
 		});
 		currentAnimator.start();
+	}
+
+	private void showScrollbar() {
+		if (bar == null || handle == null || !autoHideEnabled) {
+			return;
+		}
+
+		if (scrollbarAnimator != null) {
+			scrollbarAnimator.cancel();
+		}
+
+		if (bar.getVisibility() == View.INVISIBLE || handle.getVisibility() == View.INVISIBLE) {
+			bar.setVisibility(View.VISIBLE);
+			handle.setVisibility(View.VISIBLE);
+
+			ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, "translationX", 0);
+			ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, "translationX", 0);
+			scrollbarAnimator = new AnimatorSet();
+			scrollbarAnimator.playTogether(barAnimator, handleAnimator);
+			scrollbarAnimator.setDuration(AUTOHIDE_ANIMATION_DURATION);
+			scrollbarAnimator.addListener(new AnimatorListenerAdapter() {
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					super.onAnimationEnd(animation);
+					scrollbarAnimator = null;
+				}
+
+				@Override
+				public void onAnimationCancel(Animator animation) {
+					super.onAnimationCancel(animation);
+					scrollbarAnimator = null;
+				}
+			});
+			scrollbarAnimator.start();
+		}
+	}
+
+	private void hideScrollbar() {
+		if (bar == null || handle == null || !autoHideEnabled) {
+			return;
+		}
+
+		if (scrollbarAnimator != null) {
+			scrollbarAnimator.cancel();
+		}
+
+        ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, "translationX", bar.getWidth());
+        ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, "translationX", handle.getWidth());
+
+		scrollbarAnimator = new AnimatorSet();
+		scrollbarAnimator.playTogether(barAnimator, handleAnimator);
+		scrollbarAnimator.setDuration(AUTOHIDE_ANIMATION_DURATION);
+		scrollbarAnimator.setStartDelay(autoHideDelayInMillis);
+
+		scrollbarAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                super.onAnimationCancel(animation);
+				resetScrollbarPosition();
+				scrollbarAnimator = null;
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+				resetScrollbarPosition();
+				scrollbarAnimator = null;
+            }
+        });
+		scrollbarAnimator.start();
+    }
+
+    private void resetScrollbarPosition() {
+		bar.setVisibility(View.INVISIBLE);
+		handle.setVisibility(View.INVISIBLE);
+		bar.setTranslationX(0);
+		handle.setTranslationX(0);
 	}
 
 	public interface BubbleTextCreator {
