@@ -1,9 +1,5 @@
 package eu.davidea.fastscroller;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -50,16 +46,16 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  */
 public class FastScroller extends FrameLayout {
 
-	private static final int BUBBLE_ANIMATION_DURATION = 300;
-	private static final int TRACK_SNAP_RANGE = 5;
+	protected static final int BUBBLE_ANIMATION_DURATION = 300;
+	protected static final int TRACK_SNAP_RANGE = 5;
 
-	private static final int AUTOHIDE_ANIMATION_DURATION = 300;
-	private static final int DEFAULT_AUTOHIDE_DELAY_IN_MILLIS = 1000;
-	private static final boolean DEFAULT_AUTOHIDE_ENABLED = true;
+	protected static final int AUTOHIDE_ANIMATION_DURATION = 300;
+	protected static final int DEFAULT_AUTOHIDE_DELAY_IN_MILLIS = 1000;
+	protected static final boolean DEFAULT_AUTOHIDE_ENABLED = true;
 
 	@Retention(SOURCE)
 	@IntDef({FastScrollerBubblePosition.ADJACENT, FastScrollerBubblePosition.CENTER})
-	@interface FastScrollerBubblePosition {
+	public @interface FastScrollerBubblePosition {
 		int ADJACENT = 0;
 		int CENTER = 1;
 	}
@@ -67,39 +63,29 @@ public class FastScroller extends FrameLayout {
 	@FastScrollerBubblePosition
 	private static final int DEFAULT_BUBBLE_POSITION = FastScrollerBubblePosition.ADJACENT;
 
-	private TextView bubble;
-	private ImageView handle;
-	private View bar;
-	private int height;
-	private int width;
-	private int bubbleAndHandleColor;
-	private boolean isInitialized = false;
-	private ObjectAnimator currentAnimator;
-	private RecyclerView recyclerView;
-	private RecyclerView.LayoutManager layoutManager;
-	private BubbleTextCreator bubbleTextCreator;
-	private List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<>();
+	protected TextView bubble;
+	protected ImageView handle;
+	protected View bar;
+	protected int height;
+	protected int width;
+	protected int bubbleAndHandleColor;
+	protected boolean isInitialized = false;
 
-	private boolean autoHideEnabled;
-	private long autoHideDelayInMillis;
+	protected RecyclerView recyclerView;
+	protected RecyclerView.LayoutManager layoutManager;
+	protected BubbleTextCreator bubbleTextCreator;
+	protected List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<>();
+
+	protected boolean autoHideEnabled;
+	protected long autoHideDelayInMillis;
+
 	@FastScrollerBubblePosition
-	private int bubblePosition;
+	protected int bubblePosition;
 
-	private AnimatorSet scrollbarAnimator;
+	protected BubbleAnimator bubbleAnimator;
+	protected ScrollbarAnimator scrollbarAnimator;
 
-	private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
-		@Override
-		public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-			if (bubble == null || handle.isSelected())
-				return;
-			int verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
-			int verticalScrollRange = recyclerView.computeVerticalScrollRange();
-			float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
-			setBubbleAndHandlePosition(height * proportion);
-			showScrollbar();
-			hideScrollbar();
-		}
-	};
+	protected RecyclerView.OnScrollListener onScrollListener;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -131,10 +117,25 @@ public class FastScroller extends FrameLayout {
 		init();
 	}
 
-	private void init() {
+	protected void init() {
 		if (isInitialized) return;
 		isInitialized = true;
 		setClipChildren(false);
+
+		onScrollListener = new RecyclerView.OnScrollListener() {
+
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				if (bubble == null || handle.isSelected())
+					return;
+				int verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
+				int verticalScrollRange = recyclerView.computeVerticalScrollRange();
+				float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
+				setBubbleAndHandlePosition(height * proportion);
+				showScrollbar();
+				hideScrollbar();
+			}
+		};
 	}
 
 	/*---------------*/
@@ -182,7 +183,7 @@ public class FastScroller extends FrameLayout {
 		scrollStateChangeListeners.remove(stateChangeListener);
 	}
 
-	private void notifyScrollStateChange(boolean scrolling) {
+	protected void notifyScrollStateChange(boolean scrolling) {
 		for (OnScrollStateChangeListener stateChangeListener : scrollStateChangeListeners) {
 			stateChangeListener.onFastScrollerStateChange(scrolling);
 		}
@@ -206,6 +207,9 @@ public class FastScroller extends FrameLayout {
 		bar = findViewById(R.id.fast_scroller_bar);
 		// Setting color to Views
 		setBubbleAndHandleColor(bubbleAndHandleColor);
+
+		bubbleAnimator = new BubbleAnimator(bubble, BUBBLE_ANIMATION_DURATION);
+		scrollbarAnimator = new ScrollbarAnimator(bar, handle, autoHideDelayInMillis, AUTOHIDE_ANIMATION_DURATION);
 	}
 
 	/**
@@ -295,7 +299,7 @@ public class FastScroller extends FrameLayout {
 		switch (action) {
 			case MotionEvent.ACTION_DOWN:
 				if (event.getX() < handle.getX() - ViewCompat.getPaddingStart(handle)) return false;
-				if (currentAnimator != null) currentAnimator.cancel();
+
 				handle.setSelected(true);
 				notifyScrollStateChange(true);
 				showBubble();
@@ -323,44 +327,77 @@ public class FastScroller extends FrameLayout {
 			recyclerView.removeOnScrollListener(onScrollListener);
 	}
 
-	private void setRecyclerViewPosition(float y) {
+	protected void setRecyclerViewPosition(float y) {
 		if (recyclerView != null) {
-			int itemCount = recyclerView.getAdapter().getItemCount();
-			// Calculate proportion
-			float proportion;
-			if (handle.getY() == 0) {
-				proportion = 0f;
-			} else if (handle.getY() + handle.getHeight() >= height - TRACK_SNAP_RANGE) {
-				proportion = 1f;
-			} else {
-				proportion = y / (float) height;
-			}
-			int targetPos = getValueInRange(0, itemCount - 1, (int) (proportion * (float) itemCount));
-			// Scroll To Position based on LayoutManager
+			int targetPos = getTargetPos(y);
+
 			if (layoutManager instanceof StaggeredGridLayoutManager) {
 				((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(targetPos, 0);
 			} else {
 				((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(targetPos, 0);
 			}
-			// Update bubbleText
-			if (bubble != null) {
-				String bubbleText = bubbleTextCreator.onCreateBubbleText(targetPos);
-				if (bubbleText != null) {
-					bubble.setVisibility(View.VISIBLE);
-					bubble.setText(bubbleText);
-				} else {
-					bubble.setVisibility(View.GONE);
-				}
+
+			updateBubbleText(targetPos);
+		}
+	}
+
+	/**
+	 * Computes the index where the RecyclerView should be scrolled to based on the currY (y-coordinate of the touch event in the scrollbar)
+	 * @param currY y-coordinate of the touch event in the scrollbar
+	 * @return index position in the RecyclerView
+	 */
+	protected int getTargetPos(float currY) {
+		int itemCount = recyclerView.getAdapter().getItemCount();
+
+		float proportion;
+		if (handle.getY() == 0) {
+			proportion = 0f;
+		} else if (handle.getY() + handle.getHeight() >= height - TRACK_SNAP_RANGE) {
+			proportion = 1f;
+		} else {
+			proportion = currY / (float) height;
+		}
+		return getValueInRange(0, itemCount - 1, (int) (proportion * (float) itemCount));
+	}
+
+	/**
+	 * Update the text in the bubble based on the provided index.
+	 * The text can be retrieved by calling
+	 * <pre>
+	 * {@code
+	 * ...
+	 * String bubbleTextString = bubbleTextCreator.onCreateBubbleText(index);
+	 * bubble.setText(bubbleTextString);
+	 * ...
+	 * }
+	 * </pre>
+	 *
+	 * Override this method if you want to do something different when displaying the text in the bubble e.g. display a different text when the result of onCreateBubbleText is empty; OR apply different format depending on the result of onCreateBubbleText.
+	 * @param index index of the object that will be reflected in the bubble
+	 */
+	protected void updateBubbleText(int index) {
+		if (bubble != null) {
+			String bubbleText = bubbleTextCreator.onCreateBubbleText(index);
+			if (bubbleText != null) {
+				bubble.setVisibility(View.VISIBLE);
+				bubble.setText(bubbleText);
+			} else {
+				bubble.setVisibility(View.GONE);
 			}
 		}
 	}
 
-	private static int getValueInRange(int min, int max, int value) {
+	protected static int getValueInRange(int min, int max, int value) {
 		int minimum = Math.max(min, value);
 		return Math.min(minimum, max);
 	}
 
-	private void setBubbleAndHandlePosition(float y) {
+	/**
+	 * Sets the y-position of the bubble and the handle based on the current y-position.
+	 * Override this method if you want to adjust the min and max position of the handle and the bubble e.g. the max position of the bubble is the same as the max position of the handle.
+	 * @param y current active y position in the scrollbar
+	 */
+	protected void setBubbleAndHandlePosition(float y) {
 		int handleHeight = handle.getHeight();
 		handle.setY(getValueInRange(0, height - handleHeight, (int) (y - handleHeight / 2)));
 		if (bubble != null) {
@@ -371,7 +408,6 @@ public class FastScroller extends FrameLayout {
 				bubble.setY(Math.max(0, (height - bubble.getHeight()) / 2));
 				bubble.setX(Math.max(0, (width - bubble.getWidth()) / 2));
 			}
-
 		}
 	}
 
@@ -379,38 +415,12 @@ public class FastScroller extends FrameLayout {
 	/* ANIMATIONS */
 	/*------------*/
 
-	private void showBubble() {
-		if (bubble != null && bubble.getVisibility() != VISIBLE) {
-			bubble.setVisibility(VISIBLE);
-			if (currentAnimator != null)
-				currentAnimator.cancel();
-			currentAnimator = ObjectAnimator.ofFloat(bubble, "alpha", 0f, 1f).setDuration(BUBBLE_ANIMATION_DURATION);
-			currentAnimator.start();
-		}
+	protected void showBubble() {
+		bubbleAnimator.showBubble();
 	}
 
-	private void hideBubble() {
-		if (bubble == null)
-			return;
-		if (currentAnimator != null)
-			currentAnimator.cancel();
-		currentAnimator = ObjectAnimator.ofFloat(bubble, "alpha", 1f, 0f).setDuration(BUBBLE_ANIMATION_DURATION);
-		currentAnimator.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				super.onAnimationEnd(animation);
-				bubble.setVisibility(INVISIBLE);
-				currentAnimator = null;
-			}
-
-			@Override
-			public void onAnimationCancel(Animator animation) {
-				super.onAnimationCancel(animation);
-				bubble.setVisibility(INVISIBLE);
-				currentAnimator = null;
-			}
-		});
-		currentAnimator.start();
+	protected void hideBubble() {
+		bubbleAnimator.hideBubble();
 	}
 
 	/*-----------*/
@@ -450,6 +460,7 @@ public class FastScroller extends FrameLayout {
 	 */
 	public void setAutoHideDelayInMillis(@IntRange(from = 0) long autoHideDelayInMillis) {
 		this.autoHideDelayInMillis = autoHideDelayInMillis;
+		scrollbarAnimator.setDelayInMillis(autoHideDelayInMillis);
 	}
 
 	/**
@@ -458,35 +469,9 @@ public class FastScroller extends FrameLayout {
 	 * @since 5.0.0-rc2
 	 */
 	public void showScrollbar() {
-		if (bar == null || handle == null || !autoHideEnabled) {
-			return;
+		if (autoHideEnabled) {
+			scrollbarAnimator.showScrollbar();
 		}
-		if (scrollbarAnimator != null) {
-			scrollbarAnimator.cancel();
-		}
-
-		bar.setVisibility(View.VISIBLE);
-		handle.setVisibility(View.VISIBLE);
-
-		ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, "translationX", 0);
-		ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, "translationX", 0);
-		scrollbarAnimator = new AnimatorSet();
-		scrollbarAnimator.playTogether(barAnimator, handleAnimator);
-		scrollbarAnimator.setDuration(AUTOHIDE_ANIMATION_DURATION);
-		scrollbarAnimator.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				super.onAnimationEnd(animation);
-				scrollbarAnimator = null;
-			}
-
-			@Override
-			public void onAnimationCancel(Animator animation) {
-				super.onAnimationCancel(animation);
-				scrollbarAnimator = null;
-			}
-		});
-		scrollbarAnimator.start();
 	}
 
 	/**
@@ -495,43 +480,10 @@ public class FastScroller extends FrameLayout {
 	 * @since 5.0.0-rc2
 	 */
 	public void hideScrollbar() {
-		if (bar == null || handle == null || !autoHideEnabled) {
-			return;
+		if (autoHideEnabled) {
+			scrollbarAnimator.hideScrollbar();
 		}
-		if (scrollbarAnimator != null) {
-			scrollbarAnimator.cancel();
-		}
-
-		ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, "translationX", bar.getWidth());
-		ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, "translationX", handle.getWidth());
-		scrollbarAnimator = new AnimatorSet();
-		scrollbarAnimator.playTogether(barAnimator, handleAnimator);
-		scrollbarAnimator.setDuration(AUTOHIDE_ANIMATION_DURATION);
-		scrollbarAnimator.setStartDelay(autoHideDelayInMillis);
-		scrollbarAnimator.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationCancel(Animator animation) {
-				super.onAnimationCancel(animation);
-				resetScrollbarPosition();
-				scrollbarAnimator = null;
-			}
-
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				super.onAnimationEnd(animation);
-				resetScrollbarPosition();
-				scrollbarAnimator = null;
-			}
-		});
-		scrollbarAnimator.start();
-	}
-
-	private void resetScrollbarPosition() {
-		bar.setVisibility(View.INVISIBLE);
-		handle.setVisibility(View.INVISIBLE);
-		bar.setTranslationX(0);
-		handle.setTranslationX(0);
-	}
+    }
 
 	public interface BubbleTextCreator {
 		String onCreateBubbleText(int position);
