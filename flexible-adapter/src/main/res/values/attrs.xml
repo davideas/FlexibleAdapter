@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="FastScroller">
-        <attr name="fastScrollerAutoHideEnabled" format="boolean"/>
-        <attr name="fastScrollerAutoHideDelayInMillis" format="integer"/>
-        <attr name="fastScrollerBubblePosition" format="enum">
-            <enum name="adjacent" value="0"/>
-            <enum name="center" value="1"/>
-        </attr>
-    </declare-styleable>
+	<declare-styleable name="FastScroller">
+		<attr name="fastScrollerAutoHideEnabled" format="boolean"/>
+		<attr name="fastScrollerAutoHideDelayInMillis" format="integer"/>
+		<attr name="fastScrollerBubbleAndHandleColor" format="color"/>
+		<attr name="fastScrollerBubblePosition" format="enum">
+			<enum name="adjacent" value="0"/>
+			<enum name="center" value="1"/>
+		</attr>
+	</declare-styleable>
 </resources>

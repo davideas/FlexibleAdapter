@@ -508,15 +508,15 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	/**
 	 * Displays or Hides the {@link FastScroller} if previously configured.
+	 * <br>The action is animated.
 	 *
 	 * @see #setFastScroller(FastScroller, int)
 	 * @since 5.0.0-b1
 	 */
 	public void toggleFastScroller() {
 		if (mFastScroller != null) {
-			if (mFastScroller.getVisibility() != View.VISIBLE)
-				mFastScroller.setVisibility(View.VISIBLE);
-			else mFastScroller.setVisibility(View.GONE);
+			if (mFastScroller.isHidden()) mFastScroller.showScrollbar();
+			else mFastScroller.hideScrollbar();
 		}
 	}
 
@@ -537,14 +537,62 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	/**
+	 * Sets up the {@link FastScroller} with automatic fetch of accent color.
+	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
+	 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
+	 * for previous version, the default value is used.
+	 *
+	 * @param fastScroller        instance of {@link FastScroller}
+	 * @since 5.0.0-b6
+	 */
+	public void setFastScroller(@NonNull FastScroller fastScroller) {
+		if (DEBUG) Log.v(TAG, "Setting FastScroller...");
+		if (mRecyclerView == null) {
+			throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter has been added to the RecyclerView.");
+		} else if (fastScroller == null) {
+			throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
+		}
+		mFastScroller = fastScroller;
+		mFastScroller.setRecyclerView(mRecyclerView);
+		mFastScroller.setViewsToUse(
+				R.layout.library_fast_scroller_layout,
+				R.id.fast_scroller_bubble,
+				R.id.fast_scroller_handle);
+		if (DEBUG) Log.i(TAG, "FastScroller initialized with color " + mFastScroller.getBubbleAndHandleColor());
+	}
+
+	/**
+	 * Sets up the {@link FastScroller} with automatic fetch of accent color.
+	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
+	 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
+	 * for previous version, the default value is used.
+	 *
+	 * @param fastScroller        instance of {@link FastScroller}
+	 * @param stateChangeListener the listener to monitor when fast scrolling state changes
+	 * @since 5.0.0-b6
+	 * @deprecated Add stateChangeListener directly to the FastScroller: {@link FastScroller#addOnScrollStateChangeListener(FastScroller.OnScrollStateChangeListener)}
+	 */
+	@Deprecated
+	public void setFastScroller(@NonNull FastScroller fastScroller,
+								FastScroller.OnScrollStateChangeListener stateChangeListener) {
+		if (fastScroller == null) {
+			throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
+		}
+		mFastScroller.addOnScrollStateChangeListener(stateChangeListener);
+		setFastScroller(mFastScroller);
+	}
+
+	/**
 	 * Convenience method of {@link #setFastScroller(FastScroller, int, FastScroller.OnScrollStateChangeListener)}.
 	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
 	 *
 	 * @see #setFastScroller(FastScroller, int, FastScroller.OnScrollStateChangeListener)
 	 * @since 5.0.0-b1
+	 * @deprecated Accent Color is automatically fetched at startup
 	 */
+	@Deprecated
 	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor) {
-		setFastScroller(fastScroller, accentColor, null);
+		setFastScroller(fastScroller, null);
 	}
 
 	/**
@@ -557,24 +605,12 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @param accentColor         the default value color if the accentColor cannot be fetched
 	 * @param stateChangeListener the listener to monitor when fast scrolling state changes
 	 * @since 5.0.0-b6
+	 * @deprecated Accent Color is automatically fetched at startup
 	 */
+	@Deprecated
 	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor,
 								FastScroller.OnScrollStateChangeListener stateChangeListener) {
-		if (DEBUG) Log.v(TAG, "Setting FastScroller...");
-		if (mRecyclerView == null) {
-			throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter has been added to the RecyclerView.");
-		} else if (fastScroller == null) {
-			throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
-		}
-		mFastScroller = fastScroller;
-		mFastScroller.setRecyclerView(mRecyclerView);
-		mFastScroller.addOnScrollStateChangeListener(stateChangeListener);
-		accentColor = Utils.fetchAccentColor(fastScroller.getContext(), accentColor);
-		mFastScroller.setViewsToUse(
-				R.layout.library_fast_scroller_layout,
-				R.id.fast_scroller_bubble,
-				R.id.fast_scroller_handle, accentColor);
-		if (DEBUG) Log.i(TAG, "FastScroller initialized with color " + accentColor);
+		setFastScroller(fastScroller, stateChangeListener);
 	}
 
 	/**

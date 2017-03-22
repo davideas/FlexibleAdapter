@@ -6,11 +6,13 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
-import android.os.Build;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
 import android.support.annotation.IntDef;
+import android.support.annotation.IntRange;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
@@ -18,6 +20,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.R;
+import eu.davidea.flexibleadapter.utils.Utils;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -42,6 +46,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller</a>
  * @since Up to the date 23/01/2016
  * <br/>23/01/2016 Added onFastScrollerStateChange in the listener
+ * <br/>10/03/2017 Added autoHide, bubblePosition (thanks to @arpinca)
  */
 public class FastScroller extends FrameLayout {
 
@@ -49,12 +54,12 @@ public class FastScroller extends FrameLayout {
 	private static final int TRACK_SNAP_RANGE = 5;
 
 	private static final int AUTOHIDE_ANIMATION_DURATION = 300;
-	private static final boolean DEFAULT_AUTOHIDE_ENABLED = true;
 	private static final int DEFAULT_AUTOHIDE_DELAY_IN_MILLIS = 1000;
+	private static final boolean DEFAULT_AUTOHIDE_ENABLED = true;
 
 	@Retention(SOURCE)
 	@IntDef({FastScrollerBubblePosition.ADJACENT, FastScrollerBubblePosition.CENTER})
-	protected @interface FastScrollerBubblePosition {
+	@interface FastScrollerBubblePosition {
 		int ADJACENT = 0;
 		int CENTER = 1;
 	}
@@ -67,12 +72,13 @@ public class FastScroller extends FrameLayout {
 	private View bar;
 	private int height;
 	private int width;
+	private int bubbleAndHandleColor;
 	private boolean isInitialized = false;
 	private ObjectAnimator currentAnimator;
 	private RecyclerView recyclerView;
 	private RecyclerView.LayoutManager layoutManager;
 	private BubbleTextCreator bubbleTextCreator;
-	private List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<OnScrollStateChangeListener>();
+	private List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<>();
 
 	private boolean autoHideEnabled;
 	private long autoHideDelayInMillis;
@@ -95,6 +101,10 @@ public class FastScroller extends FrameLayout {
 		}
 	};
 
+	/*--------------*/
+	/* CONSTRUCTORS */
+	/*--------------*/
+
 	public FastScroller(Context context) {
 		super(context);
 		init();
@@ -104,17 +114,15 @@ public class FastScroller extends FrameLayout {
 		this(context, attrs, 0);
 	}
 
+	@SuppressWarnings("WrongConstant")
 	public FastScroller(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 
 		TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.FastScroller, 0, 0);
 		try {
 			autoHideEnabled = a.getBoolean(R.styleable.FastScroller_fastScrollerAutoHideEnabled, DEFAULT_AUTOHIDE_ENABLED);
-			if (autoHideEnabled) {
-				autoHideDelayInMillis = a.getInteger(R.styleable.FastScroller_fastScrollerAutoHideDelayInMillis, DEFAULT_AUTOHIDE_DELAY_IN_MILLIS);
-			}
-
-			//noinspection WrongConstant
+			autoHideDelayInMillis = a.getInteger(R.styleable.FastScroller_fastScrollerAutoHideDelayInMillis, DEFAULT_AUTOHIDE_DELAY_IN_MILLIS);
+			bubbleAndHandleColor = a.getColor(R.styleable.FastScroller_fastScrollerBubbleAndHandleColor, Utils.fetchAccentColor(context, Color.GRAY));
 			bubblePosition = a.getInteger(R.styleable.FastScroller_fastScrollerBubblePosition, DEFAULT_BUBBLE_POSITION);
 		} finally {
 			a.recycle();
@@ -123,12 +131,19 @@ public class FastScroller extends FrameLayout {
 		init();
 	}
 
-	protected void init() {
+	private void init() {
 		if (isInitialized) return;
 		isInitialized = true;
 		setClipChildren(false);
 	}
 
+	/*---------------*/
+	/* CONFIGURATION */
+	/*---------------*/
+
+	/**
+	 * This is done by FlexibleAdapter already!
+	 */
 	public void setRecyclerView(final RecyclerView recyclerView) {
 		this.recyclerView = recyclerView;
 		this.recyclerView.addOnScrollListener(onScrollListener);
@@ -175,20 +190,22 @@ public class FastScroller extends FrameLayout {
 
 	/**
 	 * Layout customization.<br/>
-	 * Color for Selected State is the color defined inside the Drawables.
+	 * Color for Selected State is the bubbleAndHandleColor defined inside the Drawables.
 	 *
 	 * @param layoutResId Main layout of Fast Scroller
 	 * @param bubbleResId Drawable resource for Bubble containing the Text
 	 * @param handleResId Drawable resource for the Handle
 	 */
 	public void setViewsToUse(@LayoutRes int layoutResId, @IdRes int bubbleResId, @IdRes int handleResId) {
-		if (bubble != null) return;//Already inflated
+		if (bubble != null) return; //Already inflated
 		LayoutInflater inflater = LayoutInflater.from(getContext());
 		inflater.inflate(layoutResId, this, true);
 		bubble = (TextView) findViewById(bubbleResId);
 		if (bubble != null) bubble.setVisibility(INVISIBLE);
 		handle = (ImageView) findViewById(handleResId);
 		bar = findViewById(R.id.fast_scroller_bar);
+		// Setting color to Views
+		setBubbleAndHandleColor(bubbleAndHandleColor);
 	}
 
 	/**
@@ -198,50 +215,65 @@ public class FastScroller extends FrameLayout {
 	 * @param layoutResId Main layout of Fast Scroller
 	 * @param bubbleResId Drawable resource for Bubble containing the Text
 	 * @param handleResId Drawable resource for the Handle
-	 * @param accentColor Color for Selected state during touch and scrolling (usually accent color)
+	 * @param accentColor Color for Selected state during touch and scrolling (usually accent bubbleAndHandleColor)
+	 * @deprecated Accent Color is automatically fetched at startup
 	 */
-	public void setViewsToUse(@LayoutRes int layoutResId, @IdRes int bubbleResId, @IdRes int handleResId, int accentColor) {
+	@Deprecated
+	public void setViewsToUse(@LayoutRes int layoutResId, @IdRes int bubbleResId, @IdRes int handleResId, @ColorInt int accentColor) {
 		setViewsToUse(layoutResId, bubbleResId, handleResId);
 		setBubbleAndHandleColor(accentColor);
 	}
 
-	private void setBubbleAndHandleColor(int accentColor) {
-		//TODO: Programmatically generate the Drawables instead of using resources
-		//BubbleDrawable accentColor
+	public int getBubbleAndHandleColor() {
+		return bubbleAndHandleColor;
+	}
+
+	/**
+	 * Changes the color of the Bubble and Handle views.
+	 * <p><b>Note:</b> Views are already initialized with accent color at startup.</p>
+	 *
+	 * @param color any color
+	 */
+	@SuppressWarnings("deprecation")
+	public void setBubbleAndHandleColor(@ColorInt int color) {
+		this.bubbleAndHandleColor = color;
+
+		// BubbleDrawable bubbleAndHandleColor
 		GradientDrawable bubbleDrawable;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+		if (Utils.hasLollipop()) {
 			bubbleDrawable = (GradientDrawable) getResources().getDrawable(R.drawable.fast_scroller_bubble, null);
 		} else {
-			//noinspection deprecation
 			bubbleDrawable = (GradientDrawable) getResources().getDrawable(R.drawable.fast_scroller_bubble);
 		}
-		assert bubbleDrawable != null;
-		bubbleDrawable.setColor(accentColor);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+		bubbleDrawable.setColor(color);
+		if (Utils.hasJellyBean()) {
 			bubble.setBackground(bubbleDrawable);
 		} else {
-			//noinspection deprecation
 			bubble.setBackgroundDrawable(bubbleDrawable);
 		}
 
-		//HandleDrawable accentColor
+		// HandleDrawable bubbleAndHandleColor
 		try {
 			StateListDrawable stateListDrawable;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			if (Utils.hasLollipop()) {
 				stateListDrawable = (StateListDrawable) getResources().getDrawable(R.drawable.fast_scroller_handle, null);
 			} else {
-				//noinspection deprecation
 				stateListDrawable = (StateListDrawable) getResources().getDrawable(R.drawable.fast_scroller_handle);
 			}
-			//Method is still hidden, invoke Java reflection
+			// Method is still hidden, invoke Java reflection
 			Method getStateDrawable = StateListDrawable.class.getMethod("getStateDrawable", int.class);
 			GradientDrawable handleDrawable = (GradientDrawable) getStateDrawable.invoke(stateListDrawable, 0);
-			handleDrawable.setColor(accentColor);
+			handleDrawable.setColor(color);
 			handle.setImageDrawable(stateListDrawable);
 		} catch (Exception e) {
-			e.printStackTrace();
+			// This should never happen in theory (Java Reflection Exception)
+			Log.e(FastScroller.class.getSimpleName(), "Exception while setting Bubble and Handle Color", e);
 		}
 	}
+
+	/*--------------*/
+	/* MAIN METHODS */
+	/*--------------*/
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -291,7 +323,7 @@ public class FastScroller extends FrameLayout {
 	private void setRecyclerViewPosition(float y) {
 		if (recyclerView != null) {
 			int itemCount = recyclerView.getAdapter().getItemCount();
-			//Calculate proportion
+			// Calculate proportion
 			float proportion;
 			if (handle.getY() == 0) {
 				proportion = 0f;
@@ -301,13 +333,13 @@ public class FastScroller extends FrameLayout {
 				proportion = y / (float) height;
 			}
 			int targetPos = getValueInRange(0, itemCount - 1, (int) (proportion * (float) itemCount));
-			//Scroll To Position based on LayoutManager
+			// Scroll To Position based on LayoutManager
 			if (layoutManager instanceof StaggeredGridLayoutManager) {
 				((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(targetPos, 0);
 			} else {
 				((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(targetPos, 0);
 			}
-			//Update bubbleText
+			// Update bubbleText
 			if (bubble != null) {
 				String bubbleText = bubbleTextCreator.onCreateBubbleText(targetPos);
 				if (bubbleText != null) {
@@ -339,6 +371,10 @@ public class FastScroller extends FrameLayout {
 
 		}
 	}
+
+	/*------------*/
+	/* ANIMATIONS */
+	/*------------*/
 
 	private void showBubble() {
 		if (bubble != null && bubble.getVisibility() != VISIBLE) {
@@ -374,77 +410,122 @@ public class FastScroller extends FrameLayout {
 		currentAnimator.start();
 	}
 
-	private void showScrollbar() {
-		if (bar == null || handle == null || !autoHideEnabled) {
-			return;
-		}
+	/*-----------*/
+	/* AUTO-HIDE */
+	/*-----------*/
 
-		if (scrollbarAnimator != null) {
-			scrollbarAnimator.cancel();
-		}
-
-		if (bar.getVisibility() == View.INVISIBLE || handle.getVisibility() == View.INVISIBLE) {
-			bar.setVisibility(View.VISIBLE);
-			handle.setVisibility(View.VISIBLE);
-
-			ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, "translationX", 0);
-			ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, "translationX", 0);
-			scrollbarAnimator = new AnimatorSet();
-			scrollbarAnimator.playTogether(barAnimator, handleAnimator);
-			scrollbarAnimator.setDuration(AUTOHIDE_ANIMATION_DURATION);
-			scrollbarAnimator.addListener(new AnimatorListenerAdapter() {
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					super.onAnimationEnd(animation);
-					scrollbarAnimator = null;
-				}
-
-				@Override
-				public void onAnimationCancel(Animator animation) {
-					super.onAnimationCancel(animation);
-					scrollbarAnimator = null;
-				}
-			});
-			scrollbarAnimator.start();
-		}
+	public boolean isHidden() {
+		return bar == null || handle == null ||
+				bar.getVisibility() == View.INVISIBLE ||
+				handle.getVisibility() == View.INVISIBLE;
 	}
 
-	private void hideScrollbar() {
-		if (bar == null || handle == null || !autoHideEnabled) {
+	public boolean isAutoHideEnabled() {
+		return autoHideEnabled;
+	}
+
+	/**
+	 * Allows to auto hide the FastScroller after x-milliseconds.
+	 * <p>Default value is {@code true}.</p>
+	 *
+	 * @param autoHideEnabled true to enable auto Hide, false to disable
+	 * @see #setAutoHideDelayInMillis(long)
+	 */
+	public void setAutoHideEnabled(boolean autoHideEnabled) {
+		this.autoHideEnabled = autoHideEnabled;
+	}
+
+	public long getAutoHideDelayInMillis() {
+		return autoHideDelayInMillis;
+	}
+
+	/**
+	 * Sets the delay in milli-seconds to auto hide the scroller when untouched.
+	 * <p>Default value is {@link #DEFAULT_AUTOHIDE_DELAY_IN_MILLIS}</p>
+	 *
+	 * @param autoHideDelayInMillis value in milli-seconds
+	 */
+	public void setAutoHideDelayInMillis(@IntRange(from = 0) long autoHideDelayInMillis) {
+		this.autoHideDelayInMillis = autoHideDelayInMillis;
+	}
+
+	/**
+	 * Shows the scrollbar with animation.
+	 * <p>If scrollbar is already shown, command is ignored.</p>
+	 *
+	 * @since 5.0.0-rc2
+	 */
+	public void showScrollbar() {
+		if (!isHidden()) {
 			return;
 		}
-
 		if (scrollbarAnimator != null) {
 			scrollbarAnimator.cancel();
 		}
 
-        ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, "translationX", bar.getWidth());
-        ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, "translationX", handle.getWidth());
+		bar.setVisibility(View.VISIBLE);
+		handle.setVisibility(View.VISIBLE);
 
+		ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, "translationX", 0);
+		ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, "translationX", 0);
+		scrollbarAnimator = new AnimatorSet();
+		scrollbarAnimator.playTogether(barAnimator, handleAnimator);
+		scrollbarAnimator.setDuration(AUTOHIDE_ANIMATION_DURATION);
+		scrollbarAnimator.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				super.onAnimationEnd(animation);
+				scrollbarAnimator = null;
+			}
+
+			@Override
+			public void onAnimationCancel(Animator animation) {
+				super.onAnimationCancel(animation);
+				scrollbarAnimator = null;
+			}
+		});
+		scrollbarAnimator.start();
+	}
+
+	/**
+	 * Hides the scrollbar with animation.
+	 * <p>If scrollbar is already hidden, command is ignored.</p>
+	 *
+	 * @since 5.0.0-rc2
+	 */
+	public void hideScrollbar() {
+		if (isHidden()) {
+			return;
+		}
+		if (scrollbarAnimator != null) {
+			scrollbarAnimator.cancel();
+		}
+
+		ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, "translationX", bar.getWidth());
+		ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, "translationX", handle.getWidth());
 		scrollbarAnimator = new AnimatorSet();
 		scrollbarAnimator.playTogether(barAnimator, handleAnimator);
 		scrollbarAnimator.setDuration(AUTOHIDE_ANIMATION_DURATION);
 		scrollbarAnimator.setStartDelay(autoHideDelayInMillis);
-
 		scrollbarAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                super.onAnimationCancel(animation);
+			@Override
+			public void onAnimationCancel(Animator animation) {
+				super.onAnimationCancel(animation);
 				resetScrollbarPosition();
 				scrollbarAnimator = null;
-            }
+			}
 
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				super.onAnimationEnd(animation);
 				resetScrollbarPosition();
 				scrollbarAnimator = null;
-            }
-        });
+			}
+		});
 		scrollbarAnimator.start();
-    }
+	}
 
-    private void resetScrollbarPosition() {
+	private void resetScrollbarPosition() {
 		bar.setVisibility(View.INVISIBLE);
 		handle.setVisibility(View.INVISIBLE);
 		bar.setTranslationX(0);
@@ -452,7 +533,7 @@ public class FastScroller extends FrameLayout {
 	}
 
 	public interface BubbleTextCreator {
-		String onCreateBubbleText(int pos);
+		String onCreateBubbleText(int position);
 	}
 
 	public interface OnScrollStateChangeListener {
