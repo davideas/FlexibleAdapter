@@ -239,35 +239,38 @@ public class FastScroller extends FrameLayout {
 		this.bubbleAndHandleColor = color;
 
 		// BubbleDrawable bubbleAndHandleColor
-		GradientDrawable bubbleDrawable;
-		if (Utils.hasLollipop()) {
-			bubbleDrawable = (GradientDrawable) getResources().getDrawable(R.drawable.fast_scroller_bubble, null);
-		} else {
-			bubbleDrawable = (GradientDrawable) getResources().getDrawable(R.drawable.fast_scroller_bubble);
-		}
-		bubbleDrawable.setColor(color);
-		if (Utils.hasJellyBean()) {
-			bubble.setBackground(bubbleDrawable);
-		} else {
-			bubble.setBackgroundDrawable(bubbleDrawable);
-		}
-
-		// HandleDrawable bubbleAndHandleColor
-		try {
-			StateListDrawable stateListDrawable;
+		if (bubble != null) {
+			GradientDrawable bubbleDrawable;
 			if (Utils.hasLollipop()) {
-				stateListDrawable = (StateListDrawable) getResources().getDrawable(R.drawable.fast_scroller_handle, null);
+				bubbleDrawable = (GradientDrawable) getResources().getDrawable(R.drawable.fast_scroller_bubble, null);
 			} else {
-				stateListDrawable = (StateListDrawable) getResources().getDrawable(R.drawable.fast_scroller_handle);
+				bubbleDrawable = (GradientDrawable) getResources().getDrawable(R.drawable.fast_scroller_bubble);
 			}
-			// Method is still hidden, invoke Java reflection
-			Method getStateDrawable = StateListDrawable.class.getMethod("getStateDrawable", int.class);
-			GradientDrawable handleDrawable = (GradientDrawable) getStateDrawable.invoke(stateListDrawable, 0);
-			handleDrawable.setColor(color);
-			handle.setImageDrawable(stateListDrawable);
-		} catch (Exception e) {
-			// This should never happen in theory (Java Reflection Exception)
-			Log.e(FastScroller.class.getSimpleName(), "Exception while setting Bubble and Handle Color", e);
+			bubbleDrawable.setColor(color);
+			if (Utils.hasJellyBean()) {
+				bubble.setBackground(bubbleDrawable);
+			} else {
+				bubble.setBackgroundDrawable(bubbleDrawable);
+			}
+		}
+		// HandleDrawable bubbleAndHandleColor
+		if (handle != null) {
+			try {
+				StateListDrawable stateListDrawable;
+				if (Utils.hasLollipop()) {
+					stateListDrawable = (StateListDrawable) getResources().getDrawable(R.drawable.fast_scroller_handle, null);
+				} else {
+					stateListDrawable = (StateListDrawable) getResources().getDrawable(R.drawable.fast_scroller_handle);
+				}
+				// Method is still hidden, invoke Java reflection
+				Method getStateDrawable = StateListDrawable.class.getMethod("getStateDrawable", int.class);
+				GradientDrawable handleDrawable = (GradientDrawable) getStateDrawable.invoke(stateListDrawable, 0);
+				handleDrawable.setColor(color);
+				handle.setImageDrawable(stateListDrawable);
+			} catch (Exception e) {
+				// This should never happen in theory (Java Reflection Exception)
+				Log.e(FastScroller.class.getSimpleName(), "Exception while setting Bubble and Handle Color", e);
+			}
 		}
 	}
 
@@ -451,12 +454,11 @@ public class FastScroller extends FrameLayout {
 
 	/**
 	 * Shows the scrollbar with animation.
-	 * <p>If scrollbar is already shown, command is ignored.</p>
 	 *
 	 * @since 5.0.0-rc2
 	 */
 	public void showScrollbar() {
-		if (!isHidden()) {
+		if (bar == null || handle == null || !autoHideEnabled) {
 			return;
 		}
 		if (scrollbarAnimator != null) {
@@ -489,12 +491,11 @@ public class FastScroller extends FrameLayout {
 
 	/**
 	 * Hides the scrollbar with animation.
-	 * <p>If scrollbar is already hidden, command is ignored.</p>
 	 *
 	 * @since 5.0.0-rc2
 	 */
 	public void hideScrollbar() {
-		if (isHidden()) {
+		if (bar == null || handle == null || !autoHideEnabled) {
 			return;
 		}
 		if (scrollbarAnimator != null) {
