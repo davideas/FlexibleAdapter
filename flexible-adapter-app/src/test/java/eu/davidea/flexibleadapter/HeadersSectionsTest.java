@@ -105,7 +105,8 @@ public class HeadersSectionsTest {
 	@Test
 	public void testGetHeaderOf() throws Exception {
 		mAdapter = new FlexibleAdapter<>(mItems);
-		IHeader header = mAdapter.getHeaderOf(mItems.get(0));
+		mAdapter.setDisplayHeadersAtStartUp(true);
+		IHeader header = mAdapter.getHeaderOf(mItems.get(1));
 		assertNotNull(header);
 	}
 
@@ -116,6 +117,20 @@ public class HeadersSectionsTest {
 		assertEquals(5, mAdapter.getHeaderItems().size());
 		mAdapter.hideAllHeaders();
 		assertEquals(0, mAdapter.getHeaderItems().size());
+	}
+
+	@Test
+	public void testGetSectionItemPositions() throws Exception {
+		mAdapter = new FlexibleAdapter<>(mItems);
+		mAdapter.setDisplayHeadersAtStartUp(true);
+		IHeader header = mAdapter.getHeaderOf(mItems.get(1));
+		List<Integer> positions = mAdapter.getSectionItemPositions(header);
+		assertNotNull(positions);
+		assertTrue(positions.size() > 0);
+		Integer count = 1;
+		for (Integer position : positions) {
+			assertEquals(count++, position);
+		}
 	}
 
 }

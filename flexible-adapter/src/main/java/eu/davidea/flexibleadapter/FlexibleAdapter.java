@@ -1259,10 +1259,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	@NonNull
 	public List<Integer> getSectionItemPositions(@NonNull IHeader header) {
 		List<Integer> sectionItemPositions = new ArrayList<>();
-		int startPosition = getGlobalPositionOf(header);
-		T item = getItem(++startPosition);
+		int position = getGlobalPositionOf(header);
+		T item = getItem(++position);
 		while (hasSameHeader(item, header)) {
-			sectionItemPositions.add(++startPosition);
+			sectionItemPositions.add(position);
+			item = getItem(++position);
 		}
 		return sectionItemPositions;
 	}
