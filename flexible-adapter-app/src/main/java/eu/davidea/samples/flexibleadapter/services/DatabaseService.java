@@ -433,8 +433,12 @@ public class DatabaseService {
 	 */
 	public List<AbstractFlexibleItem> getDatabaseList() {
 		Log.i(TAG, "Database Type: " + databaseType);
-		//Return a copy of the DB: we will perform some tricky code on this list.
-		return new ArrayList<>(mItems);
+		// Return a copy of the DB: we will perform some tricky code on this list.
+		//return new ArrayList<>(mItems);
+
+		// With RC2 mItems can be returned without making a copy.
+		// The copy is already done internally by the Adapter.
+		return mItems;
 	}
 
 	public void swapItem(int fromPosition, int toPosition) {
