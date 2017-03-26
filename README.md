@@ -42,6 +42,9 @@ This library is configurable and it guides the developers to create a better use
 * **NEW!** Easy runtime position calculation for adding/moving items in sections.
 * **NEW!** [Wiki](https://github.com/davideas/FlexibleAdapter/wiki/) pages documentation.
 
+#### Sample Application
+* Download the sample app [here](https://github.com/davideas/FlexibleAdapter/tree/master/flexible-adapter-app/flexibleadapter.apk)!
+
 # Setup
 ```
 repositories {
