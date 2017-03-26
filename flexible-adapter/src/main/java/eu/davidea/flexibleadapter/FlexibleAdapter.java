@@ -537,7 +537,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			// Execute instant reset on init
 			if (DEBUG) Log.w(TAG, "updateDataSet with notifyDataSetChanged!");
 			notifyDataSetChanged();
-			postUpdate();
+			onPostUpdate();
 		}
 	}
 
@@ -5411,12 +5411,12 @@ public class FlexibleAdapter<T extends IFlexible>
 					case UPDATE:
 						// Notify all the changes
 						executeNotifications(Payload.CHANGE);
-						postUpdate();
+						onPostUpdate();
 						break;
 					case FILTER:
 						// Notify all the changes
 						executeNotifications(Payload.FILTER);
-						postFilter();
+						onPostFilter();
 						break;
 				}
 			}
@@ -5463,31 +5463,17 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 	}
 
-	private void postUpdate() {
-		// Perform user code
-		onPostUpdate();
-		// Update empty view
-		if (mUpdateListener != null) {
-			mUpdateListener.onUpdateEmptyView(getMainItemCount());
-		}
-	}
-
-	private void postFilter() {
-		// Perform user code
-		onPostFilter();
-		// Call listener to update EmptyView, assuming the filter always made a change
-		if (mUpdateListener != null)
-			mUpdateListener.onUpdateEmptyView(getMainItemCount());
-	}
-
 	/**
 	 * This method is called after the execution of Async Update and before the call to the
 	 * {@link OnUpdateListener#onUpdateEmptyView(int)}.
 	 *
 	 * @see #updateDataSet(List, boolean)
 	 */
+	@CallSuper
 	protected void onPostUpdate() {
-		// Dedicated for user implementation
+		// Call listener to update EmptyView, assuming the update always made a change
+		if (mUpdateListener != null)
+			mUpdateListener.onUpdateEmptyView(getMainItemCount());
 	}
 
 	/**
@@ -5496,8 +5482,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @see #filterItems(List)
 	 */
+	@CallSuper
 	protected void onPostFilter() {
-		// Dedicated for user implementation
+		/// Call listener to update EmptyView, assuming the filter always made a change
+		if (mUpdateListener != null)
+			mUpdateListener.onUpdateEmptyView(getMainItemCount());
 	}
 
 	/**
