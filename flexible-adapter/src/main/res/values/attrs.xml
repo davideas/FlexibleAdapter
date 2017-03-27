@@ -3,6 +3,7 @@
 	<declare-styleable name="FastScroller">
 		<attr name="fastScrollerAutoHideEnabled" format="boolean"/>
 		<attr name="fastScrollerAutoHideDelayInMillis" format="integer"/>
+		<attr name="fastScrollerBubbleEnabled" format="boolean"/>
 		<attr name="fastScrollerBubbleAndHandleColor" format="color"/>
 		<attr name="fastScrollerBubblePosition" format="enum">
 			<enum name="adjacent" value="0"/>

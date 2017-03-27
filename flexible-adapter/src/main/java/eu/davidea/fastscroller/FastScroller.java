@@ -79,6 +79,8 @@ public class FastScroller extends FrameLayout {
 	protected boolean autoHideEnabled;
 	protected long autoHideDelayInMillis;
 
+	protected boolean bubbleEnabled;
+
 	@FastScrollerBubblePosition
 	protected int bubblePosition;
 
@@ -108,6 +110,7 @@ public class FastScroller extends FrameLayout {
 		try {
 			autoHideEnabled = a.getBoolean(R.styleable.FastScroller_fastScrollerAutoHideEnabled, DEFAULT_AUTOHIDE_ENABLED);
 			autoHideDelayInMillis = a.getInteger(R.styleable.FastScroller_fastScrollerAutoHideDelayInMillis, DEFAULT_AUTOHIDE_DELAY_IN_MILLIS);
+			bubbleEnabled = a.getBoolean(R.styleable.FastScroller_fastScrollerBubbleEnabled, true);
 			bubbleAndHandleColor = a.getColor(R.styleable.FastScroller_fastScrollerBubbleAndHandleColor, Utils.fetchAccentColor(context, Color.GRAY));
 			bubblePosition = a.getInteger(R.styleable.FastScroller_fastScrollerBubblePosition, DEFAULT_BUBBLE_POSITION);
 		} finally {
@@ -376,7 +379,7 @@ public class FastScroller extends FrameLayout {
 	 * @param index index of the object that will be reflected in the bubble
 	 */
 	protected void updateBubbleText(int index) {
-		if (bubble != null) {
+		if (bubble != null && bubbleEnabled) {
 			String bubbleText = bubbleTextCreator.onCreateBubbleText(index);
 			if (bubbleText != null) {
 				bubble.setVisibility(View.VISIBLE);
@@ -416,7 +419,9 @@ public class FastScroller extends FrameLayout {
 	/*------------*/
 
 	protected void showBubble() {
-		bubbleAnimator.showBubble();
+		if (bubbleEnabled) {
+			bubbleAnimator.showBubble();
+		}
 	}
 
 	protected void hideBubble() {
