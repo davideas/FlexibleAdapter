@@ -578,8 +578,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		if (fastScroller == null) {
 			throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
 		}
+		setFastScroller(fastScroller);
 		mFastScroller.addOnScrollStateChangeListener(stateChangeListener);
-		setFastScroller(mFastScroller);
 	}
 
 	/**
