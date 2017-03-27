@@ -291,7 +291,7 @@ public class FastScroller extends FrameLayout {
 
 	@Override
 	public boolean onTouchEvent(@NonNull MotionEvent event) {
-		if (recyclerView.getAdapter().getItemCount() == 0) {
+		if (recyclerView.computeVerticalScrollRange() <= recyclerView.computeVerticalScrollExtent()) {
 			return super.onTouchEvent(event);
 		}
 
