@@ -31,6 +31,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @author Davide Steduto
  * @since 20/01/2016 Created
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 		implements IFlexible<VH> {
 
@@ -89,6 +90,11 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	@Override
 	public int getSpanSize(int spanCount, int position) {
 		return 1;
+	}
+
+	@Override
+	public boolean shouldNotifyChange(IFlexible newItem) {
+		return true;
 	}
 
 	/*--------------------*/

@@ -149,7 +149,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private Set<IExpandable> mExpandedFilterFlags;
 	private boolean notifyChangeOfUnfilteredItems = false, filtering = false,
 			notifyMoveOfFilteredItems = false;
-	private static int ANIMATE_TO_LIMIT = 700;
+	private static int ANIMATE_TO_LIMIT = 1000;
 	private int mAnimateToLimit = ANIMATE_TO_LIMIT;
 
 	/* Expandable flags */
@@ -3917,16 +3917,20 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Sometimes it is necessary, while filtering or after the data set has been updated, to
-	 * rebound the items that remain unfiltered.
-	 * <p>If the items have highlighted text, those items must be refreshed in order to change the
-	 * text back to normal. This happens systematically when searchText is reduced in length by
-	 * the user.</p>
-	 * The notification is triggered in {@link #animateTo(List, Payload)} when new items are not added.
-	 * <p>Default value is {@code false}.</p>
+	 * Sometimes it is necessary, while Filtering or after the data set has been Updated, to
+	 * rebound the items that remain unfiltered or not deleted.
+	 * <ul><li>During {@link #filterItems(List)}: If the items have highlighted text, those items
+	 * must be refreshed in order to change the displayed text back to normal. This happens
+	 * systematically when searchText is reduced in length by the user.
+	 * <br>The notification is always triggered when filter is active!</li>
+	 * <li>During {@link #updateDataSet(List, boolean)}: If the most recent content has to be
+	 * displayed, we can optimize what to bind thanks to the {@link Payload#CHANGE}.
+	 * <br>The notification is triggered when the method of the implemented items
+	 * {@link IFlexible#shouldNotifyChange(IFlexible)} also return true.</li></ul>
+	 * Default value is {@code false}.
 	 *
-	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)} while filtering,
-	 *                     false otherwise
+	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)},
+	 *                     false to not update the items' content.
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b1
 	 */
@@ -3956,8 +3960,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * <b>WATCH OUT! PASS ALWAYS A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal mechanism,
-	 * items are removed and/or added in order to animate items in the final list.
+	 * <b>WATCH OUT! ADAPTER CREATES A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal
+	 * mechanism, items are removed and/or added in order to animate items in the final list.
 	 * <p>Same as {@link #filterItems(List)}, but with a delay in the execution, useful to grab
 	 * more characters from user before starting the search.</p>
 	 *
@@ -4013,8 +4017,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		mHandler.sendMessage(Message.obtain(mHandler, FILTER, unfilteredItems));
 	}
 
-	//TODO: isFiltering()
-
 	private synchronized void filterItemsAsync(@NonNull List<T> unfilteredItems) {
 		// Note: In case user has deleted some items and he changes or applies a filter while
 		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
@@ -4022,7 +4024,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		if (DEBUG) Log.i(TAG, "filterItems with searchText=\"" + mSearchText + "\"");
 		List<T> filteredItems = new ArrayList<>();
-		//filtering = true; //Enable flag: skip adjustPositions!
+		filtering = true; //Enable flag
 
 		if (hasSearchText() && hasNewSearchText(mSearchText)) { //skip when text is unchanged
 			int newOriginalPosition = -1;
@@ -4070,15 +4072,22 @@ public class FlexibleAdapter<T extends IFlexible>
 			restoreScrollableHeadersAndFooters(filteredItems);
 		}
 
-		// Reset flags
-		//filtering = false;
-
 		// Animate search results only in case of new SearchText
 		if (hasNewSearchText(mSearchText)) {
 			mOldSearchText = mSearchText;
 			animateDiff(filteredItems, Payload.FILTER);
 			//animateTo(filteredItems, Payload.FILTER);
 		}
+
+		// Reset flag
+		filtering = false;
+	}
+
+	/**
+	 * @return true if the filter is currently running, false otherwise.
+	 */
+	public boolean isFiltering() {
+		return filtering;
 	}
 
 	/**
@@ -4290,7 +4299,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <b>Note:</b> The animations are skipped in favor of {@link #notifyDataSetChanged()}
 	 * when the number of items reaches the limit. See {@link #setAnimateToLimit(int)}.
 	 * <p><b>Note:</b> In case the animations are performed, unchanged items will be notified if
-	 * {@code notifyChangeOfUnfilteredItems} is set true, and CHANGE payload will be set.</p>
+	 * {@code notifyChangeOfUnfilteredItems} is set true, a CHANGE payload will be set.</p>
 	 *
 	 * @param newItems the new list containing the new items
 	 * @see #setNotifyChangeOfUnfilteredItems(boolean)
@@ -4320,25 +4329,36 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Calculates the modifications for items to rebound.
+	 *
+	 * @return A Map with the unfilteredItems items to rebound and their index
+	 * @since 5.0.0-rc1
+	 */
+	private Map<T, Integer> applyModifications(List<T> from, List<T> newItems) {
+		if (notifyChangeOfUnfilteredItems) {
+			// Using Hash for performance
+			mHashItems = new HashSet<>(from);
+			Map<T, Integer> unfilteredItems = new HashMap<>();
+			for (int i = 0; i < newItems.size(); i++) {
+				if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) break;
+				final T item = newItems.get(i);
+				// Save the index of this new item
+				if (mHashItems.contains(item)) unfilteredItems.put(item, i);
+			}
+			return unfilteredItems;
+		}
+		return null;
+	}
+
+	/**
 	 * Find out all removed items and animate them, also update existent positions with newItems.
 	 *
 	 * @since 5.0.0-b1
 	 */
 	private void applyAndAnimateRemovals(List<T> from, List<T> newItems) {
-		// This avoids the call indexOf() later on: newItems.get(newItems.indexOf(item)));
-		// and use the hash for the get
-		Map<T, Integer> existingItems = null;
-		if (notifyChangeOfUnfilteredItems) {
-			// Using Hash for performance
-			mHashItems = new HashSet<>(from);
-			existingItems = new HashMap<>();
-			for (int i = 0; i < newItems.size(); i++) {
-				if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
-				final T item = newItems.get(i);
-				// Save the index of this new item
-				if (mHashItems.contains(item)) existingItems.put(item, i);
-			}
-		}
+		// This avoids the call indexOf() later on: newItems.get(unfilteredItems.indexOf(item)));
+		Map<T, Integer> unfilteredItems = applyModifications(from, newItems);
+
 		// Using Hash for performance
 		mHashItems = new HashSet<>(newItems);
 		int out = 0, mod = 0;
@@ -4351,16 +4371,20 @@ public class FlexibleAdapter<T extends IFlexible>
 				mNotifications.add(new Notification(i, Notification.REMOVE));
 				out++;
 			} else if (notifyChangeOfUnfilteredItems) {
-				from.set(i, newItems.get(existingItems.get(item)));
-				mNotifications.add(new Notification(i, Notification.CHANGE));
-				mod++;
-				//if (DEBUG) Log.v(TAG, "calculateAdditions   keep position=" + i + " item=" + item + " searchText=" + mSearchText);
+				T newItem = newItems.get(unfilteredItems.get(item));
+				// Check whether the old content should be updated with the new one
+				// Always true in case filter is active
+				if (isFiltering() || item.shouldNotifyChange(newItem)) {
+					from.set(i, newItem);
+					mNotifications.add(new Notification(i, Notification.CHANGE));
+					mod++;
+				}
 			}
 		}
 		mHashItems = null;
 		if (DEBUG) {
-			Log.v(TAG, "calculateRemovals total out=" + out);
 			Log.v(TAG, "calculateModifications total mod=" + mod);
+			Log.v(TAG, "calculateRemovals total out=" + out);
 		}
 	}
 
@@ -5252,11 +5276,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	private class AdapterDataObserver extends RecyclerView.AdapterDataObserver {
 
 		private void adjustPositions(int positionStart, int itemCount) {
-			//if (!filtering) { //Filtering has multiple insert and removal, we skip this process
-				if (adjustSelected) //Don't, if remove range / restore
-					adjustSelected(positionStart, itemCount);
-				adjustSelected = true;
-			//}
+			if (adjustSelected) //Don't, if remove range / restore
+				adjustSelected(positionStart, itemCount);
+			adjustSelected = true;
 		}
 
 		private void updateOrClearHeader() {
