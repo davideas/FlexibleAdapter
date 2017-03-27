@@ -208,8 +208,6 @@ public class FastScroller extends FrameLayout {
 		if (bubble != null) bubble.setVisibility(INVISIBLE);
 		handle = (ImageView) findViewById(handleResId);
 		bar = findViewById(R.id.fast_scroller_bar);
-		// Setting color to Views
-		setBubbleAndHandleColor(bubbleAndHandleColor);
 
 		bubbleAnimator = new BubbleAnimator(bubble, BUBBLE_ANIMATION_DURATION);
 		scrollbarAnimator = new ScrollbarAnimator(bar, handle, autoHideDelayInMillis, AUTOHIDE_ANIMATION_DURATION);
