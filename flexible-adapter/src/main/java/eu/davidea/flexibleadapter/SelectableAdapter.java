@@ -21,7 +21,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -35,6 +34,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.fastscroller.FastScrollerDelegate;
+import eu.davidea.fastscroller.FastScrollerAdapterInterface;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -52,7 +53,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  */
 @SuppressWarnings({"unused", "unchecked", "ConstantConditions", "WeakerAccess"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
-		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener {
+		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener, FastScrollerAdapterInterface {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
 	public static boolean DEBUG = false;
@@ -77,7 +78,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	private Set<FlexibleViewHolder> mBoundViewHolders;
 	private int mMode;
 	protected RecyclerView mRecyclerView;
-	protected FastScroller mFastScroller;
+	protected FastScrollerDelegate mFastScrollerDelegate;
 
 	/**
 	 * Flag when fast scrolling is active.
@@ -109,6 +110,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		mSelectedPositions = new TreeSet<>();
 		mBoundViewHolders = new HashSet<>();
 		mMode = MODE_IDLE;
+
+		mFastScrollerDelegate = new FastScrollerDelegate();
 	}
 
 	/*----------------*/
@@ -138,6 +141,10 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	@Override
 	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
+
+		if (mFastScrollerDelegate != null) {
+			mFastScrollerDelegate.onAttachedToRecyclerView(recyclerView);
+		}
 		mRecyclerView = recyclerView;
 	}
 
@@ -149,6 +156,10 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	@Override
 	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
 		super.onDetachedFromRecyclerView(recyclerView);
+
+		if (mFastScrollerDelegate != null) {
+			mFastScrollerDelegate.onDetachedFromRecyclerView(recyclerView);
+		}
 		mRecyclerView = null;
 	}
 
@@ -514,10 +525,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 5.0.0-b1
 	 */
 	public void toggleFastScroller() {
-		if (mFastScroller != null) {
-			if (mFastScroller.isHidden()) mFastScroller.showScrollbar();
-			else mFastScroller.hideScrollbar();
-		}
+		mFastScrollerDelegate.toggleFastScroller();
 	}
 
 	/**
@@ -525,7 +533,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 5.0.0-b1
 	 */
 	public boolean isFastScrollerEnabled() {
-		return mFastScroller != null && mFastScroller.getVisibility() == View.VISIBLE;
+		return mFastScrollerDelegate.isFastScrollerEnabled();
 	}
 
 	/**
@@ -533,7 +541,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 5.0.0-b1
 	 */
 	public FastScroller getFastScroller() {
-		return mFastScroller;
+		return mFastScrollerDelegate.getFastScroller();
 	}
 
 	/**
@@ -546,19 +554,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 5.0.0-b6
 	 */
 	public void setFastScroller(@NonNull FastScroller fastScroller) {
-		if (DEBUG) Log.v(TAG, "Setting FastScroller...");
-		if (mRecyclerView == null) {
-			throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter has been added to the RecyclerView.");
-		} else if (fastScroller == null) {
-			throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
-		}
-		mFastScroller = fastScroller;
-		mFastScroller.setRecyclerView(mRecyclerView);
-		mFastScroller.setViewsToUse(
-				R.layout.library_fast_scroller_layout,
-				R.id.fast_scroller_bubble,
-				R.id.fast_scroller_handle);
-		if (DEBUG) Log.i(TAG, "FastScroller initialized with color " + mFastScroller.getBubbleAndHandleColor());
+		mFastScrollerDelegate.setFastScroller(fastScroller);
 	}
 
 	/**
@@ -579,7 +575,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 			throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
 		}
 		setFastScroller(fastScroller);
-		mFastScroller.addOnScrollStateChangeListener(stateChangeListener);
+		getFastScroller().addOnScrollStateChangeListener(stateChangeListener);
 	}
 
 	/**
