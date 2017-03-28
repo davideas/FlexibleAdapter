@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
 import android.support.annotation.IntDef;
@@ -68,7 +69,10 @@ public class FastScroller extends FrameLayout {
 	protected View bar;
 	protected int height;
 	protected int width;
+
+	@Deprecated
 	protected int bubbleAndHandleColor;
+
 	protected boolean isInitialized = false;
 
 	protected RecyclerView recyclerView;
@@ -111,7 +115,6 @@ public class FastScroller extends FrameLayout {
 			autoHideEnabled = a.getBoolean(R.styleable.FastScroller_fastScrollerAutoHideEnabled, DEFAULT_AUTOHIDE_ENABLED);
 			autoHideDelayInMillis = a.getInteger(R.styleable.FastScroller_fastScrollerAutoHideDelayInMillis, DEFAULT_AUTOHIDE_DELAY_IN_MILLIS);
 			bubbleEnabled = a.getBoolean(R.styleable.FastScroller_fastScrollerBubbleEnabled, true);
-			bubbleAndHandleColor = a.getColor(R.styleable.FastScroller_fastScrollerBubbleAndHandleColor, Utils.fetchAccentColor(context, Color.GRAY));
 			bubblePosition = a.getInteger(R.styleable.FastScroller_fastScrollerBubblePosition, DEFAULT_BUBBLE_POSITION);
 		} finally {
 			a.recycle();

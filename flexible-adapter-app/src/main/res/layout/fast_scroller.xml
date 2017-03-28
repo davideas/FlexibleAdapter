@@ -10,7 +10,6 @@
 	android:layout_alignBottom="@+id/swipeRefreshLayout"
 	android:layout_alignParentEnd="true"
 	android:layout_alignParentRight="true"
-	app:fastScrollerBubbleAndHandleColor="@color/colorAccent_light"
 	app:fastScrollerAutoHideEnabled="true"
 	app:fastScrollerAutoHideDelayInMillis="1000"
 	app:fastScrollerBubblePosition="adjacent"
