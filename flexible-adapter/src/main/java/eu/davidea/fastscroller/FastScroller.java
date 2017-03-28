@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.R;
-import eu.davidea.flexibleadapter.utils.Utils;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -249,13 +248,13 @@ public class FastScroller extends FrameLayout {
 		// BubbleDrawable bubbleAndHandleColor
 		if (bubble != null) {
 			GradientDrawable bubbleDrawable;
-			if (Utils.hasLollipop()) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				bubbleDrawable = (GradientDrawable) getResources().getDrawable(R.drawable.fast_scroller_bubble, null);
 			} else {
 				bubbleDrawable = (GradientDrawable) getResources().getDrawable(R.drawable.fast_scroller_bubble);
 			}
 			bubbleDrawable.setColor(color);
-			if (Utils.hasJellyBean()) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 				bubble.setBackground(bubbleDrawable);
 			} else {
 				bubble.setBackgroundDrawable(bubbleDrawable);
@@ -265,7 +264,7 @@ public class FastScroller extends FrameLayout {
 		if (handle != null) {
 			try {
 				StateListDrawable stateListDrawable;
-				if (Utils.hasLollipop()) {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					stateListDrawable = (StateListDrawable) getResources().getDrawable(R.drawable.fast_scroller_handle, null);
 				} else {
 					stateListDrawable = (StateListDrawable) getResources().getDrawable(R.drawable.fast_scroller_handle);
