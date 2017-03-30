@@ -66,7 +66,7 @@ public class ScrollbarAnimator {
             return;
         }
 
-        if (scrollbarAnimator != null) {
+        if (isAnimating) {
             scrollbarAnimator.cancel();
         }
 

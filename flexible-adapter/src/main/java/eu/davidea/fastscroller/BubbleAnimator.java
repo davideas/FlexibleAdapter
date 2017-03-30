@@ -17,7 +17,15 @@ public class BubbleAnimator {
 	}
 
 	public void showBubble() {
-		if (bubble != null && bubble.getVisibility() != View.VISIBLE) {
+		if (bubble == null) {
+			return;
+		}
+
+		if (isAnimating) {
+			animator.cancel();
+		}
+
+		if (bubble.getVisibility() != View.VISIBLE) {
 			bubble.setVisibility(View.VISIBLE);
 			if (isAnimating) {
 				animator.cancel();
@@ -45,30 +53,33 @@ public class BubbleAnimator {
 	}
 
 	public void hideBubble() {
-		if (bubble != null) {
-			if (isAnimating) {
-				animator.cancel();
-			}
-			animator = createHideAnimator(bubble);
-			animator.addListener(new AnimatorListenerAdapter() {
-				@Override
-				public void onAnimationCancel(Animator animation) {
-					super.onAnimationCancel(animation);
-					onHideAnimationStop(bubble);
-					isAnimating = false;
-				}
-
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					super.onAnimationEnd(animation);
-					onHideAnimationStop(bubble);
-					isAnimating = false;
-				}
-			});
-
-			animator.start();
-			isAnimating = true;
+		if (bubble == null) {
+			return;
 		}
+
+		if (isAnimating) {
+			animator.cancel();
+		}
+
+		animator = createHideAnimator(bubble);
+		animator.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationCancel(Animator animation) {
+				super.onAnimationCancel(animation);
+				onHideAnimationStop(bubble);
+				isAnimating = false;
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				super.onAnimationEnd(animation);
+				onHideAnimationStop(bubble);
+				isAnimating = false;
+			}
+		});
+
+		animator.start();
+		isAnimating = true;
 	}
 
 	protected ObjectAnimator createShowAnimator(View bubble) {
