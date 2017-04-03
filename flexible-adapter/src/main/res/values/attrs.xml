@@ -8,5 +8,6 @@
 			<enum name="adjacent" value="0"/>
 			<enum name="center" value="1"/>
 		</attr>
-	</declare-styleable>
+        <attr name="fastScrollerIgnoreTouchesOutsideHandle" format="boolean"/>
+    </declare-styleable>
 </resources>

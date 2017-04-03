@@ -87,6 +87,8 @@ public class FastScroller extends FrameLayout {
 	@FastScrollerBubblePosition
 	protected int bubblePosition;
 
+	protected boolean ignoreTouchesOutsideHandle;
+
 	protected BubbleAnimator bubbleAnimator;
 	protected ScrollbarAnimator scrollbarAnimator;
 
@@ -115,6 +117,7 @@ public class FastScroller extends FrameLayout {
 			autoHideDelayInMillis = a.getInteger(R.styleable.FastScroller_fastScrollerAutoHideDelayInMillis, DEFAULT_AUTOHIDE_DELAY_IN_MILLIS);
 			bubbleEnabled = a.getBoolean(R.styleable.FastScroller_fastScrollerBubbleEnabled, true);
 			bubblePosition = a.getInteger(R.styleable.FastScroller_fastScrollerBubblePosition, DEFAULT_BUBBLE_POSITION);
+			ignoreTouchesOutsideHandle = a.getBoolean(R.styleable.FastScroller_fastScrollerIgnoreTouchesOutsideHandle, false);
 		} finally {
 			a.recycle();
 		}
@@ -303,6 +306,11 @@ public class FastScroller extends FrameLayout {
 			case MotionEvent.ACTION_DOWN:
 				if (event.getX() < handle.getX() - ViewCompat.getPaddingStart(handle)) return false;
 
+				if (ignoreTouchesOutsideHandle &&
+						(event.getY() < handle.getY() || event.getY() > handle.getY() + handle.getHeight())) {
+					return false;
+				}
+
 				handle.setSelected(true);
 				notifyScrollStateChange(true);
 				showBubble();
@@ -489,6 +497,10 @@ public class FastScroller extends FrameLayout {
 			scrollbarAnimator.hideScrollbar();
 		}
     }
+
+	public void setIgnoreTouchesOutsideHandle(boolean ignoreFlag) {
+		ignoreTouchesOutsideHandle = ignoreFlag;
+	}
 
 	public interface BubbleTextCreator {
 		String onCreateBubbleText(int position);
