@@ -94,6 +94,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	 * @param newItem The new item object with the new content
 	 * @return True will trigger a new binding to display new content, false if the content shown
 	 * is already the latest data.
+	 * @since 5.0.0-rc2
 	 */
 	boolean shouldNotifyChange(IFlexible newItem);
 

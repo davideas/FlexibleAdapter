@@ -14,6 +14,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IFilterable;
+import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.Utils;
@@ -46,6 +47,27 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
 	@Override
 	public void setHeader(IHeader header) {
 		this.header = header;
+	}
+
+	/**
+	 * Called by the FlexibleAdapter when it wants to check if this item should be bound
+	 * again with new content.
+	 * <p>
+	 * You should return {@code true} whether you want this item will be updated because
+	 * its visual representations will change.
+	 * <p>
+	 * This method is called only if {@link FlexibleAdapter#setNotifyChangeOfUnfilteredItems(boolean)}
+	 * is enabled.
+	 * <p>Default value is {@code true}.</p>
+	 *
+	 * @param newItem The new item object with the new content
+	 * @return True will trigger a new binding to display new content, false if the content shown
+	 * is already the latest data.
+	 */
+	@Override
+	public boolean shouldNotifyChange(IFlexible newItem) {
+		SubItem subItem = (SubItem) newItem;
+		return !title.equals(subItem.getTitle()); // Should be bound again if title is different
 	}
 
 	@Override
