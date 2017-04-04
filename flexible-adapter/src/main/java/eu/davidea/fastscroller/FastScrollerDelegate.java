@@ -21,7 +21,7 @@ import eu.davidea.flexibleadapter.R;
 public class FastScrollerDelegate {
 
     private static final String TAG = FastScrollerDelegate.class.getSimpleName();
-    public static boolean DEBUG = false;
+    private static final boolean DEBUG = false;
 
     private RecyclerView mRecyclerView;
     private FastScroller mFastScroller;
@@ -43,8 +43,12 @@ public class FastScrollerDelegate {
      */
     public void toggleFastScroller() {
         if (mFastScroller != null) {
-            if (mFastScroller.isHidden()) mFastScroller.showScrollbar();
-            else mFastScroller.hideScrollbar();
+            if (mFastScroller.isHidden()) {
+                mFastScroller.showScrollbar();
+            }
+            else {
+                mFastScroller.hideScrollbar();
+            }
         }
     }
 
@@ -74,7 +78,9 @@ public class FastScrollerDelegate {
      * @since 5.0.0-b6
      */
     public void setFastScroller(@NonNull FastScroller fastScroller) {
-        if (DEBUG) Log.v(TAG, "Setting FastScroller...");
+        if (DEBUG) {
+            Log.v(TAG, "Setting FastScroller...");
+        }
         if (mRecyclerView == null) {
             throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter has been added to the RecyclerView.");
         } else if (fastScroller == null) {
@@ -86,6 +92,8 @@ public class FastScrollerDelegate {
                 R.layout.library_fast_scroller_layout,
                 R.id.fast_scroller_bubble,
                 R.id.fast_scroller_handle);
-        if (DEBUG) Log.i(TAG, "FastScroller initialized with color " + mFastScroller.getBubbleAndHandleColor());
+        if (DEBUG) {
+            Log.i(TAG, "FastScroller initialized with color " + mFastScroller.getBubbleAndHandleColor());
+        }
     }
 }

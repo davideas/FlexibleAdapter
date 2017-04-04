@@ -7,9 +7,10 @@ import android.animation.ObjectAnimator;
 import android.view.View;
 
 public class ScrollbarAnimator {
+    private static final String PROPERTY_NAME = "translationX";
     protected View bar;
     protected View handle;
-    protected AnimatorSet scrollbarAnimator;
+    protected AnimatorSet scrollbarAnimatorSet;
 
     protected long delayInMillis;
     protected long durationInMillis;
@@ -33,15 +34,15 @@ public class ScrollbarAnimator {
         }
 
         if (isAnimating) {
-            scrollbarAnimator.cancel();
+            scrollbarAnimatorSet.cancel();
         }
 
         if (bar.getVisibility() == View.INVISIBLE || handle.getVisibility() == View.INVISIBLE) {
             bar.setVisibility(View.VISIBLE);
             handle.setVisibility(View.VISIBLE);
 
-            scrollbarAnimator = createShowAnimator(bar, handle);
-            scrollbarAnimator.addListener(new AnimatorListenerAdapter() {
+            scrollbarAnimatorSet = createAnimator(bar, handle, true);
+            scrollbarAnimatorSet.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
@@ -56,7 +57,7 @@ public class ScrollbarAnimator {
                     isAnimating = false;
                 }
             });
-            scrollbarAnimator.start();
+            scrollbarAnimatorSet.start();
             isAnimating = true;
         }
     }
@@ -67,11 +68,11 @@ public class ScrollbarAnimator {
         }
 
         if (isAnimating) {
-            scrollbarAnimator.cancel();
+            scrollbarAnimatorSet.cancel();
         }
 
-       scrollbarAnimator = createHideAnimator(bar, handle);
-        scrollbarAnimator.addListener(new AnimatorListenerAdapter() {
+        scrollbarAnimatorSet = createAnimator(bar, handle, false);
+        scrollbarAnimatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationCancel(Animator animation) {
                 super.onAnimationCancel(animation);
@@ -86,30 +87,22 @@ public class ScrollbarAnimator {
                 isAnimating = false;
             }
         });
-        scrollbarAnimator.start();
+        scrollbarAnimatorSet.start();
         isAnimating = true;
     }
 
-    protected AnimatorSet createShowAnimator(View bar, View handle) {
-        ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, "translationX", 0);
-        ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, "translationX", 0);
-        AnimatorSet scrollbarAnimator = new AnimatorSet();
-        scrollbarAnimator.playTogether(barAnimator, handleAnimator);
-        scrollbarAnimator.setDuration(durationInMillis);
+    protected AnimatorSet createAnimator(View bar, View handle, boolean showFlag) {
+        ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, PROPERTY_NAME, showFlag ? 0 : bar.getWidth());
+        ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, PROPERTY_NAME, showFlag ? 0 : handle.getWidth());
 
-        return scrollbarAnimator;
-    }
+        AnimatorSet animator = new AnimatorSet();
+        animator.playTogether(barAnimator, handleAnimator);
+        animator.setDuration(durationInMillis);
+        if (!showFlag) {
+            animator.setStartDelay(delayInMillis);
+        }
 
-    protected AnimatorSet createHideAnimator(View bar, View handle) {
-        ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, "translationX", bar.getWidth());
-        ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, "translationX", handle.getWidth());
-
-        AnimatorSet scrollbarAnimator = new AnimatorSet();
-        scrollbarAnimator.playTogether(barAnimator, handleAnimator);
-        scrollbarAnimator.setDuration(durationInMillis);
-        scrollbarAnimator.setStartDelay(delayInMillis);
-
-        return scrollbarAnimator;
+        return animator;
     }
 
     protected void onShowAnimationStop(View bar, View handle) {
