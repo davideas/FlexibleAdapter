@@ -34,8 +34,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.fastscroller.FastScrollerDelegate;
-import eu.davidea.fastscroller.FastScrollerAdapterInterface;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -50,10 +48,11 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @since 03/05/2015 Created
  * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
  * <br/>29/05/2016 Use of TreeSet instead of ArrayList
+ * <br/>04/04/2017 Use of FastScrollerDelegate
  */
 @SuppressWarnings({"unused", "unchecked", "ConstantConditions", "WeakerAccess"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
-		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener, FastScrollerAdapterInterface {
+		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener, FastScroller.AdapterInterface {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
 	public static boolean DEBUG = false;
@@ -78,7 +77,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	private Set<FlexibleViewHolder> mBoundViewHolders;
 	private int mMode;
 	protected RecyclerView mRecyclerView;
-	protected FastScrollerDelegate mFastScrollerDelegate;
+	protected FastScroller.Delegate mFastScrollerDelegate;
 
 	/**
 	 * Flag when fast scrolling is active.
@@ -111,7 +110,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		mBoundViewHolders = new HashSet<>();
 		mMode = MODE_IDLE;
 
-		mFastScrollerDelegate = new FastScrollerDelegate();
+		mFastScrollerDelegate = new FastScroller.Delegate();
 	}
 
 	/*----------------*/
@@ -141,7 +140,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	@Override
 	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
-
 		if (mFastScrollerDelegate != null) {
 			mFastScrollerDelegate.onAttachedToRecyclerView(recyclerView);
 		}
@@ -156,7 +154,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	@Override
 	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
 		super.onDetachedFromRecyclerView(recyclerView);
-
 		if (mFastScrollerDelegate != null) {
 			mFastScrollerDelegate.onDetachedFromRecyclerView(recyclerView);
 		}
@@ -481,9 +478,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 *
 	 * @return Set of selected items ids
 	 */
-//	public Set<Integer> getSelectedPositionsAsSet() {
-//		return mSelectedPositions;
-//	}
+	public Set<Integer> getSelectedPositionsAsSet() {
+		return mSelectedPositions;
+	}
 
 	/*----------------*/
 	/* INSTANCE STATE */

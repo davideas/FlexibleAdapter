@@ -21,7 +21,6 @@ import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -106,7 +105,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 		fastScroller.setAutoHideDelayInMillis(1000L);
 		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
 		// The color is already fetched by the FastScroller constructor, but you can change the color at runtime
-		fastScroller.setBubbleAndHandleColor(Utils.getColorAccent(getActivity()));
+		// fastScroller.setBubbleAndHandleColor(Utils.getColorAccent(getActivity()));
 		mAdapter.setFastScroller(fastScroller);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);

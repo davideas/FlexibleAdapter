@@ -2,7 +2,7 @@
 [![Download](https://api.bintray.com/packages/davideas/maven/flexible-adapter/images/download.svg) ](https://bintray.com/davideas/maven/flexible-adapter/_latestVersion)
 [![API](https://img.shields.io/badge/API-14%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=14)
 [![Licence](https://img.shields.io/badge/Licence-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![Methods and Size](https://img.shields.io/badge/Methods%20and%20Size-core:%201162%20|%20deps:%2021349%20|%20159%20KB-e91e63.svg)](http://www.methodscount.com/?lib=eu.davidea%3Aflexible-adapter%3A5.0.0-rc1)
+[![Methods and Size](https://img.shields.io/badge/Methods%20and%20Size-core:%201162%20|%20159%20KB-e91e63.svg)](http://www.methodscount.com/?lib=eu.davidea%3Aflexible-adapter%3A5.0.0-rc1)
 
 # FlexibleAdapter
 
@@ -24,7 +24,7 @@ This library is configurable and it guides the developers to create a better use
 #### Main features
 * Simple item selection with ripple effect, Single & Multi selection mode.
 * Restore deleted items, **NEW** works with Expandable items too!
-* Customizable [FastScroller](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-FastScroller), **NEW** now in the library supporting all the 3 Layouts.
+* **NEW!** Customizable [FastScroller](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-FastScroller) with new features.
 * Customizable divider item decoration.
 * Add and Remove items with custom animations.
 * Async [SearchFilter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text, **NEW** result list is animated. Works with sub items too!
@@ -133,7 +133,9 @@ I've used these blogs as starting point:
 - http://enoent.fr/blog/2015/01/18/recyclerview-basics/
 - https://www.grokkingandroid.com/statelistdrawables-for-recyclerview-selection/
 
-Special thanks goes to Martin Guillon ([Akylas](https://github.com/Akylas)) to have contributed at the development of the new technique for the Sticky Header.
+Special thanks goes to
+- Martin Guillon ([Akylas](https://github.com/Akylas)) to have contributed at the development of the new technique for the Sticky Header.
+- [Arpinca](https://github.com/arpinca) who added new features for FastScroller like _autoHide_ and _ignoreTouchesOutsideHandle_ and more.
 
 # Imported libraries
 - The library [LollipopContactsRecyclerViewFastScroller](https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller) has been imported, improved and adapted to work in conjunction with `AnimatorAdapter`.
@@ -149,6 +151,8 @@ It will be a pleasure to add your App here, once it is published.
 
 # License
 
+#### FlexibleAdapter
+
     Copyright 2015-2017 Davide Steduto
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -156,6 +160,22 @@ It will be a pleasure to add your App here, once it is published.
     You may obtain a copy of the License at
 
        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+#### FastScroller
+
+    Copyright 2016-2017 AndroidDeveloperLB, Davide Steduto & Arpinca
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,

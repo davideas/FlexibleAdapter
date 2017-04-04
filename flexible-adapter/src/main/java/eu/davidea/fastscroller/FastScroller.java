@@ -1,8 +1,22 @@
+/*
+ * Copyright 2017 AndroidDeveloperLB, Davide Steduto & Arpinca
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.davidea.fastscroller;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
@@ -42,13 +56,12 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller</a>
  * @since Up to the date 23/01/2016
  * <br/>23/01/2016 Added onFastScrollerStateChange in the listener
- * <br/>10/03/2017 Added autoHide, bubblePosition (thanks to @arpinca)
+ * <br/>10/03/2017 Added autoHide, bubblePosition, bubbleEnabled, ignoreTouchesOutsideHandle (thanks to @arpinca)
  */
 public class FastScroller extends FrameLayout {
 
 	protected static final int BUBBLE_ANIMATION_DURATION = 300;
 	protected static final int TRACK_SNAP_RANGE = 5;
-
 	protected static final int AUTOHIDE_ANIMATION_DURATION = 300;
 	protected static final int DEFAULT_AUTOHIDE_DELAY_IN_MILLIS = 1000;
 	protected static final boolean DEFAULT_AUTOHIDE_ENABLED = true;
@@ -69,29 +82,20 @@ public class FastScroller extends FrameLayout {
 	protected int height;
 	protected int width;
 
-	@Deprecated
-	protected int bubbleAndHandleColor;
-
-	protected boolean isInitialized = false;
-
 	protected RecyclerView recyclerView;
 	protected RecyclerView.LayoutManager layoutManager;
 	protected BubbleTextCreator bubbleTextCreator;
 	protected List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<>();
 
-	protected boolean autoHideEnabled;
 	protected long autoHideDelayInMillis;
-
-	protected boolean bubbleEnabled;
+	protected boolean isInitialized = false;
+	protected boolean autoHideEnabled, bubbleEnabled, ignoreTouchesOutsideHandle;
 
 	@FastScrollerBubblePosition
 	protected int bubblePosition;
 
-	protected boolean ignoreTouchesOutsideHandle;
-
 	protected BubbleAnimator bubbleAnimator;
 	protected ScrollbarAnimator scrollbarAnimator;
-
 	protected RecyclerView.OnScrollListener onScrollListener;
 
 	/*--------------*/
@@ -131,7 +135,6 @@ public class FastScroller extends FrameLayout {
 		setClipChildren(false);
 
 		onScrollListener = new RecyclerView.OnScrollListener() {
-
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 				if (bubble == null || handle.isSelected())
@@ -234,10 +237,6 @@ public class FastScroller extends FrameLayout {
 		setBubbleAndHandleColor(accentColor);
 	}
 
-	public int getBubbleAndHandleColor() {
-		return bubbleAndHandleColor;
-	}
-
 	/**
 	 * Changes the color of the Bubble and Handle views.
 	 * <p><b>Note:</b> Views are already initialized with accent color at startup.</p>
@@ -246,8 +245,6 @@ public class FastScroller extends FrameLayout {
 	 */
 	@SuppressWarnings("deprecation")
 	public void setBubbleAndHandleColor(@ColorInt int color) {
-		this.bubbleAndHandleColor = color;
-
 		// BubbleDrawable bubbleAndHandleColor
 		if (bubble != null) {
 			GradientDrawable bubbleDrawable;
@@ -354,12 +351,12 @@ public class FastScroller extends FrameLayout {
 
 	/**
 	 * Computes the index where the RecyclerView should be scrolled to based on the currY (y-coordinate of the touch event in the scrollbar)
+	 *
 	 * @param currY y-coordinate of the touch event in the scrollbar
 	 * @return index position in the RecyclerView
 	 */
 	protected int getTargetPos(float currY) {
 		int itemCount = recyclerView.getAdapter().getItemCount();
-
 		float proportion;
 		if (handle.getY() == 0) {
 			proportion = 0f;
@@ -382,8 +379,9 @@ public class FastScroller extends FrameLayout {
 	 * ...
 	 * }
 	 * </pre>
-	 *
+	 * <p>
 	 * Override this method if you want to do something different when displaying the text in the bubble e.g. display a different text when the result of onCreateBubbleText is empty; OR apply different format depending on the result of onCreateBubbleText.
+	 *
 	 * @param index index of the object that will be reflected in the bubble
 	 */
 	protected void updateBubbleText(int index) {
@@ -406,6 +404,7 @@ public class FastScroller extends FrameLayout {
 	/**
 	 * Sets the y-position of the bubble and the handle based on the current y-position.
 	 * Override this method if you want to adjust the min and max position of the handle and the bubble e.g. the max position of the bubble is the same as the max position of the handle.
+	 *
 	 * @param y current active y position in the scrollbar
 	 */
 	protected void setBubbleAndHandlePosition(float y) {
@@ -473,7 +472,9 @@ public class FastScroller extends FrameLayout {
 	 */
 	public void setAutoHideDelayInMillis(@IntRange(from = 0) long autoHideDelayInMillis) {
 		this.autoHideDelayInMillis = autoHideDelayInMillis;
-		scrollbarAnimator.setDelayInMillis(autoHideDelayInMillis);
+		if (scrollbarAnimator != null) {
+			scrollbarAnimator.setDelayInMillis(autoHideDelayInMillis);
+		}
 	}
 
 	/**
@@ -482,7 +483,7 @@ public class FastScroller extends FrameLayout {
 	 * @since 5.0.0-rc2
 	 */
 	public void showScrollbar() {
-		if (autoHideEnabled) {
+		if (autoHideEnabled && scrollbarAnimator != null) {
 			scrollbarAnimator.showScrollbar();
 		}
 	}
@@ -493,14 +494,23 @@ public class FastScroller extends FrameLayout {
 	 * @since 5.0.0-rc2
 	 */
 	public void hideScrollbar() {
-		if (autoHideEnabled) {
+		if (autoHideEnabled && scrollbarAnimator != null) {
 			scrollbarAnimator.hideScrollbar();
 		}
-    }
+	}
 
+	/**
+	 * If enabled, it ignores touches outside handle.
+	 *
+	 * @since 5.0.0-rc2
+	 */
 	public void setIgnoreTouchesOutsideHandle(boolean ignoreFlag) {
 		ignoreTouchesOutsideHandle = ignoreFlag;
 	}
+
+	/*------------*/
+	/* INTERFACES */
+	/*------------*/
 
 	public interface BubbleTextCreator {
 		String onCreateBubbleText(int position);
@@ -513,6 +523,106 @@ public class FastScroller extends FrameLayout {
 		 * @param scrolling true if the user is actively scrolling, false when idle
 		 */
 		void onFastScrollerStateChange(boolean scrolling);
+	}
+
+	public interface AdapterInterface {
+		void setFastScroller(@NonNull FastScroller fastScroller);
+	}
+
+	/*----------------*/
+	/* DELEGATE CLASS */
+	/*----------------*/
+
+	/**
+	 * This class links the FastScroller to the RecyclerView.
+	 * To use FastScroller in your existing adapter (Not FlexibleAdapter), follow the steps below:
+	 * <ol>
+	 * <li>In your layout, include @layout/fast_scroller after the RecyclerView.</li>
+	 * <li>Implement {@link FastScroller.AdapterInterface} in your adapter.</li>
+	 * <li>In your adapter, create a {@link FastScroller.Delegate} and call the delegate methods:
+	 * {@code onAttachedToRecyclerView}, {@code onDetachedFromRecyclerView} and {@code setFastScroller}.</li>
+	 * <li>If {@code fastScrollerBubbleEnabled} is true, in your adapter, implement BubbleTextCreator
+	 * and add the logic to display the label in {@code onCreateBubbleText}.</li>
+	 * <li>In the fragment/activity call the adapter's {@code setFastScroller} after setting the
+	 * RecyclerView's adapter.</li>
+	 * </ol>
+	 */
+	public static class Delegate {
+
+		private static final String TAG = Delegate.class.getSimpleName();
+		private static final boolean DEBUG = false;
+
+		private RecyclerView mRecyclerView;
+		private FastScroller mFastScroller;
+
+		public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+			mRecyclerView = recyclerView;
+		}
+
+		public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+			mRecyclerView = null;
+		}
+
+		/**
+		 * Displays or Hides the {@link FastScroller} if previously configured.
+		 * <br>The action is animated.
+		 *
+		 * @see #setFastScroller(FastScroller)
+		 * @since 5.0.0-b1
+		 */
+		public void toggleFastScroller() {
+			if (mFastScroller != null) {
+				if (mFastScroller.isHidden()) {
+					mFastScroller.showScrollbar();
+				} else {
+					mFastScroller.hideScrollbar();
+				}
+			}
+		}
+
+		/**
+		 * @return true if {@link FastScroller} is configured and shown, false otherwise
+		 * @since 5.0.0-b1
+		 */
+		public boolean isFastScrollerEnabled() {
+			return mFastScroller != null && mFastScroller.getVisibility() == View.VISIBLE;
+		}
+
+		/**
+		 * @return the current instance of the {@link FastScroller} object
+		 * @since 5.0.0-b1
+		 */
+		public FastScroller getFastScroller() {
+			return mFastScroller;
+		}
+
+		/**
+		 * Sets up the {@link FastScroller} with automatic fetch of accent color.
+		 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
+		 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
+		 * for previous version, the default value is used.
+		 *
+		 * @param fastScroller instance of {@link FastScroller}
+		 * @since 5.0.0-b6
+		 */
+		@SuppressWarnings("ConstantConditions")
+		public void setFastScroller(@NonNull FastScroller fastScroller) {
+			if (DEBUG) {
+				Log.v(TAG, "Setting FastScroller...");
+			}
+			if (mRecyclerView == null) {
+				throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter has been added to the RecyclerView.");
+			} else if (fastScroller == null) {
+				throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
+			}
+			mFastScroller = fastScroller;
+			mFastScroller.setRecyclerView(mRecyclerView);
+			mFastScroller.setViewsToUse(
+					R.layout.library_fast_scroller_layout,
+					R.id.fast_scroller_bubble,
+					R.id.fast_scroller_handle);
+			if (DEBUG) Log.i(TAG, "FastScroller initialized");
+		}
 	}
 
 }
