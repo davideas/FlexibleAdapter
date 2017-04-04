@@ -96,8 +96,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
-				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller));
 		mAdapter.setLongPressDragEnabled(true)
 				.setHandleDragEnabled(true)
 				.setSwipeEnabled(true)
