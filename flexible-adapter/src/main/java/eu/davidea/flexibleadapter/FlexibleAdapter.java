@@ -4397,9 +4397,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		// Using Hash for performance
 		mHashItems = new HashSet<>(from);
 		int in = 0;
-		for (int i = 0; i < newItems.size(); i++) {
+		for (int position = 0; position < newItems.size(); position++) {
 			if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
-			final T item = newItems.get(i);
+			final T item = newItems.get(position);
 			if (!mHashItems.contains(item)) {
 				// if (DEBUG) Log.v(TAG, "calculateAdditions    add position=" + i + " item=" + item + " searchText=" + mSearchText);
 				if (notifyMoveOfFilteredItems) {
@@ -4407,8 +4407,10 @@ public class FlexibleAdapter<T extends IFlexible>
 					from.add(item);
 					mNotifications.add(new Notification(from.size(), Notification.ADD));
 				} else {
-					from.add(i, item);
-					mNotifications.add(new Notification(i, Notification.ADD));
+					// #328 - Filtering issue during delete search query (make sure position is in bounds)
+					if (position < from.size()) from.add(position, item);
+					else from.add(item);
+					mNotifications.add(new Notification(position, Notification.ADD));
 				}
 				in++;
 			}
