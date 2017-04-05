@@ -21,7 +21,6 @@ import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -86,12 +85,13 @@ public class FragmentSelectionModes extends AbstractFragment {
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
+
 		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		// Divider item decorator with DrawOver enabled
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider)
-				.withDrawOver(true));
+		mRecyclerView.addItemDecoration(
+				new DividerItemDecoration(getActivity(), R.drawable.divider).withDrawOver(true));
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -100,8 +100,13 @@ public class FragmentSelectionModes extends AbstractFragment {
 		}, 1500L);
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
-				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		fastScroller.setAutoHideEnabled(true); // true is the default value!
+		fastScroller.setAutoHideDelayInMillis(1000L);
+		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
+		// The color is already fetched by the FastScroller constructor, but you can change the color at runtime
+		// fastScroller.setBubbleAndHandleColor(Utils.getColorAccent(getActivity()));
+		mAdapter.setFastScroller(fastScroller);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);

@@ -21,7 +21,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -49,10 +48,11 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @since 03/05/2015 Created
  * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
  * <br/>29/05/2016 Use of TreeSet instead of ArrayList
+ * <br/>04/04/2017 Use of FastScrollerDelegate
  */
 @SuppressWarnings({"unused", "unchecked", "ConstantConditions", "WeakerAccess"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
-		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener {
+		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener, FastScroller.AdapterInterface {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
 	public static boolean DEBUG = false;
@@ -77,7 +77,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	private Set<FlexibleViewHolder> mBoundViewHolders;
 	private int mMode;
 	protected RecyclerView mRecyclerView;
-	protected FastScroller mFastScroller;
+	protected FastScroller.Delegate mFastScrollerDelegate;
 
 	/**
 	 * Flag when fast scrolling is active.
@@ -109,6 +109,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		mSelectedPositions = new TreeSet<>();
 		mBoundViewHolders = new HashSet<>();
 		mMode = MODE_IDLE;
+
+		mFastScrollerDelegate = new FastScroller.Delegate();
 	}
 
 	/*----------------*/
@@ -138,6 +140,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	@Override
 	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
+		if (mFastScrollerDelegate != null) {
+			mFastScrollerDelegate.onAttachedToRecyclerView(recyclerView);
+		}
 		mRecyclerView = recyclerView;
 	}
 
@@ -149,6 +154,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	@Override
 	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
 		super.onDetachedFromRecyclerView(recyclerView);
+		if (mFastScrollerDelegate != null) {
+			mFastScrollerDelegate.onDetachedFromRecyclerView(recyclerView);
+		}
 		mRecyclerView = null;
 	}
 
@@ -470,9 +478,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 *
 	 * @return Set of selected items ids
 	 */
-//	public Set<Integer> getSelectedPositionsAsSet() {
-//		return mSelectedPositions;
-//	}
+	public Set<Integer> getSelectedPositionsAsSet() {
+		return mSelectedPositions;
+	}
 
 	/*----------------*/
 	/* INSTANCE STATE */
@@ -508,16 +516,13 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	/**
 	 * Displays or Hides the {@link FastScroller} if previously configured.
+	 * <br>The action is animated.
 	 *
 	 * @see #setFastScroller(FastScroller, int)
 	 * @since 5.0.0-b1
 	 */
 	public void toggleFastScroller() {
-		if (mFastScroller != null) {
-			if (mFastScroller.getVisibility() != View.VISIBLE)
-				mFastScroller.setVisibility(View.VISIBLE);
-			else mFastScroller.setVisibility(View.GONE);
-		}
+		mFastScrollerDelegate.toggleFastScroller();
 	}
 
 	/**
@@ -525,7 +530,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 5.0.0-b1
 	 */
 	public boolean isFastScrollerEnabled() {
-		return mFastScroller != null && mFastScroller.getVisibility() == View.VISIBLE;
+		return mFastScrollerDelegate.isFastScrollerEnabled();
 	}
 
 	/**
@@ -533,7 +538,41 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 5.0.0-b1
 	 */
 	public FastScroller getFastScroller() {
-		return mFastScroller;
+		return mFastScrollerDelegate.getFastScroller();
+	}
+
+	/**
+	 * Sets up the {@link FastScroller} with automatic fetch of accent color.
+	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
+	 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
+	 * for previous version, the default value is used.
+	 *
+	 * @param fastScroller        instance of {@link FastScroller}
+	 * @since 5.0.0-b6
+	 */
+	public void setFastScroller(@NonNull FastScroller fastScroller) {
+		mFastScrollerDelegate.setFastScroller(fastScroller);
+	}
+
+	/**
+	 * Sets up the {@link FastScroller} with automatic fetch of accent color.
+	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
+	 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
+	 * for previous version, the default value is used.
+	 *
+	 * @param fastScroller        instance of {@link FastScroller}
+	 * @param stateChangeListener the listener to monitor when fast scrolling state changes
+	 * @since 5.0.0-b6
+	 * @deprecated Add stateChangeListener directly to the FastScroller: {@link FastScroller#addOnScrollStateChangeListener(FastScroller.OnScrollStateChangeListener)}
+	 */
+	@Deprecated
+	public void setFastScroller(@NonNull FastScroller fastScroller,
+								FastScroller.OnScrollStateChangeListener stateChangeListener) {
+		if (fastScroller == null) {
+			throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
+		}
+		setFastScroller(fastScroller);
+		getFastScroller().addOnScrollStateChangeListener(stateChangeListener);
 	}
 
 	/**
@@ -542,9 +581,11 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 *
 	 * @see #setFastScroller(FastScroller, int, FastScroller.OnScrollStateChangeListener)
 	 * @since 5.0.0-b1
+	 * @deprecated Accent Color is automatically fetched at startup
 	 */
+	@Deprecated
 	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor) {
-		setFastScroller(fastScroller, accentColor, null);
+		setFastScroller(fastScroller, null);
 	}
 
 	/**
@@ -557,24 +598,12 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @param accentColor         the default value color if the accentColor cannot be fetched
 	 * @param stateChangeListener the listener to monitor when fast scrolling state changes
 	 * @since 5.0.0-b6
+	 * @deprecated Accent Color is automatically fetched at startup
 	 */
+	@Deprecated
 	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor,
 								FastScroller.OnScrollStateChangeListener stateChangeListener) {
-		if (DEBUG) Log.v(TAG, "Setting FastScroller...");
-		if (mRecyclerView == null) {
-			throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter has been added to the RecyclerView.");
-		} else if (fastScroller == null) {
-			throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
-		}
-		mFastScroller = fastScroller;
-		mFastScroller.setRecyclerView(mRecyclerView);
-		mFastScroller.addOnScrollStateChangeListener(stateChangeListener);
-		accentColor = Utils.fetchAccentColor(fastScroller.getContext(), accentColor);
-		mFastScroller.setViewsToUse(
-				R.layout.library_fast_scroller_layout,
-				R.id.fast_scroller_bubble,
-				R.id.fast_scroller_handle, accentColor);
-		if (DEBUG) Log.i(TAG, "FastScroller initialized with color " + accentColor);
+		setFastScroller(fastScroller, stateChangeListener);
 	}
 
 	/**
