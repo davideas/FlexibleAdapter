@@ -27,7 +27,6 @@ import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -96,7 +95,10 @@ public class FragmentHeadersSections extends AbstractFragment
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller));
+		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
+		mAdapter.setFastScroller(fastScroller);
+
 		mAdapter.setLongPressDragEnabled(true)
 				.setHandleDragEnabled(true)
 				.setSwipeEnabled(true)

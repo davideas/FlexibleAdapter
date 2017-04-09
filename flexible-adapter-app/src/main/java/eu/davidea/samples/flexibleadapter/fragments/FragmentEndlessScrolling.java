@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -29,7 +30,6 @@ import eu.davidea.samples.flexibleadapter.animators.FadeInDownAnimator;
 import eu.davidea.samples.flexibleadapter.items.ProgressItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -97,8 +97,10 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mRecyclerView.setItemAnimator(new FadeInDownAnimator());
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
-				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
+		mAdapter.setFastScroller(fastScroller);
+
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
 				.setHandleDragEnabled(true) //Enable drag using handle view
@@ -109,11 +111,12 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		// EndlessScrollListener - OnLoadMore (v5.0.0)
-		mAdapter//.setLoadingMoreAtStartUp(true) //To call only if the list is empty
+		mAdapter.setLoadingMoreAtStartUp(true) //To call only if the list is empty
 				//.setEndlessPageSize(3) //Endless is automatically disabled if newItems < 3
 				.setEndlessTargetCount(15) //Endless is automatically disabled if totalItems >= 15
-				//.setEndlessScrollThreshold(1); //Default=1
-				.setEndlessScrollListener(this, mProgressItem);
+				.setEndlessScrollThreshold(1) //Default=1
+				.setEndlessScrollListener(this, mProgressItem)
+				.setTopEndless(true);
 
 		// Add 1 Scrollable Header and 1 Footer items
 		mAdapter.showLayoutInfo(savedInstanceState == null);
@@ -181,8 +184,13 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				// - New items will be added to the end of the main list
 				// - When list is null or empty and limits are reached, Endless scroll will be disabled.
 				//   To enable again, you must call setEndlessProgressItem(@Nullable T progressItem).
+				if (mAdapter.isTopEndless()) {
+					Collections.reverse(newItems);
+					DatabaseService.getInstance().addAll(0, newItems);
+				} else {
+					DatabaseService.getInstance().addAll(newItems);
+				}
 				mAdapter.onLoadMoreComplete(newItems, 5000L);
-				DatabaseService.getInstance().addAll(newItems);
 				// - Retrieve the new page number after adding new items!
 				Log.d(TAG, "EndlessCurrentPage=" + mAdapter.getEndlessCurrentPage());
 				Log.d(TAG, "EndlessPageSize=" + mAdapter.getEndlessPageSize());

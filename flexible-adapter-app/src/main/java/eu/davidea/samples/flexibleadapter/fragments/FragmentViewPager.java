@@ -20,11 +20,11 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flipview.FlipView;
+import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.items.HeaderItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.utils.Utils;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -104,7 +104,9 @@ public class FragmentViewPager extends Fragment {
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
-		mAdapter.setFastScroller(fastScroller, Utils.getColorAccent(getActivity()));
+		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
+		mAdapter.setFastScroller(fastScroller);
+
 		mAdapter.toggleFastScroller();
 
 		// Sticky Headers

@@ -163,7 +163,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/* EndlessScroll */
 	private int mEndlessScrollThreshold = 1, mEndlessTargetCount = 0, mEndlessPageSize = 0;
-	private boolean endlessLoading = false, endlessScrollEnabled = false;
+	private boolean endlessLoading = false, endlessScrollEnabled = false, mTopEndless = false;
 	private T mProgressItem;
 
 	/* Listeners */
@@ -600,8 +600,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-rc1
 	 */
 	public final int getMainItemCount() {
-		//FIXME: when few items are filtered, count is not correct and becomes negative!
-		return getItemCount() - mScrollableHeaders.size() - mScrollableFooters.size();
+		return hasSearchText() ? getItemCount() : getItemCount() - mScrollableHeaders.size() - mScrollableFooters.size();
 	}
 
 	/**
@@ -807,7 +806,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (!mScrollableHeaders.contains(headerItem)) {
 			headerItem.setSelectable(false);
 			headerItem.setDraggable(false);
-			int progressFix = 0;//(headerItem == mProgressItem) ? mScrollableHeaders.size() : 0;
+			int progressFix = (headerItem == mProgressItem) ? mScrollableHeaders.size() : 0;
 			mScrollableHeaders.add(headerItem);
 			setScrollAnimate(true); //Headers will scroll animate
 			performInsert(progressFix, Collections.singletonList(headerItem), true);
@@ -1910,6 +1909,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* ENDLESS SCROLL METHODS */
 	/*------------------------*/
 
+	public boolean isTopEndless() {
+		return mTopEndless;
+	}
+
+	public void setTopEndless(boolean topEndless) {
+		mTopEndless = topEndless;
+	}
+
 	/**
 	 * Evaluates if the Adapter is in Endless Scroll mode. When no more load, this method will
 	 * return {@code false}. To enable again the progress item you MUST be set again.
@@ -2095,17 +2102,19 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	protected void onLoadMore(int position) {
 		// Skip everything when loading more is unused OR currently loading
-		if (!isEndlessScrollEnabled() || endlessLoading)
+		if (!isEndlessScrollEnabled() || endlessLoading || getItem(position) == mProgressItem)
 			return;
 
 		// Check next loading threshold
-		int threshold = getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableFooters.size());
-		if (position == getGlobalPositionOf(mProgressItem) || position < threshold) {
+		int threshold = mTopEndless ?
+				mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableHeaders.size())
+				: getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableFooters.size());
+		if ((!mTopEndless && (position == getGlobalPositionOf(mProgressItem) || position < threshold)) ||
+				(mTopEndless && position > 0 && position > threshold) ) {
 			return;
 		} else if (DEBUG) {
 			Log.v(TAG, "onLoadMore     loading=" + endlessLoading + ", position=" + position
-					+ ", itemCount=" + getItemCount() + ", threshold=" + mEndlessScrollThreshold
-					+ ", inside the threshold? " + (position >= getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableFooters.size())));
+					+ ", itemCount=" + getItemCount() + ", threshold=" + mEndlessScrollThreshold);
 		}
 		// Load more if not loading and inside the threshold
 		endlessLoading = true;
@@ -2117,11 +2126,13 @@ public class FlexibleAdapter<T extends IFlexible>
 				// Clear previous delayed message
 				mHandler.removeMessages(LOAD_MORE_COMPLETE);
 				// Add progressItem if not already shown
-				addScrollableFooter(mProgressItem);
+				boolean added = mTopEndless ? addScrollableHeader(mProgressItem) : addScrollableFooter(mProgressItem);
 				// When the listener is not set, loading more is called upon a user request
-				if (mEndlessScrollListener != null) {
+				if (added && mEndlessScrollListener != null) {
 					if (DEBUG) Log.d(TAG, "onLoadMore     invoked!");
 					mEndlessScrollListener.onLoadMore(getMainItemCount(), getEndlessCurrentPage());
+				} else if (!added) {
+					endlessLoading = false;
 				}
 			}
 		});
@@ -2156,8 +2167,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *                 loading forever and to keep the progress item visible.
 	 * @since 5.0.0-b8
 	 * <br/>5.0.0-rc1 Added limits check and changed progressItem to Scrollable Footer
+	 * <br/>5.0.0-rc2 Added Top Endless
 	 */
-	//TODO: Endless Top Scrolling
 	public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
 		// 1. Calculate new items count
 		int newItemsSize = newItems == null ? 0 : newItems.size();
@@ -2166,8 +2177,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (newItemsSize > 0) {
 			if (DEBUG)
 				Log.v(TAG, "onLoadMore     performing adding " + newItemsSize + " new items on Page=" + getEndlessCurrentPage());
-			//TODO: 0 + headers for Endless Top Scrolling
-			addItems(getGlobalPositionOf(mProgressItem), newItems);
+			int position = mTopEndless ? mScrollableHeaders.size() : getGlobalPositionOf(mProgressItem);
+			addItems(position, newItems);
 		}
 		// 3. Check if features are enabled and the limits have been reached
 		if (mEndlessPageSize > 0 && newItemsSize < mEndlessPageSize || // Is feature enabled and Not enough items?
@@ -2198,7 +2209,11 @@ public class FlexibleAdapter<T extends IFlexible>
 		int positionToNotify = getGlobalPositionOf(mProgressItem);
 		if (positionToNotify >= 0) {
 			if (DEBUG) Log.v(TAG, "onLoadMore     remove progressItem");
-			removeScrollableFooter(mProgressItem);
+			if (mTopEndless) {
+				removeScrollableHeader(mProgressItem);
+			} else {
+				removeScrollableFooter(mProgressItem);
+			}
 		}
 	}
 

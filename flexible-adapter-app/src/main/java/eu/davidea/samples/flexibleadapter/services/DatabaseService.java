@@ -461,6 +461,10 @@ public class DatabaseService {
 		mItems.clear();
 	}
 
+	public void addAll(int position, List<AbstractFlexibleItem> newItems) {
+		mItems.addAll(position, newItems);
+	}
+
 	public void addAll(List<AbstractFlexibleItem> newItems) {
 		mItems.addAll(newItems);
 	}

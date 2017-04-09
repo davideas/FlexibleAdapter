@@ -21,7 +21,6 @@ import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.samples.flexibleadapter.services.DatabaseType;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -132,8 +131,9 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		} else {
 			mFab.setImageResource(R.drawable.ic_settings_white_24dp);
 			mRecyclerView.removeItemDecoration(mDivider);
-			mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
-					Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+			FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+			fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
+			mAdapter.setFastScroller(fastScroller);
 		}
 
 		//Settings for FlipView
