@@ -800,7 +800,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #addScrollableHeaderWithDelay(IFlexible, long, boolean)
 	 * @since 5.0.0-rc1
 	 */
-	//TODO: Endless Top Scrolling
 	public final boolean addScrollableHeader(@NonNull T headerItem) {
 		if (DEBUG) Log.d(TAG, "Add scrollable header " + getClassName(headerItem));
 		if (!mScrollableHeaders.contains(headerItem)) {
@@ -5484,7 +5483,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		// We use 1 cycle for expanding And display headers
 		// to optimize the operations of adding hidden items/subItems
 		while (position < newItems.size()) {
-			T item = getItem(position);
+			T item = newItems.get(position);
 			// Expand Expandable
 			if (isExpanded(item)) {
 				IExpandable expandable = (IExpandable) item;
