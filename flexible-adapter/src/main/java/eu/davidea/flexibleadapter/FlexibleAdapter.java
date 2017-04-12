@@ -648,6 +648,17 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Gets an unmodifiable view of the internal list of items.
+	 *
+	 * @return an unmodifiable view of the current adapter list
+	 * @since 5.0.0-rc2
+	 */
+	@NonNull
+	public final List<T> getItems() {
+		return Collections.unmodifiableList(mItems);
+	}
+
+	/**
 	 * You can override this method to define your own concept of "Empty". This method is never
 	 * called internally.
 	 *
