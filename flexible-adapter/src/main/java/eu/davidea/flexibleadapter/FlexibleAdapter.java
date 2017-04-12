@@ -3223,7 +3223,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (index >= 0) {
 			item.setHeader(header);
 			if (headerPosition >= 0 && isExpandable((T) header))
-				addSubItem(headerPosition, index, (T) item, false, Payload.SUB_ITEM);
+				addSubItem(headerPosition, index, (T) item, false, Payload.ADD_SUB_ITEM);
 			else
 				addItem(headerPosition + 1 + index, (T) item);
 		}
@@ -3374,7 +3374,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 1.0.0
 	 */
 	public void removeItems(@NonNull List<Integer> selectedPositions) {
-		this.removeItems(selectedPositions, Payload.CHANGE);
+		this.removeItems(selectedPositions, Payload.REM_SUB_ITEM);
 	}
 
 	/**
@@ -3474,7 +3474,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void removeRange(@IntRange(from = 0) int positionStart,
 							@IntRange(from = 0) int itemCount) {
-		this.removeRange(positionStart, itemCount, Payload.CHANGE);
+		this.removeRange(positionStart, itemCount, Payload.REM_SUB_ITEM);
 	}
 
 	/**
@@ -3509,7 +3509,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #emptyBin()
 	 * @since 5.0.0-b1
 	 */
-	//FIXME: Fix payload message if customized
 	public void removeRange(@IntRange(from = 0) int positionStart,
 							@IntRange(from = 0) int itemCount, @Nullable Object payload) {
 		int initialCount = getItemCount();
@@ -3520,42 +3519,30 @@ public class FlexibleAdapter<T extends IFlexible>
 			return;
 		}
 
-		// Update content of the header linked to first item of the range
 		T item = getItem(positionStart);
-		IHeader header = getHeaderOf(item);
-		int headerPosition = getGlobalPositionOf(header);
-		if (header != null && headerPosition >= 0) {
-			// The header does not represents a group anymore, add it to the Orphan list
-			addToOrphanListIfNeeded(header, positionStart, itemCount);
-			notifyItemChanged(headerPosition, payload);
-		}
-
-		int parentPosition = -1;
 		IExpandable parent = null;
 		for (int position = positionStart; position < positionStart + itemCount; position++) {
-			item = getItem(positionStart);
+			item = getItem(positionStart); // We remove always at positionStart!
+			item.setHidden(true);
 			if (!permanentDelete) {
-				//When removing a range of children, parent is always the same :-)
+				// When removing a range of children, parent is always the same :-)
 				if (parent == null) parent = getExpandableOf(item);
-				//Differentiate: (Expandable & NonExpandable with No parent) from (NonExpandable with a parent)
+				// Differentiate: (Expandable & NonExpandable with No parent) from (NonExpandable with a parent)
 				if (parent == null) {
-					createRestoreItemInfo(positionStart, item, Payload.UNDO);
+					createRestoreItemInfo(positionStart, item);
 				} else {
-					parentPosition = createRestoreSubItemInfo(parent, item, Payload.UNDO);
+					createRestoreSubItemInfo(parent, item);
 				}
 			}
-			// Change to hidden status for section headers
-			if (isHeader(item)) {
-				header = (IHeader) item;
-				header.setHidden(true);
+			// Unlink items that belongs to the removed header
+			if (unlinkOnRemoveHeader && isHeader(item)) {
+				IHeader header = (IHeader) item;
 				// If item is a Header, remove linkage from ALL Sectionable items if exist
-				if (unlinkOnRemoveHeader) {
-					List<ISectionable> sectionableList = getSectionItems(header);
-					for (ISectionable sectionable : sectionableList) {
-						sectionable.setHeader(null);
-						if (payload != null)
-							notifyItemChanged(getGlobalPositionOf(sectionable), Payload.UNLINK);
-					}
+				List<ISectionable> sectionableList = getSectionItems(header);
+				for (ISectionable sectionable : sectionableList) {
+					sectionable.setHeader(null);
+					if (payload != null)
+						notifyItemChanged(getGlobalPositionOf(sectionable), Payload.UNLINK);
 				}
 			}
 			// Remove item from internal list
@@ -3565,19 +3552,29 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		// Notify range removal
 		notifyItemRangeRemoved(positionStart, itemCount);
+
+		// Update content of the header linked to first item of the range
+		IHeader header = getHeaderOf(item);
+		int headerPosition = getGlobalPositionOf(header);
+		if (payload != null && header != null && headerPosition >= 0) {
+			// The header does not represents a group anymore, add it to the Orphan list
+			addToOrphanListIfNeeded(header, positionStart, itemCount);
+			notifyItemChanged(headerPosition, payload);
+		}
 		// Notify the Parent about the change if requested
-		if (parentPosition >= 0 && payload != null) {
+		int parentPosition = getGlobalPositionOf(parent);
+		if (payload != null && parentPosition >= 0 && parentPosition != headerPosition) {
 			notifyItemChanged(parentPosition, payload);
 		}
 
-		// Remove orphan headers
+		//TODO: Deprecate remove orphan headers
 		if (removeOrphanHeaders) {
 			for (IHeader orphanHeader : mOrphanHeaders) {
 				headerPosition = getGlobalPositionOf(orphanHeader);
 				if (headerPosition >= 0) {
 					if (DEBUG) Log.v(TAG, "Removing orphan header " + orphanHeader);
 					if (!permanentDelete)
-						createRestoreItemInfo(headerPosition, (T) orphanHeader, Payload.UNDO);
+						createRestoreItemInfo(headerPosition, (T) orphanHeader);
 					mItems.remove(headerPosition);
 					notifyItemRemoved(headerPosition);
 				}
@@ -3707,37 +3704,35 @@ public class FlexibleAdapter<T extends IFlexible>
 			// Notify header if exists
 			IHeader header = getHeaderOf(restoreInfo.item);
 			if (header != null) {
-				notifyItemChanged(getGlobalPositionOf(header), restoreInfo.payload);
+				notifyItemChanged(getGlobalPositionOf(header), Payload.UNDO);
 			}
 
 			if (restoreInfo.relativePosition >= 0) {
-				// Restore child, if not deleted
-				if (DEBUG) Log.d(TAG, "Restore Child " + restoreInfo);
+				// Restore child
+				if (DEBUG) Log.d(TAG, "Restore SubItem " + restoreInfo);
 				// Skip subItem addition if filter is active
 				if (hasSearchText() && !filterObject(restoreInfo.item, getSearchText()))
 					continue;
 				// Check if refItem is shown, if not, show it again
-				if (hasSearchText() &&
-						getGlobalPositionOf(getHeaderOf(restoreInfo.item)) == RecyclerView.NO_POSITION) {
+				if (hasSearchText() && getGlobalPositionOf(header) == RecyclerView.NO_POSITION) {
 					// Add parent + subItem
 					restoreInfo.refItem.setHidden(false);
+					restoreInfo.relativePosition = 0;
 					addItem(restoreInfo.getRestorePosition(false), restoreInfo.refItem);
-					addSubItem(restoreInfo.getRestorePosition(true), 0, restoreInfo.item, true, restoreInfo.payload);
-				} else {
-					// Add subItem
-					addSubItem(restoreInfo.getRestorePosition(true), restoreInfo.relativePosition,
-							restoreInfo.item, false, restoreInfo.payload);
 				}
+				// Add subItem
+				addSubItem(restoreInfo.getRestorePosition(true), restoreInfo.relativePosition,
+						restoreInfo.item, false, Payload.UNDO);
 			} else {
-				// Restore parent or simple item, if not deleted
-				if (DEBUG) Log.d(TAG, "Restore Parent " + restoreInfo);
+				// Restore parent or simple item
+				if (DEBUG) Log.d(TAG, "Restore Item " + restoreInfo);
 				// Skip item addition if filter is active
 				if (hasSearchText() && !filterExpandableObject(restoreInfo.item))
 					continue;
-				// Add header if not visible
+				// Add header if not visible (flagging it will insert when restoring the item)
 				if (hasSearchText() && hasHeader(restoreInfo.item) &&
-						getGlobalPositionOf(getHeaderOf(restoreInfo.item)) == RecyclerView.NO_POSITION)
-					getHeaderOf(restoreInfo.item).setHidden(true);
+						getGlobalPositionOf(header) == RecyclerView.NO_POSITION)
+					header.setHidden(true);
 				// Add item
 				addItem(restoreInfo.getRestorePosition(false), restoreInfo.item);
 			}
@@ -3749,7 +3744,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				header = (IHeader) restoreInfo.item;
 				List<ISectionable> items = getSectionItems(header);
 				for (ISectionable sectionable : items) {
-					linkHeaderTo((T) sectionable, header, restoreInfo.payload);
+					linkHeaderTo((T) sectionable, header, Payload.LINK);
 				}
 			}
 		}
@@ -4922,19 +4917,16 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * @param expandable the expandable, parent of this sub item
 	 * @param item       the deleted item
-	 * @param payload    any payload object
-	 * @return the parent position
 	 * @since 5.0.0-b1
 	 */
-	private int createRestoreSubItemInfo(IExpandable expandable, T item, @Nullable Object payload) {
-		int parentPosition = getGlobalPositionOf(expandable);
+	private void createRestoreSubItemInfo(IExpandable expandable, T item) {
 		List<T> siblings = getExpandableList(expandable);
 		int childPosition = siblings.indexOf(item);
-		item.setHidden(true);
-		mRestoreList.add(new RestoreInfo((T) expandable, item, childPosition, payload));
-		if (DEBUG)
-			Log.v(TAG, "Recycled Child " + mRestoreList.get(mRestoreList.size() - 1) + " with Parent position=" + parentPosition);
-		return parentPosition;
+		mRestoreList.add(new RestoreInfo((T) expandable, item, childPosition));
+		if (DEBUG) {
+			Log.v(TAG, "Recycled SubItem " + mRestoreList.get(mRestoreList.size() - 1)
+					+ " with Parent position=" + getGlobalPositionOf(expandable));
+		}
 	}
 
 	/**
@@ -4942,11 +4934,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param item     the deleted item
 	 * @since 5.0.0-b1
 	 */
-	private void createRestoreItemInfo(int position, T item, @Nullable Object payload) {
+	private void createRestoreItemInfo(int position, T item) {
 		// Collapse Parent before removal if it is expanded!
-		if (isExpanded(item))
-			collapse(position);
-		item.setHidden(true);
+		if (isExpanded(item)) collapse(position);
 		// Get the reference of the previous item (getItem returns null if outOfBounds)
 		// If null, it will be restored at position = 0
 		T refItem = getItem(position - 1);
@@ -4955,9 +4945,9 @@ public class FlexibleAdapter<T extends IFlexible>
 			IExpandable expandable = getExpandableOf(refItem);
 			if (expandable != null) refItem = (T) expandable;
 		}
-		mRestoreList.add(new RestoreInfo(refItem, item, payload));
+		mRestoreList.add(new RestoreInfo(refItem, item));
 		if (DEBUG)
-			Log.v(TAG, "Recycled Parent " + mRestoreList.get(mRestoreList.size() - 1) + " on position=" + position);
+			Log.v(TAG, "Recycled Item " + mRestoreList.get(mRestoreList.size() - 1) + " on position=" + position);
 	}
 
 	/**
@@ -5318,7 +5308,15 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		private void updateOrClearHeader() {
 			if (mStickyHeaderHelper != null && !multiRange) {
-				mStickyHeaderHelper.updateOrClearHeader(true);
+				// #320 - To include adapter changes just notified we need a new layout pass:
+				// We must give time to LayoutManager otherwise the findFirstVisibleItemPosition()
+				// will return wrong position!
+				mRecyclerView.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						mStickyHeaderHelper.updateOrClearHeader(true);
+					}
+				}, 100L);
 			}
 		}
 
@@ -5358,18 +5356,21 @@ public class FlexibleAdapter<T extends IFlexible>
 		T refItem = null, filterRefItem = null;
 		// The deleted item
 		T item = null;
-		// Payload for the refItem
-		Object payload = false;
 
-		public RestoreInfo(T refItem, T item, Object payload) {
-			this(refItem, item, -1, payload);
+		/**
+		 * Constructor for simple, header or parent items
+		 */
+		public RestoreInfo(T refItem, T item) {
+			this(refItem, item, -1);
 		}
 
-		public RestoreInfo(T refItem, T item, int relativePosition, Object payload) {
-			this.refItem = refItem; //This can be an Expandable or a Header
+		/**
+		 * Constructor for sub-items
+		 */
+		public RestoreInfo(T refItem, T item, int relativePosition) {
+			this.refItem = refItem; //This can be an Expandable or a Header (constructor overload)
 			this.item = item;
 			this.relativePosition = relativePosition;
-			this.payload = payload;
 		}
 
 		/**
