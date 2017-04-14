@@ -73,7 +73,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 				.setAutoCollapseOnExpand(false)
 				.setAutoScrollOnExpand(true)
 				.setAnimateToLimit(Integer.MAX_VALUE) //Size limit = MAX_VALUE will always animate the changes
-				.setNotifyMoveOfFilteredItems(false) //When true, filtering on big list is very slow!
+				.setNotifyMoveOfFilteredItems(true) //When true, filtering on big list is very slow!
 				.setNotifyChangeOfUnfilteredItems(true) //We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
 				.setAnimationOnReverseScrolling(true);

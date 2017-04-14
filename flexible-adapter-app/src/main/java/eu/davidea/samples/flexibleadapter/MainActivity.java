@@ -834,7 +834,7 @@ public class MainActivity extends AppCompatActivity implements
 		if (mAdapter != null) {
 			String message = (mAdapter.hasSearchText() ? "Filtered " : "Refreshed ");
 			message += size + " items in " + mAdapter.getTime() + "ms";
-			Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
+			//Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
 		}
 	}
 
@@ -966,7 +966,7 @@ public class MainActivity extends AppCompatActivity implements
 						})
 						.remove(mAdapter.getSelectedPositions(),
 								findViewById(R.id.main_view), message,
-								getString(R.string.undo), 7000);
+								getString(R.string.undo), 20000);
 
 				// We consume the event
 				return true;
