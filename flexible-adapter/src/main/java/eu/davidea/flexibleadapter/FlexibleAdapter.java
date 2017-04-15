@@ -320,7 +320,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	@Override
 	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
-		if (mStickyHeaderHelper != null && headersShown) {
+		if (headersShown && areHeadersSticky()) {
 			mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
 		}
 	}
@@ -333,7 +333,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Override
 	public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
-		if (mStickyHeaderHelper != null) {
+		if (areHeadersSticky()) {
 			mStickyHeaderHelper.detachFromRecyclerView();
 			mStickyHeaderHelper = null;
 		}
@@ -1423,7 +1423,7 @@ public class FlexibleAdapter<T extends IFlexible>
 						mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
 						if (DEBUG) Log.i(TAG, "Sticky headers enabled");
 					}
-				} else if (mStickyHeaderHelper != null) {
+				} else if (areHeadersSticky()) {
 					mStickyHeaderHelper.detachFromRecyclerView();
 					mStickyHeaderHelper = null;
 					if (DEBUG) Log.i(TAG, "Sticky headers disabled");
@@ -1511,7 +1511,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@Deprecated
 	public FlexibleAdapter<T> setStickyHeaderContainer(@NonNull ViewGroup stickyContainer) {
-		if (mStickyHeaderHelper != null) {
+		if (areHeadersSticky()) {
 			Log.w(TAG, "StickyHeader has been already initialized! Call this method before enabling StickyHeaders");
 		}
 		if (DEBUG && stickyContainer != null)
@@ -3719,7 +3719,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		for (int i = mRestoreList.size() - 1; i >= 0; i--) {
 			adjustSelected = false;
 			RestoreInfo restoreInfo = mRestoreList.get(i);
-			IHeader header = getHeaderOf(restoreInfo.item);
 
 			if (restoreInfo.relativePosition >= 0) {
 				// Restore child
@@ -3734,6 +3733,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			// Item is again visible
 			restoreInfo.item.setHidden(false);
 			// Notify header if exists
+			IHeader header = getHeaderOf(restoreInfo.item);
 			if (header != null) {
 				notifyItemChanged(getGlobalPositionOf(header), Payload.UNDO);
 			}
@@ -5267,14 +5267,14 @@ public class FlexibleAdapter<T extends IFlexible>
 		}
 
 		private void updateOrClearHeader() {
-			if (mStickyHeaderHelper != null && !multiRange) {
+			if (areHeadersSticky() && (!multiRange || !mRestoreList.isEmpty())) {
 				// #320 - To include adapter changes just notified we need a new layout pass:
 				// We must give time to LayoutManager otherwise the findFirstVisibleItemPosition()
 				// will return wrong position!
 				mRecyclerView.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						if (mStickyHeaderHelper != null) mStickyHeaderHelper.updateOrClearHeader(true);
+						if (areHeadersSticky()) mStickyHeaderHelper.updateOrClearHeader(true);
 					}
 				}, 100L);
 			}

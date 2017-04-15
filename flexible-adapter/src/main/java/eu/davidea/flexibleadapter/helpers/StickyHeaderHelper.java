@@ -166,9 +166,8 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			// #299 - ClassCastException after click on expanded sticky header when AutoCollapse is enabled
 //			mStickyHeaderViewHolder = getHeaderViewHolder(headerPosition);
 //			mStickyHeaderViewHolder.setBackupPosition(headerPosition);
-//			mAdapter.onBindViewHolder(mStickyHeaderViewHolder, headerPosition);
-//			ensureHeaderParent();
-			//FIXME: update viewHolder when sticky
+			mAdapter.onBindViewHolder(mStickyHeaderViewHolder, headerPosition);
+			ensureHeaderParent();
 		}
 		translateHeader();
 	}
