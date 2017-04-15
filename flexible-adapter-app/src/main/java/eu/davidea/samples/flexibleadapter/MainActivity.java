@@ -831,10 +831,10 @@ public class MainActivity extends AppCompatActivity implements
 			mRefreshHandler.sendEmptyMessage(2);
 			fastScroller.setVisibility(View.GONE);
 		}
-		if (mAdapter != null) {
+		if (mAdapter != null && !mAdapter.isRestoreInTime()) {
 			String message = (mAdapter.hasSearchText() ? "Filtered " : "Refreshed ");
 			message += size + " items in " + mAdapter.getTime() + "ms";
-			//Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
 		}
 	}
 
@@ -878,8 +878,9 @@ public class MainActivity extends AppCompatActivity implements
 					case R.layout.recycler_sub_item:
 						SubItem subItem = (SubItem) adapterItem;
 						DatabaseService.getInstance().removeSubItem(mAdapter.getExpandableOfDeletedChild(subItem), subItem);
-						Log.d(TAG, "Confirm removed " + subItem.getTitle());
+						Log.d(TAG, "Confirm removed " + subItem);
 						break;
+					case R.layout.recycler_simple_item:
 					case R.layout.recycler_expandable_item:
 						DatabaseService.getInstance().removeItem(adapterItem);
 						Log.d(TAG, "Confirm removed " + adapterItem);
@@ -887,6 +888,7 @@ public class MainActivity extends AppCompatActivity implements
 				}
 
 			} catch (IllegalStateException e) {
+				//TODO: when all methods from Item Interfaces are abstract we can remove this
 				// AutoMap is disabled, fallback to if-else with "instanceof" statement
 				if (adapterItem instanceof SubItem) {
 					// SubItem

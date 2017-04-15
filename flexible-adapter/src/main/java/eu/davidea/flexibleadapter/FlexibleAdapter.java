@@ -167,13 +167,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	private T mProgressItem;
 
 	/* Listeners */
-	protected OnUpdateListener mUpdateListener;
 	public OnItemClickListener mItemClickListener;
 	public OnItemLongClickListener mItemLongClickListener;
+	protected OnUpdateListener mUpdateListener;
 	protected OnItemMoveListener mItemMoveListener;
 	protected OnItemSwipeListener mItemSwipeListener;
-	protected OnStickyHeaderChangeListener mStickyHeaderChangeListener;
 	protected EndlessScrollListener mEndlessScrollListener;
+	protected OnDeleteCompleteListener mDeleteCompleteListener;
+	protected OnStickyHeaderChangeListener mStickyHeaderChangeListener;
 
 	/*--------------*/
 	/* CONSTRUCTORS */
@@ -276,7 +277,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	@CallSuper
 	public FlexibleAdapter<T> addListener(@Nullable Object listener) {
 		if (DEBUG && listener != null) {
-			Log.i(TAG, "Adding listener class " + getClassName(listener) + " as:");
+			Log.i(TAG, "Setting listener class " + getClassName(listener) + " as:");
 		}
 		if (listener instanceof OnItemClickListener) {
 			if (DEBUG) Log.i(TAG, "- OnItemClickListener");
@@ -293,6 +294,10 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (listener instanceof OnItemSwipeListener) {
 			if (DEBUG) Log.i(TAG, "- OnItemSwipeListener");
 			mItemSwipeListener = (OnItemSwipeListener) listener;
+		}
+		if (listener instanceof OnDeleteCompleteListener) {
+			if (DEBUG) Log.i(TAG, "- OnDeleteCompleteListener");
+			mDeleteCompleteListener = (OnDeleteCompleteListener) listener;
 		}
 		if (listener instanceof OnStickyHeaderChangeListener) {
 			if (DEBUG) Log.i(TAG, "- OnStickyHeaderChangeListener");
@@ -2746,7 +2751,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		List<T> subItems = getExpandableList(expandable);
 		int subItemsCount = subItems.size(), recursiveCount = 0;
 
-		if (DEBUG && mHashItems == null) {
+		if (DEBUG) {
 			Log.v(TAG, "Request to Collapse on position=" + position +
 					" expanded=" + expandable.isExpanded() +
 					" hasSubItemsSelected=" + hasSubItemsSelected(position, subItems));
@@ -3719,30 +3724,11 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (restoreInfo.relativePosition >= 0) {
 				// Restore child
 				if (DEBUG) Log.d(TAG, "Restore SubItem " + restoreInfo);
-				// Skip subItem addition if filter is active
-				if (hasSearchText() && !filterObject(restoreInfo.item, getSearchText()))
-					continue;
-				// Check if refItem is shown, if not, show it again
-				if (hasSearchText() && getGlobalPositionOf(header) == RecyclerView.NO_POSITION) {
-					// Add parent + subItem
-					restoreInfo.refItem.setHidden(false);
-					restoreInfo.relativePosition = 0;
-					addItem(restoreInfo.getRestorePosition(false), restoreInfo.refItem);
-				}
-				// Add subItem
 				addSubItem(restoreInfo.getRestorePosition(true), restoreInfo.relativePosition,
 						restoreInfo.item, false, Payload.UNDO);
 			} else {
 				// Restore parent or simple item
 				if (DEBUG) Log.d(TAG, "Restore Item " + restoreInfo);
-				// Skip item addition if filter is active
-				if (hasSearchText() && !filterExpandableObject(restoreInfo.item))
-					continue;
-				// Add header if not visible (flagging it will insert when restoring the item)
-				if (hasSearchText() && hasHeader(restoreInfo.item) &&
-						getGlobalPositionOf(header) == RecyclerView.NO_POSITION)
-					header.setHidden(true);
-				// Add item
 				addItem(restoreInfo.getRestorePosition(false), restoreInfo.item);
 			}
 			// Item is again visible
@@ -3774,7 +3760,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 			if (DEBUG) Log.d(TAG, "Selected positions after restore " + getSelectedPositions());
 		}
-
 		// Call listener to update EmptyView
 		multiRange = false;
 		if (mUpdateListener != null && initialCount == 0 && getItemCount() > 0)
@@ -3800,7 +3785,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param listener the listener that will be called after timeout to commit the change
 	 * @since 3.0.0
+	 * @deprecated Use {@link eu.davidea.flexibleadapter.helpers.UndoHelper}
 	 */
+	@Deprecated
 	public void startUndoTimer(OnDeleteCompleteListener listener) {
 		startUndoTimer(0, listener);
 	}
@@ -3811,7 +3798,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param timeout  custom timeout
 	 * @param listener the listener that will be called after timeout to commit the change
 	 * @since 3.0.0
+	 * @deprecated Use {@link eu.davidea.flexibleadapter.helpers.UndoHelper}
 	 */
+	@Deprecated
 	public void startUndoTimer(long timeout, OnDeleteCompleteListener listener) {
 		// Make longer the timer for new coming deleted items
 		stopUndoTimer();
@@ -3823,7 +3812,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p><b>Note:</b> This method is automatically called in case of restoration.</p>
 	 *
 	 * @since 3.0.0
+	 * @deprecated Use {@link eu.davidea.flexibleadapter.helpers.UndoHelper}
 	 */
+	@Deprecated
 	protected void stopUndoTimer() {
 		mHandler.removeMessages(CONFIRM_DELETE);
 	}
@@ -3993,7 +3984,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * <b>WATCH OUT! ADAPTER CREATES A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal
+	 * <b>WATCH OUT! ADAPTER ALREADY CREATES A <u>COPY</u> OF THE PROVIDED LIST</b>: due to internal
 	 * mechanism, items are removed and/or added in order to animate items in the final list.
 	 * <p>Same as {@link #filterItems(List)}, but with a delay in the execution, useful to grab
 	 * more characters from user before starting the search.</p>
@@ -4004,8 +3995,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #onPostFilter()
 	 * @see #setAnimateToLimit(int)
 	 * @since 5.0.0-b1
-	 * <br/>5.0.0-b8 Synchronization animations limit + AsyncFilter
-	 * <br/>5.0.0-rc2 Copy of the Original List is done internally
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems, @IntRange(from = 0) long delay) {
 		//Make longer the timer for new coming deleted items
@@ -4014,7 +4003,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * <b>WATCH OUT! ADAPTER CREATES A <u>COPY</u> OF THE ORIGINAL LIST</b>: due to internal
+	 * <b>WATCH OUT! ADAPTER ALREADY CREATES A <u>COPY</u> OF THE PROVIDED LIST</b>: due to internal
 	 * mechanism, items are removed and/or added in order to animate items in the final list.
 	 * <p>This method filters the provided list with the searchText previously set with
 	 * {@link #setSearchText(String)}.</p>
@@ -4025,8 +4014,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <li>This method calls {@link #filterObject(IFlexible, String)}.</li>
 	 * <li>If searchText is empty or {@code null}, the provided list is the new list plus any
 	 * Scrollable Headers and Footers if existent.</li>
-	 * <li>Any pending deleted items are always filtered out, but if restored, they will be
-	 * displayed according to the current filter and at the right positions.</li>
+	 * <li>Any pending deleted items are always deleted before filter is performed.</li>
 	 * <li>Expandable items are picked up and displayed if at least a child is collected by
 	 * the current filter.</li>
 	 * <li>Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit of
@@ -4044,6 +4032,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <br/>5.0.0-b8 Synchronization animations limit + AsyncFilter
 	 * <br/>5.0.0-rc1 Scrollable Headers and Footers adaptation
 	 * <br/>5.0.0-rc2 Copy of the Original List is done internally
+	 * <br/>5.0.0-rc2 Removal of Undo in combination with Filter
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems) {
 		mHandler.removeMessages(FILTER);
@@ -4051,38 +4040,21 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	private synchronized void filterItemsAsync(@NonNull List<T> unfilteredItems) {
-		// Note: In case user has deleted some items and he changes or applies a filter while
-		// deletion is pending (Undo started), in order to be consistent, we need to recalculate
-		// the new position in the new list and finally skip those items to avoid they are shown!
-
 		if (DEBUG) Log.i(TAG, "filterItems with searchText=\"" + mSearchText + "\"");
 		List<T> filteredItems = new ArrayList<>();
 		filtering = true; //Enable flag
 
 		if (hasSearchText() && hasNewSearchText(mSearchText)) { //skip when text is unchanged
-			int newOriginalPosition = -1;
 			for (T item : unfilteredItems) {
 				if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
-//				// Filter header first
-//				T header = (T) getHeaderOf(item);
-//				if (headersShown && header != null && filterObject(header, getSearchText())
-//						&& !filteredItems.contains(header)) {
-//					filteredItems.add(header);
-//				}
 				if (filterExpandableObject(item)) {
-					RestoreInfo restoreInfo = getPendingRemovedItem(item);
-					if (restoreInfo != null) {
-						// If found, point to the new reference while filtering
-						restoreInfo.filterRefItem = ++newOriginalPosition < filteredItems.size() ?
-								filteredItems.get(newOriginalPosition) : null;
-					} else {
-						T header = (T) getHeaderOf(item);
-						if (headersShown && hasHeader(item) && !filteredItems.contains(header)) {
-							filteredItems.add(header);
-						}
-						filteredItems.add(item);
-						newOriginalPosition++;// + addFilteredSubItems(filteredItems, item);
+					T header = (T) getHeaderOf(item);
+					if (headersShown && hasHeader(item) && !filteredItems.contains(header)) {
+						header.setHidden(false);
+						filteredItems.add(header);
 					}
+					filteredItems.add(item);
+					addFilteredSubItems(filteredItems, item);
 				} else {
 					item.setHidden(true);
 				}
@@ -4091,28 +4063,6 @@ public class FlexibleAdapter<T extends IFlexible>
 			filteredItems = unfilteredItems; //original items with no filter
 			resetFilterFlags(filteredItems);
 			restoreScrollableHeadersAndFooters(filteredItems);
-			if (!mRestoreList.isEmpty()) {
-				for (int i = mRestoreList.size() -1; i >= 0; i--) {
-					RestoreInfo restoreInfo = mRestoreList.get(i);
-					// Clear the refItem generated by the filter
-					restoreInfo.clearFilterRef();
-					// Find the real reference
-					if (isExpandable(restoreInfo.refItem)) {
-						IExpandable expandable = (IExpandable) restoreInfo.refItem;
-						if (hasSubItems(expandable)) {
-							restoreInfo.relativePosition = expandable.getSubItems().indexOf(restoreInfo.item);
-						}
-					} else {
-						T refItem = filteredItems.get(Math.max(0, filteredItems.indexOf(restoreInfo.item) - 1));
-						// Don't overwrite refItem if it was deleted as well
-						if (getPendingRemovedItem(refItem) == null) {
-							restoreInfo.refItem = refItem;
-						}
-					}
-					// Deleted items not yet committed should not appear
-					filteredItems.remove(restoreInfo.item);
-				}
-			}
 		}
 
 		// Animate search results only in case of new SearchText
@@ -4195,7 +4145,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Adds to the final list also the filtered subItems.
 	 */
-	private int addFilteredSubItems(List<T> values, T item) {
+	private void addFilteredSubItems(List<T> values, T item) {
 		if (isExpandable(item)) {
 			IExpandable expandable = (IExpandable) item;
 			if (hasSubItems(expandable)) {
@@ -4206,10 +4156,8 @@ public class FlexibleAdapter<T extends IFlexible>
 					if (!subItem.isHidden()) filteredSubItems.add(subItem);
 				}
 				values.addAll(filteredSubItems);
-				return filteredSubItems.size();
 			}
 		}
-		return 0;
 	}
 
 	/**
@@ -4241,15 +4189,15 @@ public class FlexibleAdapter<T extends IFlexible>
 				}
 			}
 			// Restore headers visibility
-//			if (headersShown) {
-//				IHeader header = getHeaderOf(item);
-//				if (header != sameHeader && header != null && !isExpandable((T) header)) {
-//					header.setHidden(false);
-//					sameHeader = header;
-//					items.add(i, (T) header);
-//					i++;
-//				}
-//			}
+			if (headersShown) {
+				IHeader header = getHeaderOf(item);
+				if (header != sameHeader && header != null && !isExpandable((T) header)) {
+					header.setHidden(false);
+					sameHeader = header;
+					items.add(i, (T) header);
+					i++;
+				}
+			}
 		}
 		mExpandedFilterFlags = null;
 	}
@@ -5151,11 +5099,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public interface OnDeleteCompleteListener {
 		/**
-		 * Called when Undo timeout is over and removal must be committed in the user Database.
-		 * <p>Due to Java Generic, it's too complicated and not
-		 * well manageable if we pass the List&lt;<b>T</b>&gt; object.<br/>
-		 * To get deleted items, use {@link FlexibleAdapter#getDeletedItems()} from the
-		 * implementation of this method.</p>
+		 * Called when UndoTime out is over or when Filter is started or reset in order
+		 * to commit deletion in the user Database.
+		 * <p>Must be called on user Main Thread!</p>
 		 *
 		 * @since 5.0.0-b1
 		 */
@@ -5367,7 +5313,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		// Positions
 		int refPosition = -1, relativePosition = -1;
 		// The item to which the deleted item is referring to
-		T refItem = null, filterRefItem = null;
+		T refItem = null;
 		// The deleted item
 		T item = null;
 
@@ -5392,7 +5338,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 */
 		public int getRestorePosition(boolean isChild) {
 			if (refPosition < 0) {
-				refPosition = getGlobalPositionOf(filterRefItem != null ? filterRefItem : refItem);
+				refPosition = getGlobalPositionOf(refItem);
 			}
 			T item = getItem(refPosition);
 			if (isChild && isExpandable(item)) {
@@ -5406,16 +5352,9 @@ public class FlexibleAdapter<T extends IFlexible>
 			return refPosition;
 		}
 
-		public void clearFilterRef() {
-			filterRefItem = null;
-			refPosition = -1;
-		}
-
 		@Override
 		public String toString() {
-			return "RestoreInfo[item=" + item +
-					", refItem=" + refItem +
-					", filterRefItem=" + filterRefItem + "]";
+			return "RestoreInfo[item=" + item + ", refItem=" + refItem + "]";
 		}
 	}
 
@@ -5448,6 +5387,17 @@ public class FlexibleAdapter<T extends IFlexible>
 			this.what = what;
 			// Copy of the original list
 			this.newItems = new ArrayList<>(newItems);
+		}
+
+		@Override
+		protected void onPreExecute() {
+			// Note: In case some items are in pending deletion (Undo started),
+			// we commit the deletion before starting or resetting the filter.
+			if (isRestoreInTime() && mDeleteCompleteListener != null) {
+				if (DEBUG) Log.d(TAG, "Hiding all deleted items before filtering/updating");
+				newItems.removeAll(getDeletedItems());
+				mDeleteCompleteListener.onDeleteConfirmed();
+			}
 		}
 
 		@Override
@@ -5556,7 +5506,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@CallSuper
 	protected void onPostFilter() {
-		/// Call listener to update EmptyView, assuming the filter always made a change
+		// Call listener to update EmptyView, assuming the filter always made a change
 		if (mUpdateListener != null)
 			mUpdateListener.onUpdateEmptyView(getMainItemCount());
 	}
