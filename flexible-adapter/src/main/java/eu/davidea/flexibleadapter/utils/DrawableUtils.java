@@ -214,9 +214,12 @@ public final class DrawableUtils {
 														  @ColorInt int pressedColor) {
 		StateListDrawable states = new StateListDrawable();
 		states.addState(new int[]{android.R.attr.state_activated}, getColorDrawable(pressedColor));
+		if (!Utils.hasLollipop()) {
+			states.addState(new int[]{android.R.attr.state_pressed}, getColorDrawable(pressedColor));
+		}
 		states.addState(new int[]{}, getColorDrawable(normalColor));
 		// Animating across states.
-		// It seems item background is lost on scrolling out of the screen, 21 <= API <= 23
+		// It seems item background is lost on scrolling out of the screen on 21 <= API <= 23
 		if (!Utils.hasLollipop() || Utils.hasNougat()) {
 			int duration = 200; //android.R.integer.config_shortAnimTime
 			states.setEnterFadeDuration(duration);
