@@ -659,7 +659,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-rc2
 	 */
 	@NonNull
-	public final List<T> getItems() {
+	public final List<T> getCurrentItems() {
 		return Collections.unmodifiableList(mItems);
 	}
 

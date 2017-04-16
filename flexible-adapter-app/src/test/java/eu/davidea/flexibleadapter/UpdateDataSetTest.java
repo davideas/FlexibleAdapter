@@ -38,9 +38,9 @@ public class UpdateDataSetTest {
 		mAdapter.setNotifyChangeOfUnfilteredItems(true);
 		mAdapter.showAllHeaders();
 
-		List<AbstractFlexibleItem> initialItems = mAdapter.getItems();
+		List<AbstractFlexibleItem> initialItems = mAdapter.getCurrentItems();
 		mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), true);
-		List<AbstractFlexibleItem> updatedItems = mAdapter.getItems();
+		List<AbstractFlexibleItem> updatedItems = mAdapter.getCurrentItems();
 
 		assertEquals(initialItems.size(), mAdapter.getItemCount());
 		assertThat(initialItems, Matchers.contains(updatedItems.toArray()));
@@ -52,9 +52,9 @@ public class UpdateDataSetTest {
 		mAdapter.setNotifyChangeOfUnfilteredItems(true);
 		mAdapter.showAllHeaders();
 
-		List<AbstractFlexibleItem> initialItems = mAdapter.getItems();
+		List<AbstractFlexibleItem> initialItems = mAdapter.getCurrentItems();
 		mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList());
-		List<AbstractFlexibleItem> updatedItems = mAdapter.getItems();
+		List<AbstractFlexibleItem> updatedItems = mAdapter.getCurrentItems();
 
 		assertEquals(initialItems.size(), mAdapter.getItemCount());
 		assertThat(initialItems, Matchers.contains(updatedItems.toArray()));
