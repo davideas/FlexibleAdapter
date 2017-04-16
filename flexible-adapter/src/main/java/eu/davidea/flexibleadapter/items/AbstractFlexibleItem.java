@@ -166,4 +166,12 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 				+ this.getClass().getSimpleName() + ".bindViewHolder().");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void unbindViewHolder(FlexibleAdapter adapter, VH holder, int position) {
+
+	}
+
 }

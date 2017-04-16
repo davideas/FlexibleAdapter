@@ -1913,11 +1913,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	@CallSuper
 	@Override
 	public void onViewRecycled(RecyclerView.ViewHolder holder) {
+		super.onViewRecycled(holder);
 		if (areHeadersSticky()) {
 			// #297 - Empty (Invisible) Header Item when Using Sticky Headers
 			holder.itemView.setVisibility(View.VISIBLE);
 		}
-		super.onViewRecycled(holder);
+		int position = holder.getAdapterPosition();
+		T item = getItem(position);
+		if (item != null) item.unbindViewHolder(this, holder, position);
 	}
 
 	/*------------------------*/

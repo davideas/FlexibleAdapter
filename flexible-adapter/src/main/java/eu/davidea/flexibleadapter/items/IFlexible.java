@@ -170,10 +170,23 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	 * @param adapter  the FlexibleAdapter instance
 	 * @param holder   the ViewHolder instance
 	 * @param position the current position
-	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full
-	 *                 update.
+	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full update
 	 * @throws IllegalStateException if called but not implemented
 	 */
 	void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads);
+
+	/**
+	 * Called when a view created by this adapter has been recycled.
+	 * <p>A view is recycled when a RecyclerView.LayoutManager decides that it no longer needs to
+	 * be attached to its parent RecyclerView. This can be because it has fallen out of visibility
+	 * or a set of cached views represented by views still attached to the parent RecyclerView.</p>
+	 * If an item view has large or expensive data bound to it such as large bitmaps, this may be
+	 * a good place to release those resources.
+	 *
+	 * @param adapter  the FlexibleAdapter instance
+	 * @param holder   the ViewHolder instance being recycled
+	 * @param position the current position
+	 */
+	void unbindViewHolder(FlexibleAdapter adapter, VH holder, int position);
 
 }
