@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +55,12 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UC
 		);
 		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
 		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
+
+		//Support for StaggeredGridLayoutManager
+		if (holder.itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
+			((StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams()).setFullSpan(true);
+			Log.d("LayoutItem", "LayoutItem configured fullSpan for StaggeredGridLayout");
+		}
 	}
 
 	public static class UCViewHolder extends FlexibleViewHolder {

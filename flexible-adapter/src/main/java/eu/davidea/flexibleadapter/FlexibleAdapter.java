@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Davide Steduto
+ * Copyright 2015-2017 Davide Steduto
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,16 +82,16 @@ import static eu.davidea.flexibleadapter.utils.Utils.getClassName;
  * @see FlexibleViewHolder
  * @see ExpandableViewHolder
  * @since 03/05/2015 Created
- * <br/>16/01/2016 Expandable items
- * <br/>24/01/2016 Drag&Drop, Swipe
- * <br/>30/01/2016 Class now extends {@link AnimatorAdapter} that extends {@link SelectableAdapter}
- * <br/>02/02/2016 New code reorganization, new item interfaces and full refactoring
- * <br/>08/02/2016 Headers/Sections
- * <br/>10/02/2016 The class is not abstract anymore, it is ready to be used
- * <br/>20/02/2016 Sticky headers
- * <br/>22/04/2016 Endless Scrolling
- * <br/>13/07/2016 Update and Filter operations are executed asynchronously (high performance on big list)
- * <br/>25/11/2016 Scrollable Headers and Footers; Reviewed EndlessScroll
+ * <br>16/01/2016 Expandable items
+ * <br>24/01/2016 Drag&Drop, Swipe
+ * <br>30/01/2016 Class now extends {@link AnimatorAdapter} that extends {@link SelectableAdapter}
+ * <br>02/02/2016 New code reorganization, new item interfaces and full refactoring
+ * <br>08/02/2016 Headers/Sections
+ * <br>10/02/2016 The class is not abstract anymore, it is ready to be used
+ * <br>20/02/2016 Sticky headers
+ * <br>22/04/2016 Endless Scrolling
+ * <br>13/07/2016 Update and Filter operations are executed asynchronously (high performance on big list)
+ * <br>25/11/2016 Scrollable Headers and Footers; Reviewed EndlessScroll
  */
 @SuppressWarnings({"Range", "unused", "unchecked", "ConstantConditions", "SuspiciousMethodCalls", "WeakerAccess"})
 public class FlexibleAdapter<T extends IFlexible>
@@ -187,7 +187,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #FlexibleAdapter(List, Object)
 	 * @see #FlexibleAdapter(List, Object, boolean)
 	 * @since 4.2.0 Created
-	 * <br/>5.0.0-rc2 Copy of the Original List is done internally
+	 * <br>5.0.0-rc2 Copy of the Original List is done internally
 	 */
 	public FlexibleAdapter(@Nullable List<T> items) {
 		this(items, null);
@@ -214,7 +214,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #FlexibleAdapter(List, Object, boolean)
 	 * @see #addListener(Object)
 	 * @since 5.0.0-b1 Created
-	 * <br/>5.0.0-rc2 Copy of the Original List is done internally
+	 * <br>5.0.0-rc2 Copy of the Original List is done internally
 	 */
 	public FlexibleAdapter(@Nullable List<T> items, @Nullable Object listeners) {
 		this(items, listeners, false);
@@ -233,7 +233,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #FlexibleAdapter(List, Object)
 	 * @see #addListener(Object)
 	 * @since 5.0.0-b8 Created
-	 * <br/>5.0.0-rc2 Copy of the Original List is done internally
+	 * <br>5.0.0-rc2 Copy of the Original List is done internally
 	 */
 	public FlexibleAdapter(@Nullable List<T> items, @Nullable Object listeners, boolean stableIds) {
 		super(stableIds);
@@ -344,7 +344,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Maps and expands items that are initially configured to be shown as expanded.
 	 * <p>This method should be called during the creation of the Activity/Fragment, useful also
 	 * after a screen rotation.
-	 * <br/>It is also called after the data set is updated.</p>
+	 * <br>It is also called after the data set is updated.</p>
 	 *
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
@@ -434,11 +434,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Helper to automatically select all the items of the viewType equal to the viewType of
 	 * the first selected item.
 	 * <p>Examples:
-	 * <br/>- if user initially selects an expandable of type A, then only expandable items of
+	 * <br>- if user initially selects an expandable of type A, then only expandable items of
 	 * type A will be selected.
-	 * <br/>- if user initially selects a non-expandable of type B, then only items of type B
+	 * <br>- if user initially selects a non-expandable of type B, then only items of type B
 	 * will be selected.
-	 * <br/>- The developer can override this behaviour by passing a list of viewTypes for which
+	 * <br>- The developer can override this behaviour by passing a list of viewTypes for which
 	 * he wants to force the selection.</p>
 	 *
 	 * @param viewTypes All the desired viewTypes to be selected, providing no view types, will
@@ -495,7 +495,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param items the new data set
 	 * @see #updateDataSet(List, boolean)
 	 * @since 5.0.0-b1 Created
-	 * <br/>5.0.0-rc2 Copy of the Original List done internally
+	 * <br>5.0.0-rc2 Copy of the Original List done internally
 	 */
 	@CallSuper
 	public void updateDataSet(List<T> items) {
@@ -525,8 +525,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #setAnimateToLimit(int)
 	 * @see #onPostUpdate()
 	 * @since 5.0.0-b7 Created
-	 * <br/>5.0.0-b8 Synchronization animations limit
-	 * <br/>5.0.0-rc2 Copy of the Original List done internally
+	 * <br>5.0.0-b8 Synchronization animations limit
+	 * <br>5.0.0-rc2 Copy of the Original List done internally
 	 */
 	@CallSuper
 	public void updateDataSet(@Nullable List<T> items, boolean animate) {
@@ -693,9 +693,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Retrieves the position of the Main item in the Adapter list excluding the scrollable Headers.
 	 * If no scrollable Headers are added, the cardinal position coincides with the global position.
 	 * <p><b>Note:</b>
-	 * <br/>- This method is NOT suitable to call when managing items: ALL insert, remove, move and
+	 * <br>- This method is NOT suitable to call when managing items: ALL insert, remove, move and
 	 * swap operations, should done with global position {@link #getGlobalPositionOf(IFlexible)}.
-	 * <br/>- This method cannot be overridden.</p>
+	 * <br>- This method cannot be overridden.</p>
 	 *
 	 * @param item the item to find
 	 * @return the position in the Adapter excluding the Scrollable Headers, -1 otherwise
@@ -1317,9 +1317,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Enables the sticky header functionality.
 	 * <p>Headers can be sticky only if they are shown.</p>
 	 * <b>Note:</b>
-	 * <br/>- You must read {@link #getStickyHeaderContainer()}.
-	 * <br/>- Sticky headers are now clickable as any Views, but cannot be dragged nor swiped.
-	 * <br/>- Content and linkage are automatically updated.
+	 * <br>- You must read {@link #getStickyHeaderContainer()}.
+	 * <br>- Sticky headers are now clickable as any Views, but cannot be dragged nor swiped.
+	 * <br>- Content and linkage are automatically updated.
 	 *
 	 * @return this Adapter, so the call can be chained
 	 * @see #getStickyHeaderContainer()
@@ -1352,7 +1352,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * constructor: {@link FlexibleViewHolder#FlexibleViewHolder(View, FlexibleAdapter, boolean)}.</li>
 	 * <li>Optionally, you can set a custom sticky layout container that must be <u>already
 	 * inflated</u>.
-	 * <br/>Check {@link #setStickyHeaders(boolean, ViewGroup)}.</li>
+	 * <br>Check {@link #setStickyHeaders(boolean, ViewGroup)}.</li>
 	 * <li>Optionally, you can set a layout <u>elevation</u>: Header item elevation is used first,
 	 * if not set, default elevation of {@code 21f} pixel is used.
 	 * <li>Sticky headers are clickable as any views, but cannot be dragged nor swiped.</li>
@@ -1472,7 +1472,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <pre>&lt;include layout="@layout/sticky_header_layout"/&gt;</pre></p>
 	 * <p><b>OR</b></p>
 	 * Implement this method to return an already inflated ViewGroup.
-	 * <br/>The ViewGroup <u>must</u> have {@code android:id="@+id/sticky_header_container"}.
+	 * <br>The ViewGroup <u>must</u> have {@code android:id="@+id/sticky_header_container"}.
 	 *
 	 * @return ViewGroup layout that will hold the sticky header ItemViews
 	 * @since 5.0.0-b6
@@ -1793,23 +1793,23 @@ public class FlexibleAdapter<T extends IFlexible>
 		return false;
 	}
 
-	/*---------------------*/
-	/* VIEW HOLDER METHODS */
-	/*---------------------*/
+	/*--------------------------------------------*/
+	/* VIEW HOLDER METHODS ARE DELEGATED TO ITEMS */
+	/*--------------------------------------------*/
 
 	/**
-	 * Returns the ViewType for all Items depends by the provided position.
-	 * <p>You can override this method to return specific values (don't call super) OR you can
-	 * let this method to call the implementation of {@code IFlexible#getLayoutRes()} so ViewTypes
-	 * are automatically mapped (AutoMap).</p>
+	 * <p>You <b>CANNOT</b> override this method: {@code FlexibleAdapter} delegates the ViewType
+	 * definition via {@code IFlexible.getLayoutRes()} so ViewTypes are automatically mapped
+	 * (AutoMap).</p>
+	 * {@inheritDoc}
 	 *
 	 * @param position position for which ViewType is requested
-	 * @return if item is found, any integer value from user layout resource if defined in
-	 * {@code IFlexible#getLayoutRes()}
+	 * @return layout resource defined in {@code IFlexible#getLayoutRes()}
+	 * @see IFlexible#getLayoutRes()
 	 * @since 5.0.0-b1
 	 */
 	@Override
-	public int getItemViewType(int position) {
+	public final int getItemViewType(int position) {
 		T item = getItem(position);
 		if (item == null) {
 			return 0;
@@ -1821,27 +1821,24 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * You can override this method to create ViewHolder from inside the Adapter OR you can let
-	 * this method to call the implementation of {@code IFlexible#createViewHolder()} to create
-	 * ViewHolder from inside the item (AutoMap).
+	 * You <b>CANNOT</b> override this method to create the ViewHolder, {@code FlexibleAdapter}
+	 * delegates the creation via {@code IFlexible.createViewHolder()}.
 	 * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
 	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
-	 * on GitHub.
-	 * <p/>{@inheritDoc}
+	 * on GitHub.</p>
+	 * {@inheritDoc}
 	 *
 	 * @return a new ViewHolder that holds a View of the given view type
-	 * @throws IllegalStateException if this method is not overridden OR AutoMap is not active
-	 *                               OR if ViewType instance has not been properly mapped.
 	 * @see IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)
 	 * @since 5.0.0-b1
 	 */
 	@Override
-	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+	public final RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		T item = getViewTypeInstance(viewType);
 		if (item == null || !autoMap) {
 			// If everything has been set properly, this should never happen ;-)
 			throw new IllegalStateException("ViewType instance not found for viewType " + viewType +
-					". Override this method or implement the AutoMap properly.");
+					". You should implement the AutoMap properly.");
 		}
 		if (mInflater == null) {
 			mInflater = LayoutInflater.from(parent.getContext());
@@ -1850,21 +1847,18 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * You can override this method to bind the items into the corresponding ViewHolder from
-	 * inside the Adapter OR you can let this method to call the implementation of
-	 * {@code IFlexible#bindViewHolder()} to bind the item inside itself (AutoMap).
+	 * You <b>CANNOT</b> override this method to bind the items. {@code FlexibleAdapter} delegates
+	 * the binding to the corresponding item via {@code IFlexible.bindViewHolder()}.
 	 * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
 	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
-	 * on GitHub.
-	 * <p/>{@inheritDoc}
+	 * on GitHub.</p>
+	 * {@inheritDoc}
 	 *
-	 * @throws IllegalStateException if this method is not overridden OR AutoMap has not been
-	 *                               properly implemented.
 	 * @see IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)
 	 * @since 5.0.0-b1
 	 */
 	@Override
-	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+	public final void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 		this.onBindViewHolder(holder, position, Collections.unmodifiableList(new ArrayList<>()));
 	}
 
@@ -1872,14 +1866,12 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Same concept of {@code #onBindViewHolder()} but with Payload.
 	 * <p/>{@inheritDoc}
 	 *
-	 * @throws IllegalStateException if this method is not overridden OR AutoMap has not been
-	 *                               properly implemented.
 	 * @see IFlexible#bindViewHolder(FlexibleAdapter, RecyclerView.ViewHolder, int, List)
 	 * @see #onBindViewHolder(RecyclerView.ViewHolder, int)
 	 * @since 5.0.0-b1
 	 */
 	@Override
-	public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position, List payloads) {
+	public final void onBindViewHolder(final RecyclerView.ViewHolder holder, int position, List payloads) {
 		if (DEBUG) {
 			Log.v(TAG, "onViewBound    Holder=" + getClassName(holder) + " position=" + position +
 					" itemId=" + holder.getItemId() + " layoutPosition=" + holder.getLayoutPosition());
@@ -2121,13 +2113,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * This method is called automatically if METHOD A is implemented. If instead you chose the
-	 * classic way (METHOD B) to bind the items, you <u>have to manually</u> call this method
-	 * at the end of {@code onBindViewHolder()}.
+	 * This method is called automatically when an item is bound.
 	 *
 	 * @param position the current binding position
 	 * @since 5.0.0-b6
-	 * <br/>5.0.0-rc1 Added limits check and progressItem with Scrollable Footers
+	 * <br>5.0.0-rc1 Added limits check and progressItem with Scrollable Footers
 	 */
 	protected void onLoadMore(int position) {
 		// Skip everything when loading more is unused OR currently loading
@@ -2196,8 +2186,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param delay    the delay used to remove the progress item or -1 to disable the
 	 *                 loading forever and to keep the progress item visible.
 	 * @since 5.0.0-b8
-	 * <br/>5.0.0-rc1 Added limits check and changed progressItem to Scrollable Footer
-	 * <br/>5.0.0-rc2 Added Top Endless
+	 * <br>5.0.0-rc1 Added limits check and changed progressItem to Scrollable Footer
+	 * <br>5.0.0-rc2 Added Top Endless
 	 */
 	public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
 		// Calculate new items count
@@ -2295,7 +2285,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Automatically scroll the clicked expandable item to the first visible position.<br/>
+	 * Automatically scroll the clicked expandable item to the first visible position.<br>
 	 * <p>Default value is {@code false} (disabled).</p>
 	 * This works ONLY in combination with {@link SmoothScrollLinearLayoutManager} or with
 	 * {@link SmoothScrollGridLayoutManager}.
@@ -2571,7 +2561,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p><b>Note:</b> Must be used in combination with adding new items that require to be
 	 * initially expanded.</p>
 	 * <b>WARNING!</b>
-	 * <br/>Expanded status is ignored if {@code init = true}: it will always attempt to expand
+	 * <br>Expanded status is ignored if {@code init = true}: it will always attempt to expand
 	 * the item: If subItems are already visible <u>and</u> the new item has status expanded, the
 	 * subItems will appear duplicated(!) and the automatic smooth scroll will be skipped!
 	 *
@@ -2593,7 +2583,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p><b>Note:</b> Must be used in combination with adding new items that require to be
 	 * initially expanded.</p>
 	 * <b>WARNING!</b>
-	 * <br/>Expanded status is ignored if {@code init = true}: it will always attempt to expand
+	 * <br>Expanded status is ignored if {@code init = true}: it will always attempt to expand
 	 * the item: If subItems are already visible <u>and</u> the new item has status expanded, the
 	 * subItems will appear duplicated(!) and the automatic smooth scroll will be skipped!
 	 *
@@ -2948,9 +2938,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Inserts a set of items at specified position or Adds the items to the end of the list
 	 * (no matters if the new position is out of bounds!).
 	 * <p><b>Note:</b>
-	 * <br/>- When all headers are shown, if exists, the header of this item will be shown as well,
+	 * <br>- When all headers are shown, if exists, the header of this item will be shown as well,
 	 * unless it's already shown, so it won't be shown twice.
-	 * <br/>- Items will be always added between any scrollable header and footers.</p>
+	 * <br>- Items will be always added between any scrollable header and footers.</p>
 	 *
 	 * @param position position inside the list, if negative, items will be added to the end
 	 * @param items    the set of items to add
@@ -3004,7 +2994,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Convenience method of {@link #addSubItem(int, int, IFlexible, boolean, Object)}.
-	 * <br/>In this case parent item will never be expanded if it is collapsed.
+	 * <br>In this case parent item will never be expanded if it is collapsed.
 	 *
 	 * @return true if the internal list was successfully modified, false otherwise
 	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
@@ -3017,7 +3007,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Convenience method of {@link #addSubItems(int, int, IExpandable, List, boolean, Object)}.
-	 * <br/>Optionally you can pass any payload to notify the parent about the change and optimize
+	 * <br>Optionally you can pass any payload to notify the parent about the change and optimize
 	 * the view binding.
 	 *
 	 * @param parentPosition position of the expandable item that shall contain the subItem
@@ -3046,9 +3036,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Adds all current subItems of the passed parent to the internal list.
 	 * <p><b>In order to add the subItems</b>, the following condition must be satisfied:
-	 * <br/>- The item resulting from the parent position is actually an {@link IExpandable}.</p>
+	 * <br>- The item resulting from the parent position is actually an {@link IExpandable}.</p>
 	 * Optionally the parent can be expanded and subItems displayed.
-	 * <br/>Optionally you can pass any payload to notify the parent about the change and optimize
+	 * <br>Optionally you can pass any payload to notify the parent about the change and optimize
 	 * the view binding.
 	 *
 	 * @param parentPosition position of the expandable item that shall contain the subItem
@@ -3075,7 +3065,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Convenience method of {@link #addSubItems(int, int, IExpandable, List, boolean, Object)}.
-	 * <br/>Optionally you can pass any payload to notify the parent about the change and optimize
+	 * <br>Optionally you can pass any payload to notify the parent about the change and optimize
 	 * the view binding.
 	 *
 	 * @param parentPosition position of the expandable item that shall contain the subItems
@@ -3105,9 +3095,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Adds new subItems on the specified parent item, to the internal list.
 	 * <p><b>In order to add subItems</b>, the following condition must be satisfied:
-	 * <br/>- The item resulting from the parent position is actually an {@link IExpandable}.</p>
+	 * <br>- The item resulting from the parent position is actually an {@link IExpandable}.</p>
 	 * Optionally, the parent can be expanded and subItems displayed.
-	 * <br/>Optionally, you can pass any payload to notify the parent about the change and
+	 * <br>Optionally, you can pass any payload to notify the parent about the change and
 	 * optimize the view binding.
 	 *
 	 * @param parentPosition position of the expandable item that shall contain the subItems
@@ -3178,7 +3168,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * position is calculated after sorting the data set.
 	 * <p>- To add Sections to the <b>top</b>, set null the Comparator object or simply call
 	 * {@link #addSection(IHeader)};
-	 * <br/>- To add Sections to the <b>bottom</b> or in the <b>middle</b>, implement a Comparator
+	 * <br>- To add Sections to the <b>bottom</b> or in the <b>middle</b>, implement a Comparator
 	 * object able to support <u>all</u> the item types this Adapter is displaying or a
 	 * ClassCastException will be raised.</p>
 	 *
@@ -3455,8 +3445,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Selectively removes all items of the type provided as parameter.
 	 * <p><b>Note:</b>
-	 * <br/>- This method is opposite of {@link #clearAllBut(Integer...)}.
-	 * <br/>- View types of Scrollable Headers and Footers are ignored!</p>
+	 * <br>- This method is opposite of {@link #clearAllBut(Integer...)}.
+	 * <br>- View types of Scrollable Headers and Footers are ignored!</p>
 	 *
 	 * @param viewTypes the viewTypes to remove
 	 * @see #clear()
@@ -3499,10 +3489,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Removes a list of consecutive items and notify the change.
 	 * <p>If the item, resulting from the provided position:</p>
-	 * - is <u>not expandable</u> with <u>no</u> parent, it is removed as usual.<br/>
-	 * - is <u>not expandable</u> with a parent, it is removed only if the parent is expanded.<br/>
+	 * - is <u>not expandable</u> with <u>no</u> parent, it is removed as usual.<br>
+	 * - is <u>not expandable</u> with a parent, it is removed only if the parent is expanded.<br>
 	 * - is <u>expandable</u> implementing {@link IExpandable}, it is removed as usual, but
-	 * it will be collapsed if expanded.<br/>
+	 * it will be collapsed if expanded.<br>
 	 * - has a {@link IHeader} item, the header will be automatically linked to the first item
 	 * after the range or can remain orphan.
 	 * <p>Optionally you can pass any payload to notify the <u>parent</u> or the <u>header</u>
@@ -4031,11 +4021,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #onPostFilter()
 	 * @see #setAnimateToLimit(int)
 	 * @since 4.1.0 Created
-	 * <br/>5.0.0-b1 Expandable + Child filtering
-	 * <br/>5.0.0-b8 Synchronization animations limit + AsyncFilter
-	 * <br/>5.0.0-rc1 Scrollable Headers and Footers adaptation
-	 * <br/>5.0.0-rc2 Copy of the Original List is done internally
-	 * <br/>5.0.0-rc2 Removal of Undo in combination with Filter
+	 * <br>5.0.0-b1 Expandable + Child filtering
+	 * <br>5.0.0-b8 Synchronization animations limit + AsyncFilter
+	 * <br>5.0.0-rc1 Scrollable Headers and Footers adaptation
+	 * <br>5.0.0-rc2 Copy of the Original List is done internally
+	 * <br>5.0.0-rc2 Removal of Undo in combination with Filter
 	 */
 	public void filterItems(@NonNull List<T> unfilteredItems) {
 		mHandler.removeMessages(FILTER);
@@ -4087,7 +4077,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * This method is a wrapper filter for expandable items.<br/>
+	 * This method is a wrapper filter for expandable items.<br>
 	 * It performs filtering on the subItems returning true, if the any child should be in the
 	 * filtered collection.
 	 * <p>If the provided item is not an expandable it will be filtered as usual by
@@ -4127,11 +4117,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * This method checks if the provided object is a type of {@link IFilterable} interface,
 	 * if yes, performs the filter on the implemented method {@link IFilterable#filter(String)}.
 	 * <p><b>Note:</b>
-	 * <br/>- The item will be collected if the implemented method returns true.
-	 * <br/>- {@code IExpandable} items are automatically picked up and displayed if at least a
+	 * <br>- The item will be collected if the implemented method returns true.
+	 * <br>- {@code IExpandable} items are automatically picked up and displayed if at least a
 	 * child is collected by the current filter. You DON'T NEED to implement the scan for the
 	 * children: this is already done :-)
-	 * <br/>- If you don't want to implement the {@code IFilterable} interface on the items, then
+	 * <br>- If you don't want to implement the {@code IFilterable} interface on the items, then
 	 * you can override this method to have another filter logic!
 	 *
 	 * @param item       the object to be inspected
@@ -4139,7 +4129,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return true, if the object returns true as well, and so if it should be in the
 	 * filteredResult, false otherwise
 	 * @since 3.1.0 Created
-	 * <br/>5.0.0-b1 Expandable + Child filtering
+	 * <br>5.0.0-b1 Expandable + Child filtering
 	 */
 	protected boolean filterObject(T item, String constraint) {
 		return item instanceof IFilterable && ((IFilterable) item).filter(constraint);
@@ -4635,8 +4625,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Moves the item placed at position {@code fromPosition} to the position
 	 * {@code toPosition}.
-	 * <br/>- Selection of moved element is preserved.
-	 * <br/>- If item is an expandable, it is collapsed and then expanded at the new position.
+	 * <br>- Selection of moved element is preserved.
+	 * <br>- If item is an expandable, it is collapsed and then expanded at the new position.
 	 *
 	 * @param fromPosition previous position of the item
 	 * @param toPosition   new position of the item
@@ -4650,8 +4640,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Moves the item placed at position {@code fromPosition} to the position
 	 * {@code toPosition}.
-	 * <br/>- Selection of moved element is preserved.
-	 * <br/>- If item is an expandable, it is collapsed and then expanded at the new position.
+	 * <br>- Selection of moved element is preserved.
+	 * <br>- If item is an expandable, it is collapsed and then expanded at the new position.
 	 *
 	 * @param fromPosition previous position of the item
 	 * @param toPosition   new position of the item
@@ -5253,7 +5243,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * @param lastPosition the position of the last main item in the adapter
 		 * @param currentPage  the current page
 		 * @since 5.0.0-b6
-		 * <br/>5.0.0-rc1 added {@code lastPosition} and {@code currentPage} as parameters
+		 * <br>5.0.0-rc1 added {@code lastPosition} and {@code currentPage} as parameters
 		 */
 		void onLoadMore(int lastPosition, int currentPage);
 	}
@@ -5518,9 +5508,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Handler callback for delayed actions.
 	 * <p>You can use and override this Callback, current values used by the Adapter:</p>
 	 * 1 = async call for updateDataSet.
-	 * <br/>2 = async call for filterItems, optionally delayed.
-	 * <br/>3 = deleteConfirmed when Undo timeout is over.
-	 * <br/>8 = hide the progress item from the list, optionally delayed.
+	 * <br>2 = async call for filterItems, optionally delayed.
+	 * <br>3 = deleteConfirmed when Undo timeout is over.
+	 * <br>8 = hide the progress item from the list, optionally delayed.
 	 * <p><b>Note:</b> numbers 0-9 are reserved for the Adapter, use others.</p>
 	 *
 	 * @since 5.0.0-rc1
@@ -5553,7 +5543,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * The old and new lists are available as:
 	 * <p>- {@code protected List<T> oldItems;}
-	 * <br/>- {@code protected List<T> newItems;}
+	 * <br>- {@code protected List<T> newItems;}
 	 *
 	 * @deprecated DiffUtil is slower than the internal implementation, you can use it until
 	 * final release.

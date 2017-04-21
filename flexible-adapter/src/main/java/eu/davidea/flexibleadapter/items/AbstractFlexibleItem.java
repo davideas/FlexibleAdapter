@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Steduto
+ * Copyright 2016-2017 Davide Steduto
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,11 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @param <VH> {@link android.support.v7.widget.RecyclerView.ViewHolder}
  * @author Davide Steduto
  * @since 20/01/2016 Created
+ * <br>21/04/2017 ViewHolders methods are now abstract
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 		implements IFlexible<VH> {
-
-	private static final String MAPPING_ILLEGAL_STATE = " is not implemented. If you want FlexibleAdapter creates and binds ViewHolder for you, you must override and implement the method ";
 
 	/* Item flags recognized by the FlexibleAdapter */
 	protected boolean mEnabled = true, mHidden = false,
@@ -46,11 +45,11 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	/*---------------*/
 
 	/**
-	 * You <b>must</b> implement this method to compare items identifiers.
+	 * You <b>MUST</b> implement this method to compare items <b>unique</b> identifiers.
 	 * <p>Adapter needs this method to distinguish them and pick up correct items.</p>
 	 * See <a href="http://developer.android.com/reference/java/lang/Object.html#equals(java.lang.Object)">
 	 * Writing a correct {@code equals} method</a> to implement your own {@code equals} method.
-	 * <p>Basic Java implementation:
+	 * <p><b>Hint:</b> If you don't use unique IDs, reimplement with Basic Java implementation:
 	 * <pre>
 	 * public boolean equals(Object o) {
 	 *     return this == o;
@@ -139,32 +138,23 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public int getLayoutRes() {
-		return 0;
-	}
+	public abstract int getLayoutRes();
 
 	/**
 	 * {@inheritDoc}
-	 *
-	 * @throws IllegalStateException if called but not implemented
 	 */
 	@Override
-	public VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		throw new IllegalStateException("onCreateViewHolder()" + MAPPING_ILLEGAL_STATE
-				+ this.getClass().getSimpleName() + ".createViewHolder().");
-	}
+	public abstract VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent);
 
 	/**
 	 * {@inheritDoc}
-	 *
-	 * @throws IllegalStateException if called but not implemented
 	 */
 	@Override
-	public void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads) {
-		throw new IllegalStateException("onBindViewHolder()" + MAPPING_ILLEGAL_STATE
-				+ this.getClass().getSimpleName() + ".bindViewHolder().");
-	}
+	public abstract  void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads);
 
 	/**
 	 * {@inheritDoc}

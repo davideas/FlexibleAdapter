@@ -1,12 +1,10 @@
 package eu.davidea.samples.flexibleadapter;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -23,9 +21,8 @@ import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 /**
  * This is a custom implementation extending FlexibleAdapter. {@code AbstractFlexibleItem} is
  * used as most common Item for ALL view types.
- * <p>Items are bound with <b>METHOD A</b> (new way): AutoMap is active, you <u>don't have to</u>
- * implement {@code getItemViewType, onCreateViewHolder, onBindViewHolder}.</p>
- * Check {@code OverallAdapter} for <b>METHOD B</b> (classic way).
+ * <p>Binding is delegated via items (AutoMap), you <u>cannot</u> implement
+ * {@code getItemViewType, onCreateViewHolder, onBindViewHolder}.</p>
  *
  * @see OverallAdapter
  * @see AbstractFlexibleItem
@@ -34,14 +31,12 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
 	private static final String TAG = ExampleAdapter.class.getSimpleName();
 
-	private Context mContext;
-
 	public ExampleAdapter(List<AbstractFlexibleItem> items, Object listeners) {
-		//stableIds ? true = Items implement hashCode() so they can have stableIds!
+		// stableIds ? true = Items implement hashCode() so they can have stableIds!
 		super(items, listeners, true);
 
-		//In case you need a Handler, do this:
-		//- Overrides the internal Handler with a custom callback that extends the internal one
+		// In case you need a Handler, do this:
+		// - Overrides the internal Handler with a custom callback that extends the internal one
 		mHandler = new Handler(Looper.getMainLooper(), new MyHandlerCallback());
 	}
 
@@ -148,24 +143,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	}
 
 	/**
-	 * This is a customization of the Layout that hosts the header when sticky.
-	 * The code works, but it is commented because not used (default is used).
-	 * <p><b>Note:</b> You now can set a custom container by calling
-	 * {@link #setStickyHeaderContainer(ViewGroup)}</p>
-	 */
-//	@Override
-//	public ViewGroup getStickyHeaderContainer() {
-//		FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
-//		frameLayout.setLayoutParams(new ViewGroup.LayoutParams(
-//				ViewGroup.LayoutParams.WRAP_CONTENT, //or MATCH_PARENT
-//				ViewGroup.LayoutParams.WRAP_CONTENT));
-//		((ViewGroup) mRecyclerView.getParent()).addView(frameLayout); //This is important otherwise the Header disappears!
-//		return (ViewGroup) mInflater.inflate(R.layout.sticky_header_layout, frameLayout);
-//	}
-
-	/**
-	 * METHOD A - NEW! Via Model objects. In this case you don't need to implement this method!
-	 * METHOD B - You override and implement this method as you prefer (don't call super).
+	 * NEW METHOD! Delegated via item objects. You cannot implement this method!
 	 */
 //	@Override
 //	public int getItemViewType(int position) {
@@ -173,8 +151,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //	}
 
 	/**
-	 * METHOD A - NEW! Via Model objects. In this case you don't need to implement this method!
-	 * METHOD B - You override and implement this method as you prefer (don't call super).
+	 * NEW METHOD! Delegated via item objects. You cannot implement this method!
 	 */
 //	@Override
 //	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -182,8 +159,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 //	}
 
 	/**
-	 * METHOD A - NEW! Via Model objects. In this case you don't need to implement this method!
-	 * METHOD B - You override and implement this method as you prefer (don't call super).
+	 * NEW METHOD! Delegated via item objects. You cannot implement this method!
 	 */
 //	@Override
 //	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -205,6 +181,8 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 	}
 
 	/**
+	 * Showcase to reuse the internal Handler.
+	 *
 	 * <b>IMPORTANT:</b> In order to preserve the internal calls, this custom Callback
 	 * <u>must</u> extends {@link FlexibleAdapter.HandlerCallback}
 	 * which implements {@link android.os.Handler.Callback},
