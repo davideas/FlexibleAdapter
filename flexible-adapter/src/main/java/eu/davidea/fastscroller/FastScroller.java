@@ -143,8 +143,11 @@ public class FastScroller extends FrameLayout {
 				int verticalScrollRange = recyclerView.computeVerticalScrollRange();
 				float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
 				setBubbleAndHandlePosition(height * proportion);
-				showScrollbar();
-				hideScrollbar();
+				// If scroll amount is small, don't show it
+				if (dy == 0 || Math.abs(dy) > 120) {
+					showScrollbar();
+					hideScrollbar();
+				}
 			}
 		};
 	}

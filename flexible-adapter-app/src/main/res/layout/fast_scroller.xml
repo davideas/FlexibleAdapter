@@ -15,5 +15,4 @@
 	app:fastScrollerBubblePosition="adjacent"
 	app:fastScrollerBubbleEnabled="true"
 	app:fastScrollerIgnoreTouchesOutsideHandle="false"
-	android:visibility="gone"
 	tools:visibility="visible"/>
