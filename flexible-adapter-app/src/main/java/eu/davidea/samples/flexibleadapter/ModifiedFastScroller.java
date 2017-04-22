@@ -24,11 +24,11 @@ public class ModifiedFastScroller extends FastScroller {
     }
 
     @Override
-    protected void updateBubbleText(int index) {
-        super.updateBubbleText(index);
+    protected void updateBubbleText(int position) {
+        super.updateBubbleText(position);
 
         // You can set a default way to update the text in the bubble.
-        String bubbleTextString = bubbleTextCreator.onCreateBubbleText(index);
+        String bubbleTextString = bubbleTextCreator.onCreateBubbleText(position);
         if (TextUtils.isEmpty(bubbleTextString)) {
             bubble.setVisibility(View.VISIBLE);
             bubble.setText("...");

@@ -44,6 +44,10 @@ public class ScrollbarAnimator {
 		this.delayInMillis = delayInMillis;
 	}
 
+	public boolean isAnimating() {
+		return isAnimating;
+	}
+
 	public void showScrollbar() {
 		if (bar == null || handle == null) {
 			return;

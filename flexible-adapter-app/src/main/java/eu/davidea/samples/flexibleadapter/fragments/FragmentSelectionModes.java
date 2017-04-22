@@ -71,7 +71,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Get copy of the Database list
+		// Get the Database list
 		List<AbstractFlexibleItem> items = DatabaseService.getInstance().getDatabaseList();
 
 		// Initialize Adapter and RecyclerView
@@ -80,12 +80,10 @@ public class FragmentSelectionModes extends AbstractFragment {
 		mAdapter.setNotifyChangeOfUnfilteredItems(true) //This will rebind new item when refreshed
 				.setMode(SelectableAdapter.MODE_SINGLE);
 
-		// Experimenting NEW features (v5.0.0)
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-
 		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -101,11 +99,12 @@ public class FragmentSelectionModes extends AbstractFragment {
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
-		fastScroller.setAutoHideEnabled(true); // true is the default value!
-		fastScroller.setAutoHideDelayInMillis(1000L);
+		fastScroller.setAutoHideEnabled(true);          //true is the default value!
+		fastScroller.setAutoHideDelayInMillis(1000L); //1000ms is the default value!
+		fastScroller.setMinimumScrollThreshold(100); //0 pixel is the default value! When > 0 it mimics the fling gesture
 		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
-		// The color is already fetched by the FastScroller constructor, but you can change the color at runtime
-		// fastScroller.setBubbleAndHandleColor(Utils.getColorAccent(getActivity()));
+		// The color (accentColor) is automatically fetched by the FastScroller constructor, but you can change it at runtime
+		// fastScroller.setBubbleAndHandleColor(Color.RED);
 		mAdapter.setFastScroller(fastScroller);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);

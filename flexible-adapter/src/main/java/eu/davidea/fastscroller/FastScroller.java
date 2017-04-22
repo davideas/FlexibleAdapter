@@ -17,6 +17,7 @@ package eu.davidea.fastscroller;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
@@ -57,11 +58,12 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * @since Up to the date 23/01/2016
  * <br/>23/01/2016 Added onFastScrollerStateChange in the listener
  * <br/>10/03/2017 Added autoHide, bubblePosition, bubbleEnabled, ignoreTouchesOutsideHandle (thanks to @arpinca)
+ * <br/>22/04/2017 Added minimum scroll threshold
  */
 public class FastScroller extends FrameLayout {
 
-	protected static final int BUBBLE_ANIMATION_DURATION = 300;
 	protected static final int TRACK_SNAP_RANGE = 5;
+	protected static final int BUBBLE_ANIMATION_DURATION = 300;
 	protected static final int AUTOHIDE_ANIMATION_DURATION = 300;
 	protected static final int DEFAULT_AUTOHIDE_DELAY_IN_MILLIS = 1000;
 	protected static final boolean DEFAULT_AUTOHIDE_ENABLED = true;
@@ -79,14 +81,14 @@ public class FastScroller extends FrameLayout {
 	protected TextView bubble;
 	protected ImageView handle;
 	protected View bar;
-	protected int height;
-	protected int width;
+	protected int height, width, minimumScrollThreshold;
 
 	protected RecyclerView recyclerView;
 	protected RecyclerView.LayoutManager layoutManager;
 	protected BubbleTextCreator bubbleTextCreator;
 	protected List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<>();
 
+	protected int bubbleAndHandleColor = Color.TRANSPARENT;
 	protected long autoHideDelayInMillis;
 	protected boolean isInitialized = false;
 	protected boolean autoHideEnabled, bubbleEnabled, ignoreTouchesOutsideHandle;
@@ -133,7 +135,6 @@ public class FastScroller extends FrameLayout {
 		if (isInitialized) return;
 		isInitialized = true;
 		setClipChildren(false);
-
 		onScrollListener = new RecyclerView.OnScrollListener() {
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -144,7 +145,7 @@ public class FastScroller extends FrameLayout {
 				float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
 				setBubbleAndHandlePosition(height * proportion);
 				// If scroll amount is small, don't show it
-				if (dy == 0 || Math.abs(dy) > 120) {
+				if (minimumScrollThreshold == 0 || dy == 0 || Math.abs(dy) > minimumScrollThreshold || scrollbarAnimator.isAnimating()) {
 					showScrollbar();
 					hideScrollbar();
 				}
@@ -220,8 +221,14 @@ public class FastScroller extends FrameLayout {
 		handle = (ImageView) findViewById(handleResId);
 		bar = findViewById(R.id.fast_scroller_bar);
 
+		// Animators
 		bubbleAnimator = new BubbleAnimator(bubble, BUBBLE_ANIMATION_DURATION);
 		scrollbarAnimator = new ScrollbarAnimator(bar, handle, autoHideDelayInMillis, AUTOHIDE_ANIMATION_DURATION);
+
+		// Runtime custom color OR the default (accentColor)
+		if (bubbleAndHandleColor != Color.TRANSPARENT) {
+			setBubbleAndHandleColor(bubbleAndHandleColor);
+		}
 	}
 
 	/**
@@ -248,6 +255,8 @@ public class FastScroller extends FrameLayout {
 	 */
 	@SuppressWarnings("deprecation")
 	public void setBubbleAndHandleColor(@ColorInt int color) {
+		bubbleAndHandleColor = color;
+
 		// BubbleDrawable bubbleAndHandleColor
 		if (bubble != null) {
 			GradientDrawable bubbleDrawable;
@@ -373,23 +382,22 @@ public class FastScroller extends FrameLayout {
 
 	/**
 	 * Update the text in the bubble based on the provided index.
-	 * The text can be retrieved by calling
+	 * <p>Override this method if you want to do something different when displaying the text in
+	 * the bubble e.g. display a different text when the result of onCreateBubbleText is empty;
+	 * OR apply different format depending on the result of onCreateBubbleText.</p>
+	 * The text can be set by calling:
 	 * <pre>
-	 * {@code
 	 * ...
 	 * String bubbleTextString = bubbleTextCreator.onCreateBubbleText(index);
 	 * bubble.setText(bubbleTextString);
 	 * ...
-	 * }
 	 * </pre>
-	 * <p>
-	 * Override this method if you want to do something different when displaying the text in the bubble e.g. display a different text when the result of onCreateBubbleText is empty; OR apply different format depending on the result of onCreateBubbleText.
 	 *
-	 * @param index index of the object that will be reflected in the bubble
+	 * @param position position of the object that will be reflected in the bubble
 	 */
-	protected void updateBubbleText(int index) {
+	protected void updateBubbleText(int position) {
 		if (bubble != null && bubbleEnabled) {
-			String bubbleText = bubbleTextCreator.onCreateBubbleText(index);
+			String bubbleText = bubbleTextCreator.onCreateBubbleText(position);
 			if (bubbleText != null) {
 				bubble.setVisibility(View.VISIBLE);
 				bubble.setText(bubbleText);
@@ -458,6 +466,7 @@ public class FastScroller extends FrameLayout {
 	 *
 	 * @param autoHideEnabled true to enable auto Hide, false to disable
 	 * @see #setAutoHideDelayInMillis(long)
+	 * @see #setMinimumScrollThreshold(int)
 	 */
 	public void setAutoHideEnabled(boolean autoHideEnabled) {
 		this.autoHideEnabled = autoHideEnabled;
@@ -469,7 +478,7 @@ public class FastScroller extends FrameLayout {
 
 	/**
 	 * Sets the delay in milli-seconds to auto hide the scroller when untouched.
-	 * <p>Default value is {@link #DEFAULT_AUTOHIDE_DELAY_IN_MILLIS}</p>
+	 * <p>Default value is {@value DEFAULT_AUTOHIDE_DELAY_IN_MILLIS}ms.</p>
 	 *
 	 * @param autoHideDelayInMillis value in milli-seconds
 	 */
@@ -478,6 +487,33 @@ public class FastScroller extends FrameLayout {
 		if (scrollbarAnimator != null) {
 			scrollbarAnimator.setDelayInMillis(autoHideDelayInMillis);
 		}
+	}
+
+	/**
+	 * If enabled, it ignores touches outside handle.
+	 * <p>Default value is {@code false}.</p>
+	 *
+	 * @param ignoreFlag true to ignore touches outside handle
+	 * @since 5.0.0-rc2
+	 */
+	public void setIgnoreTouchesOutsideHandle(boolean ignoreFlag) {
+		ignoreTouchesOutsideHandle = ignoreFlag;
+	}
+
+	/**
+	 * If set, it ignores small scrolls, so scroller will be shown if enough amount of scroll
+	 * is reached (it mimics fling gesture).
+	 * <ul>
+	 * <li>It works only if AutoHide is enabled.</li>
+	 * <li>Good values are between 90 and 130 pixel.</li>
+	 * </ul>
+	 * Default value is {@code 0} (scroller is always shown at each scroll amount).
+	 *
+	 * @param dy minimum scroll amount to show the scroller.
+	 * @since 5.0.0-rc2
+	 */
+	public void setMinimumScrollThreshold(@IntRange(from = 0) int dy) {
+		minimumScrollThreshold = dy;
 	}
 
 	/**
@@ -500,15 +536,6 @@ public class FastScroller extends FrameLayout {
 		if (autoHideEnabled && scrollbarAnimator != null) {
 			scrollbarAnimator.hideScrollbar();
 		}
-	}
-
-	/**
-	 * If enabled, it ignores touches outside handle.
-	 *
-	 * @since 5.0.0-rc2
-	 */
-	public void setIgnoreTouchesOutsideHandle(boolean ignoreFlag) {
-		ignoreTouchesOutsideHandle = ignoreFlag;
 	}
 
 	/*------------*/
