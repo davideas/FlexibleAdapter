@@ -32,7 +32,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 
-public class DividerItemDecoration extends RecyclerView.ItemDecoration {
+public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 
 	private Drawable mDivider;
 	private int mSectionOffset;
@@ -47,7 +47,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 *
 	 * @since 5.0.0-b4
 	 */
-	public DividerItemDecoration(Context context) {
+	public FlexibleItemDecoration(Context context) {
 		final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
 		mDivider = styledAttributes.getDrawable(0);
 		styledAttributes.recycle();
@@ -59,7 +59,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 *
 	 * @since 5.0.0-b4
 	 */
-	public DividerItemDecoration(@NonNull Context context, @DrawableRes int resId) {
+	public FlexibleItemDecoration(@NonNull Context context, @DrawableRes int resId) {
 		this(context, resId, 0);
 	}
 
@@ -69,8 +69,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 *
 	 * @since 5.0.0-b6
 	 */
-	public DividerItemDecoration(@NonNull Context context, @DrawableRes int resId,
-								 @IntRange(from = 0) int sectionOffset) {
+	public FlexibleItemDecoration(@NonNull Context context, @DrawableRes int resId,
+								  @IntRange(from = 0) int sectionOffset) {
 		if (resId > 0) mDivider = ContextCompat.getDrawable(context, resId);
 		mSectionOffset = (int) (context.getResources().getDisplayMetrics().density * sectionOffset);
 	}
@@ -87,7 +87,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 * @return this Divider, so the call can be chained
 	 * @since 5.0.0-b8
 	 */
-	public DividerItemDecoration withDrawOver(boolean drawOver) {
+	public FlexibleItemDecoration withDrawOver(boolean drawOver) {
 		this.mDrawOver = drawOver;
 		return this;
 	}
@@ -95,7 +95,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	/**
 	 * @deprecated use {@link #withDrawOver(boolean)} instead.
 	 */
-	public DividerItemDecoration setDrawOver(boolean drawOver) {
+	public FlexibleItemDecoration setDrawOver(boolean drawOver) {
 		return withDrawOver(drawOver);
 	}
 
@@ -150,10 +150,10 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 	 *
 	 * @param withOffset true to leave space between items, false divider will be drawn overlapping
 	 *                   the items
-	 * @return this DividerItemDecoration instance so the call can be chained
+	 * @return this FlexibleItemDecoration instance so the call can be chained
 	 * @since 5.0.0-b8
 	 */
-	public DividerItemDecoration withOffset(boolean withOffset) {
+	public FlexibleItemDecoration withOffset(boolean withOffset) {
 		this.withOffset = withOffset;
 		return this;
 	}

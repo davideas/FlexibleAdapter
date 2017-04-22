@@ -12,7 +12,7 @@ import android.view.MenuItem;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.SelectableAdapter;
-import eu.davidea.flexibleadapter.common.DividerItemDecoration;
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
@@ -85,7 +85,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		// Custom divider item decorator
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
+		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity(),
 				R.drawable.divider, 0)); //Increase to add gap between sections (Works only with LinearLayout!)
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!

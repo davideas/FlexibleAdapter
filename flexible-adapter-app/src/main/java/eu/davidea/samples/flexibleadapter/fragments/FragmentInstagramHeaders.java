@@ -16,7 +16,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter;
-import eu.davidea.flexibleadapter.common.DividerItemDecoration;
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
@@ -83,7 +83,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		// Custom divider item decorator with 24dpi as empty space between sections
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), 0, 24));
+		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity(), 0, 24));
 
 		mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
 				.setStickyHeaders(true) //Make headers sticky

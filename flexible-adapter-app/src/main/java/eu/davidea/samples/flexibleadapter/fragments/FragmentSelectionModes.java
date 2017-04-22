@@ -13,7 +13,7 @@ import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.SelectableAdapter;
-import eu.davidea.flexibleadapter.common.DividerItemDecoration;
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
@@ -89,7 +89,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		// Divider item decorator with DrawOver enabled
 		mRecyclerView.addItemDecoration(
-				new DividerItemDecoration(getActivity(), R.drawable.divider).withDrawOver(true));
+				new FlexibleItemDecoration(getActivity(), R.drawable.divider).withDrawOver(true));
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
