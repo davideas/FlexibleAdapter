@@ -10,7 +10,6 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.samples.flexibleadapter.items.ScrollableExpandableItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableFooterItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
@@ -82,7 +81,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(
 					R.string.columns,
-					String.valueOf(Utils.getSpanCount(mRecyclerView.getLayoutManager())))
+					String.valueOf(mFlexibleLayoutManager.getSpanCount()))
 			);
 			// NOTE: If you have to change at runtime the LayoutManager AND add
 			// Scrollable Headers, consider to add them in post, using a delay >= 0

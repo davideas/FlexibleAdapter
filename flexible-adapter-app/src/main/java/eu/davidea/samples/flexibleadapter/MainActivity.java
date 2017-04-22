@@ -84,9 +84,7 @@ import eu.davidea.utils.Utils;
  * The Demo application is organized in Fragments with 1 Activity {@code MainActivity}
  * implementing most of the methods. Each Fragment shows a different example and can assemble
  * more functionalities at once.
- * <p>
  * <p>The Activity implementation is organized in this order:</p>
- * <p>
  * <ul>
  * <li>Activity management
  * <li>Initialization methods
@@ -99,10 +97,8 @@ import eu.davidea.utils.Utils;
  * <li>ActionMode implementation
  * <li>Extras
  * </ul>
- * <p>
  * The Fragments <u>may</u> use Activity implementations or may override specific behaviors
  * themselves. Fragments have {@code AbstractFragment} in common to have some methods reusable.
- * <p>
  * <p>...more on
  * <a href="https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-App">Demo app Wiki page</a>.</p>
  */
@@ -729,9 +725,18 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onItemMove(int fromPosition, int toPosition) {
 		//TODO FOR YOU: this doesn't work with all types of items (of course)..... we need to implement some custom logic. Consider to use also onActionStateChanged() when dragging is completed
-//		DatabaseService.getInstance().swapItems(
-//				DatabaseService.getInstance().getDatabaseList().indexOf(fromItem),
-//				DatabaseService.getInstance().getDatabaseList().indexOf(toItem));
+		/*
+		String prev = mItems.remove(from);
+		mItems.add(to > from ? to - 1 : to, prev);
+		*/
+//		AbstractFlexibleItem fromItem = mAdapter.getItem(fromPosition);
+//		AbstractFlexibleItem toItem = mAdapter.getItem(toPosition);
+//		if (fromItem instanceof SimpleItem) {
+//			DatabaseService.getInstance().moveItem(fromItem, toItem);
+//		} else if (fromItem instanceof SubItem) {
+//			mAdapter.getSiblingsOf(fromItem).remove(fromItem);
+//			mAdapter.getSiblingsOf(toItem).add(fromItem);
+//		}
 	}
 
 	@Override
@@ -774,7 +779,7 @@ public class MainActivity extends AppCompatActivity implements
 			}
 
 			new UndoHelper(mAdapter, this)
-					.withPayload(null) //You can pass any custom object (in this case Boolean is enough)
+					.withPayload(null) //You can pass any custom object
 					.withAction(UndoHelper.ACTION_UPDATE, new UndoHelper.SimpleActionListener() {
 						@Override
 						public boolean onPreAction() {
@@ -793,7 +798,7 @@ public class MainActivity extends AppCompatActivity implements
 			message.append(getString(R.string.action_deleted));
 			mSwipeRefreshLayout.setRefreshing(true);
 			new UndoHelper(mAdapter, this)
-					.withPayload(null) //You can pass any custom object (in this case Boolean is enough)
+					.withPayload(null) //You can pass any custom object
 					.withAction(UndoHelper.ACTION_REMOVE, new UndoHelper.SimpleActionListener() {
 						@Override
 						public void onPostAction() {

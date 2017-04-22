@@ -101,7 +101,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
 		fastScroller.setAutoHideEnabled(true);          //true is the default value!
 		fastScroller.setAutoHideDelayInMillis(1000L); //1000ms is the default value!
-		fastScroller.setMinimumScrollThreshold(100); //0 pixel is the default value! When > 0 it mimics the fling gesture
+		fastScroller.setMinimumScrollThreshold(70); //0 pixel is the default value! When > 0 it mimics the fling gesture
 		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
 		// The color (accentColor) is automatically fetched by the FastScroller constructor, but you can change it at runtime
 		// fastScroller.setBubbleAndHandleColor(Color.RED);

@@ -18,7 +18,6 @@ import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.TopSnappedSmoothScroller;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IHeader;
-import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredHeaderItem;
@@ -222,8 +221,8 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				int first = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
-				int last = Utils.findLastCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+				int first = mAdapter.getFlexibleLayoutManager().findFirstCompletelyVisibleItemPosition();
+				int last = mAdapter.getFlexibleLayoutManager().findLastCompletelyVisibleItemPosition();
 				int headerPosition = mAdapter.getGlobalPositionOf(headerItem);
 				if (scrollTo <= first) {
 					Log.d(TAG, "ScrollTo headerPosition=" + headerPosition);

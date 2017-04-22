@@ -505,7 +505,7 @@ public class FastScroller extends FrameLayout {
 	 * is reached (it mimics fling gesture).
 	 * <ul>
 	 * <li>It works only if AutoHide is enabled.</li>
-	 * <li>Good values are between 90 and 130 pixel.</li>
+	 * <li>Good values are between 60 and 100 pixel on real devices.</li>
 	 * </ul>
 	 * Default value is {@code 0} (scroller is always shown at each scroll amount).
 	 *

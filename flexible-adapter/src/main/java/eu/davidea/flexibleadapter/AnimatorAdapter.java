@@ -367,7 +367,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		if (onlyEntryAnimation && mLastAnimatedPosition >= mMaxChildViews) {
 			shouldAnimate = false;
 		}
-		int lastVisiblePosition = Utils.findLastVisibleItemPosition(mRecyclerView.getLayoutManager());
+		int lastVisiblePosition = mFlexibleLayoutManager.findLastVisibleItemPosition();
 //		if (DEBUG) {
 //			Log.v(TAG, "shouldAnimate=" + shouldAnimate
 //					+ " isFastScroll=" + isFastScroll
@@ -478,8 +478,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 */
 	private long calculateAnimationDelay(int position) {
 		long delay;
-		int firstVisiblePosition = Utils.findFirstCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
-		int lastVisiblePosition = Utils.findLastCompletelyVisibleItemPosition(mRecyclerView.getLayoutManager());
+		int firstVisiblePosition = mFlexibleLayoutManager.findFirstCompletelyVisibleItemPosition();
+		int lastVisiblePosition = mFlexibleLayoutManager.findLastCompletelyVisibleItemPosition();
 
 		// Fix for high delay on the first visible item on rotation
 		if (firstVisiblePosition < 0 && position >= 0)
@@ -506,7 +506,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 				// Reset InitialDelay only when first item is already animated
 				mInitialDelay = 0L;
 			}
-			int numColumns = Utils.getSpanCount(mRecyclerView.getLayoutManager());
+			int numColumns = mFlexibleLayoutManager.getSpanCount();
 			if (numColumns > 1) {
 				delay = mInitialDelay + mStepDelay * (position % numColumns);
 			}

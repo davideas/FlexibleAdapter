@@ -34,6 +34,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.common.FlexibleLayoutManager;
+import eu.davidea.flexibleadapter.common.IFlexibleLayoutManager;
 import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -77,6 +79,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	private Set<FlexibleViewHolder> mBoundViewHolders;
 	private int mMode;
 	protected RecyclerView mRecyclerView;
+	protected IFlexibleLayoutManager mFlexibleLayoutManager;
 	protected FastScroller.Delegate mFastScrollerDelegate;
 
 	/**
@@ -144,6 +147,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 			mFastScrollerDelegate.onAttachedToRecyclerView(recyclerView);
 		}
 		mRecyclerView = recyclerView;
+		mFlexibleLayoutManager = new FlexibleLayoutManager(mRecyclerView.getLayoutManager());
 	}
 
 	/**
@@ -166,6 +170,26 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public RecyclerView getRecyclerView() {
 		return mRecyclerView;
+	}
+
+	/**
+	 * Current instance of the wrapper class for LayoutManager suitable for FlexibleAdapter.
+	 *
+	 * return wrapper class for any non-conventional LayoutManagers.
+	 * @since 5.0.0-rc2
+	 */
+	public IFlexibleLayoutManager getFlexibleLayoutManager() {
+		return this.mFlexibleLayoutManager;
+	}
+
+	/**
+	 * Allow to use a custom LayoutManager.
+	 *
+	 * @param flexibleLayoutManager the custom LayoutManager suitable for FlexibleAdapter
+	 * @since 5.0.0-rc2
+	 */
+	public void setFlexibleLayoutManager(IFlexibleLayoutManager flexibleLayoutManager) {
+		this.mFlexibleLayoutManager = flexibleLayoutManager;
 	}
 
 	/**

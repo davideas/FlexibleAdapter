@@ -31,7 +31,6 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnStickyHeaderChangeListener;
 import eu.davidea.flexibleadapter.R;
 import eu.davidea.flexibleadapter.items.IHeader;
-import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -147,7 +146,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		// Check if there is a new header to be sticky
 		if (mHeaderPosition != headerPosition) {
 			// #244 - Don't animate if header is already visible at the first layout position
-			int firstVisibleItemPosition = Utils.findFirstVisibleItemPosition(mRecyclerView.getLayoutManager());
+			int firstVisibleItemPosition = mAdapter.getFlexibleLayoutManager().findFirstVisibleItemPosition();
 			// Animate if headers were hidden, but don't if configuration changed (rotation)
 			if (displayWithAnimation && mHeaderPosition == RecyclerView.NO_POSITION &&
 					headerPosition != firstVisibleItemPosition) {
@@ -198,7 +197,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 				int adapterPos = mRecyclerView.getChildAdapterPosition(nextChild);
 				int nextHeaderPosition = getStickyPosition(adapterPos);
 				if (mHeaderPosition != nextHeaderPosition) {
-					if (Utils.getOrientation(mRecyclerView.getLayoutManager()) == OrientationHelper.HORIZONTAL) {
+					if (mAdapter.getFlexibleLayoutManager().getOrientation() == OrientationHelper.HORIZONTAL) {
 						if (nextChild.getLeft() > 0) {
 							int headerWidth = mStickyHolderLayout.getMeasuredWidth();
 							int nextHeaderOffsetX = nextChild.getLeft() - headerWidth;
@@ -341,7 +340,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 	@SuppressWarnings("unchecked")
 	private int getStickyPosition(int adapterPosHere) {
 		if (adapterPosHere == RecyclerView.NO_POSITION) {
-			adapterPosHere = Utils.findFirstVisibleItemPosition(mRecyclerView.getLayoutManager());
+			adapterPosHere = mAdapter.getFlexibleLayoutManager().findFirstVisibleItemPosition();
 			if (adapterPosHere == 0 && !hasStickyHeaderTranslated(0)) {
 				return RecyclerView.NO_POSITION;
 			}
@@ -376,7 +375,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			// Calculate width and height
 			int widthSpec;
 			int heightSpec;
-			if (Utils.getOrientation(mRecyclerView.getLayoutManager()) == OrientationHelper.VERTICAL) {
+			if (mAdapter.getFlexibleLayoutManager().getOrientation() == OrientationHelper.VERTICAL) {
 				widthSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getWidth(), View.MeasureSpec.EXACTLY);
 				heightSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getHeight(), View.MeasureSpec.UNSPECIFIED);
 			} else {
