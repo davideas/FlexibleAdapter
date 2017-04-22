@@ -30,7 +30,7 @@ import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.ISectionable;
-import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
@@ -177,7 +177,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 				offset += mSectionOffset;
 			}
 		}
-		if (Utils.getOrientation(recyclerView.getLayoutManager()) == RecyclerView.VERTICAL) {
+		if (FlexibleUtils.getOrientation(recyclerView.getLayoutManager()) == RecyclerView.VERTICAL) {
 			outRect.set(0, 0, 0, offset);
 		} else {
 			outRect.set(0, 0, offset, 0);

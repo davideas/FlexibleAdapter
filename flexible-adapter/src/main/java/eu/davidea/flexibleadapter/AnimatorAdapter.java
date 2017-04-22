@@ -37,10 +37,9 @@ import java.util.EnumSet;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
-import eu.davidea.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
-import static eu.davidea.flexibleadapter.utils.Utils.getClassName;
+import static eu.davidea.flexibleadapter.utils.FlexibleUtils.getClassName;
 
 /**
  * This class is responsible to animate items. Bounded items are animated initially and also

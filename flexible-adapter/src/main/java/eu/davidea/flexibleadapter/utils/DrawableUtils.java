@@ -99,7 +99,7 @@ public final class DrawableUtils {
 	 */
 	public static Drawable getDrawableCompat(Context context, @DrawableRes int drawableRes) {
 		try {
-			if (Utils.hasLollipop()) {
+			if (FlexibleUtils.hasLollipop()) {
 				return context.getResources().getDrawable(drawableRes, context.getTheme());
 			} else {
 				return context.getResources().getDrawable(drawableRes);
@@ -155,7 +155,7 @@ public final class DrawableUtils {
 		TypedValue outValue = new TypedValue();
 		// It's important to not use the android.R because this wouldn't add the overridden drawable
 		context.getTheme().resolveAttribute(R.attr.colorControlHighlight, outValue, true);
-		if (Utils.hasMarshmallow()) return context.getColor(outValue.resourceId);
+		if (FlexibleUtils.hasMarshmallow()) return context.getColor(outValue.resourceId);
 		else return context.getResources().getColor(outValue.resourceId);
 	}
 
@@ -173,7 +173,7 @@ public final class DrawableUtils {
 	public static Drawable getSelectableBackgroundCompat(@ColorInt int normalColor,
 														 @ColorInt int pressedColor,
 														 @ColorInt int rippleColor) {
-		if (Utils.hasLollipop()) {
+		if (FlexibleUtils.hasLollipop()) {
 			return new RippleDrawable(ColorStateList.valueOf(rippleColor),
 					getStateListDrawable(normalColor, pressedColor),
 					getRippleMask(normalColor));
@@ -192,7 +192,7 @@ public final class DrawableUtils {
 	 * @since 5.0.0-rc1
 	 */
 	public static Drawable getRippleDrawable(Drawable drawable, @ColorInt int rippleColor) {
-		if (Utils.hasLollipop()) {
+		if (FlexibleUtils.hasLollipop()) {
 			return new RippleDrawable(ColorStateList.valueOf(rippleColor),
 					drawable, getRippleMask(Color.BLACK));
 		} else {
@@ -214,13 +214,13 @@ public final class DrawableUtils {
 														  @ColorInt int pressedColor) {
 		StateListDrawable states = new StateListDrawable();
 		states.addState(new int[]{android.R.attr.state_activated}, getColorDrawable(pressedColor));
-		if (!Utils.hasLollipop()) {
+		if (!FlexibleUtils.hasLollipop()) {
 			states.addState(new int[]{android.R.attr.state_pressed}, getColorDrawable(pressedColor));
 		}
 		states.addState(new int[]{}, getColorDrawable(normalColor));
 		// Animating across states.
 		// It seems item background is lost on scrolling out of the screen on 21 <= API <= 23
-		if (!Utils.hasLollipop() || Utils.hasNougat()) {
+		if (!FlexibleUtils.hasLollipop() || FlexibleUtils.hasNougat()) {
 			int duration = 200; //android.R.integer.config_shortAnimTime
 			states.setEnterFadeDuration(duration);
 			states.setExitFadeDuration(duration);

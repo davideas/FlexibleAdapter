@@ -55,11 +55,11 @@ import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
-import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
-import static eu.davidea.flexibleadapter.utils.Utils.getClassName;
+import static eu.davidea.flexibleadapter.utils.FlexibleUtils.getClassName;
 
 /**
  * This Adapter is backed by an ArrayList of arbitrary objects of class <b>T</b>, where <b>T</b>
@@ -1481,7 +1481,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	@Deprecated
 	public ViewGroup getStickySectionHeadersHolder() {
 		if (mStickyContainer == null) {
-			mStickyContainer = (ViewGroup) Utils
+			mStickyContainer = (ViewGroup) FlexibleUtils
 					.scanForActivity(mRecyclerView.getContext())
 					.findViewById(R.id.sticky_header_container);
 		}

@@ -36,7 +36,7 @@ import java.util.TreeSet;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.common.FlexibleLayoutManager;
 import eu.davidea.flexibleadapter.common.IFlexibleLayoutManager;
-import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -206,7 +206,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 2.0.0
 	 */
 	public void setMode(@Mode int mode) {
-		if (DEBUG) Log.i(TAG, Utils.getModeName(mode) + " enabled");
+		if (DEBUG) Log.i(TAG, FlexibleUtils.getModeName(mode) + " enabled");
 		if (mMode == MODE_SINGLE && mode == MODE_IDLE)
 			clearSelection();
 		this.mMode = mode;

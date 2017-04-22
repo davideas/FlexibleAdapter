@@ -43,7 +43,7 @@ import eu.davidea.flexibleadapter.common.FlexibleLayoutManager;
  * @author Davide Steduto
  * @since 27/01/2016 Created
  */
-public final class Utils {
+public final class FlexibleUtils {
 
 	public static final int INVALID_COLOR = -1;
 	public static int colorAccent = INVALID_COLOR;

@@ -28,7 +28,7 @@ import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemMoveListener;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemSwipeListener;
-import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -263,7 +263,7 @@ public class ItemTouchHelperCallback extends Callback {
 		if (layoutManager instanceof GridLayoutManager || layoutManager instanceof StaggeredGridLayoutManager) {
 			dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 			swipeFlags = 0;
-		} else if (Utils.getOrientation(layoutManager) == LinearLayoutManager.HORIZONTAL) {
+		} else if (FlexibleUtils.getOrientation(layoutManager) == LinearLayoutManager.HORIZONTAL) {
 			dragFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 			swipeFlags = mSwipeFlags > 0 ? mSwipeFlags : ItemTouchHelper.UP | ItemTouchHelper.DOWN;
 		} else {

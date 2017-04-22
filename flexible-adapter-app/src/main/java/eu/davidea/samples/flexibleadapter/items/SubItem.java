@@ -17,7 +17,7 @@ import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
-import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -87,7 +87,7 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
 		// this will be highlighted
 		if (adapter.hasSearchText()) {
 			Context context = holder.itemView.getContext();
-			Utils.highlightText(context, holder.mTitle, getTitle(), adapter.getSearchText(),
+			FlexibleUtils.highlightText(context, holder.mTitle, getTitle(), adapter.getSearchText(),
 					context.getResources().getColor(R.color.colorAccent_light));
 		} else {
 			holder.mTitle.setText(getTitle());

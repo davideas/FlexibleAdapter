@@ -154,7 +154,7 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
 					context.getResources().getString(R.string.merged_with, getMergedItemsAsText()));
 			holder.mergedTextView.setVisibility(View.VISIBLE);
 		} else {
-			//if (Utils.hasKitkat()) TransitionManager.beginDelayedTransition(holder.cardView);
+			//if (FlexibleUtils.hasKitkat()) TransitionManager.beginDelayedTransition(holder.cardView);
 			holder.cardView.getLayoutParams().height = (int) Utils.dpToPx(holder.itemView.getContext(),
 					context.getResources().getDimension(R.dimen.card_height));
 			holder.mergedTextView.setVisibility(View.GONE);

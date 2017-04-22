@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.samples.flexibleadapter.R;
 
 public final class Utils {
@@ -154,7 +155,7 @@ public final class Utils {
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static int getColorAccent(Context context) {
 		if (colorAccent < 0) {
-			int accentAttr = eu.davidea.flexibleadapter.utils.Utils.hasLollipop() ? android.R.attr.colorAccent : R.attr.colorAccent;
+			int accentAttr = FlexibleUtils.hasLollipop() ? android.R.attr.colorAccent : R.attr.colorAccent;
 			TypedArray androidAttr = context.getTheme().obtainStyledAttributes(new int[] { accentAttr });
 			colorAccent = androidAttr.getColor(0, 0xFF009688); //Default: material_deep_teal_500
 			androidAttr.recycle();
