@@ -83,7 +83,7 @@ import static eu.davidea.flexibleadapter.utils.FlexibleUtils.getClassName;
  * @see ExpandableViewHolder
  * @since 03/05/2015 Created
  * <br>16/01/2016 Expandable items
- * <br>24/01/2016 Drag&Drop, Swipe
+ * <br>24/01/2016 Drag&Drop, Swipe-to-dismiss
  * <br>30/01/2016 Class now extends {@link AnimatorAdapter} that extends {@link SelectableAdapter}
  * <br>02/02/2016 New code reorganization, new item interfaces and full refactoring
  * <br>08/02/2016 Headers/Sections
@@ -92,6 +92,10 @@ import static eu.davidea.flexibleadapter.utils.FlexibleUtils.getClassName;
  * <br>22/04/2016 Endless Scrolling
  * <br>13/07/2016 Update and Filter operations are executed asynchronously (high performance on big list)
  * <br>25/11/2016 Scrollable Headers and Footers; Reviewed EndlessScroll
+ * <br>28/03/2017 Adapter now makes a copy of the provided list at startup, updateDataSet and filterItems
+ * <br>10/04/2017 Endless Top Scrolling
+ * <br>15/04/2017 Starting or resetting the Filter will empty the bin of the deletedItems
+ * <br>23/04/2017 Wrapper class for any third type of LayoutManagers
  */
 @SuppressWarnings({"Range", "unused", "unchecked", "ConstantConditions", "SuspiciousMethodCalls", "WeakerAccess"})
 public class FlexibleAdapter<T extends IFlexible>
