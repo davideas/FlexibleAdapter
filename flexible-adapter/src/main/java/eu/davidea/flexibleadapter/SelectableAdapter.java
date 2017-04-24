@@ -147,7 +147,13 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 			mFastScrollerDelegate.onAttachedToRecyclerView(recyclerView);
 		}
 		mRecyclerView = recyclerView;
-		mFlexibleLayoutManager = new FlexibleLayoutManager(mRecyclerView.getLayoutManager());
+		// Initialize LayoutManager
+		RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
+		if (layoutManager instanceof IFlexibleLayoutManager) {
+			mFlexibleLayoutManager = (IFlexibleLayoutManager) layoutManager;
+		} else {
+			mFlexibleLayoutManager = new FlexibleLayoutManager(layoutManager);
+		}
 	}
 
 	/**
@@ -162,6 +168,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 			mFastScrollerDelegate.onDetachedFromRecyclerView(recyclerView);
 		}
 		mRecyclerView = null;
+		mFlexibleLayoutManager = null;
 	}
 
 	/**
