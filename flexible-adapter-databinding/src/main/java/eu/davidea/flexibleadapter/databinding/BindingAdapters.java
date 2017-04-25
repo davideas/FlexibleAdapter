@@ -3,7 +3,6 @@ package eu.davidea.flexibleadapter.databinding;
 import android.databinding.BindingAdapter;
 import android.support.v7.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
@@ -16,7 +15,7 @@ public class BindingAdapters {
 	public static <T extends IFlexible> void setAdapter(RecyclerView recyclerView, List<T> items) {
 		RecyclerView.Adapter adapter = recyclerView.getAdapter();
 		if (adapter != null && adapter instanceof FlexibleAdapter) {
-			((FlexibleAdapter<T>) adapter).updateDataSet(new ArrayList<>(items));
+			((FlexibleAdapter<T>) adapter).updateDataSet(items);
 		} else {
 			throw new IllegalStateException("Binding works only with FlexibleAdapter");
 		}

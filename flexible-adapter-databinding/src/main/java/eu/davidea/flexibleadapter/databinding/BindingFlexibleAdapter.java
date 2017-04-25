@@ -28,10 +28,6 @@ public class BindingFlexibleAdapter<T extends IFlexible> extends FlexibleAdapter
 
 	@Override
 	public void updateDataSet(List<T> items, boolean animate) {
-		//if (mItems instanceof ObservableList) {
-			//TODO: mItems are wrapped into ArrayList in FlexibleAdapter and thus we don't remove the callback on changes.
-			//((ObservableList<T>) this.mItems).removeOnListChangedCallback(callback);
-		//}
 		if (items instanceof ObservableList) {
 			((ObservableList<T>) items).addOnListChangedCallback(callback);
 		}
@@ -99,7 +95,7 @@ public class BindingFlexibleAdapter<T extends IFlexible> extends FlexibleAdapter
 
 		private static void ensureChangeOnMainThread() {
 			if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-				throw new IllegalStateException("You must only modify the ObservableList on the main thread.");
+				throw new IllegalStateException("You can only modify the ObservableList on the main thread.");
 			}
 		}
 	}
