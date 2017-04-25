@@ -49,7 +49,6 @@ import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.helpers.ActionModeHelper;
 import eu.davidea.flexibleadapter.helpers.UndoHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.samples.flexibleadapter.dialogs.EditItemDialog;
 import eu.davidea.samples.flexibleadapter.dialogs.MessageDialog;
@@ -880,34 +879,18 @@ public class MainActivity extends AppCompatActivity implements
 		mSwipeRefreshLayout.setRefreshing(false);
 		// Removing items from Database. Example:
 		for (AbstractFlexibleItem adapterItem : mAdapter.getDeletedItems()) {
-			try {
-				// NEW! You can take advantage of AutoMap and differentiate logic by viewType using "switch" statement
-				switch (adapterItem.getLayoutRes()) {
-					case R.layout.recycler_sub_item:
-						SubItem subItem = (SubItem) adapterItem;
-						DatabaseService.getInstance().removeSubItem(mAdapter.getExpandableOfDeletedChild(subItem), subItem);
-						Log.d(TAG, "Confirm removed " + subItem);
-						break;
-					case R.layout.recycler_simple_item:
-					case R.layout.recycler_expandable_item:
-						DatabaseService.getInstance().removeItem(adapterItem);
-						Log.d(TAG, "Confirm removed " + adapterItem);
-						break;
-				}
-
-			} catch (IllegalStateException e) {
-				//TODO: when all methods from Item Interfaces are abstract we can remove this
-				// AutoMap is disabled, fallback to if-else with "instanceof" statement
-				if (adapterItem instanceof SubItem) {
-					// SubItem
+			// NEW! You can take advantage of AutoMap and differentiate logic by viewType using "switch" statement
+			switch (adapterItem.getLayoutRes()) {
+				case R.layout.recycler_sub_item:
 					SubItem subItem = (SubItem) adapterItem;
-					IExpandable expandable = mAdapter.getExpandableOf(subItem);
-					DatabaseService.getInstance().removeSubItem(expandable, subItem);
-					Log.d(TAG, "Confirm removed " + subItem.getTitle());
-				} else if (adapterItem instanceof SimpleItem || adapterItem instanceof ExpandableItem) {
+					DatabaseService.getInstance().removeSubItem(mAdapter.getExpandableOfDeletedChild(subItem), subItem);
+					Log.d(TAG, "Confirm removed " + subItem);
+					break;
+				case R.layout.recycler_simple_item:
+				case R.layout.recycler_expandable_item:
 					DatabaseService.getInstance().removeItem(adapterItem);
 					Log.d(TAG, "Confirm removed " + adapterItem);
-				}
+					break;
 			}
 		}
 	}
