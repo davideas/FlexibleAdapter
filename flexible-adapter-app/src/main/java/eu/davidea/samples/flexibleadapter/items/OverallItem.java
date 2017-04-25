@@ -4,7 +4,9 @@ import android.animation.Animator;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,16 +16,11 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * Model object representing Overall functionality as CardView.
- * This Model object is bound via METHOD B: {@code OverallAdapter} implements the 3 methods to
- * bind this item.
- *
- * @author Davide Steduto
- * @see eu.davidea.samples.flexibleadapter.OverallAdapter
- * @since 12/04/2016
  */
 public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolder> {
 
@@ -61,6 +58,31 @@ public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolde
 		if (o == null || getClass() != o.getClass()) return false;
 		OverallItem that = (OverallItem) o;
 		return id == that.id;
+	}
+
+	@Override
+	public int getLayoutRes() {
+		return R.layout.recycler_overall_item;
+	}
+
+	@Override
+	public LabelViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		return new OverallItem.LabelViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	}
+
+	@Override
+	public void bindViewHolder(FlexibleAdapter adapter, LabelViewHolder holder, int position, List payloads) {
+		if (getTitle() != null) {
+			holder.mTitle.setText(getTitle());
+			holder.mTitle.setEnabled(isEnabled());
+		}
+		if (getDescription() != null) {
+			holder.mSubtitle.setText(Utils.fromHtmlCompat(getDescription()));
+			holder.mSubtitle.setEnabled(isEnabled());
+		}
+		if (getIcon() != null) {
+			holder.mIcon.setImageDrawable(getIcon());
+		}
 	}
 
 	@Override

@@ -22,8 +22,6 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 
-import eu.davidea.flexibleadapter.utils.Utils;
-
 /**
  * Common class for all Smooth Scroller Layout Managers.
  *
@@ -41,11 +39,11 @@ public class TopSnappedSmoothScroller extends LinearSmoothScroller {
 	public static float MILLISECONDS_PER_INCH = 100f;
 
 	private PointF vectorPosition = new PointF(0, 0);
-	private RecyclerView.LayoutManager layoutManager;
+	private IFlexibleLayoutManager layoutManager;
 
 	public TopSnappedSmoothScroller(Context context, RecyclerView.LayoutManager layoutManager) {
 		super(context);
-		this.layoutManager = layoutManager;
+		this.layoutManager = new FlexibleLayoutManager(layoutManager);
 	}
 
 	/**
@@ -55,10 +53,10 @@ public class TopSnappedSmoothScroller extends LinearSmoothScroller {
 	 */
 	@Override
 	public PointF computeScrollVectorForPosition(int targetPosition) {
-		final int firstChildPos = Utils.findFirstCompletelyVisibleItemPosition(layoutManager);
+		final int firstChildPos = layoutManager.findFirstCompletelyVisibleItemPosition();
 		final int direction = targetPosition < firstChildPos ? -1 : 1;
 
-		if (Utils.getOrientation(layoutManager) == OrientationHelper.HORIZONTAL) {
+		if (layoutManager.getOrientation() == OrientationHelper.HORIZONTAL) {
 			vectorPosition.set(direction, 0);
 			return vectorPosition;
 		} else {

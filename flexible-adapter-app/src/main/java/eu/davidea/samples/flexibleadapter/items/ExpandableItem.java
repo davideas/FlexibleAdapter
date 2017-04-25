@@ -25,7 +25,7 @@ import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.DrawableUtils;
-import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.ExpandableViewHolder;
@@ -146,7 +146,7 @@ public class ExpandableItem extends AbstractItem<ExpandableItem.ParentViewHolder
 		if (payloads.size() > 0) {
 			Log.d(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
 			if (adapter.hasSearchText()) {
-				Utils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+				FlexibleUtils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
 			} else {
 				holder.mSubtitle.setText(getSubtitle());
 			}
@@ -165,8 +165,8 @@ public class ExpandableItem extends AbstractItem<ExpandableItem.ParentViewHolder
 
 			// In case of searchText matches with Title or with a field this will be highlighted
 			if (adapter.hasSearchText()) {
-				Utils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText());
-				Utils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+				FlexibleUtils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText());
+				FlexibleUtils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
 			} else {
 				holder.mTitle.setText(getTitle());
 				holder.mSubtitle.setText(getSubtitle());

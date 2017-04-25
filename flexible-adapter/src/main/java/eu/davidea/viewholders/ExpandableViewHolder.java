@@ -137,8 +137,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@CallSuper
 	protected void expandView(int position) {
-		mAdapter.expand(position);
-		if (shouldNotifyParentOnClick()) mAdapter.notifyItemChanged(position, Payload.EXPANDED);
+		mAdapter.expand(position, shouldNotifyParentOnClick());
 	}
 
 	/**
@@ -151,8 +150,12 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	 */
 	@CallSuper
 	protected void collapseView(int position) {
-		mAdapter.collapse(position);
-		if (shouldNotifyParentOnClick()) mAdapter.notifyItemChanged(position, Payload.COLLAPSED);
+		mAdapter.collapse(position, shouldNotifyParentOnClick());
+		// #320 - Sticky header is not shown correctly once collapsed
+		// Scroll to this position if this Expandable is currently sticky
+		if (itemView.getX() < 0 || itemView.getY() < 0) {
+			mAdapter.getRecyclerView().scrollToPosition(position);
+		}
 	}
 
 	/*---------------------------------*/

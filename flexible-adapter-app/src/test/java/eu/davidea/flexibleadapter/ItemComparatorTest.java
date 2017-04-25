@@ -1,5 +1,8 @@
 package eu.davidea.flexibleadapter;
 
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,9 +26,9 @@ import static org.junit.Assert.assertEquals;
 @Config(constants = BuildConfig.class, sdk = 23)
 public class ItemComparatorTest {
 
-	SimpleHeader[] headers;
-	SimpleItemComparator comparator;
-	List<AbstractFlexibleItem> initItems;
+	private SimpleHeader[] headers;
+	private SimpleItemComparator comparator;
+	private List<AbstractFlexibleItem> initItems;
 
 	@Before
 	public void setup() {
@@ -225,13 +228,28 @@ public class ItemComparatorTest {
 	private class SimpleHeader extends AbstractHeaderItem<FlexibleViewHolder> {
 		String title;
 
-		public SimpleHeader(String title) {
+		SimpleHeader(String title) {
 			this.title = title;
 		}
 
 		@Override
 		public boolean equals(Object o) {
 			return o instanceof SimpleHeader && title.equals(((SimpleHeader) o).title);
+		}
+
+		@Override
+		public int getLayoutRes() {
+			return 0;
+		}
+
+		@Override
+		public FlexibleViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+			return null;
+		}
+
+		@Override
+		public void bindViewHolder(FlexibleAdapter adapter, FlexibleViewHolder holder, int position, List payloads) {
+
 		}
 
 		@Override
@@ -243,7 +261,7 @@ public class ItemComparatorTest {
 	private class SimpleItem extends AbstractSectionableItem<FlexibleViewHolder, SimpleHeader> {
 		String title;
 
-		public SimpleItem(SimpleHeader header, String title) {
+		SimpleItem(SimpleHeader header, String title) {
 			super(header);
 			this.title = title;
 		}
@@ -251,6 +269,21 @@ public class ItemComparatorTest {
 		@Override
 		public boolean equals(Object o) {
 			return o instanceof SimpleItem && title.equals(((SimpleItem) o).title);
+		}
+
+		@Override
+		public int getLayoutRes() {
+			return 0;
+		}
+
+		@Override
+		public FlexibleViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+			return null;
+		}
+
+		@Override
+		public void bindViewHolder(FlexibleAdapter adapter, FlexibleViewHolder holder, int position, List payloads) {
+
 		}
 
 		@Override

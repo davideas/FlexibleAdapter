@@ -23,7 +23,7 @@ import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.DrawableUtils;
-import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -102,8 +102,8 @@ public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
 
 		// In case of searchText matches with Title or with a field this will be highlighted
 		if (adapter.hasSearchText()) {
-			Utils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText());
-			Utils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+			FlexibleUtils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText());
+			FlexibleUtils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
 		} else {
 			holder.mTitle.setText(getTitle());
 			holder.mSubtitle.setText(getSubtitle());

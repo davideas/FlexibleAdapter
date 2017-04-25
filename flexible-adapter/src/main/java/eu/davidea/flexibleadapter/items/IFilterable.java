@@ -32,10 +32,10 @@ public interface IFilterable {
 	/**
 	 * Checks and performs the filter on this item, you can apply the logic and the filter on
 	 * every fields your use case foreseen.
-	 * <p><b>Note:</b> Filter method makes use of {@code HashSet}, in this case you should
-	 * implement {@link #hashCode()} too!</p>
+	 * <p><b>Note:</b> Filter method makes use of {@code HashSet}, in case you implemented
+	 * {@link #equals(Object)} you should implement {@link #hashCode()} too!</p>
 	 *
-	 * @param constraint the search text typed by the user
+	 * @param constraint the search text typed by the user always provided in lowercase
 	 * @return true if this item should be collected by the Adapter for the filtered list, false otherwise
 	 */
 	boolean filter(String constraint);

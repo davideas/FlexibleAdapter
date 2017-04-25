@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Steduto
+ * Copyright 2016-2017 Davide Steduto
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemMoveListener;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemSwipeListener;
-import eu.davidea.flexibleadapter.utils.Utils;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -41,9 +41,10 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class ItemTouchHelperCallback extends Callback {
 
+	private static final String TAG = ItemTouchHelperCallback.class.getSimpleName();
 	protected static final float ALPHA_FULL = 1.0f;
 
-	protected AdapterCallback mItemTouchCallback;
+	protected AdapterCallback mAdapterCallback;
 	protected boolean longPressDragEnabled = false, handleDragEnabled = false, swipeEnabled = false;
 	protected long mSwipeAnimationDuration = 300L, mDragAnimationDuration = 400L;
 	protected float mSwipeThreshold = 0.5f, mMoveThreshold = 0.5f;
@@ -53,15 +54,15 @@ public class ItemTouchHelperCallback extends Callback {
 	/* CONSTRUCTOR */
 	/*-------------*/
 
-	public ItemTouchHelperCallback(AdapterCallback itemTouchCallback) {
-		this.mItemTouchCallback = itemTouchCallback;
+	public ItemTouchHelperCallback(AdapterCallback adapterCallback) {
+		this.mAdapterCallback = adapterCallback;
 	}
 
 	/*-----------------------*/
 	/* CONFIGURATION SETTERS */
 	/*-----------------------*/
-
 	/* DRAG */
+	/*------*/
 
 	/**
 	 * Enable / Disable the drag operation with long press on the ViewHolder.
@@ -127,7 +128,9 @@ public class ItemTouchHelperCallback extends Callback {
 		return mMoveThreshold;
 	}
 
+	/*-------*/
 	/* SWIPE */
+	/*-------*/
 
 	/**
 	 * Enable the swipe operation on the ViewHolder.
@@ -208,7 +211,6 @@ public class ItemTouchHelperCallback extends Callback {
 	/**
 	 * Provides the animation duration for Drag and Swipe previously set with
 	 * {@link #setDragAnimationDuration} and {@link #setSwipeAnimationDuration}.
-	 * <p>{@inheritDoc}</p>
 	 *
 	 * @return Drag or Swipe animation duration depending the animationType
 	 * @see #setDragAnimationDuration(long)
@@ -228,11 +230,11 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-		if (!mItemTouchCallback.shouldMove(viewHolder.getAdapterPosition(), target.getAdapterPosition())) {
+		if (!mAdapterCallback.shouldMove(viewHolder.getAdapterPosition(), target.getAdapterPosition())) {
 			return false;
 		}
-		//Notify the adapter of the move
-		mItemTouchCallback.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+		// Notify the adapter of the move
+		mAdapterCallback.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
 		return true;
 	}
 
@@ -241,11 +243,11 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-		//Notify the adapter of the swipe
+		// Notify the adapter of the swipe
 		if (viewHolder instanceof ViewHolderCallback) {
 			ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
 			if (viewHolderCallback.getFrontView().getTranslationX() != 0)
-				mItemTouchCallback.onItemSwiped(viewHolder.getAdapterPosition(), direction);
+				mAdapterCallback.onItemSwiped(viewHolder.getAdapterPosition(), direction);
 		}
 	}
 
@@ -257,18 +259,18 @@ public class ItemTouchHelperCallback extends Callback {
 		RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
 		int dragFlags;
 		int swipeFlags;
-		//Set movement flags based on the Layout Manager and Orientation
+		// Set movement flags based on the Layout Manager and Orientation
 		if (layoutManager instanceof GridLayoutManager || layoutManager instanceof StaggeredGridLayoutManager) {
 			dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 			swipeFlags = 0;
-		} else if (Utils.getOrientation(layoutManager) == LinearLayoutManager.VERTICAL) {
-			dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-			swipeFlags = mSwipeFlags > 0 ? mSwipeFlags : ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
-		} else {
+		} else if (FlexibleUtils.getOrientation(layoutManager) == LinearLayoutManager.HORIZONTAL) {
 			dragFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 			swipeFlags = mSwipeFlags > 0 ? mSwipeFlags : ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+		} else {
+			dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+			swipeFlags = mSwipeFlags > 0 ? mSwipeFlags : ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 		}
-		//Disallow item swiping or dragging
+		// Disallow item swiping or dragging
 		if (viewHolder instanceof ViewHolderCallback) {
 			ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
 			if (!viewHolderCallback.isDraggable()) dragFlags = 0;
@@ -282,12 +284,12 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-		//Notify the callback about the new event
-		mItemTouchCallback.onActionStateChanged(viewHolder, actionState);
-		//We only want the active item to change
+		// Notify the callback about the new event
+		mAdapterCallback.onActionStateChanged(viewHolder, actionState);
+		// We only want the active item to change
 		if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
 			if (viewHolder instanceof ViewHolderCallback) {
-				//Let the ViewHolder to know that this item is swiping or dragging
+				// Let the ViewHolder to know that this item is swiping or dragging
 				ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
 				viewHolderCallback.onActionStateChanged(viewHolder.getAdapterPosition(), actionState);
 				if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
@@ -304,13 +306,13 @@ public class ItemTouchHelperCallback extends Callback {
 	 */
 	@Override
 	public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-		//Force full Alpha
+		// Force full Alpha
 		viewHolder.itemView.setAlpha(ALPHA_FULL);
 		if (viewHolder instanceof ViewHolderCallback) {
-			//Tell the view holder it's time to restore the idle state
+			// Tell the view holder it's time to restore the idle state
 			ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
 			getDefaultUIUtil().clearView(viewHolderCallback.getFrontView());
-			//Hide Left or Right View
+			// Hide Left or Right View
 			setLayoutVisibility(viewHolderCallback, 0);
 			viewHolderCallback.onItemReleased(viewHolder.getAdapterPosition());
 		}
@@ -325,11 +327,15 @@ public class ItemTouchHelperCallback extends Callback {
 		if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE &&
 				viewHolder instanceof ViewHolderCallback) {
 
-			//Orientation independent
+			// Update visibility for RearViews - Convert to custom VH
+			ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
+			View frontView = viewHolderCallback.getFrontView();
+
+			// Orientation independent
 			float dragAmount = dX;
 			if (dY != 0) dragAmount = dY;
 
-			//Manage opening - Is Left or Right View?
+			// Manage opening - Is Left or Right View?
 			int swipingDirection = 0;//0 is to reset the frontView
 			if (dragAmount > 0) {
 				swipingDirection = ItemTouchHelper.RIGHT;//DOWN
@@ -337,11 +343,8 @@ public class ItemTouchHelperCallback extends Callback {
 				swipingDirection = ItemTouchHelper.LEFT;//TOP
 			}
 
-			//Update visibility for RearViews - Convert to custom VH
-			ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
-			View frontView = viewHolderCallback.getFrontView();
 			setLayoutVisibility(viewHolderCallback, swipingDirection);
-			//Translate the FrontView
+			// Translate the FrontView
 			getDefaultUIUtil().onDraw(c, recyclerView, frontView, dX, dY, actionState, isCurrentlyActive);
 
 		} else {
@@ -468,7 +471,7 @@ public class ItemTouchHelperCallback extends Callback {
 		 * On Swipe, override to return the Rear Left View.
 		 * <p>Default is null (no view).</p>
 		 *
-		 * @return the item Front View
+		 * @return the Rear Left View
 		 */
 		View getRearLeftView();
 
@@ -476,7 +479,7 @@ public class ItemTouchHelperCallback extends Callback {
 		 * On Swipe, override to return the Rear Right View.
 		 * <p>Default is null (no view).</p>
 		 *
-		 * @return the item Front View
+		 * @return the Rear Right View
 		 */
 		View getRearRightView();
 	}

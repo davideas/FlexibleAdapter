@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Steduto
+ * Copyright 2016-2017 Davide Steduto
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,24 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	 */
 	int getSpanSize(int spanCount, int position);
 
+	/**
+	 * Called by the FlexibleAdapter when it wants to check if this item should be bound
+	 * again with new content.
+	 * <p>
+	 * You should return {@code true} whether you want this item will be updated because
+	 * its visual representations will change.
+	 * <p>
+	 * This method is called only if {@link FlexibleAdapter#setNotifyChangeOfUnfilteredItems(boolean)}
+	 * is enabled.
+	 * <p>Default value is {@code true}.</p>
+	 *
+	 * @param newItem The new item object with the new content
+	 * @return True will trigger a new binding to display new content, false if the content shown
+	 * is already the latest data.
+	 * @since 5.0.0-rc2
+	 */
+	boolean shouldNotifyChange(IFlexible newItem);
+
 	/*--------------------*/
 	/* SELECTABLE METHODS */
 	/*--------------------*/
@@ -117,7 +135,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	/**
 	 * Returns the layout resource ID to AutoMap a specific ViewType on this Item.
 	 * <p><b>NOTE:</b> Should identify a resource Layout reference {@link android.R.layout} used
-	 * by FlexibleAdapter to AutoMap the ViewTypes.</p>
+	 * by FlexibleAdapter to auto-map the ViewTypes.</p>
 	 * <b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
 	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
 	 * on GitHub.
@@ -128,7 +146,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	int getLayoutRes();
 
 	/**
-	 * Delegates the creation of the ViewHolder to the user if AutoMap has been implemented.
+	 * Delegates the creation of the ViewHolder to the user (AutoMap).
 	 * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
 	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
 	 * on GitHub.</p>
@@ -142,7 +160,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent);
 
 	/**
-	 * Binds the data of this item to the given Layout if AutoMap has been implemented.
+	 * Delegates the binding of this item's data to the given Layout.
 	 * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
 	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
 	 * on GitHub.</p>
@@ -152,10 +170,22 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	 * @param adapter  the FlexibleAdapter instance
 	 * @param holder   the ViewHolder instance
 	 * @param position the current position
-	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full
-	 *                 update.
-	 * @throws IllegalStateException if called but not implemented
+	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full update
 	 */
 	void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads);
+
+	/**
+	 * Called when a view created by this adapter has been recycled.
+	 * <p>A view is recycled when a RecyclerView.LayoutManager decides that it no longer needs to
+	 * be attached to its parent RecyclerView. This can be because it has fallen out of visibility
+	 * or a set of cached views represented by views still attached to the parent RecyclerView.</p>
+	 * If an item view has large or expensive data bound to it such as large bitmaps, this may be
+	 * a good place to release those resources.
+	 *
+	 * @param adapter  the FlexibleAdapter instance
+	 * @param holder   the ViewHolder instance being recycled
+	 * @param position the current position
+	 */
+	void unbindViewHolder(FlexibleAdapter adapter, VH holder, int position);
 
 }

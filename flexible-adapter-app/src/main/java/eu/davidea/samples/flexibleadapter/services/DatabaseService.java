@@ -82,7 +82,6 @@ public class DatabaseService {
 	 * It also shows how adapter animation can be configured.
 	 */
 	//TODO: Review the description of all examples
-	//TODO: Add ScrollableUseCaseItem header for each database
 	public void createOverallDatabase(Resources resources) {
 		databaseType = DatabaseType.OVERALL;
 		mItems.clear();
@@ -433,15 +432,22 @@ public class DatabaseService {
 	/*-----------------------*/
 
 	/**
-	 * @return Always a copy of the original list.
+	 * @return The original list.
 	 */
 	public List<AbstractFlexibleItem> getDatabaseList() {
 		Log.i(TAG, "Database Type: " + databaseType);
-		//Return a copy of the DB: we will perform some tricky code on this list.
-		return new ArrayList<>(mItems);
+		// Until version RC1:
+		// Return a copy of the DB: we will perform some tricky code on this list.
+		//return new ArrayList<>(mItems);
+
+		// From version RC2:
+		// mItems can be returned without making a copy: The copy is now done internally by the Adapter.
+		return mItems;
 	}
 
-	public void swapItem(int fromPosition, int toPosition) {
+	public void moveItem(AbstractFlexibleItem fromItem, AbstractFlexibleItem toItem) {
+		int fromPosition = mItems.indexOf(fromItem);
+		int toPosition = mItems.indexOf(toItem);
 		Collections.swap(mItems, fromPosition, toPosition);
 	}
 
@@ -459,6 +465,10 @@ public class DatabaseService {
 
 	public void removeAll() {
 		mItems.clear();
+	}
+
+	public void addAll(int position, List<AbstractFlexibleItem> newItems) {
+		mItems.addAll(position, newItems);
 	}
 
 	public void addAll(List<AbstractFlexibleItem> newItems) {

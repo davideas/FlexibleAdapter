@@ -15,7 +15,6 @@ import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Holder Items.
@@ -47,7 +46,9 @@ public class FragmentHolderSections extends AbstractFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		// Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createHolderSectionsDatabase(50, 10);
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createHolderSectionsDatabase(50, 10);
+		}
 		initializeRecyclerView(savedInstanceState);
 	}
 
@@ -66,8 +67,10 @@ public class FragmentHolderSections extends AbstractFragment {
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
-				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
+		mAdapter.setFastScroller(fastScroller);
+
 		mAdapter.setDisplayHeadersAtStartUp(true)
 				.setStickyHeaders(true)
 				.setOnlyEntryAnimation(true);

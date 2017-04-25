@@ -13,7 +13,7 @@ import android.view.MenuItem;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
-import eu.davidea.flexibleadapter.common.DividerItemDecoration;
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.MainActivity;
@@ -21,7 +21,6 @@ import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.samples.flexibleadapter.services.DatabaseType;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -34,7 +33,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 	public static final String TAG = FragmentAsyncFilter.class.getSimpleName();
 
 	private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
-	private DividerItemDecoration mDivider;
+	private FlexibleItemDecoration mDivider;
 	private boolean configure;
 	private MenuItem mSearchView;
 
@@ -118,7 +117,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		mRecyclerView.setAdapter(mAdapter);
 		//Custom divider item decorator with Offset
 		if (mDivider == null) {
-			mDivider = new DividerItemDecoration(getActivity(), R.drawable.divider_large).withOffset(true);
+			mDivider = new FlexibleItemDecoration(getActivity(), R.drawable.divider_large).withOffset(true);
 		}
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
@@ -132,8 +131,9 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		} else {
 			mFab.setImageResource(R.drawable.ic_settings_white_24dp);
 			mRecyclerView.removeItemDecoration(mDivider);
-			mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
-					Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+			FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+			fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
+			mAdapter.setFastScroller(fastScroller);
 		}
 
 		//Settings for FlipView

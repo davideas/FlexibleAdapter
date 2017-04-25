@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Steduto
+ * Copyright 2016-2017 Davide Steduto
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @since 30/04/2016
  */
 @SuppressWarnings("WeakerAccess")
-public class UndoHelper extends Snackbar.Callback {
+public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnDeleteCompleteListener {
 
 	/**
 	 * Default undo-timeout of 5''.
@@ -68,6 +68,7 @@ public class UndoHelper extends Snackbar.Callback {
 	private FlexibleAdapter mAdapter;
 	private OnActionListener mActionListener;
 	private OnUndoListener mUndoListener;
+	private Snackbar mSnackbar;
 	private @ColorInt int mActionTextColor = Color.TRANSPARENT;
 
 
@@ -81,8 +82,9 @@ public class UndoHelper extends Snackbar.Callback {
 	 */
 	public UndoHelper(FlexibleAdapter adapter, OnUndoListener undoListener) {
 		this.mAdapter = adapter;
+		this.mAdapter.setPermanentDelete(false);
+		this.mAdapter.addListener(this);
 		this.mUndoListener = undoListener;
-		adapter.setPermanentDelete(false);
 	}
 
 	/**
@@ -154,9 +156,8 @@ public class UndoHelper extends Snackbar.Callback {
 					   CharSequence message, CharSequence actionText,
 					   @IntRange(from = -1) int undoTime) {
 		this.mPositions = positions;
-		Snackbar snackbar;
 		if (!mAdapter.isPermanentDelete()) {
-			snackbar = Snackbar.make(mainView, message, undoTime > 0 ? undoTime + 400 : undoTime)
+			mSnackbar = Snackbar.make(mainView, message, undoTime > 0 ? undoTime + 400 : undoTime)
 					.setAction(actionText, new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
@@ -165,14 +166,27 @@ public class UndoHelper extends Snackbar.Callback {
 						}
 					});
 		} else {
-			snackbar = Snackbar.make(mainView, message, undoTime);
+			mSnackbar = Snackbar.make(mainView, message, undoTime);
 		}
 		if (mActionTextColor != Color.TRANSPARENT) {
-			snackbar.setActionTextColor(mActionTextColor);
+			mSnackbar.setActionTextColor(mActionTextColor);
 		}
-		snackbar.addCallback(this);
-		snackbar.show();
-		return snackbar;
+		mSnackbar.addCallback(this);
+		mSnackbar.show();
+		return mSnackbar;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onDeleteConfirmed() {
+		if (mUndoListener != null)
+			mUndoListener.onDeleteConfirmed(mAction);
+		mAdapter.emptyBin();
+		// Trigger manual dismiss event
+		// Note: dismiss is asynchronous!
+		if (mSnackbar.isShown()) mSnackbar.dismiss();
 	}
 
 	/**
@@ -180,14 +194,13 @@ public class UndoHelper extends Snackbar.Callback {
 	 */
 	@Override
 	public void onDismissed(Snackbar snackbar, int event) {
-		if (mAdapter.isPermanentDelete()) return;
+		// Check if deletion has already been committed
+		if (!mAdapter.isRestoreInTime()) return;
 		switch (event) {
 			case DISMISS_EVENT_SWIPE:
 			case DISMISS_EVENT_MANUAL:
 			case DISMISS_EVENT_TIMEOUT:
-				if (mUndoListener != null)
-					mUndoListener.onDeleteConfirmed(mAction);
-				mAdapter.emptyBin();
+				onDeleteConfirmed();
 			case DISMISS_EVENT_CONSECUTIVE:
 			case DISMISS_EVENT_ACTION:
 			default:
@@ -207,7 +220,7 @@ public class UndoHelper extends Snackbar.Callback {
 		if (!consumed) mAdapter.removeItems(mPositions, mPayload);
 		// Perform the action after the deletion
 		if (mActionListener != null) mActionListener.onPostAction();
-		// Here, we can notify the callback only in case of permanent deletion
+		// We can already notify the callback only in case of permanent deletion
 		if (mAdapter.isPermanentDelete() && mUndoListener != null)
 			mUndoListener.onDeleteConfirmed(mAction);
 	}

@@ -113,8 +113,9 @@ public class ExpandableHeaderItem
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ExpandableHeaderViewHolder holder, int position, List payloads) {
 		if (payloads.size() > 0) {
-			Log.d(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads);
+			Log.d(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads + " - " + getTitle());
 		} else {
+			Log.d(this.getClass().getSimpleName(), "ExpandableHeaderItem NoPayload - " + getTitle());
 			holder.mTitle.setText(getTitle());
 		}
 		setSubtitle(String.valueOf(adapter.getCurrentChildren(this).size()) +

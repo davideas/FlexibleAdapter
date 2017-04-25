@@ -53,7 +53,9 @@ public class FragmentOverall extends AbstractFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		// Create overall items and Initialize RecyclerView
-		DatabaseService.getInstance().createOverallDatabase(getActivity().getResources());
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createOverallDatabase(getActivity().getResources());
+		}
 		initializeRecyclerView(savedInstanceState);
 	}
 
@@ -61,10 +63,6 @@ public class FragmentOverall extends AbstractFragment {
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		// Initialize Adapter and RecyclerView
 		// OverallAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
-
-		// In this example the Adapter make uses of METHOD B and extends FlexibleAdapter: items
-		// don't implement the AutoMap and don't implement create and binding methods: The Adapter
-		// remains responsible to handling all view types.
 		mAdapter = new OverallAdapter(getActivity());
 
 		// Experimenting NEW features (v5.0.0)

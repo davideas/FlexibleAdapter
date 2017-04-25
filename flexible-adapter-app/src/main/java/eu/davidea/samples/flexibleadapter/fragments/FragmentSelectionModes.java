@@ -13,7 +13,7 @@ import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.SelectableAdapter;
-import eu.davidea.flexibleadapter.common.DividerItemDecoration;
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
@@ -21,7 +21,6 @@ import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -61,7 +60,9 @@ public class FragmentSelectionModes extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		// Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createEndlessDatabase(200);
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createEndlessDatabase(200);
+		}
 		initializeRecyclerView(savedInstanceState);
 
 		// Settings for FlipView
@@ -70,7 +71,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Get copy of the Database list
+		// Get the Database list
 		List<AbstractFlexibleItem> items = DatabaseService.getInstance().getDatabaseList();
 
 		// Initialize Adapter and RecyclerView
@@ -79,7 +80,6 @@ public class FragmentSelectionModes extends AbstractFragment {
 		mAdapter.setNotifyChangeOfUnfilteredItems(true) //This will rebind new item when refreshed
 				.setMode(SelectableAdapter.MODE_SINGLE);
 
-		// Experimenting NEW features (v5.0.0)
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
@@ -88,8 +88,8 @@ public class FragmentSelectionModes extends AbstractFragment {
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		// Divider item decorator with DrawOver enabled
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), R.drawable.divider)
-				.withDrawOver(true));
+		mRecyclerView.addItemDecoration(
+				new FlexibleItemDecoration(getActivity(), R.drawable.divider).withDrawOver(true));
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -98,8 +98,14 @@ public class FragmentSelectionModes extends AbstractFragment {
 		}, 1500L);
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
-				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		fastScroller.setAutoHideEnabled(true);          //true is the default value!
+		fastScroller.setAutoHideDelayInMillis(1000L); //1000ms is the default value!
+		fastScroller.setMinimumScrollThreshold(70); //0 pixel is the default value! When > 0 it mimics the fling gesture
+		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
+		// The color (accentColor) is automatically fetched by the FastScroller constructor, but you can change it at runtime
+		// fastScroller.setBubbleAndHandleColor(Color.RED);
+		mAdapter.setFastScroller(fastScroller);
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);

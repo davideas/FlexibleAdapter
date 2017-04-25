@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Steduto
+ * Copyright 2016-2017 Davide Steduto
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,8 @@ import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -40,12 +37,13 @@ import java.util.Locale;
 
 import eu.davidea.flexibleadapter.R;
 import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.common.FlexibleLayoutManager;
 
 /**
  * @author Davide Steduto
  * @since 27/01/2016 Created
  */
-public final class Utils {
+public final class FlexibleUtils {
 
 	public static final int INVALID_COLOR = -1;
 	public static int colorAccent = INVALID_COLOR;
@@ -233,30 +231,13 @@ public final class Utils {
 	/*-------------------------------*/
 
 	/**
-	 * Finds the layout orientation of the RecyclerView.
-	 *
-	 * @param recyclerView the RV instance
-	 * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
-	 * @deprecated Use {@link #getOrientation(RecyclerView.LayoutManager)} instead
-	 */
-	@Deprecated
-	public static int getOrientation(RecyclerView recyclerView) {
-		return getOrientation(recyclerView.getLayoutManager());
-	}
-
-	/**
 	 * Finds the layout orientation of the RecyclerView, no matter which LayoutManager is in use.
 	 *
 	 * @param layoutManager the LayoutManager instance in use by the RV
 	 * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
 	 */
 	public static int getOrientation(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof LinearLayoutManager) {
-			return ((LinearLayoutManager) layoutManager).getOrientation();
-		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).getOrientation();
-		}
-		return OrientationHelper.HORIZONTAL;
+		return new FlexibleLayoutManager(layoutManager).getOrientation();
 	}
 
 	/**
@@ -268,12 +249,7 @@ public final class Utils {
 	 * @since 5.0.0-b7
 	 */
 	public static int getSpanCount(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof GridLayoutManager) {
-			return ((GridLayoutManager) layoutManager).getSpanCount();
-		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
-		}
-		return 1;
+		return new FlexibleLayoutManager(layoutManager).getSpanCount();
 	}
 
 	/**
@@ -287,11 +263,7 @@ public final class Utils {
 	 * @since 5.0.0-b8
 	 */
 	public static int findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).findFirstCompletelyVisibleItemPositions(null)[0];
-		} else {
-			return ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
-		}
+		return new FlexibleLayoutManager(layoutManager).findFirstCompletelyVisibleItemPosition();
 	}
 
 	/**
@@ -305,11 +277,7 @@ public final class Utils {
 	 * @since 5.0.0-rc1
 	 */
 	public static int findFirstVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
-		} else {
-			return ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
-		}
+		return new FlexibleLayoutManager(layoutManager).findFirstVisibleItemPosition();
 	}
 
 	/**
@@ -323,11 +291,7 @@ public final class Utils {
 	 * @since 5.0.0-b8
 	 */
 	public static int findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).findLastCompletelyVisibleItemPositions(null)[0];
-		} else {
-			return ((LinearLayoutManager) layoutManager).findLastCompletelyVisibleItemPosition();
-		}
+		return new FlexibleLayoutManager(layoutManager).findLastCompletelyVisibleItemPosition();
 	}
 
 	/**
@@ -341,11 +305,7 @@ public final class Utils {
 	 * @since 5.0.0-rc1
 	 */
 	public static int findLastVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
-		if (layoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null)[0];
-		} else {
-			return ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
-		}
+		return new FlexibleLayoutManager(layoutManager).findLastVisibleItemPosition();
 	}
 
 }

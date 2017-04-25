@@ -35,10 +35,8 @@ public class FilterTest {
 		mAdapter = new FlexibleAdapter<>(mItems);
 		mAdapter.showAllHeaders();
 		mAdapter.setSearchText("1");
-		System.out.println(mAdapter.getItemCount());
 		mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList());
-		System.out.println(mAdapter.getItemCount());
-		assertEquals(16, mAdapter.getItemCount());
+		assertEquals(21, mAdapter.getItemCount());
 	}
 
 }

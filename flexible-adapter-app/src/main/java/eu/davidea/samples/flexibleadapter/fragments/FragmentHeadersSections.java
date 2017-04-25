@@ -27,7 +27,6 @@ import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -67,7 +66,9 @@ public class FragmentHeadersSections extends AbstractFragment
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		// Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createHeadersSectionsDatabase(400, 100);
+		if (savedInstanceState == null) {
+			DatabaseService.getInstance().createHeadersSectionsDatabase(400, 100);
+		}
 		initializeRecyclerView(savedInstanceState);
 
 		// Restore FAB button and icon
@@ -84,6 +85,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.setNotifyChangeOfUnfilteredItems(true) //We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
+				.setNotifyMoveOfFilteredItems(true)
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
@@ -94,8 +96,10 @@ public class FragmentHeadersSections extends AbstractFragment
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
-				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
+		mAdapter.setFastScroller(fastScroller);
+
 		mAdapter.setLongPressDragEnabled(true)
 				.setHandleDragEnabled(true)
 				.setSwipeEnabled(true)
