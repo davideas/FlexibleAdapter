@@ -1,5 +1,4 @@
 apply plugin: "com.android.application"
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
 	compileSdkVersion targetSdk
@@ -64,8 +63,8 @@ dependencies {
 	compile "eu.davidea:flipview:1.1.2"
 
 	// ButterKnife
-	compile 'com.jakewharton:butterknife:8.0.1'
-	apt 'com.jakewharton:butterknife-compiler:8.0.1'
+	compile 'com.jakewharton:butterknife:8.5.1'
+	annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 
 	// Support Libraries
 	compile supportDependencies.appcompat
