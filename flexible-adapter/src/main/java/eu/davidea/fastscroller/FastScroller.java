@@ -519,6 +519,7 @@ public class FastScroller extends FrameLayout {
 	/**
 	 * Shows the scrollbar with animation.
 	 *
+	 * @see #hideScrollbar()
 	 * @since 5.0.0-rc2
 	 */
 	public void showScrollbar() {
@@ -530,6 +531,7 @@ public class FastScroller extends FrameLayout {
 	/**
 	 * Hides the scrollbar with animation.
 	 *
+	 * @see #autoHideScrollbar()
 	 * @since 5.0.0-rc2
 	 */
 	public void hideScrollbar() {
@@ -541,10 +543,40 @@ public class FastScroller extends FrameLayout {
 	/**
 	 * Auto-hides the scrollbar with animation.
 	 *
+	 * @see #hideScrollbar()
 	 * @since 5.0.0-rc2
 	 */
-	public void autoHideScrollbar() {
+	private void autoHideScrollbar() {
 		if (autoHideEnabled) hideScrollbar();
+	}
+
+	/**
+	 * Displays or Hides the {@link FastScroller}.
+	 * <br>The action is animated.
+	 *
+	 * @see #setEnabled(boolean)
+	 * @since 5.0.0-b1
+	 */
+	public void toggleFastScroller() {
+		setEnabled(!isEnabled());
+	}
+
+	/**
+	 * Enable and display the FastScroller OR disable and hide the FastScroller.
+	 * <p>If {@code autoHide} is enabled, showing the FastScrollbar will trigger autoHide.</p>
+	 *
+	 * @param enabled true to enable and show, false to hide with animation.
+	 * @see #toggleFastScroller()
+	 */
+	@Override
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		if (enabled) {
+			showScrollbar();
+			autoHideScrollbar();
+		} else {
+			hideScrollbar();
+		}
 	}
 
 	/*------------*/
@@ -610,14 +642,8 @@ public class FastScroller extends FrameLayout {
 		 * @since 5.0.0-b1
 		 */
 		public void toggleFastScroller() {
-			if (mFastScroller == null) return;
-			if (!mFastScroller.isEnabled()) {
-				mFastScroller.setEnabled(true);
-				mFastScroller.showScrollbar();
-				mFastScroller.autoHideScrollbar();
-			} else {
-				mFastScroller.hideScrollbar();
-				mFastScroller.setEnabled(false);
+			if (mFastScroller != null) {
+				mFastScroller.toggleFastScroller();
 			}
 		}
 

@@ -58,15 +58,13 @@ public class ScrollbarAnimator {
 		}
 
 		if (bar.getVisibility() == View.INVISIBLE || handle.getVisibility() == View.INVISIBLE) {
-			bar.setVisibility(View.VISIBLE);
-			handle.setVisibility(View.VISIBLE);
-
 			scrollbarAnimatorSet = createAnimator(bar, handle, true);
 			scrollbarAnimatorSet.addListener(new AnimatorListenerAdapter() {
 				@Override
 				public void onAnimationEnd(Animator animation) {
 					super.onAnimationEnd(animation);
-					onShowAnimationStop(bar, handle);
+					bar.setVisibility(View.VISIBLE);
+					handle.setVisibility(View.VISIBLE);
 					isAnimating = false;
 				}
 
@@ -94,15 +92,15 @@ public class ScrollbarAnimator {
 		scrollbarAnimatorSet = createAnimator(bar, handle, false);
 		scrollbarAnimatorSet.addListener(new AnimatorListenerAdapter() {
 			@Override
-			public void onAnimationCancel(Animator animation) {
-				super.onAnimationCancel(animation);
+			public void onAnimationEnd(Animator animation) {
+				super.onAnimationEnd(animation);
 				onHideAnimationStop(bar, handle);
 				isAnimating = false;
 			}
 
 			@Override
-			public void onAnimationEnd(Animator animation) {
-				super.onAnimationEnd(animation);
+			public void onAnimationCancel(Animator animation) {
+				super.onAnimationCancel(animation);
 				onHideAnimationStop(bar, handle);
 				isAnimating = false;
 			}
