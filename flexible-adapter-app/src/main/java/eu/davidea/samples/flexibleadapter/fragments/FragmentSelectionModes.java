@@ -120,12 +120,6 @@ public class FragmentSelectionModes extends AbstractFragment {
 	}
 
 	@Override
-	public void showNewLayoutInfo(MenuItem item) {
-		super.showNewLayoutInfo(item);
-		mAdapter.showLayoutInfo(false);
-	}
-
-	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.menu_selection_modes, menu);
 		super.onCreateOptionsMenu(menu, inflater);

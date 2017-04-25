@@ -116,12 +116,11 @@ public class FragmentHeadersSections extends AbstractFragment
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
-		// Add 3 Scrollable Headers and 1 Footer
+		// Add 2 Scrollable Headers and 1 Footer
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.addScrollableHeaderWithDelay(new ScrollableUseCaseItem(
 				getString(R.string.headers_sections_use_case_title),
 				getString(R.string.headers_sections_use_case_description)), 900L, false);
-		mAdapter.showLayoutInfo(savedInstanceState == null);
 		mAdapter.addScrollableFooter();
 	}
 

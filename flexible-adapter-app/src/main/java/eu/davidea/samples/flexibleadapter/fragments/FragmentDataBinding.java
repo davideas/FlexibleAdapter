@@ -4,29 +4,24 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ObservableArrayList;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.SelectableAdapter;
-import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.databinding.BindingFlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
-import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.animators.GarageDoorItemAnimator;
 import eu.davidea.samples.flexibleadapter.items.HeaderItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -89,7 +84,6 @@ public class FragmentDataBinding extends AbstractFragment {
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		//Initialize Adapter and RecyclerView
-		//ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new BindingFlexibleAdapter<>(getActivity(), true);
 		//Experimenting NEW features (v5.0.0)
 		mAdapter.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
@@ -103,8 +97,8 @@ public class FragmentDataBinding extends AbstractFragment {
 		mRecyclerView.setItemAnimator(new GarageDoorItemAnimator());
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		mAdapter.setFastScroller((FastScroller) getView().findViewById(R.id.fast_scroller),
-				Utils.getColorAccent(getActivity()), (MainActivity) getActivity());
+		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		mAdapter.setFastScroller(fastScroller);
 		mAdapter.setLongPressDragEnabled(true)
 				.setHandleDragEnabled(true)
 				.setSwipeEnabled(true)
@@ -130,33 +124,6 @@ public class FragmentDataBinding extends AbstractFragment {
 	}
 
 	@Override
-	public void showNewLayoutInfo(MenuItem item) {
-		super.showNewLayoutInfo(item);
-	}
-
-	@Override
-	protected GridLayoutManager createNewGridLayoutManager() {
-		GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
-		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-			@Override
-			public int getSpanSize(int position) {
-				//NOTE: If you use simple integer to identify the ViewType,
-				//here, you should use them and not Layout integers
-				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_scrollable_layout_item:
-					case R.layout.recycler_scrollable_uls_item:
-					case R.layout.recycler_header_item:
-					case R.layout.recycler_expandable_header_item:
-						return mColumnCount;
-					default:
-						return 1;
-				}
-			}
-		});
-		return gridLayoutManager;
-	}
-
-	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		Log.v(TAG, "onCreateOptionsMenu called!");
@@ -167,7 +134,7 @@ public class FragmentDataBinding extends AbstractFragment {
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-
+		menu.findItem(R.id.action_list_type).setVisible(false);
 		menu.findItem(R.id.action_auto_collapse).setVisible(false);
 		menu.findItem(R.id.action_expand_collapse_all).setVisible(false);
 	}

@@ -118,8 +118,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				.setEndlessScrollListener(this, mProgressItem)
 				.setTopEndless(true);
 
-		// Add 1 Scrollable Header and 1 Footer items
-		mAdapter.showLayoutInfo(savedInstanceState == null);
+		// Add 1 Footer items
 		mAdapter.addScrollableFooter();
 	}
 

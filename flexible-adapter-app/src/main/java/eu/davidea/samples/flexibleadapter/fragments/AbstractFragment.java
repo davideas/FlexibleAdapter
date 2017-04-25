@@ -137,7 +137,7 @@ public abstract class AbstractFragment extends Fragment {
 			public void run() {
 				item.setEnabled(true);
 			}
-		}, 1500L);
+		}, 1000L);
 	}
 
 }

@@ -101,7 +101,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			final ScrollableULSItem item = new ScrollableULSItem("ULS");
 			item.setTitle(mRecyclerView.getContext().getString(R.string.uls_title));
 			item.setSubtitle(mRecyclerView.getContext().getString(R.string.uls_subtitle));
-			addScrollableHeaderWithDelay(item, 1000L, false);
+			addScrollableHeaderWithDelay(item, 1000L, scrollToPosition);
 		}
 	}
 

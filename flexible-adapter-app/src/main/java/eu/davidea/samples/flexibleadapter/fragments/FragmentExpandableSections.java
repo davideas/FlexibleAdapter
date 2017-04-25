@@ -102,9 +102,6 @@ public class FragmentExpandableSections extends AbstractFragment {
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
-
-		// Add 1 Scrollable Header
-		mAdapter.showLayoutInfo(savedInstanceState == null);
 	}
 
 	@Override
