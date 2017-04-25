@@ -138,7 +138,7 @@ public class FastScroller extends FrameLayout {
 		onScrollListener = new RecyclerView.OnScrollListener() {
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-				if (bubble == null || handle.isSelected())
+				if (!isEnabled() || bubble == null || handle.isSelected())
 					return;
 				int verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
 				int verticalScrollRange = recyclerView.computeVerticalScrollRange();
@@ -147,7 +147,7 @@ public class FastScroller extends FrameLayout {
 				// If scroll amount is small, don't show it
 				if (minimumScrollThreshold == 0 || dy == 0 || Math.abs(dy) > minimumScrollThreshold || scrollbarAnimator.isAnimating()) {
 					showScrollbar();
-					hideScrollbar();
+					autoHideScrollbar();
 				}
 			}
 		};
@@ -334,7 +334,7 @@ public class FastScroller extends FrameLayout {
 				handle.setSelected(false);
 				notifyScrollStateChange(false);
 				hideBubble();
-				hideScrollbar();
+				autoHideScrollbar();
 				return true;
 		}
 		return super.onTouchEvent(event);
@@ -522,7 +522,7 @@ public class FastScroller extends FrameLayout {
 	 * @since 5.0.0-rc2
 	 */
 	public void showScrollbar() {
-		if (autoHideEnabled && scrollbarAnimator != null) {
+		if (scrollbarAnimator != null) {
 			scrollbarAnimator.showScrollbar();
 		}
 	}
@@ -533,9 +533,18 @@ public class FastScroller extends FrameLayout {
 	 * @since 5.0.0-rc2
 	 */
 	public void hideScrollbar() {
-		if (autoHideEnabled && scrollbarAnimator != null) {
+		if (scrollbarAnimator != null) {
 			scrollbarAnimator.hideScrollbar();
 		}
+	}
+
+	/**
+	 * Auto-hides the scrollbar with animation.
+	 *
+	 * @since 5.0.0-rc2
+	 */
+	public void autoHideScrollbar() {
+		if (autoHideEnabled) hideScrollbar();
 	}
 
 	/*------------*/
@@ -601,12 +610,14 @@ public class FastScroller extends FrameLayout {
 		 * @since 5.0.0-b1
 		 */
 		public void toggleFastScroller() {
-			if (mFastScroller != null) {
-				if (mFastScroller.isHidden()) {
-					mFastScroller.showScrollbar();
-				} else {
-					mFastScroller.hideScrollbar();
-				}
+			if (mFastScroller == null) return;
+			if (!mFastScroller.isEnabled()) {
+				mFastScroller.setEnabled(true);
+				mFastScroller.showScrollbar();
+				mFastScroller.autoHideScrollbar();
+			} else {
+				mFastScroller.hideScrollbar();
+				mFastScroller.setEnabled(false);
 			}
 		}
 
@@ -615,7 +626,7 @@ public class FastScroller extends FrameLayout {
 		 * @since 5.0.0-b1
 		 */
 		public boolean isFastScrollerEnabled() {
-			return mFastScroller != null && mFastScroller.getVisibility() == View.VISIBLE;
+			return mFastScroller != null && mFastScroller.isEnabled();
 		}
 
 		/**
