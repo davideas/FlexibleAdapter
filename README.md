@@ -6,7 +6,7 @@
 
 # FlexibleAdapter
 
-####ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
+#### ANNOUNCEMENT: Important and Revolutionary changes are foreseen in v5.0.0. Please see [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
 ###### Fast and versatile Adapter for your RecyclerView
 - **NEW!** First release candidate: [v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) built on 2017.01.14
@@ -23,10 +23,10 @@ This library is configurable and it guides the developers to create a better use
 
 #### Main features
 * Simple item selection with ripple effect, Single & Multi selection mode.
-* Restore deleted items, **NEW** works with Expandable items too!
 * **NEW!** Customizable [FastScroller](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-FastScroller) with new features.
 * Customizable divider item decoration.
 * Add and Remove items with custom animations.
+* Restore deleted items, **NEW** works with Expandable items too!
 * Async [SearchFilter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text, **NEW** result list is animated. Works with sub items too!
 * **NEW!** [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) updates and filter on big list.
 * **NEW!** Auto mapping multi view types with [Item interfaces](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Item-Interfaces).
@@ -38,6 +38,7 @@ This library is configurable and it guides the developers to create a better use
 * **NEW!** Customizable scrolling animations based on adapter position and beyond.
 * **NEW!** Innovative [EndlessScroll](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-On-Load-More) (_No OnScrollListener_).
 * **NEW!** UndoHelper &amp; [ActionModeHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ActionModeHelper).
+* **NEW!** Supports third LayoutManagers.
 * **NEW!** DrawableUtils for dynamic backgrounds with ripple (_No XML_).
 * **NEW!** Easy runtime position calculation for adding/moving items in sections.
 * **NEW!** [Wiki](https://github.com/davideas/FlexibleAdapter/wiki/) pages documentation.
@@ -58,6 +59,8 @@ dependencies {
 	compile 'eu.davidea:flexible-adapter:5.0.0-SNAPSHOT'
 }
 ```
+#### Stay Updated
+<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
 
 # Wiki!
 I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial*.<br/>
