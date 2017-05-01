@@ -366,7 +366,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		if (onlyEntryAnimation && mLastAnimatedPosition >= mMaxChildViews) {
 			shouldAnimate = false;
 		}
-		int lastVisiblePosition = mFlexibleLayoutManager.findLastVisibleItemPosition();
+		int lastVisiblePosition = getFlexibleLayoutManager().findLastVisibleItemPosition();
 //		if (DEBUG) {
 //			Log.v(TAG, "shouldAnimate=" + shouldAnimate
 //					+ " isFastScroll=" + isFastScroll
@@ -477,8 +477,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 */
 	private long calculateAnimationDelay(int position) {
 		long delay;
-		int firstVisiblePosition = mFlexibleLayoutManager.findFirstCompletelyVisibleItemPosition();
-		int lastVisiblePosition = mFlexibleLayoutManager.findLastCompletelyVisibleItemPosition();
+		int firstVisiblePosition = getFlexibleLayoutManager().findFirstCompletelyVisibleItemPosition();
+		int lastVisiblePosition = getFlexibleLayoutManager().findLastCompletelyVisibleItemPosition();
 
 		// Fix for high delay on the first visible item on rotation
 		if (firstVisiblePosition < 0 && position >= 0)
@@ -505,7 +505,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 				// Reset InitialDelay only when first item is already animated
 				mInitialDelay = 0L;
 			}
-			int numColumns = mFlexibleLayoutManager.getSpanCount();
+			int numColumns = getFlexibleLayoutManager().getSpanCount();
 			if (numColumns > 1) {
 				delay = mInitialDelay + mStepDelay * (position % numColumns);
 			}

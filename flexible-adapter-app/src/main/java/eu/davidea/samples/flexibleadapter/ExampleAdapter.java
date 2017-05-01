@@ -81,7 +81,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(
 					R.string.columns,
-					String.valueOf(mFlexibleLayoutManager.getSpanCount()))
+					String.valueOf(getFlexibleLayoutManager().getSpanCount()))
 			);
 			// NOTE: If you have to change at runtime the LayoutManager AND add
 			// Scrollable Headers, consider to add them in post, using a delay >= 0

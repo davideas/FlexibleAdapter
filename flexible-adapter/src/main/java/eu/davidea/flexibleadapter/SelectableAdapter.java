@@ -78,8 +78,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	private Set<Integer> mSelectedPositions;
 	private Set<FlexibleViewHolder> mBoundViewHolders;
 	private int mMode;
+	private IFlexibleLayoutManager mFlexibleLayoutManager;
 	protected RecyclerView mRecyclerView;
-	protected IFlexibleLayoutManager mFlexibleLayoutManager;
 	protected FastScroller.Delegate mFastScrollerDelegate;
 
 	/**
@@ -181,8 +181,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	/**
 	 * Current instance of the wrapper class for LayoutManager suitable for FlexibleAdapter.
+	 * LayoutManager must be already initialized in the RecyclerView.
 	 *
-	 * return wrapper class for any non-conventional LayoutManagers.
+	 * return wrapper class for any non-conventional LayoutManagers or {@code null} if not initialized.
 	 * @since 5.0.0-rc2
 	 */
 	public IFlexibleLayoutManager getFlexibleLayoutManager() {

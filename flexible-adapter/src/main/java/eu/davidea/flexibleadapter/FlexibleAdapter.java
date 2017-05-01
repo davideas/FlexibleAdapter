@@ -1587,7 +1587,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					// displayed by scrolling to it. This resolves the first item below sticky
 					// header when enabled as well.
 					if (mRecyclerView != null) {
-						int firstVisibleItem = mFlexibleLayoutManager.findFirstCompletelyVisibleItemPosition();
+						int firstVisibleItem = getFlexibleLayoutManager().findFirstCompletelyVisibleItemPosition();
 						if (firstVisibleItem == 0 && isHeader(getItem(0)) && !isHeader(getItem(1))) {
 							mRecyclerView.scrollToPosition(0);
 						}
@@ -1895,7 +1895,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			// Avoid to show the double background in case header has transparency
 			// The visibility will be restored when header is reset in StickyHeaderHelper
 			if (areHeadersSticky() && !isFastScroll && mStickyHeaderHelper.getStickyPosition() >= 0 && payloads.isEmpty()) {
-				int headerPos = mFlexibleLayoutManager.findFirstVisibleItemPosition() - 1;
+				int headerPos = getFlexibleLayoutManager().findFirstVisibleItemPosition() - 1;
 				if (headerPos == position && isHeader(item))
 					holder.itemView.setVisibility(View.INVISIBLE);
 			}
@@ -2108,7 +2108,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	public FlexibleAdapter<T> setEndlessScrollThreshold(@IntRange(from = 1) int thresholdItems) {
 		// Increase visible threshold based on number of columns
 		if (mRecyclerView != null) {
-			int spanCount = mFlexibleLayoutManager.getSpanCount();
+			int spanCount = getFlexibleLayoutManager().getSpanCount();
 			thresholdItems = thresholdItems * spanCount;
 		}
 		mEndlessScrollThreshold = thresholdItems;
@@ -4954,8 +4954,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		// Must be delayed to give time at RecyclerView to recalculate positions after an automatic collapse
 		new Handler(Looper.getMainLooper(), new Handler.Callback() {
 			public boolean handleMessage(Message message) {
-				int firstVisibleItem = mFlexibleLayoutManager.findFirstCompletelyVisibleItemPosition();
-				int lastVisibleItem = mFlexibleLayoutManager.findLastCompletelyVisibleItemPosition();
+				int firstVisibleItem = getFlexibleLayoutManager().findFirstCompletelyVisibleItemPosition();
+				int lastVisibleItem = getFlexibleLayoutManager().findLastCompletelyVisibleItemPosition();
 				int itemsToShow = position + subItemsCount - lastVisibleItem;
 //				if (DEBUG)
 //					Log.v(TAG, "autoScroll itemsToShow=" + itemsToShow + " firstVisibleItem=" + firstVisibleItem + " lastVisibleItem=" + lastVisibleItem + " RvChildCount=" + mRecyclerView.getChildCount());
@@ -4963,7 +4963,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					int scrollMax = position - firstVisibleItem;
 					int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
 					int scrollBy = Math.min(scrollMax, scrollMin);
-					int spanCount = mFlexibleLayoutManager.getSpanCount();
+					int spanCount = getFlexibleLayoutManager().getSpanCount();
 					if (spanCount > 1) {
 						scrollBy = scrollBy % spanCount + spanCount;
 					}

@@ -88,8 +88,8 @@ public class FragmentHeadersSections extends AbstractFragment
 				.setNotifyMoveOfFilteredItems(true)
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
-		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
+		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.

@@ -49,7 +49,7 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 			}
 			item.setSubtitle(mRecyclerView.getContext().getString(
 					R.string.columns,
-					String.valueOf(mFlexibleLayoutManager.getSpanCount()))
+					String.valueOf(getFlexibleLayoutManager().getSpanCount()))
 			);
 			addScrollableHeaderWithDelay(item, 500L, scrollToPosition);
 			removeScrollableHeaderWithDelay(item, 3000L);
