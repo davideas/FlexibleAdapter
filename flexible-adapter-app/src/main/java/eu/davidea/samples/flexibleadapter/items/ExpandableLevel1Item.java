@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
@@ -22,7 +23,7 @@ import eu.davidea.flexibleadapter.items.IExpandable;
  */
 public class ExpandableLevel1Item
 		extends AbstractItem<ExpandableItem.ParentViewHolder>
-		implements IExpandable<ExpandableItem.ParentViewHolder, SubItem> {
+		implements IExpandable<ExpandableItem.ParentViewHolder, SubItem>, IFilterable {
 
 	/* Flags for FlexibleAdapter */
 	private boolean mExpanded = false;
@@ -51,6 +52,12 @@ public class ExpandableLevel1Item
 	public int getExpansionLevel() {
 		return 1;
 	}//This allows +1 level of expansion
+
+	@Override
+	public boolean filter(String constraint) {
+		return getTitle() != null && getTitle().toLowerCase().trim().contains(constraint) ||
+				getSubtitle() != null && getSubtitle().toLowerCase().trim().contains(constraint);
+	}
 
 	@Override
 	public List<SubItem> getSubItems() {

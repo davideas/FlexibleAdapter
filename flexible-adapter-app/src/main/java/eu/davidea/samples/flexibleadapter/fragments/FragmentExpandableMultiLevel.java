@@ -68,6 +68,8 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.expandItemsAtStartUp()
+				.setNotifyChangeOfUnfilteredItems(true)
+				.setNotifyMoveOfFilteredItems(true)
 				.setAutoCollapseOnExpand(false)
 				.setMinCollapsibleLevel(1) //Auto-collapse only items with level >= 1 (avoid to collapse also sections!)
 				.setAutoScrollOnExpand(true);

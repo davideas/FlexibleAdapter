@@ -4050,15 +4050,15 @@ public class FlexibleAdapter<T extends IFlexible>
 						header.setHidden(false);
 						filteredItems.add(header);
 					}
-					filteredItems.add(item);
-					addFilteredSubItems(filteredItems, item);
+					addFilteredSubItems(filteredItems, item); //recursive add
 				} else {
 					item.setHidden(true);
 				}
 			}
 		} else if (hasNewSearchText(mSearchText)) { //this is better than checking emptiness
 			filteredItems = unfilteredItems; //original items with no filter
-			resetFilterFlags(filteredItems);
+			resetFilterFlags(filteredItems); //recursive reset
+			mExpandedFilterFlags = null;
 			restoreScrollableHeadersAndFooters(filteredItems);
 		}
 
@@ -4143,6 +4143,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * Adds to the final list also the filtered subItems.
 	 */
 	private void addFilteredSubItems(List<T> values, T item) {
+		// Add the main item
+		values.add(item);
+		// Add the subItems if filtered
 		if (isExpandable(item)) {
 			IExpandable expandable = (IExpandable) item;
 			if (hasSubItems(expandable)) {
@@ -4150,7 +4153,9 @@ public class FlexibleAdapter<T extends IFlexible>
 				List<T> filteredSubItems = new ArrayList<>();
 				List<T> subItems = expandable.getSubItems();
 				for (T subItem : subItems) {
-					if (!subItem.isHidden()) filteredSubItems.add(subItem);
+					if (subItem instanceof IExpandable && filterExpandableObject(subItem)) {
+						addFilteredSubItems(filteredSubItems, subItem);
+					} else if (!subItem.isHidden()) filteredSubItems.add(subItem);
 				}
 				values.addAll(filteredSubItems);
 			}
@@ -4176,6 +4181,11 @@ public class FlexibleAdapter<T extends IFlexible>
 					// Reset subItem hidden flag
 					for (T subItem : subItems) {
 						subItem.setHidden(false);
+						if (subItem instanceof IExpandable) {
+							IExpandable subExpandable = (IExpandable) subItem;
+							subExpandable.setExpanded(false);
+							resetFilterFlags(subExpandable.getSubItems());
+						}
 					}
 					// Show subItems for expanded items
 					if (expandable.isExpanded()) {
@@ -4196,7 +4206,6 @@ public class FlexibleAdapter<T extends IFlexible>
 				}
 			}
 		}
-		mExpandedFilterFlags = null;
 	}
 
 	/**
