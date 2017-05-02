@@ -86,13 +86,13 @@ Active discussions:
 #### Under the hood
 Some simple features have been implemented, thanks to some Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability.
 
+<p align="center"><img src="./screenshots/diagram.png"></p>
+
 * At lower level there is `SelectableAdapter` class. It provides selection features and it's able to _maintain the state_ after the rotation: you just need to call the onSave/onRestore methods from the Activity!
 * At middle level, the `AnimatorAdapter` class has been added to give some animation at startup and when user scrolls.
 * At front level, the core class `FlexibleAdapter`. It holds and handles the main list, performs actions on all different types of item paying attention at the adding and removal of the items, as well as the new concept of "selection coherence".
 * New useful extensions and helpers have been added during the time to simplify the development.
 * Item interfaces and predefined ViewHolders complete the whole library giving more actions to the items and configuration options to the developers and the end user.
-
-<p align="center"><img src="./screenshots/diagram.png"></p>
 
 # Showcase of the demo App
 You can download the latest demo App from the latest release page OR run it with the emulator.
