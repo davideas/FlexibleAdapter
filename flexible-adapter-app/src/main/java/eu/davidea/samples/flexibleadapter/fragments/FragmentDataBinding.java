@@ -19,7 +19,9 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.animators.GarageDoorItemAnimator;
+import eu.davidea.samples.flexibleadapter.items.AbstractItem;
 import eu.davidea.samples.flexibleadapter.items.HeaderItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
@@ -71,7 +73,7 @@ public class FragmentDataBinding extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Create New Database and Initialize RecyclerView
-		DatabaseService.getInstance().createHeadersSectionsDatabase(12, 4);
+		DatabaseService.getInstance().createDataBindingDatabase(12, 4);
 		initializeRecyclerView(savedInstanceState);
 
 		//Restore FAB button and icon
@@ -83,20 +85,20 @@ public class FragmentDataBinding extends AbstractFragment {
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
-		//Initialize Adapter and RecyclerView
+		// Initialize Adapter and RecyclerView
 		mAdapter = new BindingFlexibleAdapter<>(getActivity(), true);
-		//Experimenting NEW features (v5.0.0)
+		// Experimenting NEW features (v5.0.0)
 		mAdapter.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		//NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
+		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new GarageDoorItemAnimator());
 
-		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
+		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
 		mAdapter.setFastScroller(fastScroller);
 		mAdapter.setLongPressDragEnabled(true)
@@ -108,6 +110,10 @@ public class FragmentDataBinding extends AbstractFragment {
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
+
+		mAdapter.addScrollableHeaderWithDelay(new ScrollableUseCaseItem(
+				getString(R.string.databinding_use_case_title),
+				getString(R.string.databinding_use_case_description)), 500L, false);
 	}
 
 	@Override
@@ -116,9 +122,13 @@ public class FragmentDataBinding extends AbstractFragment {
 			items.addAll(DatabaseService.getInstance().getDatabaseList());
 		} else if (fabClickedTimes == 2) {
 			HeaderItem headerItem = DatabaseService.newHeader(mAdapter.getItemCountOfTypes(R.layout.recycler_header_item) + 1);
-			items.add(1, DatabaseService.newSimpleItem(fabClickedTimes * 111, headerItem));
+			AbstractItem newItem = DatabaseService.newSimpleItem(fabClickedTimes * 111, headerItem);
+			items.add(1, newItem);
+			DatabaseService.getInstance().addItem(1, newItem); //Refreshing is consistent too
 		} else {
-			items.add(0, DatabaseService.newSimpleItem(fabClickedTimes * 111, null));
+			AbstractItem newItem = DatabaseService.newSimpleItem(fabClickedTimes * 111, null);
+			items.add(0, newItem);
+			DatabaseService.getInstance().addItem(0, newItem); //Refreshing is consistent too
 		}
 		++fabClickedTimes;
 	}

@@ -427,6 +427,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	private void showFab() {
 		if (mFragment instanceof FragmentHeadersSections ||
+				mFragment instanceof FragmentDataBinding ||
 				mFragment instanceof FragmentStaggeredLayout ||
 				mFragment instanceof FragmentAsyncFilter) {
 			ViewCompat.animate(mFab)
@@ -838,7 +839,8 @@ public class MainActivity extends AppCompatActivity implements
 			mRefreshHandler.sendEmptyMessage(2);
 			fastScroller.setVisibility(View.GONE);
 		}
-		if (mAdapter != null && !mAdapter.isRestoreInTime()) {
+		if (mAdapter != null && !mAdapter.isRestoreInTime() &&
+				DatabaseService.getInstance().getDatabaseType() != DatabaseType.DATA_BINDING) {
 			String message = (mAdapter.hasSearchText() ? "Filtered " : "Refreshed ");
 			message += size + " items in " + mAdapter.getTime() + "ms";
 			Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();

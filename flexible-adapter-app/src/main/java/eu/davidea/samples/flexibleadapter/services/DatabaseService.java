@@ -216,6 +216,14 @@ public class DatabaseService {
 	}
 
 	/*
+	 * Same as HeadersSection, but with different property type
+	 */
+	public void createDataBindingDatabase(int size, int headers) {
+		createHeadersSectionsDatabase(size, headers);
+		databaseType = DatabaseType.DATA_BINDING;
+	}
+
+	/*
 	 * List of Holder Items and Header. Only Holder Simple Items will be
 	 * added to the list. IHolder items hold the model data inside.
 	 */

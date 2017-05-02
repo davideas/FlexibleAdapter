@@ -115,7 +115,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);
 		mAdapter.addScrollableHeaderWithDelay(new ScrollableUseCaseItem(
 				getString(R.string.selection_modes_use_case_title),
-				getString(R.string.selection_modes_use_case_description)), 1100L, true
+				getString(R.string.selection_modes_use_case_description)), 1200L, true
 		);
 	}
 

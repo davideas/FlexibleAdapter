@@ -131,6 +131,8 @@ Follow the steps in the <b>Wiki</b> page of the library.]]></string>
 
 	<string name="databinding">Data Binding</string>
 	<string name="databinding_description"><![CDATA[Data Binding Extension Library<br/><font color="#ff4081"><b>Check the code!</b>]]></string>
+	<string name="databinding_use_case_description">Refresh or tap FAB button to update dataset with Data Binding.</string>
+	<string name="databinding_use_case_title">Data Binding Extension</string>
 
 	<string name="expandable_sections">Expandable Sections</string>
 	<string name="expandable_sections_description">Sections with [sticky] headers that can expand/collapse + Draggable items + Filter + Scroll Animations</string>

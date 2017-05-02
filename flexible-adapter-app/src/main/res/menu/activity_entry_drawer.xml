@@ -18,7 +18,7 @@
 			android:title="@string/filter"/>
 		<item
 			android:id="@+id/nav_animator"
-			android:icon="@drawable/ic_animation_grey600_24dp"
+			android:icon="@drawable/ic_chart_gantt_grey600_24dp"
 			android:title="@string/animator"/>
 		<item
 			android:id="@+id/nav_headers_and_sections"
@@ -89,9 +89,6 @@
 				android:id="@+id/nav_github"
 				android:icon="@drawable/ic_github_circle_grey600_24dp"
 				android:title="@string/github"/>
-			<!--<item-->
-				<!--android:id="@+id/nav_empty_space"-->
-				<!--android:title=""/>-->
 		</menu>
 	</item>
 
