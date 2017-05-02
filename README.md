@@ -47,8 +47,8 @@ This library is configurable and it guides the developers to create a better use
 * **NEW!** Data Binding.
 
 # Setup
-```
 #### build.gradle
+```
 repositories {
 	jcenter()
 	maven {url = "https://oss.sonatype.org/content/repositories/snapshots/" } //For Snapshots
@@ -58,13 +58,17 @@ repositories {
 dependencies {
 	// Using JCenter
 	compile 'eu.davidea:flexible-adapter:5.0.0-rc1'
+	compile 'eu.davidea:flexible-adapter-databinding:1.0.0-b1'
 	
 	// Using MavenSnapshots repository for continuous updates from my development
 	compile 'eu.davidea:flexible-adapter:5.0.0-SNAPSHOT'
 }
 ```
 #### Stay Updated
-<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
+|Flexible Adapter|Data Binding|Firebase|Realm|UI|
+|---|---|---|---|---|
+|5.0.0-rc1|1.0.0-b1|Coming soon|Coming soon|Coming soon
+|<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-databinding?source=watch' alt='Get automatic notifications about new "flexible-adapter-databinding" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<img src='https://www.bintray.com/docs/images/bintray_badge_greyscale.png'>|<img src='https://www.bintray.com/docs/images/bintray_badge_greyscale.png'>|<img src='https://www.bintray.com/docs/images/bintray_badge_greyscale.png'>|
 
 # Wiki!
 I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial*.<br/>
@@ -87,6 +91,8 @@ Some simple features have been implemented, thanks to some Blogs (see at the bot
 * At front level, the core class `FlexibleAdapter`. It holds and handles the main list, performs actions on all different types of item paying attention at the adding and removal of the items, as well as the new concept of "selection coherence".
 * New useful extensions and helpers have been added during the time to simplify the development.
 * Item interfaces and predefined ViewHolders complete the whole library giving more actions to the items and configuration options to the developers and the end user.
+
+![Diagram](/screenshots/diagram.png)
 
 # Showcase of the demo App
 You can download the latest demo App from the latest release page OR run it with the emulator.
