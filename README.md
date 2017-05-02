@@ -67,7 +67,7 @@ dependencies {
 #### Stay Updated
 |Flexible Adapter|Data Binding|Firebase|Realm|UI|
 |---|---|---|---|---|
-|5.0.0-rc1|1.0.0-b1|Coming soon|Coming soon|Coming soon
+|<p align="center">5.0.0-rc1</p>|<p align="center">1.0.0-b1|<p align="center">Coming soon</p>|<p align="center">Coming soon</p>|<p align="center">Coming soon</p>
 |<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-databinding?source=watch' alt='Get automatic notifications about new "flexible-adapter-databinding" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<img src='https://www.bintray.com/docs/images/bintray_badge_greyscale.png'>|<img src='https://www.bintray.com/docs/images/bintray_badge_greyscale.png'>|<img src='https://www.bintray.com/docs/images/bintray_badge_greyscale.png'>|
 
 # Wiki!
@@ -92,7 +92,7 @@ Some simple features have been implemented, thanks to some Blogs (see at the bot
 * New useful extensions and helpers have been added during the time to simplify the development.
 * Item interfaces and predefined ViewHolders complete the whole library giving more actions to the items and configuration options to the developers and the end user.
 
-![Diagram](/screenshots/diagram.png)
+<p align="center"><img src="./screenshots/diagram.png"></p>
 
 # Showcase of the demo App
 You can download the latest demo App from the latest release page OR run it with the emulator.
