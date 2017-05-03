@@ -27,7 +27,7 @@ This library is configurable and it guides the developers to create a better use
 * Customizable divider item decoration.
 * Add and Remove items with custom animations.
 * Restore deleted items, **NEW** works with Expandable items too!
-* Async [SearchFilter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text, **NEW** result list is animated. Works with sub items too!
+* Async [Filter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text, **NEW** result list is animated. Works with sub items too!
 * **NEW!** [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) updates and filter on big list.
 * **NEW!** Auto mapping multi view types with [Item interfaces](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Item-Interfaces).
 * **NEW!** Predefined [ViewHolders](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ViewHolders) with callbacks.
@@ -65,10 +65,14 @@ dependencies {
 }
 ```
 #### Stay Updated
+<div align="center">
+
 |Flexible Adapter|Data Binding|Firebase|Realm|UI|
 |---|---|---|---|---|
-|<p align="center">5.0.0-rc1</p>|<p align="center">1.0.0-b1|<p align="center">Coming soon</p>|<p align="center">Coming soon</p>|<p align="center">Coming soon</p>
+|<div align="center">5.0.0-rc1</div>|<div align="center">1.0.0-b1</div>|<div align="center">Coming soon</div>|<div align="center">Coming soon</div>|<div align="center">Coming soon</div>
 |<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-databinding?source=watch' alt='Get automatic notifications about new "flexible-adapter-databinding" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<img src='https://www.bintray.com/docs/images/bintray_badge_greyscale.png'>|<img src='https://www.bintray.com/docs/images/bintray_badge_greyscale.png'>|<img src='https://www.bintray.com/docs/images/bintray_badge_greyscale.png'>|
+
+</div>
 
 # Wiki!
 I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial*.<br/>
