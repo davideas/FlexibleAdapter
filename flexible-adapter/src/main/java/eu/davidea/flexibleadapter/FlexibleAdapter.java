@@ -1300,6 +1300,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Evaluates if Adapter has headers shown.
+	 *
 	 * @return true if all headers are currently displayed, false otherwise
 	 * @since 5.0.0-b6
 	 */
@@ -1308,13 +1310,32 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Returns if Adapter can actually display sticky headers on the top.
+	 * Evaluates if Adapter can actually display sticky headers on the top.
 	 *
 	 * @return true if headers can be sticky, false if headers are scrolled together with all items
 	 * @since 5.0.0-b6
 	 */
 	public boolean areHeadersSticky() {
 		return mStickyHeaderHelper != null;
+	}
+
+	/**
+	 * Returns the current position of the sticky header.
+	 *
+	 * @return the current sticky header position, -1 if no header is sticky
+	 * @since 5.0.0-rc2
+	 */
+	public final int getStickyPosition() {
+		return areHeadersSticky() ? mStickyHeaderHelper.getStickyPosition() : -1;
+	}
+
+	/**
+	 * Ensures the current sticky header view is correctly displayed in the sticky layout.
+	 *
+	 * @since 5.0.0-rc2
+	 */
+	public final void ensureHeaderParent() {
+		if (areHeadersSticky()) mStickyHeaderHelper.ensureHeaderParent();
 	}
 
 	/**

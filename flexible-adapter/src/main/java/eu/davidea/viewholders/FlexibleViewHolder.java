@@ -217,10 +217,11 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 		if (!mAdapter.isSelectable(position)) return;
 		// [De]Activate the view
 		boolean selected = mAdapter.isSelected(position);
-		if (itemView.isActivated() && !selected || !itemView.isActivated() && selected) {
-			itemView.setActivated(selected);
+		if (getContentView().isActivated() && !selected || !getContentView().isActivated() && selected) {
+			getContentView().setActivated(selected);
+			if (mAdapter.getStickyPosition() == position) mAdapter.ensureHeaderParent();
 			// Apply elevation
-			if (itemView.isActivated() && getActivationElevation() > 0)
+			if (getContentView().isActivated() && getActivationElevation() > 0)
 				ViewCompat.setElevation(itemView, getActivationElevation());
 			else if (getActivationElevation() > 0) //Leave unaltered the default elevation
 				ViewCompat.setElevation(itemView, 0);
@@ -332,7 +333,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 				}
 			}
 			// Now toggle the activation, Activate view and make selection visible only if necessary
-			if (!itemView.isActivated()) {
+			if (!getContentView().isActivated()) {
 				toggleActivation();
 			}
 		} else if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE &&
@@ -366,12 +367,12 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 				if (mAdapter.isSelected(position)) {
 					toggleActivation();
 				}
-			} else if (shouldActivateViewWhileSwiping() && itemView.isActivated()) {
+			} else if (shouldActivateViewWhileSwiping() && getContentView().isActivated()) {
 				mAdapter.toggleSelection(position);
 				toggleActivation();
 			} else if (mActionState == ItemTouchHelper.ACTION_STATE_DRAG) {
 				mAdapter.toggleSelection(position);
-				if (itemView.isActivated()) {
+				if (getContentView().isActivated()) {
 					toggleActivation();
 				}
 			}

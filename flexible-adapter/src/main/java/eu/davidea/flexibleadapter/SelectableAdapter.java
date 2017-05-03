@@ -303,11 +303,10 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * <ul>
 	 * <li>If you don't want any item to be selected/activated at all, just don't call this method.</li>
 	 * <li>To have actually the item visually selected you need to add a custom <i>Selector Drawable</i>
-	 * to your layout/view of the Item. It's preferable to set in your layout:
+	 * to the background of the View, via {@code DrawableUtils} or via layout's item:
 	 * <i>android:background="?attr/selectableItemBackground"</i>, pointing to a custom Drawable
 	 * in the style.xml (note: prefix <i>?android:attr</i> <u>doesn't</u> work).</li>
-	 * <li>In <i>bindViewHolder</i>, adjust the selection status:
-	 * <i>holder.itemView.setActivated(isSelected(position));</i></li>
+	 * <li></li>
 	 * </ul></p>
 	 *
 	 * @param position Position of the item to toggle the selection status for.
@@ -443,9 +442,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	private void notifySelectionChanged(int positionStart, int itemCount) {
 		if (itemCount > 0) {
 			// Avoid to rebind the VH, direct call to the itemView activation
-			for (FlexibleViewHolder holder : mBoundViewHolders) {
-				if (isSelectable(holder.getAdapterPosition()))
-					holder.toggleActivation();
+			for (FlexibleViewHolder flexHolder : mBoundViewHolders) {
+				if (isSelectable(flexHolder.getFlexibleAdapterPosition()))
+					flexHolder.toggleActivation();
 			}
 			// Use classic notification, in case FlexibleViewHolder is not implemented
 			if (mBoundViewHolders.isEmpty())
@@ -455,16 +454,18 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
-		// When user scrolls, this line binds the correct selection status
-		holder.itemView.setActivated(isSelected(position));
 		// Bind the correct view elevation
 		if (holder instanceof FlexibleViewHolder) {
 			FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
-			if (holder.itemView.isActivated() && flexHolder.getActivationElevation() > 0)
-				ViewCompat.setElevation(holder.itemView, flexHolder.getActivationElevation());
+			flexHolder.getContentView().setActivated(isSelected(position));
+			if (flexHolder.getContentView().isActivated() && flexHolder.getActivationElevation() > 0)
+				ViewCompat.setElevation(flexHolder.getContentView(), flexHolder.getActivationElevation());
 			else if (flexHolder.getActivationElevation() > 0) //Leave unaltered the default elevation
-				ViewCompat.setElevation(holder.itemView, 0);
+				ViewCompat.setElevation(flexHolder.getContentView(), 0);
 			mBoundViewHolders.add(flexHolder);
+		} else {
+			// When user scrolls, this line binds the correct selection status
+			holder.itemView.setActivated(isSelected(position));
 		}
 	}
 

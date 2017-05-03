@@ -239,7 +239,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		onStickyHeaderChange(mHeaderPosition);
 	}
 
-	private void ensureHeaderParent() {
+	public void ensureHeaderParent() {
 		final View view = mStickyHeaderViewHolder.getContentView();
 		// #121 - Make sure the measured height (width for horizontal layout) is kept if
 		// WRAP_CONTENT has been set for the Header View
