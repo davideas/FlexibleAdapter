@@ -56,11 +56,13 @@ dependencies {
 
 	// FlexibleAdapter + extensions
 	compile project (":flexible-adapter")
-	compile project (":flexible-adapter-ui")
 	compile project (":flexible-adapter-databinding")
+	compile project (":flexible-adapter-firebase")
+	compile project (":flexible-adapter-realm")
+	compile project (":flexible-adapter-ui")
 
 	// FlipView
-	compile "eu.davidea:flipview:1.1.2"
+	compile "eu.davidea:flipview:1.1.3"
 
 	// ButterKnife
 	compile 'com.jakewharton:butterknife:8.5.1'

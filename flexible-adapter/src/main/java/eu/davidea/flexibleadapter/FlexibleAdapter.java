@@ -1834,7 +1834,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	@Override
-	public final int getItemViewType(int position) {
+	public int getItemViewType(int position) {
 		T item = getItem(position);
 		if (item == null) {
 			return 0;
@@ -1858,7 +1858,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	@Override
-	public final RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		T item = getViewTypeInstance(viewType);
 		if (item == null || !autoMap) {
 			// If everything has been set properly, this should never happen ;-)
@@ -1883,7 +1883,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	@Override
-	public final void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 		this.onBindViewHolder(holder, position, Collections.unmodifiableList(new ArrayList<>()));
 	}
 
@@ -1896,7 +1896,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	@Override
-	public final void onBindViewHolder(final RecyclerView.ViewHolder holder, int position, List payloads) {
+	public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position, List payloads) {
 		if (DEBUG) {
 			Log.v(TAG, "onViewBound    Holder=" + getClassName(holder) + " position=" + position +
 					" itemId=" + holder.getItemId() + " layoutPosition=" + holder.getLayoutPosition());

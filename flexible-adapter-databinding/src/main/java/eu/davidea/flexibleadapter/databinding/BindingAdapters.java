@@ -14,7 +14,7 @@ public class BindingAdapters {
 	@BindingAdapter(value = "items")
 	public static <T extends IFlexible> void setAdapter(RecyclerView recyclerView, List<T> items) {
 		RecyclerView.Adapter adapter = recyclerView.getAdapter();
-		if (adapter != null && adapter instanceof FlexibleAdapter) {
+		if (adapter instanceof FlexibleAdapter) {
 			((FlexibleAdapter<T>) adapter).updateDataSet(items);
 		} else {
 			throw new IllegalStateException("Binding works only with FlexibleAdapter");

@@ -1,1 +1,1 @@
-include ':flexible-adapter-app', ':flexible-adapter', ':flexible-adapter-databinding', ':flexible-adapter-ui'
+include ':flexible-adapter-app', ':flexible-adapter', ':flexible-adapter-databinding', ':flexible-adapter-ui', ':flexible-adapter-realm', ':flexible-adapter-firebase'
