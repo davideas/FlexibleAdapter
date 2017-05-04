@@ -11,6 +11,10 @@ ext {
     publishedGroupId = "eu.davidea"
     bintrayName = "flexible-adapter-realm"
     artifact = bintrayName
+
+    // Realm
+    realmVersion = "3.1.4"
+    realmAndroidLibrary = "io.realm:realm-android-library:${realmVersion}"
 }
 
 android {
@@ -33,7 +37,8 @@ android {
 
 dependencies {
     compile project (":flexible-adapter")
-    compile supportDependencies.recyclerview
+    provided supportDependencies.recyclerview
+    provided realmAndroidLibrary
 }
 
 if (project.hasProperty('all') || project.hasProperty('realm')) {

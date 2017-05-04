@@ -32,7 +32,7 @@ android {
 }
 
 dependencies {
-	compile supportDependencies.recyclerview
+	provided supportDependencies.recyclerview
 	compile supportDependencies.design
 }
 

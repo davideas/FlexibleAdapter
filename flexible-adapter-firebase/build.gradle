@@ -33,7 +33,7 @@ android {
 
 dependencies {
     compile project (":flexible-adapter")
-    compile supportDependencies.recyclerview
+    provided supportDependencies.recyclerview
 }
 
 if (project.hasProperty('all') || project.hasProperty('firebase')) {
