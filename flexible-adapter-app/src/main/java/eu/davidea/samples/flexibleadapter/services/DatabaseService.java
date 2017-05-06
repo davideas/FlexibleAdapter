@@ -82,6 +82,7 @@ public class DatabaseService {
 	 * It also shows how adapter animation can be configured.
 	 */
 	//TODO: Review the description of all examples
+	@SuppressWarnings("deprecation")
 	public void createOverallDatabase(Resources resources) {
 		databaseType = DatabaseType.OVERALL;
 		mItems.clear();
@@ -114,11 +115,20 @@ public class DatabaseService {
 				.withDescription(resources.getString(R.string.endless_scrolling_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_playlist_play_grey600_24dp)));
 
-		//Special Use Cases
-		mItems.add(new OverallItem(R.id.nav_db_headers_and_sections, resources.getString(R.string.databinding))
+		// Extensions
+		mItems.add(new OverallItem(R.id.nav_databinding, resources.getString(R.string.databinding))
 				.withDescription(resources.getString(R.string.databinding_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_link_grey_600_24dp)));
 
+		mItems.add(new OverallItem(R.id.nav_firebase, resources.getString(R.string.firebase))
+				.withDescription(resources.getString(R.string.firebase_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_firebase)));
+
+		mItems.add(new OverallItem(R.id.nav_realm, resources.getString(R.string.realm))
+				.withDescription(resources.getString(R.string.realm_description))
+				.withIcon(resources.getDrawable(R.drawable.ic_realm)));
+
+		//Special Use Cases
 		mItems.add(new OverallItem(R.id.nav_model_holders, resources.getString(R.string.model_holders))
 				.withDescription(resources.getString(R.string.model_holders_description))
 				.withIcon(resources.getDrawable(R.drawable.ic_select_inverse_grey600_24dp)));

@@ -1,0 +1,38 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	tools:context="eu.davidea.samples.flexibleadapter.realm.RealmActivity">
+
+	<group android:id="@+id/group_normal_mode">
+		<!-- Search, should appear as action button -->
+		<item android:id="@+id/action_search"
+		      android:title="@string/action_search"
+		      android:icon="@drawable/ic_action_search"
+		      app:showAsAction="collapseActionView|always"
+		      android:animateLayoutChanges="true"
+		      app:actionViewClass="android.support.v7.widget.SearchView"/>
+		<item android:id="@+id/action_add"
+		      android:icon="@drawable/fab_add"
+		      android:title="@string/action_add"
+		      app:showAsAction="ifRoom"/>
+		<item android:id="@+id/action_start_delete_mode"
+		      android:icon="@drawable/ic_action_delete"
+		      android:title="@string/action_delete"
+		      app:showAsAction="ifRoom"/>
+		<item android:id="@+id/action_random"
+		      android:icon="@drawable/fab_add"
+		      android:title="@string/action_add_random"
+		      app:showAsAction="always"/>
+	</group>
+	<group android:id="@+id/group_delete_mode">
+		<item android:id="@+id/action_end_delete_mode"
+		      android:icon="@drawable/ic_action_delete"
+		      android:title="@string/action_delete"
+		      app:showAsAction="always"/>
+		<item android:id="@+id/action_cancel_delete_mode"
+		      android:icon="@drawable/button_delete"
+		      android:title="@string/CANCEL"
+		      app:showAsAction="always"/>
+	</group>
+
+</menu>

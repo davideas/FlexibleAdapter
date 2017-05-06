@@ -1,5 +1,7 @@
 <resources>
 	<!-- Action Mode -->
+	<string name="action_add">Add</string>
+	<string name="action_add_random">Add Random</string>
 	<string name="action_delete">Delete</string>
 	<string name="action_select_all">Select All</string>
 	<string name="action_selected_one">%1$s selected</string>
@@ -134,6 +136,16 @@ Follow the steps in the <b>Wiki</b> page of the library.]]></string>
 	<string name="databinding_use_case_description">Refresh or tap FAB button to update dataset with Data Binding.</string>
 	<string name="databinding_use_case_title">Data Binding Extension</string>
 
+	<string name="firebase">Firebase</string>
+	<string name="firebase_description"><![CDATA[Firebase Extension Library<br/><font color="#ff4081"><b>Check the code!</b>]]></string>
+	<string name="firebase_use_case_description">Refresh or tap FAB button to update dataset with Firebase.</string>
+	<string name="firebase_use_case_title">Firebase Extension</string>
+
+	<string name="realm">Realm</string>
+	<string name="realm_description"><![CDATA[Realm Extension Library<br/><font color="#ff4081"><b>Check the code!</b>]]></string>
+	<string name="realm_use_case_description">Refresh or tap FAB button to update dataset with Realm.</string>
+	<string name="realm_use_case_title">Realm Extension</string>
+
 	<string name="expandable_sections">Expandable Sections</string>
 	<string name="expandable_sections_description">Sections with [sticky] headers that can expand/collapse + Draggable items + Filter + Scroll Animations</string>
 
@@ -196,7 +208,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 <br/>See the License for the specific language governing permissions and
 limitations under the License.
 ]]></string>
-	<string name="title_activity_view_pager">ViewPagerActivity</string>
 	<string name="section_format">Hello World from section: %1$d</string>
 
 </resources>

@@ -558,7 +558,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return The <b>T</b> object for the position provided or null if item not found
 	 * @since 1.0.0
 	 */
-	public final T getItem(@IntRange(from = 0) int position) {
+	public T getItem(@IntRange(from = 0) int position) {
 		if (position < 0 || position >= getItemCount()) return null;
 		return mItems.get(position);
 	}
@@ -590,7 +590,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 1.0.0
 	 */
 	@Override
-	public final int getItemCount() {
+	public int getItemCount() {
 		return mItems.size();
 	}
 
@@ -1625,7 +1625,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		int position = 0;
 		IHeader sameHeader = null;
 		while (position < getItemCount() - mScrollableFooters.size()) {
-			T item = mItems.get(position);
+			T item = getItem(position);
 			// Reset hidden status! Necessary after the filter and the update
 			IHeader header = getHeaderOf(item);
 			if (header != sameHeader && header != null && !isExpandable((T) header)) {
@@ -1678,7 +1678,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				// Hide linked headers between Scrollable Headers and Footers
 				int position = getItemCount() - mScrollableFooters.size() - 1;
 				while (position >= Math.max(0, mScrollableHeaders.size() - 1)) {
-					T item = mItems.get(position);
+					T item = getItem(position);
 					if (isHeader(item))
 						hideHeader(position, (IHeader) item);
 					position--;
@@ -1869,6 +1869,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			mInflater = LayoutInflater.from(parent.getContext());
 		}
 		return item.createViewHolder(this, mInflater, parent);
+		//TODO: return item.createViewHolder(mInflater.inflate(item.getLayoutRes(), parent, false), this);
 	}
 
 	/**
@@ -2524,7 +2525,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		int startPosition = Math.max(0, mScrollableHeaders.size() - 1);
 		int endPosition = getItemCount() - mScrollableFooters.size() - 1;
 		for (int i = startPosition; i < endPosition; i++) {
-			if (isExpanded(mItems.get(i))) expandedPositions.add(i);
+			if (isExpanded(getItem(i))) expandedPositions.add(i);
 		}
 		return expandedPositions;
 	}
@@ -4690,7 +4691,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			removeSelection(fromPosition);
 			addSelection(toPosition);
 		}
-		T item = mItems.get(fromPosition);
+		T item = getItem(fromPosition);
 		// Preserve expanded status and Collapse expandable
 		boolean expanded = isExpanded(item);
 		if (expanded) collapse(toPosition);

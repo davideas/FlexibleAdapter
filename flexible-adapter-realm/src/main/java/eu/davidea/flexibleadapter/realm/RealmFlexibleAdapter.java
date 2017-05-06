@@ -19,8 +19,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
-import java.util.List;
-
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import io.realm.OrderedCollectionChangeSet;
@@ -31,38 +29,34 @@ import io.realm.RealmModel;
 import io.realm.RealmResults;
 
 /**
- * The RealmFlexibleAdapter class is an utility class for binding RecyclerView UI elements to
- * Realm data.
- * <p>This adapter will automatically handle any updates to its data and call
- * {@code notifyDataSetChanged()}, {@code notifyItemInserted()}, {@code notifyItemRemoved()} or
- * {@code notifyItemRangeChanged(} as appropriate.</p>
- * The RealmAdapter will stop receiving updates if the Realm instance providing the
+ * The {@code RealmFlexibleAdapter} class is an utility class for binding RecyclerView UI
+ * elements to Realm data using {@link FlexibleAdapter}.
+ * <p>This adapter will automatically handle any updates to its data and call fine grained
+ * notifications as appropriate.</p>
+ * The Adapter will stop receiving updates if the Realm instance providing the
  * {@link OrderedRealmCollection} is closed.
  *
  * @param <T> type of {@link RealmModel} and {@link IFlexible} stored in the adapter.
  *
  * @author Davide Steduto
  * @since 04/05/2017
- * FlexibleAdapter project
  */
-public class RealmFlexibleAdapter<T extends RealmModel & IFlexible> extends FlexibleAdapter {
+@SuppressWarnings({"unchecked", "ConstantConditions"})
+public class RealmFlexibleAdapter<T extends RealmModel & IFlexible> extends FlexibleAdapter<T> {
 
 	private boolean hasAutoUpdates;
 	private OrderedRealmCollectionChangeListener listener;
 	@Nullable
 	private OrderedRealmCollection<T> adapterData;
 
-	public RealmFlexibleAdapter(@Nullable List<T> items) {
-		super(items);
+	public RealmFlexibleAdapter(@Nullable OrderedRealmCollection<T> data,
+								@Nullable Object listeners) {
+		this(data, listeners, true);
 	}
 
-	public RealmFlexibleAdapter(@Nullable List<T> items, @Nullable Object listeners) {
-		this(items, listeners, null, false);
-	}
-
-	public RealmFlexibleAdapter(@Nullable List<T> items, @Nullable Object listeners,
-								@Nullable OrderedRealmCollection<T> data, boolean autoUpdate) {
-		super(items, listeners, true);
+	public RealmFlexibleAdapter(@Nullable OrderedRealmCollection<T> data,
+								@Nullable Object listeners, boolean autoUpdate) {
+		super(data, listeners, true);
 		if (data != null && !data.isManaged())
 			throw new IllegalStateException("Only use this adapter with managed RealmCollection");
 		this.adapterData = data;
@@ -74,12 +68,7 @@ public class RealmFlexibleAdapter<T extends RealmModel & IFlexible> extends Flex
 		return new OrderedRealmCollectionChangeListener() {
 			@Override
 			public void onChange(Object collection, OrderedCollectionChangeSet changeSet) {
-//				if (collection instanceof List) {
-//					List<T> items = (List<T>) collection;
-//					updateDataSet(items);
-//				}
-
-				// null Changes means the async query returns the first time.
+				// null changes means the async query returns the first time.
 				if (changeSet == null) {
 					notifyDataSetChanged();
 					return;
@@ -109,7 +98,6 @@ public class RealmFlexibleAdapter<T extends RealmModel & IFlexible> extends Flex
 	public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
 		if (hasAutoUpdates && isDataValid()) {
-			//noinspection ConstantConditions
 			addListener(adapterData);
 		}
 	}
@@ -118,26 +106,12 @@ public class RealmFlexibleAdapter<T extends RealmModel & IFlexible> extends Flex
 	public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
 		super.onDetachedFromRecyclerView(recyclerView);
 		if (hasAutoUpdates && isDataValid()) {
-			//noinspection ConstantConditions
 			removeListener(adapterData);
 		}
 	}
 
-	/**
-	 * Returns the current ID for an item. Note that item IDs are not stable so you cannot rely on the item ID being the
-	 * same after notifyDataSetChanged() or {@link #updateData(OrderedRealmCollection)} has been called.
-	 *
-	 * @param index position of item in the adapter.
-	 * @return current item ID.
-	 */
-	@Override
-	public long getItemId(final int index) {
-		return index;
-	}
-
 	@Override
 	public int getItemCount() {
-		//noinspection ConstantConditions
 		return isDataValid() ? adapterData.size() : 0;
 	}
 
@@ -148,10 +122,8 @@ public class RealmFlexibleAdapter<T extends RealmModel & IFlexible> extends Flex
 	 * @param index index of the item.
 	 * @return the item at the specified position, {@code null} if adapter data is not valid.
 	 */
-	@SuppressWarnings("WeakerAccess")
 	@Nullable
 	public T getItem(int index) {
-		//noinspection ConstantConditions
 		return isDataValid() ? adapterData.get(index) : null;
 	}
 
@@ -171,30 +143,26 @@ public class RealmFlexibleAdapter<T extends RealmModel & IFlexible> extends Flex
 	 *
 	 * @param data the new {@link OrderedRealmCollection} to display.
 	 */
-	@SuppressWarnings("WeakerAccess")
 	public void updateData(@Nullable OrderedRealmCollection<T> data) {
 		if (hasAutoUpdates) {
 			if (isDataValid()) {
-				//noinspection ConstantConditions
 				removeListener(adapterData);
 			}
 			if (data != null) {
 				addListener(data);
 			}
 		}
-
 		this.adapterData = data;
-		notifyDataSetChanged();
+		updateDataSet(data);
+//		notifyDataSetChanged();
 	}
 
 	private void addListener(@NonNull OrderedRealmCollection<T> data) {
 		if (data instanceof RealmResults) {
 			RealmResults<T> results = (RealmResults<T>) data;
-			//noinspection unchecked
 			results.addChangeListener(listener);
 		} else if (data instanceof RealmList) {
 			RealmList<T> list = (RealmList<T>) data;
-			//noinspection unchecked
 			list.addChangeListener(listener);
 		} else {
 			throw new IllegalArgumentException("RealmCollection not supported: " + data.getClass());
@@ -204,11 +172,9 @@ public class RealmFlexibleAdapter<T extends RealmModel & IFlexible> extends Flex
 	private void removeListener(@NonNull OrderedRealmCollection<T> data) {
 		if (data instanceof RealmResults) {
 			RealmResults<T> results = (RealmResults<T>) data;
-			//noinspection unchecked
 			results.removeChangeListener(listener);
 		} else if (data instanceof RealmList) {
 			RealmList<T> list = (RealmList<T>) data;
-			//noinspection unchecked
 			list.removeChangeListener(listener);
 		} else {
 			throw new IllegalArgumentException("RealmCollection not supported: " + data.getClass());

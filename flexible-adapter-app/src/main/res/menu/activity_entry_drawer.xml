@@ -37,10 +37,6 @@
 			android:icon="@drawable/ic_playlist_play_grey600_24dp"
 			android:title="@string/endless_scrolling"/>
 		<item
-			android:id="@+id/nav_db_headers_and_sections"
-			android:icon="@drawable/ic_link_grey_600_24dp"
-			android:title="@string/databinding"/>
-		<item
 			android:id="@+id/nav_instagram_headers"
 			android:icon="@drawable/ic_instagram_grey600_24dp"
 			android:title="@string/instagram_headers"/>
@@ -57,8 +53,26 @@
 			android:enabled="false"
 			android:icon="@drawable/ic_view_column_grey600_24dp"
 			android:title="@string/horizontal"/>
-
 	</group>
+
+<group>
+	<item android:title="Extensions for Database">
+		<menu>
+			<item
+				android:id="@+id/nav_databinding"
+				android:icon="@drawable/ic_link_grey_600_24dp"
+				android:title="@string/databinding"/>
+			<item
+				android:id="@+id/nav_firebase"
+				android:icon="@drawable/ic_firebase"
+				android:title="@string/firebase"/>
+			<item
+				android:id="@+id/nav_realm"
+				android:icon="@drawable/ic_realm"
+				android:title="@string/realm"/>
+		</menu>
+	</item>
+</group>
 
 	<item android:title="Special Layouts">
 		<menu>

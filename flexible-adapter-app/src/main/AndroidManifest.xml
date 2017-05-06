@@ -29,7 +29,16 @@
 		</activity>
 		<activity
 			android:name=".ViewPagerActivity"
-			android:label="@string/title_activity_view_pager"
+			android:label="@string/viewpager"
+			android:parentActivityName=".MainActivity"
+			android:theme="@style/AppTheme">
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="eu.davidea.samples.flexibleadapter.MainActivity"/>
+		</activity>
+		<activity
+			android:name=".realm.RealmActivity"
+			android:label="@string/realm"
 			android:parentActivityName=".MainActivity"
 			android:theme="@style/AppTheme">
 			<meta-data

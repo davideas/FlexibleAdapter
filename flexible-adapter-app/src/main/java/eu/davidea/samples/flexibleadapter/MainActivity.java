@@ -73,6 +73,7 @@ import eu.davidea.samples.flexibleadapter.items.OverallItem;
 import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredItem;
 import eu.davidea.samples.flexibleadapter.items.SubItem;
+import eu.davidea.samples.flexibleadapter.realm.RealmActivity;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.samples.flexibleadapter.services.DatabaseType;
@@ -341,8 +342,6 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentEndlessScrolling.newInstance(2);
 		} else if (id == R.id.nav_instagram_headers) {
 			mFragment = FragmentInstagramHeaders.newInstance();
-		} else if (id == R.id.nav_db_headers_and_sections) {
-			mFragment = FragmentDataBinding.newInstance(2);
 		} else if (id == R.id.nav_headers_and_sections) {
 			mFragment = FragmentHeadersSections.newInstance(2);
 			fabBehavior.setEnabled(true);
@@ -354,18 +353,12 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentStaggeredLayout.newInstance(2);
 		} else if (id == R.id.nav_model_holders) {
 			mFragment = FragmentHolderSections.newInstance();
+		} else if (id == R.id.nav_databinding) {
+			mFragment = FragmentDataBinding.newInstance(2);
+		} else if (id == R.id.nav_realm) {
+			return this.startActivity(RealmActivity.class);
 		} else if (id == R.id.nav_viewpager) {
-			Intent intent = new Intent(this, ViewPagerActivity.class);
-			ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeBasic();
-			ActivityCompat.startActivity(this, intent, activityOptionsCompat.toBundle());
-			// Close drawer
-			mRecyclerView.post(new Runnable() {
-				@Override
-				public void run() {
-					mDrawer.closeDrawer(GravityCompat.START);
-				}
-			});
-			return true;
+			return this.startActivity(ViewPagerActivity.class);
 		} else if (id == R.id.nav_about) {
 			MessageDialog.newInstance(
 					R.drawable.ic_info_grey600_24dp,
@@ -408,6 +401,20 @@ public class MainActivity extends AppCompatActivity implements
 			return true;
 		}
 		return false;
+	}
+
+	private boolean startActivity(Class claz) {
+		Intent intent = new Intent(this, claz);
+		ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeBasic();
+		ActivityCompat.startActivity(this, intent, activityOptionsCompat.toBundle());
+		// Close drawer
+		mRecyclerView.post(new Runnable() {
+			@Override
+			public void run() {
+				mDrawer.closeDrawer(GravityCompat.START);
+			}
+		});
+		return true;
 	}
 
 	/* ======================
