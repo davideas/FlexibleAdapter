@@ -1576,7 +1576,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			T item = mItems.get(position);
 			// Reset hidden status! Necessary after the filter and the update
 			IHeader header = getHeaderOf(item);
-			if (header != sameHeader && header != null && !isExpandable((T) header)) {
+			if (!header.equals(sameHeader) && header != null && !isExpandable((T) header)) {
 				sameHeader = header;
 				header.setHidden(true);
 			}
