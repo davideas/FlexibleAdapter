@@ -177,7 +177,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 				offset += mSectionOffset;
 			}
 		}
-		if (FlexibleUtils.getOrientation(recyclerView.getLayoutManager()) == RecyclerView.VERTICAL) {
+		if (FlexibleUtils.getOrientation(recyclerView) == RecyclerView.VERTICAL) {
 			outRect.set(0, 0, 0, offset);
 		} else {
 			outRect.set(0, 0, offset, 0);

@@ -29,8 +29,27 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
  */
 public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 
+	protected RecyclerView mRecyclerView;
 	protected RecyclerView.LayoutManager mLayoutManager;
 
+	/**
+	 * Providing RecyclerView is preferable for when the LayoutManager swaps.
+	 *
+	 * @param recyclerView the RecyclerView with LayoutManager in use
+	 * @see #FlexibleLayoutManager(RecyclerView.LayoutManager)
+	 */
+	public FlexibleLayoutManager(RecyclerView recyclerView) {
+		this(recyclerView.getLayoutManager());
+		this.mRecyclerView = recyclerView;
+	}
+
+	/**
+	 * Directly rely on the current instance of LayoutManager.
+	 * Using this constructor it won't update the internal instance on LayoutManager swapping.
+	 *
+	 * @param layoutManager the current instance of LayoutManager
+	 * @see #FlexibleLayoutManager(RecyclerView)
+	 */
 	public FlexibleLayoutManager(RecyclerView.LayoutManager layoutManager) {
 		this.mLayoutManager = layoutManager;
 	}
@@ -42,10 +61,11 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @since 5.0.0-rc2
 	 */
 	public int getOrientation() {
-		if (mLayoutManager instanceof LinearLayoutManager) {
-			return ((LinearLayoutManager) mLayoutManager).getOrientation();
-		} else if (mLayoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) mLayoutManager).getOrientation();
+		RecyclerView.LayoutManager layoutManager = getLayoutManager();
+		if (layoutManager instanceof LinearLayoutManager) {
+			return ((LinearLayoutManager) layoutManager).getOrientation();
+		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).getOrientation();
 		}
 		return OrientationHelper.VERTICAL;
 	}
@@ -58,10 +78,11 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @since 5.0.0-b7
 	 */
 	public int getSpanCount() {
-		if (mLayoutManager instanceof GridLayoutManager) {
-			return ((GridLayoutManager) mLayoutManager).getSpanCount();
-		} else if (mLayoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) mLayoutManager).getSpanCount();
+		RecyclerView.LayoutManager layoutManager = getLayoutManager();
+		if (layoutManager instanceof GridLayoutManager) {
+			return ((GridLayoutManager) layoutManager).getSpanCount();
+		} else if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
 		}
 		return 1;
 	}
@@ -76,10 +97,11 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @since 5.0.0-b8
 	 */
 	public int findFirstCompletelyVisibleItemPosition() {
-		if (mLayoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) mLayoutManager).findFirstCompletelyVisibleItemPositions(null)[0];
+		RecyclerView.LayoutManager layoutManager = getLayoutManager();
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findFirstCompletelyVisibleItemPositions(null)[0];
 		} else {
-			return ((LinearLayoutManager) mLayoutManager).findFirstCompletelyVisibleItemPosition();
+			return ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
 		}
 	}
 
@@ -93,10 +115,11 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @since 5.0.0-rc1
 	 */
 	public int findFirstVisibleItemPosition() {
-		if (mLayoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) mLayoutManager).findFirstVisibleItemPositions(null)[0];
+		RecyclerView.LayoutManager layoutManager = getLayoutManager();
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
 		} else {
-			return ((LinearLayoutManager) mLayoutManager).findFirstVisibleItemPosition();
+			return ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
 		}
 	}
 
@@ -110,10 +133,11 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @since 5.0.0-b8
 	 */
 	public int findLastCompletelyVisibleItemPosition() {
-		if (mLayoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) mLayoutManager).findLastCompletelyVisibleItemPositions(null)[0];
+		RecyclerView.LayoutManager layoutManager = getLayoutManager();
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findLastCompletelyVisibleItemPositions(null)[0];
 		} else {
-			return ((LinearLayoutManager) mLayoutManager).findLastCompletelyVisibleItemPosition();
+			return ((LinearLayoutManager) layoutManager).findLastCompletelyVisibleItemPosition();
 		}
 	}
 
@@ -127,11 +151,19 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @since 5.0.0-rc1
 	 */
 	public int findLastVisibleItemPosition() {
-		if (mLayoutManager instanceof StaggeredGridLayoutManager) {
-			return ((StaggeredGridLayoutManager) mLayoutManager).findLastVisibleItemPositions(null)[0];
+		RecyclerView.LayoutManager layoutManager = getLayoutManager();
+		if (layoutManager instanceof StaggeredGridLayoutManager) {
+			return ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null)[0];
 		} else {
-			return ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
+			return ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
 		}
+	}
+
+	/**
+	 * @return the current LayoutManager in use if RecyclerView was set
+	 */
+	private RecyclerView.LayoutManager getLayoutManager() {
+		return mRecyclerView != null ? mRecyclerView.getLayoutManager() : mLayoutManager;
 	}
 
 }

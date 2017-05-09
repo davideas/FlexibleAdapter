@@ -233,79 +233,79 @@ public final class FlexibleUtils {
 	/**
 	 * Finds the layout orientation of the RecyclerView, no matter which LayoutManager is in use.
 	 *
-	 * @param layoutManager the LayoutManager instance in use by the RV
+	 * @param recyclerView the RecyclerView with LayoutManager instance in use
 	 * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
 	 */
-	public static int getOrientation(RecyclerView.LayoutManager layoutManager) {
-		return new FlexibleLayoutManager(layoutManager).getOrientation();
+	public static int getOrientation(RecyclerView recyclerView) {
+		return new FlexibleLayoutManager(recyclerView).getOrientation();
 	}
 
 	/**
 	 * Helper method to retrieve the number of the columns (span count) of the given LayoutManager.
 	 * <p>All Layouts are supported.</p>
 	 *
-	 * @param layoutManager the layout manager to check
+	 * @param recyclerView the RecyclerView with LayoutManager instance in use
 	 * @return the span count
 	 * @since 5.0.0-b7
 	 */
-	public static int getSpanCount(RecyclerView.LayoutManager layoutManager) {
-		return new FlexibleLayoutManager(layoutManager).getSpanCount();
+	public static int getSpanCount(RecyclerView recyclerView) {
+		return new FlexibleLayoutManager(recyclerView).getSpanCount();
 	}
 
 	/**
 	 * Helper method to find the adapter position of the <b>first completely</b> visible view
 	 * [for each span], no matter which Layout is.
 	 *
-	 * @param layoutManager the layout manager in use
+	 * @param recyclerView the RecyclerView with LayoutManager instance in use
 	 * @return the adapter position of the <b>first fully</b> visible item or {@code RecyclerView.NO_POSITION}
 	 * if there aren't any visible items.
-	 * @see #findFirstVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @see #findFirstVisibleItemPosition(RecyclerView)
 	 * @since 5.0.0-b8
 	 */
-	public static int findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
-		return new FlexibleLayoutManager(layoutManager).findFirstCompletelyVisibleItemPosition();
+	public static int findFirstCompletelyVisibleItemPosition(RecyclerView recyclerView) {
+		return new FlexibleLayoutManager(recyclerView).findFirstCompletelyVisibleItemPosition();
 	}
 
 	/**
 	 * Helper method to find the adapter position of the <b>first partially</b> visible view
 	 * [for each span], no matter which Layout is.
 	 *
-	 * @param layoutManager the layout manager in use
+	 * @param recyclerView the RecyclerView with LayoutManager instance in use
 	 * @return the adapter position of the <b>first partially</b> visible item or {@code RecyclerView.NO_POSITION}
 	 * if there aren't any visible items.
-	 * @see #findFirstCompletelyVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @see #findFirstCompletelyVisibleItemPosition(RecyclerView)
 	 * @since 5.0.0-rc1
 	 */
-	public static int findFirstVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
-		return new FlexibleLayoutManager(layoutManager).findFirstVisibleItemPosition();
+	public static int findFirstVisibleItemPosition(RecyclerView recyclerView) {
+		return new FlexibleLayoutManager(recyclerView).findFirstVisibleItemPosition();
 	}
 
 	/**
 	 * Helper method to find the adapter position of the <b>last completely</b> visible view
 	 * [for each span], no matter which Layout is.
 	 *
-	 * @param layoutManager the layout manager in use
+	 * @param recyclerView the RecyclerView with LayoutManager instance in use
 	 * @return the adapter position of the <b>last fully</b> visible item or {@code RecyclerView.NO_POSITION}
 	 * if there aren't any visible items.
-	 * @see #findLastVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @see #findLastVisibleItemPosition(RecyclerView)
 	 * @since 5.0.0-b8
 	 */
-	public static int findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
-		return new FlexibleLayoutManager(layoutManager).findLastCompletelyVisibleItemPosition();
+	public static int findLastCompletelyVisibleItemPosition(RecyclerView recyclerView) {
+		return new FlexibleLayoutManager(recyclerView).findLastCompletelyVisibleItemPosition();
 	}
 
 	/**
 	 * Helper method to find the adapter position of the <b>last partially</b> visible view
 	 * [for each span], no matter which Layout is.
 	 *
-	 * @param layoutManager the layout manager in use
+	 * @param recyclerView the RecyclerView with LayoutManager instance in use
 	 * @return the adapter position of the <b>last partially</b> visible item or {@code RecyclerView.NO_POSITION}
 	 * if there aren't any visible items.
-	 * @see #findLastCompletelyVisibleItemPosition(RecyclerView.LayoutManager)
+	 * @see #findLastCompletelyVisibleItemPosition(RecyclerView)
 	 * @since 5.0.0-rc1
 	 */
-	public static int findLastVisibleItemPosition(RecyclerView.LayoutManager layoutManager) {
-		return new FlexibleLayoutManager(layoutManager).findLastVisibleItemPosition();
+	public static int findLastVisibleItemPosition(RecyclerView recyclerView) {
+		return new FlexibleLayoutManager(recyclerView).findLastVisibleItemPosition();
 	}
 
 }

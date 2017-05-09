@@ -185,7 +185,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 			if (layoutManager instanceof IFlexibleLayoutManager) {
 				mFlexibleLayoutManager = (IFlexibleLayoutManager) layoutManager;
 			} else if (layoutManager != null) {
-				mFlexibleLayoutManager = new FlexibleLayoutManager(layoutManager);
+				mFlexibleLayoutManager = new FlexibleLayoutManager(mRecyclerView);
 			}
 		}
 		return this.mFlexibleLayoutManager;

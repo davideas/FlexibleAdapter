@@ -263,7 +263,7 @@ public class ItemTouchHelperCallback extends Callback {
 		if (layoutManager instanceof GridLayoutManager || layoutManager instanceof StaggeredGridLayoutManager) {
 			dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 			swipeFlags = 0;
-		} else if (FlexibleUtils.getOrientation(layoutManager) == LinearLayoutManager.HORIZONTAL) {
+		} else if (FlexibleUtils.getOrientation(recyclerView) == LinearLayoutManager.HORIZONTAL) {
 			dragFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
 			swipeFlags = mSwipeFlags > 0 ? mSwipeFlags : ItemTouchHelper.UP | ItemTouchHelper.DOWN;
 		} else {
