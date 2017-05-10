@@ -5503,7 +5503,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				headersShown = true;
 			}
 			IHeader header = getHeaderOf(item);
-			if (header != null && header.equals(sameHeader) && !isExpandable((T) header)) {
+			if (header != null && !header.equals(sameHeader) && !isExpandable((T) header)) {
 				header.setHidden(false);
 				sameHeader = header;
 				newItems.add(position, (T) header);
