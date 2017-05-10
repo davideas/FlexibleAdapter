@@ -111,7 +111,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	private static final String EXTRA_SEARCH = TAG + "_searchText";
 
 	/* The main container for ALL items */
-	private List<T> mItems, mTempItems;
+	private List<T> mItems, mTempItems, mOriginalList;
 
 	/* HashSet, AsyncTask and DiffUtil objects, will increase performance in big list */
 	private Set<T> mHashItems;
@@ -534,6 +534,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	@CallSuper
 	public void updateDataSet(@Nullable List<T> items, boolean animate) {
+		mOriginalList = null; // Reset original list from filter
 		if (items == null) items = new ArrayList<>();
 		if (animate) {
 			mHandler.removeMessages(UPDATE);
@@ -3965,11 +3966,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <ul><li>During {@link #filterItems(List)}: If the items have highlighted text, those items
 	 * must be refreshed in order to change the displayed text back to normal. This happens
 	 * systematically when searchText is reduced in length by the user.
-	 * <br>The notification is always triggered when filter is active!</li>
+	 * <br>However, the notification is always triggered when filter is invoked!</li>
 	 * <li>During {@link #updateDataSet(List, boolean)}: If the most recent content has to be
-	 * displayed, we can optimize what to bind thanks to the {@link Payload#CHANGE}.
+	 * displayed, we can optimize what to bind thanks to the {@link Payload}.
 	 * <br>The notification is triggered when the method of the implemented items
-	 * {@link IFlexible#shouldNotifyChange(IFlexible)} also return true.</li></ul>
+	 * {@link IFlexible#shouldNotifyChange(IFlexible)} also returns true.</li></ul>
 	 * Default value is {@code false}.
 	 *
 	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)},
@@ -4003,6 +4004,37 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Filters the current list with the searchText previously set with
+	 * {@link #setSearchText(String)}.
+	 *
+	 * @see #filterItems(long)
+	 * @see #filterItems(List)
+	 * @see #onPostFilter()
+	 * @see #setAnimateToLimit(int)
+	 * @since 5.0.0-rc2
+	 */
+	public void filterItems() {
+		if (mOriginalList == null) mOriginalList = mItems;
+		filterItems(mOriginalList);
+	}
+
+	/**
+	 * Same as {@link #filterItems()} but with a delay in the execution, useful to grab
+	 * more characters from user before starting the search.
+	 *
+	 * @param delay any non-negative delay
+	 * @see #filterItems()
+	 * @see #filterItems(List, long)
+	 * @see #onPostFilter()
+	 * @see #setAnimateToLimit(int)
+	 * @since 5.0.0-rc2
+	 */
+	public void filterItems(@IntRange(from = 0) long delay) {
+		if (mOriginalList == null) mOriginalList = mItems;
+		filterItems(mOriginalList, delay);
+	}
+
+	/**
 	 * <b>WATCH OUT! ADAPTER ALREADY CREATES A <u>COPY</u> OF THE PROVIDED LIST</b>: due to internal
 	 * mechanism, items are removed and/or added in order to animate items in the final list.
 	 * <p>Same as {@link #filterItems(List)}, but with a delay in the execution, useful to grab
@@ -4010,7 +4042,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param unfilteredItems the list to filter
 	 * @param delay           any non-negative delay
-	 * @see #filterObject(IFlexible, String)
+	 * @see #filterItems(long)
+	 * @see #filterItems(List)
 	 * @see #onPostFilter()
 	 * @see #setAnimateToLimit(int)
 	 * @since 5.0.0-b1
@@ -4043,7 +4076,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * </ol>
 	 *
 	 * @param unfilteredItems the list to filter
-	 * @see #filterObject(IFlexible, String)
+	 * @see #filterItems()
+	 * @see #filterItems(List, long)
 	 * @see #onPostFilter()
 	 * @see #setAnimateToLimit(int)
 	 * @since 4.1.0 Created
@@ -4072,7 +4106,7 @@ public class FlexibleAdapter<T extends IFlexible>
 						header.setHidden(false);
 						filteredItems.add(header);
 					}
-					addFilteredSubItems(filteredItems, item); //recursive add
+					addFilteredSubItems(filteredItems, item); //Adds filtered item + recursive add
 				} else {
 					item.setHidden(true);
 				}
@@ -4081,7 +4115,9 @@ public class FlexibleAdapter<T extends IFlexible>
 			filteredItems = unfilteredItems; //original items with no filter
 			resetFilterFlags(filteredItems); //recursive reset
 			mExpandedFilterFlags = null;
-			restoreScrollableHeadersAndFooters(filteredItems);
+			if (mOriginalList == null)
+				restoreScrollableHeadersAndFooters(filteredItems);
+			mOriginalList = null;
 		}
 
 		// Animate search results only in case of new SearchText
@@ -4171,6 +4207,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (isExpandable(item)) {
 			IExpandable expandable = (IExpandable) item;
 			if (hasSubItems(expandable)) {
+				if (mOriginalList != null && expandable.isExpanded()) return;
 				// Add subItems if not hidden by filterObject()
 				List<T> filteredSubItems = new ArrayList<>();
 				List<T> subItems = expandable.getSubItems();
@@ -4210,7 +4247,7 @@ public class FlexibleAdapter<T extends IFlexible>
 						}
 					}
 					// Show subItems for expanded items
-					if (expandable.isExpanded()) {
+					if (expandable.isExpanded() && mOriginalList == null) {
 						if (i < items.size()) items.addAll(i + 1, subItems);
 						else items.addAll(subItems);
 						i += subItems.size();
@@ -4218,7 +4255,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				}
 			}
 			// Restore headers visibility
-			if (headersShown) {
+			if (headersShown && mOriginalList == null) {
 				IHeader header = getHeaderOf(item);
 				if (header != null && !header.equals(sameHeader) && !isExpandable((T) header)) {
 					header.setHidden(false);
@@ -5424,6 +5461,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (isRestoreInTime() && mDeleteCompleteListener != null) {
 				if (DEBUG) Log.d(TAG, "Hiding all deleted items before filtering/updating");
 				newItems.removeAll(getDeletedItems());
+				if (mOriginalList != null) mOriginalList.removeAll(getDeletedItems());
 				mDeleteCompleteListener.onDeleteConfirmed();
 			}
 		}
