@@ -4142,12 +4142,16 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	private boolean filterObject(T item, List<T> values) {
+		// Stop filter task if cancelled
+		if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return false;
+		// Skip already filtered items (it happens when internal originalList)
+		if (values.contains(item)) return false;
 		// Start to compose the filteredItems to maintain the order of addition
 		// It will be discarded if no subItem will be filtered
 		List<T> filteredItems = new ArrayList<>();
 		filteredItems.add(item);
 		// Filter subItems
-		boolean filtered = filterSubItems(item, filteredItems);
+		boolean filtered = filterSubObjects(item, filteredItems);
 		// If no subItem was filtered, fallback to Normal filter
 		if (!filtered) {
 			filtered = filterObject(item, getSearchText());
@@ -4165,7 +4169,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		return filtered;
 	}
 
-	private boolean filterSubItems(T item, List<T> filteredItems) {
+	private boolean filterSubObjects(T item, List<T> filteredItems) {
 		// Reset expansion flag
 		boolean filtered = false;
 		// Is item an expandable?
@@ -4177,7 +4181,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					mExpandedFilterFlags = new HashSet<>();
 				mExpandedFilterFlags.add(expandable);
 			}
-			// Children scan filter
+			// SubItems scan filter
 			for (T subItem : getCurrentChildren(expandable)) {
 				if (subItem instanceof IExpandable && filterObject(subItem, filteredItems)) {
 					filtered = true;
@@ -4186,9 +4190,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					subItem.setHidden(!filterObject(subItem, getSearchText()));
 					if (!subItem.isHidden()) {
 						filtered = true;
-						if (mOriginalList == null || (mOriginalList != null && !expandable.isExpanded())) {
-							filteredItems.add(subItem);
-						}
+						filteredItems.add(subItem);
 					}
 				}
 			}
