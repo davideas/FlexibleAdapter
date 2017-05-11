@@ -1,8 +1,6 @@
 package eu.davidea.samples.flexibleadapter.holders;
 
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
@@ -68,8 +66,8 @@ public class HeaderHolder extends AbstractHeaderItem<HeaderHolder.HeaderViewHold
 	}
 
 	@Override
-	public HeaderViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new HeaderViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public HeaderViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new HeaderViewHolder(view, adapter);
 	}
 
 	@Override

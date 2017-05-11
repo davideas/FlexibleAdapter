@@ -9,9 +9,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -120,8 +118,8 @@ public class ExpandableItem extends AbstractItem<ExpandableItem.ParentViewHolder
 	}
 
 	@Override
-	public ParentViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ParentViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ParentViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ParentViewHolder(view, adapter);
 	}
 
 	@Override

@@ -76,8 +76,8 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
 	}
 
 	@Override
-	public ChildViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ChildViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ChildViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ChildViewHolder(view, adapter);
 	}
 
 	@SuppressWarnings("deprecation")

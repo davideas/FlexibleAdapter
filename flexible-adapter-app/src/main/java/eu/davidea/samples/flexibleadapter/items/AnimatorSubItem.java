@@ -4,9 +4,7 @@ import android.animation.Animator;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
@@ -73,8 +71,8 @@ public class AnimatorSubItem extends AbstractSectionableItem<AnimatorSubItem.Chi
 	}
 
 	@Override
-	public ChildViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ChildViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ChildViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ChildViewHolder(view, adapter);
 	}
 
 	@SuppressWarnings("deprecation")

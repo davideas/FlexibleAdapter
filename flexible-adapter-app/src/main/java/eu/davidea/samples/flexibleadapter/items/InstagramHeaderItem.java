@@ -2,9 +2,7 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
@@ -65,8 +63,8 @@ public class InstagramHeaderItem extends AbstractHeaderItem<InstagramHeaderItem.
 	}
 
 	@Override
-	public HeaderViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new HeaderViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public HeaderViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new HeaderViewHolder(view, adapter);
 	}
 
 	@Override

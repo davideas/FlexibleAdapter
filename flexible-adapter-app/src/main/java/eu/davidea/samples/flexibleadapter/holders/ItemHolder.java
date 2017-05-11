@@ -1,8 +1,6 @@
 package eu.davidea.samples.flexibleadapter.holders;
 
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
@@ -80,8 +78,8 @@ public class ItemHolder extends AbstractSectionableItem<ItemHolder.ItemViewHolde
 	}
 
 	@Override
-	public ItemViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ItemViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ItemViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ItemViewHolder(view, adapter);
 	}
 
 	@Override

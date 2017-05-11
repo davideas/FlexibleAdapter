@@ -42,8 +42,8 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UC
 	}
 
 	@Override
-	public UCViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new UCViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public UCViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new UCViewHolder(view, adapter);
 	}
 
 	@Override

@@ -4,17 +4,16 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.items.IExpandable;
 
 /**
  * This is an experiment to evaluate how a Section with header can also be expanded/collapsed.
@@ -99,8 +98,8 @@ public class ExpandableLevel1Item
 	}
 
 	@Override
-	public ExpandableItem.ParentViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ExpandableItem.ParentViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ExpandableItem.ParentViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ExpandableItem.ParentViewHolder(view, adapter);
 	}
 
 	@Override

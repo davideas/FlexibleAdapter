@@ -73,8 +73,8 @@ public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
 	}
 
 	@Override
-	public SimpleViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new SimpleViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public SimpleViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new SimpleViewHolder(view, adapter);
 	}
 
 	@Override

@@ -16,8 +16,7 @@
 package eu.davidea.flexibleadapter.items;
 
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.view.View;
 
 import java.util.List;
 
@@ -148,7 +147,7 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public abstract VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent);
+	public abstract VH createViewHolder(View view, FlexibleAdapter adapter);
 
 	/**
 	 * {@inheritDoc}

@@ -17,8 +17,7 @@ package eu.davidea.flexibleadapter.items;
 
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.view.View;
 
 import java.util.List;
 
@@ -35,6 +34,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @see IHolder
  * @see ISectionable
  * @since 19/01/2016 Created
+ * <br/>12/05/2017 Simplified createViewHolder params
  */
 public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 
@@ -151,13 +151,11 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
 	 * on GitHub.</p>
 	 *
-	 * @param adapter  the Adapter instance extending {@link FlexibleAdapter}
-	 * @param inflater the {@link LayoutInflater} for the itemView
-	 * @param parent   the ViewGroup into which the new View will be added after it is bound
-	 *                 to an adapter position
+	 * @param view    the already inflated view
+	 * @param adapter the Adapter instance extending {@link FlexibleAdapter}
 	 * @return a new ViewHolder that holds a View of the given view type
 	 */
-	VH createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent);
+	VH createViewHolder(View view, FlexibleAdapter adapter);
 
 	/**
 	 * Delegates the binding of this item's data to the given Layout.

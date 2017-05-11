@@ -45,8 +45,8 @@ public class ScrollableExpandableItem extends AbstractItem<ScrollableExpandableV
 	}
 
 	@Override
-	public ScrollableExpandableViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ScrollableExpandableViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ScrollableExpandableViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ScrollableExpandableViewHolder(view, adapter);
 	}
 
 	@Override

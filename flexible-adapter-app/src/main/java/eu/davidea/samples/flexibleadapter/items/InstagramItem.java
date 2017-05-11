@@ -68,8 +68,8 @@ public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHol
 	}
 
 	@Override
-	public ViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ViewHolder(view, adapter);
 	}
 
 	@Override

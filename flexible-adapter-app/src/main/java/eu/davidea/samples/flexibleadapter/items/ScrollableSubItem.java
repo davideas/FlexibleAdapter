@@ -30,8 +30,8 @@ public class ScrollableSubItem extends AbstractItem<ScrollableSubItem.ChildViewH
 	}
 
 	@Override
-	public ChildViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ChildViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ChildViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ChildViewHolder(view, adapter);
 	}
 
 	@Override

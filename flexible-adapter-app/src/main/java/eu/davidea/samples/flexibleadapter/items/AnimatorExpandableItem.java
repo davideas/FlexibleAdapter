@@ -4,9 +4,7 @@ import android.animation.Animator;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
@@ -82,8 +80,8 @@ public class AnimatorExpandableItem
 	}
 
 	@Override
-	public AnimatorExpandableViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new AnimatorExpandableViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public AnimatorExpandableViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new AnimatorExpandableViewHolder(view, adapter);
 	}
 
 	@Override

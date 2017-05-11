@@ -48,8 +48,8 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 	}
 
 	@Override
-	public ProgressViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ProgressViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ProgressViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ProgressViewHolder(view, adapter);
 	}
 
 	@Override

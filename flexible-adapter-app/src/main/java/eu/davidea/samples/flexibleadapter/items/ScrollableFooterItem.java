@@ -41,8 +41,8 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 	}
 
 	@Override
-	public FooterViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new FooterViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public FooterViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new FooterViewHolder(view, adapter);
 	}
 
 	@Override

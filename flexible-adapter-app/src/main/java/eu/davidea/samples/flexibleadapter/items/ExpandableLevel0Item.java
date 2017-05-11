@@ -2,9 +2,7 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -100,8 +98,8 @@ public class ExpandableLevel0Item
 	}
 
 	@Override
-	public L0ViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new L0ViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public L0ViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new L0ViewHolder(view, adapter);
 	}
 
 	@Override

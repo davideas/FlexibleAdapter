@@ -66,8 +66,8 @@ public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolde
 	}
 
 	@Override
-	public LabelViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new OverallItem.LabelViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public LabelViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new OverallItem.LabelViewHolder(view, adapter);
 	}
 
 	@Override

@@ -39,8 +39,8 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 	}
 
 	@Override
-	public ULSViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ULSViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ULSViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ULSViewHolder(view, adapter);
 	}
 
 	@Override

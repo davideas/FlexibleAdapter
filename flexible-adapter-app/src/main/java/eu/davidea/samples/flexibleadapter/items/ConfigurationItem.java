@@ -3,9 +3,7 @@ package eu.davidea.samples.flexibleadapter.items;
 import android.animation.Animator;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -118,8 +116,8 @@ public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.Vi
 	}
 
 	@Override
-	public ViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
+	public ViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+		return new ViewHolder(view, adapter);
 	}
 
 	@Override

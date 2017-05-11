@@ -1866,7 +1866,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * {@inheritDoc}
 	 *
 	 * @return a new ViewHolder that holds a View of the given view type
-	 * @see IFlexible#createViewHolder(FlexibleAdapter, LayoutInflater, ViewGroup)
+	 * @see IFlexible#createViewHolder(View, FlexibleAdapter)
 	 * @since 5.0.0-b1
 	 */
 	@Override
@@ -1880,8 +1880,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (mInflater == null) {
 			mInflater = LayoutInflater.from(parent.getContext());
 		}
-		return item.createViewHolder(this, mInflater, parent);
-		//TODO: return item.createViewHolder(mInflater.inflate(item.getLayoutRes(), parent, false), this);
+		return item.createViewHolder(mInflater.inflate(item.getLayoutRes(), parent, false), this);
 	}
 
 	/**
