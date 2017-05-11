@@ -798,6 +798,17 @@ public class FlexibleAdapter<T extends IFlexible>
 	@Override
 	public final boolean isScrollableHeaderOrFooter(int position) {
 		T item = getItem(position);
+		return isScrollableHeaderOrFooter(item);
+	}
+
+	/**
+	 * Checks if at the provided item is a Header or Footer.
+	 *
+	 * @param item the item to check
+	 * @return true if it's a scrollable item
+	 * @since 5.0.0-rc2
+	 */
+	public final boolean isScrollableHeaderOrFooter(T item) {
 		return item != null && mScrollableHeaders.contains(item) || mScrollableFooters.contains(item);
 	}
 
@@ -4069,6 +4080,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <li>Any pending deleted items are always deleted before filter is performed.</li>
 	 * <li>Expandable items are picked up and displayed if at least a child is collected by
 	 * the current filter.</li>
+	 * <li>Filter is skipped while endless loading.</li>
 	 * <li>Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit of
 	 * {@value ANIMATE_TO_LIMIT} (default) items is set. <b>Note:</b> Above this limit,
 	 * {@link #notifyDataSetChanged()} will be called to improve performance. you can change
@@ -4145,13 +4157,15 @@ public class FlexibleAdapter<T extends IFlexible>
 		// Stop filter task if cancelled
 		if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return false;
 		// Skip already filtered items (it happens when internal originalList)
-		if (values.contains(item)) return false;
+		if (mOriginalList != null && (isScrollableHeaderOrFooter(item) || values.contains(item))) {
+			return false;
+		}
 		// Start to compose the filteredItems to maintain the order of addition
 		// It will be discarded if no subItem will be filtered
 		List<T> filteredItems = new ArrayList<>();
 		filteredItems.add(item);
 		// Filter subItems
-		boolean filtered = filterSubObjects(item, filteredItems);
+		boolean filtered = filterExpandableObject(item, filteredItems);
 		// If no subItem was filtered, fallback to Normal filter
 		if (!filtered) {
 			filtered = filterObject(item, getSearchText());
@@ -4169,8 +4183,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		return filtered;
 	}
 
-	private boolean filterSubObjects(T item, List<T> filteredItems) {
-		// Reset expansion flag
+	private boolean filterExpandableObject(T item, List<T> filteredItems) {
 		boolean filtered = false;
 		// Is item an expandable?
 		if (isExpandable(item)) {
@@ -4183,10 +4196,11 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 			// SubItems scan filter
 			for (T subItem : getCurrentChildren(expandable)) {
+				// Recursive filter for subExpandable
 				if (subItem instanceof IExpandable && filterObject(subItem, filteredItems)) {
 					filtered = true;
 				} else {
-					// Use normal filter for subItems
+					// Use normal filter for normal subItem
 					subItem.setHidden(!filterObject(subItem, getSearchText()));
 					if (!subItem.isHidden()) {
 						filtered = true;
@@ -4224,6 +4238,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Clears flags after searchText is cleared out for Expandable items and sub items.
+	 * Also restore headers visibility.
 	 */
 	private void resetFilterFlags(List<T> items) {
 		IHeader sameHeader = null;
@@ -5457,6 +5472,10 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		@Override
 		protected void onPreExecute() {
+			if (endlessLoading) {
+				Log.w(TAG, "Cannot filter while endlessLoading");
+				this.cancel(true);
+			}
 			// Note: In case some items are in pending deletion (Undo started),
 			// we commit the deletion before starting or resetting the filter.
 			if (isRestoreInTime() && mDeleteCompleteListener != null) {
@@ -5590,7 +5609,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-rc1
 	 */
 	public class HandlerCallback implements Handler.Callback {
-
 		@CallSuper
 		@Override
 		public boolean handleMessage(Message message) {

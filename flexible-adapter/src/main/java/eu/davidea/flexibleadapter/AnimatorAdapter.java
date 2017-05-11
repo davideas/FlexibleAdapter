@@ -338,10 +338,11 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Checks if at the provided position, the item is a Header or Footer
+	 * Checks if at the provided position, the item is a Header or Footer.
 	 *
 	 * @param position the position to check
-	 * @return true if is a scrollable item
+	 * @return true if it's a scrollable item
+	 * @since 5.0.0-rc1
 	 */
 	public abstract boolean isScrollableHeaderOrFooter(int position);
 
@@ -353,6 +354,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 *
 	 * @param holder   the ViewHolder just bound
 	 * @param position the current item position
+	 * @since 5.0.0-b1
 	 */
 	@SuppressWarnings("ConstantConditions")
 	protected final void animateView(final RecyclerView.ViewHolder holder, final int position) {
