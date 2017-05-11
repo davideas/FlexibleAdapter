@@ -4100,16 +4100,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (hasSearchText() && hasNewSearchText(mSearchText)) { //skip when text is unchanged
 			for (T item : unfilteredItems) {
 				if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
-				if (filterExpandableObject(item)) {
-					T header = (T) getHeaderOf(item);
-					if (headersShown && hasHeader(item) && !filteredItems.contains(header)) {
-						header.setHidden(false);
-						filteredItems.add(header);
-					}
-					addFilteredSubItems(filteredItems, item); //Adds filtered item + recursive add
-				} else {
-					item.setHidden(true);
-				}
+				// Filter normal AND expandable objects
+				filterObject(item, filteredItems);
 			}
 		} else if (hasNewSearchText(mSearchText)) { //this is better than checking emptiness
 			filteredItems = unfilteredItems; //original items with no filter
@@ -4149,9 +4141,34 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return true, if the object should be in the filteredResult, false otherwise
 	 * @since 5.0.0-b1
 	 */
-	private boolean filterExpandableObject(T item) {
+	private boolean filterObject(T item, List<T> values) {
+		// Start to compose the filteredItems to maintain the order of addition
+		// It will be discarded if no subItem will be filtered
+		List<T> filteredItems = new ArrayList<>();
+		filteredItems.add(item);
+		// Filter subItems
+		boolean filtered = filterSubItems(item, filteredItems);
+		// If no subItem was filtered, fallback to Normal filter
+		if (!filtered) {
+			filtered = filterObject(item, getSearchText());
+		}
+		if (filtered) {
+			// Check if header has to be added too
+			T header = (T) getHeaderOf(item);
+			if (headersShown && hasHeader(item) && !values.contains(header)) {
+				header.setHidden(false);
+				values.add(header);
+			}
+			values.addAll(filteredItems);
+		}
+		item.setHidden(!filtered);
+		return filtered;
+	}
+
+	private boolean filterSubItems(T item, List<T> filteredItems) {
 		// Reset expansion flag
 		boolean filtered = false;
+		// Is item an expandable?
 		if (isExpandable(item)) {
 			IExpandable expandable = (IExpandable) item;
 			// Save which expandable was originally expanded before filtering it out
@@ -4162,17 +4179,23 @@ public class FlexibleAdapter<T extends IFlexible>
 			}
 			// Children scan filter
 			for (T subItem : getCurrentChildren(expandable)) {
-				// Reuse normal filter for Children
-				subItem.setHidden(!filterObject(subItem, getSearchText()));
-				if (!filtered && !subItem.isHidden()) {
+				if (subItem instanceof IExpandable && filterObject(subItem, filteredItems)) {
 					filtered = true;
+				} else {
+					// Use normal filter for subItems
+					subItem.setHidden(!filterObject(subItem, getSearchText()));
+					if (!subItem.isHidden()) {
+						filtered = true;
+						if (mOriginalList == null || (mOriginalList != null && !expandable.isExpanded())) {
+							filteredItems.add(subItem);
+						}
+					}
 				}
 			}
 			// Expand if filter found text in subItems
 			expandable.setExpanded(filtered);
 		}
-		// if not filtered already, fallback to Normal filter
-		return filtered || filterObject(item, getSearchText());
+		return filtered;
 	}
 
 	/**
@@ -4195,30 +4218,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	protected boolean filterObject(T item, String constraint) {
 		return item instanceof IFilterable && ((IFilterable) item).filter(constraint);
-	}
-
-	/**
-	 * Adds to the final list also the filtered subItems.
-	 */
-	private void addFilteredSubItems(List<T> values, T item) {
-		// Add the main item
-		values.add(item);
-		// Add the subItems if filtered
-		if (isExpandable(item)) {
-			IExpandable expandable = (IExpandable) item;
-			if (hasSubItems(expandable)) {
-				if (mOriginalList != null && expandable.isExpanded()) return;
-				// Add subItems if not hidden by filterObject()
-				List<T> filteredSubItems = new ArrayList<>();
-				List<T> subItems = expandable.getSubItems();
-				for (T subItem : subItems) {
-					if (subItem instanceof IExpandable && filterExpandableObject(subItem)) {
-						addFilteredSubItems(filteredSubItems, subItem);
-					} else if (!subItem.isHidden()) filteredSubItems.add(subItem);
-				}
-				values.addAll(filteredSubItems);
-			}
-		}
 	}
 
 	/**

@@ -21,7 +21,7 @@ public class DatabaseConfiguration {
 	public static int maxSize = 10000;//max number of items
 	public static int maxSearchDelay = 1000;//max search delay in ms
 	public static int size = 1000;//items
-	public static int delay = 200;//ms
+	public static int delay = 300;//ms
 	public static int animateToLimit = maxSize;//start with maxSize
 	public static boolean animateWithDiffUtil = false;
 	public static boolean notifyChange = true;
