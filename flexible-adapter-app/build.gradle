@@ -1,29 +1,29 @@
-apply plugin: "com.android.application"
+apply plugin: 'com.android.application'
 
 android {
 	compileSdkVersion targetSdk
 	buildToolsVersion buildTools
 
 	defaultConfig {
-		applicationId "eu.davidea.samples.flexibleadapter"
+		applicationId 'eu.davidea.samples.flexibleadapter'
 		minSdkVersion minSdk
 		targetSdkVersion targetSdk
 		versionCode libraryCode
 		versionName libraryVersion + libraryDate
 
-		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+		testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
 
 		applicationVariants.all { variant ->
 			variant.outputs.each { output ->
 				def file = output.outputFile
-				def fileName = "flexible-adapter-v" + libraryVersion + "-c" + versionCode + ".apk"
+				def fileName = 'flexible-adapter-v' + libraryVersion + '-c' + versionCode + '.apk'
 				output.outputFile = new File(file.parentFile, fileName)
 			}
 		}
 	}
 	buildTypes {
 		debug {
-			versionNameSuffix " build"
+			versionNameSuffix ' build'
 			minifyEnabled false
 		}
 		release {
@@ -52,15 +52,15 @@ dependencies {
 	})
 	testCompile 'org.robolectric:robolectric:3.1.2'
 	testCompile 'junit:junit:4.12'
-	testCompile 'org.mockito:mockito-core:2.0.71-beta'
+	testCompile 'org.mockito:mockito-core:2.7.22'
 
 	// FlexibleAdapter + extensions
-	compile project (":flexible-adapter")
-	compile project (":flexible-adapter-ui")
-	compile project (":flexible-adapter-databinding")
+	compile project (':flexible-adapter')
+	compile project (':flexible-adapter-ui')
+	compile project (':flexible-adapter-databinding')
 
 	// FlipView
-	compile "eu.davidea:flipview:1.1.2"
+	compile 'eu.davidea:flipview:1.1.3'
 
 	// ButterKnife
 	compile 'com.jakewharton:butterknife:8.5.1'
@@ -70,12 +70,12 @@ dependencies {
 	compile supportDependencies.appcompat
 	compile supportDependencies.cardview
 	compile (supportDependencies.design) {
-		exclude module: "support-v4"
-		exclude module: "support-annotations"
+		exclude module: 'support-v4'
+		exclude module: 'support-annotations'
 	}
 	compile (supportDependencies.recyclerview) {
-		exclude module: "support-v4";
-		exclude module: "support-annotations"
+		exclude module: 'support-v4';
+		exclude module: 'support-annotations'
 	}
 
 	// Glide (Image Loader)
@@ -83,7 +83,7 @@ dependencies {
 
 	// Smooth-app-bar-layout
 	compile ('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
-		exclude group: "com.android.support"
+		exclude group: 'com.android.support'
 	}
 
 }
