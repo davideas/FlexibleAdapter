@@ -341,10 +341,21 @@ public class FastScroller extends FrameLayout {
 	}
 
 	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		if (recyclerView != null) {
+			// #369 - OnScrollListener as counterpart of onDetachedFromWindow
+			// Occurs only when a new ViewPager Adapter is changed at runtime
+			recyclerView.addOnScrollListener(onScrollListener);
+		}
+	}
+
+	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
-		if (recyclerView != null)
+		if (recyclerView != null) {
 			recyclerView.removeOnScrollListener(onScrollListener);
+		}
 	}
 
 	protected void setRecyclerViewPosition(float y) {
