@@ -3309,20 +3309,16 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	public void clearAllBut(Integer... viewTypes) {
 		List<Integer> viewTypeList = Arrays.asList(viewTypes);
-		if (viewTypeList.size() > 0) {
-			if (DEBUG) Log.d(TAG, "clearAll retaining views " + viewTypeList);
-			List<Integer> positionsToRemove = new ArrayList<>();
-			int startPosition = Math.max(0, mScrollableHeaders.size() - 1);
-			int endPosition = getItemCount() - mScrollableFooters.size() - 1;
-			for (int i = startPosition; i < endPosition; i++) {
-				if (!viewTypeList.contains(getItemViewType(i)))
-					positionsToRemove.add(i);
-			}
-			// Remove items by ranges
-			removeItems(positionsToRemove);
-		} else {
-			clear();
+		if (DEBUG) Log.d(TAG, "clearAll retaining views " + viewTypeList);
+		List<Integer> positionsToRemove = new ArrayList<>();
+		int startPosition = Math.max(0, mScrollableHeaders.size());
+		int endPosition = getItemCount() - mScrollableFooters.size();
+		for (int i = startPosition; i < endPosition; i++) {
+			if (!viewTypeList.contains(getItemViewType(i)))
+				positionsToRemove.add(i);
 		}
+		// Remove items by ranges
+		removeItems(positionsToRemove);
 	}
 
 	/**

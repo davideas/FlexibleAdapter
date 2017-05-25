@@ -1,7 +1,6 @@
 package eu.davidea.flexibleadapter;
 
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.view.View;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +22,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 23)
+@Config(constants = BuildConfig.class, sdk = 25)
 public class ItemComparatorTest {
 
 	private SimpleHeader[] headers;
@@ -243,7 +242,7 @@ public class ItemComparatorTest {
 		}
 
 		@Override
-		public FlexibleViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		public FlexibleViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
 			return null;
 		}
 
@@ -277,7 +276,7 @@ public class ItemComparatorTest {
 		}
 
 		@Override
-		public FlexibleViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
+		public FlexibleViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
 			return null;
 		}
 

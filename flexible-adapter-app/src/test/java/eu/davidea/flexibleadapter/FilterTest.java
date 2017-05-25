@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  * @since 18/10/2016
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 23)
+@Config(constants = BuildConfig.class, sdk = 25)
 public class FilterTest {
 
 	FlexibleAdapter<AbstractFlexibleItem> mAdapter;

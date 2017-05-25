@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
  * @since 18/10/2016
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 23)
+@Config(constants = BuildConfig.class, sdk = 25)
 public class UpdateDataSetTest {
 
 	FlexibleAdapter<AbstractFlexibleItem> mAdapter;
