@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements
 		hideFabSilently();
 		CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mFab.getLayoutParams();
 		ScrollAwareFABBehavior fabBehavior = ((ScrollAwareFABBehavior) layoutParams.getBehavior());
-		fabBehavior.setEnabled(false);
+		//fabBehavior.setEnabled(false);
 
 		// Handle navigation view item clicks
 		int id = item.getItemId();
@@ -345,7 +345,8 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentDataBinding.newInstance(2);
 		} else if (id == R.id.nav_headers_and_sections) {
 			mFragment = FragmentHeadersSections.newInstance(2);
-			fabBehavior.setEnabled(true);
+			showFab();
+			//fabBehavior.setEnabled(true);
 		} else if (id == R.id.nav_multi_level_expandable) {
 			mFragment = FragmentExpandableMultiLevel.newInstance(2);
 		} else if (id == R.id.nav_expandable_sections) {

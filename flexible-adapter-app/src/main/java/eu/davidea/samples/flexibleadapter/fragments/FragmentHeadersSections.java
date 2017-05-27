@@ -21,9 +21,9 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.dialogs.BottomSheetDialog;
 import eu.davidea.samples.flexibleadapter.dialogs.OnParameterSelectedListener;
 import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
+import eu.davidea.samples.flexibleadapter.items.HeaderItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -124,10 +124,17 @@ public class FragmentHeadersSections extends AbstractFragment
 		mAdapter.addScrollableFooter();
 	}
 
+	int count = 1;
 	@Override
 	public void performFabAction() {
-		BottomSheetDialog bottomSheetDialogFragment = BottomSheetDialog.newInstance(R.layout.bottom_sheet_headers_sections, this);
-		bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), BottomSheetDialog.TAG);
+		int position = mAdapter.getStickyPosition();
+		if (position > 0) {
+			HeaderItem header = (HeaderItem) mAdapter.getItem(position);
+			header.setTitle("New sticky title " + count++);
+			mAdapter.updateItem(header, null);
+		}
+//		BottomSheetDialog bottomSheetDialogFragment = BottomSheetDialog.newInstance(R.layout.bottom_sheet_headers_sections, this);
+//		bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), BottomSheetDialog.TAG);
 	}
 
 	@Override
