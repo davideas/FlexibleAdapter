@@ -2868,13 +2868,28 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*----------------*/
 
 	/**
-	 * Updates/Rebounds the itemView corresponding to the current position of that item, with
-	 * the new content provided.
+	 * Updates/Rebounds the itemView corresponding to the current position of the
+	 * provided item with the new content.
+	 *
+	 * @param item the item with the new content
+	 * @see #updateItem(IFlexible, Object)
+	 * @since 2.1.0
+	 * @see #updateItem(int, IFlexible, Object)
+	 */
+	public void updateItem(@NonNull T item) {
+		updateItem(item, null);
+	}
+
+	/**
+	 * Updates/Rebounds the itemView corresponding to the current position of the
+	 * provided item with the new content.
 	 *
 	 * @param item    the item with the new content
 	 * @param payload any non-null user object to notify the current item (the payload will be
 	 *                therefore passed to the bind method of the item ViewHolder to optimize the
 	 *                content to update); pass null to rebind all fields of this item.
+	 * @see #updateItem(IFlexible)
+	 * @see #updateItem(int, IFlexible, Object)
 	 * @since 2.1.0
 	 */
 	public void updateItem(@NonNull T item, @Nullable Object payload) {
@@ -2882,15 +2897,17 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Updates/Rebounds the itemView corresponding to the provided position with the new
-	 * provided content. Use {@link #updateItem(IFlexible, Object)} if the new content should
-	 * be bound on the same position.
+	 * Updates/Rebounds the itemView corresponding to the current position of the
+	 * provided item with the new content. Use {@link #updateItem(IFlexible, Object)} if the
+	 * new content should be bound on the same position.
 	 *
 	 * @param position the position where the new content should be updated and rebound
 	 * @param item     the item with the new content
 	 * @param payload  any non-null user object to notify the current item (the payload will be
 	 *                 therefore passed to the bind method of the item ViewHolder to optimize the
 	 *                 content to update); pass null to rebind all fields of this item.
+	 * @see #updateItem(IFlexible)
+	 * @see #updateItem(IFlexible, Object)
 	 * @since 5.0.0-b1
 	 */
 	public void updateItem(@IntRange(from = 0) int position, @NonNull T item,
@@ -5567,8 +5584,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * This method is called after the execution of Async Update and before the call to the
-	 * {@link OnUpdateListener#onUpdateEmptyView(int)}.
+	 * This method is called after the execution of Async Update, it calls the
+	 * implementation of the {@link OnUpdateListener} for the emptyView.
 	 *
 	 * @see #updateDataSet(List, boolean)
 	 */
@@ -5580,8 +5597,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * This method is called after the execution of Async Filter and before the call to the
-	 * {@link OnUpdateListener#onUpdateEmptyView(int)}.
+	 * This method is called after the execution of Async Filter, it calls the
+	 * implementation of the {@link OnUpdateListener} for the emptyView.
 	 *
 	 * @see #filterItems(List)
 	 */
