@@ -7,8 +7,8 @@
 	android:layout_width="match_parent"
 	android:layout_height="?attr/actionBarSize"
 	android:background="?attr/colorPrimary"
-	android:popupTheme="@style/AppTheme.PopupOverlay"
 	app:popupTheme="@style/AppTheme.PopupOverlay"
+	app:theme="@style/ToolBarStyle"
 	tools:showIn="@layout/activity_main">
 
 	<include layout="@layout/toolbar_titles"/>

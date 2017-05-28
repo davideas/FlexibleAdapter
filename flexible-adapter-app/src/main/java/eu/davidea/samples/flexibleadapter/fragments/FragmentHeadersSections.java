@@ -131,7 +131,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		if (position > 0) {
 			HeaderItem header = (HeaderItem) mAdapter.getItem(position);
 			header.setTitle("New sticky title " + count++);
-			mAdapter.updateItem(header, null);
+			mAdapter.updateItem(header);
 		}
 //		BottomSheetDialog bottomSheetDialogFragment = BottomSheetDialog.newInstance(R.layout.bottom_sheet_headers_sections, this);
 //		bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), BottomSheetDialog.TAG);
