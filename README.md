@@ -1,17 +1,17 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](http://android-arsenal.com/details/1/2207)
-[![Download](https://api.bintray.com/packages/davideas/maven/flexible-adapter/images/download.svg) ](https://bintray.com/davideas/maven/flexible-adapter/_latestVersion)
+[![Download](https://api.bintray.com/packages/davideas/maven/flexible-adapter/images/download.svg)](https://bintray.com/davideas/maven/flexible-adapter/_latestVersion)
 [![API](https://img.shields.io/badge/API-14%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=14)
 [![Licence](https://img.shields.io/badge/Licence-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Methods and Size](https://img.shields.io/badge/Methods%20and%20size-core:%201284%20|%20163%20KB-e91e63.svg)](http://www.methodscount.com/?lib=eu.davidea%3Aflexible-adapter%3A5.0.0%2B)
 
 # FlexibleAdapter
 
-#### ANNOUNCEMENT: Important changes in latest release
-- **NEW!** Second release candidate: [v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) built on 2017.05.27
+### ANNOUNCEMENT: Important changes in latest release
+- **NEW!** Second release candidate: [v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) built on 2017.05.31
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 - Please read [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
-#### Fast and versatile Adapter for RecyclerView
+### Fast and versatile Adapter for RecyclerView
 > When initially Android team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.<br/>
 We didn't know how to add selection and to combine all the use cases in the same Adapter.
 Since I created this library, it has become easy to configure multiple views and now, nobody wants to use a ListView anymore.
@@ -21,7 +21,7 @@ The idea behind is to regroup multiple features in a unique library, without the
 The FlexibleAdapter helps developers to simplify this process without worrying too much about the Adapter anymore. It's easy to use, it has predefined logic for different situations and prevents common mistakes.<br/>
 This library is configurable and it guides the developers to create a better user experience and now, even more with the new features.
 
-#### Main features
+### Main features
 * Simple, Single & Multi selection mode with [ActionModeHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ActionModeHelper) and with ripple effect.
 * Auto mapping multi view types with [Item interfaces](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Item-Interfaces).
 * Predefined [ViewHolders](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ViewHolders) with click listeners and others callbacks.
@@ -30,9 +30,9 @@ This library is configurable and it guides the developers to create a better use
 * Customizable animations when adding and removing items.
 * Customizable divider item decoration.
 * Restore deleted items with [UndoHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-UndoHelper); Works with Expandable items too!
-* Async [Filter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text; Result list is animated; **NEW!** Now with optional original list; Works with sub items too!
+* Async [Filter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text; Result list is animated; **NEW!** With optional original list; Works with sub items too!
 * [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) updates and filter on big list (far better than _DiffUtil_).
-* [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behaviour fully clickable and collapsible, with elevation, transparency and automatic linkage!
+* [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behaviour fully clickable and collapsible, elevation, transparency and automatic linkage!
 * **NEW!** [Scrollable Headers and Footers](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Scrollable-Headers-and-Footers) items that lay respectively at the top and at the bottom of the main items.
 * Easy runtime position calculation for adding/moving items in sections.
 * Expandable items with _Selection Coherence_ and multi-level expansion.
@@ -42,7 +42,7 @@ This library is configurable and it guides the developers to create a better use
 * DrawableUtils for dynamic backgrounds with ripple (_No XML_).
 * **NEW!** Comprehensive [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages and JavaDoc documentation.
 
-#### Extensions
+### Extensions
 * **NEW!** Data Binding.
 
 # Setup
@@ -77,13 +77,13 @@ dependencies {
 I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial.<br/>
 Wiki pages have been completely reviewed to support all the coming features of version 5.0.0.
 
-#### Pull requests / Issues / Improvement requests
+### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!<br/>
 Active discussions:
 - [The next steps of development: RC3 > Final Release > Extensions](https://github.com/davideas/FlexibleAdapter/issues/361).
 - [Snapshots and Pre-Releases for FlexibleAdapter v5.0.0](https://github.com/davideas/FlexibleAdapter/issues/39).
 
-#### Under the hood
+### Under the hood
 Some simple features have been implemented, thanks to some Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability.
 
 <p align="center"><img src="./screenshots/wiki_diagram.png"></p>
@@ -95,8 +95,8 @@ Some simple features have been implemented, thanks to some Blogs (see at the bot
 * Item interfaces and predefined ViewHolders complete the whole library giving more actions to the items and configuration options to developers.
 
 # Showcase of the demo App
-You can [download](https://github.com/davideas/FlexibleAdapter/releases)* the latest demo App from the latest release page OR run it with the emulator.
-This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-App) will introduce you the module of the demo App.
+You can [download](https://github.com/davideas/FlexibleAdapter/releases)* the latest demo App from the latest release page OR run it with the emulator.<br>
+This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-App) will give you a short briefing of the demo App.
 
 \* = Publishing to Play Store is foreseen for final release.
 
@@ -118,7 +118,7 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 
 # Change Log
 ###### Latest release
-[v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) - 2017.05.27
+[v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) - 2017.05.31
 
 ###### Old releases
 [v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) - 2017.01.14<br/>
@@ -155,7 +155,7 @@ Half swipe can be done with others means, please see issues #98 and #100. See al
 - [Arpinca](https://github.com/arpinca) who added new features for FastScroller like _autoHide_ and _ignoreTouchesOutsideHandle_ and more.
 
 ###### Donations
-If someone would like to say thank you, you are welcome! Here the link to PayPal.me account:
+If someone would like to say thank you by donating any amount, you're very welcome! Here the link to PayPal.me:
 
 [![PayPal.me](https://www.paypalobjects.com/webstatic/i/sparta/logo/logo_paypal_106x29.png)](https://www.paypal.me/davideas)
 
@@ -173,7 +173,7 @@ It will be a pleasure to add your App here, once it is published.
 
 # License
 
-#### FlexibleAdapter
+#### FlexibleAdapter & Extensions
 
     Copyright 2015-2017 Davide Steduto
 
