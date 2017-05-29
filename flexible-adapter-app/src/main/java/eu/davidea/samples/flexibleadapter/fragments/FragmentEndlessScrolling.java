@@ -85,7 +85,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mAdapter.setAutoScrollOnExpand(true)
 				//.setAnimateToLimit(Integer.MAX_VALUE) //Use the default value
 				.setNotifyMoveOfFilteredItems(true) //When true, filtering on big list is very slow, not in this case!
-				.setNotifyChangeOfUnfilteredItems(true) //We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
+				.setNotifyChangeOfUnfilteredItems(true) //true by default
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
 				.setAnimationOnReverseScrolling(true);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);

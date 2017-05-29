@@ -83,12 +83,10 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	/**
 	 * Called by the FlexibleAdapter when it wants to check if this item should be bound
 	 * again with new content.
-	 * <p>
-	 * You should return {@code true} whether you want this item will be updated because
-	 * its visual representations will change.
-	 * <p>
-	 * This method is called only if {@link FlexibleAdapter#setNotifyChangeOfUnfilteredItems(boolean)}
-	 * is enabled.
+	 * <p>You should return {@code true} whether you want this item will be updated because
+	 * its visual representations will change.</p>
+	 * This method won't be called if {@link FlexibleAdapter#setNotifyChangeOfUnfilteredItems(boolean)}
+	 * is disabled.
 	 * <p>Default value is {@code true}.</p>
 	 *
 	 * @param newItem The new item object with the new content

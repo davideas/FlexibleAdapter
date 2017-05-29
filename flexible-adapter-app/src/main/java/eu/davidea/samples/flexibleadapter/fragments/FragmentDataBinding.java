@@ -88,8 +88,7 @@ public class FragmentDataBinding extends AbstractFragment {
 		// Initialize Adapter and RecyclerView
 		mAdapter = new BindingFlexibleAdapter<>(getActivity(), true);
 		// Experimenting NEW features (v5.0.0)
-		mAdapter.setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
-				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
+		mAdapter.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
