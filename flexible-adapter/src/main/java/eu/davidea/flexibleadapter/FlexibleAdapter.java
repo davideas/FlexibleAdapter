@@ -151,7 +151,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* Filter */
 	private String mSearchText = "", mOldSearchText = "";
 	private Set<IExpandable> mExpandedFilterFlags;
-	private boolean notifyChangeOfUnfilteredItems = false, filtering = false,
+	private boolean notifyChangeOfUnfilteredItems = true, filtering = false,
 			notifyMoveOfFilteredItems = false;
 	private static int ANIMATE_TO_LIMIT = 1000;
 	private int mAnimateToLimit = ANIMATE_TO_LIMIT;
@@ -3984,17 +3984,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Sometimes it is necessary, while Filtering or after the data set has been Updated, to
-	 * rebound the items that remain unfiltered or not deleted.
-	 * <ul><li>During {@link #filterItems(List)}: If the items have highlighted text, those items
-	 * must be refreshed in order to change the displayed text back to normal. This happens
-	 * systematically when searchText is reduced in length by the user.
-	 * <br>However, the notification is always triggered when filter is invoked!</li>
-	 * <li>During {@link #updateDataSet(List, boolean)}: If the most recent content has to be
-	 * displayed, we can optimize what to bind thanks to the {@link Payload}.
-	 * <br>The notification is triggered when the method of the implemented items
-	 * {@link IFlexible#shouldNotifyChange(IFlexible)} also returns true.</li></ul>
-	 * Default value is {@code false}.
+	 * With this setting, we can skip the check of the implemented method
+	 * {@link IFlexible#shouldNotifyChange(IFlexible)}.
+	 * <p>By setting false <u>all</u> items will be skipped by an update.</p>
+	 * Default value is {@code true} (items will always be notified of a change).
 	 *
 	 * @param notifyChange true to trigger {@link #notifyItemChanged(int)},
 	 *                     false to not update the items' content.
@@ -4008,7 +4001,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * This method performs a further step to nicely animate the moved items.
+	 * This method performs a further step to nicely animate the moved items. When false, the
+	 * items are not moved but removed, to be added at the correct position.
 	 * <p>The process is very slow on big list of the order of ~3-5000 items and higher,
 	 * due to the calculation of the correct position for each item to be shifted.
 	 * Use with caution!</p>
@@ -4092,7 +4086,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <li>Any pending deleted items are always deleted before filter is performed.</li>
 	 * <li>Expandable items are picked up and displayed if at least a child is collected by
 	 * the current filter.</li>
-	 * <li>Filter is skipped while endless loading.</li>
+	 * <li>Filter is skipped while endless feature is active (loading).</li>
 	 * <li>Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit of
 	 * {@value ANIMATE_TO_LIMIT} (default) items is set. <b>Note:</b> Above this limit,
 	 * {@link #notifyDataSetChanged()} will be called to improve performance. you can change
