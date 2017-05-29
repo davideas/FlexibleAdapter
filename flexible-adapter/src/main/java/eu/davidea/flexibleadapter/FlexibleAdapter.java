@@ -720,7 +720,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return true if the provided item is currently displayed, false otherwise
 	 * @since 2.0.0
 	 */
-	public boolean contains(@NonNull T item) {
+	public boolean contains(@Nullable T item) {
 		return item != null && mItems.contains(item);
 	}
 
