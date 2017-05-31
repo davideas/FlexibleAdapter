@@ -10,6 +10,7 @@ import org.robolectric.annotation.Config;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -92,9 +93,14 @@ public class UpdateDataSetTest {
 		// The content of the 2 lists "with Notify" and "without Notify" must coincide
 		assertEquals(updatedItems_withNotifyChange.size(), updatedItems_withoutNotifyChange.size());
 		assertThat(updatedItems_withNotifyChange, Matchers.contains(updatedItems_withoutNotifyChange.toArray()));
-		SimpleItem item1 = (SimpleItem) updatedItems_withNotifyChange.get(3);
-		SimpleItem item2 = (SimpleItem) updatedItems_withoutNotifyChange.get(3);
-		assertThat(item1, Matchers.samePropertyValuesAs(item2));
+		for (int i = 0; i < mAdapter.getItemCount(); i++) {
+			IFlexible iFlexible = updatedItems_withNotifyChange.get(i);
+			if (iFlexible instanceof SimpleItem) {
+				SimpleItem item1 = (SimpleItem) updatedItems_withNotifyChange.get(i);
+				SimpleItem item2 = (SimpleItem) updatedItems_withoutNotifyChange.get(i);
+				assertThat(item1, Matchers.samePropertyValuesAs(item2));
+			}
+		}
 	}
 
 	private void changeDatabaseContent() {
