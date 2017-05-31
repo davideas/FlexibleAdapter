@@ -11,6 +11,7 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IHeader;
+import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 import static org.junit.Assert.assertEquals;
@@ -31,6 +32,7 @@ public class UpdateDataSetTest {
 	public void setUp() throws Exception {
 		DatabaseService.getInstance().createHeadersSectionsDatabase(30, 5);
 		mInitialItems = DatabaseService.getInstance().getDatabaseList();
+		FlexibleAdapter.enableLogs(true);
 	}
 
 	@Test
@@ -66,8 +68,10 @@ public class UpdateDataSetTest {
 
 		// Let's change the DB
 		changeDatabaseContent();
-
 		List<AbstractFlexibleItem> dbItems = DatabaseService.getInstance().getDatabaseList();
+
+		// updateDataSet with Notify
+		mAdapter.setNotifyChangeOfUnfilteredItems(true);
 		mAdapter.updateDataSet(dbItems, true);
 		List<AbstractFlexibleItem> updatedItems_withNotifyChange = mAdapter.getCurrentItems();
 
@@ -87,15 +91,20 @@ public class UpdateDataSetTest {
 
 		// The content of the 2 lists "with Notify" and "without Notify" must coincide
 		assertEquals(updatedItems_withNotifyChange.size(), updatedItems_withoutNotifyChange.size());
-		assertThat(updatedItems_withNotifyChange, Matchers.contains(updatedItems_withNotifyChange.toArray()));
+		assertThat(updatedItems_withNotifyChange, Matchers.contains(updatedItems_withoutNotifyChange.toArray()));
+		SimpleItem item1 = (SimpleItem) updatedItems_withNotifyChange.get(3);
+		SimpleItem item2 = (SimpleItem) updatedItems_withoutNotifyChange.get(3);
+		assertThat(item1, Matchers.samePropertyValuesAs(item2));
 	}
 
 	private void changeDatabaseContent() {
 		// Remove item pos=2
 		AbstractFlexibleItem itemToDelete = mAdapter.getItem(2);
 		DatabaseService.getInstance().removeItem(itemToDelete);
+		// Modify items content
+		DatabaseService.getInstance().updateNewItems();
 		// Add item pos=last
-		IHeader header = mAdapter.getSectionHeader(0);
+		IHeader header = mAdapter.getSectionHeader(30);
 		AbstractFlexibleItem itemToAdd = DatabaseService.newSimpleItem(31, header);
 		DatabaseService.getInstance().addItem(itemToAdd);
 	}
