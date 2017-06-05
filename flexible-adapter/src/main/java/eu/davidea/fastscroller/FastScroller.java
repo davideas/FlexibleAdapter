@@ -32,7 +32,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -47,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.R;
+import eu.davidea.flexibleadapter.utils.Log;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -56,9 +56,9 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * @see <a href="https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller">
  * github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller</a>
  * @since Up to the date 23/01/2016
- * <br/>23/01/2016 Added onFastScrollerStateChange in the listener
- * <br/>10/03/2017 Added autoHide, bubblePosition, bubbleEnabled, ignoreTouchesOutsideHandle (thanks to @arpinca)
- * <br/>22/04/2017 Added minimum scroll threshold
+ * <br>23/01/2016 Added onFastScrollerStateChange in the listener
+ * <br>10/03/2017 Added autoHide, bubblePosition, bubbleEnabled, ignoreTouchesOutsideHandle (thanks to @arpinca)
+ * <br>22/04/2017 Added minimum scroll threshold
  */
 public class FastScroller extends FrameLayout {
 
@@ -205,7 +205,7 @@ public class FastScroller extends FrameLayout {
 	}
 
 	/**
-	 * Layout customization.<br/>
+	 * Layout customization.<br>
 	 * Color for Selected State is the bubbleAndHandleColor defined inside the Drawables.
 	 *
 	 * @param layoutResId Main layout of Fast Scroller
@@ -232,7 +232,7 @@ public class FastScroller extends FrameLayout {
 	}
 
 	/**
-	 * Layout customization<br/>
+	 * Layout customization<br>
 	 * Color for Selected State is also customized by the user.
 	 *
 	 * @param layoutResId Main layout of Fast Scroller
@@ -288,7 +288,7 @@ public class FastScroller extends FrameLayout {
 				handle.setImageDrawable(stateListDrawable);
 			} catch (Exception e) {
 				// This should never happen in theory (Java Reflection Exception)
-				Log.e(FastScroller.class.getSimpleName(), "Exception while setting Bubble and Handle Color", e);
+				Log.wtf(e, "Exception while setting Bubble and Handle Color");
 			}
 		}
 	}

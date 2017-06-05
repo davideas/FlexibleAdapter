@@ -273,7 +273,7 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
 		/**
 		 * Called when Undo timeout is over and action must be committed in the user Database.
 		 * <p>Due to Java Generic, it's too complicated and not well manageable if we pass the
-		 * List&lt;T&gt; object.<br/>
+		 * {@code List<T>} object.<br>
 		 * So, to get deleted items, use {@link FlexibleAdapter#getDeletedItems()} from the
 		 * implementation of this method.</p>
 		 *

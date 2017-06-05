@@ -41,7 +41,6 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class ItemTouchHelperCallback extends Callback {
 
-	private static final String TAG = ItemTouchHelperCallback.class.getSimpleName();
 	protected static final float ALPHA_FULL = 1.0f;
 
 	protected AdapterCallback mAdapterCallback;

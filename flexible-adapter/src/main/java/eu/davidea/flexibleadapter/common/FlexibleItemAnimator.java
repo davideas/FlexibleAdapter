@@ -26,7 +26,6 @@ import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.support.v7.widget.SimpleItemAnimator;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -36,7 +35,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.viewholders.AnimatedViewHolder;
 
 /**
@@ -47,8 +46,6 @@ import eu.davidea.viewholders.AnimatedViewHolder;
  * @see RecyclerView#setItemAnimator(RecyclerView.ItemAnimator)
  */
 public class FlexibleItemAnimator extends SimpleItemAnimator {
-
-	private final String TAG = this.getClass().getSimpleName();
 
 	private ArrayList<ViewHolder> mPendingRemovals = new ArrayList<>();
 	private ArrayList<ViewHolder> mPendingAdditions = new ArrayList<>();
@@ -61,15 +58,15 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 
 	private ArrayList<ViewHolder> mMoveAnimations = new ArrayList<>();
 	private ArrayList<ViewHolder> mChangeAnimations = new ArrayList<>();
-	protected ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
-	protected ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
+	private ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
+	private ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
 
 	protected Interpolator mInterpolator = new LinearInterpolator();
 
 	private static class MoveInfo {
 
 		public ViewHolder holder;
-		public int fromX, fromY, toX, toY;
+		int fromX, fromY, toX, toY;
 
 		private MoveInfo(ViewHolder holder, int fromX, int fromY, int toX, int toY) {
 			this.holder = holder;
@@ -82,8 +79,8 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 
 	private static class ChangeInfo {
 
-		public ViewHolder oldHolder, newHolder;
-		public int fromX, fromY, toX, toY;
+		ViewHolder oldHolder, newHolder;
+		int fromX, fromY, toX, toY;
 
 		private ChangeInfo(ViewHolder oldHolder, ViewHolder newHolder) {
 			this.oldHolder = oldHolder;
@@ -263,13 +260,14 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 	 * Prepares the View for Remove Animation.
 	 * <p>- If {@link AnimatedViewHolder#preAnimateRemoveImpl()} is implemented and returns
 	 * {@code true}, then ViewHolder has precedence and the implementation of this method is ignored;
-	 * <br/>- If <u>not</u>, the implementation of this method is therefore performed.</p>
+	 * <br>- If <u>not</u>, the implementation of this method is therefore performed.</p>
 	 * Default value is {@code true}.
 	 *
 	 * @param holder the ViewHolder
 	 * @return {@code true} if a later call to {@link #runPendingAnimations()} is requested,
 	 * false otherwise.
 	 */
+	@SuppressWarnings("UnusedParameters")
 	protected boolean preAnimateRemoveImpl(final ViewHolder holder) {
 		return true;
 	}
@@ -279,7 +277,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 	 * <p>- If {@link AnimatedViewHolder#animateRemoveImpl(ViewPropertyAnimatorListener, long, int)} is
 	 * implemented and returns true, then ViewHolder has precedence and the implementation of this
 	 * method is ignored;
-	 * <br/>- If <u>not</u>, the implementation of this method is therefore performed.</p>
+	 * <br>- If <u>not</u>, the implementation of this method is therefore performed.</p>
 	 *
 	 * @param holder the ViewHolder
 	 * @param index the progressive order of execution
@@ -298,8 +296,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 	}
 
 	private void doAnimateRemove(final ViewHolder holder, final int index) {
-		if (FlexibleAdapter.DEBUG)
-			Log.v(TAG, "AnimateRemove on itemId " + holder.getItemId());
+		Log.v("AnimateRemove on itemId %s", holder.getItemId());
 		boolean consumed = false;
 		if (holder instanceof AnimatedViewHolder) {
 			consumed = ((AnimatedViewHolder) holder).animateRemoveImpl(new DefaultRemoveVpaListener(holder), getRemoveDuration(), index);
@@ -324,7 +321,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 	 * Prepares the View for Add Animation.
 	 * <p>- If {@link AnimatedViewHolder#preAnimateAddImpl()} is implemented and returns
 	 * {@code true}, then ViewHolder has precedence and the implementation of this method is ignored;
-	 * <br/>- If <u>not</u>, the implementation of this method is therefore performed.</p>
+	 * <br>- If <u>not</u>, the implementation of this method is therefore performed.</p>
 	 * Default value is {@code true}.
 	 *
 	 * @param holder the ViewHolder
@@ -340,7 +337,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 	 * <p>- If {@link AnimatedViewHolder#animateAddImpl(ViewPropertyAnimatorListener, long, int)} is
 	 * implemented and returns {@code true}, then ViewHolder has precedence and the implementation
 	 * of this method is ignored;
-	 * <br/>- If <u>not</u>, the implementation of this method is therefore performed.</p>
+	 * <br>- If <u>not</u>, the implementation of this method is therefore performed.</p>
 	 *
 	 * @param holder the ViewHolder
 	 * @param index the progressive order of execution
@@ -359,8 +356,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 	}
 
 	private void doAnimateAdd(final ViewHolder holder, final int index) {
-		if (FlexibleAdapter.DEBUG)
-			Log.v(TAG, "AnimateAdd on itemId=" + holder.getItemId() + " position=" + holder.getLayoutPosition());
+		Log.v("AnimateAdd on itemId=%s position=%s", holder.getItemId(), holder.getLayoutPosition());
 		boolean consumed = false;
 		if (holder instanceof AnimatedViewHolder) {
 			consumed = ((AnimatedViewHolder) holder).animateAddImpl(new DefaultAddVpaListener(holder), getAddDuration(), index);
@@ -765,7 +761,7 @@ public class FlexibleItemAnimator extends SimpleItemAnimator {
 		dispatchAnimationsFinished();
 	}
 
-	void cancelAll(List<ViewHolder> viewHolders) {
+	private void cancelAll(List<ViewHolder> viewHolders) {
 		for (int i = viewHolders.size() - 1; i >= 0; i--) {
 			ViewCompat.animate(viewHolders.get(i).itemView).cancel();
 		}

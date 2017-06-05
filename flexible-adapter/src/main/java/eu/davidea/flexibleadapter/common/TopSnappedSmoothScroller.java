@@ -26,7 +26,7 @@ import android.util.DisplayMetrics;
  * Common class for all Smooth Scroller Layout Managers.
  *
  * @since 5.0.0-b6 Creation
- * <br/>5.0.0-b8 Class is now public to allow customization of the MILLISECONDS_PER_INCH
+ * <br>5.0.0-b8 Class is now public to allow customization of the MILLISECONDS_PER_INCH
  */
 public class TopSnappedSmoothScroller extends LinearSmoothScroller {
 
@@ -41,6 +41,7 @@ public class TopSnappedSmoothScroller extends LinearSmoothScroller {
 	private PointF vectorPosition = new PointF(0, 0);
 	private IFlexibleLayoutManager layoutManager;
 
+	@SuppressWarnings("WeakerAccess")
 	public TopSnappedSmoothScroller(Context context, RecyclerView.LayoutManager layoutManager) {
 		super(context);
 		this.layoutManager = new FlexibleLayoutManager(layoutManager);

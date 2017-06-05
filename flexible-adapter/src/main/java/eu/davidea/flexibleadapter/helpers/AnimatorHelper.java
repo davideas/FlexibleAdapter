@@ -22,20 +22,17 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import java.util.List;
 
-import eu.davidea.flexibleadapter.FlexibleAdapter;
+import eu.davidea.flexibleadapter.utils.Log;
 
 /**
  * @author Davide Steduto
  * @since 05/09/2016
  */
 public class AnimatorHelper {
-
-	protected static final String TAG = AnimatorHelper.class.getSimpleName();
 
 	/*-----------*/
 	/* ANIMATORS */
@@ -68,7 +65,7 @@ public class AnimatorHelper {
 			RecyclerView recyclerView, @FloatRange(from = 0.0, to= 1.0) float percent) {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationX", -recyclerView.getLayoutManager().getWidth() * percent, 0));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added LEFT Animator");
+		Log.v("Added LEFT Animator");
 	}
 
 	/**
@@ -84,7 +81,7 @@ public class AnimatorHelper {
 			RecyclerView recyclerView, @FloatRange(from = 0.0, to = 1.0) float percent) {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationX", recyclerView.getLayoutManager().getWidth() * percent, 0));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added RIGHT Animator");
+		Log.v("Added RIGHT Animator");
 	}
 
 	/**
@@ -99,7 +96,7 @@ public class AnimatorHelper {
 			RecyclerView recyclerView) {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationY", -recyclerView.getMeasuredHeight() >> 1, 0));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added TOP Animator");
+		Log.v("Added TOP Animator");
 	}
 
 	/**
@@ -114,7 +111,7 @@ public class AnimatorHelper {
 			RecyclerView recyclerView) {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "translationY", recyclerView.getMeasuredHeight() >> 1, 0));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added BOTTOM Animator");
+		Log.v("Added BOTTOM Animator");
 	}
 
 	/**
@@ -130,7 +127,7 @@ public class AnimatorHelper {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "scaleX", scaleFrom, 1f));
 		animators.add(ObjectAnimator.ofFloat(view, "scaleY", scaleFrom, 1f));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added SCALE Animator");
+		Log.v("Added SCALE Animator");
 	}
 
 	/**
@@ -143,7 +140,7 @@ public class AnimatorHelper {
 	public static void flipAnimator(@NonNull List<Animator> animators, @NonNull View view) {
 		alphaAnimator(animators, view, 0f);
 		animators.add(ObjectAnimator.ofFloat(view, "scaleY", 0f, 1f));
-		if (FlexibleAdapter.DEBUG) Log.v(TAG, " Added FLIP Animator");
+		Log.v("Added FLIP Animator");
 	}
 
 	/**

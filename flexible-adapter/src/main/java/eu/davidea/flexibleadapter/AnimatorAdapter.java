@@ -26,7 +26,6 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.Interpolator;
@@ -37,6 +36,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
+import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 import static eu.davidea.flexibleadapter.utils.FlexibleUtils.getClassName;
@@ -52,13 +52,11 @@ import static eu.davidea.flexibleadapter.utils.FlexibleUtils.getClassName;
  * @see FlexibleAdapter
  * @see SelectableAdapter
  * @since 10/01/2016 Created
- * <br/>30/01/2016 Class now extends {@link SelectableAdapter}
- * <br/>13/09/2016 {@link #animateView(RecyclerView.ViewHolder, int)} is now automatically called
+ * <br>30/01/2016 Class now extends {@link SelectableAdapter}
+ * <br>13/09/2016 {@link #animateView(RecyclerView.ViewHolder, int)} is now automatically called
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class AnimatorAdapter extends SelectableAdapter {
-
-	private static final String TAG = AnimatorAdapter.class.getSimpleName();
 
 	private Interpolator mInterpolator = new LinearInterpolator();
 	private AnimatorAdapterDataObserver mAnimatorNotifierObserver;
@@ -108,7 +106,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	AnimatorAdapter(boolean stableIds) {
 		super();
 		setHasStableIds(stableIds);
-		if (DEBUG) Log.i("FlexibleAdapter", "Initialized with StableIds=" + stableIds);
+		Log.iTag("FlexibleAdapter", "Initialized with StableIds=" + stableIds);
 
 		//Get notified when an item is changed (should skip animation)
 		mAnimatorNotifierObserver = new AnimatorAdapterDataObserver();
@@ -137,7 +135,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationInitialDelay(long initialDelay) {
-		if (DEBUG) Log.i(TAG, "Set animationInitialDelay=" + initialDelay);
+		Log.i("Set animationInitialDelay=%s", initialDelay);
 		mInitialDelay = initialDelay;
 		return this;
 	}
@@ -152,7 +150,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationDelay(@IntRange(from = 0) long delay) {
-		if (DEBUG) Log.i(TAG, "Set animationDelay=" + delay);
+		Log.i("Set animationDelay=%s", delay);
 		mStepDelay = delay;
 		return this;
 	}
@@ -168,7 +166,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * since 5.0.0-b8
 	 */
 	public AnimatorAdapter setAnimationEntryStep(boolean entryStep) {
-		if (DEBUG) Log.i(TAG, "Set animationEntryStep=" + entryStep);
+		Log.i("Set animationEntryStep=%s", entryStep);
 		this.mEntryStep = entryStep;
 		return this;
 	}
@@ -182,7 +180,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationDuration(@IntRange(from = 1) long duration) {
-		if (DEBUG) Log.i(TAG, "Set animationDuration=" + duration);
+		Log.i("Set animationDuration=%s", duration);
 		mDuration = duration;
 		return this;
 	}
@@ -195,7 +193,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @return this AnimatorAdapter, so the call can be chained
 	 */
 	public AnimatorAdapter setAnimationInterpolator(@NonNull Interpolator interpolator) {
-		if (DEBUG) Log.i(TAG, "Set animationInterpolator=" + getClassName(interpolator));
+		Log.i("Set animationInterpolator=%s", getClassName(interpolator));
 		mInterpolator = interpolator;
 		return this;
 	}
@@ -210,14 +208,14 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 */
 	@Deprecated
 	public AnimatorAdapter setAnimationStartPosition(@IntRange(from = 0) int start) {
-		if (DEBUG) Log.i(TAG, "Set animationStartPosition=" + start);
+		Log.i("Set animationStartPosition=%s", start);
 		mLastAnimatedPosition = start;
 		return this;
 	}
 
 	/**
 	 * Enables/Disables item animation while scrolling and on loading.
-	 * <p>Enabling scrolling will disable onlyEntryAnimation.<br/>
+	 * <p>Enabling scrolling will disable onlyEntryAnimation.<br>
 	 * Disabling scrolling will disable also reverse scrolling.</p>
 	 * Default value is {@code false}.
 	 * <p><b>Note:</b> Loading animation can only be performed if the Adapter is initialized
@@ -230,7 +228,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationOnScrolling(boolean enabled) {
-		if (DEBUG) Log.i(TAG, "Set animationOnScrolling=" + enabled);
+		Log.i("Set animationOnScrolling=%s", enabled);
 		if (enabled) this.onlyEntryAnimation = false;
 		shouldAnimate = enabled;
 		return this;
@@ -251,7 +249,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b1
 	 */
 	public AnimatorAdapter setAnimationOnReverseScrolling(boolean enabled) {
-		if (DEBUG) Log.i(TAG, "Set animationOnReverseScrolling=" + enabled);
+		Log.i("Set animationOnReverseScrolling=%s", enabled);
 		isReverseEnabled = enabled;
 		return this;
 	}
@@ -287,7 +285,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @since 5.0.0-b8
 	 */
 	public AnimatorAdapter setOnlyEntryAnimation(boolean enabled) {
-		if (DEBUG) Log.i(TAG, "Set onlyEntryAnimation=" + enabled);
+		Log.i("Set onlyEntryAnimation=%s", enabled);
 		if (enabled) this.shouldAnimate = true;
 		this.onlyEntryAnimation = enabled;
 		return this;
@@ -307,12 +305,12 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/*--------------*/
 
 	/**
-	 * Build your custom list of {@link Animator} to apply on the ItemView.<br/>
+	 * Build your custom list of {@link Animator} to apply on the ItemView.<br>
 	 * Write the logic based on the position and/or viewType and/or the item selection.
 	 * <p><b>Suggestions:</b>
-	 * <br/>- You can also use {@link #getItemViewType(int)} to apply different Animation for
+	 * <br>- You can also use {@link #getItemViewType(int)} to apply different Animation for
 	 * each view type.
-	 * <br/>- If you want to apply same animation for all items, create new list at class level
+	 * <br>- If you want to apply same animation for all items, create new list at class level
 	 * and initialize it in the constructor, not inside this method!</p>
 	 *
 	 * @param itemView  the bounded ItemView
@@ -356,7 +354,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	 * @param position the current item position
 	 * @since 5.0.0-b1
 	 */
-	@SuppressWarnings("ConstantConditions")
 	protected final void animateView(final RecyclerView.ViewHolder holder, final int position) {
 		if (mRecyclerView == null) return;
 
@@ -369,16 +366,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			shouldAnimate = false;
 		}
 		int lastVisiblePosition = getFlexibleLayoutManager().findLastVisibleItemPosition();
-//		if (DEBUG) {
-//			Log.v(TAG, "shouldAnimate=" + shouldAnimate
-//					+ " isFastScroll=" + isFastScroll
-//					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
-//					+ " isReverseEnabled=" + isReverseEnabled
-//					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
-//					+ (!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : "")
-//					+ " mMaxChildViews=" + mMaxChildViews
-//			);
-//		}
+//		Log.v("shouldAnimate=%s isFastScroll=%s isNotified=%s isReverseEnabled=%s mLastAnimatedPosition=%s %s mMaxChildViews=%s",
+//				shouldAnimate, isFastScroll, mAnimatorNotifierObserver.isPositionNotified(), isReverseEnabled, mLastAnimatedPosition,
+//				(!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : ""), mMaxChildViews
+//		);
 		if (holder instanceof FlexibleViewHolder && shouldAnimate && !isFastScroll &&
 				!mAnimatorNotifierObserver.isPositionNotified() &&
 				(position > lastVisiblePosition || isReverseEnabled || isScrollableHeaderOrFooter(position) || (position == 0 && mMaxChildViews == 0))) {
@@ -403,7 +394,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 					duration = animator.getDuration();
 				}
 			}
-			//Log.v(TAG, "duration=" + duration);
+			//Log.v("duration=%s", duration);
 			set.setDuration(duration);
 			set.addListener(new HelperAnimatorListener(hashCode));
 			if (mEntryStep) {
@@ -412,7 +403,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			}
 			set.start();
 			mAnimators.put(hashCode, set);
-			if (DEBUG) Log.v(TAG, "animateView    Scroll animation on position " + position);
+			//Log.v("animateView    Scroll animation on position %s", position);
 		}
 		mAnimatorNotifierObserver.clearNotified();
 		// Update last animated position
@@ -449,7 +440,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			//Add Alpha animator
 			ViewCompat.setAlpha(itemView, 0);
 			animators.add(ObjectAnimator.ofFloat(itemView, "alpha", 0f, 1f));
-			Log.w(TAG, "Started Deprecated Animation on position " + position);
+			Log.w("Started Deprecated Animation on position %s", position);
 
 			//Execute the animations
 			AnimatorSet set = new AnimatorSet();
@@ -516,13 +507,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 			delay = mInitialDelay + (position * mStepDelay);
 		}
 
-//		if (DEBUG) Log.v(TAG, "Delay[" + position + "]=" + delay +
-//				" FirstVisible=" + firstVisiblePosition +
-//				" LastVisible=" + lastVisiblePosition +
-//				" LastAnimated=" + numberOfAnimatedItems +
-//				" VisibleItems=" + visibleItems +
-//				" ChildCount=" + mRecyclerView.getChildCount() +
-//				" MaxChildCount=" + mMaxChildViews);
+//		Log.v("Delay[%s]=%s FirstVisible=%s LastVisible=%s LastAnimated=%s VisibleItems=%s ChildCount=%s MaxChildCount=%s",
+//				position, delay, firstVisiblePosition, lastVisiblePosition, numberOfAnimatedItems,
+//				visibleItems, mRecyclerView.getChildCount(), mMaxChildViews);
 
 		return delay;
 	}
@@ -532,9 +519,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/*-----------*/
 
 	/**
-	 * This is the default animator.<br/>
+	 * This is the default animator.<br>
 	 * Alpha animator will be always automatically added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added.<br/>
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added.<br>
 	 * Incompatible with ALPHA animator.</p>
 	 *
 	 * @param animators user defined list
@@ -552,10 +539,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Item will slide from Left to Right.<br/>
+	 * Item will slide from Left to Right.<br>
 	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with LEFT, TOP, BOTTOM animators.<br/>
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br>
+	 * Incompatible with LEFT, TOP, BOTTOM animators.<br>
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
@@ -575,10 +562,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Item will slide from Right to Left.<br/>
+	 * Item will slide from Right to Left.<br>
 	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with RIGHT, TOP, BOTTOM animators.<br/>
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br>
+	 * Incompatible with RIGHT, TOP, BOTTOM animators.<br>
 	 *
 	 * @param animators user defined list
 	 * @param view      ItemView to animate
@@ -598,9 +585,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Item will slide from Top of the screen to its natural position.<br/>
+	 * Item will slide from Top of the screen to its natural position.<br>
 	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br>
 	 * Incompatible with LEFT, RIGHT, TOP, BOTTOM animators.</p>
 	 *
 	 * @param animators user defined list
@@ -620,9 +607,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Item will slide from Bottom of the screen to its natural position.<br/>
+	 * Item will slide from Bottom of the screen to its natural position.<br>
 	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br>
 	 * Incompatible with LEFT, RIGHT, TOP, BOTTOM animators.</p>
 	 *
 	 * @param animators user defined list
@@ -642,10 +629,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Item will scale.<br/>
+	 * Item will scale.<br>
 	 * Ignored if SCALE animator was already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br/>
-	 * Incompatible with LEFT, RIGHT, BOTTOM animators.<br/>
+	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br>
+	 * Incompatible with LEFT, RIGHT, BOTTOM animators.<br>
 	 *
 	 * @param animators user defined list
 	 * @param view      itemView to animate
@@ -675,7 +662,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 		private boolean notified;
 		private Handler mAnimatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 			public boolean handleMessage(Message message) {
-				if (DEBUG) Log.v(TAG, "Clear notified for scrolling Animations");
+				//Log.v("Clear notified for scrolling Animations");
 				notified = false;
 				return true;
 			}

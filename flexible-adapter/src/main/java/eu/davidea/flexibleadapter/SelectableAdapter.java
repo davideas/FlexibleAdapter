@@ -20,7 +20,6 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -37,6 +36,8 @@ import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.common.FlexibleLayoutManager;
 import eu.davidea.flexibleadapter.common.IFlexibleLayoutManager;
 import eu.davidea.flexibleadapter.utils.FlexibleUtils;
+import eu.davidea.flexibleadapter.utils.Log;
+import eu.davidea.flexibleadapter.utils.Log.Level;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
@@ -51,12 +52,14 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br>27/01/2016 Improved Selection, SelectAll, FastScroller
  * <br>29/05/2016 Use of TreeSet instead of ArrayList
  * <br>04/04/2017 Use of FastScrollerDelegate
+ * <br>05/06/2017 Improved Log system
  */
 @SuppressWarnings({"unused", "unchecked", "ConstantConditions", "WeakerAccess"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
 		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener, FastScroller.AdapterInterface {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
+	@Deprecated
 	public static boolean DEBUG = false;
 
 	/**
@@ -108,8 +111,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 1.0.0
 	 */
 	public SelectableAdapter() {
-		Log.i("FlexibleAdapter", "Running version " + BuildConfig.VERSION_NAME);
-		mSelectedPositions = new TreeSet<>();
+		Log.iTag("FlexibleAdapter", "Running version %s", BuildConfig.VERSION_NAME);
+		mSelectedPositions = Collections.synchronizedSet(new TreeSet<Integer>());
 		mBoundViewHolders = new HashSet<>();
 		mMode = MODE_IDLE;
 
@@ -121,14 +124,29 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	/*----------------*/
 
 	/**
-	 * Call this once, to enable or disable DEBUG logs.<br/>
+	 * Call this once, to enable or disable logs.<br>
 	 * DEBUG logs are disabled by default.
 	 *
 	 * @param enable true to show DEBUG logs in verbose mode, false to hide them.
 	 * @since 5.0.0-b1
+	 * @deprecated Use the new {@link #enableLogs(int)}
 	 */
+	@Deprecated
 	public static void enableLogs(boolean enable) {
 		DEBUG = enable;
+		if (enable) enableLogs(Level.DEBUG);
+		else enableLogs(Level.SUPPRESS);
+	}
+
+	/**
+	 * Call this once, to enable or disable internal logs with custom level.<br>
+	 * Logs are disabled by default.
+	 *
+	 * @param level One of {@link Level} value
+	 * @since 5.0.0-b1
+	 */
+	public static void enableLogs(@Level int level) {
+		Log.setLevel(level);
 	}
 
 	/*--------------*/
@@ -175,8 +193,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	/**
 	 * Current instance of the wrapper class for LayoutManager suitable for FlexibleAdapter.
 	 * LayoutManager must be already initialized in the RecyclerView.
+	 * <p>
+	 * return wrapper class for any non-conventional LayoutManagers or {@code null} if not initialized.
 	 *
-	 * @return wrapper class for any non-conventional LayoutManagers or {@code null} if not initialized
 	 * @since 5.0.0-rc2
 	 */
 	public IFlexibleLayoutManager getFlexibleLayoutManager() {
@@ -215,7 +234,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 2.0.0
 	 */
 	public void setMode(@Mode int mode) {
-		if (DEBUG) Log.i(TAG, FlexibleUtils.getModeName(mode) + " enabled");
+		Log.i("%s enabled", FlexibleUtils.getModeName(mode));
 		if (mMode == MODE_SINGLE && mode == MODE_IDLE)
 			clearSelection();
 		this.mMode = mode;
@@ -323,8 +342,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		} else {
 			addSelection(position);
 		}
-		if (DEBUG) Log.v(TAG, "toggleSelection " + (contains ? "removed" : "added") +
-				" on position " + position + ", current " + mSelectedPositions);
+		Log.v("toggleSelection %s on position %s, current %s",
+				(contains ? "removed" : "added"), position, mSelectedPositions);
 	}
 
 	/**
@@ -388,7 +407,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	public void selectAll(Integer... viewTypes) {
 		mSelectAll = true;
 		List<Integer> viewTypesToSelect = Arrays.asList(viewTypes);
-		if (DEBUG) Log.v(TAG, "selectAll ViewTypes to include " + viewTypesToSelect);
+		Log.v("selectAll ViewTypes to include %s", viewTypesToSelect);
 		int positionStart = 0, itemCount = 0;
 		for (int i = 0; i < getItemCount(); i++) {
 			if (isSelectable(i) &&
@@ -404,8 +423,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 				}
 			}
 		}
-		if (DEBUG)
-			Log.d(TAG, "selectAll notifyItemRangeChanged from positionStart=" + positionStart + " itemCount=" + getItemCount());
+		Log.d("selectAll notifyItemRangeChanged from positionStart=%s itemCount=%s", positionStart, getItemCount());
 		notifySelectionChanged(positionStart, getItemCount());
 	}
 
@@ -419,7 +437,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * @since 1.0.0
 	 */
 	public void clearSelection() {
-		if (DEBUG) Log.d(TAG, "clearSelection " + mSelectedPositions);
+		Log.d("clearSelection %s", mSelectedPositions);
 		// #373 - ConcurrentModificationException with Undo after multiple rapid swipe removals
 		synchronized (mSelectedPositions) {
 			Iterator<Integer> iterator = mSelectedPositions.iterator();
@@ -532,8 +550,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putIntegerArrayList(TAG, new ArrayList<>(mSelectedPositions));
-		if (DEBUG && getSelectedItemCount() > 0)
-			Log.d(TAG, "Saving selection " + mSelectedPositions);
+		if (Log.isDebugEnabled() && getSelectedItemCount() > 0)
+			Log.d("Saving selection %s", mSelectedPositions);
 	}
 
 	/**
@@ -544,8 +562,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		mSelectedPositions.addAll(savedInstanceState.getIntegerArrayList(TAG));
-		if (DEBUG && getSelectedItemCount() > 0)
-			Log.d(TAG, "Restore selection " + mSelectedPositions);
+		if (Log.isDebugEnabled() && getSelectedItemCount() > 0)
+			Log.d("Restore selection %s", mSelectedPositions);
 	}
 
 	/*---------------*/

@@ -30,7 +30,6 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.transition.Fade;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,6 +49,8 @@ import eu.davidea.flexibleadapter.helpers.ActionModeHelper;
 import eu.davidea.flexibleadapter.helpers.UndoHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
+import eu.davidea.flexibleadapter.utils.Log;
+import eu.davidea.flexibleadapter.utils.Log.Level;
 import eu.davidea.samples.flexibleadapter.dialogs.EditItemDialog;
 import eu.davidea.samples.flexibleadapter.dialogs.MessageDialog;
 import eu.davidea.samples.flexibleadapter.fragments.AbstractFragment;
@@ -112,8 +113,6 @@ public class MainActivity extends AppCompatActivity implements
 		NavigationView.OnNavigationItemSelectedListener,
 		OnFragmentInteractionListener {
 
-	public static final String TAG = MainActivity.class.getSimpleName();
-
 	/**
 	 * Bundle key representing the Active Fragment
 	 */
@@ -170,8 +169,8 @@ public class MainActivity extends AppCompatActivity implements
 		}
 
 		setContentView(R.layout.activity_main);
-		Log.d(TAG, "onCreate");
-		FlexibleAdapter.enableLogs(true);
+		FlexibleAdapter.enableLogs(Level.DEBUG);
+		Log.v("onCreate");
 
 		// Initialize Toolbar, Drawer & FAB
 		initializeToolbar();
@@ -187,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		Log.v(TAG, "onSaveInstanceState!");
+		Log.v("onSaveInstanceState!");
 		mAdapter.onSaveInstanceState(outState);
 		getSupportFragmentManager().putFragment(outState, STATE_ACTIVE_FRAGMENT, mFragment);
 		super.onSaveInstanceState(outState);
@@ -264,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private void initializeToolbar() {
-		Log.d(TAG, "initializeToolbar as actionBar");
+		Log.d("initializeToolbar as actionBar");
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		mHeaderView = (HeaderView) findViewById(R.id.toolbar_header_view);
 		mHeaderView.bindTo(getString(R.string.app_name), getString(R.string.overall));
@@ -446,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void initSearchView(final Menu menu) {
 		// Associate searchable configuration with the SearchView
-		Log.d(TAG, "onCreateOptionsMenu setup SearchView!");
+		Log.d("onCreateOptionsMenu setup SearchView!");
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		MenuItem searchItem = menu.findItem(R.id.action_search);
 		if (searchItem != null) {
@@ -482,7 +481,7 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public boolean onQueryTextChange(String newText) {
 		if (mAdapter.hasNewSearchText(newText)) {
-			Log.d(TAG, "onQueryTextChange newText: " + newText);
+			Log.d("onQueryTextChange newText: " + newText);
 			mAdapter.setSearchText(newText);
 
 			// Fill and Filter mItems with your custom list and automatically animate the changes
@@ -499,7 +498,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onQueryTextSubmit(String query) {
-		Log.v(TAG, "onQueryTextSubmit called!");
+		Log.v("onQueryTextSubmit called!");
 		return onQueryTextChange(query);
 	}
 
@@ -509,12 +508,12 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		Log.v(TAG, "onPrepareOptionsMenu called!");
+		Log.v("onPrepareOptionsMenu called!");
 
 		if (mSearchView != null) {
 			//Has searchText?
 			if (!mAdapter.hasSearchText()) {
-				Log.d(TAG, "onPrepareOptionsMenu Clearing SearchView!");
+				Log.d("onPrepareOptionsMenu Clearing SearchView!");
 				mSearchView.setIconified(true);// This also clears the text in SearchView widget
 			} else {
 				//Necessary after the restoreInstanceState
@@ -701,7 +700,7 @@ public class MainActivity extends AppCompatActivity implements
 		// Action on elements are allowed if Mode is IDLE, otherwise selection has priority
 		if (mAdapter.getMode() != SelectableAdapter.MODE_IDLE && mActionModeHelper != null) {
 			boolean activate = mActionModeHelper.onClick(position);
-			Log.d(TAG, "Last activated position " + mActionModeHelper.getActivatedPosition());
+			Log.d("Last activated position %s", mActionModeHelper.getActivatedPosition());
 			return activate;
 		} else {
 			// Notify the active callbacks or implement a custom action onClick
@@ -749,8 +748,7 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemSwipe(final int position, int direction) {
-		Log.i(TAG, "onItemSwipe position=" + position +
-				" direction=" + (direction == ItemTouchHelper.LEFT ? "LEFT" : "RIGHT"));
+		Log.i("onItemSwipe position=%s direction=%s", position, (direction == ItemTouchHelper.LEFT ? "LEFT" : "RIGHT"));
 
 		// Option 1 FULL_SWIPE: Direct action no Undo Action
 		// Do something based on direction when item has been swiped:
@@ -829,7 +827,7 @@ public class MainActivity extends AppCompatActivity implements
 	 */
 	@Override
 	public void onUpdateEmptyView(int size) {
-		Log.d(TAG, "onUpdateEmptyView size=" + size);
+		Log.d("onUpdateEmptyView size=%s", size);
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
 		View emptyView = findViewById(R.id.empty_view);
 		TextView emptyText = (TextView) findViewById(R.id.empty_text);
@@ -891,12 +889,12 @@ public class MainActivity extends AppCompatActivity implements
 				case R.layout.recycler_sub_item:
 					SubItem subItem = (SubItem) adapterItem;
 					DatabaseService.getInstance().removeSubItem(mAdapter.getExpandableOfDeletedChild(subItem), subItem);
-					Log.d(TAG, "Confirm removed " + subItem);
+					Log.d("Confirm removed %s", subItem);
 					break;
 				case R.layout.recycler_simple_item:
 				case R.layout.recycler_expandable_item:
 					DatabaseService.getInstance().removeItem(adapterItem);
-					Log.d(TAG, "Confirm removed " + adapterItem);
+					Log.d("Confirm removed %s", adapterItem);
 					break;
 			}
 		}

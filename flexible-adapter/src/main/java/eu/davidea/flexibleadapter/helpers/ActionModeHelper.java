@@ -18,10 +18,10 @@ package eu.davidea.flexibleadapter.helpers;
 import android.support.annotation.CallSuper;
 import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -30,6 +30,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
+import eu.davidea.flexibleadapter.utils.Log;
 
 /**
  * Helper to coordinates the MULTI selection with FlexibleAdapter.
@@ -38,8 +39,6 @@ import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
  * @since 30/04/2016
  */
 public class ActionModeHelper implements ActionMode.Callback {
-
-	public static final String TAG = ActionModeHelper.class.getSimpleName();
 
 	@Mode
 	private int defaultMode = SelectableAdapter.MODE_IDLE;
@@ -72,7 +71,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * @since 5.0.0-b6
 	 */
 	public ActionModeHelper(@NonNull FlexibleAdapter adapter, @MenuRes int cabMenu,
-							@NonNull ActionMode.Callback callback) {
+							@Nullable ActionMode.Callback callback) {
 		this(adapter, cabMenu);
 		this.mCallback = callback;
 	}
@@ -211,7 +210,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
 		// Inflate the Context Menu
 		actionMode.getMenuInflater().inflate(mCabMenu, menu);
-		if (SelectableAdapter.DEBUG) Log.i(TAG, "ActionMode is active!");
+		Log.d("ActionMode is active!");
 		// Activate the ActionMode Multi
 		mAdapter.setMode(SelectableAdapter.MODE_MULTI);
 		// Notify the provided callback
@@ -246,8 +245,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	@CallSuper
 	@Override
 	public void onDestroyActionMode(ActionMode actionMode) {
-		if (SelectableAdapter.DEBUG)
-			Log.i(TAG, "ActionMode is about to be destroyed! New mode will be " + defaultMode);
+		Log.d("ActionMode is about to be destroyed! New mode will be %s", defaultMode);
 		// Change mode and deselect everything
 		mAdapter.setMode(defaultMode);
 		mAdapter.clearSelection();
