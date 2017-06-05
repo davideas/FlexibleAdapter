@@ -21,7 +21,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * If you don't have many fields in common better to extend directly from
- * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
+ * {@link eu.davidea.flexibleadapter.items.AbstractSectionableItem} to benefit of the already
  * implemented methods (getter and setters).
  */
 public class AnimatorSubItem extends AbstractSectionableItem<AnimatorSubItem.ChildViewHolder, AnimatorExpandableItem> {

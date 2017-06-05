@@ -17,7 +17,7 @@ import eu.davidea.samples.flexibleadapter.R;
 
 /**
  * This is an experiment to evaluate how a Section with header can also be expanded/collapsed.
- * <p>Here, it still benefits of the common fields declared in AbstractModelItem.</p>
+ * <p>Here, it still benefits of the common fields declared in AbstractItem.</p>
  * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
  */
 public class ExpandableLevel1Item

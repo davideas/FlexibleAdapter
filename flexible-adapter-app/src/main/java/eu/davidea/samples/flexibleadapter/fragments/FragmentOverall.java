@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.animation.DecelerateInterpolator;
 
 import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.samples.flexibleadapter.OverallAdapter;
 import eu.davidea.samples.flexibleadapter.R;
@@ -32,6 +33,7 @@ public class FragmentOverall extends AbstractFragment {
 	 * Custom implementation of FlexibleAdapter
 	 */
 	private OverallAdapter mAdapter;
+	private ScrollableUseCaseItem scrollableUseCaseItem;
 
 
 	public static FragmentOverall newInstance(int columnCount) {
@@ -77,6 +79,9 @@ public class FragmentOverall extends AbstractFragment {
 		mRecyclerView.setLayoutManager(createNewStaggeredGridLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
+		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
+				.addItemViewType(R.layout.recycler_overall_item, 8, 8)
+				.withEdge(true));
 
 		// After Adapter is attached to RecyclerView
 		mAdapter.setLongPressDragEnabled(true);
@@ -94,9 +99,10 @@ public class FragmentOverall extends AbstractFragment {
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
 
 		// Add 1 Scrollable Header
-		mAdapter.addScrollableHeader(new ScrollableUseCaseItem(
+		scrollableUseCaseItem = new ScrollableUseCaseItem(
 				getString(R.string.overall_use_case_title),
-				getString(R.string.overall_use_case_description)));
+				getString(R.string.overall_use_case_description));
+		mAdapter.addScrollableHeader(scrollableUseCaseItem);
 	}
 
 	@Override
@@ -118,15 +124,7 @@ public class FragmentOverall extends AbstractFragment {
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {
-				// NOTE: If you use simple integers to identify the ViewType,
-				// here, you should use them and not Layout integers
-				switch (mAdapter.getItemViewType(position)) {
-					case R.layout.recycler_scrollable_usecase_item:
-					case R.layout.recycler_scrollable_layout_item:
-						return mColumnCount;
-					default:
-						return 1;
-				}
+				return mAdapter.getItem(position).getSpanSize(mColumnCount, position);
 			}
 		});
 		return gridLayoutManager;

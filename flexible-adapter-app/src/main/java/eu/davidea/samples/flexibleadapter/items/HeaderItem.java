@@ -1,6 +1,5 @@
 package eu.davidea.samples.flexibleadapter.items;
 
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -128,10 +127,8 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 				this.mHandleView.setVisibility(View.GONE);
 			}
 
-			//Support for StaggeredGridLayoutManager
-			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
-				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
-			}
+			// Support for StaggeredGridLayoutManager
+			setFullSpan(true);
 		}
 	}
 

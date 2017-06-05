@@ -1,6 +1,5 @@
 package eu.davidea.samples.flexibleadapter.items;
 
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,13 +18,12 @@ import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
  * This is an experiment to evaluate how a Section with header can also be expanded/collapsed.
- * <p>Here, it still benefits of the common fields declared in AbstractModelItem.</p>
+ * <p>Here, it still benefits of the common fields declared in AbstractItem.</p>
  * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
  */
 public class ExpandableHeaderItem
 		extends AbstractItem<ExpandableHeaderViewHolder>
-		implements IExpandable<ExpandableHeaderViewHolder, SubItem>,
-		IHeader<ExpandableHeaderViewHolder> {
+		implements IExpandable<ExpandableHeaderViewHolder, SubItem>, IHeader<ExpandableHeaderViewHolder> {
 
 	/* Flags for FlexibleAdapter */
 	private boolean mExpanded = false;
@@ -144,10 +142,8 @@ public class ExpandableHeaderItem
 				this.mHandleView.setVisibility(View.GONE);
 			}
 
-			//Support for StaggeredGridLayoutManager
-			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
-				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
-			}
+			// Support for StaggeredGridLayoutManager
+			setFullSpan(true);
 		}
 
 		/**

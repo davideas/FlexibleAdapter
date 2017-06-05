@@ -8,9 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +27,7 @@ import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
- * You should extend directly from
+ * <b>Tip:</b> Consider to extend directly from
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */

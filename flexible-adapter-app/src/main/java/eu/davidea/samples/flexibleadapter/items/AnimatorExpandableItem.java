@@ -2,7 +2,6 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -18,9 +17,9 @@ import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.viewholders.ExpandableViewHolder;
 
 /**
- * This is an experiment to evaluate how a Section with header can also be expanded/collapsed.
- * <p>Here, it still benefits of the common fields declared in AbstractModelItem.</p>
- * It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt; signature.
+ * This Section with header can also be expanded/collapsed.
+ * <p>It's important to note that, the ViewHolder must be specified in all &lt;diamond&gt;
+ * signature.</p>
  */
 public class AnimatorExpandableItem
 		extends AbstractExpandableHeaderItem<AnimatorExpandableViewHolder, AnimatorSubItem> {
@@ -111,24 +110,30 @@ public class AnimatorExpandableItem
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
 
-			//Support for StaggeredGridLayoutManager
-			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
-				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
-			}
+			// Support for StaggeredGridLayoutManager
+			setFullSpan(true);
+		}
+
+		@Override
+		protected boolean shouldNotifyParentOnClick() {
+			// Let's notify the item has been expanded / collapsed
+			return true;//default=false
 		}
 
 		@Override
 		protected void expandView(int position) {
 			super.expandView(position);
-			//Let's notify the item has been expanded
-			if (mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
+			// Let's notify the item has been expanded. Note: from 5.0.0-rc1 the next line becomes
+			// obsolete, override the new method shouldNotifyParentOnClick() as showcased here
+			//if (mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
 		}
 
 		@Override
 		protected void collapseView(int position) {
 			super.collapseView(position);
-			//Let's notify the item has been collapsed
-			if (!mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
+			// Let's notify the item has been expanded. Note: from 5.0.0-rc1 the next line becomes
+			// obsolete, override the new method shouldNotifyParentOnClick() as showcased here
+			//if (!mAdapter.isExpanded(position)) mAdapter.notifyItemChanged(position, true);
 		}
 
 		@Override

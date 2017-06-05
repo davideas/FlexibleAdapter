@@ -1,10 +1,7 @@
 package eu.davidea.samples.flexibleadapter.items;
 
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
@@ -49,11 +46,6 @@ public class StaggeredHeaderItem extends AbstractHeaderItem<StaggeredHeaderItem.
 	}
 
 	@Override
-	public int getSpanSize(int spanCount, int position) {
-		return spanCount;
-	}
-
-	@Override
 	public int getLayoutRes() {
 		return R.layout.recycler_staggered_header_item;
 	}
@@ -83,10 +75,8 @@ public class StaggeredHeaderItem extends AbstractHeaderItem<StaggeredHeaderItem.
 			super(view, adapter, true);//True for sticky
 			ButterKnife.bind(this, view);
 
-			//Support for StaggeredGridLayoutManager
-			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
-				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
-			}
+			// Support for StaggeredGridLayoutManager
+			setFullSpan(true);
 		}
 	}
 

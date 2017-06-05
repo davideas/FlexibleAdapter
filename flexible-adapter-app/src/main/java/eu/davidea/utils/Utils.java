@@ -54,7 +54,7 @@ public final class Utils {
 		return context.getResources().getDisplayMetrics();
 	}
 
-	public static float dpToPx(Context context, float dp) {
+	public static int dpToPx(Context context, float dp) {
 		return Math.round(dp * getDisplayMetrics(context).density);
 	}
 

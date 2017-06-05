@@ -14,6 +14,7 @@ import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
@@ -23,7 +24,6 @@ import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.dialogs.OnParameterSelectedListener;
 import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
-import eu.davidea.samples.flexibleadapter.items.HeaderItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -93,6 +93,10 @@ public class FragmentHeadersSections extends AbstractFragment
 		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
+				.addItemViewType(R.layout.recycler_simple_item, 8, 0)
+				.withSectionGapOffset(24)
+				.withBottomEdge(true));
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
@@ -126,12 +130,13 @@ public class FragmentHeadersSections extends AbstractFragment
 	int count = 1;
 	@Override
 	public void performFabAction() {
-		int position = mAdapter.getStickyPosition();
-		if (position > 0) {
-			HeaderItem header = (HeaderItem) mAdapter.getItem(position);
-			header.setTitle("New sticky title " + count++);
-			mAdapter.updateItem(header);
-		}
+		mAdapter.clear();
+//		int position = mAdapter.getStickyPosition();
+//		if (position > 0) {
+//			HeaderItem header = (HeaderItem) mAdapter.getItem(position);
+//			header.setTitle("New sticky title " + count++);
+//			mAdapter.updateItem(header);
+//		}
 //		BottomSheetDialog bottomSheetDialogFragment = BottomSheetDialog.newInstance(R.layout.bottom_sheet_headers_sections, this);
 //		bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), BottomSheetDialog.TAG);
 	}
@@ -199,7 +204,6 @@ public class FragmentHeadersSections extends AbstractFragment
 		gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {
-				//noinspection ConstantConditions
 				return mAdapter.getItem(position).getSpanSize(mColumnCount, position);
 			}
 		});

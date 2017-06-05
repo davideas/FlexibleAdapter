@@ -3,9 +3,7 @@ package eu.davidea.samples.flexibleadapter.items;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -71,6 +69,10 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
 			mergedText.append(SPACE).append(HASH).append(mergedItem.getId());
 		}
 		return mergedText.toString();
+	}
+
+	public int countMergedItems() {
+		return hasMergedItems() ? mergedItems.size() : 0;
 	}
 
 	public List<StaggeredItem> getMergedItems() {
@@ -148,14 +150,14 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
 		if (mergedItems != null) {
 			float extraHeight = Math.min(mergedItems.size(), 3) *
 					context.getResources().getDimension(R.dimen.card_extra_height);
-			holder.cardView.getLayoutParams().height = (int) Utils.dpToPx(holder.itemView.getContext(),
+			holder.cardView.getLayoutParams().height = Utils.dpToPx(holder.itemView.getContext(),
 					context.getResources().getDimension(R.dimen.card_height) + extraHeight);
 			holder.mergedTextView.setText(
 					context.getResources().getString(R.string.merged_with, getMergedItemsAsText()));
 			holder.mergedTextView.setVisibility(View.VISIBLE);
 		} else {
 			//if (FlexibleUtils.hasKitkat()) TransitionManager.beginDelayedTransition(holder.cardView);
-			holder.cardView.getLayoutParams().height = (int) Utils.dpToPx(holder.itemView.getContext(),
+			holder.cardView.getLayoutParams().height = Utils.dpToPx(holder.itemView.getContext(),
 					context.getResources().getDimension(R.dimen.card_height));
 			holder.mergedTextView.setVisibility(View.GONE);
 		}

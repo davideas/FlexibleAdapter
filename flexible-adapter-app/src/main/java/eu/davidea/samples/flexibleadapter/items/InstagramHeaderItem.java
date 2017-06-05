@@ -1,6 +1,5 @@
 package eu.davidea.samples.flexibleadapter.items;
 
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -101,11 +100,6 @@ public class InstagramHeaderItem extends AbstractHeaderItem<InstagramHeaderItem.
 					Log.d("InstagramHeaderItem", "Registered internal click on Header SubTitleTextView! " + mSubtitle.getText() + " position=" + getFlexibleAdapterPosition());
 				}
 			});
-
-			//Support for StaggeredGridLayoutManager
-			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
-				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
-			}
 		}
 	}
 

@@ -17,6 +17,8 @@ import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.holders.HeaderHolder;
+import eu.davidea.samples.flexibleadapter.holders.ItemHolder;
 import eu.davidea.samples.flexibleadapter.items.AbstractItem;
 import eu.davidea.samples.flexibleadapter.items.AnimatorExpandableItem;
 import eu.davidea.samples.flexibleadapter.items.AnimatorSubItem;
@@ -25,19 +27,17 @@ import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.items.ExpandableItem;
 import eu.davidea.samples.flexibleadapter.items.ExpandableLevel0Item;
 import eu.davidea.samples.flexibleadapter.items.ExpandableLevel1Item;
-import eu.davidea.samples.flexibleadapter.holders.HeaderHolder;
 import eu.davidea.samples.flexibleadapter.items.HeaderItem;
-import eu.davidea.samples.flexibleadapter.models.HeaderModel;
 import eu.davidea.samples.flexibleadapter.items.InstagramHeaderItem;
 import eu.davidea.samples.flexibleadapter.items.InstagramItem;
-import eu.davidea.samples.flexibleadapter.holders.ItemHolder;
-import eu.davidea.samples.flexibleadapter.models.ItemModel;
 import eu.davidea.samples.flexibleadapter.items.OverallItem;
 import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredHeaderItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredItemStatus;
 import eu.davidea.samples.flexibleadapter.items.SubItem;
+import eu.davidea.samples.flexibleadapter.models.HeaderModel;
+import eu.davidea.samples.flexibleadapter.models.ItemModel;
 
 /**
  * Created by Davide Steduto on 23/11/2015.
@@ -279,7 +279,7 @@ public class DatabaseService {
 		mItems.clear();
 
 		if (headers == null) {
-			headers = new HashMap<StaggeredItemStatus, StaggeredHeaderItem>();
+			headers = new HashMap<>();
 			headers.put(StaggeredItemStatus.A, new StaggeredHeaderItem(0, context.getString(StaggeredItemStatus.A.getResId())));
 			headers.put(StaggeredItemStatus.B, new StaggeredHeaderItem(1, context.getString(StaggeredItemStatus.B.getResId())));
 			headers.put(StaggeredItemStatus.C, new StaggeredHeaderItem(2, context.getString(StaggeredItemStatus.C.getResId())));
@@ -492,7 +492,7 @@ public class DatabaseService {
 
 	public void addItem(AbstractFlexibleItem item, Comparator comparator) {
 		addItem(item);
-		Collections.sort(mItems, comparator);
+		sort(comparator);
 	}
 
 	public void addItem(AbstractFlexibleItem item) {
@@ -516,10 +516,12 @@ public class DatabaseService {
 	/*---------------------*/
 
 	public int getMaxStaggeredId() {
-		if (mItems.size() > 0) {
-			StaggeredItem staggeredItem = (StaggeredItem) mItems.get(mItems.size() - 1);
-			return staggeredItem.getId() + 1;
-		} else return 1;
+		int count = 1;
+		for (AbstractFlexibleItem item : mItems) {
+			StaggeredItem staggeredItem = (StaggeredItem) item;
+			count += staggeredItem.countMergedItems() + 1;
+		}
+		return count;
 	}
 
 	public StaggeredHeaderItem getHeaderByStatus(StaggeredItemStatus a) {
@@ -550,7 +552,7 @@ public class DatabaseService {
 			header.setHidden(true);
 		}
 		mItems.addAll(mergedItems);
-		Collections.sort(mItems, new ItemComparatorById());
+		sort(new ItemComparatorById());
 		createMergedItems();
 	}
 
@@ -580,7 +582,7 @@ public class DatabaseService {
 		} else {
 			mItems.addAll(mainItem.splitAllItems());
 		}
-		Collections.sort(mItems, new ItemComparatorById());
+		sort(new ItemComparatorById());
 	}
 
 	/**
@@ -596,13 +598,20 @@ public class DatabaseService {
 		}
 	}
 
+	public void sort(Comparator<IFlexible> itemComparatorById) {
+		Collections.sort(mItems, itemComparatorById);
+	}
+
 	/**
 	 * A simple item comparator by Id.
 	 */
-	public static class ItemComparatorById implements Comparator<AbstractFlexibleItem> {
+	public static class ItemComparatorById implements Comparator<IFlexible> {
 		@Override
-		public int compare(AbstractFlexibleItem lhs, AbstractFlexibleItem rhs) {
-			return ((StaggeredItem) lhs).getId() - ((StaggeredItem) rhs).getId();
+		public int compare(IFlexible lhs, IFlexible rhs) {
+			int result = ((StaggeredItem) lhs).getHeader().getOrder() - ((StaggeredItem) rhs).getHeader().getOrder();
+			if (result == 0)
+				result = ((StaggeredItem) lhs).getId() - ((StaggeredItem) rhs).getId();
+			return result;
 		}
 	}
 

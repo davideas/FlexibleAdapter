@@ -731,6 +731,9 @@ public class MainActivity extends AppCompatActivity implements
 
 	@Override
 	public void onItemMove(int fromPosition, int toPosition) {
+		// When offset between item decorations have been set, we need to invalidate them
+		mAdapter.invalidateItemDecorations(100L);
+
 		//TODO FOR YOU: this doesn't work with all types of items (of course)..... we need to implement some custom logic. Consider to use also onActionStateChanged() when dragging is completed
 		/*
 		String prev = mItems.remove(from);
@@ -987,6 +990,8 @@ public class MainActivity extends AppCompatActivity implements
 					mAdapter.notifyItemChanged(mainPosition, "blink");
 					// New title for context
 					mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
+					// Item decorations must be invalidated and rebuilt
+					mAdapter.invalidateItemDecorations(100L);
 				}
 				// We consume always the event, never finish the ActionMode
 				return true;
@@ -1010,6 +1015,8 @@ public class MainActivity extends AppCompatActivity implements
 						// New title for context
 						mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
 					}
+					// Item decorations must be invalidated and rebuilt
+					mAdapter.invalidateItemDecorations(100L);
 				}
 				// We consume always the event, never finish the ActionMode
 				return true;

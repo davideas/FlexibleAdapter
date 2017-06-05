@@ -5,7 +5,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,6 +13,7 @@ import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
+import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
@@ -27,8 +27,6 @@ import eu.davidea.samples.flexibleadapter.services.DatabaseService;
  * interface.
  */
 public class FragmentExpandableSections extends AbstractFragment {
-
-	public static final String TAG = FragmentExpandableSections.class.getSimpleName();
 
 	private ExampleAdapter mAdapter;
 
@@ -68,6 +66,8 @@ public class FragmentExpandableSections extends AbstractFragment {
 		// Initialize Adapter and RecyclerView
 		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
+		// OnItemAdd and OnItemRemove listeners
+		mAdapter.addListener(this);
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.expandItemsAtStartUp()
 				.setAutoCollapseOnExpand(false)
@@ -135,7 +135,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		Log.v(TAG, "onCreateOptionsMenu called!");
+		Log.v("onCreateOptionsMenu called!");
 		inflater.inflate(R.menu.menu_sections, menu);
 		mListener.initSearchView(menu);
 	}

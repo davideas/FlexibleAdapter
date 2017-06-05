@@ -21,6 +21,7 @@ import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.samples.flexibleadapter.services.DatabaseType;
+import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -103,7 +104,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		mAdapter.setAnimateChangesWithDiffUtil(DatabaseConfiguration.animateWithDiffUtil)
 				.setAnimateToLimit(DatabaseConfiguration.animateToLimit)//Size limit = MAX_VALUE will always animate the changes
 				.setNotifyMoveOfFilteredItems(DatabaseConfiguration.notifyMove)//When true, filtering on big list is very slow!
-				.setNotifyChangeOfUnfilteredItems(DatabaseConfiguration.notifyChange)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
+				.setNotifyChangeOfUnfilteredItems(DatabaseConfiguration.notifyChange)
 				.setAnimationInitialDelay(100L)
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true)
@@ -117,7 +118,9 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		mRecyclerView.setAdapter(mAdapter);
 		//Custom divider item decorator with Offset
 		if (mDivider == null) {
-			mDivider = new FlexibleItemDecoration(getActivity(), R.drawable.divider_large).withOffset(true);
+			mDivider = new FlexibleItemDecoration(getActivity(), R.drawable.divider_large)
+					.withEdge(true)
+					.withOffset(Utils.dpToPx(getActivity(), 8f));
 		}
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!

@@ -6,7 +6,6 @@
 	android:id="@+id/card_view"
 	android:layout_width="match_parent"
 	android:layout_height="100dp"
-	android:layout_margin="@dimen/margin_small"
 	card_view:cardBackgroundColor="@android:color/darker_gray"
 	card_view:cardUseCompatPadding="true"
 	card_view:cardElevation="2dp"

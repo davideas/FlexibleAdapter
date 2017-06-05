@@ -15,6 +15,7 @@ import java.util.Random;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.TopSnappedSmoothScroller;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IHeader;
@@ -75,7 +76,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		// Customize the speed of the smooth scroll.
 		// NOTE: Every time you change this value you MUST recreate the LayoutManager instance
 		// and to assign it again to the RecyclerView!
-		TopSnappedSmoothScroller.MILLISECONDS_PER_INCH = 33f;
+		TopSnappedSmoothScroller.MILLISECONDS_PER_INCH = 33f; //Make faster the smooth scroll
 		mRecyclerView.setLayoutManager(createNewStaggeredGridLayoutManager());
 		// This value is restored to 100f (default) right here, because it is used in the
 		// constructor by Android. If we don't change it now, others LayoutManager will be
@@ -87,6 +88,9 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		// NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
+				.addItemViewType(R.layout.recycler_staggered_item, 8, 8)
+				.withEdge(true));
 
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
@@ -137,7 +141,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 
 	@Override
 	public void performFabAction() {
-		//Simulate changing status
+		// Simulate changing status
 		StaggeredItemStatus status = StaggeredItemStatus.values()[new Random().nextInt(StaggeredItemStatus.values().length - 1)];
 		StaggeredHeaderItem headerItem = DatabaseService.getInstance().getHeaderByStatus(status);
 		int scrollTo;
@@ -208,10 +212,11 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 			int toPosition = mAdapter.calculatePositionFor(staggeredItem, new DatabaseService.ItemComparatorByGroup());
 			// Move item to just calculated position under the correct section
 			mAdapter.moveItem(mAdapter.getGlobalPositionOf(staggeredItem), toPosition, Payload.MOVE);
+			DatabaseService.getInstance().sort(new DatabaseService.ItemComparatorById());
 		}
 		// Retrieve the final position due to a possible hidden header became now visible!
 		int scrollTo = mAdapter.getGlobalPositionOf(staggeredItem);
-		Log.d(TAG, "Moving Item to position" + scrollTo);
+		Log.d(TAG, "Moving Item " + staggeredItem + " to position" + scrollTo);
 		return scrollTo;
 	}
 

@@ -2,10 +2,7 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,7 +17,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * Item dedicated only for User Learns Selection view (located always at the top in the Adapter).
- * This item is a Scrollable Header.
+ * <p>This item is a Scrollable Header.</p>
  */
 public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHolder> {
 
@@ -80,10 +77,8 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 				}
 			});
 
-			//Support for StaggeredGridLayoutManager
-			if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
-				((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(true);
-			}
+			// Support for StaggeredGridLayoutManager
+			setFullSpan(true);
 		}
 
 		@Override

@@ -2,11 +2,7 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -16,10 +12,9 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.items.ScrollableExpandableItem.ScrollableExpandableViewHolder;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.ExpandableViewHolder;
-
-import eu.davidea.samples.flexibleadapter.items.ScrollableExpandableItem.ScrollableExpandableViewHolder;
 
 /**
  * Scrollable Header and Footer Item that can be expanded too. When visible, all the subItems
@@ -54,12 +49,6 @@ public class ScrollableExpandableItem extends AbstractItem<ScrollableExpandableV
 		holder.mTitle.setSelected(true);//For marquee!!
 		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
 		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
-
-		//Support for StaggeredGridLayoutManager
-		if (holder.itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
-			((StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams()).setFullSpan(true);
-			Log.d("ScrollableExpandable", "ScrollableExpandableItem configured fullSpan for StaggeredGridLayout");
-		}
 	}
 
 	@Override
@@ -97,6 +86,9 @@ public class ScrollableExpandableItem extends AbstractItem<ScrollableExpandableV
 			super(view, adapter, true);
 			mTitle = (TextView) view.findViewById(R.id.title);
 			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
+
+			// Support for StaggeredGridLayoutManager
+			setFullSpan(true);
 		}
 
 		@Override

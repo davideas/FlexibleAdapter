@@ -155,7 +155,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	 * @param lastPosition the position of the last main item in the adapter
 	 * @param currentPage  the current page
 	 * @since 5.0.0-b6
-	 * <br/>5.0.0-rc1 added {@code lastPosition} and {@code currentPage} as parameters
+	 * <br>5.0.0-rc1 added {@code lastPosition} and {@code currentPage} as parameters
 	 */
 	@Override
 	public void onLoadMore(int lastPosition, int currentPage) {
