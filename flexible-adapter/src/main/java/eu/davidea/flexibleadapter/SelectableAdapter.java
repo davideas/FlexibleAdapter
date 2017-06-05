@@ -48,9 +48,9 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @see FlexibleAdapter
  * @see AnimatorAdapter
  * @since 03/05/2015 Created
- * <br/>27/01/2016 Improved Selection, SelectAll, FastScroller
- * <br/>29/05/2016 Use of TreeSet instead of ArrayList
- * <br/>04/04/2017 Use of FastScrollerDelegate
+ * <br>27/01/2016 Improved Selection, SelectAll, FastScroller
+ * <br>29/05/2016 Use of TreeSet instead of ArrayList
+ * <br>04/04/2017 Use of FastScrollerDelegate
  */
 @SuppressWarnings({"unused", "unchecked", "ConstantConditions", "WeakerAccess"})
 public abstract class SelectableAdapter extends RecyclerView.Adapter
@@ -60,8 +60,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	public static boolean DEBUG = false;
 
 	/**
-	 * - MODE_IDLE: Adapter will not keep track of selections<br/>
-	 * - MODE_SINGLE: Select only one per time<br/>
+	 * - MODE_IDLE: Adapter will not keep track of selections<br>
+	 * - MODE_SINGLE: Select only one per time<br>
 	 * - MODE_MULTI: Multi selection will be activated
 	 */
 	public static final int MODE_IDLE = 0, MODE_SINGLE = 1, MODE_MULTI = 2;
@@ -75,8 +75,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	public @interface Mode {
 	}
 
-	private Set<Integer> mSelectedPositions;
-	private Set<FlexibleViewHolder> mBoundViewHolders;
+	private final Set<Integer> mSelectedPositions;
+	private final Set<FlexibleViewHolder> mBoundViewHolders;
 	private int mMode;
 	private IFlexibleLayoutManager mFlexibleLayoutManager;
 	protected RecyclerView mRecyclerView;
@@ -176,7 +176,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * Current instance of the wrapper class for LayoutManager suitable for FlexibleAdapter.
 	 * LayoutManager must be already initialized in the RecyclerView.
 	 *
-	 * return wrapper class for any non-conventional LayoutManagers or {@code null} if not initialized.
+	 * @return wrapper class for any non-conventional LayoutManagers or {@code null} if not initialized
 	 * @since 5.0.0-rc2
 	 */
 	public IFlexibleLayoutManager getFlexibleLayoutManager() {
@@ -411,32 +411,36 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	/**
 	 * Clears the selection status for all items one by one and it doesn't stop animations in the items.
-	 * <br/><br/>
-	 * <b>Note 1:</b> Items are invalidated and rebound!<br/>
-	 * <b>Note 2:</b> This method use java.util.Iterator to avoid java.util.ConcurrentModificationException.
+	 * <p>
+	 * <b>Note 1:</b> Items are not rebound, so an eventual animation is not stopped!<br>
+	 * <b>Note 2:</b> This method use {@code java.util.Iterator} on synchronized collection to
+	 * avoid {@code java.util.ConcurrentModificationException}.</p>
 	 *
 	 * @since 1.0.0
 	 */
 	public void clearSelection() {
 		if (DEBUG) Log.d(TAG, "clearSelection " + mSelectedPositions);
-		Iterator<Integer> iterator = mSelectedPositions.iterator();
-		int positionStart = 0, itemCount = 0;
-		// The notification is done only on items that are currently selected.
-		while (iterator.hasNext()) {
-			int position = iterator.next();
-			iterator.remove();
-			// Optimization for ItemRangeChanged
-			if (positionStart + itemCount == position) {
-				itemCount++;
-			} else {
-				// Notify previous items in range
-				notifySelectionChanged(positionStart, itemCount);
-				positionStart = position;
-				itemCount = 1;
+		// #373 - ConcurrentModificationException with Undo after multiple rapid swipe removals
+		synchronized (mSelectedPositions) {
+			Iterator<Integer> iterator = mSelectedPositions.iterator();
+			int positionStart = 0, itemCount = 0;
+			// The notification is done only on items that are currently selected.
+			while (iterator.hasNext()) {
+				int position = iterator.next();
+				iterator.remove();
+				// Optimization for ItemRangeChanged
+				if (positionStart + itemCount == position) {
+					itemCount++;
+				} else {
+					// Notify previous items in range
+					notifySelectionChanged(positionStart, itemCount);
+					positionStart = position;
+					itemCount = 1;
+				}
 			}
+			// Notify remaining items in range
+			notifySelectionChanged(positionStart, itemCount);
 		}
-		// Notify remaining items in range
-		notifySelectionChanged(positionStart, itemCount);
 	}
 
 	private void notifySelectionChanged(int positionStart, int itemCount) {
@@ -581,7 +585,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
 	 * for previous version, the default value is used.
 	 *
-	 * @param fastScroller        instance of {@link FastScroller}
+	 * @param fastScroller instance of {@link FastScroller}
 	 * @since 5.0.0-b6
 	 */
 	public void setFastScroller(@NonNull FastScroller fastScroller) {
