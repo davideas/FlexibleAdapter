@@ -19,7 +19,7 @@ import java.util.Random;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
-import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
@@ -108,7 +108,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
-		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 
 		// EndlessScrollListener - OnLoadMore (v5.0.0)
 		mAdapter.setLoadingMoreAtStartUp(true) //To call only if the list is empty

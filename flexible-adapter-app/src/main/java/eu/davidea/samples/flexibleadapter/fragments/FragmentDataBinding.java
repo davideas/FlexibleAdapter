@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.databinding.BindingFlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
@@ -108,7 +108,7 @@ public class FragmentDataBinding extends AbstractFragment {
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
-		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 
 		mAdapter.addScrollableHeaderWithDelay(new ScrollableUseCaseItem(
 				getString(R.string.databinding_use_case_title),

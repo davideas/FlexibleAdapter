@@ -15,6 +15,7 @@
  */
 package eu.davidea.flexibleadapter;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -39,6 +40,10 @@ import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.flexibleadapter.utils.Log.Level;
 import eu.davidea.viewholders.FlexibleViewHolder;
+
+import static eu.davidea.flexibleadapter.SelectableAdapter.Mode.IDLE;
+import static eu.davidea.flexibleadapter.SelectableAdapter.Mode.MULTI;
+import static eu.davidea.flexibleadapter.SelectableAdapter.Mode.SINGLE;
 
 /**
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
@@ -66,16 +71,24 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * - MODE_IDLE: Adapter will not keep track of selections<br>
 	 * - MODE_SINGLE: Select only one per time<br>
 	 * - MODE_MULTI: Multi selection will be activated
+	 * @deprecated Use values from interface {@link Mode}.
 	 */
+	@Deprecated
 	public static final int MODE_IDLE = 0, MODE_SINGLE = 1, MODE_MULTI = 2;
 
 	/**
-	 * Annotation interface for selection modes:
-	 * {@link #MODE_IDLE}, {@link #MODE_SINGLE}, {@link #MODE_MULTI}
+	 * Annotation interface for selection modes: {@link #IDLE}, {@link #SINGLE}, {@link #MULTI}
 	 */
-	@IntDef({MODE_IDLE, MODE_SINGLE, MODE_MULTI})
+	@SuppressLint("UniqueConstants")
+	@IntDef({IDLE, SINGLE, MULTI, MODE_IDLE, MODE_SINGLE, MODE_MULTI})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface Mode {
+		/**
+		 * - <b>IDLE:</b> Adapter will not keep track of selections.<br>
+		 * - <b>SINGLE:</b> Select only one per time.<br>
+		 * - <b>MULTI:</b> Multi selection will be activated.
+		 */
+		int IDLE = 0, SINGLE = 1, MULTI = 2;
 	}
 
 	private final Set<Integer> mSelectedPositions;
@@ -99,7 +112,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	/**
 	 * ActionMode selection flag LastItemInActionMode.
-	 * <p>Used when user returns to {@link #MODE_IDLE} and no selection is active.</p>
+	 * <p>Used when user returns to {@link Mode#IDLE} and no selection is active.</p>
 	 */
 	protected boolean mLastItemInActionMode = false;
 
@@ -114,7 +127,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		Log.iTag("FlexibleAdapter", "Running version %s", BuildConfig.VERSION_NAME);
 		mSelectedPositions = Collections.synchronizedSet(new TreeSet<Integer>());
 		mBoundViewHolders = new HashSet<>();
-		mMode = MODE_IDLE;
+		mMode = IDLE;
 
 		mFastScrollerDelegate = new FastScroller.Delegate();
 	}
@@ -223,31 +236,31 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	/**
 	 * Sets the mode of the selection:
 	 * <ul>
-	 * <li>{@link #MODE_IDLE} Default. Configures the adapter so that no item can be selected;
-	 * <li>{@link #MODE_SINGLE} configures the adapter to react at the single tap over an item
+	 * <li>{@link Mode#IDLE} Default. Configures the adapter so that no item can be selected;
+	 * <li>{@link Mode#SINGLE} configures the adapter to react at the single tap over an item
 	 * (previous selection is cleared automatically);
-	 * <li>{@link #MODE_MULTI} configures the adapter to save the position to the list of the
+	 * <li>{@link Mode#MULTI} configures the adapter to save the position to the list of the
 	 * selected items.
 	 * </ul>
 	 *
-	 * @param mode one of {@link #MODE_IDLE}, {@link #MODE_SINGLE}, {@link #MODE_MULTI}
+	 * @param mode one of {@link Mode#IDLE}, {@link Mode#SINGLE}, {@link Mode#MULTI}
 	 * @since 2.0.0
 	 */
 	public void setMode(@Mode int mode) {
-		Log.i("%s enabled", FlexibleUtils.getModeName(mode));
-		if (mMode == MODE_SINGLE && mode == MODE_IDLE)
+		Log.i("Mode %s enabled", FlexibleUtils.getModeName(mode));
+		if (mMode == SINGLE && mode == IDLE)
 			clearSelection();
 		this.mMode = mode;
-		this.mLastItemInActionMode = (mode != MODE_MULTI);
+		this.mLastItemInActionMode = (mode != MULTI);
 	}
 
 	/**
 	 * The current selection mode of the Adapter.
 	 *
 	 * @return current mode
-	 * @see #MODE_IDLE
-	 * @see #MODE_SINGLE
-	 * @see #MODE_MULTI
+	 * @see Mode#IDLE
+	 * @see Mode#SINGLE
+	 * @see Mode#MULTI
 	 * @since 2.1.0
 	 */
 	@Mode
@@ -266,7 +279,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	}
 
 	/**
-	 * @return true if user returns to {@link #MODE_IDLE} or {@link #MODE_SINGLE} and no
+	 * @return true if user returns to {@link Mode#IDLE} or {@link Mode#SINGLE} and no
 	 * selection is active, false otherwise
 	 * @since 5.0.0-b1
 	 */
@@ -333,7 +346,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 */
 	public void toggleSelection(int position) {
 		if (position < 0) return;
-		if (mMode == MODE_SINGLE)
+		if (mMode == SINGLE)
 			clearSelection();
 
 		boolean contains = mSelectedPositions.contains(position);

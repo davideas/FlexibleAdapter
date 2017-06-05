@@ -44,7 +44,7 @@ import java.util.List;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
-import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.helpers.ActionModeHelper;
 import eu.davidea.flexibleadapter.helpers.UndoHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
@@ -82,21 +82,21 @@ import eu.davidea.utils.ScrollAwareFABBehavior;
 import eu.davidea.utils.Utils;
 
 /**
- * The Demo application is organized in Fragments with 1 Activity {@code MainActivity}
+ * The Demo application is organized in Fragments with the main Activity {@code MainActivity}
  * implementing most of the methods. Each Fragment shows a different example and can assemble
  * more functionalities at once.
  * <p>The Activity implementation is organized in this order:</p>
  * <ul>
- * <li>Activity management
- * <li>Initialization methods
- * <li>Navigation drawer & Fragment management
- * <li>Floating Action Button
- * <li>SearchView
- * <li>Option menu preparation & management
- * <li>Dialog listener implementation (for the example of onItemClick)
- * <li><b>FlexibleAdapter listeners implementation</b>
- * <li>ActionMode implementation
- * <li>Extras
+ * <li>Activity management.
+ * <li>Initialization methods.
+ * <li>Navigation drawer & Fragment management.
+ * <li>Floating Action Button.
+ * <li>SearchView.
+ * <li>Option menu preparation & management.
+ * <li>Dialog listener implementation (for the example of onItemClick).
+ * <li><b>FlexibleAdapter listeners implementation</b>.
+ * <li>ActionMode implementation.
+ * <li>Extras.
  * </ul>
  * The Fragments <u>may</u> use Activity implementations or may override specific behaviors
  * themselves. Fragments have {@code AbstractFragment} in common to have some methods reusable.
@@ -640,18 +640,18 @@ public class MainActivity extends AppCompatActivity implements
 			Snackbar.make(findViewById(R.id.main_view), "Sticky headers " +
 					(mAdapter.areHeadersSticky() ? "disabled" : "enabled"), Snackbar.LENGTH_SHORT).show();
 		} else if (id == R.id.action_selection_mode) {
-			if (mAdapter.getMode() == SelectableAdapter.MODE_IDLE) {
-				mAdapter.setMode(SelectableAdapter.MODE_SINGLE);
-				mActionModeHelper.withDefaultMode(SelectableAdapter.MODE_SINGLE);
+			if (mAdapter.getMode() == Mode.IDLE) {
+				mAdapter.setMode(Mode.SINGLE);
+				mActionModeHelper.withDefaultMode(Mode.SINGLE);
 				item.setIcon(R.drawable.ic_select_off_white_24dp);
 				item.setTitle(R.string.mode_idle);
-				Snackbar.make(findViewById(R.id.main_view), "Selection MODE_SINGLE is enabled", Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(findViewById(R.id.main_view), "Selection SINGLE is enabled", Snackbar.LENGTH_SHORT).show();
 			} else {
-				mAdapter.setMode(SelectableAdapter.MODE_IDLE);
-				mActionModeHelper.withDefaultMode(SelectableAdapter.MODE_IDLE);
+				mAdapter.setMode(Mode.IDLE);
+				mActionModeHelper.withDefaultMode(Mode.IDLE);
 				item.setIcon(R.drawable.ic_select_white_24dp);
 				item.setTitle(R.string.mode_single);
-				Snackbar.make(findViewById(R.id.main_view), "Selection MODE_IDLE is enabled", Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(findViewById(R.id.main_view), "Selection IDLE is enabled", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_fast_scroller) {
 			mAdapter.toggleFastScroller();
@@ -698,7 +698,7 @@ public class MainActivity extends AppCompatActivity implements
 		}
 
 		// Action on elements are allowed if Mode is IDLE, otherwise selection has priority
-		if (mAdapter.getMode() != SelectableAdapter.MODE_IDLE && mActionModeHelper != null) {
+		if (mAdapter.getMode() != Mode.IDLE && mActionModeHelper != null) {
 			boolean activate = mActionModeHelper.onClick(position);
 			Log.d("Last activated position %s", mActionModeHelper.getActivatedPosition());
 			return activate;

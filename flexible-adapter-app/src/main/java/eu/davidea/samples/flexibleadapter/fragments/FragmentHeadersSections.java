@@ -13,7 +13,7 @@ import android.view.MenuItem;
 import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.items.IHeader;
@@ -117,7 +117,7 @@ public class FragmentHeadersSections extends AbstractFragment
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
-		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_IDLE);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 
 		// Add 2 Scrollable Headers and 1 Footer
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);

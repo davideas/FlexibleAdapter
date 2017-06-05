@@ -28,7 +28,6 @@ import android.view.MenuItem;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.utils.Log;
 
@@ -41,7 +40,7 @@ import eu.davidea.flexibleadapter.utils.Log;
 public class ActionModeHelper implements ActionMode.Callback {
 
 	@Mode
-	private int defaultMode = SelectableAdapter.MODE_IDLE;
+	private int defaultMode = Mode.IDLE;
 	@MenuRes
 	private int mCabMenu;
 	private FlexibleAdapter mAdapter;
@@ -79,15 +78,15 @@ public class ActionModeHelper implements ActionMode.Callback {
 	/**
 	 * Changes the default mode to apply when the ActionMode is destroyed and normal selection is
 	 * again active.
-	 * <p>Default value is {@link SelectableAdapter#MODE_IDLE}.</p>
+	 * <p>Default value is {@link Mode#IDLE}.</p>
 	 *
 	 * @param defaultMode the new default mode when ActionMode is off, accepted values:
-	 *                    {@code MODE_IDLE, MODE_SINGLE}
+	 *                    {@code IDLE, SINGLE}
 	 * @return this object, so it can be chained
 	 * @since 5.0.0-b6
 	 */
 	public final ActionModeHelper withDefaultMode(@Mode int defaultMode) {
-		if (defaultMode == SelectableAdapter.MODE_IDLE || defaultMode == SelectableAdapter.MODE_SINGLE)
+		if (defaultMode == Mode.IDLE || defaultMode == Mode.SINGLE)
 			this.defaultMode = defaultMode;
 		return this;
 	}
@@ -101,14 +100,14 @@ public class ActionModeHelper implements ActionMode.Callback {
 	}
 
 	/**
-	 * Gets the activated position only when mode is {@code MODE_SINGLE}.
+	 * Gets the activated position only when mode is {@code SINGLE}.
 	 *
-	 * @return the activated position when {@code MODE_SINGLE}. -1 if no item is selected
+	 * @return the activated position when {@code SINGLE}. -1 if no item is selected
 	 * @since 5.0.0-rc1
 	 */
 	public int getActivatedPosition() {
 		List<Integer> selectedPositions = mAdapter.getSelectedPositions();
-		if (mAdapter.getMode() == SelectableAdapter.MODE_SINGLE &&
+		if (mAdapter.getMode() == Mode.SINGLE &&
 				selectedPositions.size() == 1) {
 			return selectedPositions.get(0);
 		}
@@ -160,11 +159,11 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 */
 	public void toggleSelection(int position) {
 		if (position >= 0 && (
-				(mAdapter.getMode() == SelectableAdapter.MODE_SINGLE && !mAdapter.isSelected(position)) ||
-				mAdapter.getMode() == SelectableAdapter.MODE_MULTI)) {
+				(mAdapter.getMode() == Mode.SINGLE && !mAdapter.isSelected(position)) ||
+				mAdapter.getMode() == Mode.MULTI)) {
 			mAdapter.toggleSelection(position);
 		}
-		// If MODE_SINGLE is active then ActionMode can be null
+		// If SINGLE is active then ActionMode can be null
 		if (mActionMode == null) return;
 
 		int count = mAdapter.getSelectedItemCount();
@@ -199,8 +198,8 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 * @since 5.0.0-b6
 	 */
 	public void restoreSelection(AppCompatActivity activity) {
-		if ((defaultMode == SelectableAdapter.MODE_IDLE && mAdapter.getSelectedItemCount() > 0) ||
-				(defaultMode == SelectableAdapter.MODE_SINGLE && mAdapter.getSelectedItemCount() > 1)) {
+		if ((defaultMode == Mode.IDLE && mAdapter.getSelectedItemCount() > 0) ||
+				(defaultMode == Mode.SINGLE && mAdapter.getSelectedItemCount() > 1)) {
 			onLongClick(activity, -1);
 		}
 	}
@@ -212,7 +211,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 		actionMode.getMenuInflater().inflate(mCabMenu, menu);
 		Log.d("ActionMode is active!");
 		// Activate the ActionMode Multi
-		mAdapter.setMode(SelectableAdapter.MODE_MULTI);
+		mAdapter.setMode(Mode.MULTI);
 		// Notify the provided callback
 		return mCallback == null || mCallback.onCreateActionMode(actionMode, menu);
 	}
@@ -239,7 +238,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 
 	/**
 	 * {@inheritDoc}
-	 * With FlexibleAdapter v5.0.0 the default mode is {@link SelectableAdapter#MODE_IDLE}, if
+	 * With FlexibleAdapter v5.0.0 the default mode is {@link Mode#IDLE}, if
 	 * you want single selection enabled change default mode with {@link #withDefaultMode(int)}.
 	 */
 	@CallSuper

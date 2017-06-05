@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
-import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
@@ -78,7 +78,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(items, getActivity());
 		mAdapter.setNotifyChangeOfUnfilteredItems(true) //true is the default! This will rebind new item when refreshed
-				.setMode(SelectableAdapter.MODE_SINGLE);
+				.setMode(Mode.SINGLE);
 
 		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
@@ -93,7 +93,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				Snackbar.make(getView(), "Selection MODE_SINGLE is enabled", Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(getView(), "Selection SINGLE is enabled", Snackbar.LENGTH_SHORT).show();
 			}
 		}, 1500L);
 
@@ -109,7 +109,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
-		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, SelectableAdapter.MODE_SINGLE);
+		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.SINGLE);
 
 		// Add 2 Scrollable Headers
 		mAdapter.addUserLearnedSelection(savedInstanceState == null);

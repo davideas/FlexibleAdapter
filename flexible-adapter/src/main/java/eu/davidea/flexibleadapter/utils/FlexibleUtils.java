@@ -36,7 +36,7 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import eu.davidea.flexibleadapter.R;
-import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleLayoutManager;
 
 /**
@@ -83,18 +83,19 @@ public final class FlexibleUtils {
 	}
 
 	/**
-	 * @return the string representation of the provided {@link eu.davidea.flexibleadapter.SelectableAdapter.Mode}
+	 * @return the string representation of the provided {@link Mode}
 	 * @since 5.0.0-rc1
 	 */
+	@NonNull
 	@SuppressLint("SwitchIntDef")
-	public static String getModeName(@SelectableAdapter.Mode int mode) {
+	public static String getModeName(@Mode int mode) {
 		switch (mode) {
-			case SelectableAdapter.MODE_SINGLE:
-				return "MODE_SINGLE";
-			case SelectableAdapter.MODE_MULTI:
-				return "MODE_MULTI";
+			case Mode.SINGLE:
+				return "SINGLE";
+			case Mode.MULTI:
+				return "MULTI";
 			default:
-				return "MODE_IDLE";
+				return "IDLE";
 		}
 	}
 
@@ -185,8 +186,10 @@ public final class FlexibleUtils {
 	/**
 	 * Resolves bug #161. Necessary when {@code theme} attribute is used in the layout.
 	 * Used by {@code FlexibleAdapter.getStickyHeaderContainer()} method.
+	 *
+	 * @deprecated method {@code getStickyHeaderContainer()} is now deprecated.
 	 */
-	//TODO: review comment
+	@Deprecated
 	public static Activity scanForActivity(Context context) {
 		if (context instanceof Activity)
 			return (Activity) context;

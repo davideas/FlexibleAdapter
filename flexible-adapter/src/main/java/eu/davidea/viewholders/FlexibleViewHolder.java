@@ -28,7 +28,7 @@ import android.view.View;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
-import eu.davidea.flexibleadapter.SelectableAdapter;
+import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
@@ -323,12 +323,12 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 				position, mAdapter.getMode(), (actionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
 		if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
 			if (!alreadySelected) {
-				// Be sure, if MODE_MULTI is active, to add this item to the selection list (call listener!)
+				// Be sure, if MULTI is active, to add this item to the selection list (call listener!)
 				// Also be sure user consumes the long click event if not done in onLongClick.
 				// Drag by LongPress or Drag by handleView
-				if (mLongClickSkipped || mAdapter.getMode() == SelectableAdapter.MODE_MULTI) {
+				if (mLongClickSkipped || mAdapter.getMode() == Mode.MULTI) {
 					// Next check, allows to initiate the ActionMode and to add selection if configured
-					if ((shouldAddSelectionInActionMode() || mAdapter.getMode() != SelectableAdapter.MODE_MULTI) &&
+					if ((shouldAddSelectionInActionMode() || mAdapter.getMode() != Mode.MULTI) &&
 							mAdapter.mItemLongClickListener != null && mAdapter.isSelectable(position)) {
 						mAdapter.mItemLongClickListener.onItemLongClick(position);
 						alreadySelected = true; //Keep selection on release!
@@ -365,10 +365,10 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	public void onItemReleased(int position) {
 		Log.v("onItemReleased position=%s mode=%s actionState=%s",
 				position, mAdapter.getMode(), (mActionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
-		// Be sure to keep selection if MODE_MULTI and shouldAddSelectionInActionMode is active
+		// Be sure to keep selection if MULTI and shouldAddSelectionInActionMode is active
 		if (!alreadySelected) {
 			if (shouldAddSelectionInActionMode() &&
-					mAdapter.getMode() == SelectableAdapter.MODE_MULTI) {
+					mAdapter.getMode() == Mode.MULTI) {
 				mAdapter.mItemLongClickListener.onItemLongClick(position);
 				if (mAdapter.isSelected(position)) {
 					toggleActivation();
