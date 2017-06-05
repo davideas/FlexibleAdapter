@@ -559,6 +559,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return The <b>T</b> object for the position provided or null if item not found
 	 * @since 1.0.0
 	 */
+	@Nullable
 	public T getItem(@IntRange(from = 0) int position) {
 		if (position < 0 || position >= getItemCount()) return null;
 		return mItems.get(position);
@@ -719,7 +720,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return true if the provided item is currently displayed, false otherwise
 	 * @since 2.0.0
 	 */
-	public boolean contains(@NonNull T item) {
+	public boolean contains(@Nullable T item) {
 		return item != null && mItems.contains(item);
 	}
 
@@ -3578,7 +3579,10 @@ public class FlexibleAdapter<T extends IFlexible>
 			return;
 		}
 
-		T item = getItem(positionStart);
+		if (itemCount == 0)
+			return;
+
+		T item = null;
 		IExpandable parent = null;
 		for (int position = positionStart; position < positionStart + itemCount; position++) {
 			item = getItem(positionStart); // We remove always at positionStart!
@@ -3615,8 +3619,8 @@ public class FlexibleAdapter<T extends IFlexible>
 		notifyItemRangeRemoved(positionStart, itemCount);
 
 		// Update content of the header linked to first item of the range
-		IHeader header = getHeaderOf(item);
-		int headerPosition = getGlobalPositionOf(header);
+		IHeader header = item != null ? getHeaderOf(item) : null;
+		int headerPosition = header != null ? getGlobalPositionOf(header) : -1;
 		if (payload != null && header != null && headerPosition >= 0) {
 			// The header does not represents a group anymore, add it to the Orphan list
 			addToOrphanListIfNeeded(header, positionStart, itemCount);

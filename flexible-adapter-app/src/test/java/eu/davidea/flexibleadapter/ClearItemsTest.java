@@ -1,20 +1,25 @@
 package eu.davidea.flexibleadapter;
 
+import android.support.annotation.NonNull;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.items.HeaderItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableFooterItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -44,6 +49,20 @@ public class ClearItemsTest {
 	public void testClearAllBut_Empty() {
 		mAdapter.clearAllBut();
 		assertEquals(0, mAdapter.getItemCount());
+	}
+
+	@Test
+	public void testClear_EmptyAdapter() {
+		FlexibleAdapter<AbstractFlexibleItem> adapter = new FlexibleAdapter<AbstractFlexibleItem>(null) {
+			@Override
+			public IHeader getHeaderOf(@NonNull AbstractFlexibleItem item) {
+				assertNotNull(item);
+				return super.getHeaderOf(item);
+			}
+		};
+		adapter.updateDataSet(new ArrayList<AbstractFlexibleItem>(), false);
+		adapter.clear();
+		assertEquals(0, adapter.getItemCount());
 	}
 
 	@Test
