@@ -94,9 +94,10 @@ public class FragmentHeadersSections extends AbstractFragment
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
+				.addItemViewType(R.layout.recycler_header_item, 8, 100)
 				.addItemViewType(R.layout.recycler_simple_item, 8, 0)
 				.withSectionGapOffset(24)
-				.withBottomEdge(true));
+				.withEdge(true));
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);

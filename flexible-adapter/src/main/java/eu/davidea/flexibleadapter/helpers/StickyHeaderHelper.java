@@ -197,7 +197,9 @@ public final class StickyHeaderHelper extends OnScrollListener {
 					if (mAdapter.getFlexibleLayoutManager().getOrientation() == OrientationHelper.HORIZONTAL) {
 						if (nextChild.getLeft() > 0) {
 							int headerWidth = mStickyHolderLayout.getMeasuredWidth();
-							int nextHeaderOffsetX = nextChild.getLeft() - headerWidth;
+							int nextHeaderOffsetX = nextChild.getLeft() - headerWidth -
+									mRecyclerView.getLayoutManager().getLeftDecorationWidth(nextChild) -
+									mRecyclerView.getLayoutManager().getRightDecorationWidth(nextChild);
 							headerOffsetX = Math.min(nextHeaderOffsetX, 0);
 							// Early remove the elevation/shadow to match with the next view
 							if (nextHeaderOffsetX < 5) elevation = 0f;
@@ -206,7 +208,9 @@ public final class StickyHeaderHelper extends OnScrollListener {
 					} else {
 						if (nextChild.getTop() > 0) {
 							int headerHeight = mStickyHolderLayout.getMeasuredHeight();
-							int nextHeaderOffsetY = nextChild.getTop() - headerHeight;
+							int nextHeaderOffsetY = nextChild.getTop() - headerHeight -
+									mRecyclerView.getLayoutManager().getTopDecorationHeight(nextChild) -
+									mRecyclerView.getLayoutManager().getBottomDecorationHeight(nextChild);
 							headerOffsetY = Math.min(nextHeaderOffsetY, 0);
 							// Early remove the elevation/shadow to match with the next view
 							if (nextHeaderOffsetY < 5) elevation = 0f;
@@ -221,7 +225,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		// Apply translation (pushed up by another header)
 		mStickyHolderLayout.setTranslationX(headerOffsetX);
 		mStickyHolderLayout.setTranslationY(headerOffsetY);
-		//Log.v(TAG, "TranslationX=" + headerOffsetX + " TranslationY=" + headerOffsetY);
+		//Log.v("TranslationX=%s TranslationY=%s", headerOffsetX, headerOffsetY);
 	}
 
 	private void swapHeader(FlexibleViewHolder newHeader) {
@@ -245,9 +249,17 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		// Ensure the itemView is hidden to avoid double background
 		mStickyHeaderViewHolder.itemView.setVisibility(View.INVISIBLE);
 		// #139 - Copy xml params instead of Measured params
-		ViewGroup.LayoutParams params = mStickyHolderLayout.getLayoutParams();
+		ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mStickyHolderLayout.getLayoutParams();
 		params.width = view.getLayoutParams().width;
 		params.height = view.getLayoutParams().height;
+		if (params.leftMargin == 0)
+			params.leftMargin = mRecyclerView.getLayoutManager().getLeftDecorationWidth(mStickyHeaderViewHolder.itemView);
+		if (params.topMargin == 0)
+			params.topMargin = mRecyclerView.getLayoutManager().getTopDecorationHeight(mStickyHeaderViewHolder.itemView);
+		if (params.rightMargin == 0)
+			params.rightMargin = mRecyclerView.getLayoutManager().getRightDecorationWidth(mStickyHeaderViewHolder.itemView);
+		if (params.bottomMargin == 0)
+			params.bottomMargin = mRecyclerView.getLayoutManager().getBottomDecorationHeight(mStickyHeaderViewHolder.itemView);
 		removeViewFromParent(view);
 		mStickyHolderLayout.addView(view);
 		configureLayoutElevation();
