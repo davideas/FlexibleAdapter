@@ -7,7 +7,7 @@
 # FlexibleAdapter
 
 ### ANNOUNCEMENT: Important changes in latest release
-- **NEW!** Second release candidate: [v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) built on 2017.05.31
+- **NEW!** Second release candidate: [v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) built on 2017.06.09
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 - Please read [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -28,7 +28,7 @@ This library is configurable and it guides the developers to create a better use
 * **NEW!** Customizable [FastScroller](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-FastScroller) with new features.
 * Customizable scrolling animations based on adapter position and beyond.
 * Customizable animations when adding and removing items.
-* Customizable divider item decoration.
+* **NEW!** [Advanced item decoration](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Flexible-Item-Decoration) (customizable dividers, sections gap and item offsets).
 * Restore deleted items with [UndoHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-UndoHelper); Works with Expandable items too!
 * Async [Filter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text; Result list is animated; **NEW!** With optional original list; Works with sub items too!
 * [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) updates and filter on big list (far better than _DiffUtil_).
@@ -118,7 +118,7 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 
 # Change Log
 ###### Latest release
-[v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) - 2017.05.31
+[v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) - 2017.06.09
 
 ###### Old releases
 [v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) - 2017.01.14<br/>

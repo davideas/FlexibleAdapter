@@ -287,31 +287,31 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.i("Setting listener class %s as:", getClassName(listener));
 		}
 		if (listener instanceof OnItemClickListener) {
-			if (DEBUG) Log.i("- OnItemClickListener");
+			Log.i("- OnItemClickListener");
 			mItemClickListener = (OnItemClickListener) listener;
 		}
 		if (listener instanceof OnItemLongClickListener) {
-			if (DEBUG) Log.i("- OnItemLongClickListener");
+			Log.i("- OnItemLongClickListener");
 			mItemLongClickListener = (OnItemLongClickListener) listener;
 		}
 		if (listener instanceof OnItemMoveListener) {
-			if (DEBUG) Log.i("- OnItemMoveListener");
+			Log.i("- OnItemMoveListener");
 			mItemMoveListener = (OnItemMoveListener) listener;
 		}
 		if (listener instanceof OnItemSwipeListener) {
-			if (DEBUG) Log.i("- OnItemSwipeListener");
+			Log.i("- OnItemSwipeListener");
 			mItemSwipeListener = (OnItemSwipeListener) listener;
 		}
 		if (listener instanceof OnDeleteCompleteListener) {
-			if (DEBUG) Log.i("- OnDeleteCompleteListener");
+			Log.i("- OnDeleteCompleteListener");
 			mDeleteCompleteListener = (OnDeleteCompleteListener) listener;
 		}
 		if (listener instanceof OnStickyHeaderChangeListener) {
-			if (DEBUG) Log.i("- OnStickyHeaderChangeListener");
+			Log.i("- OnStickyHeaderChangeListener");
 			mStickyHeaderChangeListener = (OnStickyHeaderChangeListener) listener;
 		}
 		if (listener instanceof OnUpdateListener) {
-			if (DEBUG)  Log.i("- OnUpdateListener");
+			Log.i("- OnUpdateListener");
 			mUpdateListener = (OnUpdateListener) listener;
 			mUpdateListener.onUpdateEmptyView(getMainItemCount());
 		}
