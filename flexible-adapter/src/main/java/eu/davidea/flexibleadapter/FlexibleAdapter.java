@@ -229,13 +229,13 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Same as {@link #FlexibleAdapter(List, Object)} with possibility to set stableIds.
-	 * <p><b>Note:</b> Setting true allows the RecyclerView to rebind only items really changed
-	 * after a refresh or after swapping Adapter. This increase performance, but you loose
-	 * scrolling animations.</p>
-	 * Set {@code true} only if items implement {@code hashcode()} and have stable ids. The method
-	 * {@link #setHasStableIds(boolean)} will be called.
+	 * <p><b>Tip:</b> Setting {@code true} allows the RecyclerView to rebind only items really
+	 * changed after a refresh with {@link #notifyDataSetChanged()} or after swapping Adapter.
+	 * This increases performance.<br>
+	 * Set {@code true} only if items implement {@link Object#hashCode()} and have unique ids.
+	 * The method {@link #setHasStableIds(boolean)} will be called.</p>
 	 *
-	 * @param stableIds set {@code true} if item implements {@code hashcode()} and have stable ids.
+	 * @param stableIds set {@code true} if item implements {@code hashcode()} and have unique ids.
 	 * @see #FlexibleAdapter(List)
 	 * @see #FlexibleAdapter(List, Object)
 	 * @see #addListener(Object)
@@ -294,6 +294,14 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.i("- OnItemLongClickListener");
 			mItemLongClickListener = (OnItemLongClickListener) listener;
 		}
+//		if (listener instanceof OnItemAddListener) {
+//			Log.i("- OnItemAddListener");
+//			mItemAddListener = (OnItemAddListener) listener;
+//		}
+//		if (listener instanceof OnItemRemoveListener) {
+//			Log.i("- OnItemRemoveListener");
+//			mItemRemoveListener = (OnItemRemoveListener) listener;
+//		}
 		if (listener instanceof OnItemMoveListener) {
 			Log.i("- OnItemMoveListener");
 			mItemMoveListener = (OnItemMoveListener) listener;
@@ -517,8 +525,9 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * is not set!
 	 * <p><b>Note:</b>
 	 * <ul><li>Scrollable Headers and Footers (if existent) will be restored in this call.</li>
-	 * <li>I strongly recommend to implement {@link #hashCode()} to all adapter items along with
-	 * {@link #equals(Object)}: This Adapter is making use of HashSet to improve performance.</li>
+	 * <li>I strongly recommend to implement {@link Object#hashCode()} to all adapter items
+	 * along with {@link Object#equals(Object)}: This Adapter is making use of HashSet to
+	 * improve performance.</li>
 	 * </ul></p>
 	 * <b>Note:</b> The following methods will be also called at the end of the operation:
 	 * <ol><li>{@link #expandItemsAtStartUp()}</li>
@@ -1993,7 +2002,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * The current setting for the endless page size limit.
-	 * <p><b>Note:</b> This limit is ignored if value is 0.</p>
+	 * <p><b>Tip:</b> This limit is ignored if value is 0.</p>
 	 *
 	 * @return the page size limit, if the limit is not set, 0 is returned.
 	 * @see #getEndlessCurrentPage()
@@ -2024,7 +2033,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * The current setting for the endless target item count limit.
-	 * <p><b>Note:</b> This limit is ignored if value is 0.</p>
+	 * <p><b>Tip:</b> This limit is ignored if value is 0.</p>
 	 *
 	 * @return the target items count limit, if the limit is not set, 0 is returned.
 	 * @see #setEndlessTargetCount(int)
@@ -3290,7 +3299,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Clears the Adapter list retaining Scrollable Headers and Footers and all items of the
 	 * type provided as parameter.
-	 * <p><b>Note:</b>- This method is opposite of {@link #removeItemsOfType(Integer...)}.
+	 * <p><b>Tip:</b>- This method is opposite of {@link #removeItemsOfType(Integer...)}.
 	 *
 	 * @param viewTypes the viewTypes to retain
 	 * @see #clear()
@@ -3466,7 +3475,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Selectively removes all items of the type provided as parameter.
-	 * <p><b>Note:</b>
+	 * <p><b>Tips:</b>
 	 * <br>- This method is opposite of {@link #clearAllBut(Integer...)}.
 	 * <br>- View types of Scrollable Headers and Footers are ignored!</p>
 	 *
@@ -3720,7 +3729,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * Restore items just removed.
-	 * <p><b>Note:</b> If filter is active, only items that match that filter will be shown(restored).</p>
+	 * <p><b>Tip:</b> If filter is active, only items that match that filter will be shown(restored).</p>
 	 *
 	 * @see #setRestoreSelectionOnUndo(boolean)
 	 * @since 3.0.0
@@ -4054,7 +4063,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <ol>
 	 * <li>The Filter is <u>always</u> executed in background, asynchronously.
 	 * The method {@link #onPostFilter()} is called after the filter task is completed.</li>
-	 * <li>This method calls {@link #filterObject(IFlexible, String)}.</li>
+	 * <li>This method calls {@link #filterObject(IFlexible, String)} for each filterable item.</li>
 	 * <li>If searchText is empty or {@code null}, the provided list is the new list plus any
 	 * Scrollable Headers and Footers if existent.</li>
 	 * <li>Any pending deleted items are always deleted before filter is performed.</li>
@@ -4062,8 +4071,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * the current filter.</li>
 	 * <li>Filter is skipped while endless feature is active (loading).</li>
 	 * <li>Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit of
-	 * {@value #ANIMATE_TO_LIMIT} (default) items is set. <b>Note:</b> Above this limit,
-	 * {@link #notifyDataSetChanged()} will be called to improve performance. you can change
+	 * {@value #ANIMATE_TO_LIMIT} (default) items is set. <b>Tip:</b> Above this limit,
+	 * {@link #notifyDataSetChanged()} will be called to improve performance. You can change
 	 * this limit by calling {@link #setAnimateToLimit(int)}.</li>
 	 * </ol>
 	 *
@@ -4869,7 +4878,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	@CallSuper
 	public boolean onItemMove(int fromPosition, int toPosition) {
 		swapItems(mItems, fromPosition, toPosition);
-		//After the swap, delegate further actions to the user
+		// After the swap, delegate further actions to the user
 		if (mItemMoveListener != null) {
 			mItemMoveListener.onItemMove(fromPosition, toPosition);
 		}
@@ -5058,6 +5067,22 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.v("AdjustedSelected(%s)=%s", (diff + itemCount), getSelectedPositions());
 	}
 
+	/**
+	 * Helper method to post invalidate the item decorations after the provided delay.
+	 * <p>The delay will give time to the LayoutManagers to complete the layout of the child views.</p>
+	 * <b>Tip:</b> A delay of {@code 100ms} should be enough, anyway it can be customized.
+	 *
+	 * @param delay delay to invalidate the decorations
+	 */
+	public final void invalidateItemDecorations(@IntRange(from = 0) long delay) {
+		mRecyclerView.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (mRecyclerView != null) mRecyclerView.invalidateItemDecorations();
+			}
+		}, delay);
+	}
+
 	/*----------------*/
 	/* INSTANCE STATE */
 	/*----------------*/
@@ -5133,9 +5158,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		/**
 		 * Called at startup and every time a main item is inserted, removed or filtered.
 		 * <p><b>Note:</b> Having any Scrollable Headers/Footers visible, the {@code size}
-		 * will represents only the main items.</p>
+		 * will represents only the <b>main</b> items.</p>
 		 *
-		 * @param size the current number of main items in the adapter, result of
+		 * @param size the current number of <b>main</b> items in the adapter, result of
 		 *             {@link FlexibleAdapter#getMainItemCount()}
 		 * @since 5.0.0-b1
 		 */
@@ -5149,7 +5174,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		/**
 		 * Called when UndoTime out is over or when Filter is started or reset in order
 		 * to commit deletion in the user Database.
-		 * <p>Must be called on user Main Thread!</p>
+		 * <p><b>Note:</b> Must be called on user Main Thread!</p>
 		 *
 		 * @since 5.0.0-b1
 		 */
@@ -5230,7 +5255,9 @@ public class FlexibleAdapter<T extends IFlexible>
 		 * Called when an item has been dragged far enough to trigger a move. <b>This is called
 		 * every time an item is shifted</b>, and <strong>not</strong> at the end of a "drop" event.
 		 * <p>The end of the "drop" event is instead handled by
-		 * {@link FlexibleViewHolder#onItemReleased(int)}</p>.
+		 * {@link FlexibleViewHolder#onItemReleased(int)}.</p>
+		 * <b>Tip:</b> Here, you should call {@link #invalidateItemDecorations(long)} to recalculate
+		 * item offset if any item decoration has been set.
 		 *
 		 * @param fromPosition the start position of the moved item
 		 * @param toPosition   the resolved position of the moved item
