@@ -20,6 +20,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.MotionEvent;
 import android.view.View;
@@ -172,6 +173,17 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	/*--------------*/
 	/* MAIN METHODS */
 	/*--------------*/
+
+	/**
+	 * Support for StaggeredGridLayoutManager.
+	 *
+	 * @param enabled true to enable full span size, false to disable
+	 */
+	public void setFullSpan(boolean enabled) {
+		if (itemView.getLayoutParams() instanceof StaggeredGridLayoutManager.LayoutParams) {
+			((StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams()).setFullSpan(enabled);
+		}
+	}
 
 	/**
 	 * Sets the inner view which will be used to drag this itemView.
