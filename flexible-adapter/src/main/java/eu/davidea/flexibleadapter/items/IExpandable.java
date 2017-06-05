@@ -31,7 +31,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * @see IHolder
  * @see ISectionable
  * @since 17/01/2016 Created
- * <br/>18/06/2016 Changed signature with ExpandableViewHolder
+ * <br>18/06/2016 Changed signature with ExpandableViewHolder
  */
 public interface IExpandable<VH extends ExpandableViewHolder, S extends IFlexible>
 		extends IFlexible<VH> {

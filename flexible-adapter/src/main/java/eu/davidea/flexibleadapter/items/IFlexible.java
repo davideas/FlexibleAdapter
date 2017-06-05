@@ -15,6 +15,7 @@
  */
 package eu.davidea.flexibleadapter.items;
 
+import android.support.annotation.IntRange;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -34,8 +35,9 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @see IHolder
  * @see ISectionable
  * @since 19/01/2016 Created
- * <br/>12/05/2017 Simplified createViewHolder params
- */
+ * <br>28/03/2017 Individual item's span size AND shouldNotifyChange
+ * <br>12/05/2017 Simplified createViewHolder params
+  */
 public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 
 	/*---------------*/
@@ -72,12 +74,20 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	void setHidden(boolean hidden);
 
 	/**
-	 * Individual item's span size.
+	 * Individual item's span size to use only with {@code GridLayoutManager}.
+	 * <p><b>Note:</b>
+	 * <ul>
+	 * <li>Default implementation in {@link AbstractFlexibleItem} already returns 1.</li>
+	 * <li>Not used when {@code StaggeredGridLayoutManager} is set. With such layout use
+	 * {@link eu.davidea.viewholders.FlexibleViewHolder#setFullSpan(boolean)}.</li>
+	 * </ul></p>
 	 *
 	 * @param spanCount current column count
 	 * @param position  the adapter position of the item
 	 * @return the number of span occupied by the item at position.
+	 * @since 5.0.0-rc2
 	 */
+	@IntRange(from = 1)
 	int getSpanSize(int spanCount, int position);
 
 	/**
@@ -85,8 +95,8 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	 * again with new content.
 	 * <p>You should return {@code true} whether you want this item will be updated because
 	 * its visual representations will change.</p>
-	 * This method won't be called if {@link FlexibleAdapter#setNotifyChangeOfUnfilteredItems(boolean)}
-	 * is disabled.
+	 * <b>Note: </b>This method won't be called if
+	 * {@link FlexibleAdapter#setNotifyChangeOfUnfilteredItems(boolean)} is disabled.
 	 * <p>Default value is {@code true}.</p>
 	 *
 	 * @param newItem The new item object with the new content
@@ -101,7 +111,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	/*--------------------*/
 
 	/**
-	 * Returns if the item can be selected.<br/>
+	 * Checks if the item can be selected.
 	 *
 	 * @return (default) true for a Selectable item, false otherwise
 	 */
@@ -132,8 +142,8 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 
 	/**
 	 * Returns the layout resource ID to AutoMap a specific ViewType on this Item.
-	 * <p><b>NOTE:</b> Should identify a resource Layout reference {@link android.R.layout} used
-	 * by FlexibleAdapter to auto-map the ViewTypes.</p>
+	 * <p><b>NOTE:</b> Should identify a resource Layout reference {@link android.R.layout}
+	 * used by FlexibleAdapter to auto-map the ViewTypes.</p>
 	 * <b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
 	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
 	 * on GitHub.

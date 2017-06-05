@@ -27,7 +27,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @param <VH> {@link FlexibleViewHolder}
  * @author Davide Steduto
  * @since 17/01/2016 Created
- * <br/>18/06/2016 Changed signature with FlexibleViewHolder
+ * <br>18/06/2016 Changed signature with FlexibleViewHolder
  */
 public abstract class AbstractHeaderItem<VH extends FlexibleViewHolder>
 		extends AbstractFlexibleItem<VH>

@@ -29,7 +29,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * @param <S>  The sub item of type {@link IFlexible}
  * @author Davide Steduto
  * @since 17/01/2016 Created
- * <br/>18/06/2016 Changed signature with ExpandableViewHolder
+ * <br>18/06/2016 Changed signature with ExpandableViewHolder
  */
 public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S extends IFlexible>
 		extends AbstractFlexibleItem<VH>

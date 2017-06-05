@@ -29,7 +29,7 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * @param <S>  The sub item of type {@link ISectionable}
  * @author Davide Steduto
  * @since 01/04/2016 Created
- * <br/>18/06/2016 Changed signature with ExpandableViewHolder
+ * <br>18/06/2016 Changed signature with ExpandableViewHolder
  */
 public abstract class AbstractExpandableHeaderItem<VH extends ExpandableViewHolder, S extends ISectionable>
 		extends AbstractExpandableItem<VH, S>

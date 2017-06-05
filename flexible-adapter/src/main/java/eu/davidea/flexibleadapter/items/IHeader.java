@@ -27,7 +27,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @see IHolder
  * @see ISectionable
  * @since 15/02/2016 Created
- * <br/>18/06/2016 Changed signature with FlexibleViewHolder
+ * <br>18/06/2016 Changed signature with FlexibleViewHolder
  */
 public interface IHeader<VH extends FlexibleViewHolder> extends IFlexible<VH> {
 
