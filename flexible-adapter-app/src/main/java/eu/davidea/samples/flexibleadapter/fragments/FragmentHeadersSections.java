@@ -95,14 +95,10 @@ public class FragmentHeadersSections extends AbstractFragment
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
-				.addItemViewType(R.layout.recycler_header_item, 8, 100)
+				//.addItemViewType(R.layout.recycler_header_item, 8, 100)
 				.addItemViewType(R.layout.recycler_simple_item, 8, 0)
 				.withSectionGapOffset(24)
-				.withEdge(true)
-				.withLeftEdge(true)
-				.withTopEdge(true)
-				.withRightEdge(true)
-				.withBottomEdge(true));
+				.withEdge(true));
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
@@ -115,11 +111,11 @@ public class FragmentHeadersSections extends AbstractFragment
 				.setUnlinkAllItemsOnRemoveHeaders(true)
 				// Show Headers at startUp, 1st call, correctly executed, no warning log message!
 				.setDisplayHeadersAtStartUp(true)
-				.setStickyHeaders(true)
+				.setStickyHeaders(true);
 				// Simulate developer 2nd call mistake, now it's safe, not executed, no warning log message!
-				.setDisplayHeadersAtStartUp(true)
+				//.setDisplayHeadersAtStartUp(true)
 				// Simulate developer 3rd call mistake, still safe, not executed, warning log message displayed!
-				.showAllHeaders();
+				//.showAllHeaders();
 
 		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
