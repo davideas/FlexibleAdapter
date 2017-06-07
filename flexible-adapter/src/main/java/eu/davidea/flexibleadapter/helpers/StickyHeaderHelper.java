@@ -248,10 +248,18 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		mStickyHeaderViewHolder.itemView.getLayoutParams().height = view.getMeasuredHeight();
 		// Ensure the itemView is hidden to avoid double background
 		mStickyHeaderViewHolder.itemView.setVisibility(View.INVISIBLE);
+		applyLayoutParamsAndMargins(view);
+		removeViewFromParent(view);
+		mStickyHolderLayout.addView(view);
+		configureLayoutElevation();
+	}
+
+	private void applyLayoutParamsAndMargins(View view) {
 		// #139 - Copy xml params instead of Measured params
 		ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mStickyHolderLayout.getLayoutParams();
 		params.width = view.getLayoutParams().width;
 		params.height = view.getLayoutParams().height;
+		// Margins from current offset
 		if (params.leftMargin == 0)
 			params.leftMargin = mRecyclerView.getLayoutManager().getLeftDecorationWidth(mStickyHeaderViewHolder.itemView);
 		if (params.topMargin == 0)
@@ -260,9 +268,6 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			params.rightMargin = mRecyclerView.getLayoutManager().getRightDecorationWidth(mStickyHeaderViewHolder.itemView);
 		if (params.bottomMargin == 0)
 			params.bottomMargin = mRecyclerView.getLayoutManager().getBottomDecorationHeight(mStickyHeaderViewHolder.itemView);
-		removeViewFromParent(view);
-		mStickyHolderLayout.addView(view);
-		configureLayoutElevation();
 	}
 
 	/**

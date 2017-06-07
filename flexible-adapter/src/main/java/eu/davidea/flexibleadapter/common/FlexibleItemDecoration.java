@@ -216,7 +216,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 		}
 
 		final int itemCount = parent.getChildCount();
-		for (int i = 0; i < itemCount; i++) {
+		for (int i = 0; i < itemCount - 1; i++) {
 			final View child = parent.getChildAt(i);
 			parent.getDecoratedBoundsWithMargins(child, mBounds);
 			final int bottom = mBounds.bottom + Math.round(ViewCompat.getTranslationY(child));
@@ -243,7 +243,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 		}
 
 		final int itemCount = parent.getChildCount();
-		for (int i = 0; i < itemCount; i++) {
+		for (int i = 0; i < itemCount - 1; i++) {
 			final View child = parent.getChildAt(i);
 			parent.getLayoutManager().getDecoratedBoundsWithMargins(child, mBounds);
 			final int right = mBounds.right + Math.round(ViewCompat.getTranslationX(child));

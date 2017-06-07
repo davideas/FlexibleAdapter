@@ -24,6 +24,7 @@ import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.dialogs.OnParameterSelectedListener;
 import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
+import eu.davidea.samples.flexibleadapter.items.HeaderItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -97,7 +98,11 @@ public class FragmentHeadersSections extends AbstractFragment
 				.addItemViewType(R.layout.recycler_header_item, 8, 100)
 				.addItemViewType(R.layout.recycler_simple_item, 8, 0)
 				.withSectionGapOffset(24)
-				.withEdge(true));
+				.withEdge(true)
+				.withLeftEdge(true)
+				.withTopEdge(true)
+				.withRightEdge(true)
+				.withBottomEdge(true));
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
@@ -131,13 +136,12 @@ public class FragmentHeadersSections extends AbstractFragment
 	int count = 1;
 	@Override
 	public void performFabAction() {
-		mAdapter.clear();
-//		int position = mAdapter.getStickyPosition();
-//		if (position > 0) {
-//			HeaderItem header = (HeaderItem) mAdapter.getItem(position);
-//			header.setTitle("New sticky title " + count++);
-//			mAdapter.updateItem(header);
-//		}
+		int position = mAdapter.getStickyPosition();
+		if (position > 0) {
+			HeaderItem header = (HeaderItem) mAdapter.getItem(position);
+			header.setTitle("New sticky title " + count++);
+			mAdapter.updateItem(header);
+		}
 //		BottomSheetDialog bottomSheetDialogFragment = BottomSheetDialog.newInstance(R.layout.bottom_sheet_headers_sections, this);
 //		bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), BottomSheetDialog.TAG);
 	}

@@ -84,8 +84,8 @@ public class FragmentExpandableSections extends AbstractFragment {
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		// Custom divider item decorator
-		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity(),
-				R.drawable.divider, 0)); //Increase to add gap between sections (Works only with LinearLayout!)
+		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
+				.withDivider(R.drawable.divider));
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);

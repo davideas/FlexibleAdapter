@@ -21,7 +21,6 @@ import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.samples.flexibleadapter.services.DatabaseType;
-import eu.davidea.utils.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -118,9 +117,8 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		mRecyclerView.setAdapter(mAdapter);
 		//Custom divider item decorator with Offset
 		if (mDivider == null) {
-			mDivider = new FlexibleItemDecoration(getActivity(), R.drawable.divider_large)
-					.withEdge(true)
-					.withOffset(Utils.dpToPx(getActivity(), 8f));
+			mDivider = new FlexibleItemDecoration(getActivity())
+					.withDivider(R.drawable.divider_large);
 		}
 
 		//Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!

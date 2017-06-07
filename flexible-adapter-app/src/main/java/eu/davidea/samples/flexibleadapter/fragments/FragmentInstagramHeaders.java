@@ -83,7 +83,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		// Custom divider item decorator with 24dpi as empty space between sections
-		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity(), 0, 24));
+		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity()).withDefaultDivider());
 
 		mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
 				.setStickyHeaders(true) //Make headers sticky

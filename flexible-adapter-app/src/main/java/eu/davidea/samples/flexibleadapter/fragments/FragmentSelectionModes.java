@@ -88,8 +88,9 @@ public class FragmentSelectionModes extends AbstractFragment {
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		// Divider item decorator with DrawOver enabled
-		mRecyclerView.addItemDecoration(
-				new FlexibleItemDecoration(getActivity(), R.drawable.divider).withDrawOver(true));
+		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
+				.withDivider(R.drawable.divider)
+				.withDrawOver(true));
 		mRecyclerView.postDelayed(new Runnable() {
 			@Override
 			public void run() {
