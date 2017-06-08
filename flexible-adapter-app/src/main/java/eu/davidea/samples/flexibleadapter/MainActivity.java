@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements
 	 * INITIALIZATION METHODS
 	 * ====================== */
 
-	private void initializeActionModeHelper(int mode) {
+	private void initializeActionModeHelper(@Mode int mode) {
 		mActionModeHelper = new ActionModeHelper(mAdapter, mFragment.getContextMenuResId(), this) {
 			@Override
 			public void updateContextTitle(int count) {
@@ -831,19 +831,20 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onUpdateEmptyView(int size) {
 		Log.d("onUpdateEmptyView size=%s", size);
+		//TODO: Test with mAdapter.getFastScroller();
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
 		View emptyView = findViewById(R.id.empty_view);
 		TextView emptyText = (TextView) findViewById(R.id.empty_text);
 		if (emptyText != null)
 			emptyText.setText(getString(R.string.no_items));
 		if (size > 0) {
-			fastScroller.setVisibility(View.VISIBLE);
+			fastScroller.showScrollbar();
 			mRefreshHandler.removeMessages(2);
 			emptyView.setAlpha(0);
 		} else {
 			emptyView.setAlpha(0);
 			mRefreshHandler.sendEmptyMessage(2);
-			fastScroller.setVisibility(View.GONE);
+			fastScroller.hideScrollbar();
 		}
 		if (mAdapter != null && !mAdapter.isRestoreInTime() &&
 				DatabaseService.getInstance().getDatabaseType() != DatabaseType.DATA_BINDING) {

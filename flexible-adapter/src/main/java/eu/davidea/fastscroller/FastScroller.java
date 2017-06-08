@@ -162,6 +162,7 @@ public class FastScroller extends FrameLayout {
 	 */
 	public void setRecyclerView(final RecyclerView recyclerView) {
 		this.recyclerView = recyclerView;
+		if (onScrollListener != null) this.recyclerView.removeOnScrollListener(onScrollListener);
 		this.recyclerView.addOnScrollListener(onScrollListener);
 		this.recyclerView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
 			@Override
