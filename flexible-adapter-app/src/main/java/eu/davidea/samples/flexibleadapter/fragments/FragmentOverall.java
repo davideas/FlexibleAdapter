@@ -17,6 +17,8 @@ import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.samples.flexibleadapter.OverallAdapter;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.dialogs.BottomSheetDecorationDialog;
+import eu.davidea.samples.flexibleadapter.dialogs.OnDecorationSelectedListener;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
@@ -25,7 +27,8 @@ import eu.davidea.samples.flexibleadapter.services.DatabaseService;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class FragmentOverall extends AbstractFragment {
+public class FragmentOverall extends AbstractFragment
+		implements OnDecorationSelectedListener {
 
 	public static final String TAG = FragmentOverall.class.getSimpleName();
 
@@ -34,6 +37,7 @@ public class FragmentOverall extends AbstractFragment {
 	 */
 	private OverallAdapter mAdapter;
 	private ScrollableUseCaseItem scrollableUseCaseItem;
+	private FlexibleItemDecoration mItemDecoration;
 
 
 	public static FragmentOverall newInstance(int columnCount) {
@@ -79,9 +83,11 @@ public class FragmentOverall extends AbstractFragment {
 		mRecyclerView.setLayoutManager(createNewStaggeredGridLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
+		mItemDecoration = new FlexibleItemDecoration(getActivity())
 				.addItemViewType(R.layout.recycler_overall_item, 8, 8)
-				.withEdge(true));
+				.withOffset(8)
+				.withEdge(true);
+		mRecyclerView.addItemDecoration(mItemDecoration);
 
 		// After Adapter is attached to RecyclerView
 		mAdapter.setLongPressDragEnabled(true);
@@ -161,9 +167,23 @@ public class FragmentOverall extends AbstractFragment {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.action_list_type)
+		if (item.getItemId() == R.id.action_list_type) {
 			mAdapter.setAnimationOnScrolling(true);
+		} else if (item.getItemId() == R.id.action_decoration) {
+			BottomSheetDecorationDialog bottomSheetDialogFragment = BottomSheetDecorationDialog.newInstance(R.layout.bottom_sheet_item_decoration, this);
+			bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), BottomSheetDecorationDialog.TAG);
+		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onDecorationSelected() {
+		mAdapter.invalidateItemDecorations(200l);
+	}
+
+	@Override
+	public FlexibleItemDecoration getItemDecoration() {
+		return mItemDecoration;
 	}
 
 }

@@ -8,6 +8,7 @@
 	<string name="action_archived">Archived</string>
 	<string name="action_merge">Merge</string>
 	<string name="action_split">Split</string>
+	<string name="action_decoration">Item Decoration</string>
 
 	<!-- Actions -->
 	<string name="action_reset">Reset</string>

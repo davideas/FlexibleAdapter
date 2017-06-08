@@ -23,10 +23,10 @@ import eu.davidea.samples.flexibleadapter.R;
  * @since 20/04/2016
  */
 @SuppressWarnings({"ConstantConditions", "unchecked"})
-public class BottomSheetDialog extends android.support.design.widget.BottomSheetDialogFragment
+public class BottomSheetSectionDialog extends android.support.design.widget.BottomSheetDialogFragment
 		implements View.OnClickListener, AdapterView.OnItemClickListener {
 
-	public static final String TAG = BottomSheetDialog.class.getSimpleName();
+	public static final String TAG = BottomSheetSectionDialog.class.getSimpleName();
 	public static final String ARG_LAYOUT = "layout";
 
 	private android.support.design.widget.BottomSheetDialog mBottomSheetDialog;
@@ -36,16 +36,16 @@ public class BottomSheetDialog extends android.support.design.widget.BottomSheet
 	private ListPopupWindow mPopupReference;
 	private int mItemType = 0, mReferencePosition = -1, mChildPosition = 0;
 
-	public BottomSheetDialog() {
+	public BottomSheetSectionDialog() {
 	}
 
 	/**
 	 * Use from Activities.
 	 *
 	 * @param layoutResId custom layout to use for the bottom sheet
-	 * @return a new instance of BottomSheetDialog
+	 * @return a new instance of BottomSheetSectionDialog
 	 */
-	public static BottomSheetDialog newInstance(@LayoutRes int layoutResId) {
+	public static BottomSheetSectionDialog newInstance(@LayoutRes int layoutResId) {
 		return newInstance(layoutResId, null);
 	}
 
@@ -54,10 +54,10 @@ public class BottomSheetDialog extends android.support.design.widget.BottomSheet
 	 *
 	 * @param layoutResId custom layout to use for the bottom sheet
 	 * @param fragment    target fragment
-	 * @return a new instance of BottomSheetDialog
+	 * @return a new instance of BottomSheetSectionDialog
 	 */
-	public static BottomSheetDialog newInstance(@LayoutRes int layoutResId, @Nullable Fragment fragment) {
-		BottomSheetDialog bottomSheetFragment = new BottomSheetDialog();
+	public static BottomSheetSectionDialog newInstance(@LayoutRes int layoutResId, @Nullable Fragment fragment) {
+		BottomSheetSectionDialog bottomSheetFragment = new BottomSheetSectionDialog();
 		Bundle args = new Bundle();
 		args.putInt(ARG_LAYOUT, layoutResId);
 		bottomSheetFragment.setArguments(args);

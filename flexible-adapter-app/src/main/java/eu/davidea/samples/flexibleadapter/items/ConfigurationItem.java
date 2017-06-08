@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
+import eu.davidea.common.SimpleSeekBarChangeListener;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
@@ -148,22 +149,12 @@ public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.Vi
 				holder.mSeekBar.setMax(getMaxValue());
 				holder.mSeekBar.setProgress(getValue());
 				holder.mSeekBar.setKeyProgressIncrement(getStepValue());
-				holder.mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+				holder.mSeekBar.setOnSeekBarChangeListener(new SimpleSeekBarChangeListener(){
 					@Override
 					public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-						progress /= getStepValue();
-						progress *= getStepValue();
 						withValue(progress);
 						holder.mTitle.setText(Utils.fromHtmlCompat(getTitle() + " " + progress));
 						DatabaseConfiguration.setConfiguration(getId(), progress);
-					}
-					@Override
-					public void onStartTrackingTouch(SeekBar seekBar) {
-
-					}
-					@Override
-					public void onStopTrackingTouch(SeekBar seekBar) {
-
 					}
 				});
 				break;

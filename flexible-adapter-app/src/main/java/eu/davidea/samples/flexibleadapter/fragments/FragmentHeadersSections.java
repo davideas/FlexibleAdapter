@@ -138,8 +138,8 @@ public class FragmentHeadersSections extends AbstractFragment
 			header.setTitle("New sticky title " + count++);
 			mAdapter.updateItem(header);
 		}
-//		BottomSheetDialog bottomSheetDialogFragment = BottomSheetDialog.newInstance(R.layout.bottom_sheet_headers_sections, this);
-//		bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), BottomSheetDialog.TAG);
+//		BottomSheetSectionDialog bottomSheetDialogFragment = BottomSheetSectionDialog.newInstance(R.layout.bottom_sheet_headers_sections, this);
+//		bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), BottomSheetSectionDialog.TAG);
 	}
 
 	@Override

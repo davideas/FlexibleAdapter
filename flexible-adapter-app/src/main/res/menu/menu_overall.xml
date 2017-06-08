@@ -8,4 +8,9 @@
 	      android:icon="@drawable/ic_view_grid_white_24dp"
 	      app:showAsAction="always"/>
 
+	<item android:id="@+id/action_decoration"
+	      android:title="@string/action_decoration"
+	      android:icon="@drawable/ic_border_outer_white_24dp"
+	      app:showAsAction="always"/>
+
 </menu>

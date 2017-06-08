@@ -68,12 +68,13 @@ import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 
 	private Context context;
-	private Drawable mDivider;
 	private final Rect mBounds = new Rect();
-	private int mOffset, mSectionOffset;
-	private boolean mDrawOver, withLeftEdge, withTopEdge, withRightEdge, withBottomEdge;
 	private final ItemDecoration mDefaultDecoration = new ItemDecoration();
 	private SparseArray<ItemDecoration> mDecorations; // viewType -> itemDeco
+
+	public Drawable mDivider;
+	public int mOffset, mSectionOffset;
+	public boolean mDrawOver, withLeftEdge, withTopEdge, withRightEdge, withBottomEdge;
 
 	private static final int[] ATTRS = new int[]{
 			android.R.attr.listDivider
@@ -361,6 +362,15 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	}
 
 	/**
+	 * Returns the current general offset in dpi.
+	 *
+	 * @return the offset previously set in dpi
+	 */
+	public int getOffset() {
+		return (int) (mOffset / context.getResources().getDisplayMetrics().density);
+	}
+
+	/**
 	 * Applies the physical offset between items, of the same size of the divider previously set.
 	 *
 	 * @param withOffset true to leave space between items, false divider will be drawn overlapping
@@ -433,7 +443,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	}
 
 	/**
-	 * @since 5.0.0-b4
+	 * @since 5.0.0-rc2
 	 */
 	@Override
 	public void getItemOffsets(Rect outRect, View view, RecyclerView recyclerView, RecyclerView.State state) {
