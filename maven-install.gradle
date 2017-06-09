@@ -7,8 +7,8 @@ if (gradle.getStartParameter().getTaskNames().contains("install")) {
 group = publishedGroupId // Maven Group ID for the artifact
 
 task sourcesJar(type: Jar) {
-	from android.sourceSets.main.java.srcDirs
 	classifier = 'sources'
+	from android.sourceSets.main.java.srcDirs
 }
 
 task javadoc(type: Javadoc) {
@@ -22,8 +22,8 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 artifacts {
-	archives javadocJar
 	archives sourcesJar
+	archives javadocJar
 }
 
 install {

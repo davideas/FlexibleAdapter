@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
 	// Library Settings
 	libraryDescription = "1 Adapter for SelectionMode, ViewHolders, AsyncFilter, FastScroller, Animations, Undo, Sections, Sticky Headers, Scrollable Headers and Footers, EndlessScroll, Expandable, Draggable, Swipeable :-)"
-	libraryLabels = ['android', 'recyclerview', 'list', 'adapter', 'selection', 'actionmode', 'undo', 'viewholder', 'ripple', 'search', 'filter', 'filtering', 'async', 'asynchronous', 'item', 'item animator', 'itemanimator', 'animator' ,'animation', 'expand', 'expandable', 'collapse', 'collapsible', 'section', 'sections', 'sticky', 'header', 'headers', 'category', 'footer', 'footers', 'drag', 'draggable', 'swipe', 'swipeable', 'leave behind', 'fastscroll', 'fastscroller', 'endless', 'endless scroll', 'load more']
+	libraryLabels = ['android', 'recyclerview', 'list', 'adapter', 'selection', 'multi-select', 'actionmode', 'undo', 'viewholder', 'ripple', 'search', 'filter', 'filtering', 'async', 'asynchronous', 'item', 'item animator', 'itemanimator', 'animator', 'animation', 'expand', 'expandable', 'collapse', 'collapsible', 'section', 'sections', 'sticky', 'header', 'headers', 'category', 'footer', 'footers', 'drag', 'draggable', 'swipe', 'swipeable', 'leave behind', 'fastscroll', 'fastscroller', 'endless', 'endless scroll', 'load more']
 
 	publishedGroupId = "eu.davidea"
 	bintrayName = "flexible-adapter"
@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-	compile supportDependencies.recyclerview
+	provided supportDependencies.recyclerview
 	compile supportDependencies.design
 }
 

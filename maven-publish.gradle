@@ -108,34 +108,34 @@ afterEvaluate { project ->
 		sign configurations.archives
 	}
 
-	android.libraryVariants.all { variant ->
-		def javadocTask = task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
-			description "Generates Javadoc for $variant.name."
-			source = variant.javaCompile.source
-			ext.androidJar = project.files(android.getBootClasspath().join(File.pathSeparator))
-			classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-			exclude '**/BuildConfig.java'
-			exclude '**/R.java'
-		}
-
-		javadocTask.dependsOn variant.javaCompile
-
-		def jarJavadocTask = task("jar${variant.name.capitalize()}Javadoc", type: Jar) {
-			description "Generate Javadoc Jar for $variant.name"
-			classifier = 'javadoc'
-			from javadocTask.destinationDir
-		}
-
-		jarJavadocTask.dependsOn javadocTask
-		artifacts.add('archives', jarJavadocTask)
-
-		def jarSourceTask = task("jar${variant.name.capitalize()}Sources", type: Jar) {
-			description "Generates Java Sources for $variant.name."
-			classifier = 'sources'
-			from variant.javaCompile.source
-		}
-
-		jarSourceTask.dependsOn variant.javaCompile
-		artifacts.add('archives', jarSourceTask)
-	}
+//	android.libraryVariants.all { variant ->
+//		def javadocTask = task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
+//			description "Generates Javadoc for $variant.name."
+//			source = variant.javaCompile.source
+//			ext.androidJar = project.files(android.getBootClasspath().join(File.pathSeparator))
+//			classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+//			exclude '**/BuildConfig.java'
+//			exclude '**/R.java'
+//		}
+//
+//		javadocTask.dependsOn variant.javaCompile
+//
+//		def jarJavadocTask = task("jar${variant.name.capitalize()}Javadoc", type: Jar) {
+//			description "Generate Javadoc Jar for $variant.name"
+//			classifier = 'javadoc'
+//			from javadocTask.destinationDir
+//		}
+//
+//		jarJavadocTask.dependsOn javadocTask
+//		artifacts.add('archives', jarJavadocTask)
+//
+//		def jarSourceTask = task("jar${variant.name.capitalize()}Sources", type: Jar) {
+//			description "Generates Java Sources for $variant.name."
+//			classifier = 'sources'
+//			from variant.javaCompile.source
+//		}
+//
+//		jarSourceTask.dependsOn variant.javaCompile
+//		artifacts.add('archives', jarSourceTask)
+//	}
 }

@@ -23,7 +23,7 @@ android {
 	}
 	buildTypes {
 		debug {
-			versionNameSuffix ' build'
+			versionNameSuffix ' build #' + libraryCode
 			minifyEnabled false
 		}
 		release {
