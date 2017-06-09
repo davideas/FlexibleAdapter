@@ -84,7 +84,7 @@ public class FragmentOverall extends AbstractFragment
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		mItemDecoration = new FlexibleItemDecoration(getActivity())
-				.addItemViewType(R.layout.recycler_overall_item, 8, 8)
+				.addItemViewType(R.layout.recycler_overall_item, 8)
 				.withOffset(8)
 				.withEdge(true);
 		mRecyclerView.addItemDecoration(mItemDecoration);

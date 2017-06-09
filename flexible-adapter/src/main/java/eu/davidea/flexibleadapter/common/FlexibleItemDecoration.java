@@ -156,7 +156,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	 * <p>- When {@code false}, any content will be drawn before the item views are drawn, and will
 	 * thus appear <i>underneath</i> the views.
 	 * <br>- When {@code true}, any content will be drawn after the item views are drawn, and will
-	 * thus  appear <i>over</i> the views.</p>
+	 * thus appear <i>over</i> the views.</p>
 	 * Default value is false (drawn underneath).
 	 *
 	 * @param drawOver true to draw after the item has been added, false to draw underneath the item
@@ -289,7 +289,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	 * @param withEdge true to enable, false otherwise
 	 * @return this FlexibleItemDecoration instance so the call can be chained
 	 * @see #withOffset(int)
-	 * @see #addItemViewType(int, int, int)
+	 * @see #addItemViewType(int, int)
 	 * @since 5.0.0-rc2
 	 */
 	public FlexibleItemDecoration withEdge(boolean withEdge) {
@@ -305,7 +305,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	 * @param withLeftEdge true to add offset to the items at the Left of the first column.
 	 * @return this FlexibleItemDecoration instance so the call can be chained
 	 * @see #withOffset(int)
-	 * @see #addItemViewType(int, int, int)
+	 * @see #addItemViewType(int, int)
 	 * @since 5.0.0-rc2
 	 */
 	public FlexibleItemDecoration withLeftEdge(boolean withLeftEdge) {
@@ -321,7 +321,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	 * @param withTopEdge true to add offset to the items at the Top of the first row.
 	 * @return this FlexibleItemDecoration instance so the call can be chained
 	 * @see #withOffset(int)
-	 * @see #addItemViewType(int, int, int)
+	 * @see #addItemViewType(int, int)
 	 * @since 5.0.0-rc2
 	 */
 	public FlexibleItemDecoration withTopEdge(boolean withTopEdge) {
@@ -337,7 +337,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	 * @param withBottomEdge true to add offset to the items at the Bottom of the last row.
 	 * @return this FlexibleItemDecoration instance so the call can be chained
 	 * @see #withOffset(int)
-	 * @see #addItemViewType(int, int, int)
+	 * @see #addItemViewType(int, int)
 	 * @since 5.0.0-rc2
 	 */
 	public FlexibleItemDecoration withBottomEdge(boolean withBottomEdge) {
@@ -353,7 +353,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	 * @param withRightEdge true to add offset to the items at the Right of the last column.
 	 * @return this FlexibleItemDecoration instance so the call can be chained
 	 * @see #withOffset(int)
-	 * @see #addItemViewType(int, int, int)
+	 * @see #addItemViewType(int, int)
 	 * @since 5.0.0-rc2
 	 */
 	public FlexibleItemDecoration withRightEdge(boolean withRightEdge) {
@@ -397,36 +397,56 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	}
 
 	/**
-	 * Applies the general offset only to the specified viewType.
+	 * Applies the general offset also to the specified viewType.
 	 * <p>Call {@link #withOffset(int)} to set a general offset.</p>
 	 *
-	 * @param viewType        the viewType affected
+	 * @param viewType the viewType affected
+	 * @return this FlexibleItemDecoration instance so the call can be chained
+	 * @see #withOffset(int)
+	 * @see #addItemViewType(int, int)
+	 * @see #removeItemViewType(int)
+	 * @since 5.0.0-rc2
+	 */
+	public FlexibleItemDecoration addItemViewType(@LayoutRes int viewType) {
+		return addItemViewType(viewType, -1);
+	}
+
+	/**
+	 * As {@link #addItemViewType(int)} but with custom offset equals to all sides that will
+	 * affect only this viewType.
+	 *
+	 * @param viewType the viewType affected
 	 * @return this FlexibleItemDecoration instance so the call can be chained
 	 * @see #withOffset(int)
 	 * @see #removeItemViewType(int)
 	 * @since 5.0.0-rc2
 	 */
-	public FlexibleItemDecoration addItemViewType(@LayoutRes int viewType) {
-		return addItemViewType(viewType, -1, -1);
+	public FlexibleItemDecoration addItemViewType(@LayoutRes int viewType, int offset) {
+		return addItemViewType(viewType, offset, offset, offset, offset);
 	}
 
 	/**
 	 * As {@link #addItemViewType(int)} but with custom offset that will affect only this viewType.
 	 *
-	 * @param viewType        the viewType affected
-	 * @param horizontalSpace the offset to the top and bottom of the item
-	 * @param verticalSpace   the offset to the left and right of the item
+	 * @param viewType the viewType affected
+	 * @param left     the offset to the left of the item
+	 * @param top      the offset to the top of the item
+	 * @param right    the offset to the right of the item
+	 * @param bottom   the offset to the bottom of the item
 	 * @return this FlexibleItemDecoration instance so the call can be chained
+	 * @see #addItemViewType(int, int)
 	 * @see #removeItemViewType(int)
 	 * @since 5.0.0-rc2
 	 */
-	public FlexibleItemDecoration addItemViewType(@LayoutRes int viewType, int horizontalSpace, int verticalSpace) {
+	public FlexibleItemDecoration addItemViewType(@LayoutRes int viewType, int left, int top, int right, int bottom) {
 		if (mDecorations == null) {
 			mDecorations = new SparseArray<>();
 		}
-		horizontalSpace = (int) (context.getResources().getDisplayMetrics().density * horizontalSpace);
-		verticalSpace = (int) (context.getResources().getDisplayMetrics().density * verticalSpace);
-		mDecorations.put(viewType, new ItemDecoration(horizontalSpace, verticalSpace));
+		left = (int) (context.getResources().getDisplayMetrics().density * left);
+		top = (int) (context.getResources().getDisplayMetrics().density * top);
+		right = (int) (context.getResources().getDisplayMetrics().density * right);
+		bottom = (int) (context.getResources().getDisplayMetrics().density * bottom);
+		mDecorations.put(viewType, new ItemDecoration(left, top, right, bottom));
 		return this;
 	}
 
@@ -458,11 +478,11 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 		ItemDecoration deco = getItemDecoration(itemType);
 
 		// Check early return conditions
-		if (mSectionOffset == 0 && mOffset <= 0 && !deco.hasSpace()) {
+		if (mSectionOffset == 0 && mOffset <= 0 && !deco.hasOffset()) {
 			return;
-		} else if (!deco.hasSpace()) {
-			deco.horizontalSpace = mOffset;
-			deco.verticalSpace = mOffset;
+		} else if (!deco.hasOffset()) {
+			// No offset set, applies the general offset to this item decoration
+			deco = new ItemDecoration(mOffset);
 		}
 
 		// Default values (LinearLayout)
@@ -491,46 +511,47 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 		boolean isFirstRowOrColumn = isFirstRowOrColumn(position, adapter, spanIndex, itemType);
 		boolean isLastRowOrColumn = isLastRowOrColumn(position, adapter, spanIndex, spanCount, itemType);
 
+		// Reset offset values
 		int left = 0, top = 0, right = 0, bottom = 0;
 
 		if (orientation == GridLayoutManager.VERTICAL) {
 			int index = spanIndex;
 			if (withLeftEdge) index = spanCount - spanIndex;
-			left = deco.getVerticalSpace() * index / spanCount;
+			left = deco.left * index / spanCount;
 
 			index = (spanCount - (spanIndex + spanSize - 1) - 1);
 			if (withRightEdge) index = spanIndex + spanSize;
-			right = deco.getVerticalSpace() * index / spanCount;
+			right = deco.right * index / spanCount;
 
 			if (isFirstRowOrColumn && (withTopEdge)) {
-				top = deco.getHorizontalSpace();
+				top = deco.top;
 			}
 			if (isLastRowOrColumn) {
 				if (withBottomEdge) {
-					bottom = deco.getHorizontalSpace();
+					bottom = deco.bottom;
 				}
 			} else {
-				bottom = deco.getHorizontalSpace();
+				bottom = deco.bottom;
 			}
 
 		} else {
 			int index = spanIndex;
 			if (withTopEdge) index = spanCount - spanIndex;
-			top = deco.getHorizontalSpace() * index / spanCount;
+			top = deco.top * index / spanCount;
 
 			index = (spanCount - (spanIndex + spanSize - 1) - 1);
 			if (withBottomEdge) index = spanIndex + spanSize;
-			bottom = deco.getHorizontalSpace() * index / spanCount;
+			bottom = deco.bottom * index / spanCount;
 
 			if (isFirstRowOrColumn && (withLeftEdge)) {
-				left = deco.getVerticalSpace();
+				left = deco.left;
 			}
 			if (isLastRowOrColumn) {
 				if (withRightEdge) {
-					right = deco.getVerticalSpace();
+					right = deco.right;
 				}
 			} else {
-				right = deco.getVerticalSpace();
+				right = deco.right;
 			}
 		}
 
@@ -594,28 +615,25 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	}
 
 	private static class ItemDecoration {
-		private int verticalSpace;
-		private int horizontalSpace;
+		private int left, top, right, bottom;
 
 		ItemDecoration() {
-			this(-1, -1);
+			this(-1);
 		}
 
-		ItemDecoration(int horizontalSpace, int verticalSpace) {
-			this.verticalSpace = verticalSpace;
-			this.horizontalSpace = horizontalSpace;
+		ItemDecoration(int offset) {
+			this(offset, offset, offset, offset);
 		}
 
-		int getHorizontalSpace() {
-			return this.horizontalSpace;
+		ItemDecoration(int left, int top, int right, int bottom) {
+			this.left = left;
+			this.top = top;
+			this.right = right;
+			this.bottom = bottom;
 		}
 
-		int getVerticalSpace() {
-			return this.verticalSpace;
-		}
-
-		final boolean hasSpace() {
-			return this.horizontalSpace >= 0 || this.verticalSpace >= 0;
+		final boolean hasOffset() {
+			return this.top >= 0 || this.left >= 0 || this.right >= 0 || this.bottom >= 0;
 		}
 	}
 

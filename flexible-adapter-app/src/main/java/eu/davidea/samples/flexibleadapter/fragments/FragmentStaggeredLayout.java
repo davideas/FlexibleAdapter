@@ -89,7 +89,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		// a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
-				.addItemViewType(R.layout.recycler_staggered_item, 8, 8)
+				.addItemViewType(R.layout.recycler_staggered_item, 8)
 				.withEdge(true));
 
 		// Experimenting NEW features (v5.0.0)

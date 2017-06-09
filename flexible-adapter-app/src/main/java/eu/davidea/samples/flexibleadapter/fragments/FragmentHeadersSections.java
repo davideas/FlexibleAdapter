@@ -96,7 +96,7 @@ public class FragmentHeadersSections extends AbstractFragment
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
 				//.addItemViewType(R.layout.recycler_header_item, 8, 100)
-				.addItemViewType(R.layout.recycler_simple_item, 8, 0)
+				.addItemViewType(R.layout.recycler_simple_item, 0, 8, 0, 8)
 				.withSectionGapOffset(24)
 				.withEdge(true));
 
