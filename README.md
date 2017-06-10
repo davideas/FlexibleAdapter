@@ -7,12 +7,12 @@
 # FlexibleAdapter
 
 ### ANNOUNCEMENT: Important changes in latest release
-- **NEW!** Second release candidate: [v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) built on 2017.06.09
+- **NEW!** Second release candidate: [v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) built on 2017.06.10
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 - Please read [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
 ### Fast and versatile Adapter for RecyclerView
-> When initially Android team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.<br/>
+> :mega: When initially Android team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.<br/>
 We didn't know how to add selection and to combine all the use cases in the same Adapter.
 Since I created this library, it has become easy to configure multiple views and now, nobody wants to use a ListView anymore.
 
@@ -118,7 +118,7 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 
 # Change Log
 ###### Latest release
-[v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) - 2017.06.09
+[v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) - 2017.06.10
 
 ###### Old releases
 [v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) - 2017.01.14<br/>
@@ -155,13 +155,14 @@ Half swipe can be done with others means, please see issues #98 and #100. See al
 - [Arpinca](https://github.com/arpinca) who added new features for FastScroller like _autoHide_ and _ignoreTouchesOutsideHandle_ and more.
 
 ###### Donations
-If someone would like to say thank you by donating any amount, you're very welcome! Here the link to PayPal.me:
+If someone would like to say _Thank You_ by donating any amount, you're very welcome! Here the link to PayPal.me:
 
 [![PayPal.me](https://www.paypalobjects.com/webstatic/i/sparta/logo/logo_paypal_106x29.png)](https://www.paypal.me/davideas)
 
 # Imported libraries
 - The library [LollipopContactsRecyclerViewFastScroller](https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller) has been imported, improved and adapted to work in conjunction with `AnimatorAdapter`.
 - The library [sticky-headers-recyclerview](https://github.com/timehop/sticky-headers-recyclerview) was initially imported, then it was removed in favor of the new technique able to manage a real _View_ and so to handle the click events.
+- The item spacing technique comes from the library [CommonItemDecoration](https://github.com/ibosong/CommonItemDecoration), and it has been improved with new features.
 
 # Apps that use this Adapter
 It will be a pleasure to add your App here, once it is published.

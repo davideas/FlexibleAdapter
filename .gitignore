@@ -26,6 +26,7 @@ proguard/
 *.log
 
 .idea/
+tools/
 .DS_Store
 *.iml
 gradle.properties
