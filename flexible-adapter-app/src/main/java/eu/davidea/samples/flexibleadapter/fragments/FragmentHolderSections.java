@@ -3,7 +3,6 @@ package eu.davidea.samples.flexibleadapter.fragments;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -58,7 +57,7 @@ public class FragmentHolderSections extends AbstractFragment {
 		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
 
-		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+		mRecyclerView = getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
@@ -67,7 +66,7 @@ public class FragmentHolderSections extends AbstractFragment {
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
 		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
 		mAdapter.setFastScroller(fastScroller);
 
@@ -75,7 +74,7 @@ public class FragmentHolderSections extends AbstractFragment {
 				.setStickyHeaders(true)
 				.setOnlyEntryAnimation(true);
 
-		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 

@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -72,7 +71,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 		// Initialize Adapter and RecyclerView
 		// ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
 		mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
-		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+		mRecyclerView = getView().findViewById(R.id.recycler_view);
 		// Customize the speed of the smooth scroll.
 		// NOTE: Every time you change this value you MUST recreate the LayoutManager instance
 		// and to assign it again to the RecyclerView!
@@ -98,7 +97,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 				.setPermanentDelete(true) //Default=true
 				.setOnlyEntryAnimation(true);
 
-		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 
@@ -133,7 +132,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 			// This is necessary if we call updateDataSet() and not removeItems
 			DatabaseService.getInstance().resetHeaders();
 			// Change fab action (ADD NEW ITEM UNTIL 15)
-			FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+			FloatingActionButton fab = getActivity().findViewById(R.id.fab);
 			fab.setImageResource(R.drawable.fab_add);
 		}
 		return super.onOptionsItemSelected(item);
@@ -192,7 +191,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 
 		// Change fab action (MOVE ITEM)
 		if (mAdapter.getItemCountOfTypes(R.layout.recycler_staggered_item) >= 15) {
-			FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+			FloatingActionButton fab = getActivity().findViewById(R.id.fab);
 			fab.setImageResource(R.drawable.ic_sort_white_24dp);
 		}
 

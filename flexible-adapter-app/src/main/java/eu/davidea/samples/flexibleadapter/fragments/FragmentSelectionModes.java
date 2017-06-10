@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -80,7 +79,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 		mAdapter.setNotifyChangeOfUnfilteredItems(true) //true is the default! This will rebind new item when refreshed
 				.setMode(Mode.SINGLE);
 
-		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+		mRecyclerView = getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
@@ -99,7 +98,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 		}, 1500L);
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
 		fastScroller.setAutoHideEnabled(true);          //true is the default value!
 		fastScroller.setAutoHideDelayInMillis(1000L); //1000ms is the default value!
 		fastScroller.setMinimumScrollThreshold(70); //0 pixel is the default value! When > 0 it mimics the fling gesture
@@ -108,7 +107,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 		// fastScroller.setBubbleAndHandleColor(Color.RED);
 		mAdapter.setFastScroller(fastScroller);
 
-		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.SINGLE);
 

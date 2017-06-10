@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -75,7 +74,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 				// Experimenting NEW features (v5.0.0)
 				.setAnimationOnScrolling(true)
 				.setAnimationOnReverseScrolling(true);
-		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+		mRecyclerView = getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
@@ -91,7 +90,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
 				.setEndlessScrollListener(this, new ProgressItem())
 				.setEndlessScrollThreshold(1); //Default=1
 
-		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 	}

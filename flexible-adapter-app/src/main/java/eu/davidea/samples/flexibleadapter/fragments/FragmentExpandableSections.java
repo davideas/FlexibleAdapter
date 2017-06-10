@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -76,7 +75,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 				.setNotifyMoveOfFilteredItems(true) //When true, filtering on big list is very slow!
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
 				.setAnimationOnReverseScrolling(true);
-		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+		mRecyclerView = getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
@@ -88,7 +87,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 				.withDivider(R.drawable.divider));
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
 		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
 		mAdapter.setFastScroller(fastScroller);
 
@@ -98,7 +97,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 				//.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable AND expanded at startup)
 				.setStickyHeaders(true);
 
-		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 	}

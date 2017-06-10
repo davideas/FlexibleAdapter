@@ -57,7 +57,7 @@ public abstract class AbstractFragment extends Fragment {
 	 * Display FAB button and restore default icon
 	 */
 	protected void initializeFab() {
-		mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+		mFab = getActivity().findViewById(R.id.fab);
 		mFab.setImageResource(R.drawable.fab_add);
 		ViewCompat.animate(mFab)
 				.scaleX(1f).scaleY(1f)

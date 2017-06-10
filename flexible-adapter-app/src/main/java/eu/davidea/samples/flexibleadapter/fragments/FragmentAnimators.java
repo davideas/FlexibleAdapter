@@ -2,7 +2,6 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
@@ -22,8 +21,8 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.animators.FadeInItemAnimator;
 import eu.davidea.samples.flexibleadapter.animators.FadeInDownItemAnimator;
+import eu.davidea.samples.flexibleadapter.animators.FadeInItemAnimator;
 import eu.davidea.samples.flexibleadapter.animators.FadeInLeftItemAnimator;
 import eu.davidea.samples.flexibleadapter.animators.FadeInRightItemAnimator;
 import eu.davidea.samples.flexibleadapter.animators.FadeInUpItemAnimator;
@@ -97,7 +96,7 @@ public class FragmentAnimators extends AbstractFragment {
 				.setAnimationOnReverseScrolling(true)
 				.setAnimationInterpolator(new DecelerateInterpolator())
 				.setAnimationDuration(300L);
-		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+		mRecyclerView = getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		//mRecyclerView.setHasFixedSize(true); //Size of RV will not change
@@ -114,7 +113,7 @@ public class FragmentAnimators extends AbstractFragment {
 				.getItemTouchHelperCallback()
 				.setSwipeFlags(ItemTouchHelper.RIGHT); //Enable swipe
 
-		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(false);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 
@@ -180,7 +179,7 @@ public class FragmentAnimators extends AbstractFragment {
 		// Make visible spinner configuration
 		getActivity().findViewById(R.id.layout_for_spinners).setVisibility(View.VISIBLE);
 
-		Spinner spinner = (Spinner) getActivity().findViewById(R.id.spinner_item_animators);
+		Spinner spinner = getActivity().findViewById(R.id.spinner_item_animators);
 		spinner.setAdapter(spinnerAdapter);
 		spinner.setSelection(7);
 		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -218,7 +217,7 @@ public class FragmentAnimators extends AbstractFragment {
 		// Make visible spinner configuration
 		getActivity().findViewById(R.id.layout_for_spinners).setVisibility(View.VISIBLE);
 
-		Spinner spinner = (Spinner) getActivity().findViewById(R.id.spinner_scrolling_animation);
+		Spinner spinner = getActivity().findViewById(R.id.spinner_scrolling_animation);
 		spinner.setAdapter(spinnerAdapter);
 		spinner.setSelection(3);
 		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

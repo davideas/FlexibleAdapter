@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -72,8 +71,17 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		}
 		initializeRecyclerView(savedInstanceState);
 
+		// Restore FAB button and icon
+		initializeFab();
+
 		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
+	}
+
+	@Override
+	protected void initializeFab() {
+		super.initializeFab();
+		mFab.setImageResource(R.drawable.ic_refresh_white_24dp);
 	}
 
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
@@ -88,7 +96,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				.setNotifyChangeOfUnfilteredItems(true) //true by default
 				.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
 				.setAnimationOnReverseScrolling(true);
-		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+		mRecyclerView = getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
@@ -97,7 +105,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 		mRecyclerView.setItemAnimator(new FadeInDownItemAnimator());
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
 		fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
 		mAdapter.setFastScroller(fastScroller);
 
@@ -106,7 +114,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 				.setHandleDragEnabled(true) //Enable drag using handle view
 				.setSwipeEnabled(true); //Enable swipe items
 
-		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 
@@ -220,6 +228,12 @@ public class FragmentEndlessScrolling extends AbstractFragment
 	}
 
 	@Override
+	public void performFabAction() {
+		mAdapter.clearAllBut(R.layout.recycler_scrollable_footer_item);
+		mAdapter.setLoadingMoreAtStartUp(true); //restart from scratch
+	}
+
+	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		Log.v(TAG, "onCreateOptionsMenu called!");
@@ -239,12 +253,19 @@ public class FragmentEndlessScrolling extends AbstractFragment
 			gridMenuItem.setIcon(R.drawable.ic_view_grid_white_24dp);
 			gridMenuItem.setTitle(R.string.grid_layout);
 		}
+
+		MenuItem endlessMenuItem = menu.findItem(R.id.action_top_scrolling);
+		endlessMenuItem.setChecked(mAdapter.isTopEndless());
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.action_list_type)
+		if (item.getItemId() == R.id.action_list_type) {
 			mAdapter.setAnimationOnScrolling(true);
+		} else if (item.getItemId() == R.id.action_top_scrolling) {
+			item.setChecked(!item.isChecked());
+			mAdapter.setTopEndless(item.isChecked());
+		}
 		return super.onOptionsItemSelected(item);
 	}
 

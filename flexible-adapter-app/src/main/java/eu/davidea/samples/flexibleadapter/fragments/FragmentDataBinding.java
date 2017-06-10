@@ -4,7 +4,6 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ObservableArrayList;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -89,7 +88,7 @@ public class FragmentDataBinding extends AbstractFragment {
 		mAdapter = new BindingFlexibleAdapter<>(getActivity(), true);
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
-		mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+		mRecyclerView = getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
@@ -98,7 +97,7 @@ public class FragmentDataBinding extends AbstractFragment {
 		mRecyclerView.setItemAnimator(new GarageDoorItemAnimator());
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
 		mAdapter.setFastScroller(fastScroller);
 		mAdapter.setLongPressDragEnabled(true)
 				.setHandleDragEnabled(true)
@@ -106,7 +105,7 @@ public class FragmentDataBinding extends AbstractFragment {
 				.setDisplayHeadersAtStartUp(true)
 				.setStickyHeaders(true);
 
-		SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+		SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
 		mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 

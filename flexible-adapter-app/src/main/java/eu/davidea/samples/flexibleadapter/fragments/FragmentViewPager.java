@@ -93,7 +93,7 @@ public class FragmentViewPager extends Fragment {
 		// Experimenting NEW features (v5.0.0)
 		mAdapter.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
 
-		RecyclerView mRecyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
+		RecyclerView mRecyclerView = getView().findViewById(R.id.recycler_view);
 		mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity()));
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
@@ -102,7 +102,7 @@ public class FragmentViewPager extends Fragment {
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-		FastScroller fastScroller = (FastScroller) getView().findViewById(R.id.fast_scroller);
+		FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
 		mAdapter.setFastScroller(fastScroller);
 
 		// Sticky Headers

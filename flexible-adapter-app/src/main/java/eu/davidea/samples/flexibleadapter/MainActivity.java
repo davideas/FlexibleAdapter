@@ -78,7 +78,6 @@ import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 import eu.davidea.samples.flexibleadapter.services.DatabaseType;
 import eu.davidea.samples.flexibleadapter.views.HeaderView;
-import eu.davidea.utils.ScrollAwareFABBehavior;
 import eu.davidea.utils.Utils;
 
 /**
@@ -321,8 +320,6 @@ public class MainActivity extends AppCompatActivity implements
 	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 		hideFabSilently();
 		CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mFab.getLayoutParams();
-		ScrollAwareFABBehavior fabBehavior = ((ScrollAwareFABBehavior) layoutParams.getBehavior());
-		//fabBehavior.setEnabled(false);
 
 		// Handle navigation view item clicks
 		int id = item.getItemId();
@@ -336,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentAnimators.newInstance();
 		} else if (id == R.id.nav_endless_scrolling) {
 			mFragment = FragmentEndlessScrolling.newInstance(2);
+			showFab();
 		} else if (id == R.id.nav_instagram_headers) {
 			mFragment = FragmentInstagramHeaders.newInstance();
 		} else if (id == R.id.nav_db_headers_and_sections) {
@@ -343,7 +341,6 @@ public class MainActivity extends AppCompatActivity implements
 		} else if (id == R.id.nav_headers_and_sections) {
 			mFragment = FragmentHeadersSections.newInstance(2);
 			showFab();
-			//fabBehavior.setEnabled(true);
 		} else if (id == R.id.nav_multi_level_expandable) {
 			mFragment = FragmentExpandableMultiLevel.newInstance(2);
 		} else if (id == R.id.nav_expandable_sections) {
@@ -827,7 +824,6 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onUpdateEmptyView(int size) {
 		Log.d("onUpdateEmptyView size=%s", size);
-		//TODO: Test with mAdapter.getFastScroller();
 		FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
 		View emptyView = findViewById(R.id.empty_view);
 		TextView emptyText = (TextView) findViewById(R.id.empty_text);
@@ -853,7 +849,7 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public void onUndoConfirmed(int action) {
 		if (action == UndoHelper.ACTION_UPDATE) {
-			//TODO: Complete click animation on swiped item
+			//TODO: Complete click animation on swiped item. NotifyItem changed to display rear view as front, so user can press undo on the item
 //			final RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForLayoutPosition(mSwipedPosition);
 //			if (holder instanceof ItemTouchHelperCallback.ViewHolderCallback) {
 //				final View view = ((ItemTouchHelperCallback.ViewHolderCallback) holder).getFrontView();
