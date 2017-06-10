@@ -2,7 +2,7 @@
 [![Download](https://api.bintray.com/packages/davideas/maven/flexible-adapter/images/download.svg)](https://bintray.com/davideas/maven/flexible-adapter/_latestVersion)
 [![API](https://img.shields.io/badge/API-14%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=14)
 [![Licence](https://img.shields.io/badge/Licence-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![Methods and Size](https://img.shields.io/badge/Methods%20and%20size-core:%201284%20|%20163%20KB-e91e63.svg)](http://www.methodscount.com/?lib=eu.davidea%3Aflexible-adapter%3A5.0.0%2B)
+[![Methods and Size](https://img.shields.io/badge/Methods%20and%20size-core:%201469%20|%20178%20KB-e91e63.svg)](http://www.methodscount.com/?lib=eu.davidea%3Aflexible-adapter%3A5.0.0%2B)
 
 # FlexibleAdapter
 
