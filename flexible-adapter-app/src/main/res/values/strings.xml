@@ -172,10 +172,10 @@ Example of dynamic background with ripple effect without XML configuration.]]></
 	<string name="app_name">Flexible Adapter</string>
 	<string name="github">GitHub page…</string>
 	<string name="about_title">About</string>
-	<string name="about_version">%1$s #%2$s</string>
+	<string name="about_version">%1$s</string>
 	<string name="about_body"><![CDATA[
 <b>Flexible Adapter</b><br/>
-%1$s #%2$s
+%1$s
 
 <br/><br/><b>Author</b><br/>
 <a href="https://plus.google.com/u/0/108655371836503419479">Davide Steduto on G+</a>

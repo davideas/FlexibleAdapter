@@ -284,9 +284,7 @@ public class MainActivity extends AppCompatActivity implements
 
 		// Version
 		TextView appVersion = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.app_version);
-		appVersion.setText(getString(R.string.about_version,
-				Utils.getVersionName(this),
-				Integer.toString(Utils.getVersionCode(this))));
+		appVersion.setText(getString(R.string.about_version, Utils.getVersionName(this)));
 	}
 
 	private void initializeFab() {
@@ -370,9 +368,7 @@ public class MainActivity extends AppCompatActivity implements
 			MessageDialog.newInstance(
 					R.drawable.ic_info_grey600_24dp,
 					getString(R.string.about_title),
-					getString(R.string.about_body,
-							Utils.getVersionName(this),
-							Integer.toString(Utils.getVersionCode(this))))
+					getString(R.string.about_body, Utils.getVersionName(this)))
 					.show(getFragmentManager(), MessageDialog.TAG);
 			return true;
 		} else if (id == R.id.nav_github) {

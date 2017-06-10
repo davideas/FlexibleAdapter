@@ -115,11 +115,11 @@ public class BottomSheetDecorationDialog extends android.support.design.widget.B
 			itemDecoration.withBottomEdge(isChecked);
 
 		} else if (buttonView.getId() == R.id.switch_default_divider) {
-			itemDecoration.mDivider = null;
+			itemDecoration.removeDivider();
 			if (isChecked) itemDecoration.withDefaultDivider();
 
 		} else if (buttonView.getId() == R.id.switch_custom_divider) {
-			itemDecoration.mDivider = null;
+			itemDecoration.removeDivider();
 			if (isChecked) itemDecoration.withDivider(R.drawable.divider_large);
 
 		} else if (buttonView.getId() == R.id.switch_draw_over) {

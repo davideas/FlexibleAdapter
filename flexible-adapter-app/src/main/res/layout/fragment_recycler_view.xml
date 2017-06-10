@@ -24,7 +24,6 @@
 				android:id="@+id/recycler_view"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				android:background="@color/material_text_color_black_divider"
 				tools:listitem="@layout/recycler_simple_item"/>
 
 			<!-- NOT NEEDED ANYMORE!! This layout is generated at runtime when

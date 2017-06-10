@@ -72,9 +72,9 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	private final ItemDecoration mDefaultDecoration = new ItemDecoration();
 	private SparseArray<ItemDecoration> mDecorations; // viewType -> itemDeco
 
-	public Drawable mDivider;
-	public int mOffset, mSectionOffset;
-	public boolean mDrawOver, withLeftEdge, withTopEdge, withRightEdge, withBottomEdge;
+	private Drawable mDivider;
+	private int mOffset, mSectionOffset;
+	private boolean mDrawOver, withLeftEdge, withTopEdge, withRightEdge, withBottomEdge;
 
 	private static final int[] ATTRS = new int[]{
 			android.R.attr.listDivider
@@ -122,12 +122,17 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 		withSectionGapOffset(sectionOffset);
 	}
 
+	/*==========*/
+	/* DIVIDERS */
+	/*==========*/
+
 	/**
 	 * Default Android divider will be used.
 	 *
 	 * @return this FlexibleItemDecoration instance so the call can be chained
 	 * @see #withDivider(int)
 	 * @see #withDrawOver(boolean)
+	 * @see #removeDivider()
 	 * @since 5.0.0-rc2
 	 */
 	public FlexibleItemDecoration withDefaultDivider() {
@@ -144,10 +149,22 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	 * @return this FlexibleItemDecoration instance so the call can be chained
 	 * @see #withDefaultDivider()
 	 * @see #withDrawOver(boolean)
+	 * @see #removeDivider()
 	 * @since 5.0.0-rc2
 	 */
 	public FlexibleItemDecoration withDivider(@DrawableRes int resId) {
 		if (resId > 0) mDivider = ContextCompat.getDrawable(context, resId);
+		return this;
+	}
+
+	/**
+	 * Removes any divider previously set.
+	 *
+	 * @return this FlexibleItemDecoration instance so the call can be chained
+	 * @since 5.0.0-rc2
+	 */
+	public FlexibleItemDecoration removeDivider() {
+		mDivider = null;
 		return this;
 	}
 
@@ -254,6 +271,10 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 		}
 		canvas.restore();
 	}
+
+	/*==============================*/
+	/* OFFSET & EDGES CONFIGURATION */
+	/*==============================*/
 
 	/**
 	 * @param gap offset gap between sections, in dpi. Must be positive.
@@ -462,26 +483,26 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 		return this;
 	}
 
+	/*====================*/
+	/* OFFSET CALCULATION */
+	/*====================*/
+
 	/**
 	 * @since 5.0.0-rc2
 	 */
 	@Override
-	public void getItemOffsets(Rect outRect, View view, RecyclerView recyclerView, RecyclerView.State state) {
+	public void getItemOffsets(final Rect outRect, View view, RecyclerView recyclerView, RecyclerView.State state) {
 		int position = recyclerView.getChildAdapterPosition(view);
-		if (position == RecyclerView.NO_POSITION) {
-			return;
-		}
+		// Skip check so on item deleted, offset is kept (only if general offset was set!)
+		// if (position == RecyclerView.NO_POSITION) return;
 
 		// Get custom Item Decoration or default
 		RecyclerView.Adapter adapter = recyclerView.getAdapter();
 		int itemType = adapter.getItemViewType(position);
 		ItemDecoration deco = getItemDecoration(itemType);
 
-		// Check early return conditions
-		if (mSectionOffset == 0 && mOffset <= 0 && !deco.hasOffset()) {
-			return;
-		} else if (!deco.hasOffset()) {
-			// No offset set, applies the general offset to this item decoration
+		// No offset set, applies the general offset to this item decoration
+		if (!deco.hasOffset()) {
 			deco = new ItemDecoration(mOffset);
 		}
 
