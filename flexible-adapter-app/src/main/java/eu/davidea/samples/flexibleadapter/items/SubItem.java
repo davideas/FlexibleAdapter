@@ -3,9 +3,7 @@ package eu.davidea.samples.flexibleadapter.items;
 import android.animation.Animator;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -115,8 +113,8 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
 
 		public ChildViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
-			this.mTitle = (TextView) view.findViewById(R.id.title);
-			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
+			this.mTitle = view.findViewById(R.id.title);
+			this.mHandleView = view.findViewById(R.id.row_handle);
 			if (adapter.isHandleDragEnabled()) {
 				this.mHandleView.setVisibility(View.VISIBLE);
 				setDragHandleView(mHandleView);

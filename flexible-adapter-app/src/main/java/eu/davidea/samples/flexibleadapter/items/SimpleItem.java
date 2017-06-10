@@ -130,9 +130,9 @@ public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
 		SimpleViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
 			this.mContext = view.getContext();
-			this.mTitle = (TextView) view.findViewById(R.id.title);
-			this.mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-			this.mFlipView = (FlipView) view.findViewById(R.id.image);
+			this.mTitle = view.findViewById(R.id.title);
+			this.mSubtitle = view.findViewById(R.id.subtitle);
+			this.mFlipView = view.findViewById(R.id.image);
 			this.mFlipView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -143,7 +143,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
 					}
 				}
 			});
-			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
+			this.mHandleView = view.findViewById(R.id.row_handle);
 			setDragHandleView(mHandleView);
 
 			this.frontView = view.findViewById(R.id.front_view);

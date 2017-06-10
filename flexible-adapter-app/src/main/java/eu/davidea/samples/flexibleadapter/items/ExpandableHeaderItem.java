@@ -132,9 +132,9 @@ public class ExpandableHeaderItem
 
 		ExpandableHeaderViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);//True for sticky
-			mTitle = (TextView) view.findViewById(R.id.title);
-			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
+			mTitle = view.findViewById(R.id.title);
+			mSubtitle = view.findViewById(R.id.subtitle);
+			this.mHandleView = view.findViewById(R.id.row_handle);
 			if (adapter.isHandleDragEnabled()) {
 				this.mHandleView.setVisibility(View.VISIBLE);
 				setDragHandleView(mHandleView);

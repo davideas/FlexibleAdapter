@@ -102,8 +102,7 @@ items and higher, due to the calculation of the correct position for each item t
 	<string name="overall">Overall</string>
 	<string name="overall_use_case_title">Showcase of the library capabilities</string>
 	<string name="overall_use_case_description"><![CDATA[The demoApp is organized in <b>fragments</b> where the <i>RecyclerView</i> and the <i>Adapter</i> are reinitialized.
-	<br>Each example implements several features of the library.
-	<br>Common listeners are instead implemented in the <i>MainActivity</i>.]]></string>
+	<br>Each example implements several features of the library. Common listeners are instead implemented in the <i>MainActivity</i>.]]></string>
 
 	<string name="selection_modes">Selection modes</string>
 	<string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper + UndoHelper + Scrollable Headers</string>

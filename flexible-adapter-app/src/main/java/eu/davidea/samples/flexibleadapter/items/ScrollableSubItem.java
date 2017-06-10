@@ -2,9 +2,7 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
 import android.support.annotation.NonNull;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
@@ -52,7 +50,7 @@ public class ScrollableSubItem extends AbstractItem<ScrollableSubItem.ChildViewH
 
 		ChildViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
-			this.mTitle = (TextView) view.findViewById(R.id.title);
+			this.mTitle = view.findViewById(R.id.title);
 		}
 
 		@Override

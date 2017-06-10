@@ -92,7 +92,7 @@ public class AnimatorSubItem extends AbstractSectionableItem<AnimatorSubItem.Chi
 
 		ChildViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
-			this.mTitle = (TextView) view.findViewById(R.id.title);
+			this.mTitle = view.findViewById(R.id.title);
 		}
 
 		@Override

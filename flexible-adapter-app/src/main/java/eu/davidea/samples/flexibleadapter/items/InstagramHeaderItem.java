@@ -85,15 +85,15 @@ public class InstagramHeaderItem extends AbstractHeaderItem<InstagramHeaderItem.
 
 		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);//True for sticky
-			mAccountImage = (FlipView) view.findViewById(R.id.instagram_account_image);
+			mAccountImage = view.findViewById(R.id.instagram_account_image);
 			mAccountImage.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					Log.d("InstagramHeaderItem", "Registered internal click on Header AccountImageView!" + " position=" + getFlexibleAdapterPosition());
 				}
 			});
-			mTitle = (TextView) view.findViewById(R.id.instagram_account_title);
-			mSubtitle = (TextView) view.findViewById(R.id.instagram_place_subtitle);
+			mTitle = view.findViewById(R.id.instagram_account_title);
+			mSubtitle = view.findViewById(R.id.instagram_place_subtitle);
 			mSubtitle.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {

@@ -4,9 +4,7 @@ import android.animation.Animator;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -131,9 +129,9 @@ public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolde
 
 		public LabelViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
-			mTitle = (TextView) view.findViewById(R.id.title);
-			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-			mIcon = (ImageView) view.findViewById(R.id.label_background);
+			mTitle = view.findViewById(R.id.title);
+			mSubtitle = view.findViewById(R.id.subtitle);
+			mIcon = view.findViewById(R.id.label_background);
 		}
 
 		@Override

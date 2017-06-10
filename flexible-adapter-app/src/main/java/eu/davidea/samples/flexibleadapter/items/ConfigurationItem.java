@@ -185,10 +185,10 @@ public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.Vi
 
 		public ViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);//True for sticky
-			mTitle = (TextView) view.findViewById(R.id.title);
-			mDescription = (TextView) view.findViewById(R.id.subtitle);
-			mSeekBar = (SeekBar) view.findViewById(R.id.seek_bar);
-			mSwitchView = (Switch) view.findViewById(R.id.switch_box);
+			mTitle = view.findViewById(R.id.title);
+			mDescription = view.findViewById(R.id.subtitle);
+			mSeekBar = view.findViewById(R.id.seek_bar);
+			mSwitchView = view.findViewById(R.id.switch_box);
 		}
 
 		@Override

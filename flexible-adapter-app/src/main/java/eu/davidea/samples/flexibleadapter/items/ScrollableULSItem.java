@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
+import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.utils.Utils;
@@ -42,6 +44,11 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ULSViewHolder holder, int position, List payloads) {
+		Context context = holder.itemView.getContext();
+		DrawableUtils.setBackgroundCompat(holder.itemView, DrawableUtils.getRippleDrawable(
+				DrawableUtils.getColorDrawable(context.getResources().getColor(R.color.material_color_purple_50)),
+				DrawableUtils.getColorControlHighlight(context))
+		);
 		holder.mImageView.setImageResource(R.drawable.ic_account_circle_white_24dp);
 		holder.itemView.setActivated(true);
 		holder.mTitle.setSelected(true);//For marquee!!
@@ -61,10 +68,10 @@ public class ScrollableULSItem extends AbstractItem<ScrollableULSItem.ULSViewHol
 
 		ULSViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
-			mTitle = (TextView) view.findViewById(R.id.title);
-			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-			mImageView = (ImageView) view.findViewById(R.id.image);
-			mDismissIcon = (ImageView) view.findViewById(R.id.dismiss_icon);
+			mTitle = view.findViewById(R.id.title);
+			mSubtitle = view.findViewById(R.id.subtitle);
+			mImageView = view.findViewById(R.id.image);
+			mDismissIcon = view.findViewById(R.id.dismiss_icon);
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {

@@ -94,11 +94,11 @@ public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHol
 
 		public ViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
-			this.mImage = (ImageView) view.findViewById(R.id.instagram_image);
-			this.mImageFavourite = (FlipView) view.findViewById(R.id.instagram_image_like);
-			this.mImageComment = (ImageView) view.findViewById(R.id.instagram_image_comment);
-			this.mImageShare = (ImageView) view.findViewById(R.id.instagram_image_share);
-			this.mQuantityLikes = (TextView) view.findViewById(R.id.instagram_quantity_likes);
+			this.mImage = view.findViewById(R.id.instagram_image);
+			this.mImageFavourite = view.findViewById(R.id.instagram_image_like);
+			this.mImageComment = view.findViewById(R.id.instagram_image_comment);
+			this.mImageShare = view.findViewById(R.id.instagram_image_share);
+			this.mQuantityLikes = view.findViewById(R.id.instagram_quantity_likes);
 		}
 	}
 

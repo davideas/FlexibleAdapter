@@ -111,15 +111,15 @@ public class HeaderItem extends AbstractHeaderItem<HeaderItem.HeaderViewHolder> 
 
 		HeaderViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);//True for sticky
-			mTitle = (TextView) view.findViewById(R.id.title);
-			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
+			mTitle = view.findViewById(R.id.title);
+			mSubtitle = view.findViewById(R.id.subtitle);
 			mTitle.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					Log.d("HeaderTitle", "Registered internal click on Header TitleTextView! " + mTitle.getText() + " position=" + getFlexibleAdapterPosition());
 				}
 			});
-			this.mHandleView = (ImageView) view.findViewById(R.id.row_handle);
+			this.mHandleView = view.findViewById(R.id.row_handle);
 			if (adapter.isHandleDragEnabled()) {
 				this.mHandleView.setVisibility(View.VISIBLE);
 				setDragHandleView(mHandleView);

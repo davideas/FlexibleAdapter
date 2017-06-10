@@ -46,7 +46,7 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UC
 	public void bindViewHolder(FlexibleAdapter adapter, UCViewHolder holder, int position, List payloads) {
 		Context context = holder.itemView.getContext();
 		DrawableUtils.setBackgroundCompat(holder.itemView, DrawableUtils.getRippleDrawable(
-				DrawableUtils.getColorDrawable(context.getResources().getColor(R.color.material_color_blue_grey_50)),
+				DrawableUtils.getColorDrawable(context.getResources().getColor(R.color.material_color_deep_purple_50)),
 				DrawableUtils.getColorControlHighlight(context))
 		);
 		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
@@ -63,9 +63,9 @@ public class ScrollableUseCaseItem extends AbstractItem<ScrollableUseCaseItem.UC
 
 		public UCViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
-			mTitle = (TextView) view.findViewById(R.id.title);
-			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-			mDismissIcon = (ImageView) view.findViewById(R.id.dismiss_icon);
+			mTitle = view.findViewById(R.id.title);
+			mSubtitle = view.findViewById(R.id.subtitle);
+			mDismissIcon = view.findViewById(R.id.dismiss_icon);
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {

@@ -4,7 +4,6 @@
 	android:layout_height="?android:attr/listPreferredItemHeightLarge"
 	android:paddingTop="@dimen/margin_top"
 	android:paddingBottom="@dimen/margin_bottom"
-	android:background="?attr/selectableItemBackground"
 	android:descendantFocusability="blocksDescendants">
 
 	<ImageView

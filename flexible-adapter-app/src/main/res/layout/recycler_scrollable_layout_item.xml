@@ -4,7 +4,6 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="?android:attr/listPreferredItemHeight"
-	android:background="@color/material_color_indigo_50"
 	android:gravity="center_vertical"
 	android:orientation="vertical">
 

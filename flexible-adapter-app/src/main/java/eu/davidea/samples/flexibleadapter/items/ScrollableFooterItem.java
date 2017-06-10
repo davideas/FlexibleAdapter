@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
+import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.utils.Utils;
 import eu.davidea.viewholders.AnimatedViewHolder;
@@ -44,6 +46,11 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, FooterViewHolder holder, int position, List payloads) {
+		Context context = holder.itemView.getContext();
+		DrawableUtils.setBackgroundCompat(holder.itemView, DrawableUtils.getRippleDrawable(
+				DrawableUtils.getColorDrawable(context.getResources().getColor(R.color.material_color_light_green_50)),
+				DrawableUtils.getColorControlHighlight(context))
+		);
 		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
 		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
 	}
@@ -56,9 +63,9 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 
 		FooterViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter);
-			mTitle = (TextView) view.findViewById(R.id.title);
-			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
-			mDismissIcon = (ImageView) view.findViewById(R.id.dismiss_icon);
+			mTitle = view.findViewById(R.id.title);
+			mSubtitle = view.findViewById(R.id.subtitle);
+			mDismissIcon = view.findViewById(R.id.dismiss_icon);
 			mDismissIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {

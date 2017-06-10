@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.items.ScrollableExpandableItem.ScrollableExpandableViewHolder;
 import eu.davidea.utils.Utils;
@@ -46,6 +48,11 @@ public class ScrollableExpandableItem extends AbstractItem<ScrollableExpandableV
 
 	@Override
 	public void bindViewHolder(FlexibleAdapter adapter, ScrollableExpandableViewHolder holder, int position, List payloads) {
+		Context context = holder.itemView.getContext();
+		DrawableUtils.setBackgroundCompat(holder.itemView, DrawableUtils.getRippleDrawable(
+				DrawableUtils.getColorDrawable(context.getResources().getColor(R.color.material_color_amber_50)),
+				DrawableUtils.getColorControlHighlight(context))
+		);
 		holder.mTitle.setSelected(true);//For marquee!!
 		holder.mTitle.setText(Utils.fromHtmlCompat(getTitle()));
 		holder.mSubtitle.setText(Utils.fromHtmlCompat(getSubtitle()));
@@ -84,8 +91,8 @@ public class ScrollableExpandableItem extends AbstractItem<ScrollableExpandableV
 
 		ScrollableExpandableViewHolder(View view, FlexibleAdapter adapter) {
 			super(view, adapter, true);
-			mTitle = (TextView) view.findViewById(R.id.title);
-			mSubtitle = (TextView) view.findViewById(R.id.subtitle);
+			mTitle = view.findViewById(R.id.title);
+			mSubtitle = view.findViewById(R.id.subtitle);
 
 			// Support for StaggeredGridLayoutManager
 			setFullSpan(true);
