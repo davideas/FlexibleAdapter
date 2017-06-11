@@ -172,7 +172,7 @@ public class FastScroller extends FrameLayout {
 		});
 
 		if (recyclerView.getAdapter() instanceof BubbleTextCreator)
-			this.bubbleTextCreator = (BubbleTextCreator) recyclerView.getAdapter();
+			setBubbleTextCreator((BubbleTextCreator) recyclerView.getAdapter());
 		if (recyclerView.getAdapter() instanceof OnScrollStateChangeListener)
 			addOnScrollStateChangeListener((OnScrollStateChangeListener) recyclerView.getAdapter());
 
@@ -188,6 +188,10 @@ public class FastScroller extends FrameLayout {
 				return true;
 			}
 		});
+	}
+
+	public void setBubbleTextCreator(BubbleTextCreator bubbleTextCreator) {
+		this.bubbleTextCreator = bubbleTextCreator;
 	}
 
 	public void addOnScrollStateChangeListener(OnScrollStateChangeListener stateChangeListener) {
