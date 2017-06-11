@@ -100,21 +100,24 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 
 \* = Publishing to Play Store is foreseen for final release.
 
-![Drag Grid & Overall](/screenshots/drag_grid_overall.png)
-![Secondary Functionalities](/screenshots/secondary_functionalities.png)
-![StickyHeaders & EndlessScrolling](/screenshots/sticky_headers.png)
+![Overall](/screenshots/demo20_overall.png)
+![Adapter Animations](/screenshots/demo20_adapter_animations.png)
+![Undo](/screenshots/demo20_undo_single_selection.png)
+![Staggered Layout](/screenshots/demo20_dynamic_staggered_layout.png)
 
-![Multi Selection & SC](/screenshots/multi_selection_sc.png)
-![Undo](/screenshots/undo_single_selection.png)
-![Drag Linear](/screenshots/drag_linear.png)
+![Endless](/screenshots/demo20_endless.png)
+![Instagram](/screenshots/demo20_instagram.png)
+![Expandables](/screenshots/demo20_expandables.png)
+![Multi Selection & SC](/screenshots/demo20_selection_coherence.png)
 
-![Search](/screenshots/search_sections.png)
-![swipe-to-dismiss1](/screenshots/swipe-to-dismiss1.png)
-![swipe-to-dismiss2](/screenshots/swipe-to-dismiss2.png)
+![Drag & Drop](/screenshots/demo20_drag_linear.png)
+![swipe-to-dismiss1](/screenshots/demo20_swipe-to-dismiss1.png)
+![swipe-to-dismiss2](/screenshots/demo20_swipe-to-dismiss2.png)
+![ViewPager](/screenshots/demo20_view_pager.png)
 
-![Adapter Animations](/screenshots/adapter_animations.png)
-![Dynamic Sections](/screenshots/dynamic_sections.png)
-![Staggered Layout](/screenshots/dynamic_staggered_layout.png)
+![Async Filter](/screenshots/demo20_async_filter.png)
+![Search Filter](/screenshots/demo20_search_filter.png)
+![Search Sections](/screenshots/demo20_search_sections.png)
 
 # Change Log
 ###### Latest release
