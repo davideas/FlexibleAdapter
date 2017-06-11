@@ -109,6 +109,11 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 		this.mSelectable = selectable;
 	}
 
+	@Override
+	public String getBubbleText(int position) {
+		return String.valueOf(position + 1);
+	}
+
 	/*-------------------*/
 	/* TOUCHABLE METHODS */
 	/*-------------------*/

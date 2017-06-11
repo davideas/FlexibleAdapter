@@ -124,6 +124,14 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	 */
 	void setSelectable(boolean selectable);
 
+	/**
+	 * Custom bubble text for FastScroller.
+	 *
+ 	 * @param position the current mapped position
+	 * @return Any desired value
+	 */
+	String getBubbleText(int position);
+
 	/*-------------------*/
 	/* TOUCHABLE METHODS */
 	/*-------------------*/
