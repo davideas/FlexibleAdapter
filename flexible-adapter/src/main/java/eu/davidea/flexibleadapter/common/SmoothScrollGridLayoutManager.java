@@ -24,7 +24,7 @@ import android.support.v7.widget.RecyclerView;
  *
  * @since 5.0.0-b6
  */
-public class SmoothScrollGridLayoutManager extends GridLayoutManager {
+public class SmoothScrollGridLayoutManager extends GridLayoutManager implements IFlexibleLayoutManager {
 
 	private RecyclerView.SmoothScroller mSmoothScroller;
 
