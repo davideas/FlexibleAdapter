@@ -168,7 +168,11 @@ public class MainActivity extends AppCompatActivity implements
 		}
 
 		setContentView(R.layout.activity_main);
-		FlexibleAdapter.enableLogs(Level.DEBUG);
+		if (BuildConfig.DEBUG) {
+			FlexibleAdapter.enableLogs(Level.DEBUG);
+		} else {
+			FlexibleAdapter.enableLogs(Level.SUPPRESS);
+		}
 		Log.v("onCreate");
 
 		// Initialize Toolbar, Drawer & FAB

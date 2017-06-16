@@ -53,7 +53,8 @@ import static eu.davidea.flexibleadapter.utils.Log.Level.WARN;
  */
 public class Log {
 
-    private static int LEVEL;
+    private static final String SOURCE_FILE = "SourceFile";
+    private static int LEVEL = SUPPRESS;
     private static boolean withMethodName;
     private static boolean withLineNumber;
 
@@ -241,7 +242,9 @@ public class Log {
 
     private static String getTag() {
         StackTraceElement traceElement = new Throwable().getStackTrace()[2];
-        return traceElement.getFileName().split("[.]")[0];
+        String fileName = traceElement.getFileName();
+        if (fileName == null) return SOURCE_FILE;
+        return fileName.split("[.]")[0];
     }
 
     private static String formatMessage(String msg, Object... args) {
