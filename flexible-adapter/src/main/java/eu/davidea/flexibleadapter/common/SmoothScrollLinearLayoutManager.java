@@ -24,7 +24,7 @@ import android.support.v7.widget.RecyclerView;
  *
  * @since 5.0.0-b1
  */
-public class SmoothScrollLinearLayoutManager extends LinearLayoutManager {
+public class SmoothScrollLinearLayoutManager extends LinearLayoutManager implements IFlexibleLayoutManager {
 
 	private RecyclerView.SmoothScroller mSmoothScroller;
 
@@ -43,4 +43,8 @@ public class SmoothScrollLinearLayoutManager extends LinearLayoutManager {
 		startSmoothScroll(mSmoothScroller);
 	}
 
+	@Override
+	public int getSpanCount() {
+		return 1;
+	}
 }

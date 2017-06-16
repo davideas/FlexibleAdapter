@@ -60,6 +60,7 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
 	 * @since 5.0.0-rc2
 	 */
+	@Override
 	public int getOrientation() {
 		RecyclerView.LayoutManager layoutManager = getLayoutManager();
 		if (layoutManager instanceof LinearLayoutManager) {
@@ -77,6 +78,7 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @return the span count
 	 * @since 5.0.0-b7
 	 */
+	@Override
 	public int getSpanCount() {
 		RecyclerView.LayoutManager layoutManager = getLayoutManager();
 		if (layoutManager instanceof GridLayoutManager) {
@@ -96,6 +98,7 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @see #findFirstVisibleItemPosition()
 	 * @since 5.0.0-b8
 	 */
+	@Override
 	public int findFirstCompletelyVisibleItemPosition() {
 		RecyclerView.LayoutManager layoutManager = getLayoutManager();
 		if (layoutManager instanceof StaggeredGridLayoutManager) {
@@ -114,6 +117,7 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @see #findFirstCompletelyVisibleItemPosition()
 	 * @since 5.0.0-rc1
 	 */
+	@Override
 	public int findFirstVisibleItemPosition() {
 		RecyclerView.LayoutManager layoutManager = getLayoutManager();
 		if (layoutManager instanceof StaggeredGridLayoutManager) {
@@ -132,6 +136,7 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @see #findLastVisibleItemPosition()
 	 * @since 5.0.0-b8
 	 */
+	@Override
 	public int findLastCompletelyVisibleItemPosition() {
 		RecyclerView.LayoutManager layoutManager = getLayoutManager();
 		if (layoutManager instanceof StaggeredGridLayoutManager) {
@@ -150,6 +155,7 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 	 * @see #findLastCompletelyVisibleItemPosition()
 	 * @since 5.0.0-rc1
 	 */
+	@Override
 	public int findLastVisibleItemPosition() {
 		RecyclerView.LayoutManager layoutManager = getLayoutManager();
 		if (layoutManager instanceof StaggeredGridLayoutManager) {
