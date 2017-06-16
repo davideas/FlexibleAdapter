@@ -57,7 +57,7 @@ repositories {
 dependencies {
 	// Using JCenter
 	compile 'eu.davidea:flexible-adapter:5.0.0-rc2'
-	compile 'eu.davidea:flexible-adapter-databinding:1.0.0-b1'
+	compile 'eu.davidea:flexible-adapter-databinding:1.0.0-b1@aar'
 	
 	// Using MavenSnapshots repository for continuous updates from my development
 	compile 'eu.davidea:flexible-adapter:5.0.0-SNAPSHOT'
