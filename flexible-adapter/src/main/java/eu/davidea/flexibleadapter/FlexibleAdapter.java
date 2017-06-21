@@ -5552,10 +5552,8 @@ public class FlexibleAdapter<T extends IFlexible>
 				int itemCount = newItems.size();
 				if (position < itemCount) {
 					newItems.addAll(position + 1, subItems);
-					position += subItems.size();
 				} else {
 					newItems.addAll(subItems);
-					position = itemCount;
 				}
 			}
 			// Display headers too
