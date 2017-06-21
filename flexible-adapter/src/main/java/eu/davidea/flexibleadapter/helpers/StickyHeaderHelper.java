@@ -173,7 +173,8 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		mElevation = ViewCompat.getElevation(mStickyHeaderViewHolder.getContentView());
 		if (mElevation == 0f) {
 			// 2. Take elevation settings
-			mElevation = mAdapter.getStickyHeaderElevation();
+			mElevation = mRecyclerView.getContext().getResources().getDisplayMetrics().density
+					* mAdapter.getStickyHeaderElevation();
 		}
 		if (mElevation > 0) {
 			// Needed to elevate the view

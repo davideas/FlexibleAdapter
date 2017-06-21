@@ -22,7 +22,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.CallSuper;
-import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -141,7 +140,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/* Section items (with sticky headers) */
 	private List<IHeader> mOrphanHeaders;
 	private boolean headersShown = false, recursive = false;
-	private float mStickyElevation;
+	private int mStickyElevation;
 	private StickyHeaderHelper mStickyHeaderHelper;
 	private ViewGroup mStickyContainer;
 
@@ -1476,30 +1475,30 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Gets the layout elevation for sticky header.
+	 * Gets the layout in dpi elevation for sticky header.
 	 * <p><b>Note:</b> This setting is ignored if the header item has already an elevation. The
 	 * header elevation overrides this setting.</p>
 	 *
 	 * @return the elevation in pixel
-	 * @see #setStickyHeaderElevation(float)
+	 * @see #setStickyHeaderElevation(int)
 	 * @since 5.0.0-rc1
 	 */
-	public float getStickyHeaderElevation() {
+	public int getStickyHeaderElevation() {
 		return mStickyElevation;
 	}
 
 	/**
-	 * Sets the elevation for the sticky header layout.
+	 * Sets the elevation in dpi for the sticky header layout.
 	 * <p><b>Note:</b> This setting is ignored if the header item has already an elevation. The
 	 * header elevation overrides this setting.</p>
-	 * Default value is 0.
+	 * Default value is 0 dpi.
 	 *
-	 * @param stickyElevation the elevation in pixel
+	 * @param stickyElevation the elevation in dpi
 	 * @return this Adapter, so the call can be chained
 	 * @see #getStickyHeaderElevation()
 	 * @since 5.0.0-rc1
 	 */
-	public FlexibleAdapter<T> setStickyHeaderElevation(@FloatRange(from = 0) float stickyElevation) {
+	public FlexibleAdapter<T> setStickyHeaderElevation(@IntRange(from = 0) int stickyElevation) {
 		mStickyElevation = stickyElevation;
 		return this;
 	}
