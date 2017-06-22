@@ -5285,16 +5285,18 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * @since 05/03/2016
+	 * @since 05/03/2016 created
+	 * <br>5.0.0-rc3 providing the old position
 	 */
 	public interface OnStickyHeaderChangeListener {
 		/**
 		 * Called when the current sticky header changed.
 		 *
-		 * @param sectionIndex the position of header, -1 if no header is sticky
+		 * @param newPosition the position of NEW sticky header, -1 if no header is sticky
+		 * @param oldPosition the position of OLD sticky header, -1 if no header was sticky
 		 * @since 5.0.0-b1
 		 */
-		void onStickyHeaderChange(int sectionIndex);
+		void onStickyHeaderChange(int newPosition, int oldPosition);
 	}
 
 	/**

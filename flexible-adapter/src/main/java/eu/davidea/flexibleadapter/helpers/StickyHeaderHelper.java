@@ -121,9 +121,9 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		return vh != null && (vh.itemView.getX() < 0 || vh.itemView.getY() < 0);
 	}
 
-	private void onStickyHeaderChange(int sectionIndex) {
+	private void onStickyHeaderChange(int newPosition, int oldPosition) {
 		if (mStickyHeaderChangeListener != null) {
-			mStickyHeaderChangeListener.onStickyHeaderChange(sectionIndex);
+			mStickyHeaderChangeListener.onStickyHeaderChange(newPosition, oldPosition);
 		}
 	}
 
@@ -154,10 +154,11 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			} else {
 				mStickyHolderLayout.setAlpha(1);
 			}
+			int oldHeaderPosition = mHeaderPosition;
 			mHeaderPosition = headerPosition;
 			FlexibleViewHolder holder = getHeaderViewHolder(headerPosition);
 			Log.d("swapHeader newHeaderPosition=%s", mHeaderPosition);
-			swapHeader(holder);
+			swapHeader(holder, oldHeaderPosition);
 		} else if (updateHeaderContent) {
 			// #299 - ClassCastException after click on expanded sticky header when AutoCollapse is enabled
 //			mStickyHeaderViewHolder = getHeaderViewHolder(headerPosition);
@@ -229,7 +230,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 		//Log.v("TranslationX=%s TranslationY=%s", headerOffsetX, headerOffsetY);
 	}
 
-	private void swapHeader(FlexibleViewHolder newHeader) {
+	private void swapHeader(FlexibleViewHolder newHeader, int oldHeaderPosition) {
 		if (mStickyHeaderViewHolder != null) {
 			resetHeader(mStickyHeaderViewHolder);
 		}
@@ -238,7 +239,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			mStickyHeaderViewHolder.setIsRecyclable(false);
 			ensureHeaderParent();
 		}
-		onStickyHeaderChange(mHeaderPosition);
+		onStickyHeaderChange(mHeaderPosition, oldHeaderPosition);
 	}
 
 	public void ensureHeaderParent() {
@@ -313,8 +314,9 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			mStickyHolderLayout.animate().setListener(null);
 			mStickyHeaderViewHolder = null;
 			restoreHeaderItemVisibility();
+			int oldPosition = mHeaderPosition;
 			mHeaderPosition = RecyclerView.NO_POSITION;
-			onStickyHeaderChange(mHeaderPosition);
+			onStickyHeaderChange(mHeaderPosition, oldPosition);
 		}
 	}
 
