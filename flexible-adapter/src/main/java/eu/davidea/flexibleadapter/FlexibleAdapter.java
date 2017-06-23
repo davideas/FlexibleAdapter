@@ -2533,6 +2533,37 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Convenience method to determine the total number of items up to the subposition of expandable
+	 * subitems
+	 *
+	 * @return item count, including recursive expansions, to the first level subposition item
+	 */
+	private int getRecursiveSubItemCount( @NonNull IExpandable parent) {
+		return getRecursiveSubItemCount(parent, parent.getSubItems().size());
+	}
+
+	/**
+	 * Recursively determine the total number of items between a range of expandable subitems
+	 *
+	 * @return item count, including recursive expansions, to the first level subposition item
+	 */
+	private int getRecursiveSubItemCount( @NonNull IExpandable parent, int subPosition) {
+		int count = 0;
+		// Get the subItems
+		List<T> subItems = parent.getSubItems();
+		// Iterate through subItems
+		for(int index = 0; index < subPosition; index++) {
+			T tempSubItem = subItems.get(index);
+			// Check whether item is also expandable, and expanded
+			if(this.isExpandable(tempSubItem) && ((IExpandable) tempSubItem).isExpanded()) {
+				count += getRecursiveSubItemCount((IExpandable) tempSubItem);
+			}
+			count++;
+		}
+		return count;
+	}
+
+	/**
 	 * Expands an item that is {@code IExpandable} type, not yet expanded and if has subItems.
 	 * <p>If configured, automatic smooth scroll will be performed when necessary.</p>
 	 * Parent won't be notified.
@@ -3162,7 +3193,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		// Notify the adapter of the new addition to display it and animate it.
 		// If parent is collapsed there's no need to add sub items.
 		if (parent.isExpanded()) {
-			added = addItems(parentPosition + 1 + Math.max(0, subPosition), subItems);
+			added = addItems(parentPosition + 1 + getRecursiveSubItemCount(parent, subPosition), subItems);
 		}
 		// Notify the parent about the change if requested
 		if (payload != null) notifyItemChanged(parentPosition, payload);
@@ -4984,7 +5015,16 @@ public class FlexibleAdapter<T extends IFlexible>
 			List<T> allSubItems = expandable.getSubItems();
 			for (T subItem : allSubItems) {
 				// Pick up only no hidden items (doesn't get into account the filtered items)
-				if (!subItem.isHidden()) subItems.add(subItem);
+				if (!subItem.isHidden()) {
+					// Add the current subitem
+					subItems.add(subItem);
+					// If expandable, expanded, and of non-zero size, recursively add sub-subItems
+					if(this.isExpandable(subItem) &&
+							((IExpandable) subItem).isExpanded() &&
+							((IExpandable) subItem).getSubItems().size() > 0) {
+						subItems.addAll(getExpandableList((IExpandable) subItem));
+					}
+				}
 			}
 		}
 		return subItems;
