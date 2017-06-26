@@ -86,7 +86,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 
 	private FrameLayout createContainer(int width, int height) {
 		FrameLayout frameLayout = new FrameLayout(mRecyclerView.getContext());
-		frameLayout.setLayoutParams(new ViewGroup.LayoutParams(width, height));
+		frameLayout.setLayoutParams(new ViewGroup.MarginLayoutParams(width, height));
 		return frameLayout;
 	}
 
