@@ -2678,7 +2678,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 			// Every time an expansion is requested, subItems must be taken from the
 			// original Object and without the subItems marked hidden (removed)
-			List<T> subItems = getExpandableList(expandable);
+			List<T> subItems = getExpandableList(expandable, true);
 			mItems.addAll(position + 1, subItems);
 			subItemsCount = subItems.size();
 			// Save expanded state
@@ -2794,7 +2794,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 		IExpandable expandable = (IExpandable) item;
 		// Take the current subList (will improve the performance when collapseAll)
-		List<T> subItems = getExpandableList(expandable);
+		List<T> subItems = getExpandableList(expandable, true);
 		int subItemsCount = subItems.size(), recursiveCount = 0;
 
 		Log.v("Request to Collapse on position=%s expanded=%s hasSubItemsSelected=%s",
@@ -2827,7 +2827,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
 			Log.v("Collapsed %s subItems on position %s", subItemsCount, position);
 		}
-		return subItemsCount + recursiveCount;
+//		return subItemsCount + recursiveCount;
+		return subItemsCount;
 	}
 
 	private boolean collapseSHF(List<T> scrollables, IExpandable expandable) {
@@ -4976,7 +4977,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	private void createRestoreSubItemInfo(IExpandable expandable, T item) {
-		List<T> siblings = getExpandableList(expandable);
+		List<T> siblings = getExpandableList(expandable, true);
 		int childPosition = siblings.indexOf(item);
 		mRestoreList.add(new RestoreInfo((T) expandable, item, childPosition));
 		Log.v("Recycled SubItem %s with Parent position=%s",
@@ -5003,13 +5004,24 @@ public class FlexibleAdapter<T extends IFlexible>
 		Log.v("Recycled Item %s on position=%s", mRestoreList.get(mRestoreList.size() - 1), position);
 	}
 
+
+	/**
+	 * @param expandable the parent item
+	 * @return the list of the subItems not hidden, non-recursively
+	 * @since 5.0.0-b1
+	 */
+	@NonNull
+	private List<T> getExpandableList(IExpandable expandable) {
+		return getExpandableList(expandable, false);
+	}
+
 	/**
 	 * @param expandable the parent item
 	 * @return the list of the subItems not hidden
 	 * @since 5.0.0-b1
 	 */
 	@NonNull
-	private List<T> getExpandableList(IExpandable expandable) {
+	private List<T> getExpandableList(IExpandable expandable, boolean isRecursive) {
 		List<T> subItems = new ArrayList<>();
 		if (expandable != null && hasSubItems(expandable)) {
 			List<T> allSubItems = expandable.getSubItems();
@@ -5020,9 +5032,10 @@ public class FlexibleAdapter<T extends IFlexible>
 					subItems.add(subItem);
 					// If expandable, expanded, and of non-zero size, recursively add sub-subItems
 					if(this.isExpandable(subItem) &&
+							isRecursive &&
 							((IExpandable) subItem).isExpanded() &&
 							((IExpandable) subItem).getSubItems().size() > 0) {
-						subItems.addAll(getExpandableList((IExpandable) subItem));
+						subItems.addAll(getExpandableList((IExpandable) subItem, true));
 					}
 				}
 			}
@@ -5036,6 +5049,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @param startPosition helps to improve performance, so we can avoid a new search for position
 	 * @param subItems      the list of sub items to check
 	 * @return true if at least 1 subItem is currently selected, false if no subItems are selected
+	 * search is non-recursive
 	 * @since 5.0.0-b1
 	 */
 	private boolean hasSubItemsSelected(int startPosition, List<T> subItems) {
@@ -5460,7 +5474,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				// Assert the expandable children are collapsed
 				recursiveCollapse(refPosition, getCurrentChildren((IExpandable) item), 0);
 			} else if (isExpanded(item) && !isChild) {
-				refPosition += getExpandableList((IExpandable) item).size() + 1;
+				refPosition += getExpandableList((IExpandable) item, true).size() + 1;
 			} else {
 				refPosition++;
 			}
@@ -5588,7 +5602,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (isExpanded(item)) {
 				IExpandable expandable = (IExpandable) item;
 				expandable.setExpanded(true);
-				List<T> subItems = getExpandableList(expandable);
+				List<T> subItems = getExpandableList(expandable, true);
 				int itemCount = newItems.size();
 				if (position < itemCount) {
 					newItems.addAll(position + 1, subItems);
