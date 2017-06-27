@@ -376,10 +376,10 @@ public class DatabaseService {
 		expandableItem.setTitle("Expandable Two-Levels " + i);
 		for (int j = 1; j <= SUB_ITEMS; j++) {
 			//ExpandableLevel1Item is an expandable as well with Level=1
-			ExpandableLevel1Item expSubItem = new ExpandableLevel1Item(expandableItem.getId() + "-EL" + j);
+			ExpandableLevel1Item expSubItem = new ExpandableLevel1Item(expandableItem.getId() + "-EII" + j);
 			expSubItem.setTitle("Expandable Sub Item " + j);
 			for (int k = 1; k <= 3; k++) {
-				SubItem subItem = new SubItem(expandableItem.getId() + expSubItem.getId() + "-SB" + k);
+				SubItem subItem = new SubItem(expSubItem.getId() + "-SB" + k);
 				subItem.setTitle("Simple Sub Item " + k);
 				expSubItem.addSubItem(subItem);
 			}
@@ -451,6 +451,10 @@ public class DatabaseService {
 		// From version RC2:
 		// mItems can be returned without making a copy: The copy is now done internally by the Adapter.
 		return mItems;
+	}
+
+	public boolean isEmpty() {
+		return mItems == null || mItems.isEmpty();
 	}
 
 	public void moveItem(AbstractFlexibleItem fromItem, AbstractFlexibleItem toItem) {

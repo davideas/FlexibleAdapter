@@ -64,6 +64,14 @@ public class FragmentOverall extends AbstractFragment
 		initializeRecyclerView(savedInstanceState);
 	}
 
+	@Override
+	public void onStart() {
+		super.onStart();
+		if (DatabaseService.getInstance().isEmpty()) {
+			DatabaseService.getInstance().createOverallDatabase(getActivity().getResources());
+		}
+	}
+
 	@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 	private void initializeRecyclerView(Bundle savedInstanceState) {
 		// Initialize Adapter and RecyclerView

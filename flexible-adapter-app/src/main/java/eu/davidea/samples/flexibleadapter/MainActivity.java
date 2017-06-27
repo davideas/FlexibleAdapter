@@ -136,16 +136,23 @@ public class MainActivity extends AppCompatActivity implements
 	private AbstractFragment mFragment;
 	private SearchView mSearchView;
 
+	/*
+	 * Operations for Handler.
+	 */
+	private static final int REFRESH_STOP = 0, REFRESH_STOP_WITH_UPDATE = 1, REFRESH_START = 2, SHOW_EMPTY_VIEW = 3;
+
 	private final Handler mRefreshHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 		public boolean handleMessage(Message message) {
 			switch (message.what) {
-				case 0: // Stop
+				case REFRESH_STOP_WITH_UPDATE:
+					mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), DatabaseConfiguration.animateOnUpdate);
+				case REFRESH_STOP: // Stop
 					mSwipeRefreshLayout.setRefreshing(false);
 					return true;
-				case 1: // Start
+				case REFRESH_START: // Start
 					mSwipeRefreshLayout.setRefreshing(true);
 					return true;
-				case 2: // Show empty view
+				case SHOW_EMPTY_VIEW: // Show empty view
 					ViewCompat.animate(findViewById(R.id.empty_view)).alpha(1);
 					return true;
 				default:
@@ -257,9 +264,8 @@ public class MainActivity extends AppCompatActivity implements
 			public void onRefresh() {
 				// Passing true as parameter we always animate the changes between the old and the new data set
 				DatabaseService.getInstance().updateNewItems();
-				mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), DatabaseConfiguration.animateOnUpdate);
 				mSwipeRefreshLayout.setRefreshing(true);
-				mRefreshHandler.sendEmptyMessageDelayed(0, 1500L); //Simulate network time
+				mRefreshHandler.sendEmptyMessageDelayed(REFRESH_STOP_WITH_UPDATE, 1500L); //Simulate network time
 				mActionModeHelper.destroyActionModeIfCan();
 			}
 		});
@@ -835,11 +841,11 @@ public class MainActivity extends AppCompatActivity implements
 			emptyText.setText(getString(R.string.no_items));
 		if (size > 0) {
 			fastScroller.showScrollbar();
-			mRefreshHandler.removeMessages(2);
+			mRefreshHandler.removeMessages(SHOW_EMPTY_VIEW);
 			emptyView.setAlpha(0);
 		} else {
 			emptyView.setAlpha(0);
-			mRefreshHandler.sendEmptyMessage(2);
+			mRefreshHandler.sendEmptyMessage(SHOW_EMPTY_VIEW);
 			fastScroller.hideScrollbar();
 		}
 		if (mAdapter != null && !mAdapter.isRestoreInTime() &&
@@ -956,8 +962,8 @@ public class MainActivity extends AppCompatActivity implements
 							@Override
 							public void onPostAction() {
 								// Enable Refreshing
-								mRefreshHandler.sendEmptyMessage(1);
-								mRefreshHandler.sendEmptyMessageDelayed(0, 7000);
+								mRefreshHandler.sendEmptyMessage(REFRESH_START);
+								mRefreshHandler.sendEmptyMessageDelayed(REFRESH_STOP, 5000L);
 								// Finish the action mode
 								mActionModeHelper.destroyActionModeIfCan();
 							}
