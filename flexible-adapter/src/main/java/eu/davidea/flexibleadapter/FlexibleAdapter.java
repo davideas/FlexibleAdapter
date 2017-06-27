@@ -2795,7 +2795,7 @@ public class FlexibleAdapter<T extends IFlexible>
 		IExpandable expandable = (IExpandable) item;
 		// Take the current subList (will improve the performance when collapseAll)
 		List<T> subItems = getExpandableList(expandable, true);
-		int subItemsCount = subItems.size(), recursiveCount = 0;
+		int subItemsCount = subItems.size();
 
 		Log.v("Request to Collapse on position=%s expanded=%s hasSubItemsSelected=%s",
 				position, expandable.isExpanded(), hasSubItemsSelected(position, subItems));
@@ -2804,7 +2804,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				(!hasSubItemsSelected(position, subItems) || getPendingRemovedItem(item) != null)) {
 
 			// Recursive collapse of all sub expandable
-			recursiveCount = recursiveCollapse(position + 1, subItems, expandable.getExpansionLevel());
+			recursiveCollapse(position + 1, subItems, expandable.getExpansionLevel());
 			mItems.removeAll(subItems);
 			subItemsCount = subItems.size();
 			// Save expanded state
@@ -2827,7 +2827,6 @@ public class FlexibleAdapter<T extends IFlexible>
 
 			Log.v("Collapsed %s subItems on position %s", subItemsCount, position);
 		}
-//		return subItemsCount + recursiveCount;
 		return subItemsCount;
 	}
 
@@ -5602,7 +5601,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			if (isExpanded(item)) {
 				IExpandable expandable = (IExpandable) item;
 				expandable.setExpanded(true);
-				List<T> subItems = getExpandableList(expandable, true);
+				List<T> subItems = getExpandableList(expandable, false);
 				int itemCount = newItems.size();
 				if (position < itemCount) {
 					newItems.addAll(position + 1, subItems);
