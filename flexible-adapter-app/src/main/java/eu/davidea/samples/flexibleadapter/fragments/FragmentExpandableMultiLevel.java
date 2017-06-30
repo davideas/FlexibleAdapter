@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -88,7 +89,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 		mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
 				.setHandleDragEnabled(true) //Enable handle drag
 				.setSwipeEnabled(true); //Enable swipe items
-				//.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable)
+		//.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable)
 
 		SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
 		swipeRefreshLayout.setEnabled(true);
@@ -134,13 +135,25 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 		Log.v(TAG, "onCreateOptionsMenu called!");
 		inflater.inflate(R.menu.menu_expandable, menu);
 		mListener.initSearchView(menu);
-		//TODO: Implement Filterable in the item interfaces
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.action_list_type)
-			mAdapter.setAnimationOnScrolling(true);
+		int id = item.getItemId();
+
+		if (id == R.id.action_recursive_collapse) {
+			if (mAdapter.isRecursiveCollapse()) {
+				mAdapter.setRecursiveCollapse(false);
+				item.setChecked(false);
+				Snackbar.make(getView(), "Recursive-Collapse is disabled", Snackbar.LENGTH_SHORT).show();
+			} else {
+				mAdapter.setRecursiveCollapse(true);
+				item.setChecked(true);
+				Snackbar.make(getView(), "Recursive-Collapse is enabled", Snackbar.LENGTH_SHORT).show();
+			}
+		}
+
 		return super.onOptionsItemSelected(item);
 	}
 

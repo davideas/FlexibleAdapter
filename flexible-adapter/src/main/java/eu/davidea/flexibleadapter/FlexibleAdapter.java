@@ -115,7 +115,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	private List<Notification> mNotifications;
 	private FilterAsyncTask mFilterAsyncTask;
 	private long start, time;
-	private boolean useDiffUtil = false;
 
 	/* Handler for delayed actions */
 	protected final int UPDATE = 1, FILTER = 2, LOAD_MORE_COMPLETE = 8;
@@ -151,7 +150,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/* Expandable flags */
 	private int mMinCollapsibleLevel = 0, mSelectedLevel = -1;
-	private boolean scrollOnExpand = false, collapseOnExpand = false, collapseSubItems = false,
+	private boolean scrollOnExpand = false, collapseOnExpand = false, collapseSubLevels = false,
 			childSelected = false, parentSelected = false;
 
 	/* Drag&Drop and Swipe helpers */
@@ -2008,14 +2007,42 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Automatically collapse all previous expanded parents before expand the new clicked parent.
 	 * <p>Default value is {@code false} (disabled).</p>
+	 * <b>Tip:</b> This parameter works in collaboration with {@link #setMinCollapsibleLevel(int)}.
 	 *
 	 * @param collapseOnExpand true to collapse others items, false to just expand the current
 	 * @return this Adapter, so the call can be chained
+	 * @see #setMinCollapsibleLevel(int)
 	 * @since 5.0.0-b1
 	 */
 	public FlexibleAdapter<T> setAutoCollapseOnExpand(boolean collapseOnExpand) {
 		Log.i("Set autoCollapseOnExpand=%s", collapseOnExpand);
 		this.collapseOnExpand = collapseOnExpand;
+		return this;
+	}
+
+	/**
+	 * @return true if {@code collapseSubLevels} is enabled, false otherwise
+	 * @since 5.0.0-rc3
+	 */
+	public boolean isRecursiveCollapse() {
+		return collapseSubLevels;
+	}
+
+	/**
+	 * Automatically collapse all inner sub expandable when higher parent is collapsed.<br>
+	 * By keeping this parameter {@code false}, their expanded status remains {@code expanded=true}
+	 * so when the higher parent is expanded again, the sub expandables will appear again expanded.
+	 * <p>Default value is {@code false} (keep expanded status).</p>
+	 * <b>Tip:</b> This parameter works in collaboration with {@link #setMinCollapsibleLevel(int)}.
+	 *
+	 * @param collapseSubLevels true to allow inner sub expandable to collapse, false to keep the expanded status
+	 * @return this Adapter, so the call can be chained
+	 * @see #setMinCollapsibleLevel(int)
+	 * @since 5.0.0-rc3
+	 */
+	public FlexibleAdapter<T> setRecursiveCollapse(boolean collapseSubLevels) {
+		Log.i("Set setAutoCollapseSubLevels=%s", collapseSubLevels);
+		this.collapseSubLevels = collapseSubLevels;
 		return this;
 	}
 
@@ -2030,8 +2057,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Automatically scroll the clicked expandable item to the first visible position.<br>
 	 * <p>Default value is {@code false} (disabled).</p>
-	 * This works ONLY in combination with {@link SmoothScrollLinearLayoutManager} or with
-	 * {@link SmoothScrollGridLayoutManager}.
+	 * <b>Note:</b> This works ONLY in combination with {@link SmoothScrollLinearLayoutManager}
+	 * or with {@link SmoothScrollGridLayoutManager}.
 	 *
 	 * @param scrollOnExpand true to enable automatic scroll, false to disable
 	 * @return this Adapter, so the call can be chained
@@ -2087,9 +2114,11 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Sets the minimum level which all sub expandable items will be collapsed too.
 	 * <p>Default value is {@link #mMinCollapsibleLevel} (All levels including 0).</p>
+	 * <b>Tip:</b> This parameter works in collaboration with {@link #setRecursiveCollapse(boolean)}.
 	 *
 	 * @param minCollapsibleLevel the minimum level to auto-collapse sub expandable items
 	 * @return this Adapter, so the call can be chained
+	 * @see #setRecursiveCollapse(boolean)
 	 * @since 5.0.0-b6
 	 */
 	public FlexibleAdapter<T> setMinCollapsibleLevel(int minCollapsibleLevel) {
@@ -2118,6 +2147,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the parent of this child item or null if item has no parent
 	 * @since 5.0.0-b1
 	 */
+	@Nullable
 	public IExpandable getExpandableOf(@IntRange(from = 0) int position) {
 		return getExpandableOf(getItem(position));
 	}
@@ -2132,6 +2162,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @see #getSubPositionOf(IFlexible)
 	 * @since 5.0.0-b1
 	 */
+	@Nullable
 	public IExpandable getExpandableOf(@NonNull T child) {
 		for (T parent : mItems) {
 			if (isExpandable(parent)) {
@@ -2232,9 +2263,10 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Recursively determine the total number of items between a range of expandable subItems
+	 * Recursively determine the total number of items between a range of expandable subItems.
 	 *
 	 * @return item count, including recursive expansions, to the first level sub-position item
+	 * @since 5.0.0-rc3
 	 */
 	private int getRecursiveSubItemCount(@NonNull IExpandable parent, int subPosition) {
 		int count = 0;
@@ -2255,7 +2287,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Expands an item that is {@code IExpandable} type, not yet expanded and if has subItems.
+	 * Expands an item that is {@code IExpandable} type, not yet expanded <u>and</u> if has subItems.
 	 * <p>If configured, automatic smooth scroll will be performed when necessary.</p>
 	 * Parent won't be notified.
 	 *
@@ -2415,7 +2447,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Expands all IExpandable items with minimum of level {@link #mMinCollapsibleLevel}.
+	 * Expands all {@code IExpandable} items with minimum of level {@link #mMinCollapsibleLevel}.
 	 *
 	 * @return the number of parent successfully expanded
 	 * @see #expandAll(int)
@@ -2427,8 +2459,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Expands all IExpandable items with at least the specified level.
-	 * <p>Parent will be notified.</p>
+	 * Expands all {@code IExpandable} items with at least the specified level.
+	 * <p>Parents will be notified.</p>
 	 *
 	 * @param level the minimum level to expand the sub expandable items
 	 * @return the number of parent successfully expanded
@@ -2454,9 +2486,15 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Collapses an {@code IExpandable} item that is already expanded, if no subItem is selected.
-	 * <p>Multilevel behaviour: all {@code IExpandable} subItem, that are expanded, are recursively
-	 * collapsed.</p>
+	 * Collapses an {@code IExpandable} item that is already expanded <u>and</u> if no subItem
+	 * is selected.
+	 * <p>Multilevel option behaviours:
+	 * <ul>
+	 * <li>{@code IExpandable} subItems, that are expanded, can be recursively collapsed,
+	 * see {@link #setRecursiveCollapse(boolean)}.</li>
+	 * <li>You can set the minimum level to auto-collapse siblings,
+	 * see {@link #setMinCollapsibleLevel(int)}.</li>
+	 * </ul></p>
 	 * Parent won't be notified.
 	 *
 	 * @param position the position of the item to collapse
@@ -2469,9 +2507,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Collapses an {@code IExpandable} item that is already expanded, if no subItem is selected.
-	 * <p>Multilevel behaviour: all {@code IExpandable} subItem, that are expanded, are recursively
-	 * collapsed.</p>
+	 * Same behaviors as {@link #collapse(int)} with possibility to notify/update the parent.
 	 *
 	 * @param position     the position of the item to collapse
 	 * @param notifyParent notify the parent with {@link Payload#COLLAPSED}
@@ -2495,7 +2531,9 @@ public class FlexibleAdapter<T extends IFlexible>
 				(!hasSubItemsSelected(position, subItems) || getPendingRemovedItem(item) != null)) {
 
 			// Recursive collapse of all sub expandable
-			//recursiveCollapse(position + 1, subItems, expandable.getExpansionLevel());
+			if (collapseSubLevels) {
+				recursiveCollapse(position + 1, subItems, expandable.getExpansionLevel());
+			}
 			mItems.removeAll(subItems);
 			subItemsCount = subItems.size();
 			// Save expanded state
@@ -2527,7 +2565,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	private int recursiveCollapse(int startPosition, List<T> subItems, int level) {
 		int collapsed = 0;
-		for (int i = 0; i < subItems.size(); i++) {
+		for (int i = subItems.size() - 1; i >= 0; i--) {
 			T subItem = subItems.get(i);
 			if (isExpanded(subItem)) {
 				IExpandable expandable = (IExpandable) subItem;
@@ -4309,13 +4347,13 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (fromPosition < toPosition) {
 			for (int i = fromPosition; i < toPosition; i++) {
 				Log.v("swapItems from=%s to=%s", i, (i + 1));
-				Collections.swap(mItems, i, i + 1);
+				Collections.swap(list, i, i + 1);
 				swapSelection(i, i + 1);
 			}
 		} else {
 			for (int i = fromPosition; i > toPosition; i--) {
 				Log.v("swapItems from=%s to=%s", i, (i - 1));
-				Collections.swap(mItems, i, i - 1);
+				Collections.swap(list, i, i - 1);
 				swapSelection(i, i - 1);
 			}
 		}
@@ -4850,7 +4888,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * @since 22/04/2016
 	 */
-	public interface EndlessScrollListener<T> {
+	public interface EndlessScrollListener {
 
 		/**
 		 * No more data to load.
@@ -4987,7 +5025,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 */
 	private static class Notification {
 
-		public static final int ADD = 1, CHANGE = 2, REMOVE = 3, MOVE = 4, FULL = 0;
+		public static final int ADD = 1, CHANGE = 2, REMOVE = 3, MOVE = 4;
 		int fromPosition, position, operation;
 
 		public Notification(int position, int operation) {
@@ -5150,7 +5188,6 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * <p>You can use and override this Callback, current values used by the Adapter:</p>
 	 * 1 = async call for updateDataSet.
 	 * <br>2 = async call for filterItems, optionally delayed.
-	 * <br>3 = deleteConfirmed when Undo timeout is over.
 	 * <br>8 = hide the progress item from the list, optionally delayed.
 	 * <p><b>Note:</b> numbers 0-9 are reserved for the Adapter, use others.</p>
 	 *
