@@ -1425,7 +1425,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @throws IllegalStateException if this Adapter was not attached to the RecyclerView
 	 * @see #setStickyHeaders(boolean, ViewGroup)
 	 * @see #setDisplayHeadersAtStartUp(boolean)
-	 * @see #setStickyHeaderElevation(float)
+	 * @see #setStickyHeaderElevation(int)
 	 * @since 5.0.0-rc1
 	 */
 	public FlexibleAdapter<T> setStickyHeaders(boolean sticky) {
@@ -1443,7 +1443,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @throws IllegalStateException if this Adapter was not attached to the RecyclerView
 	 * @see #setStickyHeaders(boolean)
 	 * @see #setDisplayHeadersAtStartUp(boolean)
-	 * @see #setStickyHeaderElevation(float)
+	 * @see #setStickyHeaderElevation(int)
 	 * @since 5.0.0-rc1
 	 */
 	public FlexibleAdapter<T> setStickyHeaders(final boolean sticky, @Nullable ViewGroup stickyContainer) {
@@ -2342,6 +2342,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Checks if the provided item is an {@link IExpandable} instance and is expanded.
+	 *
 	 * @param item the item to check
 	 * @return true if the item implements {@link IExpandable} interface and its property has
 	 * {@code expanded = true}
@@ -2352,12 +2354,14 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Checks if the provided item is an {@link IExpandable} instance.
+	 *
 	 * @param item the item to check
 	 * @return true if the item implements {@link IExpandable} interface, false otherwise
 	 * @since 5.0.0-b1
 	 */
 	public boolean isExpandable(@Nullable T item) {
-		return item != null && item instanceof IExpandable;
+		return item instanceof IExpandable;
 	}
 
 	/**
@@ -2532,30 +2536,22 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
-	 * Convenience method to determine the total number of items up to the subposition of expandable
-	 * subitems
+	 * Recursively determine the total number of items between a range of expandable subItems
 	 *
-	 * @return item count, including recursive expansions, to the first level subposition item
+	 * @return item count, including recursive expansions, to the first level sub-position item
 	 */
-	private int getRecursiveSubItemCount( @NonNull IExpandable parent) {
-		return getRecursiveSubItemCount(parent, parent.getSubItems().size());
-	}
-
-	/**
-	 * Recursively determine the total number of items between a range of expandable subitems
-	 *
-	 * @return item count, including recursive expansions, to the first level subposition item
-	 */
-	private int getRecursiveSubItemCount( @NonNull IExpandable parent, int subPosition) {
+	private int getRecursiveSubItemCount(@NonNull IExpandable parent, int subPosition) {
 		int count = 0;
 		// Get the subItems
 		List<T> subItems = parent.getSubItems();
 		// Iterate through subItems
-		for(int index = 0; index < subPosition; index++) {
-			T tempSubItem = subItems.get(index);
-			// Check whether item is also expandable, and expanded
-			if(this.isExpandable(tempSubItem) && ((IExpandable) tempSubItem).isExpanded()) {
-				count += getRecursiveSubItemCount((IExpandable) tempSubItem);
+		for (int index = 0; index < subPosition; index++) {
+			T subItem = subItems.get(index);
+			// Check whether item is also expandable and expanded
+			if (isExpanded(subItem)) {
+				IExpandable subExpandable = (IExpandable) subItem;
+				int size = subExpandable.getSubItems() != null ? subExpandable.getSubItems().size() : 0;
+				count += getRecursiveSubItemCount(subExpandable, size);
 			}
 			count++;
 		}
@@ -2803,7 +2799,7 @@ public class FlexibleAdapter<T extends IFlexible>
 				(!hasSubItemsSelected(position, subItems) || getPendingRemovedItem(item) != null)) {
 
 			// Recursive collapse of all sub expandable
-			recursiveCollapse(position + 1, subItems, expandable.getExpansionLevel());
+			//recursiveCollapse(position + 1, subItems, expandable.getExpansionLevel());
 			mItems.removeAll(subItems);
 			subItemsCount = subItems.size();
 			// Save expanded state
@@ -4975,7 +4971,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @since 5.0.0-b1
 	 */
 	private void createRestoreSubItemInfo(IExpandable expandable, T item) {
-		List<T> siblings = getExpandableList(expandable, true);
+		List<T> siblings = getExpandableList(expandable, false);
 		int childPosition = siblings.indexOf(item);
 		mRestoreList.add(new RestoreInfo((T) expandable, item, childPosition));
 		Log.v("Recycled SubItem %s with Parent position=%s",
@@ -5002,17 +4998,6 @@ public class FlexibleAdapter<T extends IFlexible>
 		Log.v("Recycled Item %s on position=%s", mRestoreList.get(mRestoreList.size() - 1), position);
 	}
 
-
-	/**
-	 * @param expandable the parent item
-	 * @return the list of the subItems not hidden, non-recursively
-	 * @since 5.0.0-b1
-	 */
-	@NonNull
-	private List<T> getExpandableList(IExpandable expandable) {
-		return getExpandableList(expandable, false);
-	}
-
 	/**
 	 * @param expandable the parent item
 	 * @return the list of the subItems not hidden
@@ -5029,9 +5014,7 @@ public class FlexibleAdapter<T extends IFlexible>
 					// Add the current subitem
 					subItems.add(subItem);
 					// If expandable, expanded, and of non-zero size, recursively add sub-subItems
-					if(this.isExpandable(subItem) &&
-							isRecursive &&
-							((IExpandable) subItem).isExpanded() &&
+					if (isRecursive && isExpanded(subItem) &&
 							((IExpandable) subItem).getSubItems().size() > 0) {
 						subItems.addAll(getExpandableList((IExpandable) subItem, true));
 					}
@@ -5053,7 +5036,8 @@ public class FlexibleAdapter<T extends IFlexible>
 	private boolean hasSubItemsSelected(int startPosition, List<T> subItems) {
 		for (T subItem : subItems) {
 			if (isSelected(++startPosition) ||
-					(isExpanded(subItem) && hasSubItemsSelected(startPosition, getExpandableList((IExpandable) subItem))))
+					(isExpanded(subItem) && hasSubItemsSelected(startPosition,
+							getExpandableList((IExpandable) subItem, false))))
 				return true;
 		}
 		return false;
