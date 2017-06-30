@@ -10,9 +10,4 @@
 	      android:animateLayoutChanges="true"
 	      app:actionViewClass="android.support.v7.widget.SearchView"/>
 
-	<item android:id="@+id/action_diff_util"
-	      android:title="@string/diff_util"
-	      android:checkable="true"
-	      app:showAsAction="never"/>
-
 </menu>

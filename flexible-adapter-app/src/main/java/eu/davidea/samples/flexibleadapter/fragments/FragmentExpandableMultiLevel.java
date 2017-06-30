@@ -101,6 +101,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
+		mRecyclerView.setAdapter(mAdapter);
 		mAdapter.showLayoutInfo(false);
 	}
 

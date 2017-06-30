@@ -22,7 +22,6 @@ import eu.davidea.samples.flexibleadapter.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.dialogs.OnParameterSelectedListener;
-import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem;
 import eu.davidea.samples.flexibleadapter.items.HeaderItem;
 import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
@@ -145,6 +144,7 @@ public class FragmentHeadersSections extends AbstractFragment
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
+		mRecyclerView.setAdapter(mAdapter);
 		mAdapter.showLayoutInfo(false);
 	}
 
@@ -163,19 +163,19 @@ public class FragmentHeadersSections extends AbstractFragment
 				mAdapter.addItemToSection(sectionableExpandable, referenceHeader, childPosition);
 				scrollTo = mAdapter.getGlobalPositionOf(referenceHeader);
 				break;
-			case 2: //Expandable Header
-				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_header_item) + 1;
-				ExpandableHeaderItem expandableHeader = DatabaseService.newExpandableSectionItem(id);
-				expandableHeader.setExpanded(false);
-				mAdapter.addSection(expandableHeader, referenceHeader);
-				scrollTo = mAdapter.getGlobalPositionOf(expandableHeader);
-				break;
-			case 3: //Header
-				id = mAdapter.getItemCountOfTypes(R.layout.recycler_header_item) + 1;
-				IHeader header = DatabaseService.newHeader(id);
-				mAdapter.addSection(header, referenceHeader);
-				scrollTo = mAdapter.getGlobalPositionOf(header);
-				break;
+//			case 2: //Expandable Header
+//				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_header_item) + 1;
+//				ExpandableHeaderItem expandableHeader = DatabaseService.newExpandableSectionItem(id);
+//				expandableHeader.setExpanded(false);
+//				mAdapter.addSection(expandableHeader, referenceHeader);
+//				scrollTo = mAdapter.getGlobalPositionOf(expandableHeader);
+//				break;
+//			case 3: //Header
+//				id = mAdapter.getItemCountOfTypes(R.layout.recycler_header_item) + 1;
+//				IHeader header = DatabaseService.newHeader(id);
+//				mAdapter.addSection(header, referenceHeader);
+//				scrollTo = mAdapter.getGlobalPositionOf(header);
+//				break;
 			default: //case 0 = Simple Item
 				id = mAdapter.getItemCountOfTypes(R.layout.recycler_expandable_item) + 1;
 				ISectionable sectionable = DatabaseService.newSimpleItem(id, referenceHeader);

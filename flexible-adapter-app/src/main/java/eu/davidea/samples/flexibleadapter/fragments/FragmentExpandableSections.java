@@ -84,7 +84,8 @@ public class FragmentExpandableSections extends AbstractFragment {
 		mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		// Custom divider item decorator
 		mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
-				.withDivider(R.drawable.divider));
+				.addItemViewType(R.layout.recycler_expandable_header_item)
+				.withOffset(4));
 
 		// Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
 		FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
@@ -105,6 +106,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
+		mRecyclerView.setAdapter(mAdapter);
 		mAdapter.showLayoutInfo(false);
 	}
 

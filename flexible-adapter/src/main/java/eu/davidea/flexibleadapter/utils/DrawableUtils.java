@@ -46,32 +46,6 @@ public final class DrawableUtils {
 	 *
 	 * @param view     the view to apply the drawable
 	 * @param drawable drawable object
-	 * @since 5.0.0-b7
-	 * @deprecated Use {@link #setBackgroundCompat(View, Drawable)} instead.
-	 */
-	@Deprecated
-	public static void setBackground(View view, Drawable drawable) {
-		setBackgroundCompat(view, drawable);
-	}
-
-	/**
-	 * Helper method to set the background depending on the android version
-	 *
-	 * @param view        the view to apply the drawable
-	 * @param drawableRes drawable resource id
-	 * @since 5.0.0-b7
-	 * @deprecated Use {@link #setBackgroundCompat(View, int)} instead.
-	 */
-	@Deprecated
-	public static void setBackground(View view, @DrawableRes int drawableRes) {
-		setBackgroundCompat(view, getDrawableCompat(view.getContext(), drawableRes));
-	}
-
-	/**
-	 * Helper method to set the background depending on the android version.
-	 *
-	 * @param view     the view to apply the drawable
-	 * @param drawable drawable object
 	 * @since 5.0.0-rc1
 	 */
 	public static void setBackgroundCompat(View view, Drawable drawable) {
@@ -107,23 +81,6 @@ public final class DrawableUtils {
 		} catch (Exception ex) {
 			return null;
 		}
-	}
-
-	/**
-	 * Helper to get the default Selectable Background. Returns the resourceId of the
-	 * {@code R.attr.selectableItemBackground} attribute of the overridden style.
-	 *
-	 * @param context the context
-	 * @return Default selectable background resId
-	 * @since 5.0.0-b7
-	 * @deprecated Use {@link #getSelectableItemBackground(Context)} instead.
-	 */
-	@Deprecated
-	public static int getSelectableBackground(Context context) {
-		TypedValue outValue = new TypedValue();
-		// It's important to not use the android.R because this wouldn't add the overridden drawable
-		context.getTheme().resolveAttribute(R.attr.selectableItemBackground, outValue, true);
-		return outValue.resourceId;
 	}
 
 	/**

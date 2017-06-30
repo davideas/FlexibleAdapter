@@ -99,8 +99,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
 		FlipView.resetLayoutAnimationDelay(true, 1000L);
 
 		//Experimenting NEW features (v5.0.0)
-		mAdapter.setAnimateChangesWithDiffUtil(DatabaseConfiguration.animateWithDiffUtil)
-				.setAnimateToLimit(DatabaseConfiguration.animateToLimit)//Size limit = MAX_VALUE will always animate the changes
+		mAdapter.setAnimateToLimit(DatabaseConfiguration.animateToLimit)//Size limit = MAX_VALUE will always animate the changes
 				.setNotifyMoveOfFilteredItems(DatabaseConfiguration.notifyMove)//When true, filtering on big list is very slow!
 				.setNotifyChangeOfUnfilteredItems(DatabaseConfiguration.notifyChange)
 				.setAnimationInitialDelay(100L)

@@ -90,38 +90,6 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 		this.context = context;
 	}
 
-	/**
-	 * Custom divider will be used.
-	 * <p>By default, divider will be drawn underneath the item.</p>
-	 *
-	 * @param context current context, it will be used to access resources
-	 * @param resId   drawable resourceId that should be used as a divider
-	 * @since 5.0.0-b4
-	 * @deprecated Unsupported. Use the methods {@code with...()} to configure the decoration
-	 */
-	@Deprecated
-	public FlexibleItemDecoration(@NonNull Context context, @DrawableRes int resId) {
-		this(context, resId, 0);
-	}
-
-	/**
-	 * Custom divider with gap between sections (in dpi).
-	 * <p>An invalid divider ( {@code <= 0} ) resId, will be ignored!</p>
-	 *
-	 * @param context       current context, it will be used to access resources
-	 * @param resId         drawable resourceId that should be used as a divider
-	 * @param sectionOffset the extra offset at the end of each section
-	 * @since 5.0.0-b6
-	 * @deprecated Unsupported. Use the methods {@code with...()} to configure the decoration
-	 */
-	@Deprecated
-	public FlexibleItemDecoration(@NonNull Context context, @DrawableRes int resId,
-								  @IntRange(from = 0) int sectionOffset) {
-		this.context = context;
-		withDivider(resId);
-		withSectionGapOffset(sectionOffset);
-	}
-
 	/*==========*/
 	/* DIVIDERS */
 	/*==========*/
@@ -183,14 +151,6 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	public FlexibleItemDecoration withDrawOver(boolean drawOver) {
 		this.mDrawOver = drawOver;
 		return this;
-	}
-
-	/**
-	 * @deprecated use {@link #withDrawOver(boolean)} instead.
-	 */
-	@Deprecated
-	public FlexibleItemDecoration setDrawOver(boolean drawOver) {
-		return withDrawOver(drawOver);
 	}
 
 	@Override
@@ -275,19 +235,6 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	/*==============================*/
 	/* OFFSET & EDGES CONFIGURATION */
 	/*==============================*/
-
-	/**
-	 * @param gap offset gap between sections, in dpi. Must be positive.
-	 * @since 5.0.0-b6
-	 * @deprecated Use {@link #withSectionGapOffset(int)}
-	 */
-	@Deprecated
-	public void setSectionGapWidth(@IntRange(from = 0) int gap) {
-		if (gap < 0) {
-			throw new IllegalArgumentException("Invalid section gap width [<0]: " + gap);
-		}
-		mSectionOffset = gap;
-	}
 
 	/**
 	 * Adds an extra offset at the end of each section.
@@ -389,20 +336,6 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	 */
 	public int getOffset() {
 		return (int) (mOffset / context.getResources().getDisplayMetrics().density);
-	}
-
-	/**
-	 * Applies the physical offset between items, of the same size of the divider previously set.
-	 *
-	 * @param withOffset true to leave space between items, false divider will be drawn overlapping
-	 *                   the items
-	 * @return this FlexibleItemDecoration instance so the call can be chained
-	 * @since 5.0.0-b8
-	 * @deprecated Not applicable anymore, use the Divider or the new {@code #withOffset()} method
-	 */
-	@Deprecated
-	public FlexibleItemDecoration withOffset(boolean withOffset) {
-		throw new UnsupportedOperationException("withOffset(boolean) is unsupported, use the Divider or the new withOffset(int) method!");
 	}
 
 	/**
@@ -530,7 +463,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 		}
 
 		boolean isFirstRowOrColumn = isFirstRowOrColumn(position, adapter, spanIndex, itemType);
-		boolean isLastRowOrColumn = isLastRowOrColumn(position, adapter, spanIndex, spanCount, itemType);
+		boolean isLastRowOrColumn = isLastRowOrColumn(position, adapter, spanIndex, spanCount, spanSize, itemType);
 
 		// Reset offset values
 		int left = 0, top = 0, right = 0, bottom = 0;
@@ -602,14 +535,14 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 				preRowPos == -1 || itemType != adapter.getItemViewType(preRowPos);
 	}
 
-	private boolean isLastRowOrColumn(int position, RecyclerView.Adapter adapter, int spanIndex, int spanCount, int itemType) {
+	private boolean isLastRowOrColumn(int position, RecyclerView.Adapter adapter, int spanIndex, int spanCount, int spanSize, int itemType) {
 		int itemCount = adapter.getItemCount();
 		int nextPos = position < itemCount - 1 ? position + 1 : -1;
 		// First position on the next row
-		int nextRowPos = position < itemCount - (spanCount - spanIndex) ? position + (spanCount - spanIndex) : -1;
+		//int nextRowPos = position < itemCount - (spanCount/spanSize - spanIndex) ? position + (spanCount/spanSize - spanIndex) : -1;
 		// isLastRowOrColumn if one of the following condition is true
-		return position == itemCount - 1 || nextPos == -1 || itemType != adapter.getItemViewType(nextPos) ||
-				nextRowPos == -1 || itemType != adapter.getItemViewType(nextRowPos);
+		return position == itemCount - 1 || nextPos == -1 || itemType != adapter.getItemViewType(nextPos);// ||
+				//nextRowPos == -1 || itemType != adapter.getItemViewType(nextRowPos);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -91,7 +91,7 @@ public class FragmentOverall extends AbstractFragment
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true); //Size of RV will not change
 		mItemDecoration = new FlexibleItemDecoration(getActivity())
-				.addItemViewType(R.layout.recycler_overall_item, 8)
+				.addItemViewType(R.layout.recycler_overall_item)
 				.withOffset(8) // This helps when top items are removed!!
 				.withEdge(true);
 		mRecyclerView.addItemDecoration(mItemDecoration);
@@ -121,6 +121,7 @@ public class FragmentOverall extends AbstractFragment
 	@Override
 	public void showNewLayoutInfo(MenuItem item) {
 		super.showNewLayoutInfo(item);
+		mRecyclerView.setAdapter(mAdapter);
 		mAdapter.showLayoutInfo(true);
 	}
 

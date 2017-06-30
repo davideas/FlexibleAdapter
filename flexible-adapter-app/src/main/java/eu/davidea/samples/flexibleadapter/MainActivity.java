@@ -559,11 +559,6 @@ public class MainActivity extends AppCompatActivity implements
 			reverseMenuItem.setEnabled(mAdapter.isAnimationOnScrollingEnabled());
 			reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrollingEnabled());
 		}
-		// DiffUtil?
-		MenuItem diffUtilItem = menu.findItem(R.id.action_diff_util);
-		if (diffUtilItem != null) {
-			diffUtilItem.setChecked(DatabaseConfiguration.animateWithDiffUtil);
-		}
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -596,18 +591,6 @@ public class MainActivity extends AppCompatActivity implements
 				mAdapter.setAnimationOnReverseScrolling(true);
 				item.setChecked(true);
 				Snackbar.make(findViewById(R.id.main_view), "Enabled reverse scrolling animation", Snackbar.LENGTH_SHORT).show();
-			}
-		} else if (id == R.id.action_diff_util) {
-			if (mAdapter.isAnimateChangesWithDiffUtil()) {
-				DatabaseConfiguration.animateWithDiffUtil = false;
-				mAdapter.setAnimateChangesWithDiffUtil(false);
-				item.setChecked(false);
-				Snackbar.make(findViewById(R.id.main_view), "Default calculation is used to animate changes\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
-			} else {
-				DatabaseConfiguration.animateWithDiffUtil = true;
-				mAdapter.setAnimateChangesWithDiffUtil(true);
-				item.setChecked(true);
-				Snackbar.make(findViewById(R.id.main_view), "DiffUtil is used to animate changes\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
 			}
 		} else if (id == R.id.action_auto_collapse) {
 			if (mAdapter.isAutoCollapseOnExpand()) {

@@ -17,17 +17,13 @@ package eu.davidea.flexibleadapter;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
-import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
@@ -35,7 +31,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -199,21 +194,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Sets an initial start animation adapter position.
-	 * <p>Default value is {@code 0} (1st position).</p>
-	 *
-	 * @param start non negative minimum position to start animation.
-	 * @since 5.0.0-b1
-	 * @deprecated Can't be supported anymore due to the new internal condition of non-animations.
-	 */
-	@Deprecated
-	public AnimatorAdapter setAnimationStartPosition(@IntRange(from = 0) int start) {
-		Log.i("Set animationStartPosition=%s", start);
-		mLastAnimatedPosition = start;
-		return this;
-	}
-
-	/**
 	 * Enables/Disables item animation while scrolling and on loading.
 	 * <p>Enabling scrolling will disable onlyEntryAnimation.<br>
 	 * Disabling scrolling will disable also reverse scrolling.</p>
@@ -257,16 +237,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/**
 	 * @return true if items are animated also on reverse scrolling, false only forward
 	 * @since 5.0.0-b1
-	 * @deprecated use {@link #isAnimationOnReverseScrollingEnabled()}
-	 */
-	@Deprecated
-	public boolean isAnimationOnReverseScrolling() {
-		return isReverseEnabled;
-	}
-
-	/**
-	 * @return true if items are animated also on reverse scrolling, false only forward
-	 * @since 5.0.0-b1
 	 */
 	public boolean isAnimationOnReverseScrollingEnabled() {
 		return isReverseEnabled;
@@ -303,29 +273,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	/*--------------*/
 	/* MAIN METHODS */
 	/*--------------*/
-
-	/**
-	 * Build your custom list of {@link Animator} to apply on the ItemView.<br>
-	 * Write the logic based on the position and/or viewType and/or the item selection.
-	 * <p><b>Suggestions:</b>
-	 * <br>- You can also use {@link #getItemViewType(int)} to apply different Animation for
-	 * each view type.
-	 * <br>- If you want to apply same animation for all items, create new list at class level
-	 * and initialize it in the constructor, not inside this method!</p>
-	 *
-	 * @param itemView  the bounded ItemView
-	 * @param position  position can be used to differentiate the list of Animators
-	 * @param isForward boolean to be used to differentiate the list of Animators
-	 * @return The list of animators to animate all together.
-	 * @see #animateView(View, int)
-	 * @see #getItemViewType(int)
-	 * @since 5.0.0-b1
-	 * @deprecated Use {@link AnimatorHelper} from {@link FlexibleViewHolder#scrollAnimators(List, int, boolean)}.
-	 */
-	@Deprecated
-	public List<Animator> getAnimators(View itemView, int position, boolean isForward) {
-		return new ArrayList<>();
-	}
 
 	/**
 	 * Cancels any existing animations for given View. Useful when fling.
@@ -411,60 +358,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 	}
 
 	/**
-	 * Animates the view based on the custom animator list built with {@link #getAnimators(View, int, boolean)}.
-	 *
-	 * @since 5.0.0-b1
-	 * @deprecated New system in place. Implement {@link FlexibleViewHolder#scrollAnimators(List, int, boolean)}
-	 * and add new animator(s) to the list of {@code animators}.
-	 */
-	@Deprecated
-	public final void animateView(final View itemView, int position) {
-//		if (DEBUG)
-//			Log.v(TAG, "shouldAnimate=" + shouldAnimate
-//					+ " isFastScroll=" + isFastScroll
-//					+ " isNotified=" + mAnimatorNotifierObserver.isPositionNotified()
-//					+ " isReverseEnabled=" + isReverseEnabled
-//					+ " mLastAnimatedPosition=" + mLastAnimatedPosition
-//					+ (!isReverseEnabled ? " Pos>AniPos=" + (position > mLastAnimatedPosition) : "")
-//			);
-
-		if (shouldAnimate && !isFastScroll && !mAnimatorNotifierObserver.isPositionNotified() &&
-				(isReverseEnabled || position > mLastAnimatedPosition || (position == 0 && mRecyclerView.getChildCount() == 0))) {
-
-			//Cancel animation is necessary when fling
-			cancelExistingAnimation(itemView.hashCode());
-
-			//Retrieve user animators
-			List<Animator> animators = getAnimators(itemView, position, position > mLastAnimatedPosition);
-
-			//Add Alpha animator
-			ViewCompat.setAlpha(itemView, 0);
-			animators.add(ObjectAnimator.ofFloat(itemView, "alpha", 0f, 1f));
-			Log.w("Started Deprecated Animation on position %s", position);
-
-			//Execute the animations
-			AnimatorSet set = new AnimatorSet();
-			set.playTogether(animators);
-			set.setInterpolator(mInterpolator);
-			set.setDuration(mDuration);
-			set.addListener(new HelperAnimatorListener(itemView.hashCode()));
-			if (mEntryStep) {
-				set.setStartDelay(calculateAnimationDelay(position));
-			}
-			set.start();
-			mAnimators.put(itemView.hashCode(), set);
-
-			//Animate only during initial loading?
-			if (onlyEntryAnimation && mLastAnimatedPosition >= mMaxChildViews) {
-				shouldAnimate = false;
-			}
-		}
-
-		mAnimatorNotifierObserver.clearNotified();
-		mLastAnimatedPosition = position;
-	}
-
-	/**
 	 * @param position the position just bound
 	 * @return the delay in milliseconds after which, the animation for next ItemView should start.
 	 */
@@ -512,141 +405,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 //				visibleItems, mRecyclerView.getChildCount(), mMaxChildViews);
 
 		return delay;
-	}
-
-	/*-----------*/
-	/* ANIMATORS */
-	/*-----------*/
-
-	/**
-	 * This is the default animator.<br>
-	 * Alpha animator will be always automatically added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added.<br>
-	 * Incompatible with ALPHA animator.</p>
-	 *
-	 * @param animators user defined list
-	 * @param view      itemView to animate
-	 * @param alphaFrom starting alpha value
-	 * @since 5.0.0-b1
-	 * @deprecated Use {@link AnimatorHelper}.
-	 */
-	@Deprecated
-	private void addAlphaAnimator(
-			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float alphaFrom) {
-		if (animatorsUsed.contains(AnimatorEnum.ALPHA)) return;
-		animators.add(ObjectAnimator.ofFloat(view, "alpha", alphaFrom, 1f));
-		animatorsUsed.add(AnimatorEnum.ALPHA);
-	}
-
-	/**
-	 * Item will slide from Left to Right.<br>
-	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br>
-	 * Incompatible with LEFT, TOP, BOTTOM animators.<br>
-	 *
-	 * @param animators user defined list
-	 * @param view      itemView to animate
-	 * @param percent   any % multiplier (between 0 and 1) of the LayoutManager Width
-	 * @since 5.0.0-b1
-	 * @deprecated Use {@link AnimatorHelper}.
-	 */
-	@Deprecated
-	public void addSlideInFromLeftAnimator(
-			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float percent) {
-		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_RIGHT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_TOP) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_BOTTOM)) return;
-		animators.add(ObjectAnimator.ofFloat(view, "translationX", -mRecyclerView.getLayoutManager().getWidth() * percent, 0));
-		animatorsUsed.add(AnimatorEnum.SLIDE_IN_LEFT);
-	}
-
-	/**
-	 * Item will slide from Right to Left.<br>
-	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br>
-	 * Incompatible with RIGHT, TOP, BOTTOM animators.<br>
-	 *
-	 * @param animators user defined list
-	 * @param view      ItemView to animate
-	 * @param percent   Any % multiplier (between 0 and 1) of the LayoutManager Width
-	 * @since 5.0.0-b1
-	 * @deprecated Use {@link AnimatorHelper}.
-	 */
-	@Deprecated
-	public void addSlideInFromRightAnimator(
-			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float percent) {
-		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_RIGHT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_TOP) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_BOTTOM)) return;
-		animators.add(ObjectAnimator.ofFloat(view, "translationX", mRecyclerView.getLayoutManager().getWidth() * percent, 0));
-		animatorsUsed.add(AnimatorEnum.SLIDE_IN_RIGHT);
-	}
-
-	/**
-	 * Item will slide from Top of the screen to its natural position.<br>
-	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br>
-	 * Incompatible with LEFT, RIGHT, TOP, BOTTOM animators.</p>
-	 *
-	 * @param animators user defined list
-	 * @param view      itemView to animate
-	 * @since 5.0.0-b7
-	 * @deprecated Use {@link AnimatorHelper}.
-	 */
-	@Deprecated
-	public void addSlideInFromTopAnimator(
-			@NonNull List<Animator> animators, @NonNull View view) {
-		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_RIGHT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_TOP) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_BOTTOM)) return;
-		animators.add(ObjectAnimator.ofFloat(view, "translationY", -mRecyclerView.getMeasuredHeight() >> 1, 0));
-		animatorsUsed.add(AnimatorEnum.SLIDE_IN_TOP);
-	}
-
-	/**
-	 * Item will slide from Bottom of the screen to its natural position.<br>
-	 * Ignored if LEFT, RIGHT, TOP or BOTTOM animators were already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br>
-	 * Incompatible with LEFT, RIGHT, TOP, BOTTOM animators.</p>
-	 *
-	 * @param animators user defined list
-	 * @param view      itemView to animate
-	 * @since 5.0.0-b1
-	 * @deprecated Use {@link AnimatorHelper}.
-	 */
-	@Deprecated
-	public void addSlideInFromBottomAnimator(
-			@NonNull List<Animator> animators, @NonNull View view) {
-		if (animatorsUsed.contains(AnimatorEnum.SLIDE_IN_LEFT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_RIGHT) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_TOP) ||
-				animatorsUsed.contains(AnimatorEnum.SLIDE_IN_BOTTOM)) return;
-		animators.add(ObjectAnimator.ofFloat(view, "translationY", mRecyclerView.getMeasuredHeight() >> 1, 0));
-		animatorsUsed.add(AnimatorEnum.SLIDE_IN_BOTTOM);
-	}
-
-	/**
-	 * Item will scale.<br>
-	 * Ignored if SCALE animator was already added.
-	 * <p><b>Note:</b> Only 1 animator of the same compatible type can be added per time.<br>
-	 * Incompatible with LEFT, RIGHT, BOTTOM animators.<br>
-	 *
-	 * @param animators user defined list
-	 * @param view      itemView to animate
-	 * @param scaleFrom initial scale value
-	 * @since 5.0.0-b1
-	 * @deprecated Use {@link AnimatorHelper}.
-	 */
-	@Deprecated
-	public void addScaleInAnimator(
-			@NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float scaleFrom) {
-		if (animatorsUsed.contains(AnimatorEnum.SCALE)) return;
-		animators.add(ObjectAnimator.ofFloat(view, "scaleX", scaleFrom, 1f));
-		animators.add(ObjectAnimator.ofFloat(view, "scaleY", scaleFrom, 1f));
-		animatorsUsed.add(AnimatorEnum.SCALE);
 	}
 
 	/*---------------*/

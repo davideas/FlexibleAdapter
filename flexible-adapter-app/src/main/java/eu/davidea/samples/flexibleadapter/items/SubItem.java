@@ -85,7 +85,7 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
 		// this will be highlighted
 		if (adapter.hasSearchText()) {
 			Context context = holder.itemView.getContext();
-			FlexibleUtils.highlightText(context, holder.mTitle, getTitle(), adapter.getSearchText(),
+			FlexibleUtils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText(),
 					context.getResources().getColor(R.color.colorAccent_light));
 		} else {
 			holder.mTitle.setText(getTitle());

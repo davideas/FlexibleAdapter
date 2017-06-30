@@ -160,8 +160,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 			Log.w("Can't start drag: Item is not enabled or draggable!");
 			return false;
 		}
-		if (FlexibleAdapter.DEBUG)
-			Log.v("onTouch with DragHandleView on position %s mode=%s", position, mAdapter.getMode());
+		Log.v("onTouch with DragHandleView on position %s mode=%s", position, mAdapter.getMode());
 		if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN &&
 				mAdapter.isHandleDragEnabled()) {
 			//Start Drag!

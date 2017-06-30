@@ -237,22 +237,6 @@ public class FastScroller extends FrameLayout {
 	}
 
 	/**
-	 * Layout customization<br>
-	 * Color for Selected State is also customized by the user.
-	 *
-	 * @param layoutResId Main layout of Fast Scroller
-	 * @param bubbleResId Drawable resource for Bubble containing the Text
-	 * @param handleResId Drawable resource for the Handle
-	 * @param accentColor Color for Selected state during touch and scrolling (usually accent bubbleAndHandleColor)
-	 * @deprecated Accent Color is automatically fetched at startup
-	 */
-	@Deprecated
-	public void setViewsToUse(@LayoutRes int layoutResId, @IdRes int bubbleResId, @IdRes int handleResId, @ColorInt int accentColor) {
-		setViewsToUse(layoutResId, bubbleResId, handleResId);
-		setBubbleAndHandleColor(accentColor);
-	}
-
-	/**
 	 * Changes the color of the Bubble and Handle views.
 	 * <p><b>Note:</b> Views are already initialized with accent color at startup.</p>
 	 *

@@ -16,9 +16,7 @@
 package eu.davidea.flexibleadapter.utils;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -111,38 +109,6 @@ public final class FlexibleUtils {
 	 * Sets a spannable text with the accent color (if available) into the provided TextView.
 	 * <p>Internally calls {@link #fetchAccentColor(Context, int)}.</p>
 	 *
-	 * @param context      context
-	 * @param textView     the TextView to transform
-	 * @param originalText the original text which the transformation is applied to
-	 * @param constraint   the text to highlight
-	 * @param defColor     the default color in case accentColor is not found
-	 * @see #fetchAccentColor(Context, int)
-	 * @deprecated Use
-	 * {@link #highlightText(TextView, String, String, int)} OR
-	 * {@link #highlightText(TextView, String, String)}
-	 */
-	@Deprecated
-	public static void highlightText(@NonNull Context context, @NonNull TextView textView,
-									 String originalText, String constraint, @ColorInt int defColor) {
-		if (originalText == null) originalText = "";
-		if (constraint == null) constraint = "";
-		int i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()));
-		if (i != -1) {
-			Spannable spanText = Spannable.Factory.getInstance().newSpannable(originalText);
-			spanText.setSpan(new ForegroundColorSpan(fetchAccentColor(context, defColor)), i,
-					i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-			spanText.setSpan(new StyleSpan(Typeface.BOLD), i,
-					i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-			textView.setText(spanText, TextView.BufferType.SPANNABLE);
-		} else {
-			textView.setText(originalText, TextView.BufferType.NORMAL);
-		}
-	}
-
-	/**
-	 * Sets a spannable text with the accent color (if available) into the provided TextView.
-	 * <p>Internally calls {@link #fetchAccentColor(Context, int)}.</p>
-	 *
 	 * @param textView     the TextView to transform
 	 * @param originalText the original text which the transformation is applied to
 	 * @param constraint   the text to highlight
@@ -181,22 +147,6 @@ public final class FlexibleUtils {
 		} else {
 			textView.setText(originalText, TextView.BufferType.NORMAL);
 		}
-	}
-
-	/**
-	 * Resolves bug #161. Necessary when {@code theme} attribute is used in the layout.
-	 * Used by {@code FlexibleAdapter.getStickyHeaderContainer()} method.
-	 *
-	 * @deprecated method {@code getStickyHeaderContainer()} is now deprecated.
-	 */
-	@Deprecated
-	public static Activity scanForActivity(Context context) {
-		if (context instanceof Activity)
-			return (Activity) context;
-		else if (context instanceof ContextWrapper)
-			return scanForActivity(((ContextWrapper) context).getBaseContext());
-
-		return null;
 	}
 
 	/*------------------------------*/

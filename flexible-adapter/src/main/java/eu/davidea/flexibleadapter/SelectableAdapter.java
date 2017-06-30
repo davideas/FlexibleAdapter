@@ -64,23 +64,12 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener, FastScroller.AdapterInterface {
 
 	private static final String TAG = SelectableAdapter.class.getSimpleName();
-	@Deprecated
-	public static boolean DEBUG = false;
-
-	/**
-	 * - MODE_IDLE: Adapter will not keep track of selections<br>
-	 * - MODE_SINGLE: Select only one per time<br>
-	 * - MODE_MULTI: Multi selection will be activated
-	 * @deprecated Use values from interface {@link Mode}.
-	 */
-	@Deprecated
-	public static final int MODE_IDLE = 0, MODE_SINGLE = 1, MODE_MULTI = 2;
 
 	/**
 	 * Annotation interface for selection modes: {@link #IDLE}, {@link #SINGLE}, {@link #MULTI}
 	 */
 	@SuppressLint("UniqueConstants")
-	@IntDef({IDLE, SINGLE, MULTI, MODE_IDLE, MODE_SINGLE, MODE_MULTI})
+	@IntDef({IDLE, SINGLE, MULTI})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface Mode {
 		/**
@@ -135,21 +124,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	/*----------------*/
 	/* STATIC METHODS */
 	/*----------------*/
-
-	/**
-	 * Call this once, to enable or disable logs.<br>
-	 * DEBUG logs are disabled by default.
-	 *
-	 * @param enable true to show DEBUG logs in verbose mode, false to hide them.
-	 * @since 5.0.0-b1
-	 * @deprecated Use the new {@link #enableLogs(int)}
-	 */
-	@Deprecated
-	public static void enableLogs(boolean enable) {
-		DEBUG = enable;
-		if (enable) enableLogs(Level.DEBUG);
-		else enableLogs(Level.SUPPRESS);
-	}
 
 	/**
 	 * Call this once, to enable or disable internal logs with custom level.<br>
@@ -587,7 +561,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 	 * Displays or Hides the {@link FastScroller} if previously configured.
 	 * <br>The action is animated.
 	 *
-	 * @see #setFastScroller(FastScroller, int)
+	 * @see #setFastScroller(FastScroller)
 	 * @since 5.0.0-b1
 	 */
 	public void toggleFastScroller() {
@@ -623,57 +597,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		mFastScrollerDelegate.setFastScroller(fastScroller);
 	}
 
-	/**
-	 * Sets up the {@link FastScroller} with automatic fetch of accent color.
-	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
-	 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
-	 * for previous version, the default value is used.
-	 *
-	 * @param fastScroller        instance of {@link FastScroller}
-	 * @param stateChangeListener the listener to monitor when fast scrolling state changes
-	 * @since 5.0.0-b6
-	 * @deprecated Add stateChangeListener directly to the FastScroller: {@link FastScroller#addOnScrollStateChangeListener(FastScroller.OnScrollStateChangeListener)}
-	 */
-	@Deprecated
-	public void setFastScroller(@NonNull FastScroller fastScroller,
-								FastScroller.OnScrollStateChangeListener stateChangeListener) {
-		if (fastScroller == null) {
-			throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
-		}
-		setFastScroller(fastScroller);
-		getFastScroller().addOnScrollStateChangeListener(stateChangeListener);
-	}
-
-	/**
-	 * Convenience method of {@link #setFastScroller(FastScroller, int, FastScroller.OnScrollStateChangeListener)}.
-	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
-	 *
-	 * @see #setFastScroller(FastScroller, int, FastScroller.OnScrollStateChangeListener)
-	 * @since 5.0.0-b1
-	 * @deprecated Accent Color is automatically fetched at startup
-	 */
-	@Deprecated
-	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor) {
-		setFastScroller(fastScroller, null);
-	}
-
-	/**
-	 * Sets up the {@link FastScroller} with automatic fetch of accent color.
-	 * <p><b>IMPORTANT:</b> Call this method after the adapter is added to the RecyclerView.</p>
-	 * <b>NOTE:</b> If the device has at least Lollipop, the Accent color is fetched, otherwise
-	 * for previous version, the default value is used.
-	 *
-	 * @param fastScroller        instance of {@link FastScroller}
-	 * @param accentColor         the default value color if the accentColor cannot be fetched
-	 * @param stateChangeListener the listener to monitor when fast scrolling state changes
-	 * @since 5.0.0-b6
-	 * @deprecated Accent Color is automatically fetched at startup
-	 */
-	@Deprecated
-	public void setFastScroller(@NonNull FastScroller fastScroller, int accentColor,
-								FastScroller.OnScrollStateChangeListener stateChangeListener) {
-		setFastScroller(fastScroller, stateChangeListener);
-	}
 
 	/**
 	 * @param position the position of the handle
