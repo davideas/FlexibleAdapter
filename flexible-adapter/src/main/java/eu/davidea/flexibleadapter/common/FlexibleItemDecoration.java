@@ -539,10 +539,10 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 		int itemCount = adapter.getItemCount();
 		int nextPos = position < itemCount - 1 ? position + 1 : -1;
 		// First position on the next row
-		//int nextRowPos = position < itemCount - (spanCount/spanSize - spanIndex) ? position + (spanCount/spanSize - spanIndex) : -1;
+		int nextRowPos = position < itemCount - (spanCount/spanSize - spanIndex) ? position + (spanCount/spanSize - spanIndex) : -1;
 		// isLastRowOrColumn if one of the following condition is true
-		return position == itemCount - 1 || nextPos == -1 || itemType != adapter.getItemViewType(nextPos);// ||
-				//nextRowPos == -1 || itemType != adapter.getItemViewType(nextRowPos);
+		return position == itemCount - 1 || nextPos == -1 || itemType != adapter.getItemViewType(nextPos) ||
+				nextRowPos == -1 || itemType != adapter.getItemViewType(nextRowPos);
 	}
 
 	@SuppressWarnings("unchecked")
