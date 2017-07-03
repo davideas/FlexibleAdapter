@@ -12,6 +12,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
+import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
@@ -33,7 +34,7 @@ public class UpdateDataSetTest {
 	public void setUp() throws Exception {
 		DatabaseService.getInstance().createHeadersSectionsDatabase(30, 5);
 		mInitialItems = DatabaseService.getInstance().getDatabaseList();
-		FlexibleAdapter.enableLogs(true);
+		FlexibleAdapter.enableLogs(Log.Level.VERBOSE);
 	}
 
 	@Test

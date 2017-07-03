@@ -333,8 +333,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	/**
 	 * Maps and expands items that are initially configured to be shown as expanded.
 	 * <p>This method should be called during the creation of the Activity/Fragment, useful also
-	 * after a screen rotation.
-	 * <br>It is also called after the data set is updated.</p>
+	 * after a screen rotation.</p>
 	 *
 	 * @return this Adapter, so the call can be chained
 	 * @since 5.0.0-b6
@@ -2831,6 +2830,19 @@ public class FlexibleAdapter<T extends IFlexible>
 	}
 
 	/**
+	 * Convenience method of {@link #addSubItems(int, int, List, boolean, Object)}.
+	 * <br>In this case parent item will never be expanded if it is collapsed.
+	 *
+	 * @return true if the internal list was successfully modified, false otherwise
+	 * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
+	 * @since 5.0.0-rc3
+	 */
+	public boolean addSubItems(@IntRange(from = 0) int parentPosition,
+							  @IntRange(from = 0) int subPosition, @NonNull List<T> items) {
+		return this.addSubItems(parentPosition, subPosition, items, false, Payload.CHANGE);
+	}
+
+	/**
 	 * Convenience method of {@link #addSubItems(int, int, IExpandable, List, boolean, Object)}.
 	 * <br>Optionally you can pass any payload to notify the parent about the change and optimize
 	 * the view binding.
@@ -3516,7 +3528,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 * @return the expandable(parent) of this child, or null if no parent found.
 	 * @since 5.0.0-b1
 	 */
-	public final IExpandable getExpandableOfDeletedChild(T child) {
+	public final IExpandable getExpandableOfDeletedChild(@NonNull T child) {
 		for (RestoreInfo restoreInfo : mRestoreList) {
 			if (restoreInfo.item.equals(child) && isExpandable(restoreInfo.refItem))
 				return (IExpandable) restoreInfo.refItem;
