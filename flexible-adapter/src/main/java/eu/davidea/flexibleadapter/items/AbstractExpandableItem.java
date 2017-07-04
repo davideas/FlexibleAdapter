@@ -73,8 +73,19 @@ public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S 
 		return mSubItems != null && mSubItems.size() > 0;
 	}
 
-	public IFlexible setSubItems(List<S> subItem) {
-		mSubItems = subItem;
+	public AbstractExpandableItem setSubItems(List<S> subItems) {
+		mSubItems = subItems;
+		return this;
+	}
+
+	public AbstractExpandableItem addSubItems(int position, List<S> subItems) {
+		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
+			mSubItems.addAll(position, subItems);
+		} else {
+			if (mSubItems == null)
+				mSubItems = new ArrayList<>();
+			mSubItems.addAll(subItems);
+		}
 		return this;
 	}
 
@@ -93,17 +104,20 @@ public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S 
 		return mSubItems != null ? mSubItems.indexOf(subItem) : -1;
 	}
 
-	public void addSubItem(S subItem) {
+	public AbstractExpandableItem addSubItem(S subItem) {
 		if (mSubItems == null)
 			mSubItems = new ArrayList<>();
 		mSubItems.add(subItem);
+		return this;
 	}
 
-	public void addSubItem(int position, S subItem) {
+	public AbstractExpandableItem addSubItem(int position, S subItem) {
 		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
 			mSubItems.add(position, subItem);
-		} else
+		} else {
 			addSubItem(subItem);
+		}
+		return this;
 	}
 
 	public boolean contains(S subItem) {
@@ -111,7 +125,11 @@ public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S 
 	}
 
 	public boolean removeSubItem(S item) {
-		return item != null && mSubItems.remove(item);
+		return item != null && mSubItems != null && mSubItems.remove(item);
+	}
+
+	public boolean removeSubItems(List<S> subItems) {
+		return subItems != null && mSubItems != null && mSubItems.removeAll(subItems);
 	}
 
 	public boolean removeSubItem(int position) {
