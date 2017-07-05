@@ -158,7 +158,7 @@ Half swipe can be done with others means, please see issues #98 and #100. See al
 - [Arpinca](https://github.com/arpinca) who added new features for FastScroller like _autoHide_ and _ignoreTouchesOutsideHandle_ and more.
 
 ###### Donations
-If someone would like to say _Thank You_ by donating any amount, you're very welcome! Here the link to PayPal.me:
+This library is currently free to use and modify, if you would like to say _Thank You_ by donating any amount, you're very welcome! Here the link to PayPal.me:
 
 [![PayPal.me](https://www.paypalobjects.com/webstatic/i/sparta/logo/logo_paypal_106x29.png)](https://www.paypal.me/davideas)
 
