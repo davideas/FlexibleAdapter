@@ -142,6 +142,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	/**
 	 * {@inheritDoc}
+	 * <p>Attaches the {@code FastScrollerDelegate} to the RecyclerView if necessary.</p>
 	 *
 	 * @since 5.0.0-b6
 	 */
@@ -156,6 +157,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
 	/**
 	 * {@inheritDoc}
+	 * <p>Detaches the {@code FastScrollerDelegate} from the RecyclerView if necessary.</p>
 	 *
 	 * @since 5.0.0-b6
 	 */

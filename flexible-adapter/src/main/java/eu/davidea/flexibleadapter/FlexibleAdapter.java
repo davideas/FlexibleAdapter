@@ -303,13 +303,14 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * {@inheritDoc}
-	 * <p>Attaches the StickyHeaderHelper from the RecyclerView if necessary.</p>
+	 * <p>Attaches the {@code StickyHeaderHelper} to the RecyclerView if necessary.</p>
 	 *
 	 * @since 5.0.0-b6
 	 */
 	@Override
 	public void onAttachedToRecyclerView(RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
+		Log.v("Attached Adapter to RecyclerView");
 		if (headersShown && areHeadersSticky()) {
 			mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
 		}
@@ -317,7 +318,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/**
 	 * {@inheritDoc}
-	 * <p>Detaches the StickyHeaderHelper from the RecyclerView if necessary.</p>
+	 * <p>Detaches the {@code StickyHeaderHelper} from the RecyclerView if necessary.</p>
 	 *
 	 * @since 5.0.0-b6
 	 */
@@ -328,6 +329,7 @@ public class FlexibleAdapter<T extends IFlexible>
 			mStickyHeaderHelper = null;
 		}
 		super.onDetachedFromRecyclerView(recyclerView);
+		Log.v("Detached Adapter from RecyclerView");
 	}
 
 	/**
