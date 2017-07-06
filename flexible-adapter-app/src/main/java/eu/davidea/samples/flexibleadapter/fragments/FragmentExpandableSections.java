@@ -55,6 +55,7 @@ public class FragmentExpandableSections extends AbstractFragment {
 			DatabaseService.getInstance().createExpandableSectionsDatabase(100); //N. of sections
 		}
 		initializeRecyclerView(savedInstanceState);
+		initializeFab();
 
 		// Settings for FlipView
 		FlipView.stopLayoutAnimation();
@@ -108,6 +109,18 @@ public class FragmentExpandableSections extends AbstractFragment {
 		super.showNewLayoutInfo(item);
 		mRecyclerView.setAdapter(mAdapter);
 		mAdapter.showLayoutInfo(false);
+	}
+
+	@Override
+	protected void initializeFab() {
+		super.initializeFab();
+		mFab.setImageResource(R.drawable.ic_refresh_white_24dp);
+	}
+
+	@Override
+	public void performFabAction() {
+		super.performFabAction();
+		mAdapter.updateDataSet(DatabaseService.getInstance().getDatabaseList(), true);
 	}
 
 	@Override
