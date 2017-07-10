@@ -355,6 +355,7 @@ public class MainActivity extends AppCompatActivity implements
 			mFragment = FragmentExpandableMultiLevel.newInstance(2);
 		} else if (id == R.id.nav_expandable_sections) {
 			mFragment = FragmentExpandableSections.newInstance(3);
+			showFab();
 		} else if (id == R.id.nav_staggered) {
 			mFragment = FragmentStaggeredLayout.newInstance(2);
 		} else if (id == R.id.nav_model_holders) {
