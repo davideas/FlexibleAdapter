@@ -235,10 +235,8 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			resetHeader(mStickyHeaderViewHolder);
 		}
 		mStickyHeaderViewHolder = newHeader;
-		if (mStickyHeaderViewHolder != null) {
-			mStickyHeaderViewHolder.setIsRecyclable(false);
-			ensureHeaderParent();
-		}
+		mStickyHeaderViewHolder.setIsRecyclable(false);
+		ensureHeaderParent();
 		onStickyHeaderChange(mHeaderPosition, oldHeaderPosition);
 	}
 
@@ -386,9 +384,6 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			holder = (FlexibleViewHolder) mAdapter.createViewHolder(mRecyclerView, mAdapter.getItemViewType(position));
 			mAdapter.bindViewHolder(holder, position);
 
-			// Restore the Adapter position
-			holder.setBackupPosition(position);
-
 			// Calculate width and height
 			int widthSpec;
 			int heightSpec;
@@ -412,6 +407,8 @@ public final class StickyHeaderHelper extends OnScrollListener {
 			headerView.measure(childWidth, childHeight);
 			headerView.layout(0, 0, headerView.getMeasuredWidth(), headerView.getMeasuredHeight());
 		}
+		// #404 - Be sure VH has the backup Adapter position
+		holder.setBackupPosition(position);
 		return holder;
 	}
 

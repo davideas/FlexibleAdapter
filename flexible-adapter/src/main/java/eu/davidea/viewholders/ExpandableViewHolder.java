@@ -174,8 +174,8 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 	public void onClick(View view) {
 		if (mAdapter.isEnabled(getFlexibleAdapterPosition()) && isViewExpandableOnClick()) {
 			toggleExpansion();
+			super.onClick(view);
 		}
-		super.onClick(view);
 	}
 
 	/**
