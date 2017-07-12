@@ -41,6 +41,7 @@ import eu.davidea.flexibleadapter.common.FlexibleLayoutManager;
  * @author Davide Steduto
  * @since 27/01/2016 Created
  */
+@SuppressWarnings({"WeakerAccess", "unused", "ConstantConditions"})
 public final class FlexibleUtils {
 
 	public static final int INVALID_COLOR = -1;
@@ -101,8 +102,9 @@ public final class FlexibleUtils {
 	 * @return the SimpleClassName of the provided object
 	 * @since 5.0.0-rc1
 	 */
+	@NonNull
 	public static String getClassName(@NonNull Object o) {
-		return o.getClass().getSimpleName();
+		return o == null ? "null" : o.getClass().getSimpleName();
 	}
 
 	/**
