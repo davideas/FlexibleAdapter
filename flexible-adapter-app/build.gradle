@@ -1,4 +1,11 @@
 apply plugin: 'com.android.application'
+apply plugin: 'eu.davidea.grabver'
+
+versioning {
+	major 5
+	minor 0
+	preRelease "SNAPSHOT"
+}
 
 android {
 	compileSdkVersion targetSdk
@@ -8,22 +15,22 @@ android {
 		applicationId 'eu.davidea.samples.flexibleadapter'
 		minSdkVersion minSdk
 		targetSdkVersion targetSdk
-		versionCode libraryCode
-		versionName libraryVersion + libraryDate
+		versionCode versioning.code
+		versionName versioning.name
 
 		testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
 
 		applicationVariants.all { variant ->
 			variant.outputs.each { output ->
 				def file = output.outputFile
-				def fileName = 'flexible-adapter-v' + libraryVersion + '-c' + versionCode + '.apk'
+				def fileName = 'flexible-adapter-v' + versioning.name + '-c' + versioning.code + '.apk'
 				output.outputFile = new File(file.parentFile, fileName)
 			}
 		}
 	}
 	buildTypes {
 		debug {
-			versionNameSuffix ' #' + libraryCode + libraryDate
+			versionNameSuffix ' #' + versioning.build + versioning.builtOn
 			minifyEnabled false
 		}
 		release {

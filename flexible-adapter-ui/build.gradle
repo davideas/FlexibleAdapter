@@ -1,10 +1,15 @@
 apply plugin: 'com.android.library'
+apply plugin: 'eu.davidea.grabver'
+
+versioning {
+	major 1
+	minor 0
+	preRelease "b1"
+}
 
 ext {
 	// Library Settings
 	libraryName = "FlexibleAdapter UI extension"
-	libraryCode = 1
-	libraryVersion = "1.0.0-b1"
 	libraryDescription = "UI extension for FlexibleAdapter project"
 	libraryLabels = ['android', 'flexibleadapter', 'adapter', 'ui']
 
@@ -20,8 +25,8 @@ android {
 	defaultConfig {
 		minSdkVersion minSdk
 		targetSdkVersion targetSdk
-		versionCode libraryCode
-		versionName libraryVersion + libraryDate
+		versionCode versioning.code
+		versionName versioning.name
 	}
 	buildTypes {
 		release {
