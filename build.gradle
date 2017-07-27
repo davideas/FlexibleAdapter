@@ -1,80 +1,80 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 ext {
-	// Author
-	developerId = "davideas"
-	developerName = "Davide Steduto"
-	developerEmail = "dave.dna@gmail.com"
+    // Author
+    developerId = "davideas"
+    developerName = "Davide Steduto"
+    developerEmail = "dave.dna@gmail.com"
 
-	// Library Repository
-	libraryName = "FlexibleAdapter"
-	bintrayRepo = "maven"
-	packageExt = "aar"
-	siteUrl = "https://github.com/davideas/FlexibleAdapter"
-	gitUrl = "https://github.com/davideas/FlexibleAdapter.git"
+    // Library Repository
+    libraryName = "FlexibleAdapter"
+    bintrayRepo = "maven"
+    packageExt = "aar"
+    siteUrl = "https://github.com/davideas/FlexibleAdapter"
+    gitUrl = "https://github.com/davideas/FlexibleAdapter.git"
 
-	// Support and Build tools version
-	minSdk = 14
-	targetSdk = 26
-	buildTools = "26.0.0"
-	supportLib = "25.4.0"
+    // Support and Build tools version
+    minSdk = 14
+    targetSdk = 26
+    buildTools = "26.0.0"
+    supportLib = "25.4.0"
 
-	// Support Libraries dependencies
-	supportDependencies = [
-		design       : "com.android.support:design:${supportLib}",
-		recyclerview : "com.android.support:recyclerview-v7:${supportLib}",
-		cardview     : "com.android.support:cardview-v7:${supportLib}",
-		appcompat    : "com.android.support:appcompat-v7:${supportLib}",
-		customtabs   : "com.android.support:customtabs:${supportLib}",
-		support_v4   : "com.android.support:support-v4:${supportLib}",
-		support_v13  : "com.android.support:support-v13:${supportLib}",
-		annotations  : "com.android.support:support-annotations:${supportLib}"
-	]
+    // Support Libraries dependencies
+    supportDependencies = [
+            design      : "com.android.support:design:${supportLib}",
+            recyclerview: "com.android.support:recyclerview-v7:${supportLib}",
+            cardview    : "com.android.support:cardview-v7:${supportLib}",
+            appcompat   : "com.android.support:appcompat-v7:${supportLib}",
+            customtabs  : "com.android.support:customtabs:${supportLib}",
+            support_v4  : "com.android.support:support-v4:${supportLib}",
+            support_v13 : "com.android.support:support-v13:${supportLib}",
+            annotations : "com.android.support:support-annotations:${supportLib}"
+    ]
 
-	licenseName = "The Apache Software License, Version 2.0"
-	licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-	allLicenses = ["Apache-2.0"]
-	licenseDist = "repo"
+    licenseName = "The Apache Software License, Version 2.0"
+    licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+    allLicenses = ["Apache-2.0"]
+    licenseDist = "repo"
 }
 
 static String getDate() {
-	def date = new Date()
-	return date.format('yyyy.MM.dd')
+    def date = new Date()
+    return date.format('yyyy.MM.dd')
 }
 
 // Avoid JavaDoc Lint failures when using Java8
 if (JavaVersion.current().isJava8Compatible()) {
-	allprojects {
-		tasks.withType(Javadoc) {
-			options.addStringOption('Xdoclint:none', '-quiet')
-		}
-	}
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
 }
 
 buildscript {
-	repositories {
-		jcenter()
-		maven {url "http://dl.bintray.com/davideas/maven"}
-		maven {url "https://oss.sonatype.org/content/repositories/snapshots/" }
-	}
+    repositories {
+        jcenter()
+        maven { url "http://dl.bintray.com/davideas/maven" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    }
 
-	dependencies {
-		classpath "com.android.tools.build:gradle:2.3.3"
-		classpath "com.neenbedankt.gradle.plugins:android-apt:1.8"
-		classpath "com.github.dcendents:android-maven-gradle-plugin:1.5"
-		classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
-		classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1"
-		classpath "com.vanniktech:gradle-android-javadoc-plugin:0.2.1"
-		classpath "eu.davidea:grabver:0.3.0"
-		// NOTE: Do not place your application dependencies here; they belong
-		// in the individual module build.gradle files
-	}
+    dependencies {
+        classpath "com.android.tools.build:gradle:2.3.3"
+        classpath "com.neenbedankt.gradle.plugins:android-apt:1.8"
+        classpath "com.github.dcendents:android-maven-gradle-plugin:1.5"
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1"
+        classpath "com.vanniktech:gradle-android-javadoc-plugin:0.2.1"
+        classpath "eu.davidea:grabver:0.3.0"
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
 }
 
 allprojects {
-	repositories {
-		jcenter()
-		maven {url "https://maven.google.com" }
-		maven {url "http://dl.bintray.com/davideas/maven" }
-		maven {url "https://oss.sonatype.org/content/repositories/snapshots/" }
-	}
+    repositories {
+        jcenter()
+        maven { url "https://maven.google.com" }
+        maven { url "http://dl.bintray.com/davideas/maven" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    }
 }

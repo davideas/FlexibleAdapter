@@ -1,47 +1,47 @@
 apply plugin: 'com.jfrog.bintray'
 
-if (gradle.getStartParameter().getTaskNames().contains("bintray")) {
-	println("> Publishing: " + libraryName + " v" + libraryVersion)
-}
-
 version = libraryVersion
 
 def getRepositoryUsername() {
-	return getProperties().get('bintray.user')
+    return getProperties().get('bintray.user')
 }
 
 def getRepositoryPassphrase() {
-	return getProperties().get('bintray.gpg.password')
+    return getProperties().get('bintray.gpg.password')
 }
 
 def getApiKey() {
-	return getProperties().get("bintray.apikey")
+    return getProperties().get("bintray.apikey")
 }
 
-bintray {
-	user = getRepositoryUsername()
-	key = getApiKey()
+if (gradle.getStartParameter().getTaskNames().contains("bintrayUpload")) {
+    println("> Publishing: " + libraryName + " " + libraryVersion)
 
-	configurations = ['archives']
-	pkg {
-		repo = bintrayRepo
-		name = bintrayName
-		desc = libraryDescription
-		websiteUrl = siteUrl
-		licenses = allLicenses
-		vcsUrl = gitUrl
-		labels = libraryLabels
-		publish = true
-		publicDownloadNumbers = true
-		version {
-			name = libraryVersion
-			desc = libraryDescription
-			vcsTag = libraryVersion
-			released = new Date()
-			gpg {
-				sign = true //Determines whether to GPG sign the files. The default is false
-				passphrase = getRepositoryPassphrase()
-			}
-		}
-	}
+    bintray {
+        user = getRepositoryUsername()
+        key = getApiKey()
+
+        configurations = ['archives']
+        pkg {
+            repo = bintrayRepo
+            name = bintrayName
+            desc = libraryDescription
+            websiteUrl = siteUrl
+            licenses = allLicenses
+            vcsUrl = gitUrl
+            labels = libraryLabels
+            publish = true
+            publicDownloadNumbers = true
+            version {
+                name = libraryVersion
+                desc = libraryDescription
+                vcsTag = libraryVersion
+                released = new Date()
+                gpg {
+                    sign = true //Determines whether to GPG sign the files. The default is false
+                    passphrase = getRepositoryPassphrase()
+                }
+            }
+        }
+    }
 }
