@@ -1,5 +1,12 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.vanniktech.android.javadoc'
+apply plugin: 'eu.davidea.grabver'
+
+versioning {
+	major 5
+	minor 0
+	preRelease "SNAPSHOT"
+}
 
 ext {
 	// Library Settings
@@ -18,8 +25,8 @@ android {
 	defaultConfig {
 		minSdkVersion minSdk
 		targetSdkVersion targetSdk
-		versionCode libraryCode
-		versionName libraryVersion + libraryDate
+		versionCode versioning.code
+		versionName versioning.name
 	}
 	buildTypes {
 		release {

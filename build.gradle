@@ -7,9 +7,6 @@ ext {
 
 	// Library Repository
 	libraryName = "FlexibleAdapter"
-	libraryCode = 20
-	libraryVersion = "5.0.0-rc2"
-	libraryDate = " built on " + getDate()
 	bintrayRepo = "maven"
 	packageExt = "aar"
 	siteUrl = "https://github.com/davideas/FlexibleAdapter"
@@ -56,6 +53,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 buildscript {
 	repositories {
 		jcenter()
+		maven {url "http://dl.bintray.com/davideas/maven"}
 		maven {url "https://oss.sonatype.org/content/repositories/snapshots/" }
 	}
 
@@ -66,6 +64,7 @@ buildscript {
 		classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
 		classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1"
 		classpath "com.vanniktech:gradle-android-javadoc-plugin:0.2.1"
+		classpath "eu.davidea:grabver:0.3.0"
 		// NOTE: Do not place your application dependencies here; they belong
 		// in the individual module build.gradle files
 	}
