@@ -236,7 +236,9 @@ public class MainActivity extends AppCompatActivity implements
 							getString(R.string.action_selected_many, Integer.toString(count)));
 				}
 			}
-		}.withDefaultMode(mode);
+		}.withDefaultMode(mode)
+		 .disableDragOnActionMode(true)
+		 .disableSwipeOnActionMode(true);
 	}
 
 	private void initializeFragment(Bundle savedInstanceState) {

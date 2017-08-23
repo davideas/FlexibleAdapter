@@ -32,7 +32,7 @@ import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.utils.Log;
 
 /**
- * Helper to coordinates the MULTI selection with FlexibleAdapter.
+ * Helper to coordinate the MULTI selection with FlexibleAdapter.
  *
  * @author Davide Steduto
  * @since 30/04/2016
@@ -43,6 +43,8 @@ public class ActionModeHelper implements ActionMode.Callback {
 	private int defaultMode = Mode.IDLE;
 	@MenuRes
 	private int mCabMenu;
+	private boolean disableSwipe, disableDrag,
+			longPressDragDisabledByHelper, handleDragDisabledByHelper, swipeDisabledByHelper;
 	private FlexibleAdapter mAdapter;
 	private ActionMode.Callback mCallback;
 	protected ActionMode mActionMode;
@@ -90,6 +92,32 @@ public class ActionModeHelper implements ActionMode.Callback {
 			this.defaultMode = defaultMode;
 		return this;
 	}
+
+	/**
+	 * Automatically disables LongPress drag and Handle drag capability when ActionMode is
+	 * activated and enable it again when ActionMode is destroyed.
+	 *
+	 * @param disableDrag true to disable the drag, false to maintain the drag during ActionMode
+	 * @return this object, so it can be chained
+     * @since 5.0.0-rc3
+	 */
+	public final ActionModeHelper disableDragOnActionMode(boolean disableDrag) {
+		this.disableDrag = disableDrag;
+		return this;
+	}
+
+    /**
+     * Automatically disables Swipe capability when ActionMode is activated and enable it again
+     * when ActionMode is destroyed.
+     *
+     * @param disableSwipe true to disable the swipe, false to maintain the swipe during ActionMode
+     * @return this object, so it can be chained
+     * @since 5.0.0-rc3
+     */
+    public final ActionModeHelper disableSwipeOnActionMode(boolean disableSwipe) {
+        this.disableSwipe = disableSwipe;
+        return this;
+    }
 
 	/**
 	 * @return the current instance of the ActionMode, {@code null} if ActionMode is off.
@@ -211,6 +239,8 @@ public class ActionModeHelper implements ActionMode.Callback {
 		Log.d("ActionMode is active!");
 		// Activate the ActionMode Multi
 		mAdapter.setMode(Mode.MULTI);
+		// Disable Swipe and Drag capabilities as per settings
+		disableSwipeDragCapabilities();
 		// Notify the provided callback
 		return mCallback == null || mCallback.onCreateActionMode(actionMode, menu);
 	}
@@ -248,6 +278,8 @@ public class ActionModeHelper implements ActionMode.Callback {
 		mAdapter.setMode(defaultMode);
 		mAdapter.clearSelection();
 		mActionMode = null;
+		// Re-enable Swipe and Drag capabilities if they were disabled by this helper
+		enableSwipeDragCapabilities();
 		// Notify the provided callback
 		if (mCallback != null) {
 			mCallback.onDestroyActionMode(actionMode);
@@ -268,5 +300,35 @@ public class ActionModeHelper implements ActionMode.Callback {
 		}
 		return false;
 	}
+
+	private void enableSwipeDragCapabilities() {
+        if (longPressDragDisabledByHelper) {
+            longPressDragDisabledByHelper = false;
+            mAdapter.setLongPressDragEnabled(true);
+        }
+        if (handleDragDisabledByHelper) {
+            handleDragDisabledByHelper = false;
+            mAdapter.setHandleDragEnabled(true);
+        }
+        if (swipeDisabledByHelper) {
+            swipeDisabledByHelper = false;
+            mAdapter.setSwipeEnabled(true);
+        }
+    }
+
+	private void disableSwipeDragCapabilities() {
+        if (disableDrag && mAdapter.isLongPressDragEnabled()) {
+            longPressDragDisabledByHelper = true;
+            mAdapter.setLongPressDragEnabled(false);
+        }
+        if (disableDrag && mAdapter.isHandleDragEnabled()) {
+            handleDragDisabledByHelper = true;
+            mAdapter.setHandleDragEnabled(false);
+        }
+        if (disableSwipe && mAdapter.isSwipeEnabled()) {
+            swipeDisabledByHelper = true;
+            mAdapter.setSwipeEnabled(false);
+        }
+    }
 
 }
