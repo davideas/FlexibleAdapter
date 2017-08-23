@@ -254,6 +254,7 @@ public class FlexibleAdapter<T extends IFlexible>
 	 *
 	 * @param listener the object(s) instance(s) of any listener
 	 * @return this Adapter, so the call can be chained
+	 * @see #removeListener(Class[])
 	 * @since 5.0.0-b6
 	 */
 	@CallSuper
@@ -264,19 +265,18 @@ public class FlexibleAdapter<T extends IFlexible>
 		if (listener instanceof OnItemClickListener) {
 			Log.i("- OnItemClickListener");
 			mItemClickListener = (OnItemClickListener) listener;
+			for (FlexibleViewHolder holder : getAllBoundViewHolders()) {
+				holder.getContentView().setOnClickListener(holder);
+			}
 		}
 		if (listener instanceof OnItemLongClickListener) {
 			Log.i("- OnItemLongClickListener");
 			mItemLongClickListener = (OnItemLongClickListener) listener;
+			// Restore the event
+			for (FlexibleViewHolder holder : getAllBoundViewHolders()) {
+				holder.getContentView().setOnLongClickListener(holder);
+			}
 		}
-//		if (listener instanceof OnItemAddListener) {
-//			Log.i("- OnItemAddListener");
-//			mItemAddListener = (OnItemAddListener) listener;
-//		}
-//		if (listener instanceof OnItemRemoveListener) {
-//			Log.i("- OnItemRemoveListener");
-//			mItemRemoveListener = (OnItemRemoveListener) listener;
-//		}
 		if (listener instanceof OnItemMoveListener) {
 			Log.i("- OnItemMoveListener");
 			mItemMoveListener = (OnItemMoveListener) listener;
@@ -297,6 +297,66 @@ public class FlexibleAdapter<T extends IFlexible>
 			Log.i("- OnUpdateListener");
 			mUpdateListener = (OnUpdateListener) listener;
 			mUpdateListener.onUpdateEmptyView(getMainItemCount());
+		}
+		return this;
+	}
+
+	/**
+	 * Removes one or more listeners from this Adapter.
+	 * <p><b>Warning:</b>
+	 * <ul><li>In case of <i>Click</i> and <i>LongClick</i> events, it will remove also the callback
+	 * from all bound ViewHolders too. To restore these 2 events on the current bound ViewHolders
+	 * call {@link #addListener(Object)} providing the instance of desired listener.</li>
+	 * <li>To remove a specific listener you have to provide the class names of the listener,
+	 * example:
+	 * <pre>removeListener(FlexibleAdapter.OnUpdateListener.class,
+	 *     FlexibleAdapter.OnItemLongClickListener.class);</pre></li></ul></p>
+	 *
+	 * @param listeners the listeners type Classes to remove from the this Adapter and/or from all bound ViewHolders
+	 * @return this Adapter, so the call can be chained
+	 * @see #addListener(Object)
+	 * @since 5.0.0-rc3
+	 */
+	public final FlexibleAdapter<T> removeListener(@NonNull Class... listeners) {
+		if (listeners == null || listeners.length == 0) {
+			Log.w("No listener class to remove!");
+			return this;
+		}
+		for (Class listener : listeners) {
+			if (listener == OnItemClickListener.class) {
+				mItemClickListener = null;
+				Log.i("- Removed OnItemClickListener");
+				for (FlexibleViewHolder holder : getAllBoundViewHolders()) {
+					holder.getContentView().setOnClickListener(null);
+				}
+			}
+			if (listener == OnItemLongClickListener.class) {
+				mItemLongClickListener = null;
+				Log.i("- Removed OnItemLongClickListener");
+				for (FlexibleViewHolder holder : getAllBoundViewHolders()) {
+					holder.getContentView().setOnLongClickListener(null);
+				}
+			}
+			if (listener == OnItemMoveListener.class) {
+				mItemMoveListener = null;
+				Log.i("- Removed OnItemMoveListener");
+			}
+			if (listener == OnItemSwipeListener.class) {
+				mItemSwipeListener = null;
+				Log.i("- Removed OnItemSwipeListener");
+			}
+			if (listener == OnDeleteCompleteListener.class) {
+				mDeleteCompleteListener = null;
+				Log.i("- Removed OnDeleteCompleteListener");
+			}
+			if (listener == OnStickyHeaderChangeListener.class) {
+				mStickyHeaderChangeListener = null;
+				Log.i("- Removed OnStickyHeaderChangeListener");
+			}
+			if (listener == OnUpdateListener.class) {
+				mUpdateListener = null;
+				Log.i("- Removed OnUpdateListener");
+			}
 		}
 		return this;
 	}

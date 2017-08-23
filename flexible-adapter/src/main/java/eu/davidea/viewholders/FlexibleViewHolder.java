@@ -37,16 +37,16 @@ import eu.davidea.flexibleadapter.utils.Log;
 
 /**
  * Helper Class that implements:
- * <br/>- Single tap
- * <br/>- Long tap
- * <br/>- Touch for Drag and Swipe.
+ * <br>- Single tap
+ * <br>- Long tap
+ * <br>- Touch for Drag and Swipe.
  * <p>You must extend and implement this class for the own ViewHolder.</p>
  *
  * @author Davide Steduto
  * @since 03/01/2016 Created
- * <br/>23/01/2016 ItemTouch with Drag&Drop, Swipe
- * <br/>26/01/2016 Constructor revisited
- * <br/>18/06/2016 StickyHeader flag is delegated to the super class (ContentViewHolder)
+ * <br>23/01/2016 ItemTouch with Drag&Drop, Swipe
+ * <br>26/01/2016 Constructor revisited
+ * <br>18/06/2016 StickyHeader flag is delegated to the super class (ContentViewHolder)
  */
 public abstract class FlexibleViewHolder extends ContentViewHolder
 		implements View.OnClickListener, View.OnLongClickListener,
@@ -93,8 +93,12 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 		super(view, adapter, stickyHeader);
 		this.mAdapter = adapter;
 
-		getContentView().setOnClickListener(this);
-		getContentView().setOnLongClickListener(this);
+		if (mAdapter.mItemClickListener != null) {
+			getContentView().setOnClickListener(this);
+		}
+		if (mAdapter.mItemLongClickListener != null) {
+			getContentView().setOnLongClickListener(this);
+		}
 	}
 
 	/*--------------------------------*/
@@ -135,10 +139,10 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	public boolean onLongClick(View view) {
 		int position = getFlexibleAdapterPosition();
 		if (!mAdapter.isEnabled(position)) return false;
-		Log.v("onLongClick on position %s mode=%s", position, FlexibleUtils.getModeName(mAdapter.getMode()));
-		// If DragLongPress is enabled, then LongClick must be skipped and the listener will
+		// If LongPressDrag is enabled, then LongClick must be skipped and the listener will
 		// be called in onActionStateChanged in Drag mode.
 		if (mAdapter.mItemLongClickListener != null && !mAdapter.isLongPressDragEnabled()) {
+			Log.v("onLongClick on position %s mode=%s", position, FlexibleUtils.getModeName(mAdapter.getMode()));
 			mAdapter.mItemLongClickListener.onItemLongClick(position);
 			toggleActivation();
 			return true;
@@ -148,7 +152,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	}
 
 	/**
-	 * <b>Should be used only by the Handle View!</b><br/>
+	 * <b>Should be used only by the Handle View!</b><br>
 	 * {@inheritDoc}
 	 *
 	 * @see #setDragHandleView(View)
@@ -201,8 +205,8 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	/**
 	 * Allows to change and see the activation status on the itemView and to perform animation
 	 * on inner views.
-	 * <p><b>IMPORTANT NOTE!</b> the selected background is visible if you added
-	 * {@code android:background="?attr/selectableItemBackground"} on the item layout <u>AND</u>
+	 * <p><b>Important note!</b> the selected background is visible if you added
+	 * {@code android:background="?attr/selectableItemBackground"} in the item layout <u>AND</u>
 	 * customized the file {@code style.xml}.</p>
 	 * Alternatively, to set a background at runtime, you can use the new
 	 * {@link eu.davidea.flexibleadapter.utils.DrawableUtils}.
@@ -331,8 +335,9 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 					// Next check, allows to initiate the ActionMode and to add selection if configured
 					if ((shouldAddSelectionInActionMode() || mAdapter.getMode() != Mode.MULTI) &&
 							mAdapter.mItemLongClickListener != null && mAdapter.isSelectable(position)) {
+						Log.v("onLongClick on position %s mode=%s", position, mAdapter.getMode());
 						mAdapter.mItemLongClickListener.onItemLongClick(position);
-						alreadySelected = true; //Keep selection on release!
+						alreadySelected = true; // Keep selection on release!
 					}
 				}
 				// If still not selected, be sure current item appears selected for the Drag transition
@@ -369,9 +374,11 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 				(mActionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
 		// Be sure to keep selection if MULTI and shouldAddSelectionInActionMode is active
 		if (!alreadySelected) {
-			if (shouldAddSelectionInActionMode() &&
-					mAdapter.getMode() == Mode.MULTI) {
-				mAdapter.mItemLongClickListener.onItemLongClick(position);
+			if (shouldAddSelectionInActionMode() && mAdapter.getMode() == Mode.MULTI) {
+				Log.v("onLongClick for ActionMode on position %s mode=%s", position, mAdapter.getMode());
+				if (mAdapter.mItemLongClickListener != null) {
+					mAdapter.mItemLongClickListener.onItemLongClick(position);
+				}
 				if (mAdapter.isSelected(position)) {
 					toggleActivation();
 				}

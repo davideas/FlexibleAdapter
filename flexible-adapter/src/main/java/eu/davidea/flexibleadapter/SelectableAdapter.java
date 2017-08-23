@@ -454,8 +454,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 		if (itemCount > 0) {
 			// Avoid to rebind the VH, direct call to the itemView activation
 			for (FlexibleViewHolder flexHolder : mBoundViewHolders) {
-				if (isSelectable(flexHolder.getFlexibleAdapterPosition()))
-					flexHolder.toggleActivation();
+				flexHolder.toggleActivation();
 			}
 			// Use classic notification, in case FlexibleViewHolder is not implemented
 			if (mBoundViewHolders.isEmpty())
