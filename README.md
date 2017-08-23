@@ -11,7 +11,7 @@
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 - Please read [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
-### Fast and versatile Adapter for RecyclerView
+### One Adapter many Apps
 > :mega: When initially Android team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.<br/>
 We didn't know how to add selection and to combine all the use cases in the same Adapter.
 Since I created this library, it has become easy to configure multiple views and now, nobody wants to use a ListView anymore.
