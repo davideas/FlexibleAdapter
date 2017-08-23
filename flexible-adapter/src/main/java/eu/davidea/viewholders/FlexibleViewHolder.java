@@ -32,6 +32,7 @@ import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.items.IFlexible;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.flexibleadapter.utils.Log;
 
 /**
@@ -114,7 +115,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 		// Experimented that, if LongClick is not consumed, onClick is fired. We skip the
 		// call to the listener in this case, which is allowed only in ACTION_STATE_IDLE.
 		if (mAdapter.mItemClickListener != null && mActionState == ItemTouchHelper.ACTION_STATE_IDLE) {
-			Log.v("onClick on position %s mode=%s", position, mAdapter.getMode());
+			Log.v("onClick on position %s mode=%s", position, FlexibleUtils.getModeName(mAdapter.getMode()));
 			// Get the permission to activate the View from user
 			if (mAdapter.mItemClickListener.onItemClick(position)) {
 				// Now toggle the activation
@@ -134,7 +135,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	public boolean onLongClick(View view) {
 		int position = getFlexibleAdapterPosition();
 		if (!mAdapter.isEnabled(position)) return false;
-		Log.v("onLongClick on position %s mode=%s", position, mAdapter.getMode());
+		Log.v("onLongClick on position %s mode=%s", position, FlexibleUtils.getModeName(mAdapter.getMode()));
 		// If DragLongPress is enabled, then LongClick must be skipped and the listener will
 		// be called in onActionStateChanged in Drag mode.
 		if (mAdapter.mItemLongClickListener != null && !mAdapter.isLongPressDragEnabled()) {
@@ -160,7 +161,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 			Log.w("Can't start drag: Item is not enabled or draggable!");
 			return false;
 		}
-		Log.v("onTouch with DragHandleView on position %s mode=%s", position, mAdapter.getMode());
+		Log.v("onTouch with DragHandleView on position %s mode=%s", position, FlexibleUtils.getModeName(mAdapter.getMode()));
 		if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN &&
 				mAdapter.isHandleDragEnabled()) {
 			//Start Drag!
@@ -319,7 +320,8 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 		mActionState = actionState;
 		alreadySelected = mAdapter.isSelected(position);
 		Log.v("onActionStateChanged position=%s mode=%s actionState=%s",
-				position, mAdapter.getMode(), (actionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
+				position, FlexibleUtils.getModeName(mAdapter.getMode()),
+				(actionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
 		if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
 			if (!alreadySelected) {
 				// Be sure, if MULTI is active, to add this item to the selection list (call listener!)
@@ -363,7 +365,8 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 	@CallSuper
 	public void onItemReleased(int position) {
 		Log.v("onItemReleased position=%s mode=%s actionState=%s",
-				position, mAdapter.getMode(), (mActionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
+				position, FlexibleUtils.getModeName(mAdapter.getMode()),
+				(mActionState == ItemTouchHelper.ACTION_STATE_SWIPE ? "Swipe(1)" : "Drag(2)"));
 		// Be sure to keep selection if MULTI and shouldAddSelectionInActionMode is active
 		if (!alreadySelected) {
 			if (shouldAddSelectionInActionMode() &&

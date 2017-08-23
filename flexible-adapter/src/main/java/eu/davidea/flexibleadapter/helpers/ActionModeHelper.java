@@ -107,8 +107,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	 */
 	public int getActivatedPosition() {
 		List<Integer> selectedPositions = mAdapter.getSelectedPositions();
-		if (mAdapter.getMode() == Mode.SINGLE &&
-				selectedPositions.size() == 1) {
+		if (mAdapter.getMode() == Mode.SINGLE && selectedPositions.size() == 1) {
 			return selectedPositions.get(0);
 		}
 		return RecyclerView.NO_POSITION;
@@ -244,7 +243,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 	@CallSuper
 	@Override
 	public void onDestroyActionMode(ActionMode actionMode) {
-		Log.d("ActionMode is about to be destroyed! New mode will be %s", defaultMode);
+		Log.d("ActionMode is about to be destroyed!");
 		// Change mode and deselect everything
 		mAdapter.setMode(defaultMode);
 		mAdapter.clearSelection();
