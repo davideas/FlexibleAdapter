@@ -30,10 +30,10 @@ import android.support.v7.widget.RecyclerView;
  * <br>26/03/2016 setHeader returns void
  */
 public interface ISectionable<VH extends RecyclerView.ViewHolder, T extends IHeader>
-		extends IFlexible<VH> {
+        extends IFlexible<VH> {
 
-	T getHeader();
+    T getHeader();
 
-	void setHeader(T header);
+    void setHeader(T header);
 
 }

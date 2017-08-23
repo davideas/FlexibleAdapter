@@ -37,169 +37,169 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @since 19/01/2016 Created
  * <br>28/03/2017 Individual item's span size AND shouldNotifyChange
  * <br>12/05/2017 Simplified createViewHolder params
-  */
+ */
 public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 
 	/*---------------*/
-	/* BASIC METHODS */
+    /* BASIC METHODS */
 	/*---------------*/
 
-	/**
-	 * Returns if the Item is enabled.
-	 *
-	 * @return (default) true for enabled item, false for disabled one.
-	 */
-	boolean isEnabled();
+    /**
+     * Returns if the Item is enabled.
+     *
+     * @return (default) true for enabled item, false for disabled one.
+     */
+    boolean isEnabled();
 
-	/**
-	 * Setter to change enabled behaviour.
-	 *
-	 * @param enabled false to disable all operations on this item
-	 */
-	void setEnabled(boolean enabled);
+    /**
+     * Setter to change enabled behaviour.
+     *
+     * @param enabled false to disable all operations on this item
+     */
+    void setEnabled(boolean enabled);
 
-	/**
-	 * Returns if the Item is hidden.
-	 *
-	 * @return true for hidden item, (default) false for the shown one.
-	 */
-	boolean isHidden();
+    /**
+     * Returns if the Item is hidden.
+     *
+     * @return true for hidden item, (default) false for the shown one.
+     */
+    boolean isHidden();
 
-	/**
-	 * Setter to change hidden behaviour. Useful while filtering this item.
-	 * Default value is false.
-	 *
-	 * @param hidden true if this item should remain hidden, false otherwise
-	 */
-	void setHidden(boolean hidden);
+    /**
+     * Setter to change hidden behaviour. Useful while filtering this item.
+     * Default value is false.
+     *
+     * @param hidden true if this item should remain hidden, false otherwise
+     */
+    void setHidden(boolean hidden);
 
-	/**
-	 * Individual item's span size to use only with {@code GridLayoutManager}.
-	 * <p><b>Note:</b>
-	 * <ul>
-	 * <li>Default implementation in {@link AbstractFlexibleItem} already returns 1.</li>
-	 * <li>Not used when {@code StaggeredGridLayoutManager} is set. With such layout use
-	 * {@link eu.davidea.viewholders.FlexibleViewHolder#setFullSpan(boolean)}.</li>
-	 * </ul></p>
-	 *
-	 * @param spanCount current column count
-	 * @param position  the adapter position of the item
-	 * @return the number of span occupied by the item at position.
-	 * @since 5.0.0-rc2
-	 */
-	@IntRange(from = 1)
-	int getSpanSize(int spanCount, int position);
+    /**
+     * Individual item's span size to use only with {@code GridLayoutManager}.
+     * <p><b>Note:</b>
+     * <ul>
+     * <li>Default implementation in {@link AbstractFlexibleItem} already returns 1.</li>
+     * <li>Not used when {@code StaggeredGridLayoutManager} is set. With such layout use
+     * {@link eu.davidea.viewholders.FlexibleViewHolder#setFullSpan(boolean)}.</li>
+     * </ul></p>
+     *
+     * @param spanCount current column count
+     * @param position  the adapter position of the item
+     * @return the number of span occupied by the item at position.
+     * @since 5.0.0-rc2
+     */
+    @IntRange(from = 1)
+    int getSpanSize(int spanCount, int position);
 
-	/**
-	 * Called by the FlexibleAdapter when it wants to check if this item should be bound
-	 * again with new content.
-	 * <p>You should return {@code true} whether you want this item will be updated because
-	 * its visual representations will change.</p>
-	 * <b>Note: </b>This method won't be called if
-	 * {@link FlexibleAdapter#setNotifyChangeOfUnfilteredItems(boolean)} is disabled.
-	 * <p>Default value is {@code true}.</p>
-	 *
-	 * @param newItem The new item object with the new content
-	 * @return True will trigger a new binding to display new content, false if the content shown
-	 * is already the latest data.
-	 * @since 5.0.0-rc2
-	 */
-	boolean shouldNotifyChange(IFlexible newItem);
+    /**
+     * Called by the FlexibleAdapter when it wants to check if this item should be bound
+     * again with new content.
+     * <p>You should return {@code true} whether you want this item will be updated because
+     * its visual representations will change.</p>
+     * <b>Note: </b>This method won't be called if
+     * {@link FlexibleAdapter#setNotifyChangeOfUnfilteredItems(boolean)} is disabled.
+     * <p>Default value is {@code true}.</p>
+     *
+     * @param newItem The new item object with the new content
+     * @return True will trigger a new binding to display new content, false if the content shown
+     * is already the latest data.
+     * @since 5.0.0-rc2
+     */
+    boolean shouldNotifyChange(IFlexible newItem);
 
 	/*--------------------*/
 	/* SELECTABLE METHODS */
 	/*--------------------*/
 
-	/**
-	 * Checks if the item can be selected.
-	 *
-	 * @return (default) true for a Selectable item, false otherwise
-	 */
-	boolean isSelectable();
+    /**
+     * Checks if the item can be selected.
+     *
+     * @return (default) true for a Selectable item, false otherwise
+     */
+    boolean isSelectable();
 
-	/**
-	 * Setter to change selectable behaviour.
-	 *
-	 * @param selectable false to disable selection on this item
-	 */
-	void setSelectable(boolean selectable);
+    /**
+     * Setter to change selectable behaviour.
+     *
+     * @param selectable false to disable selection on this item
+     */
+    void setSelectable(boolean selectable);
 
-	/**
-	 * Custom bubble text for FastScroller.
-	 *
- 	 * @param position the current mapped position
-	 * @return Any desired value
-	 */
-	String getBubbleText(int position);
+    /**
+     * Custom bubble text for FastScroller.
+     *
+     * @param position the current mapped position
+     * @return Any desired value
+     */
+    String getBubbleText(int position);
 
 	/*-------------------*/
 	/* TOUCHABLE METHODS */
 	/*-------------------*/
 
-	boolean isDraggable();
+    boolean isDraggable();
 
-	void setDraggable(boolean draggable);
+    void setDraggable(boolean draggable);
 
-	boolean isSwipeable();
+    boolean isSwipeable();
 
-	void setSwipeable(boolean swipeable);
+    void setSwipeable(boolean swipeable);
 
 	/*---------------------*/
 	/* VIEW HOLDER METHODS */
 	/*---------------------*/
 
-	/**
-	 * Returns the layout resource ID to AutoMap a specific ViewType on this Item.
-	 * <p><b>NOTE:</b> Should identify a resource Layout reference {@link android.R.layout}
-	 * used by FlexibleAdapter to auto-map the ViewTypes.</p>
-	 * <b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
-	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
-	 * on GitHub.
-	 *
-	 * @return Layout identifier
-	 */
-	@LayoutRes
-	int getLayoutRes();
+    /**
+     * Returns the layout resource ID to AutoMap a specific ViewType on this Item.
+     * <p><b>NOTE:</b> Should identify a resource Layout reference {@link android.R.layout}
+     * used by FlexibleAdapter to auto-map the ViewTypes.</p>
+     * <b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
+     * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
+     * on GitHub.
+     *
+     * @return Layout identifier
+     */
+    @LayoutRes
+    int getLayoutRes();
 
-	/**
-	 * Delegates the creation of the ViewHolder to the user (AutoMap).
-	 * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
-	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
-	 * on GitHub.</p>
-	 *
-	 * @param view    the already inflated view
-	 * @param adapter the Adapter instance extending {@link FlexibleAdapter}
-	 * @return a new ViewHolder that holds a View of the given view type
-	 */
-	VH createViewHolder(View view, FlexibleAdapter adapter);
+    /**
+     * Delegates the creation of the ViewHolder to the user (AutoMap).
+     * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
+     * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
+     * on GitHub.</p>
+     *
+     * @param view    the already inflated view
+     * @param adapter the Adapter instance extending {@link FlexibleAdapter}
+     * @return a new ViewHolder that holds a View of the given view type
+     */
+    VH createViewHolder(View view, FlexibleAdapter adapter);
 
-	/**
-	 * Delegates the binding of this item's data to the given Layout.
-	 * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
-	 * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
-	 * on GitHub.</p>
-	 * How to use Payload, please refer to
-	 * {@link android.support.v7.widget.RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}.
-	 *
-	 * @param adapter  the FlexibleAdapter instance
-	 * @param holder   the ViewHolder instance
-	 * @param position the current position
-	 * @param payloads a non-null list of merged payloads. Can be empty list if requires full update
-	 */
-	void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads);
+    /**
+     * Delegates the binding of this item's data to the given Layout.
+     * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
+     * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
+     * on GitHub.</p>
+     * How to use Payload, please refer to
+     * {@link android.support.v7.widget.RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}.
+     *
+     * @param adapter  the FlexibleAdapter instance
+     * @param holder   the ViewHolder instance
+     * @param position the current position
+     * @param payloads a non-null list of merged payloads. Can be empty list if requires full update
+     */
+    void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads);
 
-	/**
-	 * Called when a view created by this adapter has been recycled.
-	 * <p>A view is recycled when a RecyclerView.LayoutManager decides that it no longer needs to
-	 * be attached to its parent RecyclerView. This can be because it has fallen out of visibility
-	 * or a set of cached views represented by views still attached to the parent RecyclerView.</p>
-	 * If an item view has large or expensive data bound to it such as large bitmaps, this may be
-	 * a good place to release those resources.
-	 *
-	 * @param adapter  the FlexibleAdapter instance
-	 * @param holder   the ViewHolder instance being recycled
-	 * @param position the current position
-	 */
-	void unbindViewHolder(FlexibleAdapter adapter, VH holder, int position);
+    /**
+     * Called when a view created by this adapter has been recycled.
+     * <p>A view is recycled when a RecyclerView.LayoutManager decides that it no longer needs to
+     * be attached to its parent RecyclerView. This can be because it has fallen out of visibility
+     * or a set of cached views represented by views still attached to the parent RecyclerView.</p>
+     * If an item view has large or expensive data bound to it such as large bitmaps, this may be
+     * a good place to release those resources.
+     *
+     * @param adapter  the FlexibleAdapter instance
+     * @param holder   the ViewHolder instance being recycled
+     * @param position the current position
+     */
+    void unbindViewHolder(FlexibleAdapter adapter, VH holder, int position);
 
 }

@@ -23,40 +23,40 @@ import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
 public class ScaleInItemAnimator extends FlexibleItemAnimator {
 
-	public ScaleInItemAnimator() {
-	}
+    public ScaleInItemAnimator() {
+    }
 
-	public ScaleInItemAnimator(Interpolator interpolator) {
-		mInterpolator = interpolator;
-	}
+    public ScaleInItemAnimator(Interpolator interpolator) {
+        mInterpolator = interpolator;
+    }
 
-	@Override
-	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
-		ViewCompat.animate(holder.itemView)
-				.scaleX(0)
-				.scaleY(0)
-				.setDuration(getRemoveDuration())
-				.setInterpolator(mInterpolator)
-				.setListener(new DefaultRemoveVpaListener(holder))
-				.start();
-	}
+    @Override
+    protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
+        ViewCompat.animate(holder.itemView)
+                  .scaleX(0)
+                  .scaleY(0)
+                  .setDuration(getRemoveDuration())
+                  .setInterpolator(mInterpolator)
+                  .setListener(new DefaultRemoveVpaListener(holder))
+                  .start();
+    }
 
-	@Override
-	protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-		ViewCompat.setScaleX(holder.itemView, 0);
-		ViewCompat.setScaleY(holder.itemView, 0);
-		return true;
-	}
+    @Override
+    protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
+        ViewCompat.setScaleX(holder.itemView, 0);
+        ViewCompat.setScaleY(holder.itemView, 0);
+        return true;
+    }
 
-	@Override
-	protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
-		ViewCompat.animate(holder.itemView)
-				.scaleX(1)
-				.scaleY(1)
-				.setDuration(getAddDuration())
-				.setInterpolator(mInterpolator)
-				.setListener(new DefaultAddVpaListener(holder))
-				.start();
-	}
+    @Override
+    protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
+        ViewCompat.animate(holder.itemView)
+                  .scaleX(1)
+                  .scaleY(1)
+                  .setDuration(getAddDuration())
+                  .setInterpolator(mInterpolator)
+                  .setListener(new DefaultAddVpaListener(holder))
+                  .start();
+    }
 
 }

@@ -164,22 +164,22 @@ public class Log {
         }
     }
 
-	/**
-	 * Sends a {@link Level#WARN} log message.
-	 *
-	 * @param msg  the message you would like logged
-	 * @param args the extra arguments for the message
-	 */
-	public static void w(String msg, Object... args) {
-		if (isWarnEnabled()) {
-			android.util.Log.w(getTag(), formatMessage(msg, args));
-		}
-	}
+    /**
+     * Sends a {@link Level#WARN} log message.
+     *
+     * @param msg  the message you would like logged
+     * @param args the extra arguments for the message
+     */
+    public static void w(String msg, Object... args) {
+        if (isWarnEnabled()) {
+            android.util.Log.w(getTag(), formatMessage(msg, args));
+        }
+    }
 
     /**
      * Sends a {@link Level#WARN} log message with the Exception at the end of the message.
      *
-	 * @param t    The exception to log
+     * @param t    The exception to log
      * @param msg  the message you would like logged
      * @param args the extra arguments for the message
      */

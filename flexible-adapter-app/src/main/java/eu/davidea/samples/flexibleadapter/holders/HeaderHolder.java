@@ -22,77 +22,77 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @since 19/10/2016
  */
 public class HeaderHolder extends AbstractHeaderItem<HeaderHolder.HeaderViewHolder>
-		implements IFilterable, IHolder<HeaderModel> {
+        implements IFilterable, IHolder<HeaderModel> {
 
-	private HeaderModel model;
+    private HeaderModel model;
 
-	public HeaderHolder(HeaderModel model) {
-		this.model = model;
-	}
+    public HeaderHolder(HeaderModel model) {
+        this.model = model;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof HeaderHolder) {
-			HeaderHolder inItem = (HeaderHolder) o;
-			return model.equals(inItem.getModel());
-		}
-		return false;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof HeaderHolder) {
+            HeaderHolder inItem = (HeaderHolder) o;
+            return model.equals(inItem.getModel());
+        }
+        return false;
+    }
 
-	@Override
-	public int hashCode() {
-		return model.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return model.hashCode();
+    }
 
-	/**
-	 * @return the model object
-	 */
-	@Override
-	public HeaderModel getModel() {
-		return model;
-	}
+    /**
+     * @return the model object
+     */
+    @Override
+    public HeaderModel getModel() {
+        return model;
+    }
 
-	/**
-	 * Filter is applied to the model fields.
-	 */
-	@Override
-	public boolean filter(String constraint) {
-		return model.getTitle() != null && model.getTitle().equals(constraint);
-	}
+    /**
+     * Filter is applied to the model fields.
+     */
+    @Override
+    public boolean filter(String constraint) {
+        return model.getTitle() != null && model.getTitle().equals(constraint);
+    }
 
-	@Override
-	public int getLayoutRes() {
-		return R.layout.recycler_holder_header;
-	}
+    @Override
+    public int getLayoutRes() {
+        return R.layout.recycler_holder_header;
+    }
 
-	@Override
-	public HeaderViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
-		return new HeaderViewHolder(view, adapter);
-	}
+    @Override
+    public HeaderViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+        return new HeaderViewHolder(view, adapter);
+    }
 
-	@Override
-	public void bindViewHolder(final FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
-		holder.mTitle.setText(model.getTitle());
-		List sectionableList = adapter.getSectionItems(this);
-		String subTitle = (sectionableList.isEmpty() ? "Empty section" :
-				sectionableList.size() + " section items");
-		holder.mSubtitle.setText(subTitle);
-	}
+    @Override
+    public void bindViewHolder(final FlexibleAdapter adapter, HeaderViewHolder holder, int position, List payloads) {
+        holder.mTitle.setText(model.getTitle());
+        List sectionableList = adapter.getSectionItems(this);
+        String subTitle = (sectionableList.isEmpty() ? "Empty section" :
+                sectionableList.size() + " section items");
+        holder.mSubtitle.setText(subTitle);
+    }
 
-	static class HeaderViewHolder extends FlexibleViewHolder {
+    static class HeaderViewHolder extends FlexibleViewHolder {
 
-		@BindView(R.id.title)
-		public TextView mTitle;
-		@BindView(R.id.subtitle)
-		public TextView mSubtitle;
+        @BindView(R.id.title)
+        public TextView mTitle;
+        @BindView(R.id.subtitle)
+        public TextView mSubtitle;
 
-		/**
-		 * Default constructor.
-		 */
-		public HeaderViewHolder(View view, FlexibleAdapter adapter) {
-			super(view, adapter, true);//true only for header items when will be sticky
-			ButterKnife.bind(this, view);
-		}
-	}
+        /**
+         * Default constructor.
+         */
+        public HeaderViewHolder(View view, FlexibleAdapter adapter) {
+            super(view, adapter, true);//true only for header items when will be sticky
+            ButterKnife.bind(this, view);
+        }
+    }
 
 }

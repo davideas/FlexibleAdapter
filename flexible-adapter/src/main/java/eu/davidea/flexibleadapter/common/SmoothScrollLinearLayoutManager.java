@@ -26,25 +26,25 @@ import android.support.v7.widget.RecyclerView;
  */
 public class SmoothScrollLinearLayoutManager extends LinearLayoutManager implements IFlexibleLayoutManager {
 
-	private RecyclerView.SmoothScroller mSmoothScroller;
+    private RecyclerView.SmoothScroller mSmoothScroller;
 
-	public SmoothScrollLinearLayoutManager(Context context) {
-		this(context, VERTICAL, false);
-	}
+    public SmoothScrollLinearLayoutManager(Context context) {
+        this(context, VERTICAL, false);
+    }
 
-	public SmoothScrollLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
-		super(context, orientation, reverseLayout);
-		mSmoothScroller = new TopSnappedSmoothScroller(context, this);
-	}
+    public SmoothScrollLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
+        super(context, orientation, reverseLayout);
+        mSmoothScroller = new TopSnappedSmoothScroller(context, this);
+    }
 
-	@Override
-	public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
-		mSmoothScroller.setTargetPosition(position);
-		startSmoothScroll(mSmoothScroller);
-	}
+    @Override
+    public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
+        mSmoothScroller.setTargetPosition(position);
+        startSmoothScroll(mSmoothScroller);
+    }
 
-	@Override
-	public int getSpanCount() {
-		return 1;
-	}
+    @Override
+    public int getSpanCount() {
+        return 1;
+    }
 }

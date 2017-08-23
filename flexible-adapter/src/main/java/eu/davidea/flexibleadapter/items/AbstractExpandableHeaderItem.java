@@ -32,16 +32,16 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * <br>18/06/2016 Changed signature with ExpandableViewHolder
  */
 public abstract class AbstractExpandableHeaderItem<VH extends ExpandableViewHolder, S extends ISectionable>
-		extends AbstractExpandableItem<VH, S>
-		implements IHeader<VH> {
+        extends AbstractExpandableItem<VH, S>
+        implements IHeader<VH> {
 
-	/**
-	 * By default, expandable header is shown, expanded and not selectable.
-	 */
-	public AbstractExpandableHeaderItem() {
-		setHidden(false);
-		setExpanded(true);
-		setSelectable(false);
-	}
+    /**
+     * By default, expandable header is shown, expanded and not selectable.
+     */
+    public AbstractExpandableHeaderItem() {
+        setHidden(false);
+        setExpanded(true);
+        setSelectable(false);
+    }
 
 }

@@ -30,15 +30,15 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * <br>18/06/2016 Changed signature with FlexibleViewHolder
  */
 public abstract class AbstractHeaderItem<VH extends FlexibleViewHolder>
-		extends AbstractFlexibleItem<VH>
-		implements IHeader<VH> {
+        extends AbstractFlexibleItem<VH>
+        implements IHeader<VH> {
 
-	/**
-	 * By default, header is hidden and not selectable
-	 */
-	public AbstractHeaderItem() {
-		setHidden(true);
-		setSelectable(false);
-	}
+    /**
+     * By default, header is hidden and not selectable
+     */
+    public AbstractHeaderItem() {
+        setHidden(true);
+        setSelectable(false);
+    }
 
 }

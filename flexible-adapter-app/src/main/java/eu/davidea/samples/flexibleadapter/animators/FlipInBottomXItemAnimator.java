@@ -23,37 +23,37 @@ import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
 public class FlipInBottomXItemAnimator extends FlexibleItemAnimator {
 
-	public FlipInBottomXItemAnimator() {
-	}
+    public FlipInBottomXItemAnimator() {
+    }
 
-	public FlipInBottomXItemAnimator(Interpolator interpolator) {
-		mInterpolator = interpolator;
-	}
+    public FlipInBottomXItemAnimator(Interpolator interpolator) {
+        mInterpolator = interpolator;
+    }
 
-	@Override
-	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
-		ViewCompat.animate(holder.itemView)
-				.rotationX(-90)
-				.setDuration(getRemoveDuration())
-				.setInterpolator(mInterpolator)
-				.setListener(new DefaultRemoveVpaListener(holder))
-				.start();
-	}
+    @Override
+    protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
+        ViewCompat.animate(holder.itemView)
+                  .rotationX(-90)
+                  .setDuration(getRemoveDuration())
+                  .setInterpolator(mInterpolator)
+                  .setListener(new DefaultRemoveVpaListener(holder))
+                  .start();
+    }
 
-	@Override
-	protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-		ViewCompat.setRotationX(holder.itemView, -90);
-		return true;
-	}
+    @Override
+    protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
+        ViewCompat.setRotationX(holder.itemView, -90);
+        return true;
+    }
 
-	@Override
-	protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
-		ViewCompat.animate(holder.itemView)
-				.rotationX(0)
-				.setDuration(getAddDuration())
-				.setInterpolator(mInterpolator)
-				.setListener(new DefaultAddVpaListener(holder))
-				.start();
-	}
+    @Override
+    protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
+        ViewCompat.animate(holder.itemView)
+                  .rotationX(0)
+                  .setDuration(getAddDuration())
+                  .setInterpolator(mInterpolator)
+                  .setListener(new DefaultAddVpaListener(holder))
+                  .start();
+    }
 
 }

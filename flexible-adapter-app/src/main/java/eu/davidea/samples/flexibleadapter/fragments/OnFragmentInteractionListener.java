@@ -18,9 +18,9 @@ import eu.davidea.flexibleadapter.SelectableAdapter;
  */
 public interface OnFragmentInteractionListener {
 
-	void onFragmentChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView,
-						  @SelectableAdapter.Mode int mode);
+    void onFragmentChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView,
+                          @SelectableAdapter.Mode int mode);
 
-	void initSearchView(final Menu menu);
+    void initSearchView(final Menu menu);
 
 }

@@ -23,39 +23,39 @@ import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
 public class OvershootInLeftItemAnimator extends FlexibleItemAnimator {
 
-	private final float mTension;
+    private final float mTension;
 
-	public OvershootInLeftItemAnimator() {
-		mTension = 2.0f;
-	}
+    public OvershootInLeftItemAnimator() {
+        mTension = 2.0f;
+    }
 
-	public OvershootInLeftItemAnimator(float mTension) {
-		this.mTension = mTension;
-	}
+    public OvershootInLeftItemAnimator(float mTension) {
+        this.mTension = mTension;
+    }
 
-	@Override
-	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
-		ViewCompat.animate(holder.itemView)
-				.translationX(-holder.itemView.getRootView().getWidth())
-				.setDuration(getRemoveDuration())
-				.setListener(new DefaultRemoveVpaListener(holder))
-				.start();
-	}
+    @Override
+    protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
+        ViewCompat.animate(holder.itemView)
+                  .translationX(-holder.itemView.getRootView().getWidth())
+                  .setDuration(getRemoveDuration())
+                  .setListener(new DefaultRemoveVpaListener(holder))
+                  .start();
+    }
 
-	@Override
-	protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-		ViewCompat.setTranslationX(holder.itemView, -holder.itemView.getRootView().getWidth());
-		return true;
-	}
+    @Override
+    protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
+        ViewCompat.setTranslationX(holder.itemView, -holder.itemView.getRootView().getWidth());
+        return true;
+    }
 
-	@Override
-	protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
-		ViewCompat.animate(holder.itemView)
-				.translationX(0)
-				.setDuration(getAddDuration())
-				.setListener(new DefaultAddVpaListener(holder))
-				.setInterpolator(new OvershootInterpolator(mTension))
-				.start();
-	}
+    @Override
+    protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
+        ViewCompat.animate(holder.itemView)
+                  .translationX(0)
+                  .setDuration(getAddDuration())
+                  .setListener(new DefaultAddVpaListener(holder))
+                  .setInterpolator(new OvershootInterpolator(mTension))
+                  .start();
+    }
 
 }

@@ -1,9 +1,7 @@
 package eu.davidea.samples.flexibleadapter.items;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,91 +18,91 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 
 public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHolder, InstagramHeaderItem> {
 
-	private String id;
-	private String url;
-	private int quantity;
+    private String id;
+    private String url;
+    private int quantity;
 
-	public InstagramItem(String id, InstagramHeaderItem header) {
-		super(header);
-		this.id = id;
-		this.header = header;
-	}
+    public InstagramItem(String id, InstagramHeaderItem header) {
+        super(header);
+        this.id = id;
+        this.header = header;
+    }
 
-	@Override
-	public boolean equals(Object inObject) {
-		if (inObject instanceof InstagramItem) {
-			InstagramItem inItem = (InstagramItem) inObject;
-			return this.id.equals(inItem.id);
-		}
-		return false;
-	}
+    @Override
+    public boolean equals(Object inObject) {
+        if (inObject instanceof InstagramItem) {
+            InstagramItem inItem = (InstagramItem) inObject;
+            return this.id.equals(inItem.id);
+        }
+        return false;
+    }
 
-	public InstagramItem withImageUrl(String url) {
-		this.url = url;
-		return this;
-	}
+    public InstagramItem withImageUrl(String url) {
+        this.url = url;
+        return this;
+    }
 
-	public InstagramItem withName(String name) {
-		getHeader().setTitle(name);
-		return this;
-	}
+    public InstagramItem withName(String name) {
+        getHeader().setTitle(name);
+        return this;
+    }
 
-	public InstagramItem withPlace(String place) {
-		getHeader().setSubtitle(place);
-		return this;
-	}
+    public InstagramItem withPlace(String place) {
+        getHeader().setSubtitle(place);
+        return this;
+    }
 
-	public boolean getStarred() {
-		return new Random().nextBoolean();
-	}
+    public boolean getStarred() {
+        return new Random().nextBoolean();
+    }
 
-	public int getLikes() {
-		return new Random().nextInt(1000);
-	}
+    public int getLikes() {
+        return new Random().nextInt(1000);
+    }
 
-	@Override
-	public int getLayoutRes() {
-		return R.layout.recycler_instagram_item;
-	}
+    @Override
+    public int getLayoutRes() {
+        return R.layout.recycler_instagram_item;
+    }
 
-	@Override
-	public ViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
-		return new ViewHolder(view, adapter);
-	}
+    @Override
+    public ViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+        return new ViewHolder(view, adapter);
+    }
 
-	@Override
-	public void bindViewHolder(final FlexibleAdapter adapter, ViewHolder holder, int position, List payloads) {
-		Context context = holder.itemView.getContext();
+    @Override
+    public void bindViewHolder(final FlexibleAdapter adapter, ViewHolder holder, int position, List payloads) {
+        Context context = holder.itemView.getContext();
 
-		holder.mQuantityLikes.setText(context.getResources().getString(R.string.likes, getLikes()));
-		holder.mImageFavourite.flipSilently(getStarred());
+        holder.mQuantityLikes.setText(context.getResources().getString(R.string.likes, getLikes()));
+        holder.mImageFavourite.flipSilently(getStarred());
 
-		//Load image via Glide
-		Glide.clear(holder.mImage);
-		Glide.with(context).load(url).crossFade(500).into(holder.mImage);
-	}
+        //Load image via Glide
+        Glide.clear(holder.mImage);
+        Glide.with(context).load(url).crossFade(500).into(holder.mImage);
+    }
 
-	static final class ViewHolder extends FlexibleViewHolder {
+    static final class ViewHolder extends FlexibleViewHolder {
 
-		ImageView mImage;
-		FlipView mImageFavourite;
-		ImageView mImageComment;
-		ImageView mImageShare;
-		TextView mQuantityLikes;
+        ImageView mImage;
+        FlipView mImageFavourite;
+        ImageView mImageComment;
+        ImageView mImageShare;
+        TextView mQuantityLikes;
 
-		public ViewHolder(View view, FlexibleAdapter adapter) {
-			super(view, adapter);
-			this.mImage = view.findViewById(R.id.instagram_image);
-			this.mImageFavourite = view.findViewById(R.id.instagram_image_like);
-			this.mImageComment = view.findViewById(R.id.instagram_image_comment);
-			this.mImageShare = view.findViewById(R.id.instagram_image_share);
-			this.mQuantityLikes = view.findViewById(R.id.instagram_quantity_likes);
-		}
-	}
+        public ViewHolder(View view, FlexibleAdapter adapter) {
+            super(view, adapter);
+            this.mImage = view.findViewById(R.id.instagram_image);
+            this.mImageFavourite = view.findViewById(R.id.instagram_image_like);
+            this.mImageComment = view.findViewById(R.id.instagram_image_comment);
+            this.mImageShare = view.findViewById(R.id.instagram_image_share);
+            this.mQuantityLikes = view.findViewById(R.id.instagram_quantity_likes);
+        }
+    }
 
-	@Override
-	public String toString() {
-		return "InstagramItem[" + super.toString() + "]";
-	}
+    @Override
+    public String toString() {
+        return "InstagramItem[" + super.toString() + "]";
+    }
 
 }

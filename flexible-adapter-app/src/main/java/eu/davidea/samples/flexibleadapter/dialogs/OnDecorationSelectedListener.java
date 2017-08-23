@@ -8,8 +8,8 @@ import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
  */
 public interface OnDecorationSelectedListener {
 
-	void onDecorationSelected();
+    void onDecorationSelected();
 
-	FlexibleItemDecoration getItemDecoration();
+    FlexibleItemDecoration getItemDecoration();
 
 }

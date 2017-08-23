@@ -23,39 +23,39 @@ import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
 public class FlipInTopXItemAnimator extends FlexibleItemAnimator {
 
-	public FlipInTopXItemAnimator() {
-	}
+    public FlipInTopXItemAnimator() {
+    }
 
-	public FlipInTopXItemAnimator(Interpolator interpolator) {
-		mInterpolator = interpolator;
-	}
+    public FlipInTopXItemAnimator(Interpolator interpolator) {
+        mInterpolator = interpolator;
+    }
 
-	@Override
-	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
-		ViewCompat.animate(holder.itemView)
-				.rotationX(90)
-				.setDuration(getRemoveDuration())
-				.setInterpolator(mInterpolator)
-				.setListener(new DefaultRemoveVpaListener(holder))
-				.setStartDelay(index * 20L)
-				.start();
-	}
+    @Override
+    protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
+        ViewCompat.animate(holder.itemView)
+                  .rotationX(90)
+                  .setDuration(getRemoveDuration())
+                  .setInterpolator(mInterpolator)
+                  .setListener(new DefaultRemoveVpaListener(holder))
+                  .setStartDelay(index * 20L)
+                  .start();
+    }
 
-	@Override
-	protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-		ViewCompat.setRotationX(holder.itemView, 90);
-		return true;
-	}
+    @Override
+    protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
+        ViewCompat.setRotationX(holder.itemView, 90);
+        return true;
+    }
 
-	@Override
-	protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
-		ViewCompat.animate(holder.itemView)
-				.rotationX(0)
-				.setDuration(getAddDuration())
-				.setInterpolator(mInterpolator)
-				.setListener(new DefaultAddVpaListener(holder))
-				.setStartDelay(index * 150L)
-				.start();
-	}
+    @Override
+    protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
+        ViewCompat.animate(holder.itemView)
+                  .rotationX(0)
+                  .setDuration(getAddDuration())
+                  .setInterpolator(mInterpolator)
+                  .setListener(new DefaultAddVpaListener(holder))
+                  .setStartDelay(index * 150L)
+                  .start();
+    }
 
 }

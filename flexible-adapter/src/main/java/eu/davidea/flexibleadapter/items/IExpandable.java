@@ -34,29 +34,29 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * <br>18/06/2016 Changed signature with ExpandableViewHolder
  */
 public interface IExpandable<VH extends ExpandableViewHolder, S extends IFlexible>
-		extends IFlexible<VH> {
+        extends IFlexible<VH> {
 
 	/*--------------------*/
-	/* EXPANDABLE METHODS */
+    /* EXPANDABLE METHODS */
 	/*--------------------*/
 
-	boolean isExpanded();
+    boolean isExpanded();
 
-	void setExpanded(boolean expanded);
+    void setExpanded(boolean expanded);
 
-	/**
-	 * Establish the level of the expansion of this type of item in case of multi level expansion.
-	 * <p>Default value of first level should return 0.</p>
-	 * Sub expandable items should return a level +1 for each sub level.
-	 *
-	 * @return the level of the expansion of this type of item
-	 */
-	int getExpansionLevel();
+    /**
+     * Establish the level of the expansion of this type of item in case of multi level expansion.
+     * <p>Default value of first level should return 0.</p>
+     * Sub expandable items should return a level +1 for each sub level.
+     *
+     * @return the level of the expansion of this type of item
+     */
+    int getExpansionLevel();
 
 	/*-------------------*/
 	/* SUB ITEMS METHODS */
 	/*-------------------*/
 
-	List<S> getSubItems();
+    List<S> getSubItems();
 
 }

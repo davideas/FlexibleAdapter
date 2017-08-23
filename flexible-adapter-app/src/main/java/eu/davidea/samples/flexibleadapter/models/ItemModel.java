@@ -8,8 +8,8 @@ package eu.davidea.samples.flexibleadapter.models;
  */
 public class ItemModel extends AbstractModel {
 
-	public ItemModel(String id) {
-		super(id);
-	}
+    public ItemModel(String id) {
+        super(id);
+    }
 
 }

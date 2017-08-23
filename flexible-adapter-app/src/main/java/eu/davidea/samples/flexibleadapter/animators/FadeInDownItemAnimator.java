@@ -23,40 +23,40 @@ import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
 public class FadeInDownItemAnimator extends FlexibleItemAnimator {
 
-	public FadeInDownItemAnimator() {
-	}
+    public FadeInDownItemAnimator() {
+    }
 
-	public FadeInDownItemAnimator(Interpolator interpolator) {
-		mInterpolator = interpolator;
-	}
+    public FadeInDownItemAnimator(Interpolator interpolator) {
+        mInterpolator = interpolator;
+    }
 
-	@Override
-	protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
-		ViewCompat.animate(holder.itemView)
-				.translationY(-holder.itemView.getHeight() * .25f)
-				.alpha(0)
-				.setDuration(getRemoveDuration())
-				.setInterpolator(mInterpolator)
-				.setListener(new DefaultRemoveVpaListener(holder))
-				.start();
-	}
+    @Override
+    protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
+        ViewCompat.animate(holder.itemView)
+                  .translationY(-holder.itemView.getHeight() * .25f)
+                  .alpha(0)
+                  .setDuration(getRemoveDuration())
+                  .setInterpolator(mInterpolator)
+                  .setListener(new DefaultRemoveVpaListener(holder))
+                  .start();
+    }
 
-	@Override
-	protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-		ViewCompat.setTranslationY(holder.itemView, -holder.itemView.getHeight() * .25f);
-		ViewCompat.setAlpha(holder.itemView, 0);
-		return true;
-	}
+    @Override
+    protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
+        ViewCompat.setTranslationY(holder.itemView, -holder.itemView.getHeight() * .25f);
+        ViewCompat.setAlpha(holder.itemView, 0);
+        return true;
+    }
 
-	@Override
-	protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
-		ViewCompat.animate(holder.itemView)
-				.translationY(0)
-				.alpha(1)
-				.setDuration(getAddDuration())
-				.setInterpolator(mInterpolator)
-				.setListener(new DefaultAddVpaListener(holder))
-				.start();
-	}
+    @Override
+    protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
+        ViewCompat.animate(holder.itemView)
+                  .translationY(0)
+                  .alpha(1)
+                  .setDuration(getAddDuration())
+                  .setInterpolator(mInterpolator)
+                  .setListener(new DefaultAddVpaListener(holder))
+                  .start();
+    }
 
 }
