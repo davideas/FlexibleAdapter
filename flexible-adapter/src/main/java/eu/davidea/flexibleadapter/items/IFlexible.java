@@ -126,6 +126,11 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 
     /**
      * Custom bubble text for FastScroller.
+     * <p>To be called from the implementation of {@code onCreateBubbleText()}. Example:
+     * <pre>
+     * public String onCreateBubbleText(int position) {
+     *     return getItem(position).getBubbleText(position);
+     * }</pre></p>
      *
      * @param position the current mapped position
      * @return Any desired value

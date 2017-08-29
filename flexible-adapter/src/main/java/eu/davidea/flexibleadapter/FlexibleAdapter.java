@@ -307,7 +307,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * <ul><li>In case of <i>Click</i> and <i>LongClick</i> events, it will remove also the callback
      * from all bound ViewHolders too. To restore these 2 events on the current bound ViewHolders
      * call {@link #addListener(Object)} providing the instance of desired listener.</li>
-     * <li>To remove a specific listener you have to provide the class names of the listener,
+     * <li>To remove a specific listener you have to provide the Class of the listener,
      * example:
      * <pre>removeListener(FlexibleAdapter.OnUpdateListener.class,
      *     FlexibleAdapter.OnItemLongClickListener.class);</pre></li></ul></p>
