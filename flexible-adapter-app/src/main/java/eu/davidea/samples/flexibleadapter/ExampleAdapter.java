@@ -141,24 +141,24 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
         addScrollableFooterWithDelay(expandable, 1500L, false);
     }
 
-    /**
-     * NEW METHOD! Delegated via item objects. You cannot implement this method!
+    /*
+     * Delegated via item objects. You should not implement this method!
      */
 //	@Override
 //	public int getItemViewType(int position) {
 //		//Not implemented: METHOD A is used
 //	}
 
-	/**
-	 * NEW METHOD! Delegated via item objects. You cannot implement this method!
+	/*
+	 * Delegated via item objects. You should not implement this method!
 	 */
 //	@Override
 //	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 //		// Not implemented: METHOD A is used
 //	}
 
-    /**
-     * NEW METHOD! Delegated via item objects. You cannot implement this method!
+    /*
+     * Delegated via item objects. You should not implement this method!
      */
 //	@Override
 //	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -175,7 +175,9 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
             position -= getScrollableHeaders().size() + 1;
         }
         // TODO FOR YOU: The basic value, usually, is the first letter
-        // For me is the position
+        // return getItem(position).getBubbleText(position);
+
+        // For me the position is (position + 1):
         return super.onCreateBubbleText(position);
     }
 

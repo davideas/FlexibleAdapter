@@ -21,22 +21,22 @@ import static org.junit.Assert.assertEquals;
 @Config(constants = BuildConfig.class, sdk = 25)
 public class FilterTest {
 
-	FlexibleAdapter<AbstractFlexibleItem> mAdapter;
-	List<AbstractFlexibleItem> mItems;
+    FlexibleAdapter<AbstractFlexibleItem> mAdapter;
+    List<AbstractFlexibleItem> mItems;
 
-	@Before
-	public void setUp() throws Exception {
-		DatabaseService.getInstance().createHeadersSectionsDatabase(30, 5);
-		mItems = DatabaseService.getInstance().getDatabaseList();
-	}
+    @Before
+    public void setUp() throws Exception {
+        DatabaseService.getInstance().createHeadersSectionsDatabase(30, 5);
+        mItems = DatabaseService.getInstance().getDatabaseList();
+    }
 
-	@Test
-	public void testNoDelayFilter() throws Exception {
-		mAdapter = new FlexibleAdapter<>(mItems);
-		mAdapter.showAllHeaders();
-		mAdapter.setSearchText("1");
-		mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList());
-		assertEquals(21, mAdapter.getItemCount());
-	}
+    @Test
+    public void testNoDelayFilter() throws Exception {
+        mAdapter = new FlexibleAdapter<>(mItems);
+        mAdapter.showAllHeaders();
+        mAdapter.setSearchText("1");
+        mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList());
+        assertEquals(21, mAdapter.getItemCount());
+    }
 
 }
