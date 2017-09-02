@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 import static eu.davidea.flexibleadapter.utils.FlexibleUtils.getClassName;
@@ -101,7 +100,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
     AnimatorAdapter(boolean stableIds) {
         super();
         setHasStableIds(stableIds);
-        Log.iTag("FlexibleAdapter", "Initialized with StableIds=" + stableIds);
+        log.i("Initialized with StableIds=" + stableIds);
 
         //Get notified when an item is changed (should skip animation)
         mAnimatorNotifierObserver = new AnimatorAdapterDataObserver();
@@ -130,7 +129,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      * @since 5.0.0-b1
      */
     public AnimatorAdapter setAnimationInitialDelay(long initialDelay) {
-        Log.i("Set animationInitialDelay=%s", initialDelay);
+        log.i("Set animationInitialDelay=%s", initialDelay);
         mInitialDelay = initialDelay;
         return this;
     }
@@ -145,7 +144,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      * @since 5.0.0-b1
      */
     public AnimatorAdapter setAnimationDelay(@IntRange(from = 0) long delay) {
-        Log.i("Set animationDelay=%s", delay);
+        log.i("Set animationDelay=%s", delay);
         mStepDelay = delay;
         return this;
     }
@@ -161,7 +160,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      * since 5.0.0-b8
      */
     public AnimatorAdapter setAnimationEntryStep(boolean entryStep) {
-        Log.i("Set animationEntryStep=%s", entryStep);
+        log.i("Set animationEntryStep=%s", entryStep);
         this.mEntryStep = entryStep;
         return this;
     }
@@ -175,7 +174,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      * @since 5.0.0-b1
      */
     public AnimatorAdapter setAnimationDuration(@IntRange(from = 1) long duration) {
-        Log.i("Set animationDuration=%s", duration);
+        log.i("Set animationDuration=%s", duration);
         mDuration = duration;
         return this;
     }
@@ -188,7 +187,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      * @return this AnimatorAdapter, so the call can be chained
      */
     public AnimatorAdapter setAnimationInterpolator(@NonNull Interpolator interpolator) {
-        Log.i("Set animationInterpolator=%s", getClassName(interpolator));
+        log.i("Set animationInterpolator=%s", getClassName(interpolator));
         mInterpolator = interpolator;
         return this;
     }
@@ -208,7 +207,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      * @since 5.0.0-b1
      */
     public AnimatorAdapter setAnimationOnScrolling(boolean enabled) {
-        Log.i("Set animationOnScrolling=%s", enabled);
+        log.i("Set animationOnScrolling=%s", enabled);
         if (enabled) this.onlyEntryAnimation = false;
         shouldAnimate = enabled;
         return this;
@@ -229,7 +228,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      * @since 5.0.0-b1
      */
     public AnimatorAdapter setAnimationOnReverseScrolling(boolean enabled) {
-        Log.i("Set animationOnReverseScrolling=%s", enabled);
+        log.i("Set animationOnReverseScrolling=%s", enabled);
         isReverseEnabled = enabled;
         return this;
     }
@@ -255,7 +254,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      * @since 5.0.0-b8
      */
     public AnimatorAdapter setOnlyEntryAnimation(boolean enabled) {
-        Log.i("Set onlyEntryAnimation=%s", enabled);
+        log.i("Set onlyEntryAnimation=%s", enabled);
         if (enabled) this.shouldAnimate = true;
         this.onlyEntryAnimation = enabled;
         return this;
@@ -313,7 +312,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
             shouldAnimate = false;
         }
         int lastVisiblePosition = getFlexibleLayoutManager().findLastVisibleItemPosition();
-//		Log.v("shouldAnimate=%s isFastScroll=%s isNotified=%s isReverseEnabled=%s mLastAnimatedPosition=%s %s mMaxChildViews=%s",
+//		log.v("shouldAnimate=%s isFastScroll=%s isNotified=%s isReverseEnabled=%s mLastAnimatedPosition=%s %s mMaxChildViews=%s",
 //				shouldAnimate, isFastScroll, mAnimatorNotifierObserver.isPositionNotified(), isReverseEnabled, mLastAnimatedPosition,
 //				(!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : ""), mMaxChildViews
 //		);
@@ -341,7 +340,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
                     duration = animator.getDuration();
                 }
             }
-            //Log.v("duration=%s", duration);
+            //log.v("duration=%s", duration);
             set.setDuration(duration);
             set.addListener(new HelperAnimatorListener(hashCode));
             if (mEntryStep) {
@@ -350,7 +349,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
             }
             set.start();
             mAnimators.put(hashCode, set);
-            //Log.v("animateView    Scroll animation on position %s", position);
+            //log.v("animateView    Scroll animation on position %s", position);
         }
         mAnimatorNotifierObserver.clearNotified();
         // Update last animated position
@@ -400,7 +399,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
             delay = mInitialDelay + (position * mStepDelay);
         }
 
-//		Log.v("Delay[%s]=%s FirstVisible=%s LastVisible=%s LastAnimated=%s VisibleItems=%s ChildCount=%s MaxChildCount=%s",
+//		log.v("Delay[%s]=%s FirstVisible=%s LastVisible=%s LastAnimated=%s VisibleItems=%s ChildCount=%s MaxChildCount=%s",
 //				position, delay, firstVisiblePosition, lastVisiblePosition, numberOfAnimatedItems,
 //				visibleItems, mRecyclerView.getChildCount(), mMaxChildViews);
 
@@ -420,7 +419,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         private boolean notified;
         private Handler mAnimatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
             public boolean handleMessage(Message message) {
-                //Log.v("Clear notified for scrolling Animations");
+                //log.v("Clear notified for scrolling Animations");
                 notified = false;
                 return true;
             }
@@ -440,7 +439,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         private void markNotified() {
             notified = !animateFromObserver;
 //			if (DEBUG)
-//				Log.v(TAG, "animateFromObserver=" + animateFromObserver + " notified=" + notified);
+//				log.v(TAG, "animateFromObserver=" + animateFromObserver + " notified=" + notified);
         }
 
         @Override

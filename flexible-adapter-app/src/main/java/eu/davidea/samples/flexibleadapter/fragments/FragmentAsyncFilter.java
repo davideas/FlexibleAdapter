@@ -69,6 +69,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
         //Restore FAB button and icon
         initializeFab();
 
+        FlexibleAdapter.useTag("AsyncFilterAdapter");
         if (configure) {
             //Create configuration list
             DatabaseService.getInstance().createConfigurationDatabase(getResources());

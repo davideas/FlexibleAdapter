@@ -69,6 +69,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
     private void initializeRecyclerView() {
         // Initialize Adapter and RecyclerView
         // true = it makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+        FlexibleAdapter.useTag("InstagramHeadersAdapter");
         mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity(), true);
         mAdapter.addListener(getActivity())
                 // Experimenting NEW features (v5.0.0)

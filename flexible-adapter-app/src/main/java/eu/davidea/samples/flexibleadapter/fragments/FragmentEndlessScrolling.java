@@ -88,6 +88,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
     private void initializeRecyclerView(Bundle savedInstanceState) {
         // Initialize Adapter and RecyclerView
         // ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+        FlexibleAdapter.useTag("EndlessScrollingAdapter");
         mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
         // Experimenting NEW features (v5.0.0)
         mAdapter.setAutoScrollOnExpand(true)

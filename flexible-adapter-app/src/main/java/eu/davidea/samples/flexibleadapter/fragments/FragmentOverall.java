@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.animation.DecelerateInterpolator;
 
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
@@ -76,6 +77,7 @@ public class FragmentOverall extends AbstractFragment
     private void initializeRecyclerView(Bundle savedInstanceState) {
         // Initialize Adapter and RecyclerView
         // OverallAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+        FlexibleAdapter.useTag("OverallAdapter");
         mAdapter = new OverallAdapter(getActivity());
 
         // Experimenting NEW features (v5.0.0)

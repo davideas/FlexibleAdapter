@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.databinding.BindingFlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
@@ -85,6 +86,7 @@ public class FragmentDataBinding extends AbstractFragment {
     @SuppressWarnings({"ConstantConditions", "NullableProblems"})
     private void initializeRecyclerView(Bundle savedInstanceState) {
         // Initialize Adapter and RecyclerView
+        FlexibleAdapter.useTag("DataBindingAdapter");
         mAdapter = new BindingFlexibleAdapter<>(getActivity(), true);
         // Experimenting NEW features (v5.0.0)
         mAdapter.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);

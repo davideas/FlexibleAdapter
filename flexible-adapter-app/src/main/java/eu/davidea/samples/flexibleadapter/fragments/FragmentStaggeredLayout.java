@@ -70,6 +70,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
     private void initializeRecyclerView(Bundle savedInstanceState) {
         // Initialize Adapter and RecyclerView
         // ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+        FlexibleAdapter.useTag("StaggeredLayoutAdapter");
         mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity());
         mRecyclerView = getView().findViewById(R.id.recycler_view);
         // Customize the speed of the smooth scroll.

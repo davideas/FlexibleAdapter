@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
@@ -75,6 +76,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 
         // Initialize Adapter and RecyclerView
         // ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
+        FlexibleAdapter.useTag("SelectionModesAdapter");
         mAdapter = new ExampleAdapter(items, getActivity());
         mAdapter.setNotifyChangeOfUnfilteredItems(true) //true is the default! This will rebind new item when refreshed
                 .setMode(Mode.SINGLE);

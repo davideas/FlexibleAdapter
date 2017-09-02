@@ -48,6 +48,15 @@ public final class FlexibleUtils {
     public static int colorAccent = INVALID_COLOR;
 
     /**
+     * API 26
+     *
+     * @see VERSION_CODES#O
+     */
+    public static boolean hasOreo() {
+        return Build.VERSION.SDK_INT >= VERSION_CODES.O;
+    }
+
+    /**
      * API 24
      *
      * @see VERSION_CODES#N
