@@ -173,7 +173,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/*--------------*/
     /* CONSTRUCTORS */
-	/*--------------*/
+    /*--------------*/
 
     /**
      * Simple Constructor with NO listeners!
@@ -324,37 +324,37 @@ public class FlexibleAdapter<T extends IFlexible>
         for (Class listener : listeners) {
             if (listener == OnItemClickListener.class) {
                 mItemClickListener = null;
-                log.i("- Removed OnItemClickListener");
+                log.i("Removed OnItemClickListener");
                 for (FlexibleViewHolder holder : getAllBoundViewHolders()) {
                     holder.getContentView().setOnClickListener(null);
                 }
             }
             if (listener == OnItemLongClickListener.class) {
                 mItemLongClickListener = null;
-                log.i("- Removed OnItemLongClickListener");
+                log.i("Removed OnItemLongClickListener");
                 for (FlexibleViewHolder holder : getAllBoundViewHolders()) {
                     holder.getContentView().setOnLongClickListener(null);
                 }
             }
             if (listener == OnItemMoveListener.class) {
                 mItemMoveListener = null;
-                log.i("- Removed OnItemMoveListener");
+                log.i("Removed OnItemMoveListener");
             }
             if (listener == OnItemSwipeListener.class) {
                 mItemSwipeListener = null;
-                log.i("- Removed OnItemSwipeListener");
+                log.i("Removed OnItemSwipeListener");
             }
             if (listener == OnDeleteCompleteListener.class) {
                 mDeleteCompleteListener = null;
-                log.i("- Removed OnDeleteCompleteListener");
+                log.i("Removed OnDeleteCompleteListener");
             }
             if (listener == OnStickyHeaderChangeListener.class) {
                 mStickyHeaderChangeListener = null;
-                log.i("- Removed OnStickyHeaderChangeListener");
+                log.i("Removed OnStickyHeaderChangeListener");
             }
             if (listener == OnUpdateListener.class) {
                 mUpdateListener = null;
-                log.i("- Removed OnUpdateListener");
+                log.i("Removed OnUpdateListener");
             }
         }
         return this;
@@ -3780,12 +3780,14 @@ public class FlexibleAdapter<T extends IFlexible>
      * <li>The Filter is <u>always</u> executed in background, asynchronously.
      * The method {@link #onPostFilter()} is called after the filter task is completed.</li>
      * <li>This method calls {@link #filterObject(IFlexible, String)} for each filterable item.</li>
-     * <li>If searchText is empty or {@code null}, the provided list is the new list plus any
-     * Scrollable Headers and Footers if existent.</li>
-     * <li>Any pending deleted items are always deleted before filter is performed.</li>
+     * <li>Any pending deleted items are always deleted before filter is performed:
+     * {@link OnDeleteCompleteListener#onDeleteConfirmed(int)} is therefore invoked
+     * (Implemented in {@code UndoHelper}).</li>
      * <li>Expandable items are picked up and displayed if at least a child is collected by
      * the current filter.</li>
      * <li>Filter is skipped while endless feature is active (loading).</li>
+     * <li>If searchText is empty or {@code null}, the provided list is the new list plus any
+     * Scrollable Headers and Footers if existent.</li>
      * <li>Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit of
      * {@value #ANIMATE_TO_LIMIT} (default) items is set. <b>Tip:</b> Above this limit,
      * {@link #notifyDataSetChanged()} will be called to improve performance. You can change
@@ -4831,12 +4833,13 @@ public class FlexibleAdapter<T extends IFlexible>
     public interface OnDeleteCompleteListener {
         /**
          * Called when UndoTime out is over or when Filter is started or reset in order
-         * to commit deletion in the user Database.
+         * to commit deletion in the user Repository.
          * <p><b>Note:</b> Must be called on user Main Thread!</p>
          *
+         * @param event One of the event of {@code Snackbar.Callback}
          * @since 5.0.0-b1
          */
-        void onDeleteConfirmed();
+        void onDeleteConfirmed(int event);
     }
 
     /**
@@ -4995,6 +4998,8 @@ public class FlexibleAdapter<T extends IFlexible>
      */
     private class AdapterDataObserver extends RecyclerView.AdapterDataObserver {
 
+        private int lastHeaderUpdate = -1;
+
         private void adjustPositions(int positionStart, int itemCount) {
             if (adjustSelected) //Don't, if remove range / restore
                 adjustSelected(positionStart, itemCount);
@@ -5141,10 +5146,10 @@ public class FlexibleAdapter<T extends IFlexible>
             // Note: In case some items are in pending deletion (Undo started),
             // we commit the deletion before starting or resetting the filter.
             if (isRestoreInTime() && mDeleteCompleteListener != null) {
-                log.d("Hiding all deleted items before filtering/updating");
+                log.d("Removing all deleted items before filtering/updating");
                 newItems.removeAll(getDeletedItems());
                 if (mOriginalList != null) mOriginalList.removeAll(getDeletedItems());
-                mDeleteCompleteListener.onDeleteConfirmed();
+                mDeleteCompleteListener.onDeleteConfirmed(3); // Snackbar.Callback.DISMISS_EVENT_MANUAL = 3
             }
         }
 
