@@ -366,6 +366,7 @@ public class FlexibleAdapter<T extends IFlexible>
      *
      * @since 5.0.0-b6
      */
+    @CallSuper
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
@@ -381,6 +382,7 @@ public class FlexibleAdapter<T extends IFlexible>
      *
      * @since 5.0.0-b6
      */
+    @CallSuper
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         if (areHeadersSticky()) {
@@ -4998,7 +5000,7 @@ public class FlexibleAdapter<T extends IFlexible>
      */
     private class AdapterDataObserver extends RecyclerView.AdapterDataObserver {
 
-        private int lastHeaderUpdate = -1;
+        private int lastHeaderUpdate = RecyclerView.NO_POSITION;
 
         private void adjustPositions(int positionStart, int itemCount) {
             if (adjustSelected) //Don't, if remove range / restore
@@ -5008,15 +5010,19 @@ public class FlexibleAdapter<T extends IFlexible>
 
         private void updateOrClearHeader() {
             if (areHeadersSticky() && (!multiRange || !mRestoreList.isEmpty())) {
-                // #320 - To include adapter changes just notified we need a new layout pass:
-                // We must give time to LayoutManager otherwise the findFirstVisibleItemPosition()
-                // will return wrong position!
-                mRecyclerView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (areHeadersSticky()) mStickyHeaderHelper.updateOrClearHeader(true);
-                    }
-                }, 100L);
+                // This check avoids to bind multiple times the same header
+                if (lastHeaderUpdate != mStickyHeaderHelper.getStickyPosition()) {
+                    lastHeaderUpdate = mStickyHeaderHelper.getStickyPosition();
+                    // #320 - To include adapter changes just notified we need a new layout pass:
+                    // We must give time to LayoutManager otherwise the findFirstVisibleItemPosition()
+                    // will return wrong position!
+                    mRecyclerView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (areHeadersSticky()) mStickyHeaderHelper.updateOrClearHeader(true);
+                        }
+                    }, 100L);
+                }
             }
         }
 

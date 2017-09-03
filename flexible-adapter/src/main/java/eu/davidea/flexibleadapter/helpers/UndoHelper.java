@@ -157,8 +157,30 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
     /**
      * As {@link #remove(List, View, CharSequence, CharSequence, int)} but with String
      * resources instead of CharSequence.
+     * @deprecated Renamed to {@link #start(List, View, int, int, int)}
      */
+    @Deprecated
     public Snackbar remove(List<Integer> positions, @NonNull View mainView,
+                           @StringRes int messageStringResId, @StringRes int actionStringResId,
+                           @IntRange(from = -1) int duration) {
+        return start(positions, mainView, messageStringResId, actionStringResId, duration);
+    }
+
+    /**
+     * @deprecated Renamed to {@link #start(List, View, CharSequence, CharSequence, int)}
+     */
+    @Deprecated
+    public Snackbar remove(List<Integer> positions, @NonNull View mainView,
+                          CharSequence message, CharSequence actionText,
+                          @IntRange(from = -1) int duration) {
+        return start(positions, mainView, message, actionText, duration);
+    }
+
+    /**
+     * As {@link #start(List, View, CharSequence, CharSequence, int)} but with String
+     * resources instead of CharSequence.
+     */
+    public Snackbar start(List<Integer> positions, @NonNull View mainView,
                            @StringRes int messageStringResId, @StringRes int actionStringResId,
                            @IntRange(from = -1) int duration) {
         Context context = mainView.getContext();
@@ -182,7 +204,7 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
      * @see #remove(List, View, int, int, int)
      */
     @SuppressWarnings("WrongConstant")
-    public Snackbar remove(List<Integer> positions, @NonNull View mainView,
+    public Snackbar start(List<Integer> positions, @NonNull View mainView,
                            CharSequence message, CharSequence actionText,
                            @IntRange(from = -1) int duration) {
         Log.d("With %s", (mAction == ACTION_REMOVE ? "ACTION_REMOVE" : "ACTION_UPDATE"));
@@ -193,8 +215,8 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
                                     @Override
                                     public void onClick(View view) {
                                         if (mUndoListener != null) {
-                                            Log.v("onUndoConfirmed event=1");
-                                            mUndoListener.onUndoConfirmed(mAction);
+                                            Log.v("onActionCanceled event=1");
+                                            mUndoListener.onActionCanceled(mAction);
                                         }
                                     }
                                 });
@@ -217,8 +239,8 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
     @Override
     public void onDeleteConfirmed(int event) {
         if (mUndoListener != null) {
-            Log.v("onDeleteConfirmed event=%s", event);
-            mUndoListener.onDeleteConfirmed(mAction, event);
+            Log.v("onActionConfirmed event=%s", event);
+            mUndoListener.onActionConfirmed(mAction, event);
         }
         mAdapter.emptyBin();
         // Trigger manual dismiss event
@@ -262,7 +284,7 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
         mAdapter.removeItems(mPositions, mPayload);
         // We can already notify the callback only in case of permanent deletion
         if (mAdapter.isPermanentDelete() && mUndoListener != null)
-            mUndoListener.onDeleteConfirmed(mAction, DISMISS_EVENT_MANUAL);
+            mUndoListener.onActionConfirmed(mAction, DISMISS_EVENT_MANUAL);
     }
 
     private void onDestroy() {
@@ -323,7 +345,8 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
     }
 
     /**
-     * @since 30/04/2016
+     * @since 30/04/2016 - Creation
+     * <br>03/09/2017 - Refactoring
      */
     public interface OnUndoListener {
         /**
@@ -333,7 +356,7 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
          *
          * @param action one of {@link UndoHelper#ACTION_REMOVE}, {@link UndoHelper#ACTION_UPDATE}
          */
-        void onUndoConfirmed(@Action int action);
+        void onActionCanceled(@Action int action);
 
         /**
          * Called when Undo timeout is over and action must be committed in the user Database.
@@ -345,9 +368,10 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
          * @param action one of {@link UndoHelper#ACTION_REMOVE}, {@link UndoHelper#ACTION_UPDATE}
          * @param event  one of {@link Snackbar.Callback#DISMISS_EVENT_SWIPE},
          *               {@link Snackbar.Callback#DISMISS_EVENT_MANUAL},
-         *               {@link Snackbar.Callback#DISMISS_EVENT_TIMEOUT}
+         *               {@link Snackbar.Callback#DISMISS_EVENT_TIMEOUT},
+         *               {@link Snackbar.Callback#DISMISS_EVENT_CONSECUTIVE}
          */
-        void onDeleteConfirmed(@Action int action, int event);
+        void onActionConfirmed(@Action int action, int event);
     }
 
 }

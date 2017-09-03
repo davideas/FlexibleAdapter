@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -294,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements
         mNavigationView.setNavigationItemSelectedListener(this);
 
         // Version
-        TextView appVersion = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.app_version);
+        TextView appVersion = mNavigationView.getHeaderView(0).findViewById(R.id.app_version);
         appVersion.setText(getString(R.string.about_version, Utils.getVersionName(this)));
     }
 
@@ -331,7 +330,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         hideFabSilently();
-        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mFab.getLayoutParams();
 
         // Handle navigation view item clicks
         int id = item.getItemId();
@@ -742,14 +740,10 @@ public class MainActivity extends AppCompatActivity implements
     public void onItemSwipe(final int position, int direction) {
         Log.i("onItemSwipe position=%s direction=%s", position, (direction == ItemTouchHelper.LEFT ? "LEFT" : "RIGHT"));
 
-        // Option 1 FULL_SWIPE: Direct action no Undo Action
+        // FULL_SWIPE: Direct action no Undo Action.
         // Do something based on direction when item has been swiped:
-        //   A) update item, set "read" if an email etc.
-        //   B) remove the item from the adapter;
-
-        // Option 2 FULL_SWIPE: Delayed action with Undo Action
-        // Show action button and start a new Handler:
-        //   A) on time out do something based on direction (open dialog with options);
+        //   1) optional: update item, set "read" if an email, etc..
+        //   2) remove the item from the adapter
 
         // Create list for single position (only in onItemSwipe)
         List<Integer> positions = new ArrayList<>(1);
@@ -763,7 +757,7 @@ public class MainActivity extends AppCompatActivity implements
             mAdapter.setRestoreSelectionOnUndo(false);
 
         // Perform different actions
-        // Here, option 2A) is implemented
+        // Here, option 1) is implemented
         if (direction == ItemTouchHelper.LEFT) {
             message.append(getString(R.string.action_archived));
 
@@ -782,10 +776,10 @@ public class MainActivity extends AppCompatActivity implements
                     .withConsecutive(true)           //Commit the previous action
                     .withAction(UndoHelper.ACTION_UPDATE) //Specify the action
                     .withActionTextColor(actionTextColor) //Change color of the action text
-                    .remove(positions, findViewById(R.id.main_view), R.string.action_archived,
+                    .start(positions, findViewById(R.id.main_view), R.string.action_archived,
                             R.string.undo, UndoHelper.UNDO_TIMEOUT);
 
-            // Here, option 1B) is implemented
+            // Here, option 2) is implemented
         } else if (direction == ItemTouchHelper.RIGHT) {
             // Prepare for next deletion
             message.append(getString(R.string.action_deleted));
@@ -795,7 +789,7 @@ public class MainActivity extends AppCompatActivity implements
             new UndoHelper(mAdapter, this)
                     .withPayload(null)     //You can provide any custom object
                     .withConsecutive(true) //Commit the previous action
-                    .remove(positions, findViewById(R.id.main_view), message,
+                    .start(positions, findViewById(R.id.main_view), message,
                             getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
 
             // Handle ActionMode title
@@ -838,7 +832,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onUndoConfirmed(@UndoHelper.Action int action) {
+    public void onActionCanceled(@UndoHelper.Action int action) {
         if (action == UndoHelper.ACTION_UPDATE) {
             //TODO: Complete click animation on swiped item. NotifyItem changed to display rear view as front, so user can press undo on the item
 //			final RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForLayoutPosition(mSwipedPosition);
@@ -871,7 +865,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onDeleteConfirmed(@UndoHelper.Action int action, int event) {
+    public void onActionConfirmed(@UndoHelper.Action int action, int event) {
         // Disable Refreshing
         mRefreshHandler.sendEmptyMessage(REFRESH_STOP);
         // Removing items from Database. Example:
@@ -938,7 +932,7 @@ public class MainActivity extends AppCompatActivity implements
                 // New Undo Helper (Basic usage)
                 new UndoHelper(mAdapter, this)
                         .withPayload(Payload.CHANGE)
-                        .remove(mAdapter.getSelectedPositions(),
+                        .start(mAdapter.getSelectedPositions(),
                                 findViewById(R.id.main_view), message,
                                 getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
 
