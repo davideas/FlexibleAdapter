@@ -35,8 +35,10 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @see IHolder
  * @see ISectionable
  * @since 19/01/2016 Created
- * <br>28/03/2017 Individual item's span size AND shouldNotifyChange
- * <br>12/05/2017 Simplified createViewHolder params
+ * <br>28/03/2017 Individual item's span size AND {@code shouldNotifyChange}
+ * <br>12/05/2017 Simplified {@code createViewHolder} params
+ * <br>16/06/2017 Added {@code getBubbleText} method
+ * <br>04/09/2017 Added {@code getItemViewType} method
  */
 public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 
@@ -59,7 +61,9 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
     void setEnabled(boolean enabled);
 
     /**
-     * Returns if the Item is hidden.
+     * (Internal usage).
+     * When and item has been deleted (with Undo) or has been filtered out by the
+     * adapter, then, it has hidden status.
      *
      * @return true for hidden item, (default) false for the shown one.
      */
@@ -134,6 +138,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      *
      * @param position the current mapped position
      * @return Any desired value
+     * @since 5.0.0-rc3
      */
     String getBubbleText(int position);
 
@@ -154,14 +159,24 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 	/*---------------------*/
 
     /**
-     * Returns the layout resource ID to AutoMap a specific ViewType on this Item.
-     * <p><b>NOTE:</b> Should identify a resource Layout reference {@link android.R.layout}
-     * used by FlexibleAdapter to auto-map the ViewTypes.</p>
-     * <b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
+     * Identifies a specific view type for this item, used by FlexibleAdapter to auto-map
+     * the ViewTypes.
+     * <p><b>HELP:</b> To know how to implement AutoMap for ViewTypes please refer to the
      * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
-     * on GitHub.
+     * on GitHub.</p>
      *
-     * @return Layout identifier
+     * @return user defined item view type identifier or layout reference if not overridden
+     * @since 5.0.0-rc3
+     */
+    int getItemViewType();
+
+    /**
+     * Returns the layout resource ID to auto-inflate the View for this item. Optionally, you
+     * can assign same layout for multiple item types, but {@link #getItemViewType()} must
+     * return <b>unique</b> values!
+     * <p><b>NOTE:</b> Should identify a resource Layout reference {@link android.R.layout}.</p>
+     *
+     * @return layout identifier
      */
     @LayoutRes
     int getLayoutRes();
@@ -195,9 +210,10 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 
     /**
      * Called when a view created by this adapter has been recycled.
-     * <p>A view is recycled when a RecyclerView.LayoutManager decides that it no longer needs to
-     * be attached to its parent RecyclerView. This can be because it has fallen out of visibility
-     * or a set of cached views represented by views still attached to the parent RecyclerView.</p>
+     * <p>A view is recycled when a {@code RecyclerView.LayoutManager} decides that it no longer
+     * needs to be attached to its parent RecyclerView. This can be because it has fallen out
+     * of visibility or a set of cached views represented by views still attached to the parent
+     * RecyclerView.</p>
      * If an item view has large or expensive data bound to it such as large bitmaps, this may be
      * a good place to release those resources.
      *

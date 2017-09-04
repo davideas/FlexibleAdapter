@@ -144,6 +144,15 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 
     /**
      * {@inheritDoc}
+     * <p>If not overridden return value is the same of {@link #getLayoutRes()}.</p>
+     */
+    @Override
+    public int getItemViewType() {
+        return getLayoutRes();
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public abstract int getLayoutRes();
@@ -165,7 +174,6 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
      */
     @Override
     public void unbindViewHolder(FlexibleAdapter adapter, VH holder, int position) {
-
     }
 
 }

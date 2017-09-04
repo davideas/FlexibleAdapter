@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * @author Davide
- * @since 24/05/2017
+ * @since 29/08/2017
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 25)
@@ -38,8 +38,8 @@ public class RemoveItemsTest {
         // Remember: Adapter is backed by a List object.
         for (int i = mAdapter.getItemCount(); i >= 7; i--) {
             AbstractFlexibleItem item = mAdapter.getItem(i);
-            // No necessary. but using getGlobalPositionOf asynchronously, it ensures the
-            // position of that item
+            // No necessary. but using getGlobalPositionOf() asynchronously,
+            // it ensures the position of that item
             mAdapter.removeItem(mAdapter.getGlobalPositionOf(item));
         }
         assertEquals(7, mAdapter.getItemCount());

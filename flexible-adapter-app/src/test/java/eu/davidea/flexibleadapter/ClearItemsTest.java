@@ -89,7 +89,7 @@ public class ClearItemsTest {
         assertEquals(35, mAdapter.getMainItemCount());
 
         // Clear all simple items, retains header items
-        mAdapter.clearAllBut(headerItem.getLayoutRes());
+        mAdapter.clearAllBut(headerItem.getItemViewType());
         assertEquals(5, mAdapter.getItemCount());
         assertEquals(5, mAdapter.getMainItemCount());
         assertTrue(mAdapter.getItem(0) instanceof HeaderItem);
@@ -108,7 +108,7 @@ public class ClearItemsTest {
         assertEquals(35, mAdapter.getMainItemCount());
 
         // Clear all simple items, retains header items (...and scrollable items)
-        mAdapter.clearAllBut(headerItem.getLayoutRes());
+        mAdapter.clearAllBut(headerItem.getItemViewType());
         assertEquals(7, mAdapter.getItemCount());
         assertEquals(5, mAdapter.getMainItemCount());
         assertEquals(scrollableHeader, mAdapter.getItem(0));
@@ -122,7 +122,7 @@ public class ClearItemsTest {
         assertEquals(35, mAdapter.getItemCount());
 
         // Delete all items of type simple
-        mAdapter.removeItemsOfType(simpleItem.getLayoutRes());
+        mAdapter.removeItemsOfType(simpleItem.getItemViewType());
         assertEquals(5, mAdapter.getItemCount());
     }
 

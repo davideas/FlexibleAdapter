@@ -1618,7 +1618,7 @@ public class FlexibleAdapter<T extends IFlexible>
      *
      * @param position position for which ViewType is requested
      * @return layout resource defined in {@code IFlexible#getLayoutRes()}
-     * @see IFlexible#getLayoutRes()
+     * @see IFlexible#getItemViewType()
      * @since 5.0.0-b1
      */
     @Override
@@ -1630,7 +1630,7 @@ public class FlexibleAdapter<T extends IFlexible>
         // Map the view type if not done yet
         mapViewTypeFrom(item);
         autoMap = true;
-        return item.getLayoutRes();
+        return item.getItemViewType();
     }
 
     /**
@@ -4562,9 +4562,9 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-b1
      */
     private void mapViewTypeFrom(T item) {
-        if (item != null && !mTypeInstances.containsKey(item.getLayoutRes())) {
-            mTypeInstances.put(item.getLayoutRes(), item);
-            log.i("Mapped viewType %s from %s", item.getLayoutRes(), getClassName(item));
+        if (item != null && !mTypeInstances.containsKey(item.getItemViewType())) {
+            mTypeInstances.put(item.getItemViewType(), item);
+            log.i("Mapped viewType %s from %s", item.getItemViewType(), getClassName(item));
         }
     }
 
