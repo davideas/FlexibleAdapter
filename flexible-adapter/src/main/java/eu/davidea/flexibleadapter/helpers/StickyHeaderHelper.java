@@ -250,7 +250,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
         mStickyHeaderViewHolder.itemView.setVisibility(View.INVISIBLE);
         applyLayoutParamsAndMargins(view);
         removeViewFromParent(view);
-        mStickyHolderLayout.addView(view);
+        addViewToParent(mStickyHolderLayout, view);
         configureLayoutElevation();
     }
 
@@ -295,8 +295,9 @@ public final class StickyHeaderHelper extends OnScrollListener {
         // Reset translation on removed header
         view.setTranslationX(0);
         view.setTranslationY(0);
-        if (!header.itemView.equals(view))
-            ((ViewGroup) header.itemView).addView(view);
+        if (!header.itemView.equals(view)) {
+            addViewToParent(((ViewGroup) header.itemView), view);
+        }
         header.setIsRecyclable(true);
         // #294 - Expandable header is not resized / redrawn on automatic configuration change when sticky headers are enabled
         header.itemView.getLayoutParams().width = view.getLayoutParams().width;
@@ -342,6 +343,14 @@ public final class StickyHeaderHelper extends OnScrollListener {
                 }
             });
             mStickyHolderLayout.animate().alpha(0).start();
+        }
+    }
+
+    private static void addViewToParent(final ViewGroup parent, View child) {
+        try {
+            parent.addView(child);
+        } catch (IllegalStateException e) {
+            Log.wtf("The specified child already has a parent! (but parent was removed!)");
         }
     }
 
