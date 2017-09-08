@@ -120,13 +120,16 @@ public final class FlexibleUtils {
 
     /**
      * Sets a spannable text with the accent color (if available) into the provided TextView.
-     * <p>Internally calls {@link #fetchAccentColor(Context, int)}.</p>
+     * <p>Multiple matches will be highlighted, but if the 2nd match is consecutive
+     * highlight is skipped.</p>
+     * Internally calls {@link #fetchAccentColor(Context, int)}.
      *
      * @param textView     the TextView to transform
      * @param originalText the original text which the transformation is applied to
      * @param constraint   the text to highlight
      * @see #highlightText(TextView, String, String, int)
-     * @since 5.0.0-rc1
+     * @since 5.0.0-rc1 Crated
+     * <br>5.0.0-rc3 Multi-span
      */
     public static void highlightText(@NonNull TextView textView,
                                      @Nullable String originalText, @Nullable String constraint) {
@@ -136,6 +139,8 @@ public final class FlexibleUtils {
 
     /**
      * Sets a spannable text with any highlight color into the provided TextView.
+     * <p>Multiple matches will be highlighted, but if the 2nd match is consecutive
+     * highlight is skipped.</p>
      *
      * @param textView     the TextView to transform
      * @param originalText the original text which the transformation is applied to
@@ -143,7 +148,8 @@ public final class FlexibleUtils {
      * @param color        the highlight color
      * @see #fetchAccentColor(Context, int)
      * @see #highlightText(TextView, String, String)
-     * @since 5.0.0-rc1
+     * @since 5.0.0-rc1 Crated
+     * <br>5.0.0-rc3 Multi-span
      */
     public static void highlightText(@NonNull TextView textView, @Nullable String originalText,
                                      @Nullable String constraint, @ColorInt int color) {
@@ -152,10 +158,12 @@ public final class FlexibleUtils {
         int i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()));
         if (i != -1) {
             Spannable spanText = Spannable.Factory.getInstance().newSpannable(originalText);
-            spanText.setSpan(new ForegroundColorSpan(color), i,
-                    i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spanText.setSpan(new StyleSpan(Typeface.BOLD), i,
-                    i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            while (i != -1) {
+                spanText.setSpan(new ForegroundColorSpan(color), i, i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spanText.setSpan(new StyleSpan(Typeface.BOLD), i, i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                // +1 skips the consecutive span
+                i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()), i + constraint.length() + 1);
+            }
             textView.setText(spanText, TextView.BufferType.SPANNABLE);
         } else {
             textView.setText(originalText, TextView.BufferType.NORMAL);
