@@ -155,15 +155,16 @@ public final class FlexibleUtils {
                                      @Nullable String constraint, @ColorInt int color) {
         if (originalText == null) originalText = "";
         if (constraint == null) constraint = "";
-        int i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()));
-        if (i != -1) {
+        int start = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()));
+        if (start != -1) {
             Spannable spanText = Spannable.Factory.getInstance().newSpannable(originalText);
-            while (i != -1) {
-                spanText.setSpan(new ForegroundColorSpan(color), i, i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                spanText.setSpan(new StyleSpan(Typeface.BOLD), i, i + constraint.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            do {
+                int end = start + constraint.length();
+                spanText.setSpan(new ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spanText.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 // +1 skips the consecutive span
-                i = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()), i + constraint.length() + 1);
-            }
+                start = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()), end + 1);
+            } while (start != -1);
             textView.setText(spanText, TextView.BufferType.SPANNABLE);
         } else {
             textView.setText(originalText, TextView.BufferType.NORMAL);
