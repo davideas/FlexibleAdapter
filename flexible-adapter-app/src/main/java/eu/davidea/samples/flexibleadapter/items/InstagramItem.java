@@ -56,8 +56,8 @@ public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHol
         return new Random().nextBoolean();
     }
 
-    public int getLikes() {
-        return new Random().nextInt(1000);
+    public String getLikes() {
+        return Integer.toString(new Random().nextInt(1000));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHol
         holder.mQuantityLikes.setText(context.getResources().getString(R.string.likes, getLikes()));
         holder.mImageFavourite.flipSilently(getStarred());
 
-        //Load image via Glide
+        // Load image via Glide
         Glide.clear(holder.mImage);
         Glide.with(context).load(url).crossFade(500).into(holder.mImage);
     }

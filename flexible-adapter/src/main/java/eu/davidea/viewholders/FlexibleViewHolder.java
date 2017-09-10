@@ -18,7 +18,6 @@ package eu.davidea.viewholders;
 import android.animation.Animator;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -166,8 +165,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
             return false;
         }
         Log.v("onTouch with DragHandleView on position %s mode=%s", position, FlexibleUtils.getModeName(mAdapter.getMode()));
-        if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN &&
-                mAdapter.isHandleDragEnabled()) {
+        if (event.getActionMasked() == MotionEvent.ACTION_DOWN && mAdapter.isHandleDragEnabled()) {
             //Start Drag!
             mAdapter.getItemTouchHelper().startDrag(this);
         }

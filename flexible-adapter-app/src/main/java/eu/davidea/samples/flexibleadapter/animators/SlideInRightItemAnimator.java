@@ -24,7 +24,6 @@ import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 public class SlideInRightItemAnimator extends FlexibleItemAnimator {
 
     public SlideInRightItemAnimator() {
-
     }
 
     public SlideInRightItemAnimator(Interpolator interpolator) {
@@ -43,7 +42,7 @@ public class SlideInRightItemAnimator extends FlexibleItemAnimator {
 
     @Override
     protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-        ViewCompat.setTranslationX(holder.itemView, holder.itemView.getRootView().getWidth());
+        holder.itemView.setTranslationX(holder.itemView.getRootView().getWidth());
         return true;
     }
 

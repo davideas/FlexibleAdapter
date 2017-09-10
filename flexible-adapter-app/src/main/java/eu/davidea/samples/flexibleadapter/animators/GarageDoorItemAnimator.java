@@ -28,13 +28,13 @@ public class GarageDoorItemAnimator extends FlexibleItemAnimator {
 
     @Override
     protected boolean preAnimateAddImpl(ViewHolder holder) {
-        ViewCompat.setRotationX(holder.itemView, 90);
+        holder.itemView.setRotationX(90);
         return true;
     }
 
     @Override
     protected void animateAddImpl(ViewHolder holder, int index) {
-        ViewCompat.setTranslationY(holder.itemView, -(holder.itemView.getMeasuredHeight() / 2));//This must stay here
+        holder.itemView.setTranslationY(-(holder.itemView.getMeasuredHeight() / 2));//This must stay here
         ViewCompat.animate(holder.itemView)
                   .rotationX(0)
                   .translationY(0)

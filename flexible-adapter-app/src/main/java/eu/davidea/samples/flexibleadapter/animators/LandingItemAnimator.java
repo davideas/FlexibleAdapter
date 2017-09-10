@@ -44,9 +44,9 @@ public class LandingItemAnimator extends FlexibleItemAnimator {
 
     @Override
     protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-        ViewCompat.setAlpha(holder.itemView, 0);
-        ViewCompat.setScaleX(holder.itemView, 1.5f);
-        ViewCompat.setScaleY(holder.itemView, 1.5f);
+        holder.itemView.setAlpha(0);
+        holder.itemView.setScaleX(1.5f);
+        holder.itemView.setScaleY(1.5f);
         return true;
     }
 

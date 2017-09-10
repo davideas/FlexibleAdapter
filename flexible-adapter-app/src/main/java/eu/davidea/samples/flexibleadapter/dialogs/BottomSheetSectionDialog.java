@@ -144,12 +144,12 @@ public class BottomSheetSectionDialog extends android.support.design.widget.Bott
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ListView listView = (ListView) parent;
         if (listView.getTag().equals(R.id.select_item_type)) {
-            Button buttonList = (Button) mBottomSheetDialog.findViewById(R.id.select_item_type);
+            Button buttonList = mBottomSheetDialog.findViewById(R.id.select_item_type);
             buttonList.setText(listView.getItemAtPosition(position).toString());
             mItemType = position;
             mPopupItemType.dismiss();
         } else if (listView.getTag().equals(R.id.select_reference_button)) {
-            Button buttonList = (Button) mBottomSheetDialog.findViewById(R.id.select_reference_button);
+            Button buttonList = mBottomSheetDialog.findViewById(R.id.select_reference_button);
             buttonList.setText(listView.getItemAtPosition(position).toString());
             mReferencePosition = getListener().getReferenceList().indexOf(listView.getItemAtPosition(position));
             mPopupReference.dismiss();

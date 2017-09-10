@@ -15,8 +15,8 @@ ext {
     // Support and Build tools version
     minSdk = 14
     targetSdk = 26
-    buildTools = "26.0.0"
-    supportLib = "25.4.0"
+    buildTools = "26.0.1"
+    supportLib = "26.0.2"
 
     // Support Libraries dependencies
     supportDependencies = [
@@ -64,7 +64,7 @@ buildscript {
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1"
         classpath "com.vanniktech:gradle-android-javadoc-plugin:0.2.1"
-        classpath "eu.davidea:grabver:0.3.0"
+        classpath "eu.davidea:grabver:0.4.0"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

@@ -43,8 +43,9 @@ public class ScaleInItemAnimator extends FlexibleItemAnimator {
 
     @Override
     protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-        ViewCompat.setScaleX(holder.itemView, 0);
-        ViewCompat.setScaleY(holder.itemView, 0);
+        holder.itemView.setScaleX(0);
+        holder.itemView.setScaleY(
+                0);
         return true;
     }
 

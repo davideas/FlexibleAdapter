@@ -134,7 +134,7 @@ public class AnimatorSubItem extends AbstractSectionableItem<AnimatorSubItem.Chi
         @Override
         public boolean preAnimateAddImpl() {
             if (DatabaseConfiguration.subItemSpecificAnimation) {
-                ViewCompat.setRotationX(itemView, 90);
+                itemView.setRotationX(90);
                 return true;
             }
             return false;

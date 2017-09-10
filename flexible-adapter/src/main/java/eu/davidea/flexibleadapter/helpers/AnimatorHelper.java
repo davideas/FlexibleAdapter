@@ -20,7 +20,6 @@ import android.animation.ObjectAnimator;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -48,7 +47,7 @@ public class AnimatorHelper {
      */
     public static void alphaAnimator(
             @NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float alphaFrom) {
-        ViewCompat.setAlpha(view, 0);
+        view.setAlpha(0);
         animators.add(ObjectAnimator.ofFloat(view, "alpha", alphaFrom, 1f));
     }
 

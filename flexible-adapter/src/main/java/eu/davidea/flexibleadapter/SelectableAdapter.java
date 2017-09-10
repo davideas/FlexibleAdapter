@@ -396,7 +396,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
     /**
      * Sets the selection status for all items which the ViewTypes are included in the specified array.
-     * <p><b>Note:</b> All items are invalidated and rebound!</p>
      *
      * @param viewTypes The ViewTypes for which we want the selection, pass nothing to select all
      * @since 1.0.0
@@ -434,9 +433,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @since 1.0.0
      */
     public void clearSelection() {
-        log.d("clearSelection %s", mSelectedPositions);
         // #373 - ConcurrentModificationException with Undo after multiple rapid swipe removals
         synchronized (mSelectedPositions) {
+            log.d("clearSelection %s", mSelectedPositions);
             Iterator<Integer> iterator = mSelectedPositions.iterator();
             int positionStart = 0, itemCount = 0;
             // The notification is done only on items that are currently selected.

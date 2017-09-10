@@ -42,7 +42,7 @@ public class FadeInItemAnimator extends FlexibleItemAnimator {
 
     @Override
     protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-        ViewCompat.setAlpha(holder.itemView, 0);
+        holder.itemView.setAlpha(0);
         return true;
     }
 

@@ -43,8 +43,8 @@ public class FadeInUpItemAnimator extends FlexibleItemAnimator {
 
     @Override
     protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-        ViewCompat.setTranslationY(holder.itemView, holder.itemView.getHeight() * .25f);
-        ViewCompat.setAlpha(holder.itemView, 0);
+        holder.itemView.setTranslationY(holder.itemView.getHeight() * .25f);
+        holder.itemView.setAlpha(0);
         return true;
     }
 

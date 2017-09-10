@@ -43,8 +43,8 @@ public class FadeInRightItemAnimator extends FlexibleItemAnimator {
 
     @Override
     protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-        ViewCompat.setTranslationX(holder.itemView, holder.itemView.getRootView().getWidth() * .25f);
-        ViewCompat.setAlpha(holder.itemView, 0);
+        holder.itemView.setTranslationX(holder.itemView.getRootView().getWidth() * .25f);
+        holder.itemView.setAlpha(0);
         return true;
     }
 

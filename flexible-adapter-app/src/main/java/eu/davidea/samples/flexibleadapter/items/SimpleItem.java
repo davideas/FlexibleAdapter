@@ -125,7 +125,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
         View rearLeftView;
         View rearRightView;
 
-        public boolean swiped = false;
+        boolean swiped = false;
 
         SimpleViewHolder(View view, FlexibleAdapter adapter) {
             super(view, adapter);

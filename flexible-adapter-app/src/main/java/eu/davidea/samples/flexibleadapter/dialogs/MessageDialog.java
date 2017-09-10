@@ -63,7 +63,7 @@ public class MessageDialog extends DialogFragment {
         View dialogView = LayoutInflater.from(getActivity())
                                         .inflate(R.layout.dialog_message, null);
 
-        TextView messageView = (TextView) dialogView.findViewById(R.id.message);
+        TextView messageView = dialogView.findViewById(R.id.message);
         messageView.setMovementMethod(LinkMovementMethod.getInstance());
         messageView.setText(Html.fromHtml(getArguments().getString(ARG_MESSAGE)));
 

@@ -88,8 +88,8 @@ public class ScrollableFooterItem extends AbstractItem<ScrollableFooterItem.Foot
 
         @Override
         public boolean preAnimateAddImpl() {
-            ViewCompat.setTranslationY(itemView, itemView.getHeight());
-            ViewCompat.setAlpha(itemView, 0);
+            itemView.setTranslationY(itemView.getHeight());
+            itemView.setAlpha(0);
             return true;
         }
 

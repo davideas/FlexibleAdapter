@@ -114,21 +114,21 @@ public final class FlexibleUtils {
      * @since 5.0.0-rc1
      */
     @NonNull
-    public static String getClassName(@NonNull Object o) {
+    public static String getClassName(@Nullable Object o) {
         return o == null ? "null" : o.getClass().getSimpleName();
     }
 
     /**
      * Sets a spannable text with the accent color (if available) into the provided TextView.
-     * <p>Multiple matches will be highlighted, but if the 2nd match is consecutive
-     * highlight is skipped.</p>
+     * <p>Multiple matches will be highlighted, but if the 2nd match is consecutive,
+     * the highlight is skipped.</p>
      * Internally calls {@link #fetchAccentColor(Context, int)}.
      *
      * @param textView     the TextView to transform
      * @param originalText the original text which the transformation is applied to
      * @param constraint   the text to highlight
      * @see #highlightText(TextView, String, String, int)
-     * @since 5.0.0-rc1 Crated
+     * @since 5.0.0-rc1 Created
      * <br>5.0.0-rc3 Multi-span
      */
     public static void highlightText(@NonNull TextView textView,
@@ -139,8 +139,8 @@ public final class FlexibleUtils {
 
     /**
      * Sets a spannable text with any highlight color into the provided TextView.
-     * <p>Multiple matches will be highlighted, but if the 2nd match is consecutive
-     * highlight is skipped.</p>
+     * <p>Multiple matches will be highlighted, but if the 2nd match is consecutive,
+     * the highlight is skipped.</p>
      *
      * @param textView     the TextView to transform
      * @param originalText the original text which the transformation is applied to
@@ -148,7 +148,7 @@ public final class FlexibleUtils {
      * @param color        the highlight color
      * @see #fetchAccentColor(Context, int)
      * @see #highlightText(TextView, String, String)
-     * @since 5.0.0-rc1 Crated
+     * @since 5.0.0-rc1 Created
      * <br>5.0.0-rc3 Multi-span
      */
     public static void highlightText(@NonNull TextView textView, @Nullable String originalText,

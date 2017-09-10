@@ -44,7 +44,7 @@ public class OvershootInRightItemAnimator extends FlexibleItemAnimator {
 
     @Override
     protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
-        ViewCompat.setTranslationX(holder.itemView, holder.itemView.getRootView().getWidth());
+        holder.itemView.setTranslationX(holder.itemView.getRootView().getWidth());
         return true;
     }
 

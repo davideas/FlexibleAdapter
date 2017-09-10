@@ -467,8 +467,7 @@ public class FlexibleAdapter<T extends IFlexible>
                 parentSelected = true;
                 if (hasParent) mSelectedLevel = parent.getExpansionLevel();
                 super.toggleSelection(position);
-            } else if (!parentSelected && hasParent && parent.getExpansionLevel() + 1 == mSelectedLevel
-                    || mSelectedLevel == -1) {
+            } else if (hasParent && (mSelectedLevel == -1 || !parentSelected && parent.getExpansionLevel() + 1 == mSelectedLevel)) {
                 // Allow selection of Child of same level and if no Parent has been previously selected
                 childSelected = true;
                 mSelectedLevel = parent.getExpansionLevel() + 1;
@@ -476,7 +475,7 @@ public class FlexibleAdapter<T extends IFlexible>
             }
         }
         // Reset flags if necessary, just to be sure
-        if (getSelectedItemCount() == 0) {
+        if (super.getSelectedItemCount() == 0) {
             mSelectedLevel = -1;
             parentSelected = childSelected = false;
         }
@@ -486,12 +485,12 @@ public class FlexibleAdapter<T extends IFlexible>
      * Helper to automatically select all the items of the viewType equal to the viewType of
      * the first selected item.
      * <p>Examples:
-     * <br>- if user initially selects an expandable of type A, then only expandable items of
-     * type A will be selected.
-     * <br>- if user initially selects a non-expandable of type B, then only items of type B
-     * will be selected.
-     * <br>- The developer can override this behaviour by passing a list of viewTypes for which
-     * he wants to force the selection.</p>
+     * <ul><li>if user initially selects an expandable of type A, then only expandable items of
+     * type A can be selected.</li>
+     * <li>if user initially selects a non-expandable of type B, then only items of type B
+     * can be selected.</li>
+     * <li>The developer can override this behaviour by passing a list of viewTypes for which
+     * he wants to force the selection.</li></ul></p>
      *
      * @param viewTypes All the desired viewTypes to be selected, providing no view types, will
      *                  automatically select all the viewTypes of the first item user has selected
@@ -2196,7 +2195,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return true if the expandable has subItems, false otherwise
      * @since 5.0.0-b1
      */
-    public boolean hasSubItems(@NonNull IExpandable expandable) {
+    public boolean hasSubItems(IExpandable expandable) {
         return expandable != null && expandable.getSubItems() != null &&
                 expandable.getSubItems().size() > 0;
     }
@@ -2210,7 +2209,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-b1
      */
     @Nullable
-    public IExpandable getExpandableOf(@IntRange(from = 0) int position) {
+    public IExpandable getExpandableOf(int position) {
         return getExpandableOf(getItem(position));
     }
 
@@ -2225,7 +2224,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-b1
      */
     @Nullable
-    public IExpandable getExpandableOf(@NonNull T child) {
+    public IExpandable getExpandableOf(T child) {
         for (T parent : mItems) {
             if (isExpandable(parent)) {
                 IExpandable expandable = (IExpandable) parent;
@@ -4083,7 +4082,7 @@ public class FlexibleAdapter<T extends IFlexible>
             if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
             final T item = from.get(i);
             if (!mHashItems.contains(item)) {
-                log.v("calculateRemovals remove position=%s item=%s searchText=%s", i, item, mSearchText);
+                log.v("calculateRemovals remove position=%s item=%s", i, item);
                 from.remove(i);
                 mNotifications.add(new Notification(i, Notification.REMOVE));
                 out++;
@@ -4117,7 +4116,7 @@ public class FlexibleAdapter<T extends IFlexible>
             if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
             final T item = newItems.get(position);
             if (!mHashItems.contains(item)) {
-                log.v("calculateAdditions add position=%s item=%s searchText=%s", position, item, mSearchText);
+                log.v("calculateAdditions add position=%s item=%s", position, item);
                 if (notifyMoveOfFilteredItems) {
                     // We add always at the end to animate moved items at the missing position
                     from.add(item);
@@ -4148,7 +4147,7 @@ public class FlexibleAdapter<T extends IFlexible>
             final T item = newItems.get(toPosition);
             final int fromPosition = from.indexOf(item);
             if (fromPosition >= 0 && fromPosition != toPosition) {
-                log.v("calculateMovedItems fromPosition=%s toPosition=%s searchText=%s", fromPosition, toPosition, mSearchText);
+                log.v("calculateMovedItems fromPosition=%s toPosition=%s", fromPosition, toPosition);
                 T movedItem = from.remove(fromPosition);
                 if (toPosition < from.size()) from.add(toPosition, movedItem);
                 else from.add(movedItem);

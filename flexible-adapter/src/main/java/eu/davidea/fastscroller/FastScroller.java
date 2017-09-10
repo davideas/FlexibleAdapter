@@ -221,9 +221,9 @@ public class FastScroller extends FrameLayout {
         if (bubble != null) return; //Already inflated
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(layoutResId, this, true);
-        bubble = (TextView) findViewById(bubbleResId);
+        bubble = findViewById(bubbleResId);
         if (bubble != null) bubble.setVisibility(INVISIBLE);
-        handle = (ImageView) findViewById(handleResId);
+        handle = findViewById(handleResId);
         bar = findViewById(R.id.fast_scroller_bar);
 
         // Animators
