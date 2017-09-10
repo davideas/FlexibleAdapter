@@ -90,7 +90,7 @@ public class FragmentSelectionModes extends AbstractFragment {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         // Divider item decorator with DrawOver enabled
         mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
-                .withDivider(R.drawable.divider)
+                .withDivider(R.drawable.divider, R.layout.recycler_simple_item)
                 .withDrawOver(true));
         mRecyclerView.postDelayed(new Runnable() {
             @Override
@@ -101,7 +101,7 @@ public class FragmentSelectionModes extends AbstractFragment {
 
         // Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
         FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
-        fastScroller.setAutoHideEnabled(true);          //true is the default value!
+        fastScroller.setAutoHideEnabled(true);        //true is the default value!
         fastScroller.setAutoHideDelayInMillis(1000L); //1000ms is the default value!
         fastScroller.setMinimumScrollThreshold(70); //0 pixel is the default value! When > 0 it mimics the fling gesture
         fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());

@@ -35,6 +35,9 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.SparseArray;
 import android.view.View;
 
+import java.util.Arrays;
+import java.util.List;
+
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.ISectionable;
@@ -53,6 +56,7 @@ import eu.davidea.flexibleadapter.utils.FlexibleUtils;
  * <li>Supports the default Android divider {@code android.R.attr.listDivider}.</li>
  * <li>Supports a custom divider by {@code DrawableRes id}.</li>
  * <li>Supports drawing the divider over or underneath the items.</li>
+ * <li>Supports drawing the divider for specific viewTypes.</li>
  * </ul>
  * <b>Tip:</b> Call the method {@link FlexibleAdapter#invalidateItemDecorations(long)} to rebuild
  * the invalidated offsets due to the changes coming from events like moveItem or any layout
@@ -62,20 +66,22 @@ import eu.davidea.flexibleadapter.utils.FlexibleUtils;
  * @since 20/07/2015 Created
  * <br>23/04/2017 Drawing of the divider over or underneath the items
  * <br>26/05/2017 Rewrote the full class to support equal spaces between items in all situations
+ * <br>10/09/2017 Optional view types for divider
  */
 @SuppressWarnings({"WeakerAccess"})
 public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 
     private Context context;
-    private final Rect mBounds = new Rect();
-    private final ItemDecoration mDefaultDecoration = new ItemDecoration();
     private SparseArray<ItemDecoration> mDecorations; // viewType -> itemDeco
-
-    private Drawable mDivider;
+    private List<Integer> mViewTypes;
+    private final ItemDecoration mDefaultDecoration = new ItemDecoration();
     private int mOffset, mSectionOffset;
-    private boolean mDrawOver, withLeftEdge, withTopEdge, withRightEdge, withBottomEdge;
+    private boolean withLeftEdge, withTopEdge, withRightEdge, withBottomEdge;
 
-    private static final int[] ATTRS = new int[]{
+    protected Drawable mDivider;
+    protected final Rect mBounds = new Rect();
+    protected boolean mDrawOver;
+    protected static final int[] ATTRS = new int[]{
             android.R.attr.listDivider
     };
 
@@ -91,36 +97,42 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 
 	/*==========*/
     /* DIVIDERS */
-	/*==========*/
+    /*==========*/
 
     /**
      * Default Android divider will be used.
      *
+     * @param viewTypes the specific ViewTypes for which the divider will be drawn OR do not
+     *                  specify any to draw divider for all ViewTypes (default behavior).
      * @return this FlexibleItemDecoration instance so the call can be chained
-     * @see #withDivider(int)
+     * @see #withDivider(int, Integer...)
      * @see #withDrawOver(boolean)
      * @see #removeDivider()
      * @since 5.0.0-rc2
      */
-    public FlexibleItemDecoration withDefaultDivider() {
+    public FlexibleItemDecoration withDefaultDivider(Integer... viewTypes) {
         final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
         mDivider = styledAttributes.getDrawable(0);
         styledAttributes.recycle();
+        mViewTypes = Arrays.asList(viewTypes);
         return this;
     }
 
     /**
      * Custom divider.
      *
-     * @param resId drawable resourceId that should be used as a divider
+     * @param resId     drawable resourceId that should be used as a divider
+     * @param viewTypes the specific ViewTypes for which the divider will be drawn OR do not
+     *                  specify any to draw divider for all ViewTypes (default behavior).
      * @return this FlexibleItemDecoration instance so the call can be chained
-     * @see #withDefaultDivider()
+     * @see #withDefaultDivider(Integer...)
      * @see #withDrawOver(boolean)
      * @see #removeDivider()
      * @since 5.0.0-rc2
      */
-    public FlexibleItemDecoration withDivider(@DrawableRes int resId) {
-        if (resId > 0) mDivider = ContextCompat.getDrawable(context, resId);
+    public FlexibleItemDecoration withDivider(@DrawableRes int resId, Integer... viewTypes) {
+        mDivider = ContextCompat.getDrawable(context, resId);
+        mViewTypes = Arrays.asList(viewTypes);
         return this;
     }
 
@@ -166,7 +178,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
         }
     }
 
-    private void draw(Canvas c, RecyclerView parent) {
+    protected void draw(Canvas c, RecyclerView parent) {
         if (parent.getLayoutManager() == null) {
             return;
         }
@@ -178,7 +190,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     @SuppressLint("NewApi")
-    private void drawVertical(Canvas canvas, RecyclerView parent) {
+    protected void drawVertical(Canvas canvas, RecyclerView parent) {
         canvas.save();
         final int left;
         final int right;
@@ -195,17 +207,20 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
         final int itemCount = parent.getChildCount();
         for (int i = 0; i < itemCount - 1; i++) {
             final View child = parent.getChildAt(i);
-            parent.getDecoratedBoundsWithMargins(child, mBounds);
-            final int bottom = mBounds.bottom + Math.round(child.getTranslationY());
-            final int top = bottom - mDivider.getIntrinsicHeight();
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(canvas);
+            RecyclerView.ViewHolder viewHolder = parent.getChildViewHolder(child);
+            if (shouldDrawDivider(viewHolder)) {
+                parent.getDecoratedBoundsWithMargins(child, mBounds);
+                final int bottom = mBounds.bottom + Math.round(child.getTranslationY());
+                final int top = bottom - mDivider.getIntrinsicHeight();
+                mDivider.setBounds(left, top, right, bottom);
+                mDivider.draw(canvas);
+            }
         }
         canvas.restore();
     }
 
     @SuppressLint("NewApi")
-    private void drawHorizontal(Canvas canvas, RecyclerView parent) {
+    protected void drawHorizontal(Canvas canvas, RecyclerView parent) {
         canvas.save();
         final int top;
         final int bottom;
@@ -222,18 +237,32 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
         final int itemCount = parent.getChildCount();
         for (int i = 0; i < itemCount - 1; i++) {
             final View child = parent.getChildAt(i);
-            parent.getLayoutManager().getDecoratedBoundsWithMargins(child, mBounds);
-            final int right = mBounds.right + Math.round(child.getTranslationX());
-            final int left = right - mDivider.getIntrinsicWidth();
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(canvas);
+            RecyclerView.ViewHolder viewHolder = parent.getChildViewHolder(child);
+            if (shouldDrawDivider(viewHolder)) {
+                parent.getLayoutManager().getDecoratedBoundsWithMargins(child, mBounds);
+                final int right = mBounds.right + Math.round(child.getTranslationX());
+                final int left = right - mDivider.getIntrinsicWidth();
+                mDivider.setBounds(left, top, right, bottom);
+                mDivider.draw(canvas);
+            }
         }
         canvas.restore();
     }
 
+    /**
+     * Allows to define for which items the divider should be drawn.
+     * <p>Override to define custom logic. By default all viewTypes will have the divider.</p>
+     *
+     * @param viewHolder the ViewHolder under analysis
+     * @return {@code true} to draw the divider, {@code false} to skip the drawing
+     */
+    protected boolean shouldDrawDivider(RecyclerView.ViewHolder viewHolder) {
+        return mViewTypes == null || mViewTypes.contains(viewHolder.getItemViewType());
+    }
+
 	/*==============================*/
-	/* OFFSET & EDGES CONFIGURATION */
-	/*==============================*/
+    /* OFFSET & EDGES CONFIGURATION */
+    /*==============================*/
 
     /**
      * Adds an extra offset at the end of each section.
@@ -416,7 +445,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
     }
 
 	/*====================*/
-	/* OFFSET CALCULATION */
+    /* OFFSET CALCULATION */
 	/*====================*/
 
     /**
