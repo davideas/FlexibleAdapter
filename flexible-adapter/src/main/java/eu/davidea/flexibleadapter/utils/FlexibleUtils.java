@@ -180,12 +180,12 @@ public final class FlexibleUtils {
      * @param textView     the TextView to transform
      * @param originalText the original text which the transformation is applied to
      * @param constraints   the multiple text to highlight
-     * @see #highlightWords(TextView, String, List<String>, int)
+     * @see #highlightWords(TextView, String, String, int)
      * @since 5.0.0-rc1 Crated
      * <br>5.0.0-rc3 Multi-span
      */
     public static void highlightWords(@NonNull TextView textView,
-                                     @Nullable String originalText, @Nullable List<String>
+                                     @Nullable String originalText, @Nullable String
                                              constraints) {
         int accentColor = fetchAccentColor(textView.getContext(), 1);
         highlightWords(textView, originalText, constraints, accentColor);
@@ -201,18 +201,18 @@ public final class FlexibleUtils {
      * @param constraints   the multiple text to highlight
      * @param color        the highlight color
      * @see #fetchAccentColor(Context, int)
-     * @see #highlightWords(TextView, String, List<String>)
+     * @see #highlightWords(TextView, String, String)
      * @since 5.0.0-rc1 Crated
      * <br>5.0.0-rc3 Multi-span
      */
     public static void highlightWords(@NonNull TextView textView, @Nullable String originalText,
-                                     @Nullable List<String> constraints, @ColorInt int color) {
+                                      @Nullable String constraints, @ColorInt int color) {
         if (originalText == null) originalText = "";
-        if (constraints == null) constraints = new ArrayList<>();
+        if (constraints == null) constraints = "";
         boolean hasSpannableText = false;
         Spannable spanText = null;
 
-        for (String constraint : constraints) {
+        for (String constraint : constraints.split("([^ ^,]+)")) {
             int start = originalText.toLowerCase(Locale.getDefault()).indexOf(constraint.toLowerCase(Locale.getDefault()));
             if (start != -1) {
                 hasSpannableText = true;
