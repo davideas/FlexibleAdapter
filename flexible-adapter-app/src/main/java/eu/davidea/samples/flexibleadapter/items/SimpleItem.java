@@ -89,19 +89,13 @@ public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
             DrawableUtils.setBackgroundCompat(holder.frontView, drawable);
         }
 
-        // DemoApp: INNER ANIMATION EXAMPLE! ImageView - Handle Flip Animation
-//		if (adapter.isSelectAll() || adapter.isLastItemInActionMode()) {
-//			// Consume the Animation
-//			holder.mFlipView.flip(adapter.isSelected(position), 200L);
-//		} else {
         // Display the current flip status
         holder.mFlipView.flipSilently(adapter.isSelected(position));
-//		}
 
-        // In case of searchText matches with Title or with a field this will be highlighted
+        // In case of any Words in the searchText matches with Title this will be highlighted
         if (adapter.hasSearchText()) {
-            FlexibleUtils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText());
-            FlexibleUtils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+            FlexibleUtils.highlightWords(holder.mTitle, getTitle(), adapter.getSearchText());
+            FlexibleUtils.highlightWords(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
         } else {
             holder.mTitle.setText(getTitle());
             holder.mSubtitle.setText(getSubtitle());
@@ -110,8 +104,12 @@ public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
 
     @Override
     public boolean filter(String constraint) {
-        return getTitle() != null && getTitle().toLowerCase().trim().contains(constraint) ||
-                getSubtitle() != null && getSubtitle().toLowerCase().trim().contains(constraint);
+        for (String word : constraint.split(FlexibleUtils.SPLIT_EXPRESSION)) {
+            if (getTitle().toLowerCase().contains(word)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     static final class SimpleViewHolder extends FlexibleViewHolder {

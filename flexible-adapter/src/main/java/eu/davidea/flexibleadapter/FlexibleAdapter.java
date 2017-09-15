@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +40,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,6 +52,7 @@ import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
@@ -3672,15 +3673,16 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * Sets the new search text.
-     * <p><b>Note:</b> text is always trimmed and to lowercase.</p>
+     * <p><b>Note:</b> Text is always <b>trimmed</b> and <b>lowercase</b>.</p>
+     * <p><b>Tip:</b> You can highlight filtered Text or Words using:
+     * <ul><li>{@link FlexibleUtils#highlightText(TextView, String, String)}</li>
+     * <li>{@link FlexibleUtils#highlightWords(TextView, String, String)}</li></ul></p>
      *
      * @param searchText the new text to filter the items
      * @since 3.1.0
      */
     public void setSearchText(String searchText) {
-        if (searchText != null)
-            mSearchText = searchText.trim().toLowerCase(Locale.getDefault());
-        else mSearchText = "";
+        mSearchText = FlexibleUtils.toLowerCase(searchText.trim());
     }
 
     /**
