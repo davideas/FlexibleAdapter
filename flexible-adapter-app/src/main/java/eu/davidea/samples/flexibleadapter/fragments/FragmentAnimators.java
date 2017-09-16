@@ -88,7 +88,6 @@ public class FragmentAnimators extends AbstractFragment {
     private void initializeRecyclerView(Bundle savedInstanceState) {
         FlexibleAdapter.useTag("AnimatorsAdapter");
         mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
-        // Experimenting NEW features (v5.0.0)
         mAdapter.expandItemsAtStartUp()
                 .setAutoCollapseOnExpand(false)
                 .setAutoScrollOnExpand(true)
@@ -110,7 +109,6 @@ public class FragmentAnimators extends AbstractFragment {
         initializeSpinnerItemAnimators();
         initializeSpinnerScrollAnimators();
 
-        // Experimenting NEW features (v5.0.0)
         mAdapter.setSwipeEnabled(true)
                 .getItemTouchHelperCallback()
                 .setSwipeFlags(ItemTouchHelper.RIGHT); //Enable swipe

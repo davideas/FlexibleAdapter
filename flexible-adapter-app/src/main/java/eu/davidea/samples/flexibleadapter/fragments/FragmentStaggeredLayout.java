@@ -92,7 +92,6 @@ public class FragmentStaggeredLayout extends AbstractFragment {
                 .addItemViewType(R.layout.recycler_staggered_item, 8)
                 .withEdge(true));
 
-        // Experimenting NEW features (v5.0.0)
         mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
                 .setNotifyMoveOfFilteredItems(true)
                 .setPermanentDelete(true) //Default=true

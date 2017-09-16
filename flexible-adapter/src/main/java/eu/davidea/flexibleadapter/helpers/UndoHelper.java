@@ -33,7 +33,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.utils.Log;
 
 /**
- * Helper to simplify the Undo operation with FlexibleAdapter.
+ * Helper Class to simplify the Undo operation with FlexibleAdapter.
  *
  * @author Davide Steduto
  * @since 30/04/2016

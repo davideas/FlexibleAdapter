@@ -32,7 +32,7 @@ import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.utils.Log;
 
 /**
- * Helper to coordinate the MULTI selection with FlexibleAdapter.
+ * Helper Class to coordinate the MULTI selection with FlexibleAdapter.
  *
  * @author Davide Steduto
  * @since 30/04/2016 Created
@@ -54,7 +54,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * Default constructor with internal callback.
      *
      * @param adapter the FlexibleAdapter instance
-     * @param cabMenu the menu resourceId
+     * @param cabMenu the Contextual Action Bar menu resourceId
      * @see #ActionModeHelper(FlexibleAdapter, int, ActionMode.Callback)
      * @since 5.0.0-b6
      */
@@ -67,7 +67,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * Constructor with internal callback + custom callback.
      *
      * @param adapter  the FlexibleAdapter instance
-     * @param cabMenu  the menu resourceId
+     * @param cabMenu  the Contextual Action Bar menu resourceId
      * @param callback the custom {@link android.support.v7.view.ActionMode.Callback}
      * @see #ActionModeHelper(FlexibleAdapter, int)
      * @since 5.0.0-b6

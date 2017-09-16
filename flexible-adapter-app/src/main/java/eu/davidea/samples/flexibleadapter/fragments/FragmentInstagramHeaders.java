@@ -72,7 +72,6 @@ public class FragmentInstagramHeaders extends AbstractFragment
         FlexibleAdapter.useTag("InstagramHeadersAdapter");
         mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity(), true);
         mAdapter.addListener(getActivity())
-                // Experimenting NEW features (v5.0.0)
                 .setAnimationOnScrolling(true)
                 .setAnimationOnReverseScrolling(true);
         mRecyclerView = getView().findViewById(R.id.recycler_view);

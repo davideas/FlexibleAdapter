@@ -809,19 +809,17 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onUpdateEmptyView(int size) {
         Log.d("onUpdateEmptyView size=%s", size);
-        FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
+        FastScroller fastScroller = mAdapter.getFastScroller();
         View emptyView = findViewById(R.id.empty_view);
-        TextView emptyText = (TextView) findViewById(R.id.empty_text);
+        TextView emptyText = findViewById(R.id.empty_text);
         if (emptyText != null)
             emptyText.setText(getString(R.string.no_items));
         if (size > 0) {
-            fastScroller.showScrollbar();
-            mRefreshHandler.removeMessages(SHOW_EMPTY_VIEW);
+            if (fastScroller != null) fastScroller.showScrollbar();
             emptyView.setAlpha(0);
-        } else {
-            emptyView.setAlpha(0);
+        } else if (emptyView.getAlpha() == 0) {
             mRefreshHandler.sendEmptyMessage(SHOW_EMPTY_VIEW);
-            fastScroller.hideScrollbar();
+            if (fastScroller != null) fastScroller.hideScrollbar();
         }
         if (mAdapter != null && !mAdapter.isRestoreInTime() &&
                 DatabaseService.getInstance().getDatabaseType() != DatabaseType.DATA_BINDING) {

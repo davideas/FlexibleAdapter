@@ -68,7 +68,6 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
         // ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
         FlexibleAdapter.useTag("ExpandableMultiLevelAdapter");
         mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
-        // Experimenting NEW features (v5.0.0)
         mAdapter.expandItemsAtStartUp()
                 .setNotifyMoveOfFilteredItems(true)
                 .setAutoCollapseOnExpand(false)
@@ -86,12 +85,10 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
         FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
         fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
         mAdapter.setFastScroller(fastScroller);
-
-        // Experimenting NEW features (v5.0.0)
         mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
                 .setHandleDragEnabled(true) //Enable handle drag
                 .setSwipeEnabled(true); //Enable swipe items
-        //.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable)
+        //.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: not necessary if Headers are also Expandable!
 
         SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setEnabled(true);

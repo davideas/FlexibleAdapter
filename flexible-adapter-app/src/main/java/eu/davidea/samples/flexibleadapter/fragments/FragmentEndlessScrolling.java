@@ -90,7 +90,6 @@ public class FragmentEndlessScrolling extends AbstractFragment
         // ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
         FlexibleAdapter.useTag("EndlessScrollingAdapter");
         mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
-        // Experimenting NEW features (v5.0.0)
         mAdapter.setAutoScrollOnExpand(true)
                 //.setAnimateToLimit(Integer.MAX_VALUE) //Use the default value
                 .setNotifyMoveOfFilteredItems(true) //When true, filtering on big list is very slow, not in this case!
@@ -109,8 +108,6 @@ public class FragmentEndlessScrolling extends AbstractFragment
         FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
         fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
         mAdapter.setFastScroller(fastScroller);
-
-        // Experimenting NEW features (v5.0.0)
         mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
                 .setHandleDragEnabled(true) //Enable drag using handle view
                 .setSwipeEnabled(true); //Enable swipe items

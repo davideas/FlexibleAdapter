@@ -91,7 +91,6 @@ public class FragmentViewPager extends Fragment {
         // Use of stableIds, I strongly suggest to implement 'item.hashCode()'
         FlexibleAdapter.useTag("ViewPagerAdapter");
         mAdapter = new FlexibleAdapter<>(createList(50, 5), getActivity(), true);
-        // Experimenting NEW features (v5.0.0)
         mAdapter.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
 
         RecyclerView mRecyclerView = getView().findViewById(R.id.recycler_view);

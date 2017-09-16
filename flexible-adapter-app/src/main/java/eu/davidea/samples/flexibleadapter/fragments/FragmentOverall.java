@@ -79,8 +79,6 @@ public class FragmentOverall extends AbstractFragment
         // OverallAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
         FlexibleAdapter.useTag("OverallAdapter");
         mAdapter = new OverallAdapter(getActivity());
-
-        // Experimenting NEW features (v5.0.0)
         mAdapter.setOnlyEntryAnimation(true)
                 .setAnimationInterpolator(new DecelerateInterpolator())
                 .setAnimationInitialDelay(500L)

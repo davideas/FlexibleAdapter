@@ -70,7 +70,6 @@ public class FragmentExpandableSections extends AbstractFragment {
         mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
         // OnItemAdd and OnItemRemove listeners
         mAdapter.addListener(this);
-        // Experimenting NEW features (v5.0.0)
         mAdapter.expandItemsAtStartUp()
                 .setAutoCollapseOnExpand(false)
                 .setAutoScrollOnExpand(true)
@@ -94,8 +93,6 @@ public class FragmentExpandableSections extends AbstractFragment {
         FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
         fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
         mAdapter.setFastScroller(fastScroller);
-
-        // Experimenting NEW features (v5.0.0)
         mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
                 .setHandleDragEnabled(true) //Enable handle drag
                 //.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable AND expanded at startup)
