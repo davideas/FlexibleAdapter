@@ -66,22 +66,25 @@ public class FragmentAsyncFilter extends AbstractFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //Restore FAB button and icon
+        // Restore FAB button and icon
         initializeFab();
 
         FlexibleAdapter.useTag("AsyncFilterAdapter");
+        // IMPORTANT! Upgrading to Support Library v26, stableIds must remain = false.
+        // StableIds cause the entry animation not animate properly: alpha property of views
+        // remain 1 (item not changed) while the entry animation requires the view to be invisible
+        // when Swapping / Changing the Adapter.
         if (configure) {
-            //Create configuration list
+            // Create configuration list
             DatabaseService.getInstance().createConfigurationDatabase(getResources());
-            //true = let's use stableIds! Since RecyclerView doesn't switch Adapters, we can
-            // optimize the changes of the items.
             mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(),
-                    getActivity(), true);
+                    getActivity(), false);
         } else {
-            //Create Database with custom size (stableIds must remains = false)
-            DatabaseService.getInstance().createEndlessDatabase(DatabaseConfiguration.size);//N. of items (1000 items it's already a medium size)
+            // Create Database with custom size
+            // N. of items (1000 items it's already a medium size)
+            DatabaseService.getInstance().createEndlessDatabase(DatabaseConfiguration.size);
             mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(),
-                    getActivity(), true);
+                    getActivity(), false);
         }
 
         initializeRecyclerView();
@@ -90,18 +93,20 @@ public class FragmentAsyncFilter extends AbstractFragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        configure = !configure;//revert the change so next time the "if-else" is executed correctly
+        // Revert the change so next time the "if-else" is executed correctly
+        configure = !configure;
         outState.putBoolean(ARG_CONFIGURE, configure);
         super.onSaveInstanceState(outState);
     }
 
     private void initializeRecyclerView() {
-        //Settings for FlipView
+        // Settings for FlipView
         FlipView.resetLayoutAnimationDelay(true, 1000L);
 
-        //Experimenting NEW features (v5.0.0)
-        mAdapter.setAnimateToLimit(DatabaseConfiguration.animateToLimit)//Size limit = MAX_VALUE will always animate the changes
-                .setNotifyMoveOfFilteredItems(DatabaseConfiguration.notifyMove)//When true, filtering on big list is very slow!
+        // Size limit = MAX_VALUE will always animate the changes
+        mAdapter.setAnimateToLimit(DatabaseConfiguration.animateToLimit)
+                // When true, filtering on big list is very slow!
+                .setNotifyMoveOfFilteredItems(DatabaseConfiguration.notifyMove)
                 .setNotifyChangeOfUnfilteredItems(DatabaseConfiguration.notifyChange)
                 .setAnimationInitialDelay(100L)
                 .setAnimationOnScrolling(true)
@@ -110,17 +115,18 @@ public class FragmentAsyncFilter extends AbstractFragment {
         if (mRecyclerView == null) {
             mRecyclerView = getView().findViewById(R.id.recycler_view);
             mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
-            mRecyclerView.setHasFixedSize(true);//Adapter changes won't affect the size of the RecyclerView
+            // Adapter changes won't affect the size of the RecyclerView
+            mRecyclerView.setHasFixedSize(true);
         }
         // ViewHolders are different so we do NOT swap Adapters
         mRecyclerView.setAdapter(mAdapter);
-        //Custom divider item decorator with Offset
+        // Custom divider item decorator with Offset
         if (mDivider == null) {
             mDivider = new FlexibleItemDecoration(getActivity())
                     .withDivider(R.drawable.divider_large);
         }
 
-        //Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
+        // Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!
         SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setEnabled(!configure);
         mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
@@ -136,14 +142,14 @@ public class FragmentAsyncFilter extends AbstractFragment {
             mAdapter.setFastScroller(fastScroller);
         }
 
-        //Settings for FlipView
+        // Settings for FlipView
         FlipView.stopLayoutAnimation();
         showFab(1200L);
     }
 
     @Override
     public void performFabAction() {
-        hideFab();//Give time to hide FAB before changing everything
+        hideFab(); //Give time to hide FAB before changing everything
         mRecyclerView.postDelayed(new Runnable() {
             @Override
             public void run() {
