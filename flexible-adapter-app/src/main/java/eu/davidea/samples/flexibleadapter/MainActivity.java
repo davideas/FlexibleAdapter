@@ -809,23 +809,25 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onUpdateEmptyView(int size) {
         Log.d("onUpdateEmptyView size=%s", size);
-        FastScroller fastScroller = mAdapter.getFastScroller();
-        View emptyView = findViewById(R.id.empty_view);
-        TextView emptyText = findViewById(R.id.empty_text);
-        if (emptyText != null)
-            emptyText.setText(getString(R.string.no_items));
-        if (size > 0) {
-            if (fastScroller != null) fastScroller.showScrollbar();
-            emptyView.setAlpha(0);
-        } else if (emptyView.getAlpha() == 0) {
-            mRefreshHandler.sendEmptyMessage(SHOW_EMPTY_VIEW);
-            if (fastScroller != null) fastScroller.hideScrollbar();
-        }
-        if (mAdapter != null && !mAdapter.isRestoreInTime() &&
-                DatabaseService.getInstance().getDatabaseType() != DatabaseType.DATA_BINDING) {
-            String message = (mAdapter.hasSearchText() ? "Filtered " : "Refreshed ");
-            message += size + " items in " + mAdapter.getTime() + "ms";
-            Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
+        if (mAdapter != null) {
+            FastScroller fastScroller = mAdapter.getFastScroller();
+            View emptyView = findViewById(R.id.empty_view);
+            TextView emptyText = findViewById(R.id.empty_text);
+            if (emptyText != null)
+                emptyText.setText(getString(R.string.no_items));
+            if (size > 0) {
+                if (fastScroller != null) fastScroller.showScrollbar();
+                emptyView.setAlpha(0);
+            } else if (emptyView.getAlpha() == 0) {
+                mRefreshHandler.sendEmptyMessage(SHOW_EMPTY_VIEW);
+                if (fastScroller != null) fastScroller.hideScrollbar();
+            }
+            if (mAdapter != null && !mAdapter.isRestoreInTime() &&
+                    DatabaseService.getInstance().getDatabaseType() != DatabaseType.DATA_BINDING) {
+                String message = (mAdapter.hasSearchText() ? "Filtered " : "Refreshed ");
+                message += size + " items in " + mAdapter.getTime() + "ms";
+                Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
+            }
         }
     }
 
