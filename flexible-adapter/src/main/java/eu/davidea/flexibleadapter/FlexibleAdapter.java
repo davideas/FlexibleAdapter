@@ -3950,6 +3950,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * Also restore headers visibility.
      */
     private void resetFilterFlags(List<T> items) {
+        if (items == null) return;
         IHeader sameHeader = null;
         // Reset flags for all items!
         for (int i = 0; i < items.size(); i++) {
