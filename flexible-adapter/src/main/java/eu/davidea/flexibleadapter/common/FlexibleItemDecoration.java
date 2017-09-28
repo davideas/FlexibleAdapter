@@ -75,7 +75,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
     private SparseArray<ItemDecoration> mDecorations; // viewType -> itemDeco
     private List<Integer> mViewTypes;
     private final ItemDecoration mDefaultDecoration = new ItemDecoration();
-    private int mOffset, mSectionOffset;
+    private int mOffset, mSectionOffset, mLastItem = 1;
     private boolean withLeftEdge, withTopEdge, withRightEdge, withBottomEdge;
 
     protected Drawable mDivider;
@@ -133,6 +133,20 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
     public FlexibleItemDecoration withDivider(@DrawableRes int resId, Integer... viewTypes) {
         mDivider = ContextCompat.getDrawable(context, resId);
         mViewTypes = Arrays.asList(viewTypes);
+        return this;
+    }
+
+    /**
+     * Allows to draw the Divider after the last item.
+     * <p>Default is {@code false} (don't draw).</p>
+     *
+     * @param lastItem {@code true} to draw, {@code false} to not draw
+     * @return this FlexibleItemDecoration instance so the call can be chained
+     * @since 5.0.0-rc3
+     */
+    public FlexibleItemDecoration withDrawDividerOnLastItem(boolean lastItem) {
+        if (lastItem) mLastItem = 0;
+        else mLastItem = 1;
         return this;
     }
 
@@ -205,7 +219,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
         }
 
         final int itemCount = parent.getChildCount();
-        for (int i = 0; i < itemCount - 1; i++) {
+        for (int i = 0; i < itemCount - mLastItem; i++) {
             final View child = parent.getChildAt(i);
             RecyclerView.ViewHolder viewHolder = parent.getChildViewHolder(child);
             if (shouldDrawDivider(viewHolder)) {
@@ -235,7 +249,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
         }
 
         final int itemCount = parent.getChildCount();
-        for (int i = 0; i < itemCount - 1; i++) {
+        for (int i = 0; i < itemCount - mLastItem; i++) {
             final View child = parent.getChildAt(i);
             RecyclerView.ViewHolder viewHolder = parent.getChildViewHolder(child);
             if (shouldDrawDivider(viewHolder)) {
