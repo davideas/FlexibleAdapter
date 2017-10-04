@@ -7,7 +7,7 @@
         android:id="@+id/launchscreen_product_logo"
         android:bottom="@dimen/launchscreen_product_logo_bottom">
         <bitmap
-            android:gravity="bottom|center_horizontal|"
+            android:gravity="bottom|center_horizontal"
             android:src="@drawable/logo_splash_144"/>
     </item>
     <item
