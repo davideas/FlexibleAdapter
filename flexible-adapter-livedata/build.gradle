@@ -47,6 +47,7 @@ dependencies {
     compile archDependencies.lifecycle
     compile archDependencies.lifecycleExtensions
     annotationProcessor archDependencies.lifecycleCompiler
+    compile 'javax.inject:javax.inject:1'
 }
 
 if (project.hasProperty('all') || project.hasProperty('livedata')) {

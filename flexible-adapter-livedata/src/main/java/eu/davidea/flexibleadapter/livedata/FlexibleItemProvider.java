@@ -1,26 +1,38 @@
+/*
+ * Copyright 2017 Davide Steduto
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.davidea.flexibleadapter.livedata;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.items.IFlexible;
 
 /**
- * Custom Transformations for a {@link LiveData} class.
+ * Generic item Providers for a {@code IFlexible} items.
  *
- * @author steduda
+ * @author Davide Steduto
  * @since 05/10/2017
  */
 public class FlexibleItemProvider {
 
     private final Factory mFactory;
 
-    private FlexibleItemProvider(Factory factory) {
+    FlexibleItemProvider(Factory factory) {
         mFactory = factory;
     }
 
@@ -35,30 +47,6 @@ public class FlexibleItemProvider {
     @MainThread
     public <T extends IFlexible, M> T map(@NonNull M model, @NonNull Class<T> itemClass) {
         return mFactory.create(itemClass, model);
-    }
-
-    /**
-     * Maps the original list on the main thread into LiveData of IFlexible items.
-     *
-     * @param liveData  a {@code LiveData} to listen to
-     * @param itemClass a function to apply
-     * @param <I>       the input type of model object
-     * @param <O>       the output type of IFlexible item
-     * @return a LiveData which emits resulting values
-     */
-    @MainThread
-    public <I, O extends IFlexible> LiveData<List<O>> map(final LiveData<List<I>> liveData,
-                                                          final @NonNull Class<O> itemClass) {
-        final MutableLiveData<List<O>> result = new MutableLiveData<>();
-        List<O> list = new ArrayList<>();
-        List<I> source = liveData.getValue();
-        if (isSourceListValid(source)) {
-            for (I item : source) {
-                list.add(map(item, itemClass));
-            }
-        }
-        result.setValue(list);
-        return result;
     }
 
     private boolean isSourceListValid(List<?> source) {
