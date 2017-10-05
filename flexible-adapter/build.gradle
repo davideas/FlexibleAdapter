@@ -8,11 +8,12 @@ versioning {
     preRelease "SNAPSHOT"
 }
 
+version = versioning.name
+
 ext {
     // Library Settings
     libraryDescription = "Fast and versatile Adapter for RecyclerView which regroups several features into one library to considerably improve the user experience :-)"
     libraryLabels = ['android', 'recyclerview', 'list', 'adapter', 'selection', 'multi-select', 'actionmode', 'undo', 'viewholder', 'ripple', 'search', 'filter', 'filtering', 'async', 'asynchronous', 'item', 'item animator', 'itemanimator', 'animator', 'animation', 'expand', 'expandable', 'collapse', 'collapsible', 'section', 'sections', 'sticky', 'header', 'headers', 'category', 'footer', 'footers', 'drag', 'draggable', 'swipe', 'swipeable', 'leave behind', 'fastscroll', 'fastscroller', 'endless', 'endless scroll', 'load more']
-
     publishedGroupId = "eu.davidea"
     bintrayName = "flexible-adapter"
     artifact = bintrayName

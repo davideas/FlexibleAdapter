@@ -1,7 +1,7 @@
 apply plugin: 'com.github.dcendents.android-maven'
 
 if (gradle.getStartParameter().getTaskNames().contains("install")) {
-    println("> Installing: " + libraryName + " v" + libraryVersion)
+    println("> Installing: " + libraryName + " v" + version)
 }
 
 group = publishedGroupId // Maven Group ID for the artifact
@@ -35,7 +35,7 @@ install {
                 packaging packageExt
                 groupId publishedGroupId
                 artifactId artifact
-                version libraryVersion
+                version version
 
                 // Add your description here
                 name libraryName

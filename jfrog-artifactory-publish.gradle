@@ -1,7 +1,5 @@
 apply plugin: 'com.jfrog.artifactory'
 
-version = libraryVersion
-
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
@@ -27,7 +25,7 @@ artifactory {
     publish {
         repository {
             // The Artifactory repository key to publish to
-            repoKey = libraryVersion.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
+            repoKey = version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
             username = getProperties().get("bintray.user")
             password = getProperties().get("bintray.apikey")
         }
