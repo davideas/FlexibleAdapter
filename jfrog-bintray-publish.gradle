@@ -1,7 +1,5 @@
 apply plugin: 'com.jfrog.bintray'
 
-version = libraryVersion
-
 def getRepositoryUsername() {
     return getProperties().get('bintray.user')
 }
@@ -15,7 +13,7 @@ def getApiKey() {
 }
 
 if (gradle.getStartParameter().getTaskNames().contains("bintrayUpload")) {
-    println("> Publishing: " + libraryName + " " + libraryVersion)
+    println("> Publishing: " + libraryName + " " + version)
 
     bintray {
         user = getRepositoryUsername()
@@ -33,9 +31,9 @@ if (gradle.getStartParameter().getTaskNames().contains("bintrayUpload")) {
             publish = true
             publicDownloadNumbers = true
             version {
-                name = libraryVersion
+                name = version
                 desc = libraryDescription
-                vcsTag = libraryVersion
+                vcsTag = version
                 released = new Date()
                 gpg {
                     sign = true //Determines whether to GPG sign the files. The default is false

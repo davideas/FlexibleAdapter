@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 apply plugin: 'maven'
 apply plugin: 'signing'
 
 if (gradle.getStartParameter().getTaskNames().contains("uploadArchives")) {
-    println("> Publishing: " + libraryName + " v" + libraryVersion)
+    println("> Publishing: " + libraryName + " v" + version)
 }
 
 def hasProxy() { return hasProperty('systemProp.http.proxyUser')}
@@ -29,7 +28,7 @@ def getProxyUser() { return getProperties().get("systemProp.http.proxyUser") }
 def getProxyPassword() { return getProperties().get("systemProp.http.proxyPassword") }
 
 def isReleaseBuild() {
-    return libraryVersion.contains("SNAPSHOT") == false
+    return version.contains("SNAPSHOT") == false
 }
 
 def getReleaseRepositoryUrl() {
@@ -56,7 +55,7 @@ afterEvaluate { project ->
 
                 pom.groupId = publishedGroupId
                 pom.artifactId = artifact
-                pom.version = libraryVersion
+                pom.version = version
 
                 if (hasProxy()) {
                     println("PROXY! host: " + getProxyHost() + ", port: " + getProxyPort() + ", type: " + getProxyType() + ", userName: " + getProxyUser() + ", password: " + getProxyPassword())
