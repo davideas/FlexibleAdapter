@@ -18,6 +18,15 @@ ext {
     buildTools = "26.0.1"
     supportLib = "26.0.2"
 
+    // Android Architecture Components
+    archLifecycleVer = "1.0.0"
+    archExtensionsVer = "1.0.0-alpha9-1"
+    archDependencies = [
+            lifecycle           : "android.arch.lifecycle:runtime:${archLifecycleVer}",
+            lifecycleExtensions : "android.arch.lifecycle:extensions:${archExtensionsVer}",
+            lifecycleCompiler   : "android.arch.lifecycle:compiler:${archExtensionsVer}"
+    ]
+
     // Support Libraries dependencies
     supportDependencies = [
             design      : "com.android.support:design:${supportLib}",
@@ -64,7 +73,7 @@ buildscript {
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1"
         classpath "com.vanniktech:gradle-android-javadoc-plugin:0.2.1"
-        classpath "eu.davidea:grabver:0.4.0"
+        classpath "eu.davidea:grabver:0.5.0"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

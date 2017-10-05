@@ -1,0 +1,55 @@
+apply plugin: 'com.android.library'
+apply plugin: 'eu.davidea.grabver'
+
+versioning {
+    major 1
+    minor 0
+    preRelease "b1"
+}
+
+ext {
+    // Library Settings
+    libraryName = "FlexibleAdapter LiveData extension"
+    libraryDescription = "LiveData extension for FlexibleAdapter project"
+    libraryLabels = ['android', 'flexibleadapter', 'adapter', 'livedata', 'androidarch']
+
+    publishedGroupId = "eu.davidea"
+    bintrayName = "flexible-adapter-livedata"
+    artifact = bintrayName
+}
+
+android {
+    compileSdkVersion targetSdk
+    buildToolsVersion buildTools
+
+    defaultConfig {
+        minSdkVersion minSdk
+        targetSdkVersion targetSdk
+        versionCode versioning.code
+        versionName versioning.name
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    compile project(":flexible-adapter")
+    provided supportDependencies.recyclerview
+
+    // Arch
+    compile archDependencies.lifecycle
+    compile archDependencies.lifecycleExtensions
+    annotationProcessor archDependencies.lifecycleCompiler
+}
+
+if (project.hasProperty('all') || project.hasProperty('livedata')) {
+    apply from: '../maven-install.gradle'
+    apply from: '../jfrog-bintray-publish.gradle'
+}
