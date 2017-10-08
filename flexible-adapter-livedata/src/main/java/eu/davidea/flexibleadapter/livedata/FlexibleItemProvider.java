@@ -18,53 +18,69 @@ package eu.davidea.flexibleadapter.livedata;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import eu.davidea.flexibleadapter.items.IFlexible;
 
 /**
- * Generic item Providers for a {@code IFlexible} items.
+ * Generic item providers for any {@code IFlexible} items.
  *
+ * @param <Model>    the type the original item
+ * @param <Flexible> the IFlexible item for the list to provide to the adapter
  * @author Davide Steduto
  * @since 05/10/2017
  */
-public class FlexibleItemProvider {
+public class FlexibleItemProvider<Model, Flexible> {
 
-    private final Factory mFactory;
+    private final Factory<Model, Flexible> mFactory;
 
-    FlexibleItemProvider(Factory factory) {
+    /**
+     * @param factory the IFlexible item creator
+     */
+    private FlexibleItemProvider(Factory<Model, Flexible> factory) {
         mFactory = factory;
     }
 
     /**
-     * Creates a new {@link IFlexible} item.
+     * Creates a {@link FlexibleItemProvider}.
+     * <p>It uses the given {@link FlexibleItemProvider.Factory} to instantiate new IFlexible
+     * items.</p>
      *
-     * @param itemClass The class of the ViewModel to create an instance of it if.
-     * @param <T>       The type parameter for the {@code IFlexible} item.
-     * @return A {@code IFlexible} item that is an instance of the given type {@code T}.
+     * @param factory a {@code Factory} to instantiate new IFlexible items
+     * @return a FlexibleItemProvider instance
      */
-    @NonNull
     @MainThread
-    public <T extends IFlexible, M> T map(@NonNull M model, @NonNull Class<T> itemClass) {
-        return mFactory.create(itemClass, model);
-    }
-
-    private boolean isSourceListValid(List<?> source) {
-        return source != null && !source.isEmpty();
+    public static <Model, Flexible> FlexibleItemProvider<Model, Flexible> with
+    (@NonNull FlexibleItemProvider.Factory<Model, Flexible> factory) {
+        return new FlexibleItemProvider<>(factory);
     }
 
     /**
-     * Implementations of {@code Factory} interface are responsible to instantiate IFlexible items.
+     * Creates a new list of {@link IFlexible} items.
+     *
+     * @param source the list with original items
+     * @return A List of {@code IFlexible} items.
      */
-    public interface Factory {
-        /**
-         * Creates a new instance of the given {@code Class}.
-         *
-         * @param itemClass a {@code Class} whose instance is requested
-         * @param <T>       the type parameter for the IFlexible item.
-         * @return a newly created IFlexible item
-         */
-        <T extends IFlexible, M> T create(Class<T> itemClass, M model);
+    @NonNull
+    @MainThread
+    public List<Flexible> from(List<Model> source) {
+        List<Flexible> items = new ArrayList<>();
+        if (isSourceValid(source)) {
+            for (Model model : source) {
+                items.add(mFactory.create(model));
+            }
+        }
+        return items;
+    }
+
+    private boolean isSourceValid(List<?> source) {
+        return source != null && !source.isEmpty();
+    }
+
+    public interface Factory<Model, Flexible> {
+        @NonNull
+        Flexible create(Model model);
     }
 
 }
