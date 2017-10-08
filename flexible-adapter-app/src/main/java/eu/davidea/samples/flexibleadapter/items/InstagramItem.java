@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 import java.util.Random;
@@ -15,6 +16,8 @@ import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
+
+import static com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade;
 
 public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHolder, InstagramHeaderItem> {
 
@@ -78,8 +81,14 @@ public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHol
         holder.mImageFavourite.flipSilently(getStarred());
 
         // Load image via Glide
-        Glide.clear(holder.mImage);
-        Glide.with(context).load(url).crossFade(500).into(holder.mImage);
+        RequestOptions options = new RequestOptions()
+                .optionalFitCenter();
+        Glide.with(context.getApplicationContext())
+             .asBitmap()
+             .apply(options)
+             .transition(withCrossFade(200))
+             .load(url)
+             .into(holder.mImage);
     }
 
     static final class ViewHolder extends FlexibleViewHolder {

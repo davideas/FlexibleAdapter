@@ -98,7 +98,7 @@ public class ItemHolder extends AbstractSectionableItem<ItemHolder.ItemViewHolde
         /**
          * Default constructor.
          */
-        public ItemViewHolder(View view, FlexibleAdapter adapter) {
+        ItemViewHolder(View view, FlexibleAdapter adapter) {
             super(view, adapter);
             ButterKnife.bind(this, view);
         }

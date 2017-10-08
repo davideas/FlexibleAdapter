@@ -89,7 +89,7 @@ public class HeaderHolder extends AbstractHeaderItem<HeaderHolder.HeaderViewHold
         /**
          * Default constructor.
          */
-        public HeaderViewHolder(View view, FlexibleAdapter adapter) {
+        HeaderViewHolder(View view, FlexibleAdapter adapter) {
             super(view, adapter, true);//true only for header items when will be sticky
             ButterKnife.bind(this, view);
         }
