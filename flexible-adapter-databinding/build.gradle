@@ -6,6 +6,8 @@ versioning {
     minor 0
     preRelease "b1"
 }
+// For maven repository
+version = versioning.name
 
 ext {
     // Library Settings
@@ -41,7 +43,7 @@ android {
 
 dependencies {
     compile project(":flexible-adapter")
-    provided supportDependencies.recyclerview
+    provided supportLib.recyclerView
 }
 
 if (project.hasProperty('all') || project.hasProperty('databinding')) {

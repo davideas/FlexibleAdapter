@@ -51,47 +51,52 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    // Testing
-    androidTestCompile supportDependencies.annotations
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    testCompile 'org.robolectric:robolectric:3.3.2'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.7.22'
-
     // FlexibleAdapter + extensions
     compile project(':flexible-adapter')
     compile project(':flexible-adapter-ui')
     compile project(':flexible-adapter-databinding')
 
-    // FlipView
-    compile 'eu.davidea:flipview:1.1.3'
-
-    // ButterKnife
-    compile 'com.jakewharton:butterknife:8.5.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-
     // Support Libraries
-    compile supportDependencies.appcompat
-    compile supportDependencies.cardview
-    compile(supportDependencies.design) {
+    compile supportLib.appcompat
+    compile supportLib.cardView
+    compile(supportLib.design) {
         exclude module: 'support-v4'
         exclude module: 'support-annotations'
     }
-    compile(supportDependencies.recyclerview) {
-        exclude module: 'support-v4';
+    compile(supportLib.recyclerView) {
+        exclude module: 'support-v4'
         exclude module: 'support-annotations'
     }
 
-    // Glide (Image Loader)
-    compile 'com.github.bumptech.glide:glide:3.7.0'
+    // Timber (Logger) - https://github.com/JakeWharton/timber
+    compile libraries.timber
+
+    // Butter Knife (View Injector) - https://github.com/JakeWharton/butterknife
+    compile libraries.butterKnife
+    annotationProcessor libraries.butterKnifeCompiler
+
+    // Glide (Image Loader & Caching)
+    compile libraries.glide
+    annotationProcessor libraries.glideCompiler
 
     // Smooth-app-bar-layout
     compile('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
         exclude group: 'com.android.support'
     }
+
+    // UI Widgets
+    compile widgets.flipView
+
+    // Test libraries
+    androidTestCompile supportLib.annotations
+    androidTestCompile 'com.android.support.test:runner:1.0.1'
+    androidTestCompile 'com.android.support.test:rules:1.0.1'
+    androidTestCompile('com.android.support.test.espresso:espresso-core:3.0.1', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    })
+    testCompile 'org.robolectric:robolectric:3.4.2'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.10.0'
 
 }

@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'de.mannodermaus.android-junit5'
 apply plugin: 'eu.davidea.grabver'
 
 versioning {
@@ -6,6 +7,8 @@ versioning {
     minor 0
     preRelease "b1"
 }
+// For maven repository
+version = versioning.name
 
 ext {
     // Library Settings
@@ -34,20 +37,34 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    dataBinding {
-        enabled = true
-    }
+}
+
+junitPlatform {
+    jupiterVersion junitJupiterVer
+    platformVersion junitPlatformVer
 }
 
 dependencies {
-    compile project(":flexible-adapter")
-    provided supportDependencies.recyclerview
+    provided project(":flexible-adapter")
+    provided supportLib.recyclerView
 
-    // Arch
-    compile archDependencies.lifecycle
-    compile archDependencies.lifecycleExtensions
-    annotationProcessor archDependencies.lifecycleCompiler
-    compile 'javax.inject:javax.inject:1'
+    // Android Arch
+    provided archLib.lifecycle
+    provided archLib.extensions
+    provided archLib.commonJava8
+    provided archLib.reactiveStreams
+    annotationProcessor archLib.compiler
+    compile libraries.javaxInject
+
+    // Test libraries: We use JUnit 5 Jupiter
+    androidTestCompile supportLib.annotations
+    androidTestCompile 'com.android.support.test:runner:1.0.1'
+    androidTestCompile 'com.android.support.test:rules:1.0.1'
+    androidTestCompile("android.arch.core:core-testing:$archExtensionsVer", {
+    })
+    testCompile 'junit:junit:4.12'
+//    testCompile junit5()
+//    testCompile "de.mannodermaus.gradle.plugins:android-junit5-embedded-runtime:1.0.0-RC3-rev1"
 }
 
 if (project.hasProperty('all') || project.hasProperty('livedata')) {
