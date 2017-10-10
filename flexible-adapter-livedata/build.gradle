@@ -5,7 +5,7 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 1
     minor 0
-    preRelease "b1"
+    preRelease "alpha1"
 }
 // For maven repository
 version = versioning.name
@@ -14,7 +14,7 @@ ext {
     // Library Settings
     libraryName = "FlexibleAdapter LiveData extension"
     libraryDescription = "LiveData extension for FlexibleAdapter project"
-    libraryLabels = ['android', 'flexibleadapter', 'adapter', 'livedata', 'androidarch']
+    libraryLabels = ['android', 'flexibleadapter', 'adapter', 'livedata', 'lifecycle', 'viewmodel', 'androidarch']
 
     publishedGroupId = "eu.davidea"
     bintrayName = "flexible-adapter-livedata"
@@ -56,7 +56,7 @@ dependencies {
     annotationProcessor archLib.compiler
     compile libraries.javaxInject
 
-    // Test libraries: We use JUnit 5 Jupiter
+    // Test libraries: from AS3 we'll use JUnit 5 Jupiter
     androidTestCompile supportLib.annotations
     androidTestCompile 'com.android.support.test:runner:1.0.1'
     androidTestCompile 'com.android.support.test:rules:1.0.1'
