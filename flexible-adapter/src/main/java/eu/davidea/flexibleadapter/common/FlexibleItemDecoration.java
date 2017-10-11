@@ -42,6 +42,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.FlexibleUtils;
+import eu.davidea.flexibleadapter.utils.Log;
 
 /**
  * This item decorator implements identical drawing technique of {@code DividerItemDecorator}
@@ -75,7 +76,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
     private SparseArray<ItemDecoration> mDecorations; // viewType -> itemDeco
     private List<Integer> mViewTypes;
     private final ItemDecoration mDefaultDecoration = new ItemDecoration();
-    private int mOffset, mSectionOffset, mLastItem = 1;
+    private int mOffset, mSectionOffset, mDividerOnLastItem = 1, mSectionGapOnLastItem = 1;
     private boolean withLeftEdge, withTopEdge, withRightEdge, withBottomEdge;
 
     protected Drawable mDivider;
@@ -145,8 +146,8 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @since 5.0.0-rc3
      */
     public FlexibleItemDecoration withDrawDividerOnLastItem(boolean lastItem) {
-        if (lastItem) mLastItem = 0;
-        else mLastItem = 1;
+        if (lastItem) mDividerOnLastItem = 0;
+        else mDividerOnLastItem = 1;
         return this;
     }
 
@@ -219,7 +220,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
         }
 
         final int itemCount = parent.getChildCount();
-        for (int i = 0; i < itemCount - mLastItem; i++) {
+        for (int i = 0; i < itemCount - mDividerOnLastItem; i++) {
             final View child = parent.getChildAt(i);
             RecyclerView.ViewHolder viewHolder = parent.getChildViewHolder(child);
             if (shouldDrawDivider(viewHolder)) {
@@ -249,7 +250,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
         }
 
         final int itemCount = parent.getChildCount();
-        for (int i = 0; i < itemCount - mLastItem; i++) {
+        for (int i = 0; i < itemCount - mDividerOnLastItem; i++) {
             final View child = parent.getChildAt(i);
             RecyclerView.ViewHolder viewHolder = parent.getChildViewHolder(child);
             if (shouldDrawDivider(viewHolder)) {
@@ -288,6 +289,20 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      */
     public FlexibleItemDecoration withSectionGapOffset(@IntRange(from = 0) int sectionOffset) {
         mSectionOffset = (int) (context.getResources().getDisplayMetrics().density * sectionOffset);
+        return this;
+    }
+
+    /**
+     * Allows to disable the SectionGap after the last item.
+     * <p>Default is {@code true} (draw).</p>
+     *
+     * @param lastItem {@code true} to draw, {@code false} to not draw
+     * @return this FlexibleItemDecoration instance so the call can be chained
+     * @since 5.0.0-rc3
+     */
+    public FlexibleItemDecoration withSectionGapOnLastItem(boolean lastItem) {
+        if (lastItem) mSectionGapOnLastItem = 1;
+        else mSectionGapOnLastItem = 0;
         return this;
     }
 
@@ -597,9 +612,10 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
             // - Only ISectionable items can finish with a gap and only if next item is a IHeader item
             // - Important: the check must be done on the bottom of the section, otherwise the
             //   sticky header will jump!
+            Log.d("applySectionGap position=%s condition=%s", position, (position >= adapter.getItemCount() - mDividerOnLastItem));
             if (item instanceof ISectionable &&
                     (flexibleAdapter.isHeader(flexibleAdapter.getItem(position + 1)) ||
-                            position >= adapter.getItemCount() - 1)) {
+                            position >= adapter.getItemCount() - mSectionGapOnLastItem)) {
 
                 if (orientation == RecyclerView.VERTICAL) {
                     outRect.bottom += mSectionOffset;
