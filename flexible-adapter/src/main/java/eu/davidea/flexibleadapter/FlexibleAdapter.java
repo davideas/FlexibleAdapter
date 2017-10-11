@@ -422,7 +422,7 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
 	/*------------------------------*/
-	/* SELECTION METHODS OVERRIDDEN */
+    /* SELECTION METHODS OVERRIDDEN */
 	/*------------------------------*/
 
     /**
@@ -714,6 +714,7 @@ public class FlexibleAdapter<T extends IFlexible>
      *
      * @param item the item for which the position needs to be found
      * @return the global position in the Adapter if found, -1 otherwise
+     * @see #getSameTypePositionOf(IFlexible)
      * @since 5.0.0-b1
      */
     public final int getGlobalPositionOf(IFlexible item) {
@@ -730,6 +731,7 @@ public class FlexibleAdapter<T extends IFlexible>
      *
      * @param item the item for which the position needs to be found
      * @return the position in the Adapter excluding the Scrollable Headers, -1 otherwise
+     * @see #getSameTypePositionOf(IFlexible)
      * @since 5.0.0-rc1
      */
     public final int getCardinalPositionOf(@NonNull IFlexible item) {
@@ -747,6 +749,7 @@ public class FlexibleAdapter<T extends IFlexible>
      *
      * @param item the item for which the position needs to be found
      * @return the position in the Adapter counting only the items of the same type, -1 otherwise
+     * @see #getSubPositionOf(IFlexible)
      * @since 5.0.0-rc3
      */
     public final int getSameTypePositionOf(@NonNull IFlexible item) {
@@ -2279,16 +2282,26 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Retrieves the position of a child item in the list where it lays.
-     * <p>Only for a real child of an expanded parent.</p>
+     * Retrieves the sub position of any sub item in the section where it lays. First position
+     * corresponds to {@code 0}.
+     * <p>Works for items under header and under expandable too.</p>
      *
-     * @param child the child item
-     * @return the position in the parent or -1 if the child is a parent itself or not found
+     * @param child any sub item of any section
+     * @return the position in the parent or -1 if the child is a parent/header itself or not found
+     * @see #getSameTypePositionOf(IFlexible)
      * @see #getExpandableOf(IFlexible)
      * @see #getExpandablePositionOf(IFlexible)
      * @since 5.0.0-b1
      */
     public int getSubPositionOf(@NonNull T child) {
+        // If a sectionable has header, we take the global position of both
+        // and calculate the difference. Expandable will have precedence.
+        if (child instanceof ISectionable && hasHeader(child)) {
+            IHeader header = getHeaderOf(child);
+            if (!(header instanceof IExpandable)) {
+                return getGlobalPositionOf(child) - getGlobalPositionOf(header) - 1;
+            }
+        }
         return getSiblingsOf(child).indexOf(child);
     }
 

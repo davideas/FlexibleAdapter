@@ -148,4 +148,14 @@ public class HeadersSectionsTest {
         int headerPosition = mAdapter.getSameTypePositionOf(header) + 1;
         assertEquals(HEADER_SIZE, headerPosition);
     }
+
+    @Test
+    public void testSubPositionOf() throws Exception {
+        mAdapter = new FlexibleAdapter<>(mItems);
+        mAdapter.setDisplayHeadersAtStartUp(true);
+        AbstractFlexibleItem item = mItems.get(15);
+        int subPosition = mAdapter.getSubPositionOf(item);
+        assertEquals(3, subPosition);
+    }
+
 }
