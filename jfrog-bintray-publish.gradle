@@ -13,7 +13,7 @@ def getApiKey() {
 }
 
 if (gradle.getStartParameter().getTaskNames().contains("bintrayUpload")) {
-    println("> Publishing: " + libraryName + " " + version)
+    println("> Publishing: " + libraryName + " v" + versioning.name)
 
     bintray {
         user = getRepositoryUsername()
@@ -31,9 +31,9 @@ if (gradle.getStartParameter().getTaskNames().contains("bintrayUpload")) {
             publish = true
             publicDownloadNumbers = true
             version {
-                name = version
+                name = versioning.name
                 desc = libraryDescription
-                vcsTag = version
+                vcsTag = versioning.name
                 released = new Date()
                 gpg {
                     sign = true //Determines whether to GPG sign the files. The default is false
