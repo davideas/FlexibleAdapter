@@ -171,6 +171,7 @@ This library is currently free to use and modify, if you would like to say _Than
 It will be a pleasure to add your App here, once it is published.
 
 [Module.org](https://play.google.com/store/apps/details?id=org.module.app) |
+[Neuronizer](https://play.google.com/store/apps/details?id=de.djuelg.neuronizer) |
 [Socio - Shake and Connect!](https://play.google.com/store/apps/details?id=com.atsocio.socio) |
 [Shibagram](https://play.google.com/store/apps/details?id=com.apripachkin.shibagram) |
 [BNVR Client](https://play.google.com/store/apps/details?id=ru.beward.bnvr)
