@@ -24,12 +24,14 @@ import static org.junit.Assert.assertTrue;
 @Config(constants = BuildConfig.class, sdk = 25)
 public class HeadersSectionsTest {
 
+    private static final int ITEM_SIZE = 30;
+    private static final int HEADER_SIZE = 5;
     FlexibleAdapter<AbstractFlexibleItem> mAdapter;
     List<AbstractFlexibleItem> mItems;
 
     @Before
     public void setUp() throws Exception {
-        DatabaseService.getInstance().createHeadersSectionsDatabase(30, 5);
+        DatabaseService.getInstance().createHeadersSectionsDatabase(ITEM_SIZE, HEADER_SIZE);
         mItems = DatabaseService.getInstance().getDatabaseList();
     }
 
@@ -52,12 +54,12 @@ public class HeadersSectionsTest {
         //2nd call to display headers
         mAdapter.setDisplayHeadersAtStartUp(true);
         System.out.println("2nd call Headers = " + mAdapter.getHeaderItems().size());
-        assertEquals(5, mAdapter.getHeaderItems().size());
+        assertEquals(HEADER_SIZE, mAdapter.getHeaderItems().size());
 
         //3rd call to display headers
         mAdapter.showAllHeaders();
         System.out.println("3rd call Headers = " + mAdapter.getHeaderItems().size());
-        assertEquals(5, mAdapter.getHeaderItems().size());
+        assertEquals(HEADER_SIZE, mAdapter.getHeaderItems().size());
     }
 
     @Test
@@ -68,7 +70,7 @@ public class HeadersSectionsTest {
         assertEquals(mItems.size(), mAdapter.getItemCount());
 
         mAdapter.setDisplayHeadersAtStartUp(true);
-        assertEquals(5, mAdapter.getHeaderItems().size());
+        assertEquals(HEADER_SIZE, mAdapter.getHeaderItems().size());
     }
 
     @Test
@@ -114,7 +116,7 @@ public class HeadersSectionsTest {
     public void testShowAndHideAllHeaders() throws Exception {
         mAdapter = new FlexibleAdapter<>(mItems);
         mAdapter.showAllHeaders();
-        assertEquals(5, mAdapter.getHeaderItems().size());
+        assertEquals(HEADER_SIZE, mAdapter.getHeaderItems().size());
         mAdapter.hideAllHeaders();
         assertEquals(0, mAdapter.getHeaderItems().size());
     }
@@ -131,6 +133,29 @@ public class HeadersSectionsTest {
         for (Integer position : positions) {
             assertEquals(count++, position);
         }
+    }
+
+    @Test
+    public void testSameTypePositionOf() throws Exception {
+        mAdapter = new FlexibleAdapter<>(mItems);
+        mAdapter.setDisplayHeadersAtStartUp(true);
+        // Checking item
+        AbstractFlexibleItem item = mItems.get(mItems.size() - 1);
+        int position = mAdapter.getSameTypePositionOf(item);
+        assertEquals(mItems.indexOf(item), position);
+        // Checking section
+        IHeader header = mAdapter.getHeaderOf(mItems.get(position));
+        int headerPosition = mAdapter.getSameTypePositionOf(header) + 1;
+        assertEquals(HEADER_SIZE, headerPosition);
+    }
+
+    @Test
+    public void testSubPositionOf() throws Exception {
+        mAdapter = new FlexibleAdapter<>(mItems);
+        mAdapter.setDisplayHeadersAtStartUp(true);
+        AbstractFlexibleItem item = mItems.get(15);
+        int subPosition = mAdapter.getSubPositionOf(item);
+        assertEquals(3, subPosition);
     }
 
 }
