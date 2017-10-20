@@ -19,8 +19,8 @@ allprojects {
         buildTools = "26.0.2"
 
         // Android Architecture Components
-        archLifecycleVer = "1.0.0"
-        archExtensionsVer = "1.0.0-beta2"
+        archLifecycleVer = "1.0.3"
+        archExtensionsVer = "1.0.0-rc1"
         archPersistenceVer = archExtensionsVer
         archLib = [
                 lifecycle      : "android.arch.lifecycle:runtime:${archLifecycleVer}",
@@ -36,7 +36,7 @@ allprojects {
 
         // Support Libraries dependencies
         supportVer = "26.1.0"
-        constraintVer = "1.1.0-beta1"
+        constraintVer = "1.1.0-beta2"
         supportLib = [
                 design          : "com.android.support:design:${supportVer}",
                 recyclerView    : "com.android.support:recyclerview-v7:${supportVer}",
