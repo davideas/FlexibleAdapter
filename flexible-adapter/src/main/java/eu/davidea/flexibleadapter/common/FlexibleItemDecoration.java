@@ -272,7 +272,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @return {@code true} to draw the divider, {@code false} to skip the drawing
      */
     protected boolean shouldDrawDivider(RecyclerView.ViewHolder viewHolder) {
-        return mViewTypes == null || mViewTypes.contains(viewHolder.getItemViewType());
+        return mViewTypes == null || mViewTypes.isEmpty() || mViewTypes.contains(viewHolder.getItemViewType());
     }
 
 	/*==============================*/
