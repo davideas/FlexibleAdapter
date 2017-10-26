@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Steduto
+ * Copyright 2016-2017 Davide Steduto
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,11 +171,12 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
      * @since 5.0.0-b1
      */
     @Override
+    @CallSuper
     public void onClick(View view) {
         if (mAdapter.isEnabled(getFlexibleAdapterPosition()) && isViewExpandableOnClick()) {
             toggleExpansion();
-            super.onClick(view);
         }
+        super.onClick(view);
     }
 
     /**
@@ -187,6 +188,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
      * @since 5.0.0-b1
      */
     @Override
+    @CallSuper
     public boolean onLongClick(View view) {
         int position = getFlexibleAdapterPosition();
         if (mAdapter.isEnabled(position) && isViewCollapsibleOnLongClick()) {
@@ -202,6 +204,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
      * @since 5.0.0-b1
      */
     @Override
+    @CallSuper
     public void onActionStateChanged(int position, int actionState) {
         if (mAdapter.isExpanded(getFlexibleAdapterPosition())) {
             collapseView(position);

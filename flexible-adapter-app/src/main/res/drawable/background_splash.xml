@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:opacity="opaque">
 
-    <!--<item android:drawable="@drawable/side_nav_bar"/>-->
     <item android:drawable="@color/material_color_grey_300"/>
     <item
         android:id="@+id/launchscreen_product_logo"
