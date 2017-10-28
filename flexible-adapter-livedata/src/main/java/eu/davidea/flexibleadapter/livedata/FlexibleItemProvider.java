@@ -21,24 +21,26 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.davidea.flexibleadapter.items.IFlexible;
-
 /**
- * Generic item providers for any {@code IFlexible} items.
+ * Generic items providers for any {@code Adapter}.
+ * <p>This extension is a complement to the new
+ * <a href="https://developer.android.com/topic/libraries/architecture/index.html">Android Architecture Components</a>
+ * able to simplify and customize the implementation of the ViewModel responsible for
+ * preparing data (items) for <i>any</i> Adapter.</p>
  *
- * @param <Model>    the type the original item
- * @param <Flexible> the IFlexible item for the list to provide to the adapter
+ * @param <Model>       the type of the model item coming from the repository
+ * @param <AdapterItem> the AdapterItem item for the list to provide to the Adapter
  * @author Davide Steduto
  * @since 05/10/2017
  */
-public class FlexibleItemProvider<Model, Flexible> {
+public class FlexibleItemProvider<Model, AdapterItem> {
 
-    private final Factory<Model, Flexible> mFactory;
+    private final Factory<Model, AdapterItem> mFactory;
 
     /**
-     * @param factory the IFlexible item creator
+     * @param factory the AdapterItem item creator
      */
-    private FlexibleItemProvider(Factory<Model, Flexible> factory) {
+    private FlexibleItemProvider(Factory<Model, AdapterItem> factory) {
         mFactory = factory;
     }
 
@@ -57,15 +59,15 @@ public class FlexibleItemProvider<Model, Flexible> {
     }
 
     /**
-     * Creates a new list of {@link IFlexible} items.
+     * Creates a new list of {@code IFlexible} items.
      *
      * @param source the list with original items
      * @return A List of {@code IFlexible} items.
      */
     @NonNull
     @MainThread
-    public List<Flexible> from(List<Model> source) {
-        List<Flexible> items = new ArrayList<>();
+    public List<AdapterItem> from(List<Model> source) {
+        List<AdapterItem> items = new ArrayList<>();
         if (isSourceValid(source)) {
             for (Model model : source) {
                 items.add(mFactory.create(model));
