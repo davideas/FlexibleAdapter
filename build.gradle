@@ -43,6 +43,7 @@ allprojects {
                 cardView        : "com.android.support:cardview-v7:${supportVer}",
                 appcompat       : "com.android.support:appcompat-v7:${supportVer}",
                 customTabs      : "com.android.support:customtabs:${supportVer}",
+                support_v4      : "com.android.support:support-v4:${supportVer}",
                 support_v13     : "com.android.support:support-v13:${supportVer}",
                 annotations     : "com.android.support:support-annotations:${supportVer}",
                 vectorDrawable  : "com.android.support:support-vector-drawable:${supportVer}",

@@ -5,7 +5,7 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 1
     minor 0
-    preRelease "alpha1"
+    preRelease "b1"
 }
 // For maven repository
 version = versioning.name
@@ -45,18 +45,11 @@ junitPlatform {
 }
 
 dependencies {
-    provided project(":flexible-adapter")
-    provided supportLib.recyclerView
-
     // Android Arch
-    provided archLib.lifecycle
-    provided archLib.extensions
-    provided archLib.commonJava8
-    provided archLib.reactiveStreams
-    annotationProcessor archLib.compiler
-    compile libraries.javaxInject
+    compile archLib.extensions
 
     // Test libraries: from AS3 we'll use JUnit 5 Jupiter
+    androidTestCompile project(":flexible-adapter")
     androidTestCompile supportLib.annotations
     androidTestCompile 'com.android.support.test:runner:1.0.1'
     androidTestCompile 'com.android.support.test:rules:1.0.1'
