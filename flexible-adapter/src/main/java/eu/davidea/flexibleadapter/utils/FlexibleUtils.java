@@ -133,8 +133,9 @@ public final class FlexibleUtils {
      * @since 5.0.0-rc1 Created
      * <br>5.0.0-rc3 Multi-span
      */
-    public static void highlightText(@NonNull TextView textView,
-                                     @Nullable String originalText, @Nullable String constraint) {
+    public static void highlightText(@NonNull final TextView textView,
+                                     @Nullable final String originalText,
+                                     @Nullable String constraint) {
         int accentColor = fetchAccentColor(textView.getContext(), 1);
         highlightText(textView, originalText, constraint, accentColor);
     }
@@ -153,11 +154,12 @@ public final class FlexibleUtils {
      * @since 5.0.0-rc1 Created
      * <br>5.0.0-rc3 Multi-span
      */
-    public static void highlightText(@NonNull TextView textView, @Nullable String originalText,
-                                     @Nullable String constraint, @ColorInt int color) {
-        originalText = toLowerCase(originalText);
+    public static void highlightText(@NonNull final TextView textView,
+                                     @Nullable final String originalText,
+                                     @Nullable String constraint,
+                                     @ColorInt int color) {
         constraint = toLowerCase(constraint);
-        int start = originalText.indexOf(constraint);
+        int start = toLowerCase(originalText).indexOf(constraint);
         if (start != -1) {
             Spannable spanText = Spannable.Factory.getInstance().newSpannable(originalText);
             spanText(originalText, constraint, color, start, spanText);
@@ -183,8 +185,9 @@ public final class FlexibleUtils {
      * @see #highlightText(TextView, String, String)
      * @since 5.0.0-rc3
      */
-    public static void highlightWords(@NonNull TextView textView,
-                                      @Nullable String originalText, @Nullable String constraints) {
+    public static void highlightWords(@NonNull final TextView textView,
+                                      @Nullable final String originalText,
+                                      @Nullable String constraints) {
         int accentColor = fetchAccentColor(textView.getContext(), 1);
         highlightWords(textView, originalText, constraints, accentColor);
     }
@@ -204,14 +207,15 @@ public final class FlexibleUtils {
      * @see #highlightText(TextView, String, String, int)
      * @since 5.0.0-rc3
      */
-    public static void highlightWords(@NonNull TextView textView, @Nullable String originalText,
-                                      @Nullable String constraints, @ColorInt int color) {
-        originalText = toLowerCase(originalText);
+    public static void highlightWords(@NonNull final TextView textView,
+                                      @Nullable final String originalText,
+                                      @Nullable String constraints,
+                                      @ColorInt int color) {
         constraints = toLowerCase(constraints);
         Spannable spanText = null;
 
         for (String constraint : constraints.split(SPLIT_EXPRESSION)) {
-            int start = originalText.indexOf(constraint);
+            int start = toLowerCase(originalText).indexOf(constraint);
             if (start != -1) {
                 if (spanText == null) {
                     spanText = Spannable.Factory.getInstance().newSpannable(originalText);
@@ -227,13 +231,15 @@ public final class FlexibleUtils {
         }
     }
 
-    private static void spanText(@NonNull String originalText, @NonNull String constraint,
-                                 @ColorInt int color, int start, @NonNull Spannable spanText) {
+    private static void spanText(@NonNull final String originalText,
+                                 @NonNull String constraint,
+                                 @ColorInt int color, int start,
+                                 @NonNull final Spannable spanText) {
         do {
             int end = start + constraint.length();
             spanText.setSpan(new ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             spanText.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            start = originalText.indexOf(constraint, end + 1); // +1 skips the consecutive span
+            start = toLowerCase(originalText).indexOf(constraint, end + 1); // +1 skips the consecutive span
         } while (start != -1);
     }
 
