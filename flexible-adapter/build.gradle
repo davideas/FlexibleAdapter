@@ -38,8 +38,8 @@ android {
 }
 
 dependencies {
-    provided supportLib.recyclerView
-    compile supportLib.design
+    compileOnly supportLib.recyclerView
+    implementation supportLib.design
 }
 
 if (project.hasProperty('all') || project.hasProperty('adapter')) {

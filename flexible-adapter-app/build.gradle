@@ -18,15 +18,23 @@ android {
         versionCode versioning.code
         versionName versioning.name
 
-        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+        // https://medium.com/@chrisbanes/appcompat-v23-2-age-of-the-vectors-91cbafa87c88
+        // https://developer.android.com/studio/write/vector-asset-studio.html
+        vectorDrawables.useSupportLibrary = true
 
-        applicationVariants.all { variant ->
-            variant.outputs.each { output ->
-                def file = output.outputFile
-                def fileName = 'flexible-adapter-v' + versioning.name + '-c' + versioning.code + '.apk'
-                output.outputFile = new File(file.parentFile, fileName)
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        android.applicationVariants.all { variant ->
+            variant.outputs.all {
+                outputFileName = "flexible-adapter-v" + versioning.name + "-c" + versioning.code + ".apk"
             }
         }
+    }
+    // Configure only for each module that uses Java 8 language features
+    // (either in its source code or through dependencies).
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         debug {
@@ -42,61 +50,56 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
-
+    lintOptions {
+        abortOnError false
+    }
     dataBinding {
         enabled = true
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // FlexibleAdapter + extensions
-    compile project(':flexible-adapter')
-    compile project(':flexible-adapter-ui')
-    compile project(':flexible-adapter-databinding')
+    implementation project(':flexible-adapter')
+    implementation project(':flexible-adapter-ui')
+    implementation project(':flexible-adapter-databinding')
 
     // Support Libraries
-    compile supportLib.appcompat
-    compile supportLib.cardView
-    compile(supportLib.design) {
-        exclude module: 'support-v4'
-        exclude module: 'support-annotations'
-    }
-    compile(supportLib.recyclerView) {
-        exclude module: 'support-v4'
-        exclude module: 'support-annotations'
-    }
+    implementation supportLib.appcompat
+    implementation supportLib.cardView
+    implementation supportLib.design
+    implementation supportLib.recyclerView
 
     // Timber (Logger) - https://github.com/JakeWharton/timber
-    compile libraries.timber
+    implementation libraries.timber
 
     // Butter Knife (View Injector) - https://github.com/JakeWharton/butterknife
-    compile libraries.butterKnife
+    implementation libraries.butterKnife
     annotationProcessor libraries.butterKnifeCompiler
 
     // Glide (Image Loader & Caching)
-    compile libraries.glide
+    implementation libraries.glide
     annotationProcessor libraries.glideCompiler
 
     // Smooth-app-bar-layout
-    compile('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
+    implementation('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
         exclude group: 'com.android.support'
     }
 
     // UI Widgets
-    compile widgets.flipView
+    implementation widgets.flipView
 
     // Test libraries
-    androidTestCompile supportLib.annotations
-    androidTestCompile 'com.android.support.test:runner:1.0.1'
-    androidTestCompile 'com.android.support.test:rules:1.0.1'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:3.0.1', {
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test:rules:1.0.1'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     })
-    testCompile 'org.robolectric:robolectric:3.4.2'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.10.0'
+    testImplementation 'org.robolectric:robolectric:3.4.2'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.10.0'
 
 }

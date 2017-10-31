@@ -46,18 +46,18 @@ junitPlatform {
 
 dependencies {
     // Android Arch
-    compile archLib.extensions
+    implementation archLib.extensions
 
     // Test libraries: from AS3 we'll use JUnit 5 Jupiter
-    androidTestCompile project(":flexible-adapter")
-    androidTestCompile supportLib.annotations
-    androidTestCompile 'com.android.support.test:runner:1.0.1'
-    androidTestCompile 'com.android.support.test:rules:1.0.1'
-    androidTestCompile("android.arch.core:core-testing:$archExtensionsVer", {
+    androidTestImplementation project(":flexible-adapter")
+    androidTestImplementation supportLib.annotations
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test:rules:1.0.1'
+    androidTestImplementation("android.arch.core:core-testing:$archExtensionsVer", {
     })
-    testCompile 'junit:junit:4.12'
-//    testCompile junit5()
-//    testCompile "de.mannodermaus.gradle.plugins:android-junit5-embedded-runtime:1.0.0-RC3-rev1"
+    //testImplementation 'junit:junit:4.12'
+    testImplementation junit5()
+    testImplementation "de.mannodermaus.gradle.plugins:android-junit5-embedded-runtime:1.0.0-RC3-rev1"
 }
 
 if (project.hasProperty('all') || project.hasProperty('livedata')) {

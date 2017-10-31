@@ -42,9 +42,9 @@ android {
 }
 
 dependencies {
-    provided project(":flexible-adapter")
-    provided supportLib.recyclerView
-    compile supportLib.support_v4
+    compileOnly project(":flexible-adapter")
+    compileOnly supportLib.recyclerView
+    implementation supportLib.support_v4
 }
 
 if (project.hasProperty('all') || project.hasProperty('databinding')) {

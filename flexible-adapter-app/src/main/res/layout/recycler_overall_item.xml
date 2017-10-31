@@ -39,7 +39,7 @@
 			android:gravity="center"
 			android:ellipsize="end"
 			android:lines="2"
-			android:maxLines="2"
+			android:singleLine="false"
 			android:textAppearance="@style/TextAppearance.AppCompat.Title"
 			tools:text="@string/endless_scrolling"/>
 
