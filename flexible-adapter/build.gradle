@@ -5,7 +5,7 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 5
     minor 0
-    preRelease "rc3"
+    preRelease "SNAPSHOT"
 }
 // For maven repository
 version = versioning.name
@@ -28,6 +28,9 @@ android {
         targetSdkVersion targetSdk
         versionCode versioning.code
         versionName versioning.name
+    }
+    lintOptions {
+        abortOnError false
     }
     buildTypes {
         release {

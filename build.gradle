@@ -92,6 +92,11 @@ allprojects {
         maven { url "http://dl.bintray.com/davideas/maven" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
+
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
+    }
 }
 
 buildscript {
@@ -103,7 +108,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0-alpha01'
+        classpath 'com.android.tools.build:gradle:3.1.0-alpha02'
         classpath "com.neenbedankt.gradle.plugins:android-apt:1.8"
         classpath "com.github.dcendents:android-maven-gradle-plugin:1.5"
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"

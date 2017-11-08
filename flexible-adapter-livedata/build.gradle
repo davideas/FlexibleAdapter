@@ -49,7 +49,6 @@ dependencies {
     implementation archLib.extensions
 
     // Test libraries: from AS3 we'll use JUnit 5 Jupiter
-    androidTestImplementation project(":flexible-adapter")
     androidTestImplementation supportLib.annotations
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test:rules:1.0.1'
@@ -58,6 +57,8 @@ dependencies {
     //testImplementation 'junit:junit:4.12'
     testImplementation junit5()
     testImplementation "de.mannodermaus.gradle.plugins:android-junit5-embedded-runtime:1.0.0-RC3-rev1"
+    testImplementation supportLib.recyclerView
+    testImplementation project(":flexible-adapter")
 }
 
 if (project.hasProperty('all') || project.hasProperty('livedata')) {
