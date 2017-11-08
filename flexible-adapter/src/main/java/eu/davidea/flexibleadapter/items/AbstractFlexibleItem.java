@@ -167,7 +167,7 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
      * {@inheritDoc}
      */
     @Override
-    public abstract void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads);
+    public abstract void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List<Object> payloads);
 
     /**
      * {@inheritDoc}

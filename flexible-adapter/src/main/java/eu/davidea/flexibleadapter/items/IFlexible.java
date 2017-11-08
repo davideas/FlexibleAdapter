@@ -206,7 +206,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      * @param position the current position
      * @param payloads a non-null list of merged payloads. Can be empty list if requires full update
      */
-    void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List payloads);
+    void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List<Object> payloads);
 
     /**
      * Called when a view created by this adapter has been recycled.
