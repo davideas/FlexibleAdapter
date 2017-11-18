@@ -4717,6 +4717,8 @@ public class FlexibleAdapter<T extends IFlexible>
         // Must be delayed to give time at RecyclerView to recalculate positions after an automatic collapse
         new Handler(Looper.getMainLooper(), new Handler.Callback() {
             public boolean handleMessage(Message message) {
+                // #492 - NullPointerException when expanding item with auto-scroll
+                if (mRecyclerView == null) return false;
                 int firstVisibleItem = getFlexibleLayoutManager().findFirstCompletelyVisibleItemPosition();
                 int lastVisibleItem = getFlexibleLayoutManager().findLastCompletelyVisibleItemPosition();
                 int itemsToShow = position + subItemsCount - lastVisibleItem;
