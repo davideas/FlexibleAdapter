@@ -89,7 +89,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
         // Initialize Adapter and RecyclerView
         // ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
         FlexibleAdapter.useTag("EndlessScrollingAdapter");
-        mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
+        mAdapter = new ExampleAdapter(null, getActivity());
         mAdapter.setAutoScrollOnExpand(true)
                 //.setAnimateToLimit(Integer.MAX_VALUE) //Use the default value
                 .setNotifyMoveOfFilteredItems(true) //When true, filtering on big list is very slow, not in this case!
@@ -119,13 +119,13 @@ public class FragmentEndlessScrolling extends AbstractFragment
         // EndlessScrollListener - OnLoadMore (v5.0.0)
         mAdapter.setLoadingMoreAtStartUp(true) //To call only if the list is empty
                 //.setEndlessPageSize(3) //Endless is automatically disabled if newItems < 3
-                .setEndlessTargetCount(15) //Endless is automatically disabled if totalItems >= 15
-                .setEndlessScrollThreshold(1) //Default=1
+                //.setEndlessTargetCount(15) //Endless is automatically disabled if totalItems >= 15
+                //.setEndlessScrollThreshold(1) //Default=1
                 .setEndlessScrollListener(this, mProgressItem)
-                .setTopEndless(true);
+                .setTopEndless(false);
 
         // Add 1 Footer items
-        mAdapter.addScrollableFooter();
+        //mAdapter.addScrollableFooter();
     }
 
     @Override
@@ -196,7 +196,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
                 } else {
                     DatabaseService.getInstance().addAll(newItems);
                 }
-                mAdapter.onLoadMoreComplete(newItems, 5000L);
+                mAdapter.onLoadMoreComplete(newItems, 3000L);
                 // - Retrieve the new page number after adding new items!
                 Log.d(TAG, "EndlessCurrentPage=" + mAdapter.getEndlessCurrentPage());
                 Log.d(TAG, "EndlessPageSize=" + mAdapter.getEndlessPageSize());
@@ -223,7 +223,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
                             Toast.LENGTH_SHORT).show();
                 }
             }
-        }, 4000L);
+        }, 2000L);
     }
 
     @Override

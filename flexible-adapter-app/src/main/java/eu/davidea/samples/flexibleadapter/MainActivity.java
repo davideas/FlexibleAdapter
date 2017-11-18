@@ -810,9 +810,9 @@ public class MainActivity extends AppCompatActivity implements
     public void onUpdateEmptyView(int size) {
         Log.d("onUpdateEmptyView size=%s", size);
         // #454- Can't take fastScroller from Adapter, since this callback occurs before setting it
-        FastScroller fastScroller = findViewById(R.id.fast_scroller);
+        FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
         View emptyView = findViewById(R.id.empty_view);
-        TextView emptyText = findViewById(R.id.empty_text);
+        TextView emptyText = (TextView) findViewById(R.id.empty_text);
         if (emptyText != null)
             emptyText.setText(getString(R.string.no_items));
         if (size > 0) {

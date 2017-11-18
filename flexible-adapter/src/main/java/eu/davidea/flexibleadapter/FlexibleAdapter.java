@@ -106,6 +106,7 @@ public class FlexibleAdapter<T extends IFlexible>
     private static final String EXTRA_STICKY = TAG + "_stickyHeaders";
     private static final String EXTRA_LEVEL = TAG + "_selectedLevel";
     private static final String EXTRA_SEARCH = TAG + "_searchText";
+    private static final long AUTO_SCROLL_DELAY = 150L;
 
     /* The main container for ALL items */
     private List<T> mItems, mTempItems, mOriginalList;
@@ -423,7 +424,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/*------------------------------*/
     /* SELECTION METHODS OVERRIDDEN */
-	/*------------------------------*/
+    /*------------------------------*/
 
     /**
      * Checks if the current item has the property {@code enabled = true}.
@@ -2024,12 +2025,6 @@ public class FlexibleAdapter<T extends IFlexible>
         // Calculate new items count
         int newItemsSize = newItems == null ? 0 : newItems.size();
         int totalItemCount = newItemsSize + getMainItemCount();
-        // Add any new items
-        if (newItemsSize > 0) {
-            log.v("onLoadMore     performing adding %s new items on page=%s", newItemsSize, getEndlessCurrentPage());
-            int position = mTopEndless ? mScrollableHeaders.size() : getGlobalPositionOf(mProgressItem);
-            addItems(position, newItems);
-        }
         // Check if features are enabled and the limits have been reached
         if (mEndlessPageSize > 0 && newItemsSize < mEndlessPageSize || // Is feature enabled and Not enough items?
                 mEndlessTargetCount > 0 && totalItemCount >= mEndlessTargetCount) { // Is feature enabled and Max limit has been reached?
@@ -2042,6 +2037,12 @@ public class FlexibleAdapter<T extends IFlexible>
             mHandler.sendEmptyMessageDelayed(LOAD_MORE_COMPLETE, delay);
         } else {
             hideProgressItem();
+        }
+        // Add any new items
+        if (newItemsSize > 0) {
+            log.v("onLoadMore     performing adding %s new items on page=%s", newItemsSize, getEndlessCurrentPage());
+            int position = mTopEndless ? mScrollableHeaders.size() : getGlobalPositionOf(mProgressItem);
+            addItems(position, newItems);
         }
         // Reset the loading status
         endlessLoading = false;
@@ -2507,7 +2508,7 @@ public class FlexibleAdapter<T extends IFlexible>
             // Automatically smooth scroll the current expandable item to show as much
             // children as possible
             if (!init && scrollOnExpand && !expandAll) {
-                autoScrollWithDelay(position, subItemsCount, 150L);
+                autoScrollWithDelay(position, subItemsCount);
             }
 
             // Expand!
@@ -4712,7 +4713,7 @@ public class FlexibleAdapter<T extends IFlexible>
         }
     }
 
-    private void autoScrollWithDelay(final int position, final int subItemsCount, final long delay) {
+    private void autoScrollWithDelay(final int position, final int subItemsCount) {
         // Must be delayed to give time at RecyclerView to recalculate positions after an automatic collapse
         new Handler(Looper.getMainLooper(), new Handler.Callback() {
             public boolean handleMessage(Message message) {
@@ -4736,7 +4737,7 @@ public class FlexibleAdapter<T extends IFlexible>
                 }
                 return true;
             }
-        }).sendMessageDelayed(Message.obtain(mHandler), delay);
+        }).sendMessageDelayed(Message.obtain(mHandler), AUTO_SCROLL_DELAY);
     }
 
     private void adjustSelected(int startPosition, int itemCount) {

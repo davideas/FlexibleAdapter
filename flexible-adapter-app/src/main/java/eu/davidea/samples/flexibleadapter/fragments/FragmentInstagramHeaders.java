@@ -70,7 +70,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
         // Initialize Adapter and RecyclerView
         // true = it makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
         FlexibleAdapter.useTag("InstagramHeadersAdapter");
-        mAdapter = new FlexibleAdapter<>(DatabaseService.getInstance().getDatabaseList(), getActivity(), true);
+        mAdapter = new FlexibleAdapter<>(null, getActivity(), true);
         mAdapter.addListener(getActivity())
                 .setAnimationOnScrolling(true)
                 .setAnimationOnReverseScrolling(true);
@@ -87,6 +87,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
         mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
                 .setStickyHeaders(true) //Make headers sticky
                 // Endless scroll with 1 item threshold
+                .setLoadingMoreAtStartUp(true)
                 .setEndlessScrollListener(this, new ProgressItem())
                 .setEndlessScrollThreshold(1); //Default=1
 

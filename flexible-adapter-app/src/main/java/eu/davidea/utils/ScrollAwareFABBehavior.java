@@ -1,6 +1,7 @@
 package eu.davidea.utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
@@ -20,10 +21,10 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     }
 
     @Override
-    public boolean onStartNestedScroll(final CoordinatorLayout coordinatorLayout,
-                                       final FloatingActionButton child,
-                                       final View directTargetChild,
-                                       final View target,
+    public boolean onStartNestedScroll(@NonNull final CoordinatorLayout coordinatorLayout,
+                                       @NonNull final FloatingActionButton child,
+                                       @NonNull final View directTargetChild,
+                                       @NonNull final View target,
                                        final int nestedScrollAxes,
                                        final int type) {
         // Ensure we react to vertical scrolling
@@ -32,9 +33,9 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     }
 
     @Override
-    public void onNestedScroll(final CoordinatorLayout coordinatorLayout,
-                               final FloatingActionButton fab,
-                               final View target,
+    public void onNestedScroll(@NonNull final CoordinatorLayout coordinatorLayout,
+                               @NonNull final FloatingActionButton fab,
+                               @NonNull final View target,
                                final int dxConsumed,
                                final int dyConsumed,
                                final int dxUnconsumed,
