@@ -16,7 +16,7 @@ allprojects {
         // SDK and Build tools version
         minSdk = 14
         targetSdk = 26
-        buildTools = "26.0.2"
+        buildTools = "26.0.3"
 
         // Android Architecture Components
         archLifecycleVer = "1.0.3"
@@ -35,8 +35,8 @@ allprojects {
         ]
 
         // Support Libraries dependencies
-        supportVer = "27.0.0"
-        constraintVer = "1.1.0-beta2"
+        supportVer = "27.0.1"
+        constraintVer = "1.1.0-beta3"
         supportLib = [
                 design          : "com.android.support:design:${supportVer}",
                 recyclerView    : "com.android.support:recyclerview-v7:${supportVer}",
@@ -64,6 +64,7 @@ allprojects {
         ]
 
         // 3rd Libraries
+        daggerVer = "2.13"
         butterKnifeVer = "8.8.1"
         timberVer = "4.5.1"
         glideVer = "4.1.1"
@@ -71,6 +72,9 @@ allprojects {
         junitPlatformVer = "1.0.1"
         junitJupiterVer = "5.0.1"
         libraries = [
+                dagger               : "com.google.dagger:dagger:${daggerVer}",
+                daggerAndroid        : "com.google.dagger:dagger-android-support:${daggerVer}",
+                daggerCompiler       : "com.google.dagger:dagger-compiler:${daggerVer}",
                 butterKnife        : "com.jakewharton:butterknife:${butterKnifeVer}",
                 butterKnifeCompiler: "com.jakewharton:butterknife-compiler:${butterKnifeVer}",
                 timber             : "com.jakewharton.timber:timber:${timberVer}",
@@ -103,6 +107,7 @@ buildscript {
     repositories {
         jcenter()
         google()
+        //mavenLocal()
         maven { url "http://dl.bintray.com/davideas/maven" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
@@ -115,7 +120,7 @@ buildscript {
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.1"
         classpath "com.vanniktech:gradle-android-javadoc-plugin:0.2.1"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.0.0"
-        classpath "eu.davidea:grabver:0.6.0"
+        classpath "eu.davidea:grabver:0.7.0"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

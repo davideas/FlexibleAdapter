@@ -7,7 +7,7 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:fitsSystemWindows="true"
-	tools:context="eu.davidea.samples.flexibleadapter.ViewPagerActivity">
+	tools:context="eu.davidea.samples.flexibleadapter.ui.ViewPagerActivity">
 
 	<!-- Toolbar -->
 	<android.support.design.widget.AppBarLayout

@@ -50,7 +50,7 @@ public class DatabaseService {
     private static final int SUB_ITEMS = 4;
     private DatabaseType databaseType = DatabaseType.NONE;
 
-    //Database original items (used as cache)
+    //FlexibleDatabase original items (used as cache)
     private List<AbstractFlexibleItem> mItems = new ArrayList<AbstractFlexibleItem>();
     private Map<StaggeredItemStatus, StaggeredHeaderItem> headers;
 
@@ -443,7 +443,7 @@ public class DatabaseService {
      * @return The original list.
      */
     public List<AbstractFlexibleItem> getDatabaseList() {
-        Log.i(TAG, "Database Type: " + databaseType);
+        Log.i(TAG, "FlexibleDatabase Type: " + databaseType);
         // Until version RC1:
         // Return a copy of the DB: we will perform some tricky code on this list.
         //return new ArrayList<>(mItems);

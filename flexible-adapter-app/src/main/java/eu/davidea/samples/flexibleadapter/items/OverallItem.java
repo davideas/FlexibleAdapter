@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
+import android.arch.persistence.room.Entity;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
@@ -20,6 +21,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 /**
  * Model object representing Overall functionality as CardView.
  */
+@Entity
 public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolder> {
 
     private int id;
