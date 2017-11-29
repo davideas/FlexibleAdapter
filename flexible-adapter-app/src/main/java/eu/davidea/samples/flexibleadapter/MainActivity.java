@@ -692,9 +692,15 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             // Notify the active callbacks or implement a custom action onClick
             if (flexibleItem instanceof SimpleItem || flexibleItem instanceof SubItem) {
-                //TODO FOR YOU: call your custom Action on item click
-                String title = extractTitleFrom(flexibleItem);
-                EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
+                mRecyclerView.postDelayed(() -> {
+                    Log.d("scroll to position=%s item=%s", position, mAdapter.getItem(position));
+                    int headers = mAdapter.areHeadersSticky() ? 1 : 0;
+                    mRecyclerView.smoothScrollToPosition(Math.max(0, position - headers));
+                }, 300L);
+
+//                //TODO FOR YOU: call your custom Action on item click
+//                String title = extractTitleFrom(flexibleItem);
+//                EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
             }
             return false;
         }

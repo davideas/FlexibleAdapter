@@ -16,6 +16,7 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
+import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.holders.HeaderHolder;
 import eu.davidea.samples.flexibleadapter.holders.ItemHolder;
@@ -594,10 +595,19 @@ public class DatabaseService {
      * notified with CHANGE Payload in the Adapter list when refreshed.
      */
     public void updateNewItems() {
+        IHeader header = null;
         for (IFlexible iFlexible : mItems) {
             if (iFlexible instanceof AbstractItem) {
                 AbstractItem item = (AbstractItem) iFlexible;
                 item.increaseUpdates();
+            }
+            if (iFlexible instanceof ISectionable) {
+                IHeader newHeader = ((ISectionable) iFlexible).getHeader();
+                if (newHeader instanceof HeaderItem && !newHeader.equals(header)) {
+                    header = newHeader;
+                    HeaderItem headerItem = (HeaderItem) header;
+                    headerItem.increaseUpdates();
+                }
             }
         }
     }
