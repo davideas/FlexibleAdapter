@@ -1707,7 +1707,8 @@ public class FlexibleAdapter<T extends IFlexible>
      */
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position, List payloads) {
-        log.v("onViewBound    Holder=%s position=%s itemId=%s", getClassName(holder), position, holder.getItemId());
+        String itemId = hasStableIds() ? " itemId=" + holder.getItemId() : "";
+        log.v("onViewBound    Holder=%s position=%s%s", getClassName(holder), position, itemId);
         if (!autoMap) {
             // If everything has been set properly, this should never happen ;-)
             throw new IllegalStateException("AutoMap is not active, this method cannot be called. You should implement the AutoMap properly.");
@@ -2886,7 +2887,8 @@ public class FlexibleAdapter<T extends IFlexible>
         if (headersShown && !recursive) {
             recursive = true;
             // Use Set to uniquely save objects
-            Set<IHeader> headersInserted = new HashSet(), headersToUpdate = new HashSet();
+            Set<IHeader> headersInserted = new HashSet();
+            Set<IHeader> headersToUpdate = new HashSet();
             for (T item : items) {
                 IHeader header = getHeaderOf(item);
                 if (header == null) continue;
@@ -3026,8 +3028,10 @@ public class FlexibleAdapter<T extends IFlexible>
         if (parent.isExpanded()) {
             added = addItems(parentPosition + 1 + getRecursiveSubItemCount(parent, subPosition), subItems);
         }
-        // Notify the parent about the change if requested
-        if (payload != null) notifyItemChanged(parentPosition, payload);
+        // Notify the parent about the change if requested and not already done as Header
+        if (payload != null && !isHeader((T) parent)) {
+            notifyItemChanged(parentPosition, payload);
+        }
         return added;
     }
 
@@ -4209,7 +4213,7 @@ public class FlexibleAdapter<T extends IFlexible>
                 move++;
             }
         }
-        log.v("calculateMovedItems total move=%s", move);
+        log.d("calculateMovedItems total move=%s", move);
     }
 
     private synchronized void executeNotifications(Payload payloadChange) {
@@ -5075,7 +5079,7 @@ public class FlexibleAdapter<T extends IFlexible>
                     public void run() {
                         if (areHeadersSticky()) mStickyHeaderHelper.updateOrClearHeader(true);
                     }
-                }, 100L);
+                }, 50L);
             }
         }
 
