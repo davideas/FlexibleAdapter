@@ -42,7 +42,6 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.FlexibleUtils;
-import eu.davidea.flexibleadapter.utils.Log;
 
 /**
  * This item decorator implements identical drawing technique of {@code DividerItemDecorator}
@@ -612,7 +611,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
             // - Only ISectionable items can finish with a gap and only if next item is a IHeader item
             // - Important: the check must be done on the bottom of the section, otherwise the
             //   sticky header will jump!
-            Log.d("applySectionGap position=%s condition=%s", position, (position >= adapter.getItemCount() - mDividerOnLastItem));
+            //Log.v("applySectionGap position=%s condition=%s", position, (position >= adapter.getItemCount() - mDividerOnLastItem));
             if (item instanceof ISectionable &&
                     (flexibleAdapter.isHeader(flexibleAdapter.getItem(position + 1)) ||
                             position >= adapter.getItemCount() - mSectionGapOnLastItem)) {
