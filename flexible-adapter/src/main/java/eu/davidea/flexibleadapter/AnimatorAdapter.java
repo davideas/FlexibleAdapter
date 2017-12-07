@@ -33,7 +33,7 @@ import java.util.List;
 
 import eu.davidea.viewholders.FlexibleViewHolder;
 
-import static eu.davidea.flexibleadapter.utils.FlexibleUtils.getClassName;
+import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
 
 /**
  * This class is responsible to animate items. Bounded items are animated initially and also

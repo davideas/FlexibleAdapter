@@ -41,7 +41,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.ISectionable;
-import eu.davidea.flexibleadapter.utils.FlexibleUtils;
+import eu.davidea.flexibleadapter.utils.LayoutUtils;
 
 /**
  * This item decorator implements identical drawing technique of {@code DividerItemDecorator}
@@ -196,7 +196,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
         if (parent.getLayoutManager() == null) {
             return;
         }
-        if (FlexibleUtils.getOrientation(parent) == RecyclerView.VERTICAL) {
+        if (LayoutUtils.getOrientation(parent) == RecyclerView.VERTICAL) {
             drawVertical(c, parent);
         } else {
             drawHorizontal(c, parent);

@@ -31,7 +31,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +39,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,11 +52,10 @@ import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
-import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
-import static eu.davidea.flexibleadapter.utils.FlexibleUtils.getClassName;
+import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
 
 /**
  * This Adapter is backed by an ArrayList of arbitrary objects of class <b>T</b>, where <b>T</b>
@@ -123,6 +122,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /* Deleted items and RestoreList (Undo) */
     private List<RestoreInfo> mRestoreList;
+    private List<Integer> mUndoPositions;
     private boolean restoreSelection = false, multiRange = false, unlinkOnRemoveHeader = false,
             permanentDelete = true, adjustSelected = true;
 
@@ -241,6 +241,7 @@ public class FlexibleAdapter<T extends IFlexible>
         mScrollableHeaders = new ArrayList<>();
         mScrollableFooters = new ArrayList<>();
         mRestoreList = new ArrayList<>();
+        mUndoPositions = new ArrayList<>();
 
         // Create listeners instances
         addListener(listeners);
@@ -255,14 +256,16 @@ public class FlexibleAdapter<T extends IFlexible>
      *
      * @param listener the object(s) instance(s) of any listener
      * @return this Adapter, so the call can be chained
-     * @see #removeListener(Class[])
+     * @see #removeListener(Object)
      * @since 5.0.0-b6
      */
     @CallSuper
-    public FlexibleAdapter<T> addListener(@Nullable Object listener) {
-        if (listener != null) {
-            log.i("Setting listener class %s as:", getClassName(listener));
+    public FlexibleAdapter<T> addListener(@NonNull Object listener) {
+        if (listener == null) {
+            log.e("Invalid listener class: null");
+            return this;
         }
+        log.i("Adding listener class %s as:", getClassName(listener));
         if (listener instanceof OnItemClickListener) {
             log.i("- OnItemClickListener");
             mItemClickListener = (OnItemClickListener) listener;
@@ -303,61 +306,61 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Removes one or more listeners from this Adapter.
+     * Removes one listener from this Adapter.
      * <p><b>Warning:</b>
      * <ul><li>In case of <i>Click</i> and <i>LongClick</i> events, it will remove also the callback
-     * from all bound ViewHolders too. To restore these 2 events on the current bound ViewHolders
-     * call {@link #addListener(Object)} providing the instance of desired listener.</li>
-     * <li>To remove a specific listener you have to provide the Class of the listener,
-     * example:
-     * <pre>removeListener(FlexibleAdapter.OnUpdateListener.class,
-     *     FlexibleAdapter.OnItemLongClickListener.class);</pre></li></ul></p>
+     * from all bound ViewHolders too. To restore these 2 events on the current bound ViewHolders,
+     * call {@link #addListener(Object)} providing the instance of the desired listener.</li>
+     * <li>To remove a specific listener you have to provide the either the instance or the Class
+     * type of the listener, example:
+     * <pre>
+     *     removeListener(mUpdateListener);
+     *     removeListener(FlexibleAdapter.OnItemLongClickListener.class);</pre></li></ul></p>
      *
-     * @param listeners the listeners type Classes to remove from the this Adapter and/or from all bound ViewHolders
+     * @param listener the listener instance or Class type to remove from this Adapter and/or from all bound ViewHolders
      * @return this Adapter, so the call can be chained
      * @see #addListener(Object)
      * @since 5.0.0-rc3
      */
-    public final FlexibleAdapter<T> removeListener(@NonNull Class... listeners) {
-        if (listeners == null || listeners.length == 0) {
+    public final FlexibleAdapter<T> removeListener(@NonNull Object listener) {
+        if (listener == null) {
             log.e("No listener class to remove!");
             return this;
         }
-        for (Class listener : listeners) {
-            if (listener == OnItemClickListener.class) {
-                mItemClickListener = null;
-                log.i("Removed OnItemClickListener");
-                for (FlexibleViewHolder holder : getAllBoundViewHolders()) {
-                    holder.getContentView().setOnClickListener(null);
-                }
+        String className = getClassName(listener);
+        if (listener instanceof OnItemClickListener || listener == OnItemClickListener.class) {
+            mItemClickListener = null;
+            log.i("Removed %s as OnItemClickListener", className);
+            for (FlexibleViewHolder holder : getAllBoundViewHolders()) {
+                holder.getContentView().setOnClickListener(null);
             }
-            if (listener == OnItemLongClickListener.class) {
-                mItemLongClickListener = null;
-                log.i("Removed OnItemLongClickListener");
-                for (FlexibleViewHolder holder : getAllBoundViewHolders()) {
-                    holder.getContentView().setOnLongClickListener(null);
-                }
+        }
+        if (listener instanceof OnItemLongClickListener || listener == OnItemLongClickListener.class) {
+            mItemLongClickListener = null;
+            log.i("Removed %s as OnItemLongClickListener", className);
+            for (FlexibleViewHolder holder : getAllBoundViewHolders()) {
+                holder.getContentView().setOnLongClickListener(null);
             }
-            if (listener == OnItemMoveListener.class) {
-                mItemMoveListener = null;
-                log.i("Removed OnItemMoveListener");
-            }
-            if (listener == OnItemSwipeListener.class) {
-                mItemSwipeListener = null;
-                log.i("Removed OnItemSwipeListener");
-            }
-            if (listener == OnDeleteCompleteListener.class) {
-                mDeleteCompleteListener = null;
-                log.i("Removed OnDeleteCompleteListener");
-            }
-            if (listener == OnStickyHeaderChangeListener.class) {
-                mStickyHeaderChangeListener = null;
-                log.i("Removed OnStickyHeaderChangeListener");
-            }
-            if (listener == OnUpdateListener.class) {
-                mUpdateListener = null;
-                log.i("Removed OnUpdateListener");
-            }
+        }
+        if (listener instanceof OnItemMoveListener || listener == OnItemMoveListener.class) {
+            mItemMoveListener = null;
+            log.i("Removed %s as OnItemMoveListener", className);
+        }
+        if (listener instanceof OnItemSwipeListener || listener == OnItemSwipeListener.class) {
+            mItemSwipeListener = null;
+            log.i("Removed %s as OnItemSwipeListener", className);
+        }
+        if (listener instanceof OnDeleteCompleteListener || listener == OnDeleteCompleteListener.class) {
+            mDeleteCompleteListener = null;
+            log.i("Removed %s as OnDeleteCompleteListener", className);
+        }
+        if (listener instanceof OnStickyHeaderChangeListener || listener == OnStickyHeaderChangeListener.class) {
+            mStickyHeaderChangeListener = null;
+            log.i("Removed %s as OnStickyHeaderChangeListener", className);
+        }
+        if (listener instanceof OnUpdateListener || listener == OnUpdateListener.class) {
+            mUpdateListener = null;
+            log.i("Removed %s as OnUpdateListener", className);
         }
         return this;
     }
@@ -819,7 +822,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/*------------------------------------*/
     /* SCROLLABLE HEADERS/FOOTERS METHODS */
-	/*------------------------------------*/
+    /*------------------------------------*/
 
     /**
      * @return unmodifiable list of Scrollable Headers currently held by the Adapter
@@ -1098,8 +1101,8 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
 	/*--------------------------*/
-	/* HEADERS/SECTIONS METHODS */
-	/*--------------------------*/
+    /* HEADERS/SECTIONS METHODS */
+    /*--------------------------*/
 
     /**
      * Setting to automatically unlink the deleted header from items having that header linked.
@@ -3616,6 +3619,7 @@ public class FlexibleAdapter<T extends IFlexible>
     public synchronized void emptyBin() {
         log.d("emptyBin!");
         mRestoreList.clear();
+        mUndoPositions.clear();
     }
 
     /**
@@ -3637,6 +3641,23 @@ public class FlexibleAdapter<T extends IFlexible>
             deletedItems.add(restoreInfo.item);
         }
         return deletedItems;
+    }
+
+    /**
+     * @return the list of positions to undo
+     * @since 5.0.0-rc4
+     */
+    @NonNull
+    public List<Integer> getUndoPositions() {
+        return this.mUndoPositions;
+    }
+
+    /**
+     * @param undoPositions the positions to Undo with UndoHelper when {@code Action.UPDATE}.
+     * @since 5.0.0-rc4
+     */
+    public void saveUndoPositions(@NonNull List<Integer> undoPositions) {
+        mUndoPositions.addAll(undoPositions);
     }
 
     /**
@@ -3722,6 +3743,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return the current search text
      * @since 3.1.0
      */
+    @NonNull
     public String getSearchText() {
         return mSearchText;
     }
@@ -3729,15 +3751,15 @@ public class FlexibleAdapter<T extends IFlexible>
     /**
      * Sets the new search text.
      * <p><b>Note:</b> Text is always <b>trimmed</b> and <b>lowercase</b>.</p>
-     * <p><b>Tip:</b> You can highlight filtered Text or Words using:
-     * <ul><li>{@link FlexibleUtils#highlightText(TextView, String, String)}</li>
-     * <li>{@link FlexibleUtils#highlightWords(TextView, String, String)}</li></ul></p>
+     * <p><b>Tip:</b> You can highlight filtered Text or Words using {@code FlexibleUtils} from UI package:
+     * <ul><li>{@code FlexibleUtils#highlightText(TextView, String, String)}</li>
+     * <li>{@code FlexibleUtils#highlightWords(TextView, String, String)}</li></ul></p>
      *
      * @param searchText the new text to filter the items
      * @since 3.1.0
      */
-    public void setSearchText(String searchText) {
-        mSearchText = FlexibleUtils.toLowerCase(searchText.trim());
+    public void setSearchText(@NonNull String searchText) {
+        mSearchText = searchText != null ? searchText.trim().toLowerCase(Locale.getDefault()) : "";
     }
 
     /**

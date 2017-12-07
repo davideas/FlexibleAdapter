@@ -32,7 +32,7 @@ import android.view.View;
 
 import java.util.Arrays;
 
-import eu.davidea.flexibleadapter.R;
+import eu.davidea.flexibleadapter.helpers.R;
 
 /**
  * @author Davide Steduto
