@@ -48,6 +48,7 @@ import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
  * @since 10/01/2016 Created
  * <br>30/01/2016 Class now extends {@link SelectableAdapter}
  * <br>13/09/2016 {@link #animateView(RecyclerView.ViewHolder, int)} is now automatically called
+ * <br>07/12/2017 Reverse scrolling is independent from Forward scrolling
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class AnimatorAdapter extends SelectableAdapter {
@@ -80,7 +81,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      */
     private EnumSet<AnimatorEnum> animatorsUsed = EnumSet.noneOf(AnimatorEnum.class);
 
-    private boolean isReverseEnabled = false, shouldAnimate = false,
+    private boolean isReverseEnabled = false, isForwardEnabled = false,
             onlyEntryAnimation = false, animateFromObserver = false;
 
     private static long DEFAULT_DURATION = 300L;
@@ -90,7 +91,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
 	/*--------------*/
     /* CONSTRUCTORS */
-	/*--------------*/
+    /*--------------*/
 
     /**
      * Simple Constructor for Animator Adapter.
@@ -108,8 +109,8 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
     }
 
 	/*-----------------------*/
-	/* CONFIGURATION SETTERS */
-	/*-----------------------*/
+    /* CONFIGURATION SETTERS */
+    /*-----------------------*/
 
     /**
      * @param animate true to notify this Adapter that initialization is started and so
@@ -192,39 +193,50 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         return this;
     }
 
+    @Deprecated
+    public AnimatorAdapter setAnimationOnScrolling(boolean enabled) {
+        return setAnimationOnForwardScrolling(enabled);
+    }
+
     /**
-     * Enables/Disables item animation while scrolling and on loading.
-     * <p>Enabling scrolling will disable onlyEntryAnimation.<br>
-     * Disabling scrolling will disable also reverse scrolling.</p>
-     * Default value is {@code false}.
-     * <p><b>Note:</b> Loading animation can only be performed if the Adapter is initialized
-     * with some items using the constructor.</p>
+     * Enables/Disables item animation while forward scrolling and on loading.
+     * <br>Enabling forward scrolling will disable {@code onlyEntryAnimation}.
+     * <br>Forward scrolling is independent from reverse scrolling.
+     * <p>Default value is {@code false}.</p>
+     * <b>Note:</b> Loading animation can only be performed if the Adapter is initialized
+     * with some items using the constructor.
      *
-     * @param enabled true to enable item animation, false to disable them all.
+     * @param enabled true to enable item animation on forward scrolling, false to disable.
      * @return this AnimatorAdapter, so the call can be chained
      * @see #setOnlyEntryAnimation(boolean)
      * @see #setAnimationOnReverseScrolling(boolean)
      * @since 5.0.0-b1
      */
-    public AnimatorAdapter setAnimationOnScrolling(boolean enabled) {
-        log.i("Set animationOnScrolling=%s", enabled);
+    public AnimatorAdapter setAnimationOnForwardScrolling(boolean enabled) {
+        log.i("Set animationOnForwardScrolling=%s", enabled);
         if (enabled) this.onlyEntryAnimation = false;
-        shouldAnimate = enabled;
+        isForwardEnabled = enabled;
         return this;
     }
 
+    @Deprecated
     public boolean isAnimationOnScrollingEnabled() {
-        return shouldAnimate;
+        return isForwardEnabled;
+    }
+
+    public boolean isAnimationOnForwardScrollingEnabled() {
+        return isForwardEnabled;
     }
 
     /**
-     * Enables reverse scrolling animation if AnimationOnScrolling is also enabled!
-     * <p>Value is ignored if basic animation on scrolling is disabled.</p>
-     * Default value is {@code false} (only forward).
+     * Enables/Disables reverse scrolling animation.
+     * <br>Reverse scrolling is independent from forward scrolling.
+     * <p>Default value is {@code false} (only forward).</p>
      *
-     * @param enabled false to animate items only forward, true to also reverse animate
+     * @param enabled true to enable item animation on reverse scrolling, false to disable.
      * @return this AnimatorAdapter, so the call can be chained
-     * @see #setAnimationOnScrolling(boolean)
+     * @see #setOnlyEntryAnimation(boolean)
+     * @see #setAnimationOnForwardScrolling(boolean)
      * @since 5.0.0-b1
      */
     public AnimatorAdapter setAnimationOnReverseScrolling(boolean enabled) {
@@ -250,12 +262,12 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      *
      * @param enabled true to perform only entry animation, false otherwise
      * @return this AnimatorAdapter, so the call can be chained
-     * @see #setAnimationOnScrolling(boolean)
+     * @see #setAnimationOnForwardScrolling(boolean)
      * @since 5.0.0-b8
      */
     public AnimatorAdapter setOnlyEntryAnimation(boolean enabled) {
         log.i("Set onlyEntryAnimation=%s", enabled);
-        if (enabled) this.shouldAnimate = true;
+        if (enabled) this.isForwardEnabled = true;
         this.onlyEntryAnimation = enabled;
         return this;
     }
@@ -270,7 +282,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
     }
 
 	/*--------------*/
-	/* MAIN METHODS */
+    /* MAIN METHODS */
 	/*--------------*/
 
     /**
@@ -309,16 +321,20 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         }
         // Animate only during initial loading?
         if (onlyEntryAnimation && mLastAnimatedPosition >= mMaxChildViews) {
-            shouldAnimate = false;
+            isForwardEnabled = false;
         }
         int lastVisiblePosition = getFlexibleLayoutManager().findLastVisibleItemPosition();
-//		log.v("shouldAnimate=%s isFastScroll=%s isNotified=%s isReverseEnabled=%s mLastAnimatedPosition=%s %s mMaxChildViews=%s",
-//				shouldAnimate, isFastScroll, mAnimatorNotifierObserver.isPositionNotified(), isReverseEnabled, mLastAnimatedPosition,
+//		log.v("isForwardEnabled=%s isFastScroll=%s isNotified=%s isReverseEnabled=%s mLastAnimatedPosition=%s %s mMaxChildViews=%s",
+//				isForwardEnabled, isFastScroll, mAnimatorNotifierObserver.isPositionNotified(), isReverseEnabled, mLastAnimatedPosition,
 //				(!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : ""), mMaxChildViews
 //		);
-        if (holder instanceof FlexibleViewHolder && shouldAnimate && !isFastScroll &&
-                !mAnimatorNotifierObserver.isPositionNotified() &&
-                (position > lastVisiblePosition || isReverseEnabled || isScrollableHeaderOrFooter(position) || (position == 0 && mMaxChildViews == 0))) {
+        if ((isForwardEnabled || isReverseEnabled)
+                && !isFastScroll && holder instanceof FlexibleViewHolder
+                && !mAnimatorNotifierObserver.isPositionNotified()
+                && (isScrollableHeaderOrFooter(position)
+                || (isForwardEnabled && position > lastVisiblePosition)
+                || (isReverseEnabled && position < lastVisiblePosition)
+                || (position == 0 && mMaxChildViews == 0))) {
 
             // Cancel animation is necessary when fling
             int hashCode = holder.itemView.hashCode();

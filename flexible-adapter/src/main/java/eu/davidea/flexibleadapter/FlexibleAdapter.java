@@ -1409,7 +1409,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @param displayHeaders true to display headers, false to keep them hidden
      * @return this Adapter, so the call can be chained
      * @see #showAllHeaders()
-     * @see #setAnimationOnScrolling(boolean)
+     * @see #setAnimationOnForwardScrolling(boolean)
      * @since 5.0.0-b6
      */
     public FlexibleAdapter<T> setDisplayHeadersAtStartUp(boolean displayHeaders) {

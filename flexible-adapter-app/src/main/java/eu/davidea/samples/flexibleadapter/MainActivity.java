@@ -551,14 +551,13 @@ public class MainActivity extends AppCompatActivity implements
             stickyItem.setChecked(mAdapter.areHeadersSticky());
         }
         // Scrolling Animations?
-        MenuItem animationMenuItem = menu.findItem(R.id.action_animation);
+        MenuItem animationMenuItem = menu.findItem(R.id.action_forward);
         if (animationMenuItem != null) {
-            animationMenuItem.setChecked(DatabaseConfiguration.animateOnScrolling);
+            animationMenuItem.setChecked(DatabaseConfiguration.animateOnForwardScrolling);
         }
         // Reverse scrolling animation?
         MenuItem reverseMenuItem = menu.findItem(R.id.action_reverse);
         if (reverseMenuItem != null) {
-            reverseMenuItem.setEnabled(mAdapter.isAnimationOnScrollingEnabled());
             reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrollingEnabled());
         }
         return super.onPrepareOptionsMenu(menu);
@@ -571,18 +570,18 @@ public class MainActivity extends AppCompatActivity implements
             DatabaseConfiguration.animateOnUpdate = !DatabaseConfiguration.animateOnUpdate;
             item.setChecked(DatabaseConfiguration.animateOnUpdate);
             Snackbar.make(findViewById(R.id.main_view), (DatabaseConfiguration.animateOnUpdate ? "Enabled" : "Disabled") +
-                    " animation on update, now refresh!\n(P = persistent)", Snackbar.LENGTH_SHORT).show();
-        } else if (id == R.id.action_animation) {
-            if (mAdapter.isAnimationOnScrollingEnabled()) {
-                DatabaseConfiguration.animateOnScrolling = false;
-                mAdapter.setAnimationOnScrolling(false);
+                    " animation on update, now refresh!\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+        } else if (id == R.id.action_forward) {
+            if (mAdapter.isAnimationOnForwardScrollingEnabled()) {
+                DatabaseConfiguration.animateOnForwardScrolling = false;
+                mAdapter.setAnimationOnForwardScrolling(false);
                 item.setChecked(false);
-                Snackbar.make(findViewById(R.id.main_view), "Disabled scrolling animation, now reopen the page\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.main_view), "Disabled forward scrolling animation\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
             } else {
-                DatabaseConfiguration.animateOnScrolling = true;
-                mAdapter.setAnimationOnScrolling(true);
+                DatabaseConfiguration.animateOnForwardScrolling = true;
+                mAdapter.setAnimationOnForwardScrolling(true);
                 item.setChecked(true);
-                Snackbar.make(findViewById(R.id.main_view), "Enabled scrolling animation, now reopen the page\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.main_view), "Enabled forward scrolling animation\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
             }
         } else if (id == R.id.action_reverse) {
             if (mAdapter.isAnimationOnReverseScrollingEnabled()) {

@@ -109,7 +109,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
                 .setNotifyMoveOfFilteredItems(DatabaseConfiguration.notifyMove)
                 .setNotifyChangeOfUnfilteredItems(DatabaseConfiguration.notifyChange)
                 .setAnimationInitialDelay(100L)
-                .setAnimationOnScrolling(true)
+                .setAnimationOnForwardScrolling(true)
                 .setAnimationOnReverseScrolling(true)
                 .setOnlyEntryAnimation(true);
         if (mRecyclerView == null) {

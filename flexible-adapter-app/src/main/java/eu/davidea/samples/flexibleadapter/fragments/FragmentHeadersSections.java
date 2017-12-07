@@ -85,7 +85,7 @@ public class FragmentHeadersSections extends AbstractFragment
         FlexibleAdapter.useTag("HeadersSectionsAdapter");
         mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
         mAdapter.setNotifyMoveOfFilteredItems(true)
-                .setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
+                .setAnimationOnForwardScrolling(DatabaseConfiguration.animateOnForwardScrolling);
         mRecyclerView = getView().findViewById(R.id.recycler_view);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(createNewLinearLayoutManager());

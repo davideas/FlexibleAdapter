@@ -75,7 +75,7 @@ public class FragmentExpandableSections extends AbstractFragment {
                 .setAutoScrollOnExpand(true)
                 .setAnimateToLimit(Integer.MAX_VALUE) //Size limit = MAX_VALUE will always animate the changes
                 .setNotifyMoveOfFilteredItems(true) //When true, filtering on big list is very slow!
-                .setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
+                .setAnimationOnForwardScrolling(DatabaseConfiguration.animateOnForwardScrolling)
                 .setAnimationOnReverseScrolling(true);
         mRecyclerView = getView().findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
@@ -161,7 +161,7 @@ public class FragmentExpandableSections extends AbstractFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_list_type)
-            mAdapter.setAnimationOnScrolling(true);
+            mAdapter.setAnimationOnForwardScrolling(true);
         return super.onOptionsItemSelected(item);
     }
 

@@ -94,7 +94,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
                 //.setAnimateToLimit(Integer.MAX_VALUE) //Use the default value
                 .setNotifyMoveOfFilteredItems(true) //When true, filtering on big list is very slow, not in this case!
                 .setNotifyChangeOfUnfilteredItems(true) //true by default
-                .setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
+                .setAnimationOnForwardScrolling(DatabaseConfiguration.animateOnForwardScrolling)
                 .setAnimationOnReverseScrolling(true);
         mRecyclerView = getView().findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
@@ -260,7 +260,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_list_type) {
-            mAdapter.setAnimationOnScrolling(true);
+            mAdapter.setAnimationOnForwardScrolling(true);
         } else if (item.getItemId() == R.id.action_top_scrolling) {
             item.setChecked(!item.isChecked());
             mAdapter.setTopEndless(item.isChecked());

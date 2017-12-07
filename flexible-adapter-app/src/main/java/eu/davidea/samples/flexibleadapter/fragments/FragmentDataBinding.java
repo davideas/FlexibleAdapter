@@ -88,7 +88,7 @@ public class FragmentDataBinding extends AbstractFragment {
         // Initialize Adapter and RecyclerView
         FlexibleAdapter.useTag("DataBindingAdapter");
         mAdapter = new BindingFlexibleAdapter<>(getActivity(), true);
-        mAdapter.setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling);
+        mAdapter.setAnimationOnForwardScrolling(DatabaseConfiguration.animateOnForwardScrolling);
         mRecyclerView = getView().findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
         mRecyclerView.setAdapter(mAdapter);

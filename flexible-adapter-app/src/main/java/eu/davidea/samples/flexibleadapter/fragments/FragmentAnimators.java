@@ -93,7 +93,7 @@ public class FragmentAnimators extends AbstractFragment {
                 .setAutoScrollOnExpand(true)
                 .setOnlyEntryAnimation(false)
                 .setAnimationEntryStep(true) //In Overall, watch the effect at initial loading when Grid Layout is set
-                .setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
+                .setAnimationOnForwardScrolling(DatabaseConfiguration.animateOnForwardScrolling)
                 .setAnimationOnReverseScrolling(true)
                 .setAnimationInterpolator(new DecelerateInterpolator())
                 .setAnimationDuration(300L);

@@ -22,7 +22,7 @@
 	<string name="columns">%1$s column(s)</string>
 	<string name="diff_util">Use DiffUtil*</string>
 	<string name="scrolling_entry_animation">Entry Animation Only</string>
-	<string name="scrolling_animation">Scrolling Animation*</string>
+	<string name="forward_scrolling">Forward Scrolling*</string>
 	<string name="reverse_scrolling">Reverse scrolling</string>
 	<string name="sub_item_specific">Specific SubItem Animation</string>
 	<string name="auto_collapse">Auto collapse</string>
