@@ -224,6 +224,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         return isForwardEnabled;
     }
 
+    /**
+     * @return true if items are animated when forward scrolling, false only forward
+     * @since 5.0.0-b1
+     */
     public boolean isAnimationOnForwardScrollingEnabled() {
         return isForwardEnabled;
     }
@@ -246,7 +250,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
     }
 
     /**
-     * @return true if items are animated also on reverse scrolling, false only forward
+     * @return true if items are animated when reverse scrolling, false only forward
      * @since 5.0.0-b1
      */
     public boolean isAnimationOnReverseScrollingEnabled() {

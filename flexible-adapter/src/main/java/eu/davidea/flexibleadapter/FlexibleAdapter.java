@@ -1733,8 +1733,26 @@ public class FlexibleAdapter<T extends IFlexible>
         }
         // Endless Scroll
         onLoadMore(position);
-        // Scroll Animation
+        // Scroll Animations
         animateView(holder, position);
+    }
+
+    @CallSuper
+    @Override
+    public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
+        int position = holder.getAdapterPosition();
+        //log.v("onViewAttached Holder=%s position=%s", getClassName(holder), position);
+        T item = getItem(position);
+        if (item != null) item.onViewAttached(this, holder, position);
+    }
+
+    @CallSuper
+    @Override
+    public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+        int position = holder.getAdapterPosition();
+        //log.v("onViewDetached Holder=%s position=%s", getClassName(holder), position);
+        T item = getItem(position);
+        if (item != null) item.onViewDetached(this, holder, position);
     }
 
     @CallSuper
@@ -1746,6 +1764,7 @@ public class FlexibleAdapter<T extends IFlexible>
             holder.itemView.setVisibility(View.VISIBLE);
         }
         int position = holder.getAdapterPosition();
+        //log.v("onViewRecycled Holder=%s position=%s", getClassName(holder), position);
         T item = getItem(position);
         if (item != null) item.unbindViewHolder(this, holder, position);
     }
