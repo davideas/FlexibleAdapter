@@ -891,7 +891,7 @@ public class FlexibleAdapter<T extends IFlexible>
             headerItem.setDraggable(false);
             int progressFix = (headerItem == mProgressItem) ? mScrollableHeaders.size() : 0;
             mScrollableHeaders.add(headerItem);
-            setScrollAnimate(true); //Headers will scroll animate
+            setScrollAnimate(true); // Headers will scroll animate
             performInsert(progressFix, Collections.singletonList(headerItem), true);
             setScrollAnimate(false);
             return true;
@@ -4138,7 +4138,7 @@ public class FlexibleAdapter<T extends IFlexible>
             mTempItems = newItems;
             mNotifications.add(new Notification(-1, 0));
         }
-        //Execute All notifications if filter was Synchronous!
+        // Execute All notifications if filter was Synchronous!
         if (mFilterAsyncTask == null) executeNotifications(payloadChange);
     }
 
@@ -4259,8 +4259,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
     private synchronized void executeNotifications(Payload payloadChange) {
         log.i("Performing %s notifications", mNotifications.size());
-        mItems = mTempItems; //Update mItems in the UI Thread
-        setScrollAnimate(false); //Disable scroll animation
+        mItems = mTempItems;     // Update mItems in the UI Thread
+        setScrollAnimate(false); // Disable scroll animation
         for (Notification notification : mNotifications) {
             switch (notification.operation) {
                 case Notification.ADD:
@@ -4283,6 +4283,7 @@ public class FlexibleAdapter<T extends IFlexible>
         }
         mTempItems = null;
         mNotifications = null;
+        setScrollAnimate(true);
 
         time = System.currentTimeMillis();
         time = time - start;
