@@ -16,18 +16,14 @@
 package eu.davidea.viewholders;
 
 import android.support.v4.view.ViewPropertyAnimatorListener;
-import android.support.v7.widget.RecyclerView;
-
-import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
 
 /**
  * Interface for {@code itemView} addition/removal animation.
- * <p>Used by {@link FlexibleItemAnimator} when notify events occur. If any of these methods
+ * <p>Used by {@code FlexibleItemAnimator} when notify events occur. If any of these methods
  * are implemented, the ItemAnimator extending FlexibleItemAnimator is skipped in favour of this
  * ViewHolder implementation.</p>
  *
  * @author Davide Steduto
- * @see FlexibleItemAnimator
  * @since 26/08/2016 Created
  */
 public interface AnimatedViewHolder {
@@ -35,7 +31,7 @@ public interface AnimatedViewHolder {
     /**
      * Prepares the View for Add Animation. If this method is implemented and returns
      * {@code true}, then this method is performed against
-     * {@link FlexibleItemAnimator#preAnimateAddImpl(RecyclerView.ViewHolder)} which will be ignored.
+     * {@code FlexibleItemAnimator#preAnimateAddImpl(RecyclerView.ViewHolder)} which will be ignored.
      * <p>Default value is {@code false}.</p>
      *
      * @return {@code true} to confirm the execution of {@link #animateAddImpl(ViewPropertyAnimatorListener, long, int)},
@@ -47,7 +43,7 @@ public interface AnimatedViewHolder {
     /**
      * Prepares the View for Remove Animation. If this method is implemented and returns
      * {@code true}, then this method is performed against
-     * {@link FlexibleItemAnimator#preAnimateRemoveImpl(RecyclerView.ViewHolder)} which will be ignored.
+     * {@code FlexibleItemAnimator#preAnimateRemoveImpl(RecyclerView.ViewHolder)} which will be ignored.
      * <p>Default value is {@code false}.</p>
      *
      * @return {@code true} to confirm the execution of {@link #animateRemoveImpl(ViewPropertyAnimatorListener, long, int)},
@@ -77,8 +73,8 @@ public interface AnimatedViewHolder {
      *
      * @param listener       should assign to {@code ViewCompat.animate().setListener(listener)}
      * @param removeDuration duration of remove animation
-     * @param index          order of execution, starts with 0  @return {@code true} to animate with this implementation, {@code false} to use the generic
-     *                       animation.
+     * @param index          order of execution, starts with 0  @return {@code true} to animate with this
+     *                       implementation, {@code false} to use the generic animation.
      * @since 5.0.0-b8
      */
     boolean animateRemoveImpl(ViewPropertyAnimatorListener listener, long removeDuration, int index);

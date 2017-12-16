@@ -285,9 +285,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         return onlyEntryAnimation;
     }
 
-	/*--------------*/
+    /*--------------*/
     /* MAIN METHODS */
-	/*--------------*/
+    /*--------------*/
 
     /**
      * Cancels any existing animations for given View. Useful when fling.
@@ -328,10 +328,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
             isForwardEnabled = false;
         }
         int lastVisiblePosition = getFlexibleLayoutManager().findLastVisibleItemPosition();
-//		log.v("isForwardEnabled=%s isFastScroll=%s isNotified=%s isReverseEnabled=%s mLastAnimatedPosition=%s %s mMaxChildViews=%s",
-//				isForwardEnabled, isFastScroll, mAnimatorNotifierObserver.isPositionNotified(), isReverseEnabled, mLastAnimatedPosition,
-//				(!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : ""), mMaxChildViews
-//		);
+        log.v("isForwardEnabled=%s isReverseEnabled=%s isFastScroll=%s isNotified=%s mLastAnimatedPosition=%s mMaxChildViews=%s %s",
+                isForwardEnabled, isReverseEnabled, isFastScroll, mAnimatorNotifierObserver.isPositionNotified(), mLastAnimatedPosition,
+                mMaxChildViews, (!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : "")
+        );
         if ((isForwardEnabled || isReverseEnabled)
                 && !isFastScroll && holder instanceof FlexibleViewHolder
                 && !mAnimatorNotifierObserver.isPositionNotified()
@@ -360,7 +360,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
                     duration = animator.getDuration();
                 }
             }
-            //log.v("duration=%s", duration);
+            log.v("duration=%s", duration);
             set.setDuration(duration);
             set.addListener(new HelperAnimatorListener(hashCode));
             if (mEntryStep) {
@@ -369,7 +369,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
             }
             set.start();
             mAnimators.put(hashCode, set);
-            //log.v("animateView    Scroll animation on position %s", position);
+            log.v("animateView    Scroll animation on position %s", position);
         }
         mAnimatorNotifierObserver.clearNotified();
         // Update last animated position
@@ -396,9 +396,12 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         int visibleItems = lastVisiblePosition - firstVisiblePosition;
         int numberOfAnimatedItems = position - 1;
 
-        if (mMaxChildViews == 0 || visibleItems < numberOfAnimatedItems || //Normal Forward scrolling after max itemOnScreen is reached
-                (firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews) || //Reverse scrolling
-                (position > mMaxChildViews && firstVisiblePosition == -1 && mRecyclerView.getChildCount() == 0)) { //Reverse scrolling and click on FastScroller
+        // Normal Forward scrolling after max itemOnScreen is reached
+        if (mMaxChildViews == 0 || visibleItems < numberOfAnimatedItems ||
+                // Reverse scrolling
+                (firstVisiblePosition > 1 && firstVisiblePosition <= mMaxChildViews) ||
+                // Reverse scrolling and click on FastScroller
+                (position > mMaxChildViews && firstVisiblePosition == -1 && mRecyclerView.getChildCount() == 0)) {
 
             // Base delay is step delay
             delay = mStepDelay;
@@ -415,20 +418,20 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
                 delay = mInitialDelay + mStepDelay * (position % numColumns);
             }
 
-        } else { //forward scrolling before max itemOnScreen is reached
+        } else { // Forward scrolling before max itemOnScreen is reached
             delay = mInitialDelay + (position * mStepDelay);
         }
 
-//		log.v("Delay[%s]=%s FirstVisible=%s LastVisible=%s LastAnimated=%s VisibleItems=%s ChildCount=%s MaxChildCount=%s",
-//				position, delay, firstVisiblePosition, lastVisiblePosition, numberOfAnimatedItems,
-//				visibleItems, mRecyclerView.getChildCount(), mMaxChildViews);
+        log.v("Delay[%s]=%s FirstVisible=%s LastVisible=%s LastAnimated=%s VisibleItems=%s ChildCount=%s MaxChildCount=%s",
+                position, delay, firstVisiblePosition, lastVisiblePosition, numberOfAnimatedItems,
+                visibleItems, mRecyclerView.getChildCount(), mMaxChildViews);
 
         return delay;
     }
 
-	/*---------------*/
-	/* INNER CLASSES */
-	/*---------------*/
+    /*---------------*/
+    /* INNER CLASSES */
+    /*---------------*/
 
     /**
      * Observer Class responsible to skip animation when items are notified to avoid
@@ -458,8 +461,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
         private void markNotified() {
             notified = !animateFromObserver;
-//			if (DEBUG)
-//				log.v(TAG, "animateFromObserver=" + animateFromObserver + " notified=" + notified);
+            //log.v(TAG, "animateFromObserver=" + animateFromObserver + " notified=" + notified);
         }
 
         @Override

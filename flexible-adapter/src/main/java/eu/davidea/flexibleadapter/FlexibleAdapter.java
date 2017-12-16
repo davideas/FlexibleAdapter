@@ -43,8 +43,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
-import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.helpers.StickyHeaderHelper;
 import eu.davidea.flexibleadapter.items.IExpandable;
@@ -2164,8 +2162,8 @@ public class FlexibleAdapter<T extends IFlexible>
     /**
      * Automatically scroll the clicked expandable item to the first visible position.<br>
      * <p>Default value is {@code false} (disabled).</p>
-     * <b>Note:</b> This works ONLY in combination with {@link SmoothScrollLinearLayoutManager}
-     * or with {@link SmoothScrollGridLayoutManager}.
+     * <b>Note:</b> This works ONLY in combination with {@code SmoothScrollLinearLayoutManager}
+     * or with {@code SmoothScrollGridLayoutManager} available in UI extension.
      *
      * @param scrollOnExpand true to enable automatic scroll, false to disable
      * @return this Adapter, so the call can be chained
@@ -3770,7 +3768,7 @@ public class FlexibleAdapter<T extends IFlexible>
     /**
      * Sets the new search text.
      * <p><b>Note:</b> Text is always <b>trimmed</b> and <b>lowercase</b>.</p>
-     * <p><b>Tip:</b> You can highlight filtered Text or Words using {@code FlexibleUtils} from UI package:
+     * <p><b>Tip:</b> You can highlight filtered Text or Words using {@code FlexibleUtils} from UI extension:
      * <ul><li>{@code FlexibleUtils#highlightText(TextView, String, String)}</li>
      * <li>{@code FlexibleUtils#highlightWords(TextView, String, String)}</li></ul></p>
      *

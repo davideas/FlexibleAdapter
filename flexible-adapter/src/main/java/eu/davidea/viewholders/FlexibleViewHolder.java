@@ -205,7 +205,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
      * <p><b>Important note!</b> the selected background is visible if you added
      * {@code android:background="?attr/selectableItemBackground"} in the item layout <u>AND</u>
      * customized the file {@code style.xml}.</p>
-     * Alternatively, to set a background at runtime, you can use the new {@code DrawableUtils} from UI package.
+     * Alternatively, to set a background at runtime, you can use the new {@code DrawableUtils} from UI extension.
      * <p><b>Note:</b> This method must be called every time we want the activation state visible
      * on the itemView, for instance: after a Click (to add the item to the selection list) or
      * after a LongClick (to activate the ActionMode) or during dragging (to show that we enabled
