@@ -16,6 +16,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
@@ -72,7 +73,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
         FlexibleAdapter.useTag("InstagramHeadersAdapter");
         mAdapter = new FlexibleAdapter<>(null, getActivity(), true);
         mAdapter.addListener(getActivity())
-                .setAnimationOnScrolling(true)
+                .setAnimationOnForwardScrolling(true)
                 .setAnimationOnReverseScrolling(true);
         mRecyclerView = getView().findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
@@ -83,6 +84,9 @@ public class FragmentInstagramHeaders extends AbstractFragment
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         // Custom divider item decorator with 24dpi as empty space between sections
         mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity()).withDefaultDivider());
+
+        // New empty views handling
+        mAdapter.addListener(new EmptyViewHelper(mAdapter, getView().findViewById(R.id.empty_view)));
 
         mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
                 .setStickyHeaders(true) //Make headers sticky
@@ -161,7 +165,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_list_type)
-            mAdapter.setAnimationOnScrolling(true);
+            mAdapter.setAnimationOnForwardScrolling(true);
         return super.onOptionsItemSelected(item);
     }
 

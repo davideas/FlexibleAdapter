@@ -24,8 +24,6 @@ import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -33,13 +31,13 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import eu.davidea.flexibleadapter.R;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
-import eu.davidea.flexibleadapter.common.FlexibleLayoutManager;
+import eu.davidea.flexibleadapter.helpers.R;
 
 /**
  * @author Davide Steduto
  * @since 27/01/2016 Created
+ * <br>17/12/2017 Moved into UI package
  */
 @SuppressWarnings({"WeakerAccess", "unused", "ConstantConditions"})
 public final class FlexibleUtils {
@@ -276,88 +274,6 @@ public final class FlexibleUtils {
             androidAttr.recycle();
         }
         return colorAccent;
-    }
-
-    /*-------------------------------*/
-    /* RECYCLER-VIEW UTILITY METHODS */
-    /*-------------------------------*/
-
-    /**
-     * Finds the layout orientation of the RecyclerView, no matter which LayoutManager is in use.
-     *
-     * @param recyclerView the RecyclerView with LayoutManager instance in use
-     * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
-     */
-    public static int getOrientation(RecyclerView recyclerView) {
-        return new FlexibleLayoutManager(recyclerView).getOrientation();
-    }
-
-    /**
-     * Helper method to retrieve the number of the columns (span count) of the given LayoutManager.
-     * <p>All Layouts are supported.</p>
-     *
-     * @param recyclerView the RecyclerView with LayoutManager instance in use
-     * @return the span count
-     * @since 5.0.0-b7
-     */
-    public static int getSpanCount(RecyclerView recyclerView) {
-        return new FlexibleLayoutManager(recyclerView).getSpanCount();
-    }
-
-    /**
-     * Helper method to find the adapter position of the <b>first completely</b> visible view
-     * [for each span], no matter which Layout is.
-     *
-     * @param recyclerView the RecyclerView with LayoutManager instance in use
-     * @return the adapter position of the <b>first fully</b> visible item or {@code RecyclerView.NO_POSITION}
-     * if there aren't any visible items.
-     * @see #findFirstVisibleItemPosition(RecyclerView)
-     * @since 5.0.0-b8
-     */
-    public static int findFirstCompletelyVisibleItemPosition(RecyclerView recyclerView) {
-        return new FlexibleLayoutManager(recyclerView).findFirstCompletelyVisibleItemPosition();
-    }
-
-    /**
-     * Helper method to find the adapter position of the <b>first partially</b> visible view
-     * [for each span], no matter which Layout is.
-     *
-     * @param recyclerView the RecyclerView with LayoutManager instance in use
-     * @return the adapter position of the <b>first partially</b> visible item or {@code RecyclerView.NO_POSITION}
-     * if there aren't any visible items.
-     * @see #findFirstCompletelyVisibleItemPosition(RecyclerView)
-     * @since 5.0.0-rc1
-     */
-    public static int findFirstVisibleItemPosition(RecyclerView recyclerView) {
-        return new FlexibleLayoutManager(recyclerView).findFirstVisibleItemPosition();
-    }
-
-    /**
-     * Helper method to find the adapter position of the <b>last completely</b> visible view
-     * [for each span], no matter which Layout is.
-     *
-     * @param recyclerView the RecyclerView with LayoutManager instance in use
-     * @return the adapter position of the <b>last fully</b> visible item or {@code RecyclerView.NO_POSITION}
-     * if there aren't any visible items.
-     * @see #findLastVisibleItemPosition(RecyclerView)
-     * @since 5.0.0-b8
-     */
-    public static int findLastCompletelyVisibleItemPosition(RecyclerView recyclerView) {
-        return new FlexibleLayoutManager(recyclerView).findLastCompletelyVisibleItemPosition();
-    }
-
-    /**
-     * Helper method to find the adapter position of the <b>last partially</b> visible view
-     * [for each span], no matter which Layout is.
-     *
-     * @param recyclerView the RecyclerView with LayoutManager instance in use
-     * @return the adapter position of the <b>last partially</b> visible item or {@code RecyclerView.NO_POSITION}
-     * if there aren't any visible items.
-     * @see #findLastCompletelyVisibleItemPosition(RecyclerView)
-     * @since 5.0.0-rc1
-     */
-    public static int findLastVisibleItemPosition(RecyclerView recyclerView) {
-        return new FlexibleLayoutManager(recyclerView).findLastVisibleItemPosition();
     }
 
 }

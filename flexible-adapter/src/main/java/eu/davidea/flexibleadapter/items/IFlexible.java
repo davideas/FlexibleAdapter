@@ -223,4 +223,26 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      */
     void unbindViewHolder(FlexibleAdapter adapter, VH holder, int position);
 
+    /**
+     * Called when a view created by this adapter has been attached to a window.
+     * <p>This can be used as a reasonable signal that the view is about to be seen by the user.</p>
+     *
+     * @param adapter  the FlexibleAdapter instance
+     * @param holder   the ViewHolder instance being recycled
+     * @param position the current position
+     */
+    void onViewAttached(FlexibleAdapter adapter, VH holder, int position);
+
+    /**
+     * Called when a view created by this adapter has been detached from its window.
+     * <p>Becoming detached from the window is not necessarily a permanent condition; the consumer of an
+     * Adapter's views may choose to cache views offscreen while they are not visible, attaching and
+     * detaching them as appropriate.</p>
+     *
+     * @param adapter  the FlexibleAdapter instance
+     * @param holder   the ViewHolder instance being recycled
+     * @param position the current position
+     */
+    void onViewDetached(FlexibleAdapter adapter, VH holder, int position);
+
 }

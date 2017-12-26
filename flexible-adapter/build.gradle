@@ -5,7 +5,7 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 5
     minor 0
-    preRelease "SNAPSHOT"
+    preRelease "rc4"
 }
 // For maven repository
 version = versioning.name
@@ -41,8 +41,7 @@ android {
 }
 
 dependencies {
-    compileOnly supportLib.recyclerView
-    implementation supportLib.design
+    implementation supportLib.recyclerView
 }
 
 if (project.hasProperty('all') || project.hasProperty('adapter')) {

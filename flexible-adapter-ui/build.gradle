@@ -39,7 +39,7 @@ android {
 }
 
 dependencies {
-    implementation supportLib.recyclerView
+    compileOnly project(':flexible-adapter')
     implementation supportLib.design
 }
 

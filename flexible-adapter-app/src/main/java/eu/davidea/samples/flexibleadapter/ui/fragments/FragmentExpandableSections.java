@@ -13,6 +13,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ui.ExampleAdapter;
@@ -75,7 +76,7 @@ public class FragmentExpandableSections extends AbstractFragment {
                 .setAutoScrollOnExpand(true)
                 .setAnimateToLimit(Integer.MAX_VALUE) //Size limit = MAX_VALUE will always animate the changes
                 .setNotifyMoveOfFilteredItems(true) //When true, filtering on big list is very slow!
-                .setAnimationOnScrolling(DatabaseConfiguration.animateOnScrolling)
+                .setAnimationOnForwardScrolling(DatabaseConfiguration.animateOnForwardScrolling)
                 .setAnimationOnReverseScrolling(true);
         mRecyclerView = getView().findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
@@ -93,6 +94,12 @@ public class FragmentExpandableSections extends AbstractFragment {
         FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
         fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
         mAdapter.setFastScroller(fastScroller);
+
+        // New empty views handling, to set after FastScroller
+        mAdapter.addListener(new EmptyViewHelper(mAdapter,
+                getView().findViewById(R.id.empty_view),
+                getView().findViewById(R.id.filter_view)));
+
         mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
                 .setHandleDragEnabled(true) //Enable handle drag
                 //.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable AND expanded at startup)
@@ -161,7 +168,7 @@ public class FragmentExpandableSections extends AbstractFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_list_type)
-            mAdapter.setAnimationOnScrolling(true);
+            mAdapter.setAnimationOnForwardScrolling(true);
         return super.onOptionsItemSelected(item);
     }
 

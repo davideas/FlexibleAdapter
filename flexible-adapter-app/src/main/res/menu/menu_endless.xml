@@ -21,8 +21,8 @@
 	      android:checkable="true"
 	      app:showAsAction="never"/>
 
-	<item android:id="@+id/action_animation"
-		  android:title="@string/scrolling_animation"
+	<item android:id="@+id/action_forward"
+		  android:title="@string/forward_scrolling"
 		  android:checkable="true"
 		  android:checked="true"
 		  app:showAsAction="never"/>

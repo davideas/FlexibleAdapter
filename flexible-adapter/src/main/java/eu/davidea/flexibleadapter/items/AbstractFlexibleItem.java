@@ -30,6 +30,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @author Davide Steduto
  * @since 20/01/2016 Created
  * <br>21/04/2017 ViewHolders methods are now abstract
+ * <br>08/12/2017 new callback methods when view is attached/detached/recycled
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
@@ -41,7 +42,7 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
 
 	/*---------------*/
     /* BASIC METHODS */
-	/*---------------*/
+    /*---------------*/
 
     /**
      * You <b>MUST</b> implement this method to compare items <b>unique</b> identifiers.
@@ -174,6 +175,20 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
      */
     @Override
     public void unbindViewHolder(FlexibleAdapter adapter, VH holder, int position) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onViewAttached(FlexibleAdapter adapter, VH holder, int position) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onViewDetached(FlexibleAdapter adapter, VH holder, int position) {
     }
 
 }

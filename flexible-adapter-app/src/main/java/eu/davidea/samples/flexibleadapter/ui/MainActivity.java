@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
@@ -45,6 +46,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.helpers.ActionModeHelper;
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flexibleadapter.helpers.UndoHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
@@ -106,7 +108,7 @@ import eu.davidea.utils.Utils;
 @SuppressWarnings({"ConstantConditions", "unchecked"})
 public class MainActivity extends AppCompatActivity implements
         ActionMode.Callback, EditItemDialog.OnEditItemListener, SearchView.OnQueryTextListener,
-        FlexibleAdapter.OnUpdateListener, UndoHelper.OnUndoListener,
+        UndoHelper.OnActionListener, EmptyViewHelper.OnEmptyViewListener,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener,
         FlexibleAdapter.OnItemMoveListener, FlexibleAdapter.OnItemSwipeListener,
         FastScroller.OnScrollStateChangeListener,
@@ -140,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements
     /*
      * Operations for Handler.
      */
-    private static final int REFRESH_STOP = 0, REFRESH_STOP_WITH_UPDATE = 1, REFRESH_START = 2, SHOW_EMPTY_VIEW = 3;
+    private static final int REFRESH_STOP = 0, REFRESH_STOP_WITH_UPDATE = 1, REFRESH_START = 2;
 
     private final Handler mRefreshHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
         public boolean handleMessage(Message message) {
@@ -152,9 +154,6 @@ public class MainActivity extends AppCompatActivity implements
                     return true;
                 case REFRESH_START: // Start
                     mSwipeRefreshLayout.setRefreshing(true);
-                    return true;
-                case SHOW_EMPTY_VIEW: // Show empty view
-                    ViewCompat.animate(findViewById(R.id.empty_view)).alpha(1);
                     return true;
                 default:
                     return false;
@@ -189,10 +188,6 @@ public class MainActivity extends AppCompatActivity implements
         initializeFab();
         // Initialize Fragment containing Adapter & RecyclerView
         initializeFragment(savedInstanceState);
-
-        // With FlexibleAdapter v5.0.0 we don't need to call this function anymore
-        // It is automatically called if Activity implements FlexibleAdapter.OnUpdateListener
-        //updateEmptyView();
     }
 
     @Override
@@ -552,14 +547,13 @@ public class MainActivity extends AppCompatActivity implements
             stickyItem.setChecked(mAdapter.areHeadersSticky());
         }
         // Scrolling Animations?
-        MenuItem animationMenuItem = menu.findItem(R.id.action_animation);
+        MenuItem animationMenuItem = menu.findItem(R.id.action_forward);
         if (animationMenuItem != null) {
-            animationMenuItem.setChecked(DatabaseConfiguration.animateOnScrolling);
+            animationMenuItem.setChecked(DatabaseConfiguration.animateOnForwardScrolling);
         }
         // Reverse scrolling animation?
         MenuItem reverseMenuItem = menu.findItem(R.id.action_reverse);
         if (reverseMenuItem != null) {
-            reverseMenuItem.setEnabled(mAdapter.isAnimationOnScrollingEnabled());
             reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrollingEnabled());
         }
         return super.onPrepareOptionsMenu(menu);
@@ -572,18 +566,18 @@ public class MainActivity extends AppCompatActivity implements
             DatabaseConfiguration.animateOnUpdate = !DatabaseConfiguration.animateOnUpdate;
             item.setChecked(DatabaseConfiguration.animateOnUpdate);
             Snackbar.make(findViewById(R.id.main_view), (DatabaseConfiguration.animateOnUpdate ? "Enabled" : "Disabled") +
-                    " animation on update, now refresh!\n(P = persistent)", Snackbar.LENGTH_SHORT).show();
-        } else if (id == R.id.action_animation) {
-            if (mAdapter.isAnimationOnScrollingEnabled()) {
-                DatabaseConfiguration.animateOnScrolling = false;
-                mAdapter.setAnimationOnScrolling(false);
+                    " animation on update, now refresh!\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+        } else if (id == R.id.action_forward) {
+            if (mAdapter.isAnimationOnForwardScrollingEnabled()) {
+                DatabaseConfiguration.animateOnForwardScrolling = false;
+                mAdapter.setAnimationOnForwardScrolling(false);
                 item.setChecked(false);
-                Snackbar.make(findViewById(R.id.main_view), "Disabled scrolling animation, now reopen the page\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.main_view), "Disabled forward scrolling animation\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
             } else {
-                DatabaseConfiguration.animateOnScrolling = true;
-                mAdapter.setAnimationOnScrolling(true);
+                DatabaseConfiguration.animateOnForwardScrolling = true;
+                mAdapter.setAnimationOnForwardScrolling(true);
                 item.setChecked(true);
-                Snackbar.make(findViewById(R.id.main_view), "Enabled scrolling animation, now reopen the page\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.main_view), "Enabled forward scrolling animation\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
             }
         } else if (id == R.id.action_reverse) {
             if (mAdapter.isAnimationOnReverseScrollingEnabled()) {
@@ -694,9 +688,15 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             // Notify the active callbacks or implement a custom action onClick
             if (flexibleItem instanceof SimpleItem || flexibleItem instanceof SubItem) {
-                //TODO FOR YOU: call your custom Action on item click
-                String title = extractTitleFrom(flexibleItem);
-                EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
+                mRecyclerView.postDelayed(() -> {
+                    Log.d("scroll to position=%s item=%s", position, mAdapter.getItem(position));
+                    int headers = mAdapter.areHeadersSticky() ? 1 : 0;
+                    mRecyclerView.smoothScrollToPosition(Math.max(0, position - headers));
+                }, 300L);
+
+//                //TODO FOR YOU: call your custom Action on item click
+//                String title = extractTitleFrom(flexibleItem);
+//                EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
             }
             return false;
         }
@@ -748,8 +748,7 @@ public class MainActivity extends AppCompatActivity implements
         //   2) remove the item from the adapter
 
         // Create list for single position (only in onItemSwipe)
-        List<Integer> positions = new ArrayList<>(1);
-        positions.add(position);
+        List<Integer> positions = Collections.singletonList(position);
         // Build the message
         IFlexible abstractItem = mAdapter.getItem(position);
         StringBuilder message = new StringBuilder();
@@ -774,10 +773,10 @@ public class MainActivity extends AppCompatActivity implements
 
             mAdapter.setPermanentDelete(false);
             new UndoHelper(mAdapter, this)
-                    .withPayload(Payload.CHANGE)     //You can provide any custom object
-                    .withConsecutive(true)           //Commit the previous action
-                    .withAction(UndoHelper.ACTION_UPDATE) //Specify the action
-                    .withActionTextColor(actionTextColor) //Change color of the action text
+                    .withPayload(Payload.CHANGE)          // You can provide any custom object
+                    .withConsecutive(false)               // Keep all previous archived items until time out
+                    .withAction(UndoHelper.Action.UPDATE) // Specify the action
+                    .withActionTextColor(actionTextColor) // Change color of the action text
                     .start(positions, findViewById(R.id.main_view), R.string.action_archived,
                             R.string.undo, UndoHelper.UNDO_TIMEOUT);
 
@@ -789,8 +788,8 @@ public class MainActivity extends AppCompatActivity implements
             mAdapter.setPermanentDelete(false);
 
             new UndoHelper(mAdapter, this)
-                    .withPayload(null)     //You can provide any custom object
-                    .withConsecutive(true) //Commit the previous action
+                    .withPayload(null)     // You can provide any custom object
+                    .withConsecutive(true) // Commit the previous action
                     .start(positions, findViewById(R.id.main_view), message,
                             getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
 
@@ -809,51 +808,50 @@ public class MainActivity extends AppCompatActivity implements
      * are placed in the Layout, is important!</p>
      */
     @Override
-    public void onUpdateEmptyView(int size) {
-        Log.d("onUpdateEmptyView size=%s", size);
-        // #454- Can't take fastScroller from Adapter, since this callback occurs before setting it
-        FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
-        View emptyView = findViewById(R.id.empty_view);
-        TextView emptyText = (TextView) findViewById(R.id.empty_text);
-        if (emptyText != null)
-            emptyText.setText(getString(R.string.no_items));
-        if (size > 0) {
-            if (fastScroller != null) fastScroller.showScrollbar();
-            emptyView.setAlpha(0);
-        } else if (emptyView.getAlpha() == 0) {
-            mRefreshHandler.sendEmptyMessage(SHOW_EMPTY_VIEW);
-            if (fastScroller != null) fastScroller.hideScrollbar();
-        }
+    public void onUpdateEmptyDataView(int size) {
         if (mAdapter != null && !mAdapter.isRestoreInTime() &&
                 DatabaseService.getInstance().getDatabaseType() != DatabaseType.DATA_BINDING) {
-            String message = (mAdapter.hasSearchText() ? "Filtered " : "Refreshed ");
-            message += size + " items in " + mAdapter.getTime() + "ms";
+            String message = "Refreshed " + size + " items in " + mAdapter.getTime() + "ms";
             Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onActionCanceled(@UndoHelper.Action int action) {
-        if (action == UndoHelper.ACTION_UPDATE) {
-            //TODO: Complete click animation on swiped item. NotifyItem changed to display rear view as front, so user can press undo on the item
-//			final RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForLayoutPosition(mSwipedPosition);
-//			if (holder instanceof ItemTouchHelperCallback.ViewHolderCallback) {
-//				final View view = ((ItemTouchHelperCallback.ViewHolderCallback) holder).getFrontView();
-//              view.setVisibility(View.VISIBLE);
-//				Animator animator = ObjectAnimator.ofFloat(view, "translationX", view.getTranslationX(), 0);
-//				animator.addListener(new SimpleAnimatorListener() {
-//					@Override
-//					public void onAnimationCancel(Animator animation) {
-//						view.setTranslationX(0);
-//					}
-//				});
-//				animator.start();
-//			}
+    public void onUpdateEmptyFilterView(int size) {
+        if (mAdapter != null && !mAdapter.isRestoreInTime() &&
+                DatabaseService.getInstance().getDatabaseType() != DatabaseType.DATA_BINDING) {
+            String message = "Filtered " + size + " items in " + mAdapter.getTime() + "ms";
+            Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
+        }
+    }
 
-            // Custom action is restore deleted items
-            mAdapter.restoreDeletedItems();
+    @Override
+    public void onActionCanceled(@UndoHelper.Action int action, List<Integer> positions) {
+        if (action == UndoHelper.Action.UPDATE) {
+            //TODO: Complete back animation on swiped item.
+//            for (int position : positions) {
+//                final RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForLayoutPosition(position);
+//                if (holder instanceof ItemTouchHelperCallback.ViewHolderCallback) {
+//                    ItemTouchHelperCallback.ViewHolderCallback viewCallBack = ((ItemTouchHelperCallback.ViewHolderCallback) holder);
+//                    final View view = viewCallBack.getFrontView();
+//                    view.setVisibility(View.VISIBLE);
+//                    Animator animator = ObjectAnimator.ofFloat(view, "translationX", view.getTranslationX(), 0);
+//                    animator.addListener(new SimpleAnimatorListener() {
+//                        @Override
+//                        public void onAnimationEnd(Animator animation) {
+//                            mAdapter.notifyItemChanged(position);
+//                        }
+//                    });
+//                    animator.start();
+//                }
+//            }
 
-        } else if (action == UndoHelper.ACTION_REMOVE) {
+            // Custom action is update archived items (not removed)
+            for (int position : positions) {
+                mAdapter.notifyItemChanged(position);
+            }
+
+        } else if (action == UndoHelper.Action.REMOVE) {
             // Custom action is restore deleted items
             mAdapter.restoreDeletedItems();
             // Disable Refreshing
@@ -867,6 +865,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onActionConfirmed(@UndoHelper.Action int action, int event) {
+        if (action == UndoHelper.Action.UPDATE) {
+            mAdapter.removeItems(mAdapter.getUndoPositions());
+        }
         // Disable Refreshing
         mRefreshHandler.sendEmptyMessage(REFRESH_STOP);
         // Removing items from FlexibleDatabase. Example:

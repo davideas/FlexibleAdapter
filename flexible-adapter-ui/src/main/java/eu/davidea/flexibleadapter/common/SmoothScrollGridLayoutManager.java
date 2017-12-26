@@ -16,24 +16,25 @@
 package eu.davidea.flexibleadapter.common;
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 /**
- * Optimized implementation of LinearLayoutManager to SmoothScroll to a Top position.
+ * Optimized implementation of GridLayoutManager to SmoothScroll to a Top position.
  *
- * @since 5.0.0-b1
+ * @since 5.0.0-b6
+ * <br>17/12/2017 Moved into UI package
  */
-public class SmoothScrollLinearLayoutManager extends LinearLayoutManager implements IFlexibleLayoutManager {
+public class SmoothScrollGridLayoutManager extends GridLayoutManager implements IFlexibleLayoutManager {
 
     private RecyclerView.SmoothScroller mSmoothScroller;
 
-    public SmoothScrollLinearLayoutManager(Context context) {
-        this(context, VERTICAL, false);
+    public SmoothScrollGridLayoutManager(Context context, int spanCount) {
+        this(context, spanCount, VERTICAL, false);
     }
 
-    public SmoothScrollLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
-        super(context, orientation, reverseLayout);
+    public SmoothScrollGridLayoutManager(Context context, int spanCount, int orientation, boolean reverseLayout) {
+        super(context, spanCount, orientation, reverseLayout);
         mSmoothScroller = new TopSnappedSmoothScroller(context, this);
     }
 
@@ -43,8 +44,4 @@ public class SmoothScrollLinearLayoutManager extends LinearLayoutManager impleme
         startSmoothScroll(mSmoothScroller);
     }
 
-    @Override
-    public int getSpanCount() {
-        return 1;
-    }
 }

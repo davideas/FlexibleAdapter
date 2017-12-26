@@ -13,6 +13,7 @@ import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ui.MainActivity;
@@ -109,7 +110,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
                 .setNotifyMoveOfFilteredItems(DatabaseConfiguration.notifyMove)
                 .setNotifyChangeOfUnfilteredItems(DatabaseConfiguration.notifyChange)
                 .setAnimationInitialDelay(100L)
-                .setAnimationOnScrolling(true)
+                .setAnimationOnForwardScrolling(true)
                 .setAnimationOnReverseScrolling(true)
                 .setOnlyEntryAnimation(true);
         if (mRecyclerView == null) {
@@ -134,6 +135,8 @@ public class FragmentAsyncFilter extends AbstractFragment {
         if (configure) {
             mFab.setImageResource(R.drawable.ic_check_white_24dp);
             mRecyclerView.addItemDecoration(mDivider);
+            FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
+            fastScroller.setEnabled(false);
         } else {
             mFab.setImageResource(R.drawable.ic_settings_white_24dp);
             mRecyclerView.removeItemDecoration(mDivider);
@@ -141,6 +144,13 @@ public class FragmentAsyncFilter extends AbstractFragment {
             fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
             mAdapter.setFastScroller(fastScroller);
         }
+
+        // New empty views handling, to set after FastScroller
+        mAdapter.addListener(new EmptyViewHelper(mAdapter,
+                getView().findViewById(R.id.empty_view),
+                getView().findViewById(R.id.filter_view),
+                (EmptyViewHelper.OnEmptyViewListener) getActivity()) // Optional!!
+        );
 
         // Settings for FlipView
         FlipView.stopLayoutAnimation();
@@ -185,9 +195,9 @@ public class FragmentAsyncFilter extends AbstractFragment {
 
     private void hideFab() {
         ViewCompat.animate(mFab)
-                  .scaleX(0f).scaleY(0f)
-                  .alpha(0f).setDuration(50)
-                  .start();
+                .scaleX(0f).scaleY(0f)
+                .alpha(0f).setDuration(50)
+                .start();
     }
 
     private void showFab(long delay) {
@@ -195,9 +205,9 @@ public class FragmentAsyncFilter extends AbstractFragment {
             @Override
             public void run() {
                 ViewCompat.animate(mFab)
-                          .scaleX(1f).scaleY(1f)
-                          .alpha(1f).setDuration(200)
-                          .start();
+                        .scaleX(1f).scaleY(1f)
+                        .alpha(1f).setDuration(200)
+                        .start();
             }
         }, delay);
     }
