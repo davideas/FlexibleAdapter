@@ -27,7 +27,8 @@ import java.util.List;
 
 /**
  * @author Davide Steduto
- * @since 05/09/2016
+ * @since 05/09/2016 Created
+ * <br>17/12/2017 Moved into UI package
  */
 public class AnimatorHelper {
 
@@ -41,7 +42,7 @@ public class AnimatorHelper {
      * @param animators user defined list of animators
      * @param view      itemView to animate
      * @param alphaFrom starting alpha value
-     * @since 5.0.0-b1
+     * @since 1.0.0-b1
      */
     public static void alphaAnimator(
             @NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float alphaFrom) {
@@ -55,7 +56,7 @@ public class AnimatorHelper {
      * @param animators user defined list of animators
      * @param view      itemView to animate
      * @param percent   any % multiplier (between 0 and 1) of the LayoutManager Width
-     * @since 5.0.0-b1
+     * @since 1.0.0-b1
      */
     public static void slideInFromLeftAnimator(
             @NonNull List<Animator> animators, @NonNull View view,
@@ -71,7 +72,7 @@ public class AnimatorHelper {
      * @param animators user defined list of animators
      * @param view      ItemView to animate
      * @param percent   Any % multiplier (between 0 and 1) of the LayoutManager Width
-     * @since 5.0.0-b1
+     * @since 1.0.0-b1
      */
     public static void slideInFromRightAnimator(
             @NonNull List<Animator> animators, @NonNull View view,
@@ -86,7 +87,7 @@ public class AnimatorHelper {
      *
      * @param animators user defined list of animators
      * @param view      itemView to animate
-     * @since 5.0.0-b7
+     * @since 1.0.0-b1
      */
     public static void slideInFromTopAnimator(
             @NonNull List<Animator> animators, @NonNull View view,
@@ -101,7 +102,7 @@ public class AnimatorHelper {
      *
      * @param animators user defined list of animators
      * @param view      itemView to animate
-     * @since 5.0.0-b1
+     * @since 1.0.0-b1
      */
     public static void slideInFromBottomAnimator(
             @NonNull List<Animator> animators, @NonNull View view,
@@ -117,7 +118,7 @@ public class AnimatorHelper {
      * @param animators user defined list of animators
      * @param view      itemView to animate
      * @param scaleFrom initial scale value
-     * @since 5.0.0-b1
+     * @since 1.0.0-b1
      */
     public static void scaleAnimator(
             @NonNull List<Animator> animators, @NonNull View view, @FloatRange(from = 0.0, to = 1.0) float scaleFrom) {
@@ -132,7 +133,7 @@ public class AnimatorHelper {
      *
      * @param animators user defined list of animators
      * @param view      itemView to animate
-     * @since 5.0.0-rc1
+     * @since 1.0.0-b1
      */
     public static void flipAnimator(@NonNull List<Animator> animators, @NonNull View view) {
         alphaAnimator(animators, view, 0f);
@@ -145,6 +146,7 @@ public class AnimatorHelper {
      *
      * @param animators user defined list of animators
      * @param duration  duration in milliseconds
+     * @since 1.0.0-b1
      */
     public static void setDuration(@NonNull List<Animator> animators, @IntRange(from = 0) long duration) {
         if (animators.size() > 0) {

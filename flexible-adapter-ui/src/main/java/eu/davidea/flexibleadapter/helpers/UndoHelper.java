@@ -38,6 +38,7 @@ import eu.davidea.flexibleadapter.utils.Log;
  * @author Davide Steduto
  * @since 30/04/2016 Created
  * <br>07/12/2017 Better use of OnActionListener
+ * <br>17/12/2017 Moved into UI package
  */
 @SuppressWarnings("WeakerAccess")
 public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnDeleteCompleteListener {

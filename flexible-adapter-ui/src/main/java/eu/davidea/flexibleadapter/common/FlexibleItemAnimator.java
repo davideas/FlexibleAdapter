@@ -45,6 +45,7 @@ import eu.davidea.viewholders.AnimatedViewHolder;
  * a RecyclerView. RecyclerView uses a DefaultItemAnimator by default.
  *
  * @see RecyclerView#setItemAnimator(RecyclerView.ItemAnimator)
+ * @since 17/12/2017 Moved into UI package
  */
 public class FlexibleItemAnimator extends SimpleItemAnimator {
 
