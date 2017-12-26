@@ -15,6 +15,7 @@ import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.databinding.BindingFlexibleAdapter;
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
@@ -100,6 +101,12 @@ public class FragmentDataBinding extends AbstractFragment {
         // Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
         FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
         mAdapter.setFastScroller(fastScroller);
+
+        // New empty views handling, to set after FastScroller
+        mAdapter.addListener(new EmptyViewHelper(mAdapter,
+                getView().findViewById(R.id.empty_view),
+                getView().findViewById(R.id.filter_view)));
+
         mAdapter.setLongPressDragEnabled(true)
                 .setHandleDragEnabled(true)
                 .setSwipeEnabled(true)

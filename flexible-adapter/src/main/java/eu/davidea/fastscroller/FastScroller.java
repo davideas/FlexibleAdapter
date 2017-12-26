@@ -27,6 +27,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -102,7 +103,7 @@ public class FastScroller extends FrameLayout {
 
 	/*--------------*/
     /* CONSTRUCTORS */
-	/*--------------*/
+    /*--------------*/
 
     public FastScroller(Context context) {
         super(context);
@@ -631,6 +632,7 @@ public class FastScroller extends FrameLayout {
         }
 
         public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+            mFastScroller = null;
             mRecyclerView = null;
         }
 
@@ -659,7 +661,8 @@ public class FastScroller extends FrameLayout {
          * @return the current instance of the {@link FastScroller} object
          * @since 5.0.0-b1
          */
-        public FastScroller getFastScroller() {
+        public @Nullable
+        FastScroller getFastScroller() {
             return mFastScroller;
         }
 
@@ -673,22 +676,26 @@ public class FastScroller extends FrameLayout {
          * @since 5.0.0-b6
          */
         @SuppressWarnings("ConstantConditions")
-        public void setFastScroller(@NonNull FastScroller fastScroller) {
+        public void setFastScroller(@Nullable FastScroller fastScroller) {
             if (DEBUG) {
                 Log.v(TAG, "Setting FastScroller...");
             }
             if (mRecyclerView == null) {
                 throw new IllegalStateException("RecyclerView cannot be null. Setup FastScroller after the Adapter has been added to the RecyclerView.");
-            } else if (fastScroller == null) {
-                throw new IllegalArgumentException("FastScroller cannot be null. Review the widget ID of the FastScroller.");
+            } else if (fastScroller != null) {
+                mFastScroller = fastScroller;
+                mFastScroller.setRecyclerView(mRecyclerView);
+                mFastScroller.setEnabled(true);
+                mFastScroller.setViewsToUse(
+                        R.layout.library_fast_scroller_layout,
+                        R.id.fast_scroller_bubble,
+                        R.id.fast_scroller_handle);
+                if (DEBUG) Log.i(TAG, "FastScroller initialized");
+            } else if (mFastScroller != null) {
+                mFastScroller.setEnabled(false);
+                mFastScroller = null;
+                if (DEBUG) Log.i(TAG, "FastScroller removed");
             }
-            mFastScroller = fastScroller;
-            mFastScroller.setRecyclerView(mRecyclerView);
-            mFastScroller.setViewsToUse(
-                    R.layout.library_fast_scroller_layout,
-                    R.id.fast_scroller_bubble,
-                    R.id.fast_scroller_handle);
-            if (DEBUG) Log.i(TAG, "FastScroller initialized");
         }
     }
 

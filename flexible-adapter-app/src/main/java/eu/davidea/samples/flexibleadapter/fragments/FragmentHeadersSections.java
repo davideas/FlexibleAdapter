@@ -16,6 +16,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flipview.FlipView;
@@ -104,6 +105,14 @@ public class FragmentHeadersSections extends AbstractFragment
         fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
         mAdapter.setFastScroller(fastScroller);
 
+        // New empty views handling, to set after FastScroller
+        mAdapter.addListener(new EmptyViewHelper(mAdapter,
+                getView().findViewById(R.id.empty_view),
+                getView().findViewById(R.id.filter_view),
+                (EmptyViewHelper.OnEmptyViewListener) getActivity()) // Optional!!
+        );
+
+        // More settings
         mAdapter.setLongPressDragEnabled(true)
                 .setHandleDragEnabled(true)
                 .setSwipeEnabled(true)

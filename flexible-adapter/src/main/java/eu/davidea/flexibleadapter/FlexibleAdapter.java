@@ -165,6 +165,7 @@ public class FlexibleAdapter<T extends IFlexible>
     public OnItemClickListener mItemClickListener;
     public OnItemLongClickListener mItemLongClickListener;
     protected OnUpdateListener mUpdateListener;
+    protected OnFilterListener mFilterListener;
     protected OnItemMoveListener mItemMoveListener;
     protected OnItemSwipeListener mItemSwipeListener;
     protected EndlessScrollListener mEndlessScrollListener;
@@ -300,6 +301,10 @@ public class FlexibleAdapter<T extends IFlexible>
             mUpdateListener = (OnUpdateListener) listener;
             mUpdateListener.onUpdateEmptyView(getMainItemCount());
         }
+        if (listener instanceof OnFilterListener) {
+            log.i("- OnFilterListener");
+            mFilterListener = (OnFilterListener) listener;
+        }
         return this;
     }
 
@@ -359,6 +364,10 @@ public class FlexibleAdapter<T extends IFlexible>
         if (listener instanceof OnUpdateListener || listener == OnUpdateListener.class) {
             mUpdateListener = null;
             log.i("Removed %s as OnUpdateListener", className);
+        }
+        if (listener instanceof OnFilterListener || listener == OnFilterListener.class) {
+            mFilterListener = null;
+            log.i("Removed %s as OnFilterListener", className);
         }
         return this;
     }
@@ -4283,8 +4292,7 @@ public class FlexibleAdapter<T extends IFlexible>
         mNotifications = null;
         setScrollAnimate(true);
 
-        time = System.currentTimeMillis();
-        time = time - start;
+        time = System.currentTimeMillis() - start;
         log.i("Animate changes DONE in %sms", time);
     }
 
@@ -4917,7 +4925,7 @@ public class FlexibleAdapter<T extends IFlexible>
      */
     public interface OnUpdateListener {
         /**
-         * Called at startup and every time a main item is inserted, removed or filtered.
+         * Called at startup and every time a main item is inserted or removed.
          * <p><b>Note:</b> Having any Scrollable Headers/Footers visible, the {@code size}
          * will represents only the <b>main</b> items.</p>
          *
@@ -4926,6 +4934,19 @@ public class FlexibleAdapter<T extends IFlexible>
          * @since 5.0.0-b1
          */
         void onUpdateEmptyView(int size);
+    }
+
+    /**
+     * @since 26/12/2017
+     */
+    public interface OnFilterListener {
+        /**
+         * Called at each filter request.
+         *
+         * @param size the current number of <b>filtered</b> items.
+         * @since 5.0.0
+         */
+        void onUpdateFilterView(int size);
     }
 
     /**
@@ -5332,8 +5353,8 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * This method is called after the execution of Async Update, it calls the
-     * implementation of the {@link OnUpdateListener} for the emptyView.
+     * This method is called only in case of granular notifications (not when notifyDataSetChanged) and after the
+     * execution of Async Update, it calls the implementation of the {@link OnUpdateListener} for the emptyView.
      *
      * @see #updateDataSet(List, boolean)
      */
@@ -5346,15 +5367,15 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * This method is called after the execution of Async Filter, it calls the
-     * implementation of the {@link OnUpdateListener} for the emptyView.
+     * implementation of the {@link OnFilterListener} for the filterView.
      *
      * @see #filterItems(List)
      */
     @CallSuper
     protected void onPostFilter() {
-        // Call listener to update EmptyView, assuming the filter always made a change
-        if (mUpdateListener != null)
-            mUpdateListener.onUpdateEmptyView(getMainItemCount());
+        // Call listener to update FilterView, assuming the filter always made a change
+        if (mFilterListener != null)
+            mFilterListener.onUpdateFilterView(getMainItemCount());
     }
 
     /**

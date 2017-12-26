@@ -46,6 +46,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.helpers.ActionModeHelper;
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flexibleadapter.helpers.UndoHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
@@ -105,7 +106,7 @@ import eu.davidea.utils.Utils;
 @SuppressWarnings({"ConstantConditions", "unchecked"})
 public class MainActivity extends AppCompatActivity implements
         ActionMode.Callback, EditItemDialog.OnEditItemListener, SearchView.OnQueryTextListener,
-        FlexibleAdapter.OnUpdateListener, UndoHelper.OnActionListener,
+        UndoHelper.OnActionListener, EmptyViewHelper.OnEmptyViewListener,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener,
         FlexibleAdapter.OnItemMoveListener, FlexibleAdapter.OnItemSwipeListener,
         FastScroller.OnScrollStateChangeListener,
@@ -139,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements
     /*
      * Operations for Handler.
      */
-    private static final int REFRESH_STOP = 0, REFRESH_STOP_WITH_UPDATE = 1, REFRESH_START = 2, SHOW_EMPTY_VIEW = 3;
+    private static final int REFRESH_STOP = 0, REFRESH_STOP_WITH_UPDATE = 1, REFRESH_START = 2;
 
     private final Handler mRefreshHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
         public boolean handleMessage(Message message) {
@@ -151,9 +152,6 @@ public class MainActivity extends AppCompatActivity implements
                     return true;
                 case REFRESH_START: // Start
                     mSwipeRefreshLayout.setRefreshing(true);
-                    return true;
-                case SHOW_EMPTY_VIEW: // Show empty view
-                    ViewCompat.animate(findViewById(R.id.empty_view)).alpha(1);
                     return true;
                 default:
                     return false;
@@ -188,10 +186,6 @@ public class MainActivity extends AppCompatActivity implements
         initializeFab();
         // Initialize Fragment containing Adapter & RecyclerView
         initializeFragment(savedInstanceState);
-
-        // With FlexibleAdapter v5.0.0 we don't need to call this function anymore
-        // It is automatically called if Activity implements FlexibleAdapter.OnUpdateListener
-        //updateEmptyView();
     }
 
     @Override
@@ -812,25 +806,19 @@ public class MainActivity extends AppCompatActivity implements
      * are placed in the Layout, is important!</p>
      */
     @Override
-    public void onUpdateEmptyView(int size) {
-        Log.d("onUpdateEmptyView size=%s", size);
-        // #454- Can't take fastScroller from Adapter, since this callback occurs before setting it
-        FastScroller fastScroller = (FastScroller) findViewById(R.id.fast_scroller);
-        View emptyView = findViewById(R.id.empty_view);
-        TextView emptyText = (TextView) findViewById(R.id.empty_text);
-        if (emptyText != null)
-            emptyText.setText(getString(R.string.no_items));
-        if (size > 0) {
-            if (fastScroller != null) fastScroller.showScrollbar();
-            emptyView.setAlpha(0);
-        } else if (emptyView.getAlpha() == 0) {
-            mRefreshHandler.sendEmptyMessage(SHOW_EMPTY_VIEW);
-            if (fastScroller != null) fastScroller.hideScrollbar();
-        }
+    public void onUpdateEmptyDataView(int size) {
         if (mAdapter != null && !mAdapter.isRestoreInTime() &&
                 DatabaseService.getInstance().getDatabaseType() != DatabaseType.DATA_BINDING) {
-            String message = (mAdapter.hasSearchText() ? "Filtered " : "Refreshed ");
-            message += size + " items in " + mAdapter.getTime() + "ms";
+            String message = "Refreshed " + size + " items in " + mAdapter.getTime() + "ms";
+            Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onUpdateEmptyFilterView(int size) {
+        if (mAdapter != null && !mAdapter.isRestoreInTime() &&
+                DatabaseService.getInstance().getDatabaseType() != DatabaseType.DATA_BINDING) {
+            String message = "Filtered " + size + " items in " + mAdapter.getTime() + "ms";
             Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
         }
     }

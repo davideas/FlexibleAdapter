@@ -193,11 +193,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         return this;
     }
 
-    @Deprecated
-    public AnimatorAdapter setAnimationOnScrolling(boolean enabled) {
-        return setAnimationOnForwardScrolling(enabled);
-    }
-
     /**
      * Enables/Disables item animation while forward scrolling and on loading.
      * <br>Enabling forward scrolling will disable {@code onlyEntryAnimation}.
@@ -217,11 +212,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         if (enabled) this.onlyEntryAnimation = false;
         isForwardEnabled = enabled;
         return this;
-    }
-
-    @Deprecated
-    public boolean isAnimationOnScrollingEnabled() {
-        return isForwardEnabled;
     }
 
     /**
