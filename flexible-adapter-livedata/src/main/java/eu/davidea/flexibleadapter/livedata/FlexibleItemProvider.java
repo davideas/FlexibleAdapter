@@ -131,8 +131,8 @@ public class FlexibleItemProvider<Model, AdapterItem> {
          * with headers and is <b>optional</b>: depends if you have correctly implemented the {@code equals()}
          * and {@code hashCode()} methods, but is preferable to have a unique instance of each header!
          *
-         * @param model the original model object from Repository.
-         * @return The Flexible item
+         * @param model the original model object from Repository
+         * @return The Flexible item, or null to skip it, if the item will be added automatically by the Adapter
          */
         @Nullable
         Flexible create(Model model);
