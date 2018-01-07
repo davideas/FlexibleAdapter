@@ -1406,7 +1406,7 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Sets if all headers should be shown at startup.
+     * Sets if all headers should be shown at startup by the Adapter automatically.
      * <p>If called, this method won't trigger {@code notifyItemInserted()} and scrolling
      * animations are instead performed if the header item was configured with animation:
      * <u>Headers will be loaded/bound along with others items.</u></p>
@@ -1423,6 +1423,20 @@ public class FlexibleAdapter<T extends IFlexible>
         if (!headersShown && displayHeaders) {
             showAllHeaders(true);
         }
+        return this;
+    }
+
+    /**
+     * Manually change the flag to indicate that headers are inserted(or not) in the main list by the user
+     * and the Adapter doesn't(does) have to automatically insert them.
+     * <p>Default value is {@code false} (headers are <u>not</u> shown at startup).</p>
+     *
+     * @param headersShown true, if headers are already shown
+     * @return this Adapter, so the call can be chained
+     * @since 5.0.0
+     */
+    public FlexibleAdapter<T> setHeadersShown(boolean headersShown) {
+        this.headersShown = headersShown;
         return this;
     }
 
