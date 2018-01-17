@@ -20,6 +20,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ExampleAdapter;
@@ -108,6 +109,12 @@ public class FragmentEndlessScrolling extends AbstractFragment
         FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
         fastScroller.addOnScrollStateChangeListener((MainActivity) getActivity());
         mAdapter.setFastScroller(fastScroller);
+
+        // New empty views handling, to set after FastScroller
+        mAdapter.addListener(new EmptyViewHelper(mAdapter,
+                getView().findViewById(R.id.empty_view),
+                getView().findViewById(R.id.filter_view)));
+
         mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
                 .setHandleDragEnabled(true) //Enable drag using handle view
                 .setSwipeEnabled(true); //Enable swipe items

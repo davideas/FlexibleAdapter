@@ -96,15 +96,17 @@ public final class StickyHeaderHelper extends OnScrollListener {
 
     private void initStickyHeadersHolder() {
         if (mStickyHolderLayout == null) {
-            // Create stickyContainer for shadow elevation
-            FrameLayout stickyContainer = createContainer(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
             ViewGroup oldParentLayout = getParent(mRecyclerView);
-            oldParentLayout.addView(stickyContainer);
-            // Initialize Holder Layout
-            mStickyHolderLayout = (ViewGroup) LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.sticky_header_layout, stickyContainer);
-            Log.i("Default StickyHolderLayout initialized");
+            if (oldParentLayout != null) {
+                // Create stickyContainer for shadow elevation
+                FrameLayout stickyContainer = createContainer(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                oldParentLayout.addView(stickyContainer);
+                // Initialize Holder Layout
+                mStickyHolderLayout = (ViewGroup) LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.sticky_header_layout, stickyContainer);
+                Log.i("Default StickyHolderLayout initialized");
+            }
         } else {
             Log.i("User defined StickyHolderLayout initialized");
         }
@@ -142,7 +144,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
 
     private void updateHeader(int headerPosition, boolean updateHeaderContent) {
         // Check if there is a new header to be sticky
-        if (mHeaderPosition != headerPosition) {
+        if (mHeaderPosition != headerPosition && mStickyHolderLayout != null) {
             // #244 - Don't animate if header is already visible at the first layout position
             int firstVisibleItemPosition = mAdapter.getFlexibleLayoutManager().findFirstVisibleItemPosition();
             // Animate if headers were hidden, but don't if configuration changed (rotation)

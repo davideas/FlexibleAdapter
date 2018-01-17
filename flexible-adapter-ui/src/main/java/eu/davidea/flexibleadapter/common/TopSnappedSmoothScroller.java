@@ -27,6 +27,7 @@ import android.util.DisplayMetrics;
  *
  * @since 5.0.0-b6 Creation
  * <br>5.0.0-b8 Class is now public to allow customization of the MILLISECONDS_PER_INCH
+ * <br>17/12/2017 Moved into UI package
  */
 public class TopSnappedSmoothScroller extends LinearSmoothScroller {
 

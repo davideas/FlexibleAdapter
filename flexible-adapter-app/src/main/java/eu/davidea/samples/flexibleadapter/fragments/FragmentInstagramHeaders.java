@@ -16,6 +16,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
@@ -84,6 +85,9 @@ public class FragmentInstagramHeaders extends AbstractFragment
         // 24dpi as empty space between sections (each post)
         mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
                 .withSectionGapOffset(24));
+
+        // New empty views handling
+        mAdapter.addListener(new EmptyViewHelper(mAdapter, getView().findViewById(R.id.empty_view)));
 
         mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
                 .setStickyHeaders(true) //Make headers sticky

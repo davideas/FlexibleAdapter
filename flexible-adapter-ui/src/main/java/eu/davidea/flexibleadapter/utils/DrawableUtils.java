@@ -37,6 +37,7 @@ import eu.davidea.flexibleadapter.helpers.R;
 /**
  * @author Davide Steduto
  * @since 14/06/2016 Created
+ * <br>17/12/2017 Moved into UI package
  */
 @SuppressWarnings("deprecation")
 public final class DrawableUtils {

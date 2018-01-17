@@ -37,6 +37,9 @@
 	<!-- Custom EmptyView for RV when empty-->
 	<include layout="@layout/empty_view"/>
 
+	<!-- Custom EmptyView for RV when filter has empty result-->
+	<include layout="@layout/filter_view"/>
+
 	<!-- Custom ProgressBar (at the moment not used) -->
 	<!--<include layout="@layout/progress_bar"/>-->
 

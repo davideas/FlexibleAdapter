@@ -18,7 +18,7 @@ package eu.davidea.flexibleadapter;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 
@@ -586,7 +586,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @return the current instance of the {@link FastScroller} object
      * @since 5.0.0-b1
      */
-    public FastScroller getFastScroller() {
+    public @Nullable FastScroller getFastScroller() {
         return mFastScrollerDelegate.getFastScroller();
     }
 
@@ -599,7 +599,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @param fastScroller instance of {@link FastScroller}
      * @since 5.0.0-b6
      */
-    public void setFastScroller(@NonNull FastScroller fastScroller) {
+    public void setFastScroller(@Nullable FastScroller fastScroller) {
         mFastScrollerDelegate.setFastScroller(fastScroller);
     }
 

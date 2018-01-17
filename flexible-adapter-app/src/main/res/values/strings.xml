@@ -62,6 +62,7 @@
 
 	<!-- Extras -->
 	<string name="no_items">No items</string>
+	<string name="no_items_found">No items found</string>
 	<string name="err_no_edit">Nothing to modify</string>
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>

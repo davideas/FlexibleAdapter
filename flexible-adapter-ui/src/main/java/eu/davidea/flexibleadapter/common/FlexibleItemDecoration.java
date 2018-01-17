@@ -66,6 +66,7 @@ import eu.davidea.flexibleadapter.utils.LayoutUtils;
  * <br>23/04/2017 Drawing of the divider over or underneath the items
  * <br>26/05/2017 Rewrote the full class to support equal spaces between items in all situations
  * <br>10/09/2017 Optional view types for divider
+ * <br>17/12/2017 Moved into UI package
  */
 @SuppressWarnings({"WeakerAccess"})
 public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
@@ -88,7 +89,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * Constructor which saves the Context to calculate the dpi OR to retrieve the divider later on.
      *
      * @param context current Context, it will be used to calculate dpi OR to retrieve the divider
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration(@NonNull Context context) {
         this.context = context;
@@ -107,7 +108,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @see #withDivider(int, Integer...)
      * @see #withDrawOver(boolean)
      * @see #removeDivider()
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withDefaultDivider(Integer... viewTypes) {
         final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
@@ -127,7 +128,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @see #withDefaultDivider(Integer...)
      * @see #withDrawOver(boolean)
      * @see #removeDivider()
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withDivider(@DrawableRes int resId, Integer... viewTypes) {
         mDivider = ContextCompat.getDrawable(context, resId);
@@ -141,7 +142,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      *
      * @param lastItem {@code true} to draw, {@code false} to not draw
      * @return this FlexibleItemDecoration instance so the call can be chained
-     * @since 5.0.0-rc3
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withDrawDividerOnLastItem(boolean lastItem) {
         if (lastItem) mDividerOnLastItem = 0;
@@ -153,7 +154,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * Removes any divider previously set.
      *
      * @return this FlexibleItemDecoration instance so the call can be chained
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration removeDivider() {
         mDivider = null;
@@ -170,7 +171,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      *
      * @param drawOver true to draw after the item has been added, false to draw underneath the item
      * @return this Divider, so the call can be chained
-     * @since 5.0.0-b8
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withDrawOver(boolean drawOver) {
         this.mDrawOver = drawOver;
@@ -283,7 +284,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      *
      * @param sectionOffset the extra offset at the end of each section
      * @return this FlexibleItemDecoration instance so the call can be chained
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withSectionGapOffset(@IntRange(from = 0) int sectionOffset) {
         mSectionOffset = (int) (context.getResources().getDisplayMetrics().density * sectionOffset);
@@ -296,7 +297,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      *
      * @param lastItem {@code true} to draw, {@code false} to not draw
      * @return this FlexibleItemDecoration instance so the call can be chained
-     * @since 5.0.0-rc3
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withSectionGapOnLastItem(boolean lastItem) {
         if (lastItem) mSectionGapOnLastItem = 1;
@@ -313,7 +314,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @return this FlexibleItemDecoration instance so the call can be chained
      * @see #withOffset(int)
      * @see #addItemViewType(int, int)
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withEdge(boolean withEdge) {
         withLeftEdge = withTopEdge = withRightEdge = withBottomEdge = withEdge;
@@ -329,7 +330,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @return this FlexibleItemDecoration instance so the call can be chained
      * @see #withOffset(int)
      * @see #addItemViewType(int, int)
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withLeftEdge(boolean withLeftEdge) {
         this.withLeftEdge = withLeftEdge;
@@ -345,7 +346,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @return this FlexibleItemDecoration instance so the call can be chained
      * @see #withOffset(int)
      * @see #addItemViewType(int, int)
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withTopEdge(boolean withTopEdge) {
         this.withTopEdge = withTopEdge;
@@ -361,7 +362,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @return this FlexibleItemDecoration instance so the call can be chained
      * @see #withOffset(int)
      * @see #addItemViewType(int, int)
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withBottomEdge(boolean withBottomEdge) {
         this.withBottomEdge = withBottomEdge;
@@ -377,7 +378,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @return this FlexibleItemDecoration instance so the call can be chained
      * @see #withOffset(int)
      * @see #addItemViewType(int, int)
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withRightEdge(boolean withRightEdge) {
         this.withRightEdge = withRightEdge;
@@ -398,7 +399,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      *
      * @param offset the offset in dpi to apply
      * @return this FlexibleItemDecoration instance so the call can be chained
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration withOffset(@IntRange(from = 0) int offset) {
         mOffset = (int) (context.getResources().getDisplayMetrics().density * offset);
@@ -414,7 +415,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @see #withOffset(int)
      * @see #addItemViewType(int, int)
      * @see #removeItemViewType(int)
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration addItemViewType(@LayoutRes int viewType) {
         return addItemViewType(viewType, -1);
@@ -428,7 +429,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @return this FlexibleItemDecoration instance so the call can be chained
      * @see #withOffset(int)
      * @see #removeItemViewType(int)
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration addItemViewType(@LayoutRes int viewType, int offset) {
         return addItemViewType(viewType, offset, offset, offset, offset);
@@ -445,7 +446,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      * @return this FlexibleItemDecoration instance so the call can be chained
      * @see #addItemViewType(int, int)
      * @see #removeItemViewType(int)
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration addItemViewType(@LayoutRes int viewType, int left, int top, int right, int bottom) {
         if (mDecorations == null) {
@@ -464,7 +465,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
      *
      * @param viewType the viewType to remove from the decoration management
      * @return this FlexibleItemDecoration instance so the call can be chained
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     public FlexibleItemDecoration removeItemViewType(@LayoutRes int viewType) {
         mDecorations.remove(viewType);
@@ -476,7 +477,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 	/*====================*/
 
     /**
-     * @since 5.0.0-rc2
+     * @since 1.0.0-b1
      */
     @Override
     public void getItemOffsets(final Rect outRect, View view, RecyclerView recyclerView, RecyclerView.State state) {

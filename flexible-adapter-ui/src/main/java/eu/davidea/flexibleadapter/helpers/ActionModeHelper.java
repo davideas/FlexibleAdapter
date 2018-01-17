@@ -37,6 +37,7 @@ import eu.davidea.flexibleadapter.utils.Log;
  * @author Davide Steduto
  * @since 30/04/2016 Created
  * <br>23/08/2017 Option to disable swipe/drag capabilities
+ * <br>17/12/2017 Moved into UI package
  */
 public class ActionModeHelper implements ActionMode.Callback {
 
@@ -56,7 +57,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * @param adapter the FlexibleAdapter instance
      * @param cabMenu the Contextual Action Bar menu resourceId
      * @see #ActionModeHelper(FlexibleAdapter, int, ActionMode.Callback)
-     * @since 5.0.0-b6
+     * @since 1.0.0-b1
      */
     public ActionModeHelper(@NonNull FlexibleAdapter adapter, @MenuRes int cabMenu) {
         this.mAdapter = adapter;
@@ -70,7 +71,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * @param cabMenu  the Contextual Action Bar menu resourceId
      * @param callback the custom {@link android.support.v7.view.ActionMode.Callback}
      * @see #ActionModeHelper(FlexibleAdapter, int)
-     * @since 5.0.0-b6
+     * @since 1.0.0-b1
      */
     public ActionModeHelper(@NonNull FlexibleAdapter adapter, @MenuRes int cabMenu,
                             @Nullable ActionMode.Callback callback) {
@@ -86,7 +87,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * @param defaultMode the new default mode when ActionMode is off, accepted values:
      *                    {@code IDLE, SINGLE}
      * @return this object, so it can be chained
-     * @since 5.0.0-b6
+     * @since 1.0.0-b1
      */
     public final ActionModeHelper withDefaultMode(@Mode int defaultMode) {
         if (defaultMode == Mode.IDLE || defaultMode == Mode.SINGLE)
@@ -100,7 +101,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      *
      * @param disableDrag true to disable the drag, false to maintain the drag during ActionMode
      * @return this object, so it can be chained
-     * @since 5.0.0-rc3
+     * @since 1.0.0-b1
      */
     public final ActionModeHelper disableDragOnActionMode(boolean disableDrag) {
         this.disableDrag = disableDrag;
@@ -113,7 +114,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      *
      * @param disableSwipe true to disable the swipe, false to maintain the swipe during ActionMode
      * @return this object, so it can be chained
-     * @since 5.0.0-rc3
+     * @since 1.0.0-b1
      */
     public final ActionModeHelper disableSwipeOnActionMode(boolean disableSwipe) {
         this.disableSwipe = disableSwipe;
@@ -122,7 +123,7 @@ public class ActionModeHelper implements ActionMode.Callback {
 
     /**
      * @return the current instance of the ActionMode, {@code null} if ActionMode is off.
-     * @since 5.0.0-b6
+     * @since 1.0.0-b1
      */
     public ActionMode getActionMode() {
         return mActionMode;
@@ -132,7 +133,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * Gets the activated position only when mode is {@code SINGLE}.
      *
      * @return the activated position when {@code SINGLE}. -1 if no item is selected
-     * @since 5.0.0-rc1
+     * @since 1.0.0-b1
      */
     public int getActivatedPosition() {
         List<Integer> selectedPositions = mAdapter.getSelectedPositions();
@@ -148,7 +149,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * @param position the current item position
      * @return true if selection is changed, false if the click event should ignore the ActionMode
      * and continue
-     * @since 5.0.0-b6
+     * @since 1.0.0-b1
      */
     public boolean onClick(int position) {
         if (position != RecyclerView.NO_POSITION) {
@@ -164,7 +165,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * @param activity the current Activity
      * @param position the position of the clicked item
      * @return the initialized ActionMode or null if nothing was done
-     * @since 5.0.0-b6
+     * @since 1.0.0-b1
      */
     @NonNull
     public ActionMode onLongClick(AppCompatActivity activity, int position) {
@@ -183,7 +184,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * Note that the selection must already be started (actionMode must not be null).</p>
      *
      * @param position position of the item to toggle the selection state
-     * @since 5.0.0-b6
+     * @since 1.0.0-b1
      */
     public void toggleSelection(int position) {
         if (position >= 0 && (
@@ -207,7 +208,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * <p>Override to customize the title and subtitle.</p>
      *
      * @param count the current number of selected items
-     * @since 5.0.0-b6
+     * @since 1.0.0-b1
      */
     public void updateContextTitle(int count) {
         if (mActionMode != null) {
@@ -223,7 +224,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * of {@code onRestoreInstanceState}.</p>
      *
      * @param activity the current Activity
-     * @since 5.0.0-b6
+     * @since 1.0.0-b1
      */
     public void restoreSelection(AppCompatActivity activity) {
         if ((defaultMode == Mode.IDLE && mAdapter.getSelectedItemCount() > 0) ||
@@ -292,7 +293,7 @@ public class ActionModeHelper implements ActionMode.Callback {
      * <i>onRefresh</i> for SwipeRefreshLayout, after <i>deleting</i> all selected items.
      *
      * @return true if ActionMode was active (in case it is also terminated), false otherwise
-     * @since 5.0.0-b6
+     * @since 1.0.0-b1
      */
     public boolean destroyActionModeIfCan() {
         if (mActionMode != null) {
