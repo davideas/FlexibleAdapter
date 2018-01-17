@@ -259,7 +259,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-b6
      */
     @CallSuper
-    public FlexibleAdapter<T> addListener(@NonNull Object listener) {
+    public FlexibleAdapter<T> addListener(Object listener) {
         if (listener == null) {
             log.e("Invalid listener class: null");
             return this;
@@ -325,7 +325,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #addListener(Object)
      * @since 5.0.0-rc3
      */
-    public final FlexibleAdapter<T> removeListener(@NonNull Object listener) {
+    public final FlexibleAdapter<T> removeListener(Object listener) {
         if (listener == null) {
             log.e("No listener class to remove!");
             return this;
