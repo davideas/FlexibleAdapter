@@ -360,8 +360,9 @@ public class DatabaseService {
         for (int j = 1; j <= SUB_ITEMS; j++) {
             SubItem subItem = new SubItem(expandableItem.getId() + "-SB" + j);
             subItem.setTitle("Sub Item " + j);
-            //In this case the Header is the same parent: ExpandableHeaderItem instance
-            subItem.setHeader(expandableItem);
+            // NOTE: In case you want to retrieve the parent, you can implement ISectionable
+            // then, assign the Header: ExpandableHeaderItem instance.
+            //subItem.setHeader(expandableItem);
             expandableItem.addSubItem(subItem);
         }
         return expandableItem;

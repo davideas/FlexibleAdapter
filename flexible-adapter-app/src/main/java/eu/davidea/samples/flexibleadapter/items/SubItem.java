@@ -14,7 +14,6 @@ import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
-import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -24,8 +23,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
-        implements ISectionable<SubItem.ChildViewHolder, IHeader>, IFilterable {
+public class SubItem extends AbstractItem<SubItem.ChildViewHolder> implements IFilterable {
 
     /**
      * The header of this item
@@ -35,16 +33,6 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
     public SubItem(String id) {
         super(id);
         setDraggable(true);
-    }
-
-    @Override
-    public IHeader getHeader() {
-        return header;
-    }
-
-    @Override
-    public void setHeader(IHeader header) {
-        this.header = header;
     }
 
     /**
@@ -89,10 +77,6 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
                     context.getResources().getColor(R.color.colorAccent_light));
         } else {
             holder.mTitle.setText(getTitle());
-        }
-
-        if (getHeader() != null) {
-            setSubtitle("Header " + getHeader().toString());
         }
     }
 

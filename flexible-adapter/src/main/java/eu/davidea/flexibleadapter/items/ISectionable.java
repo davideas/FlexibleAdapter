@@ -19,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 
 /**
  * This interface represents an item in the section.
+ * <p>With this interface linking the header/parent is simplified.</p>
  *
  * @author Davide Steduto
  * @see IFlexible

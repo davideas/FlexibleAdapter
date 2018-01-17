@@ -251,6 +251,18 @@ public class ExpandableItem extends AbstractItem<ExpandableItem.ParentViewHolder
         }
 
         @Override
+        protected void expandView(int position) {
+            super.expandView(position);
+            mAdapter.invalidateItemDecorations(100);
+        }
+
+        @Override
+        protected void collapseView(int position) {
+            super.collapseView(position);
+            mAdapter.invalidateItemDecorations(100);
+        }
+
+        @Override
         public View getFrontView() {
             return frontView;
         }
