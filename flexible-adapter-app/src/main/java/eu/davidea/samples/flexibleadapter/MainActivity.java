@@ -746,7 +746,7 @@ public class MainActivity extends AppCompatActivity implements
         //   2) remove the item from the adapter
 
         // Create list for single position (only in onItemSwipe)
-        List<Integer> positions = Collections.singletonList(position);
+        List<Integer> positions = Collections.singletonList(position); // This is an immutable list and cannot be sort!
         // Build the message
         IFlexible abstractItem = mAdapter.getItem(position);
         StringBuilder message = new StringBuilder();
