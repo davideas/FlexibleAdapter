@@ -243,7 +243,7 @@ public class FlexibleAdapter<T extends IFlexible>
         mUndoPositions = new ArrayList<>();
 
         // Create listeners instances
-        addListener(listeners);
+        if (listeners != null) addListener(listeners);
 
         // Get notified when items are inserted or removed (it adjusts selected positions)
         registerAdapterDataObserver(new AdapterDataObserver());
