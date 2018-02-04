@@ -669,7 +669,7 @@ public class MainActivity extends AppCompatActivity implements
 	 * ======================================================================== */
 
     @Override
-    public boolean onItemClick(int position) {
+    public boolean onItemClick(View view, int position) {
         IFlexible flexibleItem = mAdapter.getItem(position);
         if (flexibleItem instanceof OverallItem) {
             OverallItem overallItem = (OverallItem) flexibleItem;

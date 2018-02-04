@@ -180,8 +180,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * Simple Constructor with NO listeners!
      *
      * @param items items to display.
-     * @see #FlexibleAdapter(List, Object)
-     * @see #FlexibleAdapter(List, Object, boolean)
+     * @see FlexibleAdapter(List, Object)
+     * @see FlexibleAdapter(List, Object, boolean)
      * @since 4.2.0 Created
      * <br>5.0.0-rc2 Copy of the Original List is done internally
      */
@@ -206,8 +206,8 @@ public class FlexibleAdapter<T extends IFlexible>
      *                  <li>{@link OnStickyHeaderChangeListener}
      *                  <li>{@link OnUpdateListener}
      *                  </ul>
-     * @see #FlexibleAdapter(List)
-     * @see #FlexibleAdapter(List, Object, boolean)
+     * @see FlexibleAdapter(List)
+     * @see FlexibleAdapter(List, Object, boolean)
      * @see #addListener(Object)
      * @since 5.0.0-b1 Created
      * <br>5.0.0-rc2 Copy of the Original List is done internally
@@ -217,7 +217,7 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Same as {@link #FlexibleAdapter(List, Object)} with possibility to set stableIds.
+     * Same as {@link FlexibleAdapter(List, Object)} with possibility to set stableIds.
      * <p><b>Tip:</b> Setting {@code true} allows the RecyclerView to rebind only items really
      * changed after a refresh with {@link #notifyDataSetChanged()} or after swapping Adapter.
      * This increases performance.<br>
@@ -225,8 +225,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * The method {@link #setHasStableIds(boolean)} will be called.</p>
      *
      * @param stableIds set {@code true} if item implements {@code hashcode()} and have unique ids.
-     * @see #FlexibleAdapter(List)
-     * @see #FlexibleAdapter(List, Object)
+     * @see FlexibleAdapter(List)
+     * @see FlexibleAdapter(List, Object)
      * @see #addListener(Object)
      * @since 5.0.0-b8 Created
      * <br>5.0.0-rc2 Copy of the Original List is done internally
@@ -4984,17 +4984,19 @@ public class FlexibleAdapter<T extends IFlexible>
     public interface OnItemClickListener {
         /**
          * Called when single tap occurs.
-         * <p>This method receives the click event generated from the itemView to check if one
-         * of the selection mode ({@code SINGLE or MULTI}) is enabled in order to activate the
-         * itemView.</p>
-         * For Expandable Views it will toggle the Expansion if configured so.
+         * <p>The click event is generated from the itemView or any view inside it (if registered).</p>
+         * Here, we check if one of the selection mode ({@code SINGLE or MULTI}) is enabled in order
+         * to activate the itemView.</p>
+         * To register the click event to any subview, just assign the ViewHolder instance as click
+         * listener to that view.
          *
+         * @param view     the view that generated the event
          * @param position the adapter position of the item clicked
          * @return true if the click should activate the itemView according to the selection mode,
          * false for no change to the itemView.
          * @since 5.0.0-b1
          */
-        boolean onItemClick(int position);
+        boolean onItemClick(View view, int position);
     }
 
     /**
