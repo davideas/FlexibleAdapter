@@ -103,9 +103,9 @@ public class FragmentDataBinding extends AbstractFragment {
         mAdapter.setFastScroller(fastScroller);
 
         // New empty views handling, to set after FastScroller
-        mAdapter.addListener(new EmptyViewHelper(mAdapter,
+        new EmptyViewHelper(mAdapter,
                 getView().findViewById(R.id.empty_view),
-                getView().findViewById(R.id.filter_view)));
+                getView().findViewById(R.id.filter_view));
 
         mAdapter.setLongPressDragEnabled(true)
                 .setHandleDragEnabled(true)

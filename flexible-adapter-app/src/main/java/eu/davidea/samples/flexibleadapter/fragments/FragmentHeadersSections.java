@@ -106,11 +106,10 @@ public class FragmentHeadersSections extends AbstractFragment
         mAdapter.setFastScroller(fastScroller);
 
         // New empty views handling, to set after FastScroller
-        mAdapter.addListener(new EmptyViewHelper(mAdapter,
-                getView().findViewById(R.id.empty_view),
-                getView().findViewById(R.id.filter_view),
-                (EmptyViewHelper.OnEmptyViewListener) getActivity()) // Optional!!
-        );
+new EmptyViewHelper(mAdapter,
+        getView().findViewById(R.id.empty_view),
+        getView().findViewById(R.id.filter_view),
+        (EmptyViewHelper.OnEmptyViewListener) getActivity()); // Optional!!
 
         // More settings
         mAdapter.setLongPressDragEnabled(true)
