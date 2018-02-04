@@ -61,8 +61,8 @@ repositories {
 dependencies {
 	// Using JCenter
 	compile 'eu.davidea:flexible-adapter:5.0.0-rc4'
-	compile 'eu.davidea:flexible-adapter-ui:1.0.0-b1'
-	compile 'eu.davidea:flexible-adapter-livedata:1.0.0-b1'
+	compile 'eu.davidea:flexible-adapter-ui:1.0.0-b2'
+	compile 'eu.davidea:flexible-adapter-livedata:1.0.0-b2'
 	compile 'eu.davidea:flexible-adapter-databinding:1.0.0-b2'
 	
 	// Using MavenSnapshots repository for continuous updates from my development
@@ -72,7 +72,7 @@ dependencies {
 #### Stay Updated
 |Flexible Adapter|Live Data|Data Binding|UI|
 |---|---|---|---|
-|<div align="center">5.0.0-rc4</div>|<div align="center">1.0.0-b1</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b1</div>
+|<div align="center">5.0.0-rc4</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>
 |<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-livedata?source=watch' alt='Get automatic notifications about new "flexible-adapter-livedata" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-databinding?source=watch' alt='Get automatic notifications about new "flexible-adapter-databinding" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-ui?source=watch' alt='Get automatic notifications about new "flexible-adapter-ui" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>
 
 # Wiki!
