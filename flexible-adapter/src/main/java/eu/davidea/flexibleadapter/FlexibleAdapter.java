@@ -5415,7 +5415,7 @@ public class FlexibleAdapter<T extends IFlexible>
                 case FILTER: //filterItems
                     if (mFilterAsyncTask != null) mFilterAsyncTask.cancel(true);
                     mFilterAsyncTask = new FilterAsyncTask(message.what, (List<T>) message.obj);
-                    mFilterAsyncTask.execute();
+                    mFilterAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return true;
                 case LOAD_MORE_COMPLETE: //hide progress item
                     hideProgressItem();
