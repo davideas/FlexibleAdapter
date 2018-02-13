@@ -23,7 +23,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SubItem extends AbstractItem<SubItem.ChildViewHolder> implements IFilterable {
+public class SubItem extends AbstractItem<SubItem.ChildViewHolder> implements IFilterable<String> {
 
     /**
      * The header of this item

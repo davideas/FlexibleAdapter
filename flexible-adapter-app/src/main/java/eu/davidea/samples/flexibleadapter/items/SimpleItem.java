@@ -32,7 +32,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * implemented methods (getter and setters).
  */
 public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
-        implements ISectionable<SimpleItem.SimpleViewHolder, HeaderItem>, IFilterable, Serializable {
+        implements ISectionable<SimpleItem.SimpleViewHolder, HeaderItem>, IFilterable<String>, Serializable {
 
     /* The header of this item */
     HeaderItem header;

@@ -22,7 +22,7 @@ import eu.davidea.samples.flexibleadapter.R;
  */
 public class ExpandableLevel1Item
         extends AbstractItem<ExpandableItem.ParentViewHolder>
-        implements IExpandable<ExpandableItem.ParentViewHolder, SubItem>, IFilterable {
+        implements IExpandable<ExpandableItem.ParentViewHolder, SubItem>, IFilterable<String> {
 
     /* Flags for FlexibleAdapter */
     private boolean mExpanded = false;

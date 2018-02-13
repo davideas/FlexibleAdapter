@@ -32,6 +32,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -102,7 +103,7 @@ public class FlexibleAdapter<T extends IFlexible>
     private static final String EXTRA_HEADERS = TAG + "_headersShown";
     private static final String EXTRA_STICKY = TAG + "_stickyHeaders";
     private static final String EXTRA_LEVEL = TAG + "_selectedLevel";
-    private static final String EXTRA_SEARCH = TAG + "_searchText";
+    private static final String EXTRA_FILTER = TAG + "_filter";
     private static final long AUTO_SCROLL_DELAY = 150L;
 
     /* The main container for ALL items */
@@ -140,7 +141,7 @@ public class FlexibleAdapter<T extends IFlexible>
     private boolean autoMap = false;
 
     /* Filter */
-    private String mSearchText = "", mOldSearchText = "";
+    private Serializable mFilterEntity = null, mOldFilterEntity = null;
     private Set<IExpandable> mExpandedFilterFlags;
     private boolean notifyChangeOfUnfilteredItems = true, filtering = false,
             notifyMoveOfFilteredItems = false;
@@ -671,7 +672,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-rc1
      */
     public final int getMainItemCount() {
-        return hasSearchText() ? getItemCount() : getItemCount() - mScrollableHeaders.size() - mScrollableFooters.size();
+        return hasFilter() ? getItemCount() : getItemCount() - mScrollableHeaders.size() - mScrollableFooters.size();
     }
 
     /**
@@ -1653,8 +1654,8 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
 	/*--------------------------------------------*/
-	/* VIEW HOLDER METHODS ARE DELEGATED TO ITEMS */
-	/*--------------------------------------------*/
+    /* VIEW HOLDER METHODS ARE DELEGATED TO ITEMS */
+    /*--------------------------------------------*/
 
     /**
      * <p>You <b>CANNOT</b> override this method: {@code FlexibleAdapter} delegates the ViewType
@@ -1999,8 +2000,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
         // Check next loading threshold
         int threshold = mTopEndless ?
-                mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableHeaders.size())
-                : getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableFooters.size());
+                mEndlessScrollThreshold - (hasFilter() ? 0 : mScrollableHeaders.size())
+                : getItemCount() - mEndlessScrollThreshold - (hasFilter() ? 0 : mScrollableFooters.size());
         if ((!mTopEndless && (position == getGlobalPositionOf(mProgressItem) || position < threshold)) ||
                 (mTopEndless && position > 0 && position > threshold)) {
             return;
@@ -3765,9 +3766,20 @@ public class FlexibleAdapter<T extends IFlexible>
     /**
      * @return true if the current search text is not empty or null
      * @since 3.1.0
+     * @deprecated Use {@link #hasFilter()}
      */
+    @Deprecated
     public boolean hasSearchText() {
-        return mSearchText != null && !mSearchText.isEmpty();
+        return hasFilter();
+    }
+
+    /**
+     * @return true if the current filter is not null
+     * @since 5.0.0
+     */
+    public boolean hasFilter() {
+        if (mFilterEntity instanceof String) return !((String) mFilterEntity).isEmpty();
+        return mFilterEntity != null;
     }
 
     /**
@@ -3776,18 +3788,36 @@ public class FlexibleAdapter<T extends IFlexible>
      * @param newText the new searchText
      * @return true if the old search text is different than the newText, false otherwise
      * @since 5.0.0-b5
+     * @deprecated Use {@link #hasNewFilter(Serializable)}
      */
+    @Deprecated
     public boolean hasNewSearchText(String newText) {
-        return !mOldSearchText.equalsIgnoreCase(newText);
+        return hasNewFilter(newText);
+    }
+
+    /**
+     * Checks if the filter is changed.
+     *
+     * @param constraint the new filter entity
+     * @return true if the old filter is different than the new one, false otherwise
+     * @since 5.0.0
+     */
+    public boolean hasNewFilter(Serializable constraint) {
+        if (constraint instanceof String && mOldFilterEntity instanceof String) {
+            return !((String) mOldFilterEntity).equalsIgnoreCase((String) constraint);
+        }
+        return !mOldFilterEntity.equals(constraint);
     }
 
     /**
      * @return the current search text
      * @since 3.1.0
+     * @deprecated Use {@link #setFilter(Serializable)} instead.
      */
+    @Deprecated
     @NonNull
     public String getSearchText() {
-        return mSearchText;
+        return (String) mFilterEntity;
     }
 
     /**
@@ -3799,9 +3829,42 @@ public class FlexibleAdapter<T extends IFlexible>
      *
      * @param searchText the new text to filter the items
      * @since 3.1.0
+     * @deprecated Use {@link #setFilter(Serializable)} instead.
      */
+    @Deprecated
     public void setSearchText(@NonNull String searchText) {
-        mSearchText = searchText != null ? searchText.trim().toLowerCase(Locale.getDefault()) : "";
+        setFilter(searchText != null ? searchText.trim().toLowerCase(Locale.getDefault()) : "");
+    }
+
+    /**
+     * Sets the new filter entity.
+     * <p><b>Note:</b></p><ul>
+     * <li>Must implement {@link Serializable} (String does).</li>
+     * <li>In case of free text (String), filter is automatically <b>trimmed</b>
+     * and <b>lowercase</b>.</li>
+     * </ul>
+     * <p><b>Tip:</b> You can highlight filtered Text or Words using {@code FlexibleUtils}
+     * from UI extension:
+     * <ul><li>{@code FlexibleUtils#highlightText(TextView, String, String)}</li>
+     * <li>{@code FlexibleUtils#highlightWords(TextView, String, String)}</li></ul></p>
+     *
+     * @param filter the new filter entity for the items
+     * @since 5.0.0
+     */
+    public void setFilter(@Nullable Serializable filter) {
+        if (filter instanceof String) {
+            filter = ((String) filter).trim().toLowerCase(Locale.getDefault());
+        }
+        mFilterEntity = filter;
+    }
+
+    /**
+     * @return the current filter object
+     * @since 5.0.0
+     */
+    @Nullable
+    public Serializable getFilter() {
+        return mFilterEntity;
     }
 
     /**
@@ -3827,7 +3890,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * <p>The process is very slow on big list of the order of ~3-5000 items and higher,
      * due to the calculation of the correct position for each item to be shifted.
      * Use with caution!</p>
-     * The slowness is higher when the searchText is cleared out.
+     * The slowness is higher when the filter is cleared out.
      * <p>Default value is {@code false}.</p>
      *
      * @param notifyMove true to animate move changes after filtering or update data set,
@@ -3842,8 +3905,8 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Filters the current list with the searchText previously set with
-     * {@link #setSearchText(String)}.
+     * Filters the current list with the filter previously set with
+     * {@link #setFilter(Serializable)}.
      *
      * @see #filterItems(long)
      * @see #filterItems(List)
@@ -3861,6 +3924,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * more characters from user before starting the search.
      *
      * @param delay any non-negative delay
+     * @see #setFilter(Serializable)
      * @see #filterItems()
      * @see #filterItems(List, long)
      * @see #onPostFilter()
@@ -3880,6 +3944,7 @@ public class FlexibleAdapter<T extends IFlexible>
      *
      * @param unfilteredItems the list to filter
      * @param delay           any non-negative delay
+     * @see #setFilter(Serializable)
      * @see #filterItems(long)
      * @see #filterItems(List)
      * @see #onPostFilter()
@@ -3895,20 +3960,20 @@ public class FlexibleAdapter<T extends IFlexible>
     /**
      * <b>WATCH OUT! ADAPTER ALREADY CREATES A <u>COPY</u> OF THE PROVIDED LIST</b>: due to internal
      * mechanism, items are removed and/or added in order to animate items in the final list.
-     * <p>This method filters the provided list with the searchText previously set with
-     * {@link #setSearchText(String)}.</p>
+     * <p>This method filters the provided list with the filter previously set with
+     * {@link #setFilter(Serializable)}. Filter object can be of any type.</p>
      * <b>Important notes:</b>
      * <ol>
      * <li>The Filter is <u>always</u> executed in background, asynchronously.
      * The method {@link #onPostFilter()} is called after the filter task is completed.</li>
-     * <li>This method calls {@link #filterObject(IFlexible, String)} for each filterable item.</li>
+     * <li>This method calls {@link #filterObject(IFlexible, Serializable)} for each filterable item.</li>
      * <li>Any pending deleted items are always deleted before filter is performed:
-     * {@link OnDeleteCompleteListener#onDeleteConfirmed(int)} is therefore invoked
-     * (Implemented in {@code UndoHelper}).</li>
+     * {@link OnDeleteCompleteListener#onDeleteConfirmed(int)} (implemented in {@code UndoHelper})
+     * is therefore invoked.</li>
      * <li>Expandable items are picked up and displayed if at least a child is collected by
      * the current filter.</li>
      * <li>Filter is skipped while endless feature is active (loading).</li>
-     * <li>If searchText is empty or {@code null}, the provided list is the new list plus any
+     * <li>If filter is {@code null}, the provided list is the new list plus any
      * Scrollable Headers and Footers if existent.</li>
      * <li>Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit of
      * {@value #ANIMATE_TO_LIMIT} (default) items is set. <b>Tip:</b> Above this limit,
@@ -3917,6 +3982,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * </ol>
      *
      * @param unfilteredItems the list to filter
+     * @see #setFilter(Serializable)
      * @see #filterItems()
      * @see #filterItems(List, long)
      * @see #onPostFilter()
@@ -3927,6 +3993,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * <br>5.0.0-rc1 Scrollable Headers and Footers adaptation
      * <br>5.0.0-rc2 Copy of the Original List is done internally
      * <br>5.0.0-rc2 Removal of Undo in combination with Filter
+     * <br>5.0.0 Use of any filter object, instead of only String
      */
     public void filterItems(@NonNull List<T> unfilteredItems) {
         mHandler.removeMessages(FILTER);
@@ -3934,17 +4001,17 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     private synchronized void filterItemsAsync(@NonNull List<T> unfilteredItems) {
-        log.d("filterItems with searchText=\"%s\"", mSearchText);
+        log.d("filterItems with filterEntity=\"%s\"", mFilterEntity);
         List<T> filteredItems = new ArrayList<>();
         filtering = true; //Enable flag
 
-        if (hasSearchText() && hasNewSearchText(mSearchText)) { //skip when text is unchanged
+        if (hasFilter() && hasNewFilter(mFilterEntity)) { //skip when filter is unchanged
             for (T item : unfilteredItems) {
                 if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
                 // Filter normal AND expandable objects
                 filterObject(item, filteredItems);
             }
-        } else if (hasNewSearchText(mSearchText)) { //this is better than checking emptiness
+        } else if (hasNewFilter(mFilterEntity)) {
             filteredItems = unfilteredItems; //original items with no filter
             resetFilterFlags(filteredItems); //recursive reset
             mExpandedFilterFlags = null;
@@ -3953,9 +4020,9 @@ public class FlexibleAdapter<T extends IFlexible>
             mOriginalList = null;
         }
 
-        // Animate search results only in case of new SearchText
-        if (hasNewSearchText(mSearchText)) {
-            mOldSearchText = mSearchText;
+        // Animate search results only in case of new Filter
+        if (hasNewFilter(mFilterEntity)) {
+            mOldFilterEntity = mFilterEntity;
             animateTo(filteredItems, Payload.FILTER);
         }
 
@@ -3975,7 +4042,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * It performs filtering on the subItems returning true, if the any child should be in the
      * filtered collection.
      * <p>If the provided item is not an expandable it will be filtered as usual by
-     * {@link #filterObject(T, String)}.</p>
+     * {@link #filterObject(T, Serializable)}.</p>
      *
      * @param item the object with subItems to be inspected
      * @return true, if the object should be in the filteredResult, false otherwise
@@ -3996,7 +4063,7 @@ public class FlexibleAdapter<T extends IFlexible>
         boolean filtered = filterExpandableObject(item, filteredItems);
         // If no subItem was filtered, fallback to Normal filter
         if (!filtered) {
-            filtered = filterObject(item, getSearchText());
+            filtered = filterObject(item, getFilter());
         }
         if (filtered) {
             // Check if header has to be added too
@@ -4029,7 +4096,7 @@ public class FlexibleAdapter<T extends IFlexible>
                     filtered = true;
                 } else {
                     // Use normal filter for normal subItem
-                    subItem.setHidden(!filterObject(subItem, getSearchText()));
+                    subItem.setHidden(!filterObject(subItem, getFilter()));
                     if (!subItem.isHidden()) {
                         filtered = true;
                         filteredItems.add(subItem);
@@ -4044,13 +4111,13 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * This method checks if the provided object is a type of {@link IFilterable} interface,
-     * if yes, performs the filter on the implemented method {@link IFilterable#filter(String)}.
+     * if yes, performs the filter on the implemented method {@link IFilterable#filter(Serializable)}.
      * <p><b>Note:</b>
      * <br>- The item will be collected if the implemented method returns true.
      * <br>- {@code IExpandable} items are automatically picked up and displayed if at least a
      * child is collected by the current filter. You DON'T NEED to implement the scan for the
      * children: this is already done :-)
-     * <br>- If you don't want to implement the {@code IFilterable} interface on the items, then
+     * <br>- If you don't want to implement the {@code IFilterable} interface on each item, then
      * you can override this method to have another filter logic!
      *
      * @param item       the object to be inspected
@@ -4060,12 +4127,12 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 3.1.0 Created
      * <br>5.0.0-b1 Expandable + Child filtering
      */
-    protected boolean filterObject(T item, String constraint) {
+    protected boolean filterObject(T item, Serializable constraint) {
         return item instanceof IFilterable && ((IFilterable) item).filter(constraint);
     }
 
     /**
-     * Clears flags after searchText is cleared out for Expandable items and sub items.
+     * Clears flags after filter is cleared out for Expandable items and sub items.
      * Also restore headers visibility.
      */
     private void resetFilterFlags(List<T> items) {
@@ -4891,7 +4958,7 @@ public class FlexibleAdapter<T extends IFlexible>
             outState.putBoolean(EXTRA_PARENT, this.parentSelected);
             outState.putInt(EXTRA_LEVEL, this.mSelectedLevel);
             // Current filter. Old text is not saved otherwise animateTo() cannot be called
-            outState.putString(EXTRA_SEARCH, this.mSearchText);
+            outState.putSerializable(EXTRA_FILTER, this.mFilterEntity);
             // Save headers shown status
             outState.putBoolean(EXTRA_HEADERS, this.headersShown);
             outState.putBoolean(EXTRA_STICKY, areHeadersSticky());
@@ -4927,8 +4994,8 @@ public class FlexibleAdapter<T extends IFlexible>
             this.parentSelected = savedInstanceState.getBoolean(EXTRA_PARENT);
             this.childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
             this.mSelectedLevel = savedInstanceState.getInt(EXTRA_LEVEL);
-            // Current filter (old text must not be saved)
-            this.mSearchText = savedInstanceState.getString(EXTRA_SEARCH);
+            // Current filter (old filter must not be saved)
+            this.mFilterEntity = savedInstanceState.getSerializable(EXTRA_FILTER);
         }
     }
 

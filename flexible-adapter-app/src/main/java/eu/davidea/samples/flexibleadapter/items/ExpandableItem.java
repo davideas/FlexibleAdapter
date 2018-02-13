@@ -34,8 +34,9 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * implemented methods around subItems list.
  */
 public class ExpandableItem extends AbstractItem<ExpandableItem.ParentViewHolder>
-        implements ISectionable<ExpandableItem.ParentViewHolder, HeaderItem>, IFilterable,
-        IExpandable<ExpandableItem.ParentViewHolder, SubItem> {
+        implements ISectionable<ExpandableItem.ParentViewHolder, HeaderItem>,
+        IExpandable<ExpandableItem.ParentViewHolder, SubItem>,
+        IFilterable<String> {
 
     /* The header of this item */
     HeaderItem header;
