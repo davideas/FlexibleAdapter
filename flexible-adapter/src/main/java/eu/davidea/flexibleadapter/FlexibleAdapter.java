@@ -3778,7 +3778,9 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0
      */
     public boolean hasFilter() {
-        if (mFilterEntity instanceof String) return !((String) mFilterEntity).isEmpty();
+        if (mFilterEntity instanceof String) {
+            return !((String) mFilterEntity).isEmpty();
+        }
         return mFilterEntity != null;
     }
 
@@ -3806,7 +3808,7 @@ public class FlexibleAdapter<T extends IFlexible>
         if (constraint instanceof String && mOldFilterEntity instanceof String) {
             return !((String) mOldFilterEntity).equalsIgnoreCase((String) constraint);
         }
-        return !mOldFilterEntity.equals(constraint);
+        return mOldFilterEntity == null || !mOldFilterEntity.equals(constraint);
     }
 
     /**
