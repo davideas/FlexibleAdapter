@@ -90,7 +90,11 @@ public class FragmentEndlessScrolling extends AbstractFragment
         // Initialize Adapter and RecyclerView
         // ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
         FlexibleAdapter.useTag("EndlessScrollingAdapter");
-        mAdapter = new ExampleAdapter(null, getActivity());
+        if (savedInstanceState != null) {
+            mAdapter = new ExampleAdapter(DatabaseService.getInstance().getDatabaseList(), getActivity());
+        } else {
+            mAdapter = new ExampleAdapter(null, getActivity());
+        }
         mAdapter.setAutoScrollOnExpand(true)
                 //.setAnimateToLimit(Integer.MAX_VALUE) //Use the default value
                 .setNotifyMoveOfFilteredItems(true) //When true, filtering on big list is very slow, not in this case!
@@ -124,7 +128,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
         mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 
         // EndlessScrollListener - OnLoadMore (v5.0.0)
-        mAdapter.setLoadingMoreAtStartUp(true) //To call only if the list is empty
+        mAdapter.setLoadingMoreAtStartUp(savedInstanceState == null) //To call only if the list is empty
                 //.setEndlessPageSize(3) //Endless is automatically disabled if newItems < 3
                 //.setEndlessTargetCount(15) //Endless is automatically disabled if totalItems >= 15
                 //.setEndlessScrollThreshold(1) //Default=1
