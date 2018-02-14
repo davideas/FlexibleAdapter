@@ -6,8 +6,7 @@
 
 # FlexibleAdapter
 
-### ANNOUNCEMENT: Important changes in latest release
-- **NEW!** [v5.0.0-rc4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc4) built on 2017.12.17
+- **NEW!** [v5.0.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0) built on 2018.03.04
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 - Please read also [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -29,11 +28,11 @@ This library is configurable and it guides the developers to create a better use
 * Customizable [Scrolling Animations](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Adapter-Animations) based on adapter position and beyond.
 * Customizable [Animations](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Adapter-Animations#item-animations-when-items-are-notified) when adding and removing items.
 * [Advanced item decoration](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Flexible-Item-Decoration) (customizable dividers, sections gap and item offsets).
-* Restore deleted items with [UndoHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-UndoHelper); Works with Expandable items too!
-* **NEW!** EmptyView handling with [EmptyViewHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-EmptyViewHelper).
-* Async [Filter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text; Result list is animated; With optional original list; Works with sub items too!
-* [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) updates and filter on big list (far better than _DiffUtil_).
-* [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behaviour fully clickable and collapsible, elevation, transparency and automatic linkage!
+* Restore deleted items with [UndoHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-UndoHelper); Works with Expandable and swiped items too!
+* **NEW!** Basic empty view handling with [EmptyViewHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-EmptyViewHelper).
+* Async [Filter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text; Result list is animated; With optional original list; Works with sub items; **NEW!** Multi filter.
+* [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) updates and filter on big list (small and medium lists with _DiffUtil_).
+* [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behaviour fully clickable and collapsible, elevation, transparency and automatic linkage on item move!
 * [Scrollable Headers and Footers](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Scrollable-Headers-and-Footers) items that lay respectively at the top and at the bottom of the main items.
 * Easy runtime position calculation for adding/moving items in sections.
 * [Expandable items](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Expandable-items) with _Selection Coherence_ and multi-level expansion.
@@ -41,7 +40,7 @@ This library is configurable and it guides the developers to create a better use
 * Innovative bottom and top [EndlessScroll](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-On-Load-More) (_No OnScrollListener_).
 * Supports [thirds LayoutManagers](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Thirds-Layout-Managers).
 * [DrawableUtils](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Utils) for dynamic backgrounds with ripple effect (_No XML_).
-* Custom Tags for multiple Adapter instances.
+* Custom Tags for multiple adapter instances that ease our debug.
 * Comprehensive [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages and JavaDoc documentation.
 
 ### Extensions
@@ -60,7 +59,7 @@ repositories {
 ```
 dependencies {
 	// Using JCenter
-	compile 'eu.davidea:flexible-adapter:5.0.0-rc4'
+	compile 'eu.davidea:flexible-adapter:5.0.0'
 	compile 'eu.davidea:flexible-adapter-ui:1.0.0-b2'
 	compile 'eu.davidea:flexible-adapter-livedata:1.0.0-b2'
 	compile 'eu.davidea:flexible-adapter-databinding:1.0.0-b2'
@@ -72,18 +71,17 @@ dependencies {
 #### Stay Updated
 |Flexible Adapter|Live Data|Data Binding|UI|
 |---|---|---|---|
-|<div align="center">5.0.0-rc4</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>
+|<div align="center">5.0.0</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>
 |<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-livedata?source=watch' alt='Get automatic notifications about new "flexible-adapter-livedata" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-databinding?source=watch' alt='Get automatic notifications about new "flexible-adapter-databinding" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-ui?source=watch' alt='Get automatic notifications about new "flexible-adapter-ui" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>
 
 # Wiki!
 I strongly recommend to read the **new [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial.<br/>
-Wiki pages have been completely reviewed to support all the coming features of version 5.0.0.
+Wiki pages have been completely reviewed to support all the features of version 5.0.0.
 
 ### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!<br/>
 Active discussions:
 - [The next steps of development: Final Release > Extensions](https://github.com/davideas/FlexibleAdapter/issues/361).
-- [Snapshots and Pre-Releases for FlexibleAdapter v5.0.0](https://github.com/davideas/FlexibleAdapter/issues/39).
 
 ### Under the hood
 Some simple features have been implemented, thanks to some Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability.
@@ -123,9 +121,10 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 
 # Change Log
 ###### Latest release
-[v5.0.0-rc4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc4) - 2017.12.17
+[v5.0.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0) - 2018.03.04
 
 ###### Old releases
+[v5.0.0-rc4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc4) - 2017.12.17 |
 [v5.0.0-rc3](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc3) - 2017.10.20 |
 [v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) - 2017.06.10 |
 [v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) - 2017.01.14<br/>
@@ -184,7 +183,7 @@ It will be a pleasure to add your App here, once it is published.
 
 #### FlexibleAdapter & Extensions
 
-    Copyright 2015-2017 Davide Steduto, Davidea Solutions Sprl
+    Copyright 2015-2018 Davide Steduto, Davidea Solutions Sprl
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

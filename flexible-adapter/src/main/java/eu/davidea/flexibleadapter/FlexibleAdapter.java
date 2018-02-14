@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Davide Steduto
+ * Copyright 2015-2018 Davide Steduto
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,10 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -91,6 +93,8 @@ import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
  * <br>10/04/2017 Endless Top Scrolling
  * <br>15/04/2017 Starting or resetting the Filter will empty the bin of the deletedItems
  * <br>23/04/2017 Wrapper class for any third type of LayoutManagers
+ * <br>04/02/2018 Child view click
+ * <br>13/02/2018 Multi filter
  */
 @SuppressWarnings({"Range", "unused", "unchecked", "ConstantConditions", "SuspiciousMethodCalls", "WeakerAccess", "SameParameterValue"})
 public class FlexibleAdapter<T extends IFlexible>
@@ -114,6 +118,9 @@ public class FlexibleAdapter<T extends IFlexible>
     private List<Notification> mNotifications;
     private FilterAsyncTask mFilterAsyncTask;
     private long start, time;
+    private boolean useDiffUtil = false;
+    private DiffUtil.DiffResult diffResult;
+    private DiffUtilCallback diffUtilCallback;
 
     /* Handler for delayed actions */
     protected final int UPDATE = 1, FILTER = 2, LOAD_MORE_COMPLETE = 8;
@@ -1792,7 +1799,7 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
 	/*------------------------*/
-	/* ENDLESS SCROLL METHODS */
+    /* ENDLESS SCROLL METHODS */
 	/*------------------------*/
 
     /**
@@ -4025,7 +4032,7 @@ public class FlexibleAdapter<T extends IFlexible>
         // Animate search results only in case of new Filter
         if (hasNewFilter(mFilterEntity)) {
             mOldFilterEntity = mFilterEntity;
-            animateTo(filteredItems, Payload.FILTER);
+            animateDiff(filteredItems, Payload.FILTER);
         }
 
         // Reset flag
@@ -4202,6 +4209,56 @@ public class FlexibleAdapter<T extends IFlexible>
 	/*-------------------------*/
 
     /**
+     * @return true to calculate animation changes with DiffUtil, false to use default calculation.
+     * @see #setAnimateChangesWithDiffUtil(boolean)
+     */
+    public boolean isAnimateChangesWithDiffUtil() {
+        return useDiffUtil;
+    }
+
+    /**
+     * Whether use {@link DiffUtil} to calculate the changes between 2 lists after Update or
+     * Filter operations. If disabled, the advanced default calculation will be used instead.
+     * <p>A time, to compare the 2 different approaches, is calculated and displayed in the log.
+     * To see the logs call {@link #enableLogs(int)} before creating the Adapter instance!</p>
+     * Default value is {@code false} (default calculation is used).
+     *
+     * @param useDiffUtil true to switch the calculation and use DiffUtil, false to use the default
+     *                    calculation.
+     * @return this Adapter, so the call can be chained
+     * @see #setDiffUtilCallback(DiffUtilCallback)
+     */
+    public FlexibleAdapter setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
+        this.useDiffUtil = useDiffUtil;
+        return this;
+    }
+
+    /**
+     * Sets a custom implementation of {@link DiffUtilCallback} for the DiffUtil.
+     *
+     * @param diffUtilCallback the custom callback that DiffUtil will call
+     * @return this Adapter, so the call can be chained
+     * @see #setAnimateChangesWithDiffUtil(boolean)
+     */
+    public FlexibleAdapter setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
+        this.diffUtilCallback = diffUtilCallback;
+        return this;
+    }
+
+    private synchronized void animateDiff(@Nullable List<T> newItems, Payload payloadChange) {
+        if (useDiffUtil) {
+            Log.v(TAG, "Animate changes with DiffUtils! oldSize=" + getItemCount() + " newSize=" + newItems.size());
+            if (diffUtilCallback == null) {
+                diffUtilCallback = new DiffUtilCallback();
+            }
+            diffUtilCallback.setItems(mItems, newItems);
+            diffResult = DiffUtil.calculateDiff(diffUtilCallback, notifyMoveOfFilteredItems);
+        } else {
+            animateTo(newItems, payloadChange);
+        }
+    }
+
+    /**
      * Animate the synchronization between the old list and the new list.
      * <p>Used by filter and updateDataSet.</p>
      * <b>Note:</b> The animations are skipped in favor of {@link #notifyDataSetChanged()}
@@ -4350,33 +4407,39 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     private synchronized void executeNotifications(Payload payloadChange) {
-        log.i("Performing %s notifications", mNotifications.size());
-        mItems = mTempItems;     // Update mItems in the UI Thread
-        setScrollAnimate(false); // Disable scroll animation
-        for (Notification notification : mNotifications) {
-            switch (notification.operation) {
-                case Notification.ADD:
-                    notifyItemInserted(notification.position);
-                    break;
-                case Notification.CHANGE:
-                    notifyItemChanged(notification.position, payloadChange);
-                    break;
-                case Notification.REMOVE:
-                    notifyItemRemoved(notification.position);
-                    break;
-                case Notification.MOVE:
-                    notifyItemMoved(notification.fromPosition, notification.position);
-                    break;
-                default:
-                    log.w("notifyDataSetChanged!");
-                    notifyDataSetChanged();
-                    break;
+        if (diffResult != null) {
+            Log.i(TAG, "Dispatching notifications");
+            mItems = diffUtilCallback.getNewItems();// Update mItems in the UI Thread
+            diffResult.dispatchUpdatesTo(this);
+            diffResult = null;
+        } else {
+            log.i("Performing %s notifications", mNotifications.size());
+            mItems = mTempItems;     // Update mItems in the UI Thread
+            setScrollAnimate(false); // Disable scroll animation
+            for (Notification notification : mNotifications) {
+                switch (notification.operation) {
+                    case Notification.ADD:
+                        notifyItemInserted(notification.position);
+                        break;
+                    case Notification.CHANGE:
+                        notifyItemChanged(notification.position, payloadChange);
+                        break;
+                    case Notification.REMOVE:
+                        notifyItemRemoved(notification.position);
+                        break;
+                    case Notification.MOVE:
+                        notifyItemMoved(notification.fromPosition, notification.position);
+                        break;
+                    default:
+                        log.w("notifyDataSetChanged!");
+                        notifyDataSetChanged();
+                        break;
+                }
             }
+            mTempItems = null;
+            mNotifications = null;
+            setScrollAnimate(true);
         }
-        mTempItems = null;
-        mNotifications = null;
-        setScrollAnimate(true);
-
         time = System.currentTimeMillis() - start;
         log.i("Animate changes DONE in %sms", time);
     }
@@ -5051,6 +5114,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * @since 26/01/2016
+     * <br>04/02/2018 Providing the view that generated the event
      */
     public interface OnItemClickListener {
         /**
@@ -5369,7 +5433,7 @@ public class FlexibleAdapter<T extends IFlexible>
                 case UPDATE:
                     log.d("doInBackground - started UPDATE");
                     prepareItemsForUpdate(newItems);
-                    animateTo(newItems, Payload.CHANGE);
+                    animateDiff(newItems, Payload.CHANGE);
                     log.d("doInBackground - ended UPDATE");
                     break;
                 case FILTER:
@@ -5383,7 +5447,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
         @Override
         protected void onPostExecute(Void result) {
-            if (mNotifications != null) {
+            if (diffResult != null || mNotifications != null) {
                 //Execute post data
                 switch (what) {
                     case UPDATE:
@@ -5491,6 +5555,97 @@ public class FlexibleAdapter<T extends IFlexible>
                     return true;
             }
             return false;
+        }
+    }
+
+    /**
+     * Use {@link #setItems(List, List)} to set the old and new lists, that are available as:
+     * <p>- {@code protected List<T> oldItems;}
+     * <br/>- {@code protected List<T> newItems;}</p>
+     */
+    public static class DiffUtilCallback<T extends IFlexible> extends DiffUtil.Callback {
+
+        protected List<T> oldItems;
+        protected List<T> newItems;
+
+        public final void setItems(List<T> oldItems, List<T> newItems) {
+            this.oldItems = oldItems;
+            this.newItems = newItems;
+        }
+
+        public final List<T> getNewItems() {
+            return newItems;
+        }
+
+        @Override
+        public final int getOldListSize() {
+            return oldItems.size();
+        }
+
+        @Override
+        public final int getNewListSize() {
+            return newItems.size();
+        }
+
+        /**
+         * Called by the DiffUtil to decide whether two object represent the same item.
+         * <p>
+         * For example, if your items have unique ids, this method should check their id equality.
+         *
+         * @param oldItemPosition The position of the item in the old list
+         * @param newItemPosition The position of the item in the new list
+         * @return True if the two items represent the same object or false if they are different.
+         */
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            T oldItem = oldItems.get(oldItemPosition);
+            T newItem = newItems.get(newItemPosition);
+            return oldItem.equals(newItem);
+        }
+
+        /**
+         * Called by the DiffUtil when it wants to check whether two items have the same data.
+         * DiffUtil uses this information to detect if the contents of an item has changed.
+         * <p>
+         * DiffUtil uses this method to check equality instead of {@link Object#equals(Object)}
+         * so that you can change its behavior depending on your UI.
+         * For example, if you are using DiffUtil with a {@link RecyclerView.Adapter RecyclerView.Adapter},
+         * you should return whether the items' visual representations are the same.
+         * <p>
+         * This method is called only if {@link #areItemsTheSame(int, int)} returns
+         * {@code true} for these items.
+         *
+         * @param oldItemPosition The position of the item in the old list
+         * @param newItemPosition The position of the item in the new list which replaces the oldItem
+         * @return True if the contents of the items are the same or false if they are different.
+         */
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            T oldItem = oldItems.get(oldItemPosition);
+            T newItem = newItems.get(newItemPosition);
+            return !oldItem.shouldNotifyChange(newItem);
+        }
+
+        /**
+         * When {@link #areItemsTheSame(int, int)} returns {@code true} for two items and
+         * {@link #areContentsTheSame(int, int)} returns false for them, DiffUtil
+         * calls this method to get a payload about the change.
+         * <p>
+         * For example, if you are using DiffUtil with {@link RecyclerView}, you can return the
+         * particular field that changed in the item and your
+         * {@link android.support.v7.widget.RecyclerView.ItemAnimator ItemAnimator} can use that
+         * information to run the correct animation.
+         * <p>
+         * Default implementation returns {@code null}.
+         *
+         * @param oldItemPosition The position of the item in the old list
+         * @param newItemPosition The position of the item in the new list
+         * @return A payload object that represents the change between the two items.
+         */
+        @Nullable
+        @Override
+        public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+            return Payload.CHANGE;
         }
     }
 
