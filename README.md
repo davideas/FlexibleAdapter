@@ -5,7 +5,7 @@
 [![Methods and Size](https://img.shields.io/badge/Methods%20and%20size-core:%201099%20|%20119%20KB-e91e63.svg)](http://www.methodscount.com/?lib=eu.davidea%3Aflexible-adapter%3A5.0.0%2B)
 
 # FlexibleAdapter
-- **NEW!** [v5.0.0-rc4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc4) built on 2017.12.17
+- [v5.0.0-rc4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc4) built on 2017.12.17
 - **NEW!** [v5.0.0](https://github.com/davideas/FlexibleAdapter/wiki/Migrations) foreseen for 2018.03.04 already available as SNAPSHOT.
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 - Please read also [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
@@ -31,7 +31,7 @@ This library is configurable and it guides the developers to create a better use
 * Restore deleted items with [UndoHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-UndoHelper); Works with Expandable and swiped items too!
 * **NEW!** Basic empty view handling with [EmptyViewHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-EmptyViewHelper).
 * Async [Filter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text; Result list is animated; With optional original list; Works with sub items; **NEW!** Multi filter.
-* [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) updates and filter on big list (small and medium lists with _DiffUtil_).
+* [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) filter and updates on big list; **NEW!** optional _DiffUtil_ for small and medium lists.
 * [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behaviour fully clickable and collapsible, elevation, transparency and automatic linkage on item move!
 * [Scrollable Headers and Footers](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Scrollable-Headers-and-Footers) items that lay respectively at the top and at the bottom of the main items.
 * Easy runtime position calculation for adding/moving items in sections.
