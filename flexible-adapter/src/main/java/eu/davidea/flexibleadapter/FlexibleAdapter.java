@@ -1843,7 +1843,10 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-rc1
      */
     public int getEndlessCurrentPage() {
-        return mEndlessPageSize > 0 ? getMainItemCount() / mEndlessPageSize : 0;
+        if (mEndlessPageSize > 0) {
+            return (int) Math.ceil((double) getMainItemCount() / mEndlessPageSize);
+        }
+        return 0;
     }
 
     /**
