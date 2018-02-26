@@ -28,6 +28,7 @@ import eu.davidea.samples.flexibleadapter.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.animators.FadeInDownItemAnimator;
 import eu.davidea.samples.flexibleadapter.items.ProgressItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
@@ -68,7 +69,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
 
         // Create New Database and Initialize RecyclerView
         if (savedInstanceState == null) {
-            DatabaseService.getInstance().createEndlessDatabase(0); //N. of items
+            DatabaseService.getInstance().createHeadersSectionsDatabase(0, 0); //N. of items
         }
         initializeRecyclerView(savedInstanceState);
 
@@ -135,8 +136,11 @@ public class FragmentEndlessScrolling extends AbstractFragment
                 .setEndlessScrollListener(this, mProgressItem)
                 .setTopEndless(false);
 
-        // Add 1 Footer items
-        //mAdapter.addScrollableFooter();
+        // Add 1 Header item
+        ScrollableLayoutItem scrollHeader = new ScrollableLayoutItem("SLI");
+        scrollHeader.setTitle("Endless Scrolling");
+        scrollHeader.setSubtitle("...with ScrollableHeaderItem");
+        mAdapter.addScrollableHeader(scrollHeader);
     }
 
     @Override

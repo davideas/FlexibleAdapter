@@ -845,6 +845,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #addScrollableHeaderWithDelay(IFlexible, long, boolean)
      * @since 5.0.0-rc1
      */
+    @NonNull
     public final List<T> getScrollableHeaders() {
         return Collections.unmodifiableList(mScrollableHeaders);
     }
@@ -855,6 +856,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #addScrollableFooterWithDelay(IFlexible, long, boolean)
      * @since 5.0.0-rc1
      */
+    @NonNull
     public final List<T> getScrollableFooters() {
         return Collections.unmodifiableList(mScrollableFooters);
     }
@@ -2073,6 +2075,7 @@ public class FlexibleAdapter<T extends IFlexible>
         // Calculate new items count
         int newItemsSize = newItems == null ? 0 : newItems.size();
         int totalItemCount = newItemsSize + getMainItemCount();
+        int progressPosition = getGlobalPositionOf(mProgressItem);
         // Check if features are enabled and the limits have been reached
         if (mEndlessPageSize > 0 && newItemsSize < mEndlessPageSize || // Is feature enabled and Not enough items?
                 mEndlessTargetCount > 0 && totalItemCount >= mEndlessTargetCount) { // Is feature enabled and Max limit has been reached?
@@ -2089,8 +2092,8 @@ public class FlexibleAdapter<T extends IFlexible>
         // Add any new items
         if (newItemsSize > 0) {
             log.v("onLoadMore     performing adding %s new items on page=%s", newItemsSize, getEndlessCurrentPage());
-            int position = mTopEndless ? mScrollableHeaders.size() : getGlobalPositionOf(mProgressItem);
-            addItems(position, newItems);
+            progressPosition = mTopEndless ? mScrollableHeaders.size() : progressPosition;
+            addItems(progressPosition, newItems);
         }
         // Reset the loading status
         endlessLoading = false;
@@ -2902,7 +2905,7 @@ public class FlexibleAdapter<T extends IFlexible>
         int initialCount = getMainItemCount(); // Count only main items!
         if (position < 0) {
             log.w("addItems Position is negative! adding items to the end");
-            position = initialCount;
+            position = initialCount + mScrollableHeaders.size();
         }
         // Insert the items properly
         performInsert(position, items, true);
