@@ -1837,7 +1837,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * Provides the current endless page if the page size limit is set, if not set the returned
-     * value is always 1.
+     * value is always 0.
      *
      * @return the current endless page
      * @see #getEndlessPageSize()
@@ -1845,7 +1845,10 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-rc1
      */
     public int getEndlessCurrentPage() {
-        return Math.max(1, mEndlessPageSize > 0 ? getMainItemCount() / mEndlessPageSize : 0);
+        if (mEndlessPageSize > 0) {
+            return (int) Math.ceil((double) getMainItemCount() / mEndlessPageSize);
+        }
+        return 0;
     }
 
     /**
