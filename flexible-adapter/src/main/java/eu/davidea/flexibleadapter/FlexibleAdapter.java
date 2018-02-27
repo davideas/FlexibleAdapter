@@ -1802,7 +1802,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
 	/*------------------------*/
     /* ENDLESS SCROLL METHODS */
-	/*------------------------*/
+    /*------------------------*/
 
     /**
      * @return true if loading more will add items to the top, false to the bottom.
@@ -2094,7 +2094,7 @@ public class FlexibleAdapter<T extends IFlexible>
         }
         // Add any new items
         if (newItemsSize > 0) {
-            log.v("onLoadMore     performing adding %s new items on page=%s", newItemsSize, getEndlessCurrentPage());
+            log.d("onLoadMore     performing adding %s new items on page=%s", newItemsSize, getEndlessCurrentPage());
             progressPosition = mTopEndless ? mScrollableHeaders.size() : progressPosition;
             addItems(progressPosition, newItems);
         }
