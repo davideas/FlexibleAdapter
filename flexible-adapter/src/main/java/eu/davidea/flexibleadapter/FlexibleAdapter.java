@@ -1681,6 +1681,7 @@ public class FlexibleAdapter<T extends IFlexible>
     public int getItemViewType(int position) {
         T item = getItem(position);
         if (item == null) {
+            log.e("Item for ViewType not found position=%s, total items=%s", position, getItemCount());
             return 0;
         }
         // Map the view type if not done yet
@@ -4820,8 +4821,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * @param item the item to map
      * @since 5.0.0-b1
      */
-    private void mapViewTypeFrom(T item) {
-        if (item != null && !mTypeInstances.containsKey(item.getItemViewType())) {
+    private void mapViewTypeFrom(@NonNull T item) {
+        if (!mTypeInstances.containsKey(item.getItemViewType())) {
             mTypeInstances.put(item.getItemViewType(), item);
             log.i("Mapped viewType %s from %s", item.getItemViewType(), getClassName(item));
         }
