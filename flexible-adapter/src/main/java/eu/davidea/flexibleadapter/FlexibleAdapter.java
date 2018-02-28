@@ -1681,7 +1681,7 @@ public class FlexibleAdapter<T extends IFlexible>
     public int getItemViewType(int position) {
         T item = getItem(position);
         if (item == null) {
-            log.e("Item for ViewType not found position=%s, total items=%s", position, getItemCount());
+            log.e("Item for ViewType not found! position=%s, items=%s", position, getItemCount());
             return 0;
         }
         // Map the view type if not done yet
