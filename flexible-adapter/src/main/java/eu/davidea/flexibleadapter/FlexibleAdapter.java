@@ -620,7 +620,7 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Returns the object of type <b>T</b>.
+     * Returns the object of the generic type <b>T</b>.
      * <p>This method cannot be overridden since the entire library relies on it.</p>
      *
      * @param position the position of the item in the list
@@ -631,6 +631,20 @@ public class FlexibleAdapter<T extends IFlexible>
     public T getItem(int position) {
         if (position < 0 || position >= getItemCount()) return null;
         return mItems.get(position);
+    }
+
+    /**
+     * Returns the object of specific type <b>S</b>.
+     *
+     * @param position the position of the item in the list
+     * @param clazz    the class type expected
+     * @return The <b>S</b> object for the position provided or null if item not found
+     * @throws ClassCastException if the class type doesn't match with the item type requested
+     * @since 5.0.0
+     */
+    @Nullable
+    public <S extends T> S getItem(int position, Class<S> clazz) {
+        return clazz.cast(getItem(position));
     }
 
     /**
@@ -3825,8 +3839,11 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
+     * Gets the current filter.
+     *
      * @param clazz The class type of filter to return (eg. String.class)
      * @return the current filter entity
+     * @throws ClassCastException if the class type doesn't match with the filter type previously set
      * @since 5.0.0
      */
     @Nullable
