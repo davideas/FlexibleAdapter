@@ -180,7 +180,7 @@ public class FlexibleAdapter<T extends IFlexible>
     protected OnDeleteCompleteListener mDeleteCompleteListener;
     protected OnStickyHeaderChangeListener mStickyHeaderChangeListener;
 
-	/*--------------*/
+    /*--------------*/
     /* CONSTRUCTORS */
     /*--------------*/
 
@@ -440,7 +440,7 @@ public class FlexibleAdapter<T extends IFlexible>
         return this;
     }
 
-	/*------------------------------*/
+    /*------------------------------*/
     /* SELECTION METHODS OVERRIDDEN */
     /*------------------------------*/
 
@@ -553,7 +553,7 @@ public class FlexibleAdapter<T extends IFlexible>
         return childSelected;
     }
 
-	/*--------------*/
+    /*--------------*/
     /* MAIN METHODS */
     /*--------------*/
 
@@ -835,7 +835,7 @@ public class FlexibleAdapter<T extends IFlexible>
         return Math.max(0, sortedList.indexOf(item));
     }
 
-	/*------------------------------------*/
+    /*------------------------------------*/
     /* SCROLLABLE HEADERS/FOOTERS METHODS */
     /*------------------------------------*/
 
@@ -1117,7 +1117,7 @@ public class FlexibleAdapter<T extends IFlexible>
         items.addAll(mScrollableFooters);
     }
 
-	/*--------------------------*/
+    /*--------------------------*/
     /* HEADERS/SECTIONS METHODS */
     /*--------------------------*/
 
@@ -1662,7 +1662,7 @@ public class FlexibleAdapter<T extends IFlexible>
         }
     }
 
-	/*--------------------------------------------*/
+    /*--------------------------------------------*/
     /* VIEW HOLDER METHODS ARE DELEGATED TO ITEMS */
     /*--------------------------------------------*/
 
@@ -1801,7 +1801,7 @@ public class FlexibleAdapter<T extends IFlexible>
         if (item != null) item.unbindViewHolder(this, holder, position);
     }
 
-	/*------------------------*/
+    /*------------------------*/
     /* ENDLESS SCROLL METHODS */
     /*------------------------*/
 
@@ -2135,9 +2135,9 @@ public class FlexibleAdapter<T extends IFlexible>
         }
     }
 
-	/*--------------------*/
-	/* EXPANDABLE METHODS */
-	/*--------------------*/
+    /*--------------------*/
+    /* EXPANDABLE METHODS */
+    /*--------------------*/
 
     /**
      * @return true if {@code collapseOnExpand} is enabled, false otherwise
@@ -2757,9 +2757,9 @@ public class FlexibleAdapter<T extends IFlexible>
         return recursiveCollapse(0, mItems, level);
     }
 
-	/*----------------*/
-	/* UPDATE METHODS */
-	/*----------------*/
+    /*----------------*/
+    /* UPDATE METHODS */
+    /*----------------*/
 
     /**
      * Updates/Rebounds the itemView corresponding to the current position of the
@@ -2819,9 +2819,9 @@ public class FlexibleAdapter<T extends IFlexible>
         notifyItemChanged(position, payload);
     }
 
-	/*----------------*/
-	/* ADDING METHODS */
-	/*----------------*/
+    /*----------------*/
+    /* ADDING METHODS */
+    /*----------------*/
 
     /**
      * Inserts the given item at desired position or Add item at last position with a delay
@@ -3180,9 +3180,9 @@ public class FlexibleAdapter<T extends IFlexible>
         return getGlobalPositionOf(sectionable);
     }
 
-	/*----------------------*/
-	/* DELETE ITEMS METHODS */
-	/*----------------------*/
+    /*----------------------*/
+    /* DELETE ITEMS METHODS */
+    /*----------------------*/
 
     /**
      * This method clears <b>everything</b>: main items, Scrollable Headers and Footers and
@@ -3546,9 +3546,9 @@ public class FlexibleAdapter<T extends IFlexible>
         this.removeItems(getSelectedPositions(), payload);
     }
 
-	/*----------------------*/
-	/* UNDO/RESTORE METHODS */
-	/*----------------------*/
+    /*----------------------*/
+    /* UNDO/RESTORE METHODS */
+    /*----------------------*/
 
     /**
      * Returns if items will be deleted immediately when deletion is requested.
@@ -3773,49 +3773,26 @@ public class FlexibleAdapter<T extends IFlexible>
         return subItems;
     }
 
-	/*----------------*/
-	/* FILTER METHODS */
-	/*----------------*/
+    /*----------------*/
+    /* FILTER METHODS */
+    /*----------------*/
 
     /**
-     * @return true if the current search text is not empty or null
-     * @since 3.1.0
-     * @deprecated Use {@link #hasFilter()}
-     */
-    @Deprecated
-    public boolean hasSearchText() {
-        return hasFilter();
-    }
-
-    /**
-     * @return true if the current filter is not null
+     * @return true if the current filter is not {@code null}
      * @since 5.0.0
      */
     public boolean hasFilter() {
         if (mFilterEntity instanceof String) {
-            return !((String) mFilterEntity).isEmpty();
+            return !getFilter(String.class).isEmpty();
         }
         return mFilterEntity != null;
-    }
-
-    /**
-     * Checks if the searchText is changed.
-     *
-     * @param newText the new searchText
-     * @return true if the old search text is different than the newText, false otherwise
-     * @since 5.0.0-b5
-     * @deprecated Use {@link #hasNewFilter(Serializable)}
-     */
-    @Deprecated
-    public boolean hasNewSearchText(String newText) {
-        return hasNewFilter(newText);
     }
 
     /**
      * Checks if the filter is changed.
      *
      * @param constraint the new filter entity
-     * @return true if the old filter is different than the new one, false otherwise
+     * @return true if the old filter is different than the new one, false if not changed
      * @since 5.0.0
      */
     public boolean hasNewFilter(Serializable constraint) {
@@ -3826,37 +3803,10 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * @return the current search text
-     * @since 3.1.0
-     * @deprecated Use {@link #setFilter(Serializable)} instead.
-     */
-    @Deprecated
-    @NonNull
-    public String getSearchText() {
-        return (String) mFilterEntity;
-    }
-
-    /**
-     * Sets the new search text.
-     * <p><b>Note:</b> Text is always <b>trimmed</b> and <b>lowercase</b>.</p>
-     * <p><b>Tip:</b> You can highlight filtered Text or Words using {@code FlexibleUtils} from UI extension:
-     * <ul><li>{@code FlexibleUtils#highlightText(TextView, String, String)}</li>
-     * <li>{@code FlexibleUtils#highlightWords(TextView, String, String)}</li></ul></p>
-     *
-     * @param searchText the new text to filter the items
-     * @since 3.1.0
-     * @deprecated Use {@link #setFilter(Serializable)} instead.
-     */
-    @Deprecated
-    public void setSearchText(@NonNull String searchText) {
-        setFilter(searchText != null ? searchText.trim().toLowerCase(Locale.getDefault()) : "");
-    }
-
-    /**
      * Sets the new filter entity.
      * <p><b>Note:</b></p><ul>
-     * <li>Must implement {@link Serializable} (String does).</li>
-     * <li>In case of free text (String), filter is automatically <b>trimmed</b>
+     * <li>Filter object must implement {@link Serializable} ({@code String} does).</li>
+     * <li>In case of free text ({@code String}), filter is automatically <b>trimmed</b>
      * and <b>lowercase</b>.</li>
      * </ul>
      * <p><b>Tip:</b> You can highlight filtered Text or Words using {@code FlexibleUtils}
@@ -3875,12 +3825,13 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * @return the current filter object
+     * @param clazz The class type of filter to return (eg. String.class)
+     * @return the current filter entity
      * @since 5.0.0
      */
     @Nullable
-    public Serializable getFilter() {
-        return mFilterEntity;
+    public <F extends Serializable> F getFilter(Class<F> clazz) {
+        return clazz.cast(mFilterEntity);
     }
 
     /**
@@ -4079,7 +4030,7 @@ public class FlexibleAdapter<T extends IFlexible>
         boolean filtered = filterExpandableObject(item, filteredItems);
         // If no subItem was filtered, fallback to Normal filter
         if (!filtered) {
-            filtered = filterObject(item, getFilter());
+            filtered = filterObject(item, getFilter(Serializable.class));
         }
         if (filtered) {
             // Check if header has to be added too
@@ -4112,7 +4063,7 @@ public class FlexibleAdapter<T extends IFlexible>
                     filtered = true;
                 } else {
                     // Use normal filter for normal subItem
-                    subItem.setHidden(!filterObject(subItem, getFilter()));
+                    subItem.setHidden(!filterObject(subItem, getFilter(Serializable.class)));
                     if (!subItem.isHidden()) {
                         filtered = true;
                         filteredItems.add(subItem);
@@ -4211,9 +4162,9 @@ public class FlexibleAdapter<T extends IFlexible>
         return this;
     }
 
-	/*-------------------------*/
-	/* ANIMATE CHANGES METHODS */
-	/*-------------------------*/
+    /*-------------------------*/
+    /* ANIMATE CHANGES METHODS */
+    /*-------------------------*/
 
     /**
      * @return true to calculate animation changes with DiffUtil, false to use default calculation.
@@ -4458,9 +4409,9 @@ public class FlexibleAdapter<T extends IFlexible>
         return time;
     }
 
-	/*---------------*/
-	/* TOUCH METHODS */
-	/*---------------*/
+    /*---------------*/
+    /* TOUCH METHODS */
+    /*---------------*/
 
     private void initializeItemTouchHelper() {
         if (mItemTouchHelper == null) {
@@ -4811,9 +4762,9 @@ public class FlexibleAdapter<T extends IFlexible>
         }
     }
 
-	/*------------------------*/
-	/* OTHERS PRIVATE METHODS */
-	/*------------------------*/
+    /*------------------------*/
+    /* OTHERS PRIVATE METHODS */
+    /*------------------------*/
 
     /**
      * Internal mapper to remember and add all view types for the items.
@@ -5007,9 +4958,9 @@ public class FlexibleAdapter<T extends IFlexible>
         }, delay);
     }
 
-	/*----------------*/
-	/* INSTANCE STATE */
-	/*----------------*/
+    /*----------------*/
+    /* INSTANCE STATE */
+    /*----------------*/
 
     /**
      * Save the state of the current expanded items.
@@ -5071,9 +5022,9 @@ public class FlexibleAdapter<T extends IFlexible>
         }
     }
 
-	/*---------------*/
-	/* INNER CLASSES */
-	/*---------------*/
+    /*---------------*/
+    /* INNER CLASSES */
+    /*---------------*/
 
     /**
      * @since 03/01/2016

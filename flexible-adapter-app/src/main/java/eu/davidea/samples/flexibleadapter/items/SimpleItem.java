@@ -19,6 +19,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IFilterable;
+import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.flexibleadapter.utils.FlexibleUtils;
@@ -76,8 +77,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
     }
 
     @Override
-    @SuppressWarnings({"unchecked"})
-    public void bindViewHolder(final FlexibleAdapter adapter, SimpleViewHolder holder, int position, List payloads) {
+    public void bindViewHolder(FlexibleAdapter<IFlexible> adapter, SimpleViewHolder holder, int position, List<Object> payloads) {
         Context context = holder.itemView.getContext();
 
         // Background, when bound the first time
@@ -93,9 +93,10 @@ public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
         holder.mFlipView.flipSilently(adapter.isSelected(position));
 
         // In case of any Words in the searchText matches with Title this will be highlighted
-        if (adapter.hasSearchText()) {
-            FlexibleUtils.highlightWords(holder.mTitle, getTitle(), adapter.getSearchText());
-            FlexibleUtils.highlightWords(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+        if (adapter.hasFilter()) {
+            String filter = adapter.getFilter(String.class);
+            FlexibleUtils.highlightWords(holder.mTitle, getTitle(), filter);
+            FlexibleUtils.highlightWords(holder.mSubtitle, getSubtitle(), filter);
         } else {
             holder.mTitle.setText(getTitle());
             holder.mSubtitle.setText(getSubtitle());

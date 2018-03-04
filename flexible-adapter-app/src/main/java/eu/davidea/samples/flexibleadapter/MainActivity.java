@@ -479,9 +479,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if (mAdapter.hasNewSearchText(newText)) {
+        if (mAdapter.hasNewFilter(newText)) {
             Log.d("onQueryTextChange newText: " + newText);
-            mAdapter.setSearchText(newText);
+            mAdapter.setFilter(newText);
 
             // Fill and Filter mItems with your custom list and automatically animate the changes
             // - Option A: Use the internal list as original list
@@ -491,7 +491,7 @@ public class MainActivity extends AppCompatActivity implements
             //mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), DatabaseConfiguration.delay);
         }
         // Disable SwipeRefresh if search is active!!
-        mSwipeRefreshLayout.setEnabled(!mAdapter.hasSearchText());
+        mSwipeRefreshLayout.setEnabled(!mAdapter.hasFilter());
         return true;
     }
 
@@ -511,14 +511,14 @@ public class MainActivity extends AppCompatActivity implements
 
         if (mSearchView != null) {
             //Has searchText?
-            if (!mAdapter.hasSearchText()) {
+            if (!mAdapter.hasFilter()) {
                 Log.d("onPrepareOptionsMenu Clearing SearchView!");
                 mSearchView.setIconified(true);// This also clears the text in SearchView widget
             } else {
                 //Necessary after the restoreInstanceState
                 menu.findItem(R.id.action_search).expandActionView();//must be called first
                 //This restores the text, must be after the expandActionView()
-                mSearchView.setQuery(mAdapter.getSearchText(), false);//submit = false!!!
+                mSearchView.setQuery(mAdapter.getFilter(String.class), false);//submit = false!!!
                 mSearchView.clearFocus();//Optionally the keyboard can be closed
                 //mSearchView.setIconified(false);//This is not necessary
             }

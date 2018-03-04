@@ -68,7 +68,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
      * The view is represented by a custom Item type to better represent any dynamic content.
      */
     public void showLayoutInfo(boolean scrollToPosition) {
-        if (!hasSearchText()) {
+        if (!hasFilter()) {
             final ScrollableLayoutItem item = new ScrollableLayoutItem("LAY-L");
             if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
                 item.setId("LAY-S");
@@ -97,7 +97,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
      * The view is represented by a custom Item type to better represent any dynamic content.
      */
     public void addUserLearnedSelection(boolean scrollToPosition) {
-        if (!DatabaseConfiguration.userLearnedSelection && !hasSearchText() && !(getItem(0) instanceof ScrollableULSItem)) {
+        if (!DatabaseConfiguration.userLearnedSelection && !hasFilter() && !(getItem(0) instanceof ScrollableULSItem)) {
             final ScrollableULSItem item = new ScrollableULSItem("ULS");
             item.setTitle(mRecyclerView.getContext().getString(R.string.uls_title));
             item.setSubtitle(mRecyclerView.getContext().getString(R.string.uls_subtitle));

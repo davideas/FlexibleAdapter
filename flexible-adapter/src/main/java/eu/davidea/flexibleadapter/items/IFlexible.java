@@ -191,7 +191,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      * @param adapter the Adapter instance extending {@link FlexibleAdapter}
      * @return a new ViewHolder that holds a View of the given view type
      */
-    VH createViewHolder(View view, FlexibleAdapter adapter);
+    VH createViewHolder(View view, FlexibleAdapter<IFlexible> adapter);
 
     /**
      * Delegates the binding of this item's data to the given Layout.
@@ -206,7 +206,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      * @param position the current position
      * @param payloads a non-null list of merged payloads. Can be empty list if requires full update
      */
-    void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List<Object> payloads);
+    void bindViewHolder(FlexibleAdapter<IFlexible> adapter, VH holder, int position, List<Object> payloads);
 
     /**
      * Called when a view created by this adapter has been recycled.
@@ -221,7 +221,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      * @param holder   the ViewHolder instance being recycled
      * @param position the current position
      */
-    void unbindViewHolder(FlexibleAdapter adapter, VH holder, int position);
+    void unbindViewHolder(FlexibleAdapter<IFlexible> adapter, VH holder, int position);
 
     /**
      * Called when a view created by this adapter has been attached to a window.
@@ -231,7 +231,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      * @param holder   the ViewHolder instance being recycled
      * @param position the current position
      */
-    void onViewAttached(FlexibleAdapter adapter, VH holder, int position);
+    void onViewAttached(FlexibleAdapter<IFlexible> adapter, VH holder, int position);
 
     /**
      * Called when a view created by this adapter has been detached from its window.
@@ -243,6 +243,6 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      * @param holder   the ViewHolder instance being recycled
      * @param position the current position
      */
-    void onViewDetached(FlexibleAdapter adapter, VH holder, int position);
+    void onViewDetached(FlexibleAdapter<IFlexible> adapter, VH holder, int position);
 
 }

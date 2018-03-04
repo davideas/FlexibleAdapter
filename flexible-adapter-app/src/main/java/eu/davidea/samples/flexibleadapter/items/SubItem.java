@@ -66,14 +66,14 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder> implements IF
         return new ChildViewHolder(view, adapter);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public void bindViewHolder(FlexibleAdapter adapter, ChildViewHolder holder, int position, List payloads) {
+    public void bindViewHolder(FlexibleAdapter<IFlexible> adapter, ChildViewHolder holder, int position, List<Object> payloads) {
         //In case of searchText matches with Title or with an SimpleItem's field
         // this will be highlighted
-        if (adapter.hasSearchText()) {
+        if (adapter.hasFilter()) {
             Context context = holder.itemView.getContext();
-            FlexibleUtils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText(),
+            String filter = adapter.getFilter(String.class);
+            FlexibleUtils.highlightText(holder.mTitle, getTitle(), filter,
                     context.getResources().getColor(R.color.colorAccent_light));
         } else {
             holder.mTitle.setText(getTitle());
