@@ -5,8 +5,7 @@
 [![Methods and Size](https://img.shields.io/badge/Methods%20and%20size-core:%201099%20|%20119%20KB-e91e63.svg)](http://www.methodscount.com/?lib=eu.davidea%3Aflexible-adapter%3A5.0.0%2B)
 
 # FlexibleAdapter
-- [v5.0.0-rc4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc4) built on 2017.12.17
-- **NEW!** [v5.0.0](https://github.com/davideas/FlexibleAdapter/wiki/Migrations) foreseen for 2018.03.04 already available as SNAPSHOT.
+- [v5.0.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0) built on 2018.03.04
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 - Please read also [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -31,7 +30,7 @@ This library is configurable and it guides the developers to create a better use
 * Restore deleted items with [UndoHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-UndoHelper); Works with Expandable and swiped items too!
 * **NEW!** Basic empty view handling with [EmptyViewHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-EmptyViewHelper).
 * Async [Filter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with Spannable text; Result list is animated; With optional original list; Works with sub items; **NEW!** Multi filter.
-* [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) filter and updates for medium and big lists; **NEW!** optional _DiffUtil_ for small one.
+* [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) filter and updates for medium and big lists; **NEW!** optional _DiffUtil_ for small lists.
 * [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behaviour fully clickable and collapsible, elevation, transparency and automatic linkage on item move!
 * [Scrollable Headers and Footers](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Scrollable-Headers-and-Footers) items that lay respectively at the top and at the bottom of the main items.
 * Easy runtime position calculation for adding/moving items in sections.
@@ -59,19 +58,19 @@ repositories {
 ```
 dependencies {
 	// Using JCenter
-	compile 'eu.davidea:flexible-adapter:5.0.0-rc4'
+	compile 'eu.davidea:flexible-adapter:5.0.0'
 	compile 'eu.davidea:flexible-adapter-ui:1.0.0-b2'
 	compile 'eu.davidea:flexible-adapter-livedata:1.0.0-b2'
 	compile 'eu.davidea:flexible-adapter-databinding:1.0.0-b2'
 	
 	// Using MavenSnapshots repository for continuous updates from my development
-	compile 'eu.davidea:flexible-adapter:5.0.0-SNAPSHOT'
+	compile 'eu.davidea:flexible-adapter:x.y.z-SNAPSHOT'
 }
 ```
 #### Stay Updated
 |Flexible Adapter|Live Data|Data Binding|UI|
 |---|---|---|---|
-|<div align="center">5.0.0-rc4</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>
+|<div align="center">5.0.0</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>
 |<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-livedata?source=watch' alt='Get automatic notifications about new "flexible-adapter-livedata" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-databinding?source=watch' alt='Get automatic notifications about new "flexible-adapter-databinding" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-ui?source=watch' alt='Get automatic notifications about new "flexible-adapter-ui" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>
 
 # Wiki!
@@ -81,8 +80,7 @@ Wiki pages have been completely reviewed to support all the coming features of v
 ### Pull requests / Issues / Improvement requests
 Feel free to contribute and ask!<br/>
 Active discussions:
-- [The next steps of development: Final Release > Extensions](https://github.com/davideas/FlexibleAdapter/issues/361).
-- [Snapshots and Pre-Releases for FlexibleAdapter v5.0.0](https://github.com/davideas/FlexibleAdapter/issues/39).
+- [The next steps of development: New demoApp > Extensions](https://github.com/davideas/FlexibleAdapter/issues/361).
 
 ### Under the hood
 Some simple features have been implemented, thanks to some Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability.
@@ -122,9 +120,10 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 
 # Change Log
 ###### Latest release
-[v5.0.0-rc4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc4) - 2017.12.17
+[v5.0.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0) - 2018.03.04
 
 ###### Old releases
+[v5.0.0-rc4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc4) - 2017.12.17 |
 [v5.0.0-rc3](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc3) - 2017.10.20 |
 [v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) - 2017.06.10 |
 [v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) - 2017.01.14<br/>
