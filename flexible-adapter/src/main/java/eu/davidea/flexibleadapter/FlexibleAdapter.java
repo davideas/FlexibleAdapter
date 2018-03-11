@@ -3501,6 +3501,9 @@ public class FlexibleAdapter<T extends IFlexible>
             }
             // Remove item from internal list
             mItems.remove(positionStart);
+            if (permanentDelete && mOriginalList != null) {
+                mOriginalList.remove(item);
+            }
             removeSelection(position);
         }
 
@@ -3681,9 +3684,23 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
+     * Performs removal confirmation and cleans memory by synchronizing the internal list from deletion.
+     * <p><b>Note:</b> This method is automatically called after timer is over in UndoHelper.</p>
+     *
+     * @since 5.0.1
+     */
+    public void confirmDeletion() {
+        log.d("confirmDeletion!");
+        if (mOriginalList != null) {
+            mOriginalList.removeAll(getDeletedItems());
+        }
+        emptyBin();
+    }
+
+    /**
      * Cleans memory from items just removed.
-     * <p><b>Note:</b> This method is automatically called after timer is over and after a
-     * restoration.</p>
+     * <p><b>Note:</b> This method is automatically called after timer is over in UndoHelper
+     * and after a restoration.</p>
      *
      * @since 3.0.0
      */
@@ -3697,7 +3714,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return true if the restore list is not empty, false otherwise
      * @since 4.0.0
      */
-    public final boolean isRestoreInTime() {
+    public synchronized final boolean isRestoreInTime() {
         return mRestoreList != null && !mRestoreList.isEmpty();
     }
 
@@ -5386,13 +5403,14 @@ public class FlexibleAdapter<T extends IFlexible>
                 log.w("Cannot filter while endlessLoading");
                 this.cancel(true);
             }
-            // Note: In case some items are in pending deletion (Undo started),
-            // we commit the deletion before starting or resetting the filter.
-            if (isRestoreInTime() && mDeleteCompleteListener != null) {
+            // Note: In case of some deleted items, we commit the deletion in the original list
+            // and in the current list before starting or resetting the filter.
+            if (isRestoreInTime()) {
                 log.d("Removing all deleted items before filtering/updating");
                 newItems.removeAll(getDeletedItems());
-                if (mOriginalList != null) mOriginalList.removeAll(getDeletedItems());
-                mDeleteCompleteListener.onDeleteConfirmed(3); // Snackbar.Callback.DISMISS_EVENT_MANUAL = 3
+                if (mDeleteCompleteListener != null) {
+                    mDeleteCompleteListener.onDeleteConfirmed(3); // Snackbar.Callback.DISMISS_EVENT_MANUAL = 3
+                }
             }
         }
 
@@ -5487,8 +5505,9 @@ public class FlexibleAdapter<T extends IFlexible>
     @CallSuper
     protected void onPostUpdate() {
         // Call listener to update EmptyView, assuming the update always made a change
-        if (mUpdateListener != null)
+        if (mUpdateListener != null) {
             mUpdateListener.onUpdateEmptyView(getMainItemCount());
+        }
     }
 
     /**
@@ -5500,8 +5519,9 @@ public class FlexibleAdapter<T extends IFlexible>
     @CallSuper
     protected void onPostFilter() {
         // Call listener to update FilterView, assuming the filter always made a change
-        if (mFilterListener != null)
+        if (mFilterListener != null) {
             mFilterListener.onUpdateFilterView(getMainItemCount());
+        }
     }
 
     /**
