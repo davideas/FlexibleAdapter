@@ -7,8 +7,11 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 import static org.junit.Assert.assertEquals;
@@ -21,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 @Config(constants = BuildConfig.class, sdk = 25)
 public class FilterTest {
 
-    FlexibleAdapter<AbstractFlexibleItem> mAdapter;
-    List<AbstractFlexibleItem> mItems;
+    private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
+    private List<AbstractFlexibleItem> mItems;
 
     @Before
     public void setUp() throws Exception {
@@ -30,13 +33,39 @@ public class FilterTest {
         mItems = DatabaseService.getInstance().getDatabaseList();
     }
 
-    @Test
-    public void testNoDelayFilter() throws Exception {
-        mAdapter = new FlexibleAdapter<>(mItems);
+    @SuppressWarnings("unchecked")
+    private void createSignalAdapter(final CountDownLatch signal) {
+        mAdapter = new FlexibleAdapter(mItems) {
+            @Override
+            protected void onPostFilter() {
+                super.onPostFilter();
+                signal.countDown();
+                verifyResult();
+            }
+        };
         mAdapter.showAllHeaders();
-        mAdapter.setSearchText("1");
+    }
+
+    @Test
+    public void testFilter() throws Throwable {
+        CountDownLatch signal = new CountDownLatch(1);
+        createSignalAdapter(signal);
+
+        mAdapter.setFilter("1"); // No delay
         mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList());
-        assertEquals(21, mAdapter.getItemCount());
+
+        signal.await(100L, TimeUnit.MILLISECONDS);
+    }
+
+    private void verifyResult() {
+        int count = 0;
+        for (AbstractFlexibleItem dbItem : mItems) {
+            SimpleItem simpleItem = (SimpleItem) dbItem;
+            if (simpleItem.filter("1")) {
+                count++;
+            }
+        }
+        assertEquals(count, mAdapter.getItemCount());
     }
 
 }

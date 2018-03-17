@@ -318,10 +318,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
             isForwardEnabled = false;
         }
         int lastVisiblePosition = getFlexibleLayoutManager().findLastVisibleItemPosition();
-        log.v("isForwardEnabled=%s isReverseEnabled=%s isFastScroll=%s isNotified=%s mLastAnimatedPosition=%s mMaxChildViews=%s %s",
-                isForwardEnabled, isReverseEnabled, isFastScroll, mAnimatorNotifierObserver.isPositionNotified(), mLastAnimatedPosition,
-                mMaxChildViews, (!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : "")
-        );
+//        log.v("animateView isForwardEnabled=%s isReverseEnabled=%s isFastScroll=%s isNotified=%s mLastAnimatedPosition=%s mMaxChildViews=%s %s",
+//                isForwardEnabled, isReverseEnabled, isFastScroll, mAnimatorNotifierObserver.isPositionNotified(), mLastAnimatedPosition,
+//                mMaxChildViews, (!isReverseEnabled ? " Pos>LasVisPos=" + (position > lastVisiblePosition) : "")
+//        );
         if ((isForwardEnabled || isReverseEnabled)
                 && !isFastScroll && holder instanceof FlexibleViewHolder
                 && !mAnimatorNotifierObserver.isPositionNotified()
@@ -350,16 +350,15 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
                     duration = animator.getDuration();
                 }
             }
-            log.v("duration=%s", duration);
             set.setDuration(duration);
             set.addListener(new HelperAnimatorListener(hashCode));
             if (mEntryStep) {
                 // Stop stepDelay when screen is filled
-                set.setStartDelay(calculateAnimationDelay(position));
+                set.setStartDelay(calculateAnimationDelay(holder, position));
             }
             set.start();
             mAnimators.put(hashCode, set);
-            log.v("animateView    Scroll animation on position %s", position);
+            //log.v("animateView    Scroll animation on position %s", position);
         }
         mAnimatorNotifierObserver.clearNotified();
         // Update last animated position
@@ -370,7 +369,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      * @param position the position just bound
      * @return the delay in milliseconds after which, the animation for next ItemView should start.
      */
-    private long calculateAnimationDelay(int position) {
+    private long calculateAnimationDelay(RecyclerView.ViewHolder holder, int position) {
         long delay;
         int firstVisiblePosition = getFlexibleLayoutManager().findFirstCompletelyVisibleItemPosition();
         int lastVisiblePosition = getFlexibleLayoutManager().findLastCompletelyVisibleItemPosition();
@@ -412,9 +411,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
             delay = mInitialDelay + (position * mStepDelay);
         }
 
-        log.v("Delay[%s]=%s FirstVisible=%s LastVisible=%s LastAnimated=%s VisibleItems=%s ChildCount=%s MaxChildCount=%s",
-                position, delay, firstVisiblePosition, lastVisiblePosition, numberOfAnimatedItems,
-                visibleItems, mRecyclerView.getChildCount(), mMaxChildViews);
+//        log.v("animateView %s delay[%s]=%s firstVisible=%s lastVisible=%s lastAnimated=%s visibleItems=%s childCount=%s maxChildCount=%s",
+//                getClassName(holder), position, delay, firstVisiblePosition, lastVisiblePosition,
+//                numberOfAnimatedItems, visibleItems, mRecyclerView.getChildCount(), mMaxChildViews);
 
         return delay;
     }

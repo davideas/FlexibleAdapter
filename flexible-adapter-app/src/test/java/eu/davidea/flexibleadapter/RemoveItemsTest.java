@@ -7,6 +7,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
@@ -21,8 +23,8 @@ import static org.junit.Assert.assertEquals;
 @Config(constants = BuildConfig.class, sdk = 25)
 public class RemoveItemsTest {
 
-    FlexibleAdapter<AbstractFlexibleItem> mAdapter;
-    List<AbstractFlexibleItem> mItems;
+    private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
+    private List<AbstractFlexibleItem> mItems;
 
     @Before
     public void setUp() throws Exception {
@@ -31,7 +33,17 @@ public class RemoveItemsTest {
         mAdapter = new FlexibleAdapter<>(mItems);
     }
 
-    @SuppressWarnings("Range")
+    @SuppressWarnings("unchecked")
+    private void createSignalAdapter(final CountDownLatch signal) {
+        mAdapter = new FlexibleAdapter(mItems) {
+            @Override
+            protected void onPostFilter() {
+                super.onPostFilter();
+                signal.countDown();
+            }
+        };
+    }
+
     @Test
     public void testRemoveItems() {
         // Items must be deleted from bottom in a cycle for
@@ -45,7 +57,6 @@ public class RemoveItemsTest {
         assertEquals(7, mAdapter.getItemCount());
     }
 
-    @SuppressWarnings("Range")
     @Test
     public void testRemoveSelectedItems() {
         for (int i = 0; i < mAdapter.getItemCount(); i++) {
@@ -55,6 +66,25 @@ public class RemoveItemsTest {
         mAdapter.removeAllSelectedItems();
         assertEquals(0, mAdapter.getSelectedItemCount());
         assertEquals(7, mAdapter.getItemCount());
+    }
+
+    @Test
+    public void testRemoveItemsWithFilter() throws InterruptedException {
+        CountDownLatch signal = new CountDownLatch(2);
+        createSignalAdapter(signal);
+
+        final int INITIAL_COUNT = mItems.size();
+        final int REMOVE_COUNT = 5;
+        mAdapter.setFilter("1"); // No delay
+        mAdapter.filterItems();
+
+        signal.await(100L, TimeUnit.MILLISECONDS);
+        mAdapter.removeRange(0, REMOVE_COUNT);
+        mAdapter.setFilter(""); // No delay
+        mAdapter.filterItems();
+
+        signal.await(100L, TimeUnit.MILLISECONDS);
+        assertEquals(INITIAL_COUNT - REMOVE_COUNT, mAdapter.getItemCount());
     }
 
 }

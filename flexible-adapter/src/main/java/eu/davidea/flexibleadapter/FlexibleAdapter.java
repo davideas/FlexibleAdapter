@@ -1756,8 +1756,6 @@ public class FlexibleAdapter<T extends IFlexible>
      */
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position, List payloads) {
-        String itemId = hasStableIds() ? " itemId=" + holder.getItemId() : "";
-        log.v("onViewBound    Holder=%s position=%s%s", getClassName(holder), position, itemId);
         if (!autoMap) {
             // If everything has been set properly, this should never happen ;-)
             throw new IllegalStateException("AutoMap is not active, this method cannot be called. You should implement the AutoMap properly.");
@@ -1810,7 +1808,6 @@ public class FlexibleAdapter<T extends IFlexible>
             holder.itemView.setVisibility(View.VISIBLE);
         }
         int position = holder.getAdapterPosition();
-        //log.v("onViewRecycled Holder=%s position=%s", getClassName(holder), position);
         T item = getItem(position);
         if (item != null) item.unbindViewHolder(this, holder, position);
     }

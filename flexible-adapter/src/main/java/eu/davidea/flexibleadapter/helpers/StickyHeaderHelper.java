@@ -237,7 +237,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
             resetHeader(mStickyHeaderViewHolder);
         }
         mStickyHeaderViewHolder = newHeader;
-        mStickyHeaderViewHolder.setIsRecyclable(false);
+//        mStickyHeaderViewHolder.setIsRecyclable(false);
         ensureHeaderParent();
         onStickyHeaderChange(mHeaderPosition, oldHeaderPosition);
     }
@@ -300,7 +300,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
         if (!header.itemView.equals(view)) {
             addViewToParent(((ViewGroup) header.itemView), view);
         }
-        header.setIsRecyclable(true);
+        //header.setIsRecyclable(true);
         // #294 - Expandable header is not resized / redrawn on automatic configuration change when sticky headers are enabled
         header.itemView.getLayoutParams().width = view.getLayoutParams().width;
         header.itemView.getLayoutParams().height = view.getLayoutParams().height;
@@ -393,7 +393,10 @@ public final class StickyHeaderHelper extends OnScrollListener {
         if (holder == null) {
             // Create and binds a new ViewHolder
             holder = (FlexibleViewHolder) mAdapter.createViewHolder(mRecyclerView, mAdapter.getItemViewType(position));
+            // Skip ViewHolder caching by setting not recyclable
+            holder.setIsRecyclable(false);
             mAdapter.bindViewHolder(holder, position);
+            holder.setIsRecyclable(true);
 
             // Calculate width and height
             int widthSpec;

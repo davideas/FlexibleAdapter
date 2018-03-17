@@ -142,6 +142,11 @@ public class HeaderItem
             // Support for StaggeredGridLayoutManager
             setFullSpan(true);
         }
+
+        @Override
+        public String toString() {
+            return super.toString() + " " + mTitle.getText();
+        }
     }
 
     @Override
