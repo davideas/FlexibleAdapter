@@ -28,7 +28,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -597,13 +596,14 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #setAnimateToLimit(int)
      * @see #onPostUpdate()
      * @since 5.0.0-b7 Created
-     * <br>5.0.0-b8 Synchronization animations limit
      * <br>5.0.0-rc2 Copy of the Original List done internally
      */
     @CallSuper
     public void updateDataSet(@Nullable List<T> items, boolean animate) {
         mOriginalList = null; // Reset original list from filter
         if (items == null) items = new ArrayList<>();
+        // Always clear cache of bound view holders
+        discardBoundViewHolders();
         if (animate) {
             mHandler.removeMessages(UPDATE);
             mHandler.sendMessage(Message.obtain(mHandler, UPDATE, items));
@@ -1769,10 +1769,11 @@ public class FlexibleAdapter<T extends IFlexible>
             item.bindViewHolder(this, holder, position, payloads);
             // Avoid to show the double background in case header has transparency
             // The visibility will be restored when header is reset in StickyHeaderHelper
-            if (areHeadersSticky() && !isFastScroll && mStickyHeaderHelper.getStickyPosition() >= 0 && payloads.isEmpty()) {
+            if (areHeadersSticky() && isHeader(item) && !isFastScroll && mStickyHeaderHelper.getStickyPosition() >= 0 && payloads.isEmpty()) {
                 int headerPos = getFlexibleLayoutManager().findFirstVisibleItemPosition() - 1;
-                if (headerPos == position && isHeader(item))
+                if (headerPos == position) {
                     holder.itemView.setVisibility(View.INVISIBLE);
+                }
             }
         }
         // Endless Scroll
@@ -4236,7 +4237,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     private synchronized void animateDiff(@Nullable List<T> newItems, Payload payloadChange) {
         if (useDiffUtil) {
-            Log.v(TAG, "Animate changes with DiffUtils! oldSize=" + getItemCount() + " newSize=" + newItems.size());
+            log.v("Animate changes with DiffUtils! oldSize=" + getItemCount() + " newSize=" + newItems.size());
             if (diffUtilCallback == null) {
                 diffUtilCallback = new DiffUtilCallback();
             }
@@ -4397,7 +4398,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     private synchronized void executeNotifications(Payload payloadChange) {
         if (diffResult != null) {
-            Log.i(TAG, "Dispatching notifications");
+            log.i("Dispatching notifications");
             mItems = diffUtilCallback.getNewItems();// Update mItems in the UI Thread
             diffResult.dispatchUpdatesTo(this);
             diffResult = null;

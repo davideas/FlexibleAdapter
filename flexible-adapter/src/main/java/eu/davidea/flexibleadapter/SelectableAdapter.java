@@ -504,6 +504,13 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
     }
 
     /**
+     * To call when views are all discarded.
+     */
+    void discardBoundViewHolders() {
+        mBoundViewHolders.clear();
+    }
+
+    /**
      * Usually {@code RecyclerView} binds 3 items more than the visible items.
      *
      * @return a Set with all bound FlexibleViewHolders
@@ -555,6 +562,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @since 1.0.0
      */
     public void onSaveInstanceState(Bundle outState) {
+        discardBoundViewHolders();
         outState.putIntegerArrayList(TAG, new ArrayList<>(mSelectedPositions));
         if (getSelectedItemCount() > 0) log.d("Saving selection %s", mSelectedPositions);
     }

@@ -235,9 +235,13 @@ public final class StickyHeaderHelper extends OnScrollListener {
     private void swapHeader(FlexibleViewHolder newHeader, int oldHeaderPosition) {
         if (mStickyHeaderViewHolder != null) {
             resetHeader(mStickyHeaderViewHolder);
+            // #568, #575 - Header ViewHolder out of the top screen must be recycled manually
+            if (mHeaderPosition > oldHeaderPosition) {
+                mAdapter.onViewRecycled(mStickyHeaderViewHolder);
+            }
         }
         mStickyHeaderViewHolder = newHeader;
-//        mStickyHeaderViewHolder.setIsRecyclable(false);
+        mStickyHeaderViewHolder.setIsRecyclable(false);
         ensureHeaderParent();
         onStickyHeaderChange(mHeaderPosition, oldHeaderPosition);
     }
@@ -300,7 +304,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
         if (!header.itemView.equals(view)) {
             addViewToParent(((ViewGroup) header.itemView), view);
         }
-        //header.setIsRecyclable(true);
+        header.setIsRecyclable(true);
         // #294 - Expandable header is not resized / redrawn on automatic configuration change when sticky headers are enabled
         header.itemView.getLayoutParams().width = view.getLayoutParams().width;
         header.itemView.getLayoutParams().height = view.getLayoutParams().height;
