@@ -58,13 +58,13 @@ repositories {
 ```
 dependencies {
 	// Using JCenter
-	compile 'eu.davidea:flexible-adapter:5.0.3'
-	compile 'eu.davidea:flexible-adapter-ui:1.0.0-b3'
-	compile 'eu.davidea:flexible-adapter-livedata:1.0.0-b2'
-	compile 'eu.davidea:flexible-adapter-databinding:1.0.0-b2'
+	implementation 'eu.davidea:flexible-adapter:5.0.3'
+	implementation 'eu.davidea:flexible-adapter-ui:1.0.0-b3'
+	implementation 'eu.davidea:flexible-adapter-livedata:1.0.0-b2'
+	implementation 'eu.davidea:flexible-adapter-databinding:1.0.0-b2'
 	
 	// Using MavenSnapshots repository for continuous updates from my development
-	compile 'eu.davidea:flexible-adapter:x.y.z-SNAPSHOT'
+	implementation 'eu.davidea:flexible-adapter:x.y.z-SNAPSHOT'
 }
 ```
 #### Stay Updated
