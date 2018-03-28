@@ -51,20 +51,20 @@ This library is configurable and it guides the developers to create a better use
 #### build.gradle
 ```
 repositories {
-	jcenter()
-	maven {url = "https://oss.sonatype.org/content/repositories/snapshots/" } //For Snapshots
+    jcenter()
+    maven {url = "https://oss.sonatype.org/content/repositories/snapshots/" } //For Snapshots
 }
 ```
 ```
 dependencies {
-	// Using JCenter
-	implementation 'eu.davidea:flexible-adapter:5.0.3'
-	implementation 'eu.davidea:flexible-adapter-ui:1.0.0-b3'
-	implementation 'eu.davidea:flexible-adapter-livedata:1.0.0-b2'
-	implementation 'eu.davidea:flexible-adapter-databinding:1.0.0-b2'
-	
-	// Using MavenSnapshots repository for continuous updates from my development
-	implementation 'eu.davidea:flexible-adapter:x.y.z-SNAPSHOT'
+    // Using JCenter
+    implementation 'eu.davidea:flexible-adapter:5.0.3'
+    implementation 'eu.davidea:flexible-adapter-ui:1.0.0-b3'
+    implementation 'eu.davidea:flexible-adapter-livedata:1.0.0-b2'
+    implementation 'eu.davidea:flexible-adapter-databinding:1.0.0-b2'
+    
+    // Using MavenSnapshots repository for continuous updates from my development
+    implementation 'eu.davidea:flexible-adapter:x.y.z-SNAPSHOT'
 }
 ```
 #### Stay Updated
