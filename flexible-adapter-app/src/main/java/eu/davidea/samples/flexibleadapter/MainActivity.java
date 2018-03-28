@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements
 
         setContentView(R.layout.activity_main);
         if (BuildConfig.DEBUG) {
-            FlexibleAdapter.enableLogs(Level.DEBUG);
+            FlexibleAdapter.enableLogs(Level.VERBOSE);
         } else {
             FlexibleAdapter.enableLogs(Level.SUPPRESS);
         }

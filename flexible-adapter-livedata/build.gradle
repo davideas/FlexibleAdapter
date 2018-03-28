@@ -37,26 +37,32 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-}
-
-junitPlatform {
-    jupiterVersion junitJupiterVer
-    platformVersion junitPlatformVer
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+    testOptions {
+        /* Android-junit5 - https://github.com/mannodermaus/android-junit5 */
+        junitPlatform {
+            jupiterVersion junitJupiterVer
+            platformVersion junitPlatformVer
+        }
+    }
 }
 
 dependencies {
     // Android Arch
     implementation archLib.extensions
 
-    // Test libraries: from AS3 we'll use JUnit 5 Jupiter
+    // Test libraries: from AS3 we'll use JUnit 5 Jupiter, using "android-junit5" plugin
     androidTestImplementation supportLib.annotations
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test:rules:1.0.1'
     androidTestImplementation("android.arch.core:core-testing:$archExtensionsVer", {
     })
-    //testImplementation 'junit:junit:4.12'
-    testImplementation junit5()
-    testImplementation "de.mannodermaus.gradle.plugins:android-junit5-embedded-runtime:1.0.0-RC3-rev1"
+    testImplementation junit5.unitTests()
+    testCompileOnly junit5.unitTestsRuntime()
+    testImplementation "de.mannodermaus.gradle.plugins:android-junit5-embedded-runtime:1.0.31"
     testImplementation supportLib.recyclerView
     testImplementation project(":flexible-adapter")
 }

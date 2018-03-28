@@ -487,7 +487,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 
         // Get custom Item Decoration or default
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
-        int itemType = adapter.getItemViewType(position);
+        int itemType = (position != RecyclerView.NO_POSITION ? adapter.getItemViewType(position) : 0);
         ItemDecoration deco = getItemDecoration(itemType);
 
         // No offset set, applies the general offset to this item decoration

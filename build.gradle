@@ -15,8 +15,8 @@ allprojects {
 
         // SDK and Build tools version
         minSdk = 14
-        targetSdk = 26
-        buildTools = "27.0.1"
+        targetSdk = 27
+        buildTools = "27.0.3"
 
         // Android Architecture Components
         archLifecycleVer = "1.0.3"
@@ -35,8 +35,8 @@ allprojects {
         ]
 
         // Support Libraries dependencies
-        supportVer = "27.0.2"
-        constraintVer = "1.1.0-beta2"
+        supportVer = "27.1.0"
+        constraintVer = "1.1.0"
         supportLib = [
                 design          : "com.android.support:design:${supportVer}",
                 recyclerView    : "com.android.support:recyclerview-v7:${supportVer}",
@@ -68,8 +68,8 @@ allprojects {
         timberVer = "4.5.1"
         glideVer = "4.1.1"
         javaxInjectVer = "1"
-        junitPlatformVer = "1.0.1"
-        junitJupiterVer = "5.0.1"
+        junitPlatformVer = "1.1.0"
+        junitJupiterVer = "5.1.0"
         libraries = [
                 butterKnife        : "com.jakewharton:butterknife:${butterKnifeVer}",
                 butterKnifeCompiler: "com.jakewharton:butterknife-compiler:${butterKnifeVer}",
@@ -108,13 +108,13 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0-alpha02'
+        classpath 'com.android.tools.build:gradle:3.1.0'
         classpath "com.neenbedankt.gradle.plugins:android-apt:1.8"
         classpath "com.github.dcendents:android-maven-gradle-plugin:1.5"
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.1"
-        classpath "com.vanniktech:gradle-android-javadoc-plugin:0.2.1"
-        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.0.0"
+        classpath "com.vanniktech:gradle-android-javadoc-plugin:0.3.0-SNAPSHOT"
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.0.31"
         classpath "eu.davidea:grabver:0.7.0"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

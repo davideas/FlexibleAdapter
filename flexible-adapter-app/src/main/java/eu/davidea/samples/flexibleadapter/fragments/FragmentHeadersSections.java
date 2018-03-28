@@ -68,7 +68,7 @@ public class FragmentHeadersSections extends AbstractFragment
 
         // Create New Database and Initialize RecyclerView
         if (savedInstanceState == null) {
-            DatabaseService.getInstance().createHeadersSectionsDatabase(400, 100);
+            DatabaseService.getInstance().createHeadersSectionsDatabase(400, 30);
         }
         initializeRecyclerView(savedInstanceState);
 

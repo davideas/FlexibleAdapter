@@ -2,7 +2,7 @@ package eu.davidea.flexibleadapter.livedata;
 
 import android.support.annotation.NonNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,10 +16,25 @@ import eu.davidea.flexibleadapter.livedata.items.ItemHolder;
 import eu.davidea.flexibleadapter.livedata.models.HeaderModel;
 import eu.davidea.flexibleadapter.livedata.models.ItemModel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/*
+ * Test Case Definitions
+ *
+ * JUnit 4                                  JUnit 5
+ * -------------------------------------    ---------------------------
+ * @org.junit.Test                       -> @org.junit.jupiter.api.Test
+ * @Ignore                               -> @Disabled
+ * @Category(Class)                      -> @Tag(String)
+ * @Parameters + @RunWith(Parameterized) -> @ParameterizedTest + <Source>
+ * Assert.assertXXX                      -> Assertions.assertXXX
+ * n/a                                   -> @DisplayName
+ * n/a                                   -> @Nested
+ * n/a                                   -> @TestFactory
+*/
 
 /**
  * @author Davide Steduto
@@ -49,9 +64,11 @@ public class FlexibleFactoryTest {
         assertEquals(header, itemHolder.getHeader().getModel());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void createWithMismatchingParam() {
-        FlexibleFactory.create(HeaderHolder.class, new Object());
+        assertThrows(RuntimeException.class, () -> {
+            FlexibleFactory.create(HeaderHolder.class, new Object());
+        });
     }
 
     @Test
