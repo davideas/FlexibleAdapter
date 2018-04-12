@@ -430,9 +430,11 @@ public class FlexibleAdapter<T extends IFlexible>
                 headersShown = true;
             }
             if (isExpanded(item)) {
-                expand(position, false, true, false);
+                // All subItems will be added recursively if they result to be expanded at start up
+                position += expand(position, false, true, false);
+            } else {
+                position++;
             }
-            position++; //+1 Check also subItems with expanded = true
         }
         multiRange = false;
         setScrollAnimate(false);
