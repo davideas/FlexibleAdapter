@@ -95,7 +95,7 @@ import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
  * <br>04/02/2018 Child view click
  * <br>13/02/2018 Multi filter
  */
-@SuppressWarnings({"Range", "unused", "unchecked", "ConstantConditions", "SuspiciousMethodCalls", "WeakerAccess", "SameParameterValue"})
+@SuppressWarnings({"Range", "unused", "unchecked", "ConstantConditions", "SuspiciousMethodCalls", "WeakerAccess", "SameParameterValue", "UnusedReturnValue"})
 public class FlexibleAdapter<T extends IFlexible>
         extends AnimatorAdapter
         implements ItemTouchHelperCallback.AdapterCallback {
@@ -332,7 +332,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #addListener(Object)
      * @since 5.0.0-rc3
      */
-    public final FlexibleAdapter<T> removeListener(Object listener) {
+    @CallSuper
+    public FlexibleAdapter<T> removeListener(Object listener) {
         if (listener == null) {
             log.e("No listener class to remove!");
             return this;
@@ -1718,8 +1719,9 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see IFlexible#createViewHolder(View, FlexibleAdapter)
      * @since 5.0.0-b1
      */
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         T item = getViewTypeInstance(viewType);
         if (item == null || !autoMap) {
             // If everything has been set properly, this should never happen ;-)
@@ -1744,7 +1746,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-b1
      */
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         this.onBindViewHolder(holder, position, Collections.unmodifiableList(new ArrayList<>()));
     }
 
@@ -1786,7 +1788,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     @CallSuper
     @Override
-    public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         int position = holder.getAdapterPosition();
         //log.v("onViewAttached Holder=%s position=%s", getClassName(holder), position);
         T item = getItem(position);
@@ -1795,7 +1797,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     @CallSuper
     @Override
-    public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
         int position = holder.getAdapterPosition();
         //log.v("onViewDetached Holder=%s position=%s", getClassName(holder), position);
         T item = getItem(position);
@@ -5386,6 +5388,7 @@ public class FlexibleAdapter<T extends IFlexible>
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class FilterAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private final List<T> newItems;
