@@ -52,7 +52,6 @@ This library is configurable and it guides the developers to create a better use
 ```
 repositories {
     jcenter()
-    maven {url = "https://oss.sonatype.org/content/repositories/snapshots/" } //For Snapshots
 }
 ```
 ```
@@ -61,16 +60,14 @@ dependencies {
     implementation 'eu.davidea:flexible-adapter:5.0.3'
     implementation 'eu.davidea:flexible-adapter-ui:1.0.0-b3'
     implementation 'eu.davidea:flexible-adapter-livedata:1.0.0-b2'
-    implementation 'eu.davidea:flexible-adapter-databinding:1.0.0-b2'
-    
-    // Using MavenSnapshots repository for continuous updates from my development
-    implementation 'eu.davidea:flexible-adapter:x.y.z-SNAPSHOT'
+    // From 1.0.0-b3, library is compiled with data binding v2
+    implementation 'eu.davidea:flexible-adapter-databinding:1.0.0-b3'
 }
 ```
 #### Stay Updated
 |Flexible Adapter|Live Data|Data Binding|UI|
 |---|---|---|---|
-|<div align="center">5.0.3</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b3</div>
+|<div align="center">5.0.3</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b3</div>|<div align="center">1.0.0-b3</div>
 |<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-livedata?source=watch' alt='Get automatic notifications about new "flexible-adapter-livedata" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-databinding?source=watch' alt='Get automatic notifications about new "flexible-adapter-databinding" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-ui?source=watch' alt='Get automatic notifications about new "flexible-adapter-ui" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>
 
 # Wiki!

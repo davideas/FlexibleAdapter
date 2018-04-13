@@ -19,9 +19,9 @@ allprojects {
         buildTools = "27.0.3"
 
         // Android Architecture Components
-        archLifecycleVer = "1.0.3"
-        archExtensionsVer = "1.0.0-rc1"
-        archPersistenceVer = archExtensionsVer
+        archLifecycleVer = "1.1.1"
+        archExtensionsVer = "1.1.1"
+        roomPersistenceVer = "1.1.0-beta2"
         archLib = [
                 lifecycle      : "android.arch.lifecycle:runtime:${archLifecycleVer}",
                 extensions     : "android.arch.lifecycle:extensions:${archExtensionsVer}",
@@ -29,9 +29,9 @@ allprojects {
                 commonJava8    : "android.arch.lifecycle:common-java8:${archExtensionsVer}",
                 reactiveStreams: "android.arch.lifecycle:reactivestreams:${archExtensionsVer}",
                 coreTesting    : "android.arch.core:core-testing:${archExtensionsVer}",
-                room           : "android.arch.persistence.room:runtime:${archPersistenceVer}",
-                roomCompiler   : "android.arch.persistence.room:compiler:${archPersistenceVer}",
-                roomRxJava2    : "android.arch.persistence.room:rxjava2:${archPersistenceVer}"
+                room           : "android.arch.persistence.room:runtime:${roomPersistenceVer}",
+                roomCompiler   : "android.arch.persistence.room:compiler:${roomPersistenceVer}",
+                roomRxJava2    : "android.arch.persistence.room:rxjava2:${roomPersistenceVer}"
         ]
 
         // Support Libraries dependencies
@@ -54,8 +54,8 @@ allprojects {
 
         // Widgets
         flipViewVer = "1.1.3@aar"
-        iconicsVer = "2.9.3@aar"
-        iconicsCmdVer = "1.9.32.2@aar"
+        iconicsVer = "3.0.3@aar"
+        iconicsCmdVer = "2.0.46.1@aar"
         widgets = [
                 flipView        : "eu.davidea:flipview:${flipViewVer}",
                 iconicsCore     : "com.mikepenz:iconics-core:${iconicsVer}",
@@ -65,8 +65,8 @@ allprojects {
 
         // 3rd Libraries
         butterKnifeVer = "8.8.1"
-        timberVer = "4.5.1"
-        glideVer = "4.1.1"
+        timberVer = "4.7.0"
+        glideVer = "4.7.0"
         javaxInjectVer = "1"
         junitPlatformVer = "1.1.0"
         junitJupiterVer = "5.1.0"
