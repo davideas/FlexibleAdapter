@@ -4,7 +4,7 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 1
     minor 0
-    preRelease "b2"
+    preRelease "b3"
 }
 // For maven repository
 version = versioning.name
