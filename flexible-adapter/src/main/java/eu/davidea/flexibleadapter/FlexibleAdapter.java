@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Davide Steduto
+ * Copyright 2015-2018 Davide Steduto
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -90,8 +92,10 @@ import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
  * <br>10/04/2017 Endless Top Scrolling
  * <br>15/04/2017 Starting or resetting the Filter will empty the bin of the deletedItems
  * <br>23/04/2017 Wrapper class for any third type of LayoutManagers
+ * <br>04/02/2018 Child view click
+ * <br>13/02/2018 Multi filter
  */
-@SuppressWarnings({"Range", "unused", "unchecked", "ConstantConditions", "SuspiciousMethodCalls", "WeakerAccess", "SameParameterValue"})
+@SuppressWarnings({"Range", "unused", "unchecked", "ConstantConditions", "SuspiciousMethodCalls", "WeakerAccess", "SameParameterValue", "UnusedReturnValue"})
 public class FlexibleAdapter<T extends IFlexible>
         extends AnimatorAdapter
         implements ItemTouchHelperCallback.AdapterCallback {
@@ -102,7 +106,7 @@ public class FlexibleAdapter<T extends IFlexible>
     private static final String EXTRA_HEADERS = TAG + "_headersShown";
     private static final String EXTRA_STICKY = TAG + "_stickyHeaders";
     private static final String EXTRA_LEVEL = TAG + "_selectedLevel";
-    private static final String EXTRA_SEARCH = TAG + "_searchText";
+    private static final String EXTRA_FILTER = TAG + "_filter";
     private static final long AUTO_SCROLL_DELAY = 150L;
 
     /* The main container for ALL items */
@@ -113,6 +117,9 @@ public class FlexibleAdapter<T extends IFlexible>
     private List<Notification> mNotifications;
     private FilterAsyncTask mFilterAsyncTask;
     private long start, time;
+    private boolean useDiffUtil = false;
+    private DiffUtil.DiffResult diffResult;
+    private DiffUtilCallback diffUtilCallback;
 
     /* Handler for delayed actions */
     protected final int UPDATE = 1, FILTER = 2, LOAD_MORE_COMPLETE = 8;
@@ -140,7 +147,7 @@ public class FlexibleAdapter<T extends IFlexible>
     private boolean autoMap = false;
 
     /* Filter */
-    private String mSearchText = "", mOldSearchText = "";
+    private Serializable mFilterEntity = null, mOldFilterEntity = null;
     private Set<IExpandable> mExpandedFilterFlags;
     private boolean notifyChangeOfUnfilteredItems = true, filtering = false,
             notifyMoveOfFilteredItems = false;
@@ -172,7 +179,7 @@ public class FlexibleAdapter<T extends IFlexible>
     protected OnDeleteCompleteListener mDeleteCompleteListener;
     protected OnStickyHeaderChangeListener mStickyHeaderChangeListener;
 
-	/*--------------*/
+    /*--------------*/
     /* CONSTRUCTORS */
     /*--------------*/
 
@@ -180,8 +187,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * Simple Constructor with NO listeners!
      *
      * @param items items to display.
-     * @see #FlexibleAdapter(List, Object)
-     * @see #FlexibleAdapter(List, Object, boolean)
+     * @see FlexibleAdapter(List, Object)
+     * @see FlexibleAdapter(List, Object, boolean)
      * @since 4.2.0 Created
      * <br>5.0.0-rc2 Copy of the Original List is done internally
      */
@@ -206,8 +213,8 @@ public class FlexibleAdapter<T extends IFlexible>
      *                  <li>{@link OnStickyHeaderChangeListener}
      *                  <li>{@link OnUpdateListener}
      *                  </ul>
-     * @see #FlexibleAdapter(List)
-     * @see #FlexibleAdapter(List, Object, boolean)
+     * @see FlexibleAdapter(List)
+     * @see FlexibleAdapter(List, Object, boolean)
      * @see #addListener(Object)
      * @since 5.0.0-b1 Created
      * <br>5.0.0-rc2 Copy of the Original List is done internally
@@ -217,7 +224,7 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Same as {@link #FlexibleAdapter(List, Object)} with possibility to set stableIds.
+     * Same as {@link FlexibleAdapter(List, Object)} with possibility to set stableIds.
      * <p><b>Tip:</b> Setting {@code true} allows the RecyclerView to rebind only items really
      * changed after a refresh with {@link #notifyDataSetChanged()} or after swapping Adapter.
      * This increases performance.<br>
@@ -225,8 +232,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * The method {@link #setHasStableIds(boolean)} will be called.</p>
      *
      * @param stableIds set {@code true} if item implements {@code hashcode()} and have unique ids.
-     * @see #FlexibleAdapter(List)
-     * @see #FlexibleAdapter(List, Object)
+     * @see FlexibleAdapter(List)
+     * @see FlexibleAdapter(List, Object)
      * @see #addListener(Object)
      * @since 5.0.0-b8 Created
      * <br>5.0.0-rc2 Copy of the Original List is done internally
@@ -243,7 +250,7 @@ public class FlexibleAdapter<T extends IFlexible>
         mUndoPositions = new ArrayList<>();
 
         // Create listeners instances
-        addListener(listeners);
+        if (listeners != null) addListener(listeners);
 
         // Get notified when items are inserted or removed (it adjusts selected positions)
         registerAdapterDataObserver(new AdapterDataObserver());
@@ -259,7 +266,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-b6
      */
     @CallSuper
-    public FlexibleAdapter<T> addListener(@NonNull Object listener) {
+    public FlexibleAdapter<T> addListener(Object listener) {
         if (listener == null) {
             log.e("Invalid listener class: null");
             return this;
@@ -325,7 +332,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #addListener(Object)
      * @since 5.0.0-rc3
      */
-    public final FlexibleAdapter<T> removeListener(@NonNull Object listener) {
+    @CallSuper
+    public FlexibleAdapter<T> removeListener(Object listener) {
         if (listener == null) {
             log.e("No listener class to remove!");
             return this;
@@ -423,16 +431,18 @@ public class FlexibleAdapter<T extends IFlexible>
                 headersShown = true;
             }
             if (isExpanded(item)) {
-                expand(position, false, true, false);
+                // All subItems will be added recursively if they result to be expanded at start up
+                position += expand(position, false, true, false);
+            } else {
+                position++;
             }
-            position++; //+1 Check also subItems with expanded = true
         }
         multiRange = false;
         setScrollAnimate(false);
         return this;
     }
 
-	/*------------------------------*/
+    /*------------------------------*/
     /* SELECTION METHODS OVERRIDDEN */
     /*------------------------------*/
 
@@ -545,7 +555,7 @@ public class FlexibleAdapter<T extends IFlexible>
         return childSelected;
     }
 
-	/*--------------*/
+    /*--------------*/
     /* MAIN METHODS */
     /*--------------*/
 
@@ -589,13 +599,14 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #setAnimateToLimit(int)
      * @see #onPostUpdate()
      * @since 5.0.0-b7 Created
-     * <br>5.0.0-b8 Synchronization animations limit
      * <br>5.0.0-rc2 Copy of the Original List done internally
      */
     @CallSuper
     public void updateDataSet(@Nullable List<T> items, boolean animate) {
         mOriginalList = null; // Reset original list from filter
         if (items == null) items = new ArrayList<>();
+        // Always clear cache of bound view holders
+        discardBoundViewHolders();
         if (animate) {
             mHandler.removeMessages(UPDATE);
             mHandler.sendMessage(Message.obtain(mHandler, UPDATE, items));
@@ -612,7 +623,7 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Returns the object of type <b>T</b>.
+     * Returns the object of the generic type <b>T</b>.
      * <p>This method cannot be overridden since the entire library relies on it.</p>
      *
      * @param position the position of the item in the list
@@ -623,6 +634,20 @@ public class FlexibleAdapter<T extends IFlexible>
     public T getItem(int position) {
         if (position < 0 || position >= getItemCount()) return null;
         return mItems.get(position);
+    }
+
+    /**
+     * Returns the object of specific type <b>S</b>.
+     *
+     * @param position the position of the item in the list
+     * @param clazz    the class type expected
+     * @return The <b>S</b> object for the position provided or null if item not found
+     * @throws ClassCastException if the class type doesn't match with the item type requested
+     * @since 5.0.0
+     */
+    @Nullable
+    public <S extends T> S getItem(int position, Class<S> clazz) {
+        return clazz.cast(getItem(position));
     }
 
     /**
@@ -671,7 +696,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-rc1
      */
     public final int getMainItemCount() {
-        return hasSearchText() ? getItemCount() : getItemCount() - mScrollableHeaders.size() - mScrollableFooters.size();
+        return hasFilter() ? getItemCount() : getItemCount() - mScrollableHeaders.size() - mScrollableFooters.size();
     }
 
     /**
@@ -827,7 +852,7 @@ public class FlexibleAdapter<T extends IFlexible>
         return Math.max(0, sortedList.indexOf(item));
     }
 
-	/*------------------------------------*/
+    /*------------------------------------*/
     /* SCROLLABLE HEADERS/FOOTERS METHODS */
     /*------------------------------------*/
 
@@ -837,6 +862,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #addScrollableHeaderWithDelay(IFlexible, long, boolean)
      * @since 5.0.0-rc1
      */
+    @NonNull
     public final List<T> getScrollableHeaders() {
         return Collections.unmodifiableList(mScrollableHeaders);
     }
@@ -847,6 +873,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #addScrollableFooterWithDelay(IFlexible, long, boolean)
      * @since 5.0.0-rc1
      */
+    @NonNull
     public final List<T> getScrollableFooters() {
         return Collections.unmodifiableList(mScrollableFooters);
     }
@@ -1107,7 +1134,7 @@ public class FlexibleAdapter<T extends IFlexible>
         items.addAll(mScrollableFooters);
     }
 
-	/*--------------------------*/
+    /*--------------------------*/
     /* HEADERS/SECTIONS METHODS */
     /*--------------------------*/
 
@@ -1406,7 +1433,7 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Sets if all headers should be shown at startup.
+     * Sets if all headers should be shown at startup by the Adapter automatically.
      * <p>If called, this method won't trigger {@code notifyItemInserted()} and scrolling
      * animations are instead performed if the header item was configured with animation:
      * <u>Headers will be loaded/bound along with others items.</u></p>
@@ -1423,6 +1450,20 @@ public class FlexibleAdapter<T extends IFlexible>
         if (!headersShown && displayHeaders) {
             showAllHeaders(true);
         }
+        return this;
+    }
+
+    /**
+     * Manually change the flag to indicate that headers are inserted(or not) in the main list by the user
+     * and the Adapter doesn't(does) have to automatically insert them.
+     * <p>Default value is {@code false} (headers are <u>not</u> shown at startup).</p>
+     *
+     * @param headersShown true, if headers are already shown
+     * @return this Adapter, so the call can be chained
+     * @since 5.0.0
+     */
+    public FlexibleAdapter<T> setHeadersShown(boolean headersShown) {
+        this.headersShown = headersShown;
         return this;
     }
 
@@ -1638,9 +1679,9 @@ public class FlexibleAdapter<T extends IFlexible>
         }
     }
 
-	/*--------------------------------------------*/
-	/* VIEW HOLDER METHODS ARE DELEGATED TO ITEMS */
-	/*--------------------------------------------*/
+    /*--------------------------------------------*/
+    /* VIEW HOLDER METHODS ARE DELEGATED TO ITEMS */
+    /*--------------------------------------------*/
 
     /**
      * <p>You <b>CANNOT</b> override this method: {@code FlexibleAdapter} delegates the ViewType
@@ -1657,6 +1698,7 @@ public class FlexibleAdapter<T extends IFlexible>
     public int getItemViewType(int position) {
         T item = getItem(position);
         if (item == null) {
+            log.e("Item for ViewType not found! position=%s, items=%s", position, getItemCount());
             return 0;
         }
         // Map the view type if not done yet
@@ -1677,8 +1719,9 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see IFlexible#createViewHolder(View, FlexibleAdapter)
      * @since 5.0.0-b1
      */
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         T item = getViewTypeInstance(viewType);
         if (item == null || !autoMap) {
             // If everything has been set properly, this should never happen ;-)
@@ -1703,7 +1746,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-b1
      */
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         this.onBindViewHolder(holder, position, Collections.unmodifiableList(new ArrayList<>()));
     }
 
@@ -1717,8 +1760,6 @@ public class FlexibleAdapter<T extends IFlexible>
      */
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position, List payloads) {
-        String itemId = hasStableIds() ? " itemId=" + holder.getItemId() : "";
-        log.v("onViewBound    Holder=%s position=%s%s", getClassName(holder), position, itemId);
         if (!autoMap) {
             // If everything has been set properly, this should never happen ;-)
             throw new IllegalStateException("AutoMap is not active, this method cannot be called. You should implement the AutoMap properly.");
@@ -1732,10 +1773,11 @@ public class FlexibleAdapter<T extends IFlexible>
             item.bindViewHolder(this, holder, position, payloads);
             // Avoid to show the double background in case header has transparency
             // The visibility will be restored when header is reset in StickyHeaderHelper
-            if (areHeadersSticky() && !isFastScroll && mStickyHeaderHelper.getStickyPosition() >= 0 && payloads.isEmpty()) {
+            if (areHeadersSticky() && isHeader(item) && !isFastScroll && mStickyHeaderHelper.getStickyPosition() >= 0 && payloads.isEmpty()) {
                 int headerPos = getFlexibleLayoutManager().findFirstVisibleItemPosition() - 1;
-                if (headerPos == position && isHeader(item))
+                if (headerPos == position) {
                     holder.itemView.setVisibility(View.INVISIBLE);
+                }
             }
         }
         // Endless Scroll
@@ -1746,7 +1788,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     @CallSuper
     @Override
-    public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         int position = holder.getAdapterPosition();
         //log.v("onViewAttached Holder=%s position=%s", getClassName(holder), position);
         T item = getItem(position);
@@ -1755,7 +1797,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     @CallSuper
     @Override
-    public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
         int position = holder.getAdapterPosition();
         //log.v("onViewDetached Holder=%s position=%s", getClassName(holder), position);
         T item = getItem(position);
@@ -1771,14 +1813,13 @@ public class FlexibleAdapter<T extends IFlexible>
             holder.itemView.setVisibility(View.VISIBLE);
         }
         int position = holder.getAdapterPosition();
-        //log.v("onViewRecycled Holder=%s position=%s", getClassName(holder), position);
         T item = getItem(position);
         if (item != null) item.unbindViewHolder(this, holder, position);
     }
 
-	/*------------------------*/
-	/* ENDLESS SCROLL METHODS */
-	/*------------------------*/
+    /*------------------------*/
+    /* ENDLESS SCROLL METHODS */
+    /*------------------------*/
 
     /**
      * @return true if loading more will add items to the top, false to the bottom.
@@ -1813,7 +1854,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * Provides the current endless page if the page size limit is set, if not set the returned
-     * value is always 1.
+     * value is always 0.
      *
      * @return the current endless page
      * @see #getEndlessPageSize()
@@ -1821,7 +1862,10 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-rc1
      */
     public int getEndlessCurrentPage() {
-        return Math.max(1, mEndlessPageSize > 0 ? getMainItemCount() / mEndlessPageSize : 0);
+        if (mEndlessPageSize > 0) {
+            return (int) Math.ceil((double) getMainItemCount() / mEndlessPageSize);
+        }
+        return 0;
     }
 
     /**
@@ -1985,8 +2029,8 @@ public class FlexibleAdapter<T extends IFlexible>
 
         // Check next loading threshold
         int threshold = mTopEndless ?
-                mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableHeaders.size())
-                : getItemCount() - mEndlessScrollThreshold - (hasSearchText() ? 0 : mScrollableFooters.size());
+                mEndlessScrollThreshold - (hasFilter() ? 0 : mScrollableHeaders.size())
+                : getItemCount() - mEndlessScrollThreshold - (hasFilter() ? 0 : mScrollableFooters.size());
         if ((!mTopEndless && (position == getGlobalPositionOf(mProgressItem) || position < threshold)) ||
                 (mTopEndless && position > 0 && position > threshold)) {
             return;
@@ -2051,6 +2095,7 @@ public class FlexibleAdapter<T extends IFlexible>
         // Calculate new items count
         int newItemsSize = newItems == null ? 0 : newItems.size();
         int totalItemCount = newItemsSize + getMainItemCount();
+        int progressPosition = getGlobalPositionOf(mProgressItem);
         // Check if features are enabled and the limits have been reached
         if (mEndlessPageSize > 0 && newItemsSize < mEndlessPageSize || // Is feature enabled and Not enough items?
                 mEndlessTargetCount > 0 && totalItemCount >= mEndlessTargetCount) { // Is feature enabled and Max limit has been reached?
@@ -2066,9 +2111,9 @@ public class FlexibleAdapter<T extends IFlexible>
         }
         // Add any new items
         if (newItemsSize > 0) {
-            log.v("onLoadMore     performing adding %s new items on page=%s", newItemsSize, getEndlessCurrentPage());
-            int position = mTopEndless ? mScrollableHeaders.size() : getGlobalPositionOf(mProgressItem);
-            addItems(position, newItems);
+            log.d("onLoadMore     performing adding %s new items on page=%s", newItemsSize, getEndlessCurrentPage());
+            progressPosition = mTopEndless ? mScrollableHeaders.size() : progressPosition;
+            addItems(progressPosition, newItems);
         }
         // Reset the loading status
         endlessLoading = false;
@@ -2106,9 +2151,9 @@ public class FlexibleAdapter<T extends IFlexible>
         }
     }
 
-	/*--------------------*/
-	/* EXPANDABLE METHODS */
-	/*--------------------*/
+    /*--------------------*/
+    /* EXPANDABLE METHODS */
+    /*--------------------*/
 
     /**
      * @return true if {@code collapseOnExpand} is enabled, false otherwise
@@ -2728,9 +2773,9 @@ public class FlexibleAdapter<T extends IFlexible>
         return recursiveCollapse(0, mItems, level);
     }
 
-	/*----------------*/
-	/* UPDATE METHODS */
-	/*----------------*/
+    /*----------------*/
+    /* UPDATE METHODS */
+    /*----------------*/
 
     /**
      * Updates/Rebounds the itemView corresponding to the current position of the
@@ -2790,9 +2835,9 @@ public class FlexibleAdapter<T extends IFlexible>
         notifyItemChanged(position, payload);
     }
 
-	/*----------------*/
-	/* ADDING METHODS */
-	/*----------------*/
+    /*----------------*/
+    /* ADDING METHODS */
+    /*----------------*/
 
     /**
      * Inserts the given item at desired position or Add item at last position with a delay
@@ -2880,7 +2925,7 @@ public class FlexibleAdapter<T extends IFlexible>
         int initialCount = getMainItemCount(); // Count only main items!
         if (position < 0) {
             log.w("addItems Position is negative! adding items to the end");
-            position = initialCount;
+            position = initialCount + mScrollableHeaders.size();
         }
         // Insert the items properly
         performInsert(position, items, true);
@@ -3151,9 +3196,9 @@ public class FlexibleAdapter<T extends IFlexible>
         return getGlobalPositionOf(sectionable);
     }
 
-	/*----------------------*/
-	/* DELETE ITEMS METHODS */
-	/*----------------------*/
+    /*----------------------*/
+    /* DELETE ITEMS METHODS */
+    /*----------------------*/
 
     /**
      * This method clears <b>everything</b>: main items, Scrollable Headers and Footers and
@@ -3304,14 +3349,16 @@ public class FlexibleAdapter<T extends IFlexible>
         log.v("removeItems selectedPositions=%s payload=%s", selectedPositions, payload);
         // Check if list is empty
         if (selectedPositions == null || selectedPositions.isEmpty()) return;
-        // Reverse-sort the list, start from last position for efficiency
-        Collections.sort(selectedPositions, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer lhs, Integer rhs) {
-                return rhs - lhs;
-            }
-        });
-        log.v("removeItems after reverse sort selectedPositions=%s", selectedPositions);
+        if (selectedPositions.size() > 1) {
+            // Reverse-sort the list, start from last position for efficiency
+            Collections.sort(selectedPositions, new Comparator<Integer>() {
+                @Override
+                public int compare(Integer lhs, Integer rhs) {
+                    return rhs - lhs;
+                }
+            });
+            log.v("removeItems after reverse sort selectedPositions=%s", selectedPositions);
+        }
         // Split the list in ranges
         int positionStart = 0, itemCount = 0;
         int lastPosition = selectedPositions.get(0);
@@ -3456,6 +3503,9 @@ public class FlexibleAdapter<T extends IFlexible>
             }
             // Remove item from internal list
             mItems.remove(positionStart);
+            if (permanentDelete && mOriginalList != null) {
+                mOriginalList.remove(item);
+            }
             removeSelection(position);
         }
 
@@ -3515,9 +3565,9 @@ public class FlexibleAdapter<T extends IFlexible>
         this.removeItems(getSelectedPositions(), payload);
     }
 
-	/*----------------------*/
-	/* UNDO/RESTORE METHODS */
-	/*----------------------*/
+    /*----------------------*/
+    /* UNDO/RESTORE METHODS */
+    /*----------------------*/
 
     /**
      * Returns if items will be deleted immediately when deletion is requested.
@@ -3636,9 +3686,23 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
+     * Performs removal confirmation and cleans memory by synchronizing the internal list from deletion.
+     * <p><b>Note:</b> This method is automatically called after timer is over in UndoHelper.</p>
+     *
+     * @since 5.0.1
+     */
+    public void confirmDeletion() {
+        log.d("confirmDeletion!");
+        if (mOriginalList != null) {
+            mOriginalList.removeAll(getDeletedItems());
+        }
+        emptyBin();
+    }
+
+    /**
      * Cleans memory from items just removed.
-     * <p><b>Note:</b> This method is automatically called after timer is over and after a
-     * restoration.</p>
+     * <p><b>Note:</b> This method is automatically called after timer is over in UndoHelper
+     * and after a restoration.</p>
      *
      * @since 3.0.0
      */
@@ -3652,7 +3716,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return true if the restore list is not empty, false otherwise
      * @since 4.0.0
      */
-    public final boolean isRestoreInTime() {
+    public synchronized final boolean isRestoreInTime() {
         return mRestoreList != null && !mRestoreList.isEmpty();
     }
 
@@ -3742,50 +3806,68 @@ public class FlexibleAdapter<T extends IFlexible>
         return subItems;
     }
 
-	/*----------------*/
-	/* FILTER METHODS */
-	/*----------------*/
+    /*----------------*/
+    /* FILTER METHODS */
+    /*----------------*/
 
     /**
-     * @return true if the current search text is not empty or null
-     * @since 3.1.0
+     * @return true if the current filter is not {@code null}
+     * @since 5.0.0
      */
-    public boolean hasSearchText() {
-        return mSearchText != null && !mSearchText.isEmpty();
+    public boolean hasFilter() {
+        if (mFilterEntity instanceof String) {
+            return !getFilter(String.class).isEmpty();
+        }
+        return mFilterEntity != null;
     }
 
     /**
-     * Checks if the searchText is changed.
+     * Checks if the filter is changed.
      *
-     * @param newText the new searchText
-     * @return true if the old search text is different than the newText, false otherwise
-     * @since 5.0.0-b5
+     * @param constraint the new filter entity
+     * @return true if the old filter is different than the new one, false if not changed
+     * @since 5.0.0
      */
-    public boolean hasNewSearchText(String newText) {
-        return !mOldSearchText.equalsIgnoreCase(newText);
+    public boolean hasNewFilter(Serializable constraint) {
+        if (constraint instanceof String && mOldFilterEntity instanceof String) {
+            return !((String) mOldFilterEntity).equalsIgnoreCase((String) constraint);
+        }
+        return mOldFilterEntity == null || !mOldFilterEntity.equals(constraint);
     }
 
     /**
-     * @return the current search text
-     * @since 3.1.0
-     */
-    @NonNull
-    public String getSearchText() {
-        return mSearchText;
-    }
-
-    /**
-     * Sets the new search text.
-     * <p><b>Note:</b> Text is always <b>trimmed</b> and <b>lowercase</b>.</p>
-     * <p><b>Tip:</b> You can highlight filtered Text or Words using {@code FlexibleUtils} from UI extension:
+     * Sets the new filter entity.
+     * <p><b>Note:</b></p><ul>
+     * <li>Filter object must implement {@link Serializable} ({@code String} does).</li>
+     * <li>In case of free text ({@code String}), filter is automatically <b>trimmed</b>
+     * and <b>lowercase</b>.</li>
+     * </ul>
+     * <p><b>Tip:</b> You can highlight filtered Text or Words using {@code FlexibleUtils}
+     * from UI extension:
      * <ul><li>{@code FlexibleUtils#highlightText(TextView, String, String)}</li>
      * <li>{@code FlexibleUtils#highlightWords(TextView, String, String)}</li></ul></p>
      *
-     * @param searchText the new text to filter the items
-     * @since 3.1.0
+     * @param filter the new filter entity for the items
+     * @since 5.0.0
      */
-    public void setSearchText(@NonNull String searchText) {
-        mSearchText = searchText != null ? searchText.trim().toLowerCase(Locale.getDefault()) : "";
+    public void setFilter(@Nullable Serializable filter) {
+        if (filter instanceof String) {
+            filter = ((String) filter).trim().toLowerCase(Locale.getDefault());
+        }
+        mFilterEntity = filter;
+    }
+
+    /**
+     * Gets the current filter.
+     *
+     * @param clazz The class type of filter to return (eg. String.class)
+     * @return the current filter entity
+     * @throws ClassCastException if the class type doesn't match with the filter type previously set
+     * @since 5.0.0
+     */
+    @Nullable
+    public <F extends Serializable> F getFilter(Class<F> clazz) {
+        return clazz.cast(mFilterEntity);
     }
 
     /**
@@ -3811,7 +3893,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * <p>The process is very slow on big list of the order of ~3-5000 items and higher,
      * due to the calculation of the correct position for each item to be shifted.
      * Use with caution!</p>
-     * The slowness is higher when the searchText is cleared out.
+     * The slowness is higher when the filter is cleared out.
      * <p>Default value is {@code false}.</p>
      *
      * @param notifyMove true to animate move changes after filtering or update data set,
@@ -3826,8 +3908,8 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Filters the current list with the searchText previously set with
-     * {@link #setSearchText(String)}.
+     * Filters the current list with the filter previously set with
+     * {@link #setFilter(Serializable)}.
      *
      * @see #filterItems(long)
      * @see #filterItems(List)
@@ -3845,6 +3927,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * more characters from user before starting the search.
      *
      * @param delay any non-negative delay
+     * @see #setFilter(Serializable)
      * @see #filterItems()
      * @see #filterItems(List, long)
      * @see #onPostFilter()
@@ -3864,6 +3947,7 @@ public class FlexibleAdapter<T extends IFlexible>
      *
      * @param unfilteredItems the list to filter
      * @param delay           any non-negative delay
+     * @see #setFilter(Serializable)
      * @see #filterItems(long)
      * @see #filterItems(List)
      * @see #onPostFilter()
@@ -3879,20 +3963,20 @@ public class FlexibleAdapter<T extends IFlexible>
     /**
      * <b>WATCH OUT! ADAPTER ALREADY CREATES A <u>COPY</u> OF THE PROVIDED LIST</b>: due to internal
      * mechanism, items are removed and/or added in order to animate items in the final list.
-     * <p>This method filters the provided list with the searchText previously set with
-     * {@link #setSearchText(String)}.</p>
+     * <p>This method filters the provided list with the filter previously set with
+     * {@link #setFilter(Serializable)}. Filter object can be of any type.</p>
      * <b>Important notes:</b>
      * <ol>
      * <li>The Filter is <u>always</u> executed in background, asynchronously.
      * The method {@link #onPostFilter()} is called after the filter task is completed.</li>
-     * <li>This method calls {@link #filterObject(IFlexible, String)} for each filterable item.</li>
+     * <li>This method calls {@link #filterObject(IFlexible, Serializable)} for each filterable item.</li>
      * <li>Any pending deleted items are always deleted before filter is performed:
-     * {@link OnDeleteCompleteListener#onDeleteConfirmed(int)} is therefore invoked
-     * (Implemented in {@code UndoHelper}).</li>
+     * {@link OnDeleteCompleteListener#onDeleteConfirmed(int)} (implemented in {@code UndoHelper})
+     * is therefore invoked.</li>
      * <li>Expandable items are picked up and displayed if at least a child is collected by
      * the current filter.</li>
      * <li>Filter is skipped while endless feature is active (loading).</li>
-     * <li>If searchText is empty or {@code null}, the provided list is the new list plus any
+     * <li>If filter is {@code null}, the provided list is the new list plus any
      * Scrollable Headers and Footers if existent.</li>
      * <li>Items are animated thanks to {@link #animateTo(List, Payload)} BUT a limit of
      * {@value #ANIMATE_TO_LIMIT} (default) items is set. <b>Tip:</b> Above this limit,
@@ -3901,6 +3985,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * </ol>
      *
      * @param unfilteredItems the list to filter
+     * @see #setFilter(Serializable)
      * @see #filterItems()
      * @see #filterItems(List, long)
      * @see #onPostFilter()
@@ -3911,6 +3996,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * <br>5.0.0-rc1 Scrollable Headers and Footers adaptation
      * <br>5.0.0-rc2 Copy of the Original List is done internally
      * <br>5.0.0-rc2 Removal of Undo in combination with Filter
+     * <br>5.0.0 Use of any filter object, instead of only String
      */
     public void filterItems(@NonNull List<T> unfilteredItems) {
         mHandler.removeMessages(FILTER);
@@ -3918,17 +4004,17 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     private synchronized void filterItemsAsync(@NonNull List<T> unfilteredItems) {
-        log.d("filterItems with searchText=\"%s\"", mSearchText);
+        log.d("filterItems with filterEntity=\"%s\"", mFilterEntity);
         List<T> filteredItems = new ArrayList<>();
         filtering = true; //Enable flag
 
-        if (hasSearchText() && hasNewSearchText(mSearchText)) { //skip when text is unchanged
+        if (hasFilter() && hasNewFilter(mFilterEntity)) { //skip when filter is unchanged
             for (T item : unfilteredItems) {
                 if (mFilterAsyncTask != null && mFilterAsyncTask.isCancelled()) return;
                 // Filter normal AND expandable objects
                 filterObject(item, filteredItems);
             }
-        } else if (hasNewSearchText(mSearchText)) { //this is better than checking emptiness
+        } else if (hasNewFilter(mFilterEntity)) {
             filteredItems = unfilteredItems; //original items with no filter
             resetFilterFlags(filteredItems); //recursive reset
             mExpandedFilterFlags = null;
@@ -3937,10 +4023,10 @@ public class FlexibleAdapter<T extends IFlexible>
             mOriginalList = null;
         }
 
-        // Animate search results only in case of new SearchText
-        if (hasNewSearchText(mSearchText)) {
-            mOldSearchText = mSearchText;
-            animateTo(filteredItems, Payload.FILTER);
+        // Animate search results only in case of new Filter
+        if (hasNewFilter(mFilterEntity)) {
+            mOldFilterEntity = mFilterEntity;
+            animateDiff(filteredItems, Payload.FILTER);
         }
 
         // Reset flag
@@ -3959,7 +4045,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * It performs filtering on the subItems returning true, if the any child should be in the
      * filtered collection.
      * <p>If the provided item is not an expandable it will be filtered as usual by
-     * {@link #filterObject(T, String)}.</p>
+     * {@link #filterObject(T, Serializable)}.</p>
      *
      * @param item the object with subItems to be inspected
      * @return true, if the object should be in the filteredResult, false otherwise
@@ -3980,7 +4066,7 @@ public class FlexibleAdapter<T extends IFlexible>
         boolean filtered = filterExpandableObject(item, filteredItems);
         // If no subItem was filtered, fallback to Normal filter
         if (!filtered) {
-            filtered = filterObject(item, getSearchText());
+            filtered = filterObject(item, getFilter(Serializable.class));
         }
         if (filtered) {
             // Check if header has to be added too
@@ -4013,7 +4099,7 @@ public class FlexibleAdapter<T extends IFlexible>
                     filtered = true;
                 } else {
                     // Use normal filter for normal subItem
-                    subItem.setHidden(!filterObject(subItem, getSearchText()));
+                    subItem.setHidden(!filterObject(subItem, getFilter(Serializable.class)));
                     if (!subItem.isHidden()) {
                         filtered = true;
                         filteredItems.add(subItem);
@@ -4028,13 +4114,13 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * This method checks if the provided object is a type of {@link IFilterable} interface,
-     * if yes, performs the filter on the implemented method {@link IFilterable#filter(String)}.
+     * if yes, performs the filter on the implemented method {@link IFilterable#filter(Serializable)}.
      * <p><b>Note:</b>
      * <br>- The item will be collected if the implemented method returns true.
      * <br>- {@code IExpandable} items are automatically picked up and displayed if at least a
      * child is collected by the current filter. You DON'T NEED to implement the scan for the
      * children: this is already done :-)
-     * <br>- If you don't want to implement the {@code IFilterable} interface on the items, then
+     * <br>- If you don't want to implement the {@code IFilterable} interface on each item, then
      * you can override this method to have another filter logic!
      *
      * @param item       the object to be inspected
@@ -4044,12 +4130,12 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 3.1.0 Created
      * <br>5.0.0-b1 Expandable + Child filtering
      */
-    protected boolean filterObject(T item, String constraint) {
+    protected boolean filterObject(T item, Serializable constraint) {
         return item instanceof IFilterable && ((IFilterable) item).filter(constraint);
     }
 
     /**
-     * Clears flags after searchText is cleared out for Expandable items and sub items.
+     * Clears flags after filter is cleared out for Expandable items and sub items.
      * Also restore headers visibility.
      */
     private void resetFilterFlags(List<T> items) {
@@ -4112,9 +4198,59 @@ public class FlexibleAdapter<T extends IFlexible>
         return this;
     }
 
-	/*-------------------------*/
-	/* ANIMATE CHANGES METHODS */
-	/*-------------------------*/
+    /*-------------------------*/
+    /* ANIMATE CHANGES METHODS */
+    /*-------------------------*/
+
+    /**
+     * @return true to calculate animation changes with DiffUtil, false to use default calculation.
+     * @see #setAnimateChangesWithDiffUtil(boolean)
+     */
+    public boolean isAnimateChangesWithDiffUtil() {
+        return useDiffUtil;
+    }
+
+    /**
+     * Whether use {@link DiffUtil} to calculate the changes between 2 lists after Update or
+     * Filter operations. If disabled, the advanced default calculation will be used instead.
+     * <p>A time, to compare the 2 different approaches, is calculated and displayed in the log.
+     * To see the logs call {@link #enableLogs(int)} before creating the Adapter instance!</p>
+     * Default value is {@code false} (default calculation is used).
+     *
+     * @param useDiffUtil true to switch the calculation and use DiffUtil, false to use the default
+     *                    calculation.
+     * @return this Adapter, so the call can be chained
+     * @see #setDiffUtilCallback(DiffUtilCallback)
+     */
+    public FlexibleAdapter setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
+        this.useDiffUtil = useDiffUtil;
+        return this;
+    }
+
+    /**
+     * Sets a custom implementation of {@link DiffUtilCallback} for the DiffUtil.
+     *
+     * @param diffUtilCallback the custom callback that DiffUtil will call
+     * @return this Adapter, so the call can be chained
+     * @see #setAnimateChangesWithDiffUtil(boolean)
+     */
+    public FlexibleAdapter setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
+        this.diffUtilCallback = diffUtilCallback;
+        return this;
+    }
+
+    private synchronized void animateDiff(@Nullable List<T> newItems, Payload payloadChange) {
+        if (useDiffUtil) {
+            log.v("Animate changes with DiffUtils! oldSize=" + getItemCount() + " newSize=" + newItems.size());
+            if (diffUtilCallback == null) {
+                diffUtilCallback = new DiffUtilCallback();
+            }
+            diffUtilCallback.setItems(mItems, newItems);
+            diffResult = DiffUtil.calculateDiff(diffUtilCallback, notifyMoveOfFilteredItems);
+        } else {
+            animateTo(newItems, payloadChange);
+        }
+    }
 
     /**
      * Animate the synchronization between the old list and the new list.
@@ -4265,33 +4401,39 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     private synchronized void executeNotifications(Payload payloadChange) {
-        log.i("Performing %s notifications", mNotifications.size());
-        mItems = mTempItems;     // Update mItems in the UI Thread
-        setScrollAnimate(false); // Disable scroll animation
-        for (Notification notification : mNotifications) {
-            switch (notification.operation) {
-                case Notification.ADD:
-                    notifyItemInserted(notification.position);
-                    break;
-                case Notification.CHANGE:
-                    notifyItemChanged(notification.position, payloadChange);
-                    break;
-                case Notification.REMOVE:
-                    notifyItemRemoved(notification.position);
-                    break;
-                case Notification.MOVE:
-                    notifyItemMoved(notification.fromPosition, notification.position);
-                    break;
-                default:
-                    log.w("notifyDataSetChanged!");
-                    notifyDataSetChanged();
-                    break;
+        if (diffResult != null) {
+            log.i("Dispatching notifications");
+            mItems = diffUtilCallback.getNewItems();// Update mItems in the UI Thread
+            diffResult.dispatchUpdatesTo(this);
+            diffResult = null;
+        } else {
+            log.i("Performing %s notifications", mNotifications.size());
+            mItems = mTempItems;     // Update mItems in the UI Thread
+            setScrollAnimate(false); // Disable scroll animation
+            for (Notification notification : mNotifications) {
+                switch (notification.operation) {
+                    case Notification.ADD:
+                        notifyItemInserted(notification.position);
+                        break;
+                    case Notification.CHANGE:
+                        notifyItemChanged(notification.position, payloadChange);
+                        break;
+                    case Notification.REMOVE:
+                        notifyItemRemoved(notification.position);
+                        break;
+                    case Notification.MOVE:
+                        notifyItemMoved(notification.fromPosition, notification.position);
+                        break;
+                    default:
+                        log.w("notifyDataSetChanged!");
+                        notifyDataSetChanged();
+                        break;
+                }
             }
+            mTempItems = null;
+            mNotifications = null;
+            setScrollAnimate(true);
         }
-        mTempItems = null;
-        mNotifications = null;
-        setScrollAnimate(true);
-
         time = System.currentTimeMillis() - start;
         log.i("Animate changes DONE in %sms", time);
     }
@@ -4303,9 +4445,9 @@ public class FlexibleAdapter<T extends IFlexible>
         return time;
     }
 
-	/*---------------*/
-	/* TOUCH METHODS */
-	/*---------------*/
+    /*---------------*/
+    /* TOUCH METHODS */
+    /*---------------*/
 
     private void initializeItemTouchHelper() {
         if (mItemTouchHelper == null) {
@@ -4656,9 +4798,9 @@ public class FlexibleAdapter<T extends IFlexible>
         }
     }
 
-	/*------------------------*/
-	/* OTHERS PRIVATE METHODS */
-	/*------------------------*/
+    /*------------------------*/
+    /* OTHERS PRIVATE METHODS */
+    /*------------------------*/
 
     /**
      * Internal mapper to remember and add all view types for the items.
@@ -4666,8 +4808,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * @param item the item to map
      * @since 5.0.0-b1
      */
-    private void mapViewTypeFrom(T item) {
-        if (item != null && !mTypeInstances.containsKey(item.getItemViewType())) {
+    private void mapViewTypeFrom(@NonNull T item) {
+        if (!mTypeInstances.containsKey(item.getItemViewType())) {
             mTypeInstances.put(item.getItemViewType(), item);
             log.i("Mapped viewType %s from %s", item.getItemViewType(), getClassName(item));
         }
@@ -4852,9 +4994,9 @@ public class FlexibleAdapter<T extends IFlexible>
         }, delay);
     }
 
-	/*----------------*/
-	/* INSTANCE STATE */
-	/*----------------*/
+    /*----------------*/
+    /* INSTANCE STATE */
+    /*----------------*/
 
     /**
      * Save the state of the current expanded items.
@@ -4875,7 +5017,7 @@ public class FlexibleAdapter<T extends IFlexible>
             outState.putBoolean(EXTRA_PARENT, this.parentSelected);
             outState.putInt(EXTRA_LEVEL, this.mSelectedLevel);
             // Current filter. Old text is not saved otherwise animateTo() cannot be called
-            outState.putString(EXTRA_SEARCH, this.mSearchText);
+            outState.putSerializable(EXTRA_FILTER, this.mFilterEntity);
             // Save headers shown status
             outState.putBoolean(EXTRA_HEADERS, this.headersShown);
             outState.putBoolean(EXTRA_STICKY, areHeadersSticky());
@@ -4911,14 +5053,14 @@ public class FlexibleAdapter<T extends IFlexible>
             this.parentSelected = savedInstanceState.getBoolean(EXTRA_PARENT);
             this.childSelected = savedInstanceState.getBoolean(EXTRA_CHILD);
             this.mSelectedLevel = savedInstanceState.getInt(EXTRA_LEVEL);
-            // Current filter (old text must not be saved)
-            this.mSearchText = savedInstanceState.getString(EXTRA_SEARCH);
+            // Current filter (old filter must not be saved)
+            this.mFilterEntity = savedInstanceState.getSerializable(EXTRA_FILTER);
         }
     }
 
-	/*---------------*/
-	/* INNER CLASSES */
-	/*---------------*/
+    /*---------------*/
+    /* INNER CLASSES */
+    /*---------------*/
 
     /**
      * @since 03/01/2016
@@ -4966,21 +5108,24 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * @since 26/01/2016
+     * <br>04/02/2018 Providing the view that generated the event
      */
     public interface OnItemClickListener {
         /**
          * Called when single tap occurs.
-         * <p>This method receives the click event generated from the itemView to check if one
-         * of the selection mode ({@code SINGLE or MULTI}) is enabled in order to activate the
-         * itemView.</p>
-         * For Expandable Views it will toggle the Expansion if configured so.
+         * <p>The click event is generated from the itemView or any view inside it (if registered).</p>
+         * Here, we check if one of the selection mode ({@code SINGLE or MULTI}) is enabled in order
+         * to activate the itemView.</p>
+         * To register the click event to any subview, just assign the ViewHolder instance as click
+         * listener to that view.
          *
+         * @param view     the view that generated the event
          * @param position the adapter position of the item clicked
          * @return true if the click should activate the itemView according to the selection mode,
          * false for no change to the itemView.
          * @since 5.0.0-b1
          */
-        boolean onItemClick(int position);
+        boolean onItemClick(View view, int position);
     }
 
     /**
@@ -5243,6 +5388,7 @@ public class FlexibleAdapter<T extends IFlexible>
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class FilterAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private final List<T> newItems;
@@ -5260,13 +5406,14 @@ public class FlexibleAdapter<T extends IFlexible>
                 log.w("Cannot filter while endlessLoading");
                 this.cancel(true);
             }
-            // Note: In case some items are in pending deletion (Undo started),
-            // we commit the deletion before starting or resetting the filter.
-            if (isRestoreInTime() && mDeleteCompleteListener != null) {
+            // Note: In case of some deleted items, we commit the deletion in the original list
+            // and in the current list before starting or resetting the filter.
+            if (isRestoreInTime()) {
                 log.d("Removing all deleted items before filtering/updating");
                 newItems.removeAll(getDeletedItems());
-                if (mOriginalList != null) mOriginalList.removeAll(getDeletedItems());
-                mDeleteCompleteListener.onDeleteConfirmed(3); // Snackbar.Callback.DISMISS_EVENT_MANUAL = 3
+                if (mDeleteCompleteListener != null) {
+                    mDeleteCompleteListener.onDeleteConfirmed(3); // Snackbar.Callback.DISMISS_EVENT_MANUAL = 3
+                }
             }
         }
 
@@ -5282,7 +5429,7 @@ public class FlexibleAdapter<T extends IFlexible>
                 case UPDATE:
                     log.d("doInBackground - started UPDATE");
                     prepareItemsForUpdate(newItems);
-                    animateTo(newItems, Payload.CHANGE);
+                    animateDiff(newItems, Payload.CHANGE);
                     log.d("doInBackground - ended UPDATE");
                     break;
                 case FILTER:
@@ -5296,7 +5443,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
         @Override
         protected void onPostExecute(Void result) {
-            if (mNotifications != null) {
+            if (diffResult != null || mNotifications != null) {
                 //Execute post data
                 switch (what) {
                     case UPDATE:
@@ -5361,8 +5508,9 @@ public class FlexibleAdapter<T extends IFlexible>
     @CallSuper
     protected void onPostUpdate() {
         // Call listener to update EmptyView, assuming the update always made a change
-        if (mUpdateListener != null)
+        if (mUpdateListener != null) {
             mUpdateListener.onUpdateEmptyView(getMainItemCount());
+        }
     }
 
     /**
@@ -5374,8 +5522,9 @@ public class FlexibleAdapter<T extends IFlexible>
     @CallSuper
     protected void onPostFilter() {
         // Call listener to update FilterView, assuming the filter always made a change
-        if (mFilterListener != null)
+        if (mFilterListener != null) {
             mFilterListener.onUpdateFilterView(getMainItemCount());
+        }
     }
 
     /**
@@ -5397,13 +5546,104 @@ public class FlexibleAdapter<T extends IFlexible>
                 case FILTER: //filterItems
                     if (mFilterAsyncTask != null) mFilterAsyncTask.cancel(true);
                     mFilterAsyncTask = new FilterAsyncTask(message.what, (List<T>) message.obj);
-                    mFilterAsyncTask.execute();
+                    mFilterAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return true;
                 case LOAD_MORE_COMPLETE: //hide progress item
                     hideProgressItem();
                     return true;
             }
             return false;
+        }
+    }
+
+    /**
+     * Use {@link #setItems(List, List)} to set the old and new lists, that are available as:
+     * <p>- {@code protected List<T> oldItems;}
+     * <br/>- {@code protected List<T> newItems;}</p>
+     */
+    public static class DiffUtilCallback<T extends IFlexible> extends DiffUtil.Callback {
+
+        protected List<T> oldItems;
+        protected List<T> newItems;
+
+        public final void setItems(List<T> oldItems, List<T> newItems) {
+            this.oldItems = oldItems;
+            this.newItems = newItems;
+        }
+
+        public final List<T> getNewItems() {
+            return newItems;
+        }
+
+        @Override
+        public final int getOldListSize() {
+            return oldItems.size();
+        }
+
+        @Override
+        public final int getNewListSize() {
+            return newItems.size();
+        }
+
+        /**
+         * Called by the DiffUtil to decide whether two object represent the same item.
+         * <p>
+         * For example, if your items have unique ids, this method should check their id equality.
+         *
+         * @param oldItemPosition The position of the item in the old list
+         * @param newItemPosition The position of the item in the new list
+         * @return True if the two items represent the same object or false if they are different.
+         */
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            T oldItem = oldItems.get(oldItemPosition);
+            T newItem = newItems.get(newItemPosition);
+            return oldItem.equals(newItem);
+        }
+
+        /**
+         * Called by the DiffUtil when it wants to check whether two items have the same data.
+         * DiffUtil uses this information to detect if the contents of an item has changed.
+         * <p>
+         * DiffUtil uses this method to check equality instead of {@link Object#equals(Object)}
+         * so that you can change its behavior depending on your UI.
+         * For example, if you are using DiffUtil with a {@link RecyclerView.Adapter RecyclerView.Adapter},
+         * you should return whether the items' visual representations are the same.
+         * <p>
+         * This method is called only if {@link #areItemsTheSame(int, int)} returns
+         * {@code true} for these items.
+         *
+         * @param oldItemPosition The position of the item in the old list
+         * @param newItemPosition The position of the item in the new list which replaces the oldItem
+         * @return True if the contents of the items are the same or false if they are different.
+         */
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            T oldItem = oldItems.get(oldItemPosition);
+            T newItem = newItems.get(newItemPosition);
+            return !oldItem.shouldNotifyChange(newItem);
+        }
+
+        /**
+         * When {@link #areItemsTheSame(int, int)} returns {@code true} for two items and
+         * {@link #areContentsTheSame(int, int)} returns false for them, DiffUtil
+         * calls this method to get a payload about the change.
+         * <p>
+         * For example, if you are using DiffUtil with {@link RecyclerView}, you can return the
+         * particular field that changed in the item and your
+         * {@link android.support.v7.widget.RecyclerView.ItemAnimator ItemAnimator} can use that
+         * information to run the correct animation.
+         * <p>
+         * Default implementation returns {@code null}.
+         *
+         * @param oldItemPosition The position of the item in the old list
+         * @param newItemPosition The position of the item in the new list
+         * @return A payload object that represents the change between the two items.
+         */
+        @Nullable
+        @Override
+        public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+            return Payload.CHANGE;
         }
     }
 

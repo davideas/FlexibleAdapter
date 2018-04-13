@@ -119,7 +119,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
         if (mAdapter.mItemClickListener != null && mActionState == ItemTouchHelper.ACTION_STATE_IDLE) {
             Log.v("onClick on position %s mode=%s", position, LayoutUtils.getModeName(mAdapter.getMode()));
             // Get the permission to activate the View from user
-            if (mAdapter.mItemClickListener.onItemClick(position)) {
+            if (mAdapter.mItemClickListener.onItemClick(view, position)) {
                 // Now toggle the activation
                 toggleActivation();
             }

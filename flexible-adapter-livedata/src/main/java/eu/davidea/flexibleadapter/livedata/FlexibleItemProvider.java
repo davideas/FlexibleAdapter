@@ -17,8 +17,11 @@ package eu.davidea.flexibleadapter.livedata;
 
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -70,9 +73,27 @@ public class FlexibleItemProvider<Model, AdapterItem> {
         List<AdapterItem> items = new ArrayList<>();
         if (isSourceValid(source)) {
             for (Model model : source) {
-                items.add(mFactory.create(model));
+                AdapterItem item = mFactory.create(model);
+                if (item != null) {
+                    items.add(item);
+                }
             }
         }
+        return items;
+    }
+
+    /**
+     * Creates a new list of sorted {@code IFlexible} items.
+     *
+     * @param source     the list with original items
+     * @param comparator comparator to sort the items
+     * @return A List of {@code IFlexible} items.
+     */
+    @NonNull
+    @MainThread
+    public List<AdapterItem> from(List<Model> source, Comparator<AdapterItem> comparator) {
+        List<AdapterItem> items = from(source);
+        if (comparator != null) Collections.sort(items, comparator);
         return items;
     }
 
@@ -81,7 +102,39 @@ public class FlexibleItemProvider<Model, AdapterItem> {
     }
 
     public interface Factory<Model, Flexible> {
-        @NonNull
+        /**
+         * Creates an Adapter item starting from the model object.
+         * <p>For more complex list, such Header, Sectionable, Expandable with sub-items, this method must
+         * return the main items.<br>For instance if we have <i>always</i> Sectionable objects,
+         * we <b>WILL</b> call {@code mAdapter.setDisplayHeadersAtStartUp(true)}:
+         * <pre>
+         * if (model.isSectionable()) {
+         *     Header header = mHeadersMap.get(model.getHeaderId());
+         *     return new Sectionable(model, header);
+         * }
+         * return null;
+         * </pre>
+         * If instead, your use case <i>may</i> have empty sections: Header instance must be forced <u>not hidden</u>
+         * and returned, we <b>WILL</b> call {@code mAdapter.setHeadersShown(true)} and <b>WON'T</b> call
+         * {@code mAdapter.setDisplayHeadersAtStartUp(true)}:
+         * <pre>
+         * if (model.isHeader()) {
+         *     Header header = mHeadersMap.get(model.getId());
+         *     header.setHidden(false); // or in its constructor
+         *     return header;
+         * } else { //is a sectionable
+         *     Header header = mHeadersMap.get(model.getHeaderId());
+         *     return new Sectionable(model, header);
+         * }
+         * </pre>
+         * <b>Note:</b> {@code mHeadersMap} is a HashMap field in this Factory instance previously built only
+         * with headers and is <b>optional</b>: depends if you have correctly implemented the {@code equals()}
+         * and {@code hashCode()} methods, but is preferable to have a unique instance of each header!
+         *
+         * @param model the original model object from Repository
+         * @return The Flexible item, or null to skip it, if the item will be added automatically by the Adapter
+         */
+        @Nullable
         Flexible create(Model model);
     }
 

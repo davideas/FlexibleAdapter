@@ -72,7 +72,7 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
     private boolean consecutive = false;
     private List<Integer> mPositions = null;
     private Object mPayload = null;
-    private FlexibleAdapter mAdapter;
+    private FlexibleAdapter<?> mAdapter;
     private OnActionListener mUndoListener;
     private Snackbar mSnackbar;
 
@@ -230,7 +230,7 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
             Log.v("onActionConfirmed event=%s", event);
             mUndoListener.onActionConfirmed(mAction, event);
         }
-        mAdapter.emptyBin();
+        mAdapter.confirmDeletion();
         // Trigger manual dismiss event
         // Avoid circular calls!
         if (mSnackbar.isShown() && (mAction == Action.REMOVE && !mAdapter.isRestoreInTime())) {

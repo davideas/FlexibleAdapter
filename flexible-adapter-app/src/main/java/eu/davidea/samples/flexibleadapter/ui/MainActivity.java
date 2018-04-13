@@ -481,9 +481,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if (mAdapter.hasNewSearchText(newText)) {
+        if (mAdapter.hasNewFilter(newText)) {
             Log.d("onQueryTextChange newText: " + newText);
-            mAdapter.setSearchText(newText);
+            mAdapter.setFilter(newText);
 
             // Fill and Filter mItems with your custom list and automatically animate the changes
             // - Option A: Use the internal list as original list
@@ -493,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements
             //mAdapter.filterItems(DatabaseService.getInstance().getDatabaseList(), DatabaseConfiguration.delay);
         }
         // Disable SwipeRefresh if search is active!!
-        mSwipeRefreshLayout.setEnabled(!mAdapter.hasSearchText());
+        mSwipeRefreshLayout.setEnabled(!mAdapter.hasFilter());
         return true;
     }
 
@@ -513,14 +513,14 @@ public class MainActivity extends AppCompatActivity implements
 
         if (mSearchView != null) {
             //Has searchText?
-            if (!mAdapter.hasSearchText()) {
+            if (!mAdapter.hasFilter()) {
                 Log.d("onPrepareOptionsMenu Clearing SearchView!");
                 mSearchView.setIconified(true);// This also clears the text in SearchView widget
             } else {
                 //Necessary after the restoreInstanceState
                 menu.findItem(R.id.action_search).expandActionView();//must be called first
                 //This restores the text, must be after the expandActionView()
-                mSearchView.setQuery(mAdapter.getSearchText(), false);//submit = false!!!
+                mSearchView.setQuery(mAdapter.getFilter(String.class), false);//submit = false!!!
                 mSearchView.clearFocus();//Optionally the keyboard can be closed
                 //mSearchView.setIconified(false);//This is not necessary
             }
@@ -556,6 +556,11 @@ public class MainActivity extends AppCompatActivity implements
         if (reverseMenuItem != null) {
             reverseMenuItem.setChecked(mAdapter.isAnimationOnReverseScrollingEnabled());
         }
+        //DiffUtil?
+        MenuItem diffUtilItem = menu.findItem(R.id.action_diff_util);
+        if (diffUtilItem != null) {
+            diffUtilItem.setChecked(DatabaseConfiguration.animateWithDiffUtil);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -589,6 +594,18 @@ public class MainActivity extends AppCompatActivity implements
                 item.setChecked(true);
                 Snackbar.make(findViewById(R.id.main_view), "Enabled reverse scrolling animation", Snackbar.LENGTH_SHORT).show();
             }
+		} else if (id == R.id.action_diff_util) {
+			if (mAdapter.isAnimateChangesWithDiffUtil()) {
+				DatabaseConfiguration.animateWithDiffUtil = false;
+				mAdapter.setAnimateChangesWithDiffUtil(false);
+				item.setChecked(false);
+				Snackbar.make(findViewById(R.id.main_view), "Default calculation is used to animate changes\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+			} else {
+				DatabaseConfiguration.animateWithDiffUtil = true;
+				mAdapter.setAnimateChangesWithDiffUtil(true);
+				item.setChecked(true);
+				Snackbar.make(findViewById(R.id.main_view), "DiffUtil is used to animate changes\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+			}
         } else if (id == R.id.action_auto_collapse) {
             if (mAdapter.isAutoCollapseOnExpand()) {
                 mAdapter.setAutoCollapseOnExpand(false);
@@ -671,7 +688,7 @@ public class MainActivity extends AppCompatActivity implements
 	 * ======================================================================== */
 
     @Override
-    public boolean onItemClick(int position) {
+    public boolean onItemClick(View view, int position) {
         IFlexible flexibleItem = mAdapter.getItem(position);
         if (flexibleItem instanceof OverallItem) {
             OverallItem overallItem = (OverallItem) flexibleItem;
@@ -748,7 +765,7 @@ public class MainActivity extends AppCompatActivity implements
         //   2) remove the item from the adapter
 
         // Create list for single position (only in onItemSwipe)
-        List<Integer> positions = Collections.singletonList(position);
+        List<Integer> positions = Collections.singletonList(position); // This is an immutable list and cannot be sort!
         // Build the message
         IFlexible abstractItem = mAdapter.getItem(position);
         StringBuilder message = new StringBuilder();

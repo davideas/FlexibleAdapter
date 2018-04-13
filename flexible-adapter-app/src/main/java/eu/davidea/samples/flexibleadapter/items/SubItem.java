@@ -14,7 +14,6 @@ import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
-import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -24,8 +23,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * {@link eu.davidea.flexibleadapter.items.AbstractFlexibleItem} to benefit of the already
  * implemented methods (getter and setters).
  */
-public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
-        implements ISectionable<SubItem.ChildViewHolder, IHeader>, IFilterable {
+public class SubItem extends AbstractItem<SubItem.ChildViewHolder> implements IFilterable<String> {
 
     /**
      * The header of this item
@@ -35,16 +33,6 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
     public SubItem(String id) {
         super(id);
         setDraggable(true);
-    }
-
-    @Override
-    public IHeader getHeader() {
-        return header;
-    }
-
-    @Override
-    public void setHeader(IHeader header) {
-        this.header = header;
     }
 
     /**
@@ -78,21 +66,17 @@ public class SubItem extends AbstractItem<SubItem.ChildViewHolder>
         return new ChildViewHolder(view, adapter);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public void bindViewHolder(FlexibleAdapter adapter, ChildViewHolder holder, int position, List payloads) {
+    public void bindViewHolder(FlexibleAdapter<IFlexible> adapter, ChildViewHolder holder, int position, List<Object> payloads) {
         //In case of searchText matches with Title or with an SimpleItem's field
         // this will be highlighted
-        if (adapter.hasSearchText()) {
+        if (adapter.hasFilter()) {
             Context context = holder.itemView.getContext();
-            FlexibleUtils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText(),
+            String filter = adapter.getFilter(String.class);
+            FlexibleUtils.highlightText(holder.mTitle, getTitle(), filter,
                     context.getResources().getColor(R.color.colorAccent_light));
         } else {
             holder.mTitle.setText(getTitle());
-        }
-
-        if (getHeader() != null) {
-            setSubtitle("Header " + getHeader().toString());
         }
     }
 

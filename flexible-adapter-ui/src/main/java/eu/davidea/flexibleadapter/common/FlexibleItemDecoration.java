@@ -40,7 +40,6 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.LayoutUtils;
 
 /**
@@ -488,7 +487,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
 
         // Get custom Item Decoration or default
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
-        int itemType = adapter.getItemViewType(position);
+        int itemType = (position != RecyclerView.NO_POSITION ? adapter.getItemViewType(position) : 0);
         ItemDecoration deco = getItemDecoration(itemType);
 
         // No offset set, applies the general offset to this item decoration
@@ -607,16 +606,20 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
         // Section Gap Offset
         if (mSectionOffset > 0 && adapter instanceof FlexibleAdapter) {
             FlexibleAdapter flexibleAdapter = (FlexibleAdapter) adapter;
-            IFlexible item = flexibleAdapter.getItem(position);
+            IFlexible nextItem = flexibleAdapter.getItem(position + 1);
 
-            // - Only ISectionable items can finish with a gap and only if next item is a IHeader item
-            // - Important: the check must be done on the bottom of the section, otherwise the
-            //   sticky header will jump!
-            //Log.v("applySectionGap position=%s condition=%s", position, (position >= adapter.getItemCount() - mDividerOnLastItem));
-            if (item instanceof ISectionable &&
-                    (flexibleAdapter.isHeader(flexibleAdapter.getItem(position + 1)) ||
-                            position >= adapter.getItemCount() - mSectionGapOnLastItem)) {
-
+            // IMPORTANT: the check must be done on the BOTTOM of the section,
+            // otherwise the sticky header will jump!
+            if (flexibleAdapter.isHeader(nextItem)) {
+                //Log.v("applySectionGap position=%s", position);
+                if (orientation == RecyclerView.VERTICAL) {
+                    outRect.bottom += mSectionOffset;
+                } else {
+                    outRect.right += mSectionOffset;
+                }
+            }
+            if (position >= adapter.getItemCount() - mSectionGapOnLastItem) {
+                //Log.v("applySectionGapOnLastPosition position=%s", position);
                 if (orientation == RecyclerView.VERTICAL) {
                     outRect.bottom += mSectionOffset;
                 } else {

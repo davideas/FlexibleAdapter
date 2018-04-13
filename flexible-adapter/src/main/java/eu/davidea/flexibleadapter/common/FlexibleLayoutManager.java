@@ -102,7 +102,13 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
     public int findFirstCompletelyVisibleItemPosition() {
         RecyclerView.LayoutManager layoutManager = getLayoutManager();
         if (layoutManager instanceof StaggeredGridLayoutManager) {
-            return ((StaggeredGridLayoutManager) layoutManager).findFirstCompletelyVisibleItemPositions(null)[0];
+            StaggeredGridLayoutManager staggeredGLM = (StaggeredGridLayoutManager) layoutManager;
+            int position = staggeredGLM.findFirstCompletelyVisibleItemPositions(null)[0];
+            for (int i = 1; i < getSpanCount(); i++) {
+                int nextPosition = staggeredGLM.findFirstCompletelyVisibleItemPositions(null)[i];
+                if (nextPosition < position) position = nextPosition;
+            }
+            return position;
         } else {
             return ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
         }
@@ -121,7 +127,13 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
     public int findFirstVisibleItemPosition() {
         RecyclerView.LayoutManager layoutManager = getLayoutManager();
         if (layoutManager instanceof StaggeredGridLayoutManager) {
-            return ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
+            StaggeredGridLayoutManager staggeredGLM = (StaggeredGridLayoutManager) layoutManager;
+            int position = staggeredGLM.findFirstVisibleItemPositions(null)[0];
+            for (int i = 1; i < getSpanCount(); i++) {
+                int nextPosition = staggeredGLM.findFirstVisibleItemPositions(null)[i];
+                if (nextPosition < position) position = nextPosition;
+            }
+            return position;
         } else {
             return ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
         }
@@ -140,7 +152,13 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
     public int findLastCompletelyVisibleItemPosition() {
         RecyclerView.LayoutManager layoutManager = getLayoutManager();
         if (layoutManager instanceof StaggeredGridLayoutManager) {
-            return ((StaggeredGridLayoutManager) layoutManager).findLastCompletelyVisibleItemPositions(null)[0];
+            StaggeredGridLayoutManager staggeredGLM = (StaggeredGridLayoutManager) layoutManager;
+            int position = staggeredGLM.findLastCompletelyVisibleItemPositions(null)[0];
+            for (int i = 1; i < getSpanCount(); i++) {
+                int nextPosition = staggeredGLM.findLastCompletelyVisibleItemPositions(null)[i];
+                if (nextPosition > position) position = nextPosition;
+            }
+            return position;
         } else {
             return ((LinearLayoutManager) layoutManager).findLastCompletelyVisibleItemPosition();
         }
@@ -159,7 +177,13 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
     public int findLastVisibleItemPosition() {
         RecyclerView.LayoutManager layoutManager = getLayoutManager();
         if (layoutManager instanceof StaggeredGridLayoutManager) {
-            return ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null)[0];
+            StaggeredGridLayoutManager staggeredGLM = (StaggeredGridLayoutManager) layoutManager;
+            int position = staggeredGLM.findLastVisibleItemPositions(null)[0];
+            for (int i = 1; i < getSpanCount(); i++) {
+                int nextPosition = staggeredGLM.findLastVisibleItemPositions(null)[i];
+                if (nextPosition > position) position = nextPosition;
+            }
+            return position;
         } else {
             return ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
         }

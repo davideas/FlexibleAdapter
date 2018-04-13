@@ -21,6 +21,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.IExpandable;
 import eu.davidea.flexibleadapter.items.IFilterable;
+import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.flexibleadapter.utils.FlexibleUtils;
@@ -34,8 +35,9 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * implemented methods around subItems list.
  */
 public class ExpandableItem extends AbstractItem<ExpandableItem.ParentViewHolder>
-        implements ISectionable<ExpandableItem.ParentViewHolder, HeaderItem>, IFilterable,
-        IExpandable<ExpandableItem.ParentViewHolder, SubItem> {
+        implements ISectionable<ExpandableItem.ParentViewHolder, HeaderItem>,
+        IExpandable<ExpandableItem.ParentViewHolder, SubItem>,
+        IFilterable<String> {
 
     /* The header of this item */
     HeaderItem header;
@@ -123,8 +125,7 @@ public class ExpandableItem extends AbstractItem<ExpandableItem.ParentViewHolder
     }
 
     @Override
-    @SuppressWarnings({"unchecked"})
-    public void bindViewHolder(final FlexibleAdapter adapter, ParentViewHolder holder, int position, List payloads) {
+    public void bindViewHolder(final FlexibleAdapter<IFlexible> adapter, ParentViewHolder holder, int position, List<Object> payloads) {
         Context context = holder.itemView.getContext();
 
         // Subtitle
@@ -143,8 +144,8 @@ public class ExpandableItem extends AbstractItem<ExpandableItem.ParentViewHolder
 
         if (payloads.size() > 0) {
             Log.d(this.getClass().getSimpleName(), "ExpandableItem Payload " + payloads);
-            if (adapter.hasSearchText()) {
-                FlexibleUtils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+            if (adapter.hasFilter()) {
+                FlexibleUtils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getFilter(String.class));
             } else {
                 holder.mSubtitle.setText(getSubtitle());
             }
@@ -162,9 +163,10 @@ public class ExpandableItem extends AbstractItem<ExpandableItem.ParentViewHolder
             }
 
             // In case of searchText matches with Title or with a field this will be highlighted
-            if (adapter.hasSearchText()) {
-                FlexibleUtils.highlightText(holder.mTitle, getTitle(), adapter.getSearchText());
-                FlexibleUtils.highlightText(holder.mSubtitle, getSubtitle(), adapter.getSearchText());
+            if (adapter.hasFilter()) {
+                String filter = adapter.getFilter(String.class);
+                FlexibleUtils.highlightWords(holder.mTitle, getTitle(), filter);
+                FlexibleUtils.highlightWords(holder.mSubtitle, getSubtitle(), filter);
             } else {
                 holder.mTitle.setText(getTitle());
                 holder.mSubtitle.setText(getSubtitle());
@@ -248,6 +250,18 @@ public class ExpandableItem extends AbstractItem<ExpandableItem.ParentViewHolder
         @Override
         protected boolean shouldAddSelectionInActionMode() {
             return false;//default=false
+        }
+
+        @Override
+        protected void expandView(int position) {
+            super.expandView(position);
+            mAdapter.invalidateItemDecorations(100);
+        }
+
+        @Override
+        protected void collapseView(int position) {
+            super.collapseView(position);
+            mAdapter.invalidateItemDecorations(100);
         }
 
         @Override

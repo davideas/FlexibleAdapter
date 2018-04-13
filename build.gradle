@@ -15,13 +15,13 @@ allprojects {
 
         // SDK and Build tools version
         minSdk = 14
-        targetSdk = 26
-        buildTools = "27.0.1"
+        targetSdk = 27
+        buildTools = "27.0.3"
 
         // Android Architecture Components
-        archLifecycleVer = "1.0.3"
-        archExtensionsVer = "1.0.0-rc1"
-        archPersistenceVer = archExtensionsVer
+        archLifecycleVer = "1.1.1"
+        archExtensionsVer = "1.1.1"
+        roomPersistenceVer = "1.1.0-beta2"
         archLib = [
                 lifecycle      : "android.arch.lifecycle:runtime:${archLifecycleVer}",
                 extensions     : "android.arch.lifecycle:extensions:${archExtensionsVer}",
@@ -29,14 +29,14 @@ allprojects {
                 commonJava8    : "android.arch.lifecycle:common-java8:${archExtensionsVer}",
                 reactiveStreams: "android.arch.lifecycle:reactivestreams:${archExtensionsVer}",
                 coreTesting    : "android.arch.core:core-testing:${archExtensionsVer}",
-                room           : "android.arch.persistence.room:runtime:${archPersistenceVer}",
-                roomCompiler   : "android.arch.persistence.room:compiler:${archPersistenceVer}",
-                roomRxJava2    : "android.arch.persistence.room:rxjava2:${archPersistenceVer}"
+                room           : "android.arch.persistence.room:runtime:${roomPersistenceVer}",
+                roomCompiler   : "android.arch.persistence.room:compiler:${roomPersistenceVer}",
+                roomRxJava2    : "android.arch.persistence.room:rxjava2:${roomPersistenceVer}"
         ]
 
         // Support Libraries dependencies
-        supportVer = "27.0.2"
-        constraintVer = "1.1.0-beta2"
+        supportVer = "27.1.0"
+        constraintVer = "1.1.0"
         supportLib = [
                 design          : "com.android.support:design:${supportVer}",
                 recyclerView    : "com.android.support:recyclerview-v7:${supportVer}",
@@ -54,8 +54,8 @@ allprojects {
 
         // Widgets
         flipViewVer = "1.1.3@aar"
-        iconicsVer = "2.9.3@aar"
-        iconicsCmdVer = "1.9.32.2@aar"
+        iconicsVer = "3.0.3@aar"
+        iconicsCmdVer = "2.0.46.1@aar"
         widgets = [
                 flipView        : "eu.davidea:flipview:${flipViewVer}",
                 iconicsCore     : "com.mikepenz:iconics-core:${iconicsVer}",
@@ -64,17 +64,13 @@ allprojects {
         ]
 
         // 3rd Libraries
-        daggerVer = "2.13"
         butterKnifeVer = "8.8.1"
-        timberVer = "4.5.1"
-        glideVer = "4.1.1"
+        timberVer = "4.7.0"
+        glideVer = "4.6.1"
         javaxInjectVer = "1"
-        junitPlatformVer = "1.0.1"
-        junitJupiterVer = "5.0.1"
+        junitPlatformVer = "1.1.0"
+        junitJupiterVer = "5.1.0"
         libraries = [
-                dagger               : "com.google.dagger:dagger:${daggerVer}",
-                daggerAndroid        : "com.google.dagger:dagger-android-support:${daggerVer}",
-                daggerCompiler       : "com.google.dagger:dagger-compiler:${daggerVer}",
                 butterKnife        : "com.jakewharton:butterknife:${butterKnifeVer}",
                 butterKnifeCompiler: "com.jakewharton:butterknife-compiler:${butterKnifeVer}",
                 timber             : "com.jakewharton.timber:timber:${timberVer}",
@@ -107,19 +103,18 @@ buildscript {
     repositories {
         jcenter()
         google()
-        //mavenLocal()
         maven { url "http://dl.bintray.com/davideas/maven" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0-alpha06'
+        classpath 'com.android.tools.build:gradle:3.1.0'
         classpath "com.neenbedankt.gradle.plugins:android-apt:1.8"
         classpath "com.github.dcendents:android-maven-gradle-plugin:1.5"
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.1"
-        classpath "com.vanniktech:gradle-android-javadoc-plugin:0.2.1"
-        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.0.0"
+        classpath "com.vanniktech:gradle-android-javadoc-plugin:0.3.0-SNAPSHOT"
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.0.31"
         classpath "eu.davidea:grabver:0.7.0"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

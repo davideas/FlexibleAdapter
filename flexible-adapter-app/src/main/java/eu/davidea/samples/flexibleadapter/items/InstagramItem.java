@@ -29,6 +29,7 @@ public class InstagramItem extends AbstractSectionableItem<InstagramItem.ViewHol
         super(header);
         this.id = id;
         this.header = header;
+        setSelectable(false);
     }
 
     @Override

@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flipview.FlipView;
@@ -88,14 +89,17 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
         mAdapter.setFastScroller(fastScroller);
 
         // New empty views handling, to set after FastScroller
-        mAdapter.addListener(new EmptyViewHelper(mAdapter,
+        new EmptyViewHelper(mAdapter,
                 getView().findViewById(R.id.empty_view),
-                getView().findViewById(R.id.filter_view)));
+                getView().findViewById(R.id.filter_view));
 
         mAdapter.setLongPressDragEnabled(true) //Enable long press to drag items
                 .setHandleDragEnabled(true) //Enable handle drag
                 .setSwipeEnabled(true); //Enable swipe items
         //.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: not necessary if Headers are also Expandable!
+
+        mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
+                .withSectionGapOffset(24));
 
         SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setEnabled(true);

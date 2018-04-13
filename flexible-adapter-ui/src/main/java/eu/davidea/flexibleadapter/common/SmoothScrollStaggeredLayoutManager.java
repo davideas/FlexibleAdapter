@@ -46,22 +46,42 @@ public class SmoothScrollStaggeredLayoutManager extends StaggeredGridLayoutManag
 
     @Override
     public int findFirstCompletelyVisibleItemPosition() {
-        return super.findFirstCompletelyVisibleItemPositions(null)[0];
+        int position = super.findFirstCompletelyVisibleItemPositions(null)[0];
+        for (int i = 1; i < getSpanCount(); i++) {
+            int nextPosition = super.findFirstCompletelyVisibleItemPositions(null)[i];
+            if (nextPosition < position) position = nextPosition;
+        }
+        return position;
     }
 
     @Override
     public int findFirstVisibleItemPosition() {
-        return super.findFirstVisibleItemPositions(null)[0];
+        int position = super.findFirstVisibleItemPositions(null)[0];
+        for (int i = 1; i < getSpanCount(); i++) {
+            int nextPosition = super.findFirstVisibleItemPositions(null)[i];
+            if (nextPosition < position) position = nextPosition;
+        }
+        return position;
     }
 
     @Override
     public int findLastCompletelyVisibleItemPosition() {
-        return super.findLastCompletelyVisibleItemPositions(null)[0];
+        int position = super.findLastCompletelyVisibleItemPositions(null)[0];
+        for (int i = 1; i < getSpanCount(); i++) {
+            int nextPosition = super.findLastCompletelyVisibleItemPositions(null)[i];
+            if (nextPosition > position) position = nextPosition;
+        }
+        return position;
     }
 
     @Override
     public int findLastVisibleItemPosition() {
-        return super.findLastVisibleItemPositions(null)[0];
+        int position = super.findLastVisibleItemPositions(null)[0];
+        for (int i = 1; i < getSpanCount(); i++) {
+            int nextPosition = super.findLastVisibleItemPositions(null)[i];
+            if (nextPosition > position) position = nextPosition;
+        }
+        return position;
     }
 
 }

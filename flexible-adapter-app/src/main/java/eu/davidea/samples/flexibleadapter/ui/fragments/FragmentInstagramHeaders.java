@@ -82,11 +82,12 @@ public class FragmentInstagramHeaders extends AbstractFragment
         // NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
         // a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        // Custom divider item decorator with 24dpi as empty space between sections
-        mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity()).withDefaultDivider());
+        // 24dpi as empty space between sections (each post)
+        mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
+                .withSectionGapOffset(24));
 
         // New empty views handling
-        mAdapter.addListener(new EmptyViewHelper(mAdapter, getView().findViewById(R.id.empty_view)));
+        new EmptyViewHelper(mAdapter, getView().findViewById(R.id.empty_view));
 
         mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
                 .setStickyHeaders(true) //Make headers sticky

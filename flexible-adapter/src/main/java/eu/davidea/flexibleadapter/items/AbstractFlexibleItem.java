@@ -162,33 +162,33 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
      * {@inheritDoc}
      */
     @Override
-    public abstract VH createViewHolder(View view, FlexibleAdapter adapter);
+    public abstract VH createViewHolder(View view, FlexibleAdapter<IFlexible> adapter);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public abstract void bindViewHolder(FlexibleAdapter adapter, VH holder, int position, List<Object> payloads);
+    public abstract void bindViewHolder(FlexibleAdapter<IFlexible> adapter, VH holder, int position, List<Object> payloads);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void unbindViewHolder(FlexibleAdapter adapter, VH holder, int position) {
+    public void unbindViewHolder(FlexibleAdapter<IFlexible> adapter, VH holder, int position) {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onViewAttached(FlexibleAdapter adapter, VH holder, int position) {
+    public void onViewAttached(FlexibleAdapter<IFlexible> adapter, VH holder, int position) {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onViewDetached(FlexibleAdapter adapter, VH holder, int position) {
+    public void onViewDetached(FlexibleAdapter<IFlexible> adapter, VH holder, int position) {
     }
 
 }

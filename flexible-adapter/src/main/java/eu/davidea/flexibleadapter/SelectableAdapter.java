@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Davide Steduto
+ * Copyright 2015-2018 Davide Steduto
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 import static eu.davidea.flexibleadapter.SelectableAdapter.Mode.IDLE;
 import static eu.davidea.flexibleadapter.SelectableAdapter.Mode.MULTI;
 import static eu.davidea.flexibleadapter.SelectableAdapter.Mode.SINGLE;
+import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
 
 /**
  * This class provides a set of standard methods to handle the selection on the items of an Adapter.
@@ -232,8 +233,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      */
     public void setMode(@Mode int mode) {
         log.i("Mode %s enabled", LayoutUtils.getModeName(mode));
-        if (mMode == SINGLE && mode == IDLE)
+        if (mMode == SINGLE && mode == IDLE) {
             clearSelection();
+        }
         this.mMode = mode;
         this.mLastItemInActionMode = (mode != MULTI);
     }
@@ -330,9 +332,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      */
     public void toggleSelection(int position) {
         if (position < 0) return;
-        if (mMode == SINGLE)
+        if (mMode == SINGLE) {
             clearSelection();
-
+        }
         boolean contains = mSelectedPositions.contains(position);
         if (contains) {
             removeSelection(position);
@@ -464,8 +466,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
                 flexHolder.toggleActivation();
             }
             // Use classic notification, in case FlexibleViewHolder is not implemented
-            if (mBoundViewHolders.isEmpty())
+            if (mBoundViewHolders.isEmpty()) {
                 notifyItemRangeChanged(positionStart, itemCount, Payload.SELECTION);
+            }
         }
     }
 
@@ -475,11 +478,17 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
         if (holder instanceof FlexibleViewHolder) {
             FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
             flexHolder.getContentView().setActivated(isSelected(position));
-            if (flexHolder.getContentView().isActivated() && flexHolder.getActivationElevation() > 0)
+            if (flexHolder.getContentView().isActivated() && flexHolder.getActivationElevation() > 0) {
                 ViewCompat.setElevation(flexHolder.getContentView(), flexHolder.getActivationElevation());
-            else if (flexHolder.getActivationElevation() > 0) //Leave unaltered the default elevation
+            } else if (flexHolder.getActivationElevation() > 0) { // Leave unaltered the default elevation
                 ViewCompat.setElevation(flexHolder.getContentView(), 0);
-            mBoundViewHolders.add(flexHolder);
+            }
+            if (flexHolder.isRecyclable()) {
+                mBoundViewHolders.add(flexHolder);
+                log.v("onViewBound    viewSize=%s %s %s", mBoundViewHolders.size(), getClassName(holder), holder);
+            } else {
+                log.v("onViewBound    recyclable=%s %s %s", holder.isRecyclable(), getClassName(holder), holder);
+            }
         } else {
             // When user scrolls, this line binds the correct selection status
             holder.itemView.setActivated(isSelected(position));
@@ -488,8 +497,17 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
 
     @Override
     public void onViewRecycled(RecyclerView.ViewHolder holder) {
-        if (holder instanceof FlexibleViewHolder)
-            mBoundViewHolders.remove(holder);
+        if (holder instanceof FlexibleViewHolder) {
+            boolean recycled = mBoundViewHolders.remove(holder);
+            log.v("onViewRecycled viewSize=%s %s %s recycled=%s", mBoundViewHolders.size(), getClassName(holder), holder, recycled);
+        }
+    }
+
+    /**
+     * To call when views are all discarded.
+     */
+    void discardBoundViewHolders() {
+        mBoundViewHolders.clear();
     }
 
     /**
@@ -544,6 +562,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @since 1.0.0
      */
     public void onSaveInstanceState(Bundle outState) {
+        discardBoundViewHolders();
         outState.putIntegerArrayList(TAG, new ArrayList<>(mSelectedPositions));
         if (getSelectedItemCount() > 0) log.d("Saving selection %s", mSelectedPositions);
     }

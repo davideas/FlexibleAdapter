@@ -68,7 +68,7 @@ public class FragmentHeadersSections extends AbstractFragment
 
         // Create New FlexibleDatabase and Initialize RecyclerView
         if (savedInstanceState == null) {
-            DatabaseService.getInstance().createHeadersSectionsDatabase(400, 100);
+            DatabaseService.getInstance().createHeadersSectionsDatabase(400, 30);
         }
         initializeRecyclerView(savedInstanceState);
 
@@ -106,11 +106,10 @@ public class FragmentHeadersSections extends AbstractFragment
         mAdapter.setFastScroller(fastScroller);
 
         // New empty views handling, to set after FastScroller
-        mAdapter.addListener(new EmptyViewHelper(mAdapter,
+        new EmptyViewHelper(mAdapter,
                 getView().findViewById(R.id.empty_view),
                 getView().findViewById(R.id.filter_view),
-                (EmptyViewHelper.OnEmptyViewListener) getActivity()) // Optional!!
-        );
+                (EmptyViewHelper.OnEmptyViewListener) getActivity()); // Optional!!
 
         // More settings
         mAdapter.setLongPressDragEnabled(true)

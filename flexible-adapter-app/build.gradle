@@ -4,7 +4,6 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 5
     minor 0
-    preRelease "rc4"
 }
 
 android {
@@ -64,18 +63,7 @@ dependencies {
     // FlexibleAdapter + extensions
     implementation project(':flexible-adapter')
     implementation project(':flexible-adapter-ui')
-    implementation project(':flexible-adapter-livedata')
     implementation project(':flexible-adapter-databinding')
-
-    // Arch
-    implementation archLib.lifecycle
-    implementation archLib.extensions
-    annotationProcessor archLib.compiler
-
-    // Room
-    implementation archLib.room
-    implementation archLib.roomRxJava2
-    annotationProcessor archLib.roomCompiler
 
     // Support Libraries
     implementation supportLib.appcompat
@@ -85,11 +73,6 @@ dependencies {
 
     // Timber (Logger) - https://github.com/JakeWharton/timber
     implementation libraries.timber
-
-    // D2
-    implementation libraries.dagger
-    implementation libraries.daggerAndroid
-    annotationProcessor libraries.daggerCompiler
 
     // Butter Knife (View Injector) - https://github.com/JakeWharton/butterknife
     implementation libraries.butterKnife
@@ -107,11 +90,6 @@ dependencies {
     // UI Widgets
     implementation widgets.flipView
 
-    // Iconics - https://github.com/mikepenz/Android-Iconics
-    implementation widgets.iconicsCore
-    implementation widgets.iconicsViews
-    implementation widgets.iconicsCommunity
-
     // Test libraries
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test:rules:1.0.1'
@@ -121,6 +99,6 @@ dependencies {
     })
     testImplementation 'org.robolectric:robolectric:3.4.2'
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.11.0'
+    testImplementation 'org.mockito:mockito-core:2.15.0'
 
 }

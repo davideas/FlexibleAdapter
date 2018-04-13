@@ -21,8 +21,9 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @author Davide Steduto
  * @since 19/10/2016
  */
-public class HeaderHolder extends AbstractHeaderItem<HeaderHolder.HeaderViewHolder>
-        implements IFilterable, IHolder<HeaderModel> {
+public class HeaderHolder
+        extends AbstractHeaderItem<HeaderHolder.HeaderViewHolder>
+        implements IFilterable<String>, IHolder<HeaderModel> {
 
     private HeaderModel model;
 
