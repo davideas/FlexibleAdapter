@@ -17,6 +17,7 @@ package eu.davidea.flexibleadapter.helpers;
 
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
@@ -31,6 +32,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  *
  * @author Davide Steduto
  * @since 26/12/2017 Created
+ * <br>22/04/2018 Added static creator methods
  */
 @SuppressWarnings("WeakerAccess")
 public class EmptyViewHelper implements FlexibleAdapter.OnUpdateListener, FlexibleAdapter.OnFilterListener {
@@ -40,6 +42,19 @@ public class EmptyViewHelper implements FlexibleAdapter.OnUpdateListener, Flexib
     private View mEmptyDataView;
     private View mEmptyFilterView;
 
+    public static EmptyViewHelper create(FlexibleAdapter adapter, View emptyDataView) {
+        return new EmptyViewHelper(adapter, emptyDataView);
+    }
+
+    public static EmptyViewHelper create(FlexibleAdapter adapter, View emptyDataView, View emptyFilterView) {
+        return new EmptyViewHelper(adapter, emptyDataView, emptyFilterView);
+    }
+
+    public static EmptyViewHelper create(FlexibleAdapter adapter, View emptyDataView, View emptyFilterView,
+                                       @Nullable OnEmptyViewListener emptyViewListener) {
+        return new EmptyViewHelper(adapter, emptyDataView, emptyFilterView, emptyViewListener);
+    }
+
     /**
      * Constructor to initialize both empty data view.
      * <p><b>Note:</b> To better handle FastScroller, initialize this helper class after setting fast scroller
@@ -48,7 +63,7 @@ public class EmptyViewHelper implements FlexibleAdapter.OnUpdateListener, Flexib
      * @param adapter       the Adapter instance
      * @param emptyDataView the view for empty updates
      */
-    public EmptyViewHelper(FlexibleAdapter adapter, View emptyDataView) {
+    private EmptyViewHelper(FlexibleAdapter adapter, View emptyDataView) {
         this(adapter, emptyDataView, null);
     }
 
@@ -61,7 +76,7 @@ public class EmptyViewHelper implements FlexibleAdapter.OnUpdateListener, Flexib
      * @param emptyDataView   the view for empty updates
      * @param emptyFilterView the view for empty filter result
      */
-    public EmptyViewHelper(FlexibleAdapter adapter, View emptyDataView, View emptyFilterView) {
+    private EmptyViewHelper(FlexibleAdapter adapter, View emptyDataView, View emptyFilterView) {
         this(adapter, emptyDataView, emptyFilterView, null);
     }
 
@@ -76,7 +91,7 @@ public class EmptyViewHelper implements FlexibleAdapter.OnUpdateListener, Flexib
      * @param emptyFilterView   the view for empty filter result
      * @param emptyViewListener another level of listener callback in case more customization is needed
      */
-    public EmptyViewHelper(FlexibleAdapter adapter, View emptyDataView, View emptyFilterView,
+    private EmptyViewHelper(FlexibleAdapter adapter, View emptyDataView, View emptyFilterView,
                            @Nullable OnEmptyViewListener emptyViewListener) {
         this.mEmptyDataView = emptyDataView;
         this.mEmptyFilterView = emptyFilterView;
@@ -97,36 +112,28 @@ public class EmptyViewHelper implements FlexibleAdapter.OnUpdateListener, Flexib
      * Shows EmptyDataView by animating alpha property to {@code 1}.
      */
     public final void showEmptyDataView() {
-        if (mEmptyDataView != null) {
-            mEmptyDataView.animate().alpha(1);
-        }
+        showView(mEmptyDataView);
     }
 
     /**
      * Hides EmptyDataView by setting Alpha property to {@code 0}.</p>
      */
     public final void hideEmptyDataView() {
-        if (mEmptyDataView != null) {
-            mEmptyDataView.setAlpha(0);
-        }
+        hideView(mEmptyDataView);
     }
 
     /**
      * Shows EmptyFilterView by animating alpha property to {@code 1}.
      */
     public final void showEmptyFilterView() {
-        if (mEmptyFilterView != null) {
-            mEmptyFilterView.animate().alpha(1);
-        }
+        showView(mEmptyFilterView);
     }
 
     /**
      * Hides EmptyFilterView by setting Alpha property to {@code 0}.</p>
      */
     public final void hideEmptyFilterView() {
-        if (mEmptyFilterView != null) {
-            mEmptyFilterView.setAlpha(0);
-        }
+        hideView(mEmptyFilterView);
     }
 
     @Override
@@ -158,6 +165,22 @@ public class EmptyViewHelper implements FlexibleAdapter.OnUpdateListener, Flexib
         }
         if (mEmptyViewListener != null) {
             mEmptyViewListener.onUpdateEmptyFilterView(size);
+        }
+    }
+
+    private static void showView(View view) {
+        if (view != null) {
+            ViewPropertyAnimator animator = view.animate();
+            animator.cancel();
+            animator.alpha(1);
+        }
+    }
+
+    public static void hideView(View view) {
+        if (view != null) {
+            ViewPropertyAnimator animator = view.animate();
+            animator.cancel();
+            animator.alpha(0);
         }
     }
 

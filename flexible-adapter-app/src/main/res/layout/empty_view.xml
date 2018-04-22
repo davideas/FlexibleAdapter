@@ -14,7 +14,6 @@
 		android:layout_width="164dp"
 		android:layout_height="164dp"
 		android:layout_centerHorizontal="true"
-		android:layout_marginTop="-16dp"
 		android:alpha="0.2"
 		android:scaleType="fitCenter"
 		android:src="@drawable/ic_xml_grey600_48dp"/>

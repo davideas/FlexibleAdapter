@@ -86,7 +86,6 @@ public class FragmentEndlessScrolling extends AbstractFragment
         mFab.setImageResource(R.drawable.ic_refresh_white_24dp);
     }
 
-    @SuppressWarnings({"ConstantConditions", "NullableProblems"})
     private void initializeRecyclerView(Bundle savedInstanceState) {
         // Initialize Adapter and RecyclerView
         // ExampleAdapter makes use of stableIds, I strongly suggest to implement 'item.hashCode()'
@@ -116,7 +115,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
         mAdapter.setFastScroller(fastScroller);
 
         // New empty views handling, to set after FastScroller
-        new EmptyViewHelper(mAdapter,
+        EmptyViewHelper.create(mAdapter,
                 getView().findViewById(R.id.empty_view),
                 getView().findViewById(R.id.filter_view));
 
@@ -211,7 +210,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
                 } else {
                     DatabaseService.getInstance().addAll(newItems);
                 }
-                mAdapter.onLoadMoreComplete(newItems, 3000L);
+                mAdapter.onLoadMoreComplete(newItems, (newItems.isEmpty() ? -1 : 3000L));
                 // - Retrieve the new page number after adding new items!
                 Log.d(TAG, "EndlessCurrentPage=" + mAdapter.getEndlessCurrentPage());
                 Log.d(TAG, "EndlessPageSize=" + mAdapter.getEndlessPageSize());

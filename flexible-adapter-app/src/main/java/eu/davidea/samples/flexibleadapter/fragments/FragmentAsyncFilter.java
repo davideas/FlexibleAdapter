@@ -147,11 +147,10 @@ public class FragmentAsyncFilter extends AbstractFragment {
         }
 
         // New empty views handling, to set after FastScroller
-        mAdapter.addListener(new EmptyViewHelper(mAdapter,
+        EmptyViewHelper.create(mAdapter,
                 getView().findViewById(R.id.empty_view),
                 getView().findViewById(R.id.filter_view),
-                (EmptyViewHelper.OnEmptyViewListener) getActivity()) // Optional!!
-        );
+                (EmptyViewHelper.OnEmptyViewListener) getActivity()); // Optional!!
 
         // Settings for FlipView
         FlipView.stopLayoutAnimation();

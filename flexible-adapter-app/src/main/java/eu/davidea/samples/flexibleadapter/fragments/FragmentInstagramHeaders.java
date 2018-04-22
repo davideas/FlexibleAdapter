@@ -87,7 +87,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
                 .withSectionGapOffset(24));
 
         // New empty views handling
-        new EmptyViewHelper(mAdapter, getView().findViewById(R.id.empty_view));
+        EmptyViewHelper.create(mAdapter, getView().findViewById(R.id.empty_view));
 
         mAdapter.setDisplayHeadersAtStartUp(true) //Show Headers at startUp!
                 .setStickyHeaders(true) //Make headers sticky
