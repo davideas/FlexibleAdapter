@@ -2045,17 +2045,15 @@ public class FlexibleAdapter<T extends IFlexible>
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                // Clear previous delayed message
-                mHandler.removeMessages(LOAD_MORE_COMPLETE);
-                // Add progressItem if not already shown
-                boolean added = mTopEndless ? addScrollableHeader(mProgressItem) : addScrollableFooter(mProgressItem);
+                // Show progressItem if not already shown
+                showProgressItem();
                 // When the listener is not set, loading more is called upon a user request
-                if (added && mEndlessScrollListener != null) {
+                if (mEndlessScrollListener != null) {
                     log.d("onLoadMore     invoked!");
                     mEndlessScrollListener.onLoadMore(getMainItemCount(), getEndlessCurrentPage());
-                } else if (!added) {
-                    endlessLoading = false;
                 }
+                // Reset the loading status
+                endlessLoading = false;
             }
         });
     }
@@ -2102,11 +2100,12 @@ public class FlexibleAdapter<T extends IFlexible>
             // Disable the EndlessScroll feature
             setEndlessProgressItem(null);
         }
-        // Remove the progressItem if needed
+        // Remove the progressItem if needed.
+        // Don't remove progressItem if delay is negative (-1) to keep it visible.
         if (delay > 0 && (newItemsSize == 0 || !isEndlessScrollEnabled())) {
             log.v("onLoadMore     enqueued removing progressItem (%sms)", delay);
             mHandler.sendEmptyMessageDelayed(LOAD_MORE_COMPLETE, delay);
-        } else {
+        } else if (delay >= 0) {
             hideProgressItem();
         }
         // Add any new items
@@ -2115,11 +2114,23 @@ public class FlexibleAdapter<T extends IFlexible>
             progressPosition = mTopEndless ? mScrollableHeaders.size() : progressPosition;
             addItems(progressPosition, newItems);
         }
-        // Reset the loading status
-        endlessLoading = false;
         // Eventually notify noMoreLoad
         if (newItemsSize == 0 || !isEndlessScrollEnabled()) {
             noMoreLoad(newItemsSize);
+        }
+    }
+
+    /**
+     * Called at each loading more.
+     */
+    private void showProgressItem() {
+        // Clear previous delayed message
+        mHandler.removeMessages(LOAD_MORE_COMPLETE);
+        log.v("onLoadMore     show progressItem");
+        if (mTopEndless) {
+            addScrollableHeader(mProgressItem);
+        } else {
+            addScrollableFooter(mProgressItem);
         }
     }
 
