@@ -5,6 +5,8 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 5
     minor 0
+    patch 4
+    preRelease = 'SNAPSHOT'
     dependsOn 'install'
 }
 // For maven repository

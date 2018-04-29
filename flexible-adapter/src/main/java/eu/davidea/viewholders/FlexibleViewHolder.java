@@ -113,7 +113,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
     @CallSuper
     public void onClick(View view) {
         int position = getFlexibleAdapterPosition();
-        if (!mAdapter.isEnabled(position)) return;
+        if (!mAdapter.isItemEnabled(position)) return;
         // Experimented that, if LongClick is not consumed, onClick is fired. We skip the
         // call to the listener in this case, which is allowed only in ACTION_STATE_IDLE.
         if (mAdapter.mItemClickListener != null && mActionState == ItemTouchHelper.ACTION_STATE_IDLE) {
@@ -136,7 +136,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
     @CallSuper
     public boolean onLongClick(View view) {
         int position = getFlexibleAdapterPosition();
-        if (!mAdapter.isEnabled(position)) return false;
+        if (!mAdapter.isItemEnabled(position)) return false;
         // If LongPressDrag is enabled, then LongClick must be skipped and the listener will
         // be called in onActionStateChanged in Drag mode.
         if (mAdapter.mItemLongClickListener != null && !mAdapter.isLongPressDragEnabled()) {
@@ -159,7 +159,7 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
     @Override
     public boolean onTouch(View view, MotionEvent event) {
         int position = getFlexibleAdapterPosition();
-        if (!mAdapter.isEnabled(position) || !isDraggable()) {
+        if (!mAdapter.isItemEnabled(position) || !isDraggable()) {
             Log.w("Can't start drag: Item is not enabled or draggable!");
             return false;
         }

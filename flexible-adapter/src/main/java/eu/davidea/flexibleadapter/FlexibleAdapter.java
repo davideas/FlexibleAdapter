@@ -447,6 +447,14 @@ public class FlexibleAdapter<T extends IFlexible>
     /*------------------------------*/
 
     /**
+     * @deprecated Use {@link #isItemEnabled(int)}.
+     */
+    @Deprecated
+    public boolean isEnabled(int position) {
+        return isItemEnabled(position);
+    }
+
+    /**
      * Checks if the current item has the property {@code enabled = true}.
      * <p>When an item is disabled, user cannot interact with it.</p>
      *
@@ -454,7 +462,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return true if the item property <i>enabled</i> is set true, false otherwise
      * @since 5.0.0-b6
      */
-    public boolean isEnabled(int position) {
+    public boolean isItemEnabled(int position) {
         T item = getItem(position);
         return item != null && item.isEnabled();
     }
