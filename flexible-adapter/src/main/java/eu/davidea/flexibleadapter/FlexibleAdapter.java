@@ -3892,7 +3892,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
+    public final FlexibleAdapter<T>setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
         log.i("Set notifyChangeOfUnfilteredItems=%s", notifyChange);
         this.notifyChangeOfUnfilteredItems = notifyChange;
         return this;
@@ -3912,7 +3912,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b8
      */
-    public final FlexibleAdapter setNotifyMoveOfFilteredItems(boolean notifyMove) {
+    public final FlexibleAdapter<T>setNotifyMoveOfFilteredItems(boolean notifyMove) {
         log.i("Set notifyMoveOfFilteredItems=%s", notifyMove);
         this.notifyMoveOfFilteredItems = notifyMove;
         return this;
@@ -4233,7 +4233,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @see #setDiffUtilCallback(DiffUtilCallback)
      */
-    public FlexibleAdapter setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
+    public FlexibleAdapter<T>setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
         this.useDiffUtil = useDiffUtil;
         return this;
     }
@@ -4245,7 +4245,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @see #setAnimateChangesWithDiffUtil(boolean)
      */
-    public FlexibleAdapter setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
+    public FlexibleAdapter<T>setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
         this.diffUtilCallback = diffUtilCallback;
         return this;
     }
@@ -4508,7 +4508,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-rc1
      */
-    public final FlexibleAdapter setItemTouchHelperCallback(ItemTouchHelperCallback itemTouchHelperCallback) {
+    public final FlexibleAdapter<T>setItemTouchHelperCallback(ItemTouchHelperCallback itemTouchHelperCallback) {
         mItemTouchHelperCallback = itemTouchHelperCallback;
         mItemTouchHelper = null;
         initializeItemTouchHelper();
@@ -4542,7 +4542,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter setLongPressDragEnabled(boolean longPressDragEnabled) {
+    public final FlexibleAdapter<T>setLongPressDragEnabled(boolean longPressDragEnabled) {
         initializeItemTouchHelper();
         log.i("Set longPressDragEnabled=%s", longPressDragEnabled);
         mItemTouchHelperCallback.setLongPressDragEnabled(longPressDragEnabled);
@@ -4573,7 +4573,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter setHandleDragEnabled(boolean handleDragEnabled) {
+    public final FlexibleAdapter<T>setHandleDragEnabled(boolean handleDragEnabled) {
         initializeItemTouchHelper();
         log.i("Set handleDragEnabled=%s", handleDragEnabled);
         this.mItemTouchHelperCallback.setHandleDragEnabled(handleDragEnabled);
@@ -4606,7 +4606,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter setSwipeEnabled(boolean swipeEnabled) {
+    public final FlexibleAdapter<T>setSwipeEnabled(boolean swipeEnabled) {
         log.i("Set swipeEnabled=%s", swipeEnabled);
         initializeItemTouchHelper();
         mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
