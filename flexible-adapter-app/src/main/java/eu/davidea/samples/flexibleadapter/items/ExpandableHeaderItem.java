@@ -161,6 +161,20 @@ public class ExpandableHeaderItem
         }
 
         /**
+         * Allows to collapse child views of this ItemView when {@link View.OnClickListener}
+         * event occurs on the entire view.
+         * <p>This method returns always true; Extend with "return false" to Not collapse this
+         * ItemView onClick events.</p>
+         *
+         * @return always true, if not overridden
+         * @since 5.0.4
+         */
+        @Override
+        protected boolean isViewCollapsibleOnClick() {
+            return true;//default=true
+        }
+
+        /**
          * Allows to collapse child views of this ItemView when {@link View.OnLongClickListener}
          * event occurs on the entire view.
          * <p>This method returns always true; Extend with "return false" to Not collapse this
