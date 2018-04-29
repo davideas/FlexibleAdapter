@@ -33,6 +33,8 @@ import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
+import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
+
 /**
  * A sticky header helper, to use only with {@link FlexibleAdapter}.
  * <p>Header ViewHolders must be of type {@link FlexibleViewHolder}.</p>
@@ -159,13 +161,18 @@ public final class StickyHeaderHelper extends OnScrollListener {
             int oldHeaderPosition = mHeaderPosition;
             mHeaderPosition = headerPosition;
             FlexibleViewHolder holder = getHeaderViewHolder(headerPosition);
-            Log.d("swapHeader newHeaderPosition=%s", mHeaderPosition);
+            // Swapping header
             swapHeader(holder, oldHeaderPosition);
         } else if (updateHeaderContent) {
-            // #299 - ClassCastException after click on expanded sticky header when AutoCollapse is enabled
-//			mStickyHeaderViewHolder = getHeaderViewHolder(headerPosition);
-//			mStickyHeaderViewHolder.setBackupPosition(headerPosition);
-            mAdapter.onBindViewHolder(mStickyHeaderViewHolder, headerPosition);
+            // #299 - ClassCastException after click on expanded sticky header when auto-collapse is enabled.
+            // #594 - Checking same item view type and increased delay to 100ms.
+            if (mStickyHeaderViewHolder.getItemViewType() == mAdapter.getItemViewType(headerPosition)) {
+                mAdapter.onBindViewHolder(mStickyHeaderViewHolder, headerPosition);
+            } else {
+                Log.e("updateHeader Wrong itemViewType for StickyViewHolder=%s, PositionViewHolder=%s",
+                        getClassName(mStickyHeaderViewHolder),
+                        getClassName(getHeaderViewHolder(headerPosition)));
+            }
             ensureHeaderParent();
         }
         translateHeader();
@@ -233,6 +240,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
     }
 
     private void swapHeader(FlexibleViewHolder newHeader, int oldHeaderPosition) {
+        Log.d("swapHeader newHeaderPosition=%s", mHeaderPosition);
         if (mStickyHeaderViewHolder != null) {
             resetHeader(mStickyHeaderViewHolder);
             // #568, #575 - Header ViewHolder out of the top screen must be recycled manually

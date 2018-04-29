@@ -2509,7 +2509,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * Convenience method to initially expand a single item. Parent won't be notified.
-     * <p><b>Note:</b> Must be used in combination with adding new items that require to be
+     * <p><b>Note:</b> Must be used in combination when adding new items, those require to be
      * initially expanded.</p>
      * <b>WARNING!</b>
      * <br>Expanded status is ignored if {@code init = true}: it will always attempt to expand
@@ -2550,7 +2550,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
         IExpandable expandable = (IExpandable) item;
         if (!hasSubItems(expandable)) {
-            expandable.setExpanded(false);//clear the expanded flag
+            expandable.setExpanded(false); // Clear the expanded flag
             log.w("No subItems to Expand on position %s expanded %s", position, expandable.isExpanded());
             return 0;
         }
@@ -4452,7 +4452,7 @@ public class FlexibleAdapter<T extends IFlexible>
     private void initializeItemTouchHelper() {
         if (mItemTouchHelper == null) {
             if (mRecyclerView == null) {
-                throw new IllegalStateException("RecyclerView cannot be null. Enabling LongPressDrag or Swipe must be done after the Adapter is added to the RecyclerView.");
+                throw new IllegalStateException("RecyclerView cannot be null. Enabling LongPressDrag or Swipe must be done after the Adapter has been attached to the RecyclerView.");
             }
             if (mItemTouchHelperCallback == null) {
                 mItemTouchHelperCallback = new ItemTouchHelperCallback(this);
@@ -4520,10 +4520,11 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Enable / Disable the Drag on LongPress on the entire ViewHolder.
+     * Enables / Disables the drag of the item when long-press the entire itemView.
      * <p><b>Note:</b> This will skip LongClick on the view in order to handle the LongPress,
      * however the LongClick listener will be called if necessary in the new
      * {@link FlexibleViewHolder#onActionStateChanged(int, int)}.</p>
+     * Requires the Adapter being attached to the RecyclerView.
      * Default value is {@code false}.
      *
      * @param longPressDragEnabled true to activate, false otherwise
@@ -4553,7 +4554,8 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Enable / Disable the drag of the itemView with a handle view.
+     * Enables / Disables the drag of the item with a handle view.
+     * Requires the Adapter being attached to the RecyclerView.
      * <p>Default value is {@code false}.</p>
      *
      * @param handleDragEnabled true to activate, false otherwise
@@ -4582,8 +4584,12 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Enable the Full Swipe of the items.
-     * <p>Default value is {@code false}.</p>
+     * Enables full the swipe of the items.
+     * <p><b>Note:</b></p>
+     * <ul><li>Requires the Adapter being attached to the RecyclerView.</li>
+     * <li>Must override {@code getFrontView} and at least a rear View: {@code getRearLeftView} and/or
+     * {@code getRearRightView} in the {@code FlexibleViewHolder}.</li></ul>
+     * Default value is {@code false}.
      *
      * @param swipeEnabled true to activate, false otherwise
      * @return this Adapter, so the call can be chained
@@ -5285,7 +5291,7 @@ public class FlexibleAdapter<T extends IFlexible>
                     public void run() {
                         if (areHeadersSticky()) mStickyHeaderHelper.updateOrClearHeader(true);
                     }
-                }, 50L);
+                }, 100L);
             }
         }
 
