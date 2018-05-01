@@ -123,8 +123,8 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 [v5.0.4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.4) - 2018.05.01
 
 ###### Old releases
-[v5.0.3](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.3) - 2018.03.23
-[v5.0.2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.2) - 2018.03.17
+[v5.0.3](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.3) - 2018.03.23 |
+[v5.0.2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.2) - 2018.03.17 |
 [v5.0.1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.1) - 2018.03.11 |
 [v5.0.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0) - 2018.03.04<br>
 [v5.0.0-rc4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc4) - 2017.12.17 |
