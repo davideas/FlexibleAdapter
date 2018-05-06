@@ -447,6 +447,14 @@ public class FlexibleAdapter<T extends IFlexible>
     /*------------------------------*/
 
     /**
+     * @deprecated Use {@link #isItemEnabled(int)}.
+     */
+    @Deprecated
+    public boolean isEnabled(int position) {
+        return isItemEnabled(position);
+    }
+
+    /**
      * Checks if the current item has the property {@code enabled = true}.
      * <p>When an item is disabled, user cannot interact with it.</p>
      *
@@ -454,7 +462,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return true if the item property <i>enabled</i> is set true, false otherwise
      * @since 5.0.0-b6
      */
-    public boolean isEnabled(int position) {
+    public boolean isItemEnabled(int position) {
         T item = getItem(position);
         return item != null && item.isEnabled();
     }
@@ -2045,17 +2053,15 @@ public class FlexibleAdapter<T extends IFlexible>
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                // Clear previous delayed message
-                mHandler.removeMessages(LOAD_MORE_COMPLETE);
-                // Add progressItem if not already shown
-                boolean added = mTopEndless ? addScrollableHeader(mProgressItem) : addScrollableFooter(mProgressItem);
+                // Show progressItem if not already shown
+                showProgressItem();
                 // When the listener is not set, loading more is called upon a user request
-                if (added && mEndlessScrollListener != null) {
+                if (mEndlessScrollListener != null) {
                     log.d("onLoadMore     invoked!");
                     mEndlessScrollListener.onLoadMore(getMainItemCount(), getEndlessCurrentPage());
-                } else if (!added) {
-                    endlessLoading = false;
                 }
+                // Reset the loading status
+                endlessLoading = false;
             }
         });
     }
@@ -2102,11 +2108,12 @@ public class FlexibleAdapter<T extends IFlexible>
             // Disable the EndlessScroll feature
             setEndlessProgressItem(null);
         }
-        // Remove the progressItem if needed
+        // Remove the progressItem if needed.
+        // Don't remove progressItem if delay is negative (-1) to keep it visible.
         if (delay > 0 && (newItemsSize == 0 || !isEndlessScrollEnabled())) {
             log.v("onLoadMore     enqueued removing progressItem (%sms)", delay);
             mHandler.sendEmptyMessageDelayed(LOAD_MORE_COMPLETE, delay);
-        } else {
+        } else if (delay >= 0) {
             hideProgressItem();
         }
         // Add any new items
@@ -2115,11 +2122,23 @@ public class FlexibleAdapter<T extends IFlexible>
             progressPosition = mTopEndless ? mScrollableHeaders.size() : progressPosition;
             addItems(progressPosition, newItems);
         }
-        // Reset the loading status
-        endlessLoading = false;
         // Eventually notify noMoreLoad
         if (newItemsSize == 0 || !isEndlessScrollEnabled()) {
             noMoreLoad(newItemsSize);
+        }
+    }
+
+    /**
+     * Called at each loading more.
+     */
+    private void showProgressItem() {
+        // Clear previous delayed message
+        mHandler.removeMessages(LOAD_MORE_COMPLETE);
+        log.v("onLoadMore     show progressItem");
+        if (mTopEndless) {
+            addScrollableHeader(mProgressItem);
+        } else {
+            addScrollableFooter(mProgressItem);
         }
     }
 
@@ -2509,7 +2528,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * Convenience method to initially expand a single item. Parent won't be notified.
-     * <p><b>Note:</b> Must be used in combination with adding new items that require to be
+     * <p><b>Note:</b> Must be used in combination when adding new items, those require to be
      * initially expanded.</p>
      * <b>WARNING!</b>
      * <br>Expanded status is ignored if {@code init = true}: it will always attempt to expand
@@ -2550,7 +2569,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
         IExpandable expandable = (IExpandable) item;
         if (!hasSubItems(expandable)) {
-            expandable.setExpanded(false);//clear the expanded flag
+            expandable.setExpanded(false); // Clear the expanded flag
             log.w("No subItems to Expand on position %s expanded %s", position, expandable.isExpanded());
             return 0;
         }
@@ -3881,7 +3900,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
+    public final FlexibleAdapter<T>setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
         log.i("Set notifyChangeOfUnfilteredItems=%s", notifyChange);
         this.notifyChangeOfUnfilteredItems = notifyChange;
         return this;
@@ -3901,7 +3920,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b8
      */
-    public final FlexibleAdapter setNotifyMoveOfFilteredItems(boolean notifyMove) {
+    public final FlexibleAdapter<T>setNotifyMoveOfFilteredItems(boolean notifyMove) {
         log.i("Set notifyMoveOfFilteredItems=%s", notifyMove);
         this.notifyMoveOfFilteredItems = notifyMove;
         return this;
@@ -4222,7 +4241,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @see #setDiffUtilCallback(DiffUtilCallback)
      */
-    public FlexibleAdapter setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
+    public FlexibleAdapter<T>setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
         this.useDiffUtil = useDiffUtil;
         return this;
     }
@@ -4234,7 +4253,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @see #setAnimateChangesWithDiffUtil(boolean)
      */
-    public FlexibleAdapter setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
+    public FlexibleAdapter<T>setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
         this.diffUtilCallback = diffUtilCallback;
         return this;
     }
@@ -4452,7 +4471,7 @@ public class FlexibleAdapter<T extends IFlexible>
     private void initializeItemTouchHelper() {
         if (mItemTouchHelper == null) {
             if (mRecyclerView == null) {
-                throw new IllegalStateException("RecyclerView cannot be null. Enabling LongPressDrag or Swipe must be done after the Adapter is added to the RecyclerView.");
+                throw new IllegalStateException("RecyclerView cannot be null. Enabling LongPressDrag or Swipe must be done after the Adapter has been attached to the RecyclerView.");
             }
             if (mItemTouchHelperCallback == null) {
                 mItemTouchHelperCallback = new ItemTouchHelperCallback(this);
@@ -4497,7 +4516,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-rc1
      */
-    public final FlexibleAdapter setItemTouchHelperCallback(ItemTouchHelperCallback itemTouchHelperCallback) {
+    public final FlexibleAdapter<T>setItemTouchHelperCallback(ItemTouchHelperCallback itemTouchHelperCallback) {
         mItemTouchHelperCallback = itemTouchHelperCallback;
         mItemTouchHelper = null;
         initializeItemTouchHelper();
@@ -4520,17 +4539,18 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Enable / Disable the Drag on LongPress on the entire ViewHolder.
+     * Enables / Disables the drag of the item when long-press the entire itemView.
      * <p><b>Note:</b> This will skip LongClick on the view in order to handle the LongPress,
      * however the LongClick listener will be called if necessary in the new
      * {@link FlexibleViewHolder#onActionStateChanged(int, int)}.</p>
+     * Requires the Adapter being attached to the RecyclerView.
      * Default value is {@code false}.
      *
      * @param longPressDragEnabled true to activate, false otherwise
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter setLongPressDragEnabled(boolean longPressDragEnabled) {
+    public final FlexibleAdapter<T>setLongPressDragEnabled(boolean longPressDragEnabled) {
         initializeItemTouchHelper();
         log.i("Set longPressDragEnabled=%s", longPressDragEnabled);
         mItemTouchHelperCallback.setLongPressDragEnabled(longPressDragEnabled);
@@ -4553,14 +4573,15 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Enable / Disable the drag of the itemView with a handle view.
+     * Enables / Disables the drag of the item with a handle view.
+     * Requires the Adapter being attached to the RecyclerView.
      * <p>Default value is {@code false}.</p>
      *
      * @param handleDragEnabled true to activate, false otherwise
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter setHandleDragEnabled(boolean handleDragEnabled) {
+    public final FlexibleAdapter<T>setHandleDragEnabled(boolean handleDragEnabled) {
         initializeItemTouchHelper();
         log.i("Set handleDragEnabled=%s", handleDragEnabled);
         this.mItemTouchHelperCallback.setHandleDragEnabled(handleDragEnabled);
@@ -4582,14 +4603,18 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Enable the Full Swipe of the items.
-     * <p>Default value is {@code false}.</p>
+     * Enables full the swipe of the items.
+     * <p><b>Note:</b></p>
+     * <ul><li>Requires the Adapter being attached to the RecyclerView.</li>
+     * <li>Must override {@code getFrontView} and at least a rear View: {@code getRearLeftView} and/or
+     * {@code getRearRightView} in the {@code FlexibleViewHolder}.</li></ul>
+     * Default value is {@code false}.
      *
      * @param swipeEnabled true to activate, false otherwise
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter setSwipeEnabled(boolean swipeEnabled) {
+    public final FlexibleAdapter<T>setSwipeEnabled(boolean swipeEnabled) {
         log.i("Set swipeEnabled=%s", swipeEnabled);
         initializeItemTouchHelper();
         mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
@@ -5285,7 +5310,7 @@ public class FlexibleAdapter<T extends IFlexible>
                     public void run() {
                         if (areHeadersSticky()) mStickyHeaderHelper.updateOrClearHeader(true);
                     }
-                }, 50L);
+                }, 100L);
             }
         }
 

@@ -29,11 +29,11 @@ import static eu.davidea.flexibleadapter.utils.Log.Level.VERBOSE;
 import static eu.davidea.flexibleadapter.utils.Log.Level.WARN;
 
 /**
- * Utility static class that simplifies the use of {@link android.util.Log} by improving the call
- * to all log methods by supplying arguments as parameters instead of creating a string. This
- * avoids useless memory allocations when not requested: the StringBuilder itself, the buffer
- * and the String object. The new methods check in advance if the level is enabled and only
- * after the string message with arguments is created.
+ * Utility class for Android libraries, that simplifies the use of {@link android.util.Log} by improving
+ * the call to all log methods by supplying arguments as parameters {@code '%s'} instead of creating a string.
+ * This avoids useless memory allocations when not requested: the {@code StringBuilder} itself, the <i>buffer</i>
+ * and the {@code String} object. The new methods check in advance if the level is enabled and only after
+ * the string message with arguments is created.
  * <p><b>Note:</b> This class can work in collaboration with {@link Logger}.</p>
  * <p>Others features are:</p>
  * <ul>

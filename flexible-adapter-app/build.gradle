@@ -66,7 +66,7 @@ dependencies {
     implementation project(':flexible-adapter-databinding')
 
     // Support Libraries
-    implementation supportLib.appcompat
+    implementation supportLib.appCompat
     implementation supportLib.cardView
     implementation supportLib.design
     implementation supportLib.recyclerView

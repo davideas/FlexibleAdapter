@@ -81,6 +81,19 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
     }
 
     /**
+     * Allows to collapse child views of this ItemView when {@link OnClickListener}
+     * event occurs on the entire view.
+     * <p>This method returns always true; Extend with "return false" to Not collapse this
+     * ItemView onClick events.</p>
+     *
+     * @return always true, if not overridden
+     * @since 5.0.4
+     */
+    protected boolean isViewCollapsibleOnClick() {
+        return true;
+    }
+
+    /**
      * Allows to collapse child views of this ItemView when {@link OnLongClickListener}
      * event occurs on the entire view.
      * <p>This method returns always true; Extend with "return false" to Not collapse this
@@ -110,19 +123,21 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
     }
 
     /**
-     * Expands or Collapses based on the current state.
+     * Expands or Collapses based on the current state AND on the configuration of the methods
+     * {@link #isViewExpandableOnClick()} and {@link #isViewCollapsibleOnClick()}.
      *
      * @see #shouldNotifyParentOnClick()
+     * @see #isViewExpandableOnClick()
+     * @see #isViewCollapsibleOnClick()
      * @see #expandView(int)
      * @see #collapseView(int)
      * @since 5.0.0-b1
      */
-    @CallSuper
     protected void toggleExpansion() {
         int position = getFlexibleAdapterPosition();
-        if (mAdapter.isExpanded(position)) {
+        if (isViewCollapsibleOnClick() && mAdapter.isExpanded(position)) {
             collapseView(position);
-        } else if (!mAdapter.isSelected(position)) {
+        } else if (isViewExpandableOnClick() && !mAdapter.isSelected(position)) {
             expandView(position);
         }
     }
@@ -135,7 +150,6 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
      * @see #shouldNotifyParentOnClick()
      * @since 5.0.0-b1
      */
-    @CallSuper
     protected void expandView(int position) {
         mAdapter.expand(position, shouldNotifyParentOnClick());
     }
@@ -148,7 +162,6 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
      * @see #shouldNotifyParentOnClick()
      * @since 5.0.0-b1
      */
-    @CallSuper
     protected void collapseView(int position) {
         mAdapter.collapse(position, shouldNotifyParentOnClick());
         // #320 - Sticky header is not shown correctly once collapsed
@@ -173,7 +186,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
     @Override
     @CallSuper
     public void onClick(View view) {
-        if (mAdapter.isEnabled(getFlexibleAdapterPosition()) && isViewExpandableOnClick()) {
+        if (mAdapter.isItemEnabled(getFlexibleAdapterPosition())) {
             toggleExpansion();
         }
         super.onClick(view);
@@ -191,7 +204,7 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
     @CallSuper
     public boolean onLongClick(View view) {
         int position = getFlexibleAdapterPosition();
-        if (mAdapter.isEnabled(position) && isViewCollapsibleOnLongClick()) {
+        if (mAdapter.isItemEnabled(position) && isViewCollapsibleOnLongClick()) {
             collapseView(position);
         }
         return super.onLongClick(view);

@@ -324,7 +324,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 //        );
         if ((isForwardEnabled || isReverseEnabled)
                 && !isFastScroll && holder instanceof FlexibleViewHolder
-                && !mAnimatorNotifierObserver.isPositionNotified()
+                && (!mAnimatorNotifierObserver.isPositionNotified() || isScrollableHeaderOrFooter(position))
                 && (isScrollableHeaderOrFooter(position)
                 || (isForwardEnabled && position > lastVisiblePosition)
                 || (isReverseEnabled && position < lastVisiblePosition)
@@ -431,7 +431,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         private boolean notified;
         private Handler mAnimatorHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
             public boolean handleMessage(Message message) {
-                //log.v("Clear notified for scrolling Animations");
                 notified = false;
                 return true;
             }
@@ -449,8 +448,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         }
 
         private void markNotified() {
-            notified = !animateFromObserver;
-            //log.v(TAG, "animateFromObserver=" + animateFromObserver + " notified=" + notified);
+            notified = true;
         }
 
         @Override
@@ -501,12 +499,10 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
         @Override
         public void onAnimationCancel(Animator animation) {
-
         }
 
         @Override
         public void onAnimationRepeat(Animator animation) {
-
         }
     }
 

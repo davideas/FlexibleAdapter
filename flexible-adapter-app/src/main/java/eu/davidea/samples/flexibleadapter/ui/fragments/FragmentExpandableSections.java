@@ -96,7 +96,7 @@ public class FragmentExpandableSections extends AbstractFragment {
         mAdapter.setFastScroller(fastScroller);
 
         // New empty views handling, to set after FastScroller
-        new EmptyViewHelper(mAdapter,
+        EmptyViewHelper.create(mAdapter,
                 getView().findViewById(R.id.empty_view),
                 getView().findViewById(R.id.filter_view));
 
