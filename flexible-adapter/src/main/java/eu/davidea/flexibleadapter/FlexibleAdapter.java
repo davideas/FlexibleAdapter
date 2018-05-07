@@ -388,7 +388,7 @@ public class FlexibleAdapter<T extends IFlexible>
      */
     @CallSuper
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         log.v("Attached Adapter to RecyclerView");
         if (headersShown && areHeadersSticky()) {
@@ -404,7 +404,7 @@ public class FlexibleAdapter<T extends IFlexible>
      */
     @CallSuper
     @Override
-    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         if (areHeadersSticky()) {
             mStickyHeaderHelper.detachFromRecyclerView();
             mStickyHeaderHelper = null;
@@ -613,8 +613,6 @@ public class FlexibleAdapter<T extends IFlexible>
     public void updateDataSet(@Nullable List<T> items, boolean animate) {
         mOriginalList = null; // Reset original list from filter
         if (items == null) items = new ArrayList<>();
-        // Always clear cache of bound view holders
-        discardBoundViewHolders();
         if (animate) {
             mHandler.removeMessages(UPDATE);
             mHandler.sendMessage(Message.obtain(mHandler, UPDATE, items));
@@ -1767,7 +1765,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-b1
      */
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position, List payloads) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position, @NonNull List payloads) {
         if (!autoMap) {
             // If everything has been set properly, this should never happen ;-)
             throw new IllegalStateException("AutoMap is not active, this method cannot be called. You should implement the AutoMap properly.");
@@ -1814,7 +1812,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     @CallSuper
     @Override
-    public void onViewRecycled(RecyclerView.ViewHolder holder) {
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewRecycled(holder);
         if (areHeadersSticky()) {
             // #297 - Empty (Invisible) Header Item when Using Sticky Headers
@@ -5488,6 +5486,10 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     private void prepareItemsForUpdate(List<T> newItems) {
+        // Clear cache of bound view holders
+        if (notifyChangeOfUnfilteredItems) {
+            discardBoundViewHolders();
+        }
         // Display Scrollable Headers and Footers
         restoreScrollableHeadersAndFooters(newItems);
 

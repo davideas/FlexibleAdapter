@@ -183,6 +183,7 @@ public class ExpandableHeaderItem
          * @return always true, if not overridden
          * @since 5.0.0-b1
          */
+        @Override
         protected boolean isViewCollapsibleOnLongClick() {
             return true;//default=true
         }
