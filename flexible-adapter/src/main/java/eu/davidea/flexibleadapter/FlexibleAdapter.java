@@ -3292,6 +3292,22 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
+     * Removes all items of a section, header included.
+     * <p>For header that is also expandable, it's equivalent to remove a single item.</p>
+     *
+     * @see #removeItem(int)
+     * @param header the head of the section
+     * @since 5.0.5
+     */
+    public void removeSection(IHeader header) {
+        List<Integer> sectionItems = getSectionItemPositions(header);
+        int headerPos = getGlobalPositionOf(header);
+        log.d("removeSection %s with all subItems at position=%s", getClassName(header), headerPos);
+        sectionItems.add(headerPos);
+        this.removeItems(sectionItems);
+    }
+
+    /**
      * Convenience method of {@link #removeItem(int, Object)} providing {@link Payload#CHANGE}
      * as payload for the parent item.
      *
@@ -3346,7 +3362,7 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     /**
-     * Removes items by <b>ranges</b> and notify the change.
+     * Removes items by <b>ranges</b>, auto-collapse expanded items and notify the change.
      * <p>Every item is retained for an eventual Undo.</p>
      * Optionally you can pass any payload to notify the parent items about the change to
      * optimize the view binding.
@@ -3898,7 +3914,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter<T>setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
+    public final FlexibleAdapter<T> setNotifyChangeOfUnfilteredItems(boolean notifyChange) {
         log.i("Set notifyChangeOfUnfilteredItems=%s", notifyChange);
         this.notifyChangeOfUnfilteredItems = notifyChange;
         return this;
@@ -3918,7 +3934,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b8
      */
-    public final FlexibleAdapter<T>setNotifyMoveOfFilteredItems(boolean notifyMove) {
+    public final FlexibleAdapter<T> setNotifyMoveOfFilteredItems(boolean notifyMove) {
         log.i("Set notifyMoveOfFilteredItems=%s", notifyMove);
         this.notifyMoveOfFilteredItems = notifyMove;
         return this;
@@ -4239,7 +4255,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @see #setDiffUtilCallback(DiffUtilCallback)
      */
-    public FlexibleAdapter<T>setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
+    public FlexibleAdapter<T> setAnimateChangesWithDiffUtil(boolean useDiffUtil) {
         this.useDiffUtil = useDiffUtil;
         return this;
     }
@@ -4251,7 +4267,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @see #setAnimateChangesWithDiffUtil(boolean)
      */
-    public FlexibleAdapter<T>setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
+    public FlexibleAdapter<T> setDiffUtilCallback(DiffUtilCallback diffUtilCallback) {
         this.diffUtilCallback = diffUtilCallback;
         return this;
     }
@@ -4514,7 +4530,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-rc1
      */
-    public final FlexibleAdapter<T>setItemTouchHelperCallback(ItemTouchHelperCallback itemTouchHelperCallback) {
+    public final FlexibleAdapter<T> setItemTouchHelperCallback(ItemTouchHelperCallback itemTouchHelperCallback) {
         mItemTouchHelperCallback = itemTouchHelperCallback;
         mItemTouchHelper = null;
         initializeItemTouchHelper();
@@ -4548,7 +4564,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter<T>setLongPressDragEnabled(boolean longPressDragEnabled) {
+    public final FlexibleAdapter<T> setLongPressDragEnabled(boolean longPressDragEnabled) {
         initializeItemTouchHelper();
         log.i("Set longPressDragEnabled=%s", longPressDragEnabled);
         mItemTouchHelperCallback.setLongPressDragEnabled(longPressDragEnabled);
@@ -4579,7 +4595,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter<T>setHandleDragEnabled(boolean handleDragEnabled) {
+    public final FlexibleAdapter<T> setHandleDragEnabled(boolean handleDragEnabled) {
         initializeItemTouchHelper();
         log.i("Set handleDragEnabled=%s", handleDragEnabled);
         this.mItemTouchHelperCallback.setHandleDragEnabled(handleDragEnabled);
@@ -4612,7 +4628,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @return this Adapter, so the call can be chained
      * @since 5.0.0-b1
      */
-    public final FlexibleAdapter<T>setSwipeEnabled(boolean swipeEnabled) {
+    public final FlexibleAdapter<T> setSwipeEnabled(boolean swipeEnabled) {
         log.i("Set swipeEnabled=%s", swipeEnabled);
         initializeItemTouchHelper();
         mItemTouchHelperCallback.setSwipeEnabled(swipeEnabled);
@@ -5325,6 +5341,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
         @Override
         public void onItemRangeRemoved(int positionStart, int itemCount) {
+            updateStickyHeader(positionStart);
             adjustPositions(positionStart, -itemCount);
         }
 
