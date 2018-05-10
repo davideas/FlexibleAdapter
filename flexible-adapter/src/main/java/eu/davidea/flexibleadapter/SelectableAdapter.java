@@ -18,6 +18,7 @@ package eu.davidea.flexibleadapter;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
@@ -156,7 +157,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @since 5.0.0-b6
      */
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         if (mFastScrollerDelegate != null) {
             mFastScrollerDelegate.onAttachedToRecyclerView(recyclerView);
@@ -171,7 +172,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @since 5.0.0-b6
      */
     @Override
-    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         if (mFastScrollerDelegate != null) {
             mFastScrollerDelegate.onDetachedFromRecyclerView(recyclerView);
@@ -473,7 +474,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List payloads) {
         // Bind the correct view elevation
         if (holder instanceof FlexibleViewHolder) {
             FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
@@ -496,7 +497,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
     }
 
     @Override
-    public void onViewRecycled(RecyclerView.ViewHolder holder) {
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
         if (holder instanceof FlexibleViewHolder) {
             boolean recycled = mBoundViewHolders.remove(holder);
             log.v("onViewRecycled viewSize=%s %s %s recycled=%s", mBoundViewHolders.size(), getClassName(holder), holder, recycled);
@@ -562,7 +563,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @since 1.0.0
      */
     public void onSaveInstanceState(Bundle outState) {
-        discardBoundViewHolders();
         outState.putIntegerArrayList(TAG, new ArrayList<>(mSelectedPositions));
         if (getSelectedItemCount() > 0) log.d("Saving selection %s", mSelectedPositions);
     }
