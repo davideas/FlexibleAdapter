@@ -4,6 +4,7 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 5
     minor 0
+    patch 5
 }
 
 android {
@@ -71,8 +72,27 @@ dependencies {
     implementation supportLib.design
     implementation supportLib.recyclerView
 
+    // Arch
+    implementation archLib.lifecycle
+    implementation archLib.extensions
+    implementation archLib.commonJava8
+    annotationProcessor archLib.compiler
+
+    // Room
+    implementation archLib.room
+    implementation archLib.roomRxJava2
+    annotationProcessor archLib.roomCompiler
+    implementation 'com.amitshekhar.android:debug-db:1.0.1'
+
     // Timber (Logger) - https://github.com/JakeWharton/timber
     implementation libraries.timber
+
+    // D2
+    implementation libraries.dagger
+    implementation libraries.daggerAndroid
+    implementation libraries.daggerAndroidSupport
+    annotationProcessor libraries.daggerCompiler
+    annotationProcessor libraries.daggerCompilerSupport
 
     // Butter Knife (View Injector) - https://github.com/JakeWharton/butterknife
     implementation libraries.butterKnife
@@ -87,12 +107,20 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
+    // Iconics - https://github.com/mikepenz/Android-Iconics
+    implementation widgets.iconicsCore
+    implementation widgets.iconicsViews
+    implementation widgets.iconicsCommunity
+
+    // Material Dialogs - https://github.com/afollestad/material-dialogs
+    implementation widgets.materialDialogs
+
     // UI Widgets
     implementation widgets.flipView
 
     // Test libraries
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test:rules:1.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'

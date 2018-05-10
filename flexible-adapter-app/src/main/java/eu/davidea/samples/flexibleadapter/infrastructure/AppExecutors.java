@@ -18,6 +18,7 @@ package eu.davidea.samples.flexibleadapter.infrastructure;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -34,19 +35,21 @@ import javax.inject.Singleton;
 public class AppExecutors {
 
     private final Executor diskIO;
-    private final Executor networkIO;
-    private final Executor mainThread;
 
-    public AppExecutors(Executor diskIO, Executor networkIO, Executor mainThread) {
-        this.diskIO = diskIO;
-        this.networkIO = networkIO;
-        this.mainThread = mainThread;
-    }
+    private final Executor networkIO;
+
+    private final Executor mainThread;
 
     @Inject
     public AppExecutors() {
-        this(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(3),
-                new MainThreadExecutor());
+        this(new MainThreadExecutor(), new DiskIOThreadExecutor(), Executors.newFixedThreadPool(3));
+    }
+
+    @VisibleForTesting
+    private AppExecutors(Executor mainThread, Executor diskIO, Executor networkIO) {
+        this.mainThread = mainThread;
+        this.diskIO = diskIO;
+        this.networkIO = networkIO;
     }
 
     public Executor diskIO() {
@@ -61,12 +64,33 @@ public class AppExecutors {
         return mainThread;
     }
 
+    /**
+     * Executor that runs a task on main thread.
+     */
     private static class MainThreadExecutor implements Executor {
+
         private Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
         @Override
         public void execute(@NonNull Runnable command) {
             mainThreadHandler.post(command);
+        }
+    }
+
+    /**
+     * Executor that runs a task on a new background thread.
+     */
+    private static class DiskIOThreadExecutor implements Executor {
+
+        private final Executor mDiskIO;
+
+        DiskIOThreadExecutor() {
+            mDiskIO = Executors.newSingleThreadExecutor();
+        }
+
+        @Override
+        public void execute(@NonNull Runnable command) {
+            mDiskIO.execute(command);
         }
     }
 

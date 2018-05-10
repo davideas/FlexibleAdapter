@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.davidea.samples.flexibleadapter.persistence.repositories;
+package eu.davidea.samples.flexibleadapter.persistence;
 
 import android.arch.lifecycle.LiveData;
 

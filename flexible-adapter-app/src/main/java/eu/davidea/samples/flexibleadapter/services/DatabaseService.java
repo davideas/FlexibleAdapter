@@ -31,7 +31,7 @@ import eu.davidea.samples.flexibleadapter.items.ExpandableLevel1Item;
 import eu.davidea.samples.flexibleadapter.items.HeaderItem;
 import eu.davidea.samples.flexibleadapter.items.InstagramHeaderItem;
 import eu.davidea.samples.flexibleadapter.items.InstagramItem;
-import eu.davidea.samples.flexibleadapter.items.OverallItem;
+import eu.davidea.samples.flexibleadapter.overall.OverallItem;
 import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredHeaderItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredItem;

@@ -4,10 +4,10 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 
-import eu.davidea.samples.flexibleadapter.items.OverallItem;
+import eu.davidea.samples.flexibleadapter.overall.Overall;
 
-@Database(entities = {OverallItem.class}, version = 1)
-@TypeConverters({DateConverters.class, EnumConverters.class})
+@Database(entities = {Overall.class}, version = 1, exportSchema = false)
+@TypeConverters({DateConverters.class})
 public abstract class FlexibleDatabase extends RoomDatabase {
 
     public static final String DATABASE_NAME = "FlexibleDatabase.db";

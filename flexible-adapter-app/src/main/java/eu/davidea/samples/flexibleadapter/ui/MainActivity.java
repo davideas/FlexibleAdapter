@@ -73,7 +73,7 @@ import eu.davidea.samples.flexibleadapter.ui.fragments.OnFragmentInteractionList
 import eu.davidea.samples.flexibleadapter.items.AbstractItem;
 import eu.davidea.samples.flexibleadapter.items.ExpandableItem;
 import eu.davidea.samples.flexibleadapter.items.HeaderItem;
-import eu.davidea.samples.flexibleadapter.items.OverallItem;
+import eu.davidea.samples.flexibleadapter.overall.OverallItem;
 import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.items.StaggeredItem;
 import eu.davidea.samples.flexibleadapter.items.SubItem;
