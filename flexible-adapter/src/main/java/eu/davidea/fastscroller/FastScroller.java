@@ -101,7 +101,7 @@ public class FastScroller extends FrameLayout {
     protected ScrollbarAnimator scrollbarAnimator;
     protected RecyclerView.OnScrollListener onScrollListener;
 
-	/*--------------*/
+    /*--------------*/
     /* CONSTRUCTORS */
     /*--------------*/
 
@@ -143,7 +143,7 @@ public class FastScroller extends FrameLayout {
                     return;
                 int verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
                 int verticalScrollRange = recyclerView.computeVerticalScrollRange();
-                float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
+                float proportion = (float) verticalScrollOffset / (float) (verticalScrollRange - height);
                 setBubbleAndHandlePosition(height * proportion);
                 // If scroll amount is small, don't show it
                 if (minimumScrollThreshold == 0 || dy == 0 || Math.abs(dy) > minimumScrollThreshold || scrollbarAnimator.isAnimating()) {
@@ -154,9 +154,9 @@ public class FastScroller extends FrameLayout {
         };
     }
 
-	/*---------------*/
-	/* CONFIGURATION */
-	/*---------------*/
+    /*---------------*/
+    /* CONFIGURATION */
+    /*---------------*/
 
     /**
      * This is done by FlexibleAdapter already!
@@ -184,7 +184,7 @@ public class FastScroller extends FrameLayout {
                 if (bubble == null || handle.isSelected()) return true;
                 int verticalScrollOffset = FastScroller.this.recyclerView.computeVerticalScrollOffset();
                 int verticalScrollRange = FastScroller.this.computeVerticalScrollRange();
-                float proportion = (float) verticalScrollOffset / ((float) verticalScrollRange - height);
+                float proportion = (float) verticalScrollOffset / (float) (verticalScrollRange - height);
                 setBubbleAndHandlePosition(height * proportion);
                 return true;
             }
@@ -283,9 +283,9 @@ public class FastScroller extends FrameLayout {
         }
     }
 
-	/*--------------*/
-	/* MAIN METHODS */
-	/*--------------*/
+    /*--------------*/
+    /* MAIN METHODS */
+    /*--------------*/
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -363,7 +363,8 @@ public class FastScroller extends FrameLayout {
     }
 
     /**
-     * Computes the index where the RecyclerView should be scrolled to based on the currY (y-coordinate of the touch event in the scrollbar)
+     * Computes the index where the RecyclerView should be scrolled to based on the currY
+     * (y-coordinate of the touch event in the scrollbar).
      *
      * @param currY y-coordinate of the touch event in the scrollbar
      * @return index position in the RecyclerView
@@ -415,17 +416,22 @@ public class FastScroller extends FrameLayout {
 
     /**
      * Sets the y-position of the bubble and the handle based on the current y-position.
-     * Override this method if you want to adjust the min and max position of the handle and the bubble e.g. the max position of the bubble is the same as the max position of the handle.
+     * Override this method if you want to adjust the min and max position of the handle and the bubble.
+     * E.g. the max position of the bubble is the same as the max position of the handle.
      *
-     * @param y current active y position in the scrollbar
+     * @param y current active y height in the scrollbar
      */
     protected void setBubbleAndHandlePosition(float y) {
+        if (height == 0) return; // Happens at startup
         int handleHeight = handle.getHeight();
-        handle.setY(getValueInRange(0, height - handleHeight, (int) (y - handleHeight / 2)));
+        // #605 - Remove small proportions of handleHeight at each scroll event,
+        // so the handle moves from top to bottom edges as its value changes.
+        y -= (y * handleHeight / height);
+        handle.setY(getValueInRange(0, height - handleHeight, (int) y));
         if (bubble != null) {
             int bubbleHeight = bubble.getHeight();
             if (bubblePosition == FastScrollerBubblePosition.ADJACENT) {
-                bubble.setY(getValueInRange(0, height - bubbleHeight - handleHeight / 2, (int) (y - bubbleHeight)));
+                bubble.setY(getValueInRange(0, height - bubbleHeight - handleHeight / 2, (int) (y - bubbleHeight / 1.5f)));
             } else {
                 bubble.setY(Math.max(0, (height - bubble.getHeight()) / 2));
                 bubble.setX(Math.max(0, (width - bubble.getWidth()) / 2));
@@ -433,9 +439,9 @@ public class FastScroller extends FrameLayout {
         }
     }
 
-	/*------------*/
-	/* ANIMATIONS */
-	/*------------*/
+    /*------------*/
+    /* ANIMATIONS */
+    /*------------*/
 
     protected void showBubble() {
         if (bubbleEnabled) {
@@ -447,9 +453,9 @@ public class FastScroller extends FrameLayout {
         bubbleAnimator.hideBubble();
     }
 
-	/*-----------*/
-	/* AUTO-HIDE */
-	/*-----------*/
+    /*-----------*/
+    /* AUTO-HIDE */
+    /*-----------*/
 
     public boolean isHidden() {
         return bar == null || handle == null ||
@@ -580,9 +586,9 @@ public class FastScroller extends FrameLayout {
         }
     }
 
-	/*------------*/
-	/* INTERFACES */
-	/*------------*/
+    /*------------*/
+    /* INTERFACES */
+    /*------------*/
 
     public interface BubbleTextCreator {
         String onCreateBubbleText(int position);
@@ -601,9 +607,9 @@ public class FastScroller extends FrameLayout {
         void setFastScroller(@NonNull FastScroller fastScroller);
     }
 
-	/*----------------*/
-	/* DELEGATE CLASS */
-	/*----------------*/
+    /*----------------*/
+    /* DELEGATE CLASS */
+    /*----------------*/
 
     /**
      * This class links the FastScroller to the RecyclerView.
