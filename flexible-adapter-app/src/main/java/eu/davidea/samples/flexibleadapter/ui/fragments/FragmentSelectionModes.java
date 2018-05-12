@@ -19,7 +19,7 @@ import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.ui.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.ui.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 /**

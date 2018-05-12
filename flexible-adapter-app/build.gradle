@@ -4,7 +4,6 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 5
     minor 0
-    patch 5
 }
 
 android {
@@ -12,7 +11,7 @@ android {
     buildToolsVersion buildTools
 
     defaultConfig {
-        applicationId 'eu.davidea.samples.flexibleadapter'
+        applicationId "eu.davidea.samples.flexibleadapter"
         minSdkVersion minSdk
         targetSdkVersion targetSdk
         versionCode versioning.code
@@ -72,27 +71,8 @@ dependencies {
     implementation supportLib.design
     implementation supportLib.recyclerView
 
-    // Arch
-    implementation archLib.lifecycle
-    implementation archLib.extensions
-    implementation archLib.commonJava8
-    annotationProcessor archLib.compiler
-
-    // Room
-    implementation archLib.room
-    implementation archLib.roomRxJava2
-    annotationProcessor archLib.roomCompiler
-    implementation 'com.amitshekhar.android:debug-db:1.0.1'
-
     // Timber (Logger) - https://github.com/JakeWharton/timber
     implementation libraries.timber
-
-    // D2
-    implementation libraries.dagger
-    implementation libraries.daggerAndroid
-    implementation libraries.daggerAndroidSupport
-    annotationProcessor libraries.daggerCompiler
-    annotationProcessor libraries.daggerCompilerSupport
 
     // Butter Knife (View Injector) - https://github.com/JakeWharton/butterknife
     implementation libraries.butterKnife
@@ -106,14 +86,6 @@ dependencies {
     implementation('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
         exclude group: 'com.android.support'
     }
-
-    // Iconics - https://github.com/mikepenz/Android-Iconics
-    implementation widgets.iconicsCore
-    implementation widgets.iconicsViews
-    implementation widgets.iconicsCommunity
-
-    // Material Dialogs - https://github.com/afollestad/material-dialogs
-    implementation widgets.materialDialogs
 
     // UI Widgets
     implementation widgets.flipView

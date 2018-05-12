@@ -19,7 +19,7 @@ import eu.davidea.samples.flexibleadapter.ui.OverallAdapter;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.ui.dialogs.BottomSheetDecorationDialog;
 import eu.davidea.samples.flexibleadapter.ui.dialogs.OnDecorationSelectedListener;
-import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 /**

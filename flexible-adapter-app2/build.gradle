@@ -1,0 +1,132 @@
+apply plugin: 'com.android.application'
+apply plugin: 'eu.davidea.grabver'
+
+versioning {
+    major 5
+    minor 0
+    patch 5
+}
+
+android {
+    compileSdkVersion targetSdk
+    buildToolsVersion buildTools
+
+    defaultConfig {
+        applicationId "eu.davidea.samples.flexibleadapter2"
+        minSdkVersion minSdk
+        targetSdkVersion targetSdk
+        versionCode versioning.code
+        versionName versioning.name
+
+        // https://medium.com/@chrisbanes/appcompat-v23-2-age-of-the-vectors-91cbafa87c88
+        // https://developer.android.com/studio/write/vector-asset-studio.html
+        vectorDrawables.useSupportLibrary = true
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        android.applicationVariants.all { variant ->
+            variant.outputs.all {
+                outputFileName = "flexible-adapter-v" + versioning.name + "-c" + versioning.code + ".apk"
+            }
+        }
+    }
+    // Configure only for each module that uses Java 8 language features
+    // (either in its source code or through dependencies).
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        debug {
+            versionNameSuffix ' #' + versioning.build + versioning.builtOn
+            minifyEnabled false
+        }
+        release {
+            zipAlignEnabled true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+    lintOptions {
+        abortOnError false
+    }
+    dataBinding {
+        enabled = false
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // FlexibleAdapter + extensions
+    implementation project(':flexible-adapter')
+    implementation project(':flexible-adapter-ui')
+
+    // Support Libraries
+    implementation supportLib.appCompat
+    implementation supportLib.cardView
+    implementation supportLib.design
+    implementation supportLib.recyclerView
+
+    // Arch
+    implementation archLib.lifecycle
+    implementation archLib.extensions
+    implementation archLib.commonJava8
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    annotationProcessor archLib.compiler
+
+    // Room
+    implementation archLib.room
+    implementation archLib.roomRxJava2
+    annotationProcessor archLib.roomCompiler
+    implementation 'com.amitshekhar.android:debug-db:1.0.1'
+
+    // Timber (Logger) - https://github.com/JakeWharton/timber
+    implementation libraries.timber
+
+    // D2
+    implementation libraries.dagger
+    implementation libraries.daggerAndroid
+    implementation libraries.daggerAndroidSupport
+    annotationProcessor libraries.daggerCompiler
+    annotationProcessor libraries.daggerCompilerSupport
+
+    // Butter Knife (View Injector) - https://github.com/JakeWharton/butterknife
+    implementation libraries.butterKnife
+    annotationProcessor libraries.butterKnifeCompiler
+
+    // Glide (Image Loader & Caching)
+    implementation libraries.glide
+    annotationProcessor libraries.glideCompiler
+
+    // Smooth-app-bar-layout
+    implementation('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
+        exclude group: 'com.android.support'
+    }
+
+    // Iconics - https://github.com/mikepenz/Android-Iconics
+    implementation widgets.iconicsCore
+    implementation widgets.iconicsViews
+    implementation widgets.iconicsCommunity
+
+    // Material Dialogs - https://github.com/afollestad/material-dialogs
+    implementation widgets.materialDialogs
+
+    // UI Widgets
+    implementation widgets.flipView
+
+    // Test libraries
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    })
+    testImplementation 'org.robolectric:robolectric:3.4.2'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.15.0'
+
+}

@@ -1,5 +1,6 @@
 include ':flexible-adapter',
         ':flexible-adapter-app',
+        ':flexible-adapter-app2',
         ':flexible-adapter-databinding',
         ':flexible-adapter-ui',
         ':flexible-adapter-livedata'

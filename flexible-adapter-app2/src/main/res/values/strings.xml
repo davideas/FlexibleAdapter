@@ -1,0 +1,205 @@
+<resources>
+    <!-- Action Mode -->
+    <string name="action_delete">Delete</string>
+    <string name="action_select_all">Select All</string>
+    <string name="action_selected_one">%1$s selected</string>
+    <string name="action_selected_many">%1$s selected</string>
+    <string name="action_deleted">Deleted</string>
+    <string name="action_archived">Archived</string>
+    <string name="action_merge">Merge</string>
+    <string name="action_split">Split</string>
+
+    <!-- Actions -->
+    <string name="action_reset">Reset</string>
+    <string name="action_search">Search...</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_decoration">Item Decoration</string>
+    <string name="top_scrolling">Endless Top</string>
+    <string name="animate_on_update">Animate on update*</string>
+    <string name="linear_layout">Linear Layout</string>
+    <string name="grid_layout">Grid Layout</string>
+    <string name="staggered_layout">Staggered Layout</string>
+    <string name="columns">%1$s column(s)</string>
+    <string name="diff_util">Use DiffUtil*</string>
+    <string name="scrolling_entry_animation">Entry Animation Only</string>
+    <string name="forward_scrolling">Forward Scrolling*</string>
+    <string name="reverse_scrolling">Reverse scrolling</string>
+    <string name="sub_item_specific">Specific SubItem Animation</string>
+    <string name="auto_collapse">Auto collapse</string>
+    <string name="recursive_collapse">Recursive collapse</string>
+    <string name="expand_all">Expand All</string>
+    <string name="collapse_all">Collapse All</string>
+    <string name="show_headers">Show Headers</string>
+    <string name="hide_headers">Hide Headers</string>
+    <string name="fast_scroller">Fast Scroller</string>
+    <string name="sticky_headers">Sticky Headers</string>
+    <string name="create_new_item">Create new Item</string>
+    <string name="mode_idle">Mode Idle</string>
+    <string name="mode_single">Mode Single</string>
+    <string name="undo">Undo</string>
+
+    <!-- Scrollable Headers/Footer/ProgressItem -->
+    <string name="uls_title"><![CDATA[<i>Click on Image (or LongClick on Item) to select that Item</i>]]></string>
+    <string name="uls_subtitle"><![CDATA[<i>This is a scrollable header.</i>]]></string>
+    <string name="scrollable_header_title">Scrollable Header Item</string>
+    <string name="scrollable_header_subtitle"><![CDATA[<i>Scrollable Headers are always displayed at the top of all main items.</i>]]></string>
+    <string name="scrollable_expandable_header_title">Scrollable Expandable Header Item</string>
+    <string name="scrollable_expandable_header_subtitle"><![CDATA[<i>When expanded, subItems will be added as headers too.</i>]]></string>
+    <string name="scrollable_expandable_footer_title">Scrollable Expandable Footer Item</string>
+    <string name="scrollable_expandable_footer_subtitle"><![CDATA[<i>When expanded, subItems will be added as footers too.</i>]]></string>
+    <string name="scrollable_footer_title">Scrollable Footer Item</string>
+    <string name="scrollable_footer_subtitle"><![CDATA[<i>Scrollable Footers are always displayed at the bottom of all main items.</i>]]></string>
+    <string name="no_more_load_retry">No more items to load. Refresh to retry.</string>
+    <string name="endless_disabled">No more items to load (max reached).</string>
+    <string name="endless_cancel">Cancelled by the user.</string>
+    <string name="endless_error">An error occurred while loading more items.</string>
+
+    <!-- Dialog -->
+    <string name="dialog_edit_title_hint">Title</string>
+    <string name="dialog_edit_title">Edit title</string>
+    <string name="CANCEL">Cancel</string>
+    <string name="OK">OK</string>
+
+    <!-- Extras -->
+    <string name="no_items">No items</string>
+    <string name="no_items_found">No items found</string>
+    <string name="err_no_edit">Nothing to modify</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="select_item_type">"Select Item Type                     "</string>
+    <string name="select_section_reference">"Select Section Reference             "</string>
+    <string name="likes">%1$s likes</string>
+    <string name="merged_with">Merged with%1$s</string><!--No space between!-->
+    <string name="status_a">STATUS A</string>
+    <string name="status_b">STATUS B</string>
+    <string name="status_c">STATUS C</string>
+    <string name="status_d">STATUS D</string>
+    <string name="status_e">STATUS E</string>
+    <string name="scrolling_animations">Scrolling Animations</string>
+    <string name="item_animators">Item Animators</string>
+    <string name="intent_chooser">Complete action using</string>
+
+    <!-- Configuration for Dynamic List -->
+    <string name="config_title">Configure the list ...</string>
+    <string name="config_description">... apply the configuration, then, try to filter the list with few and many items.</string>
+    <string name="config_num_of_items">Number of items:</string>
+    <string name="config_animate_to_limit"><![CDATA[<i>AnimateTo</i> limit (items):]]></string>
+    <string name="config_animate_to_limit_description"><![CDATA[Tunes the limit after the which
+the synchronization animations, occurred during updateDataSet and filter operations, are skipped
+and <i>notifyDataSetChanged()</i> will be called instead.<br>The limit is checked against the new
+filtered list.]]></string>
+    <string name="config_delay">Search delay (ms):</string>
+    <string name="config_delay_description">Waiting time before the search process starts. The time is reset at each new typing.</string>
+    <string name="config_notify_change">Notify change of unfiltered items</string>
+    <string name="config_notify_change_description"><![CDATA[Rebound the items that remain unfiltered.
+<br>If the items have highlighted text, those items must be refreshed in order to change the
+text back to normal. This happens systematically when searchText is reduced in length by the user.]]></string>
+    <string name="config_notify_move">Notify move of filtered items (Nicely animate the moved items)</string>
+    <string name="config_notify_move_description"><![CDATA[Performs a further step to nicely
+animate the moved items.<br>The process is <b>very slow</b> on big list of the order of ~3-5000
+items and higher, due to the calculation of the correct position for each item to shift. Use with caution!
+<br>The slowness is higher when the searchText is cleared out. Try to disable to improve performance.]]></string>
+
+    <!-- Menu Drawers -->
+    <string name="overall">Overall</string>
+    <string name="overall_use_case_title">Showcase of the library capabilities</string>
+    <string name="overall_use_case_description"><![CDATA[The demoApp is organized in <b>fragments</b> where the <i>RecyclerView</i> and the <i>Adapter</i> are reinitialized.
+	<br>Each example implements several features of the library. Common listeners are instead implemented in the <i>MainActivity</i>.]]></string>
+
+    <string name="selection_modes">Selection modes</string>
+    <string name="selection_modes_description">IDLE, SINGLE, MULTI + ActionModeHelper + UndoHelper + Scrollable Headers</string>
+    <string name="selection_modes_use_case_title">IDLE, SINGLE, MULTI</string>
+    <string name="selection_modes_use_case_description"><![CDATA[The 3 selection modes are managed with the new<b>ActionModeHelper</b>.
+<br>- You can experiment the MULTI selection starting from the SINGLE and from IDLE mode.
+<br>- Screen rotation is also supported.
+<br>- <i>ActionMode</i> is implemented in the <i>MainActivity</i>.]]></string>
+
+    <string name="filter">Async Filter</string>
+    <string name="filter_description">Big list with Asynchronous filter and refresh + Synchronization Animations + Configuration</string>
+
+    <string name="animator">Item Animators</string>
+    <string name="animator_description">ItemAnimators coherent with ScrollingAnimation</string>
+    <string name="animator_use_case_title">ItemAnimator coherent with ScrollingAnimation</string>
+    <string name="animator_use_case_description"><![CDATA[- Items can have common animation for inserting/deletion but some can be unique if <b>AnimatedViewHolder</b> is implemented.
+<br>- Index of section items is also provided to give a cascade effect when expanding/collapsing items.
+<br>- ScrollingAnimation gives an unique touch of animations when filling the RecyclerView or scrolling it.]]></string>
+
+    <string name="headers_sections">Headers and Sections</string>
+    <string name="headers_sections_description">Clickable sticky headers for sections + Draggable items with Auto-Linkage + Filter + Scrollable Headers and Footers</string>
+    <string name="headers_sections_use_case_title"><![CDATA[Sticky headers showcase (<i>IHeader</i>)]]></string>
+    <string name="headers_sections_use_case_description"><![CDATA[- Headers can be displayed and hidden all together.
+<br>- Sticky header is a real view and it\'s fully clickable, elevation and transparency are supported too.
+<br>- Using filter will disable the sticky header.
+<br>- Follow the steps in the <b>Wiki</b> page of the library.]]></string>
+
+    <string name="databinding">Data Binding</string>
+    <string name="databinding_description"><![CDATA[Data Binding Extension Library<br><font color="#ff4081"><b>Check the code!</b>]]></string>
+    <string name="databinding_use_case_description">Refresh or tap FAB button to update dataset with Data Binding.</string>
+    <string name="databinding_use_case_title">Data Binding Extension</string>
+
+    <string name="expandable_sections">Expandable Sections</string>
+    <string name="expandable_sections_description">Sections with [sticky] headers that can expand/collapse + Draggable items + Filter + Scroll Animations</string>
+
+    <string name="multi_level_expandable">Expandable Multi Level</string>
+    <string name="multi_level_expandable_description">2 levels of expandable + Selection Coherence + Swipeable &amp; Draggable items + ActionModeHelper + UndoHelper</string>
+
+    <string name="endless_scrolling">Endless Scrolling</string>
+    <string name="endless_scrolling_description">EndlessScrolling + Drag + Swipe-To-Delete w/rear-views + Scroll Animations + ActionModeHelper + UndoHelper + Scrollable Headers and Footers</string>
+
+    <string name="instagram_headers">Instagram headers</string>
+    <string name="instagram_headers_description"><![CDATA[1 sticky header for each item + Endless Scrolling.<br><font color="#ff4081"><b>Internet is required.</b></font>]]></string>
+
+    <string name="model_holders">Item Model Holder</string>
+    <string name="model_holders_description"><![CDATA[A representation of Items holding the model object.<br><font color="#ff4081"><b>Check the code!</b></font>]]></string>
+    <string name="model_holders_use_case_title"><![CDATA[<i>IHolder</i> item interface]]></string>
+    <string name="model_holders_use_case_description"><![CDATA[Adapter item holding the model object.
+<br>Use can use <i>IHolder</i> interface when you have to serialize/deserialize the model object coming from a network or from a different layer.
+<font color="#ff4081"><b>Check the code!</b></font>]]></string>
+
+    <string name="horizontal">Horizontal Layout</string>
+    <string name="horizontal_description">Items are disposed in vertical</string>
+
+    <string name="staggered_description">Cards with Sticky Headers disposed in Staggered Layout, dynamic background, insertion and sorting</string>
+    <string name="staggered_use_case_title">Support for Staggered Layout</string>
+    <string name="staggered_use_case_description"><![CDATA[Easy and predefined method for runtime item insertion and sorting in sections: <i>calculatePositionFor()</i>.
+<br>- Example of dynamic background with ripple effect without XML configuration.<br>- You can long press to merge and split items.]]></string>
+
+    <string name="viewpager">View Pager</string>
+    <string name="viewpager_description">Example usage with Sticky Headers in ViewPager layout</string>
+
+    <string name="dialogs">Dialogs</string>
+    <string name="dialogs_description">Example usage in Dialogs</string>
+
+    <!-- About -->
+    <string name="app_name">Flexible Adapter</string>
+    <string name="github">GitHub page…</string>
+    <string name="about_title">About</string>
+    <string name="about_version">%1$s</string>
+    <string name="about_body"><![CDATA[
+<b>Flexible Adapter</b><br>
+%1$s
+
+<br><br><b>Author</b><br>
+<a href="https://plus.google.com/u/0/108655371836503419479">Davide Steduto on G+</a>
+
+<br><br><b>Contact</b><br>
+<a href="https://github.com/davideas">Github Profile</a>
+
+<br><br><b>Licence</b><br>
+Copyright © 2015-2017 Davide Steduto.
+<br><br>Licensed under the Apache License, Version 2.0 (the "License");
+You may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+<br><br><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>
+
+<br><br>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<br>See the License for the specific language governing permissions and
+limitations under the License.
+]]></string>
+    <string name="title_activity_view_pager">ViewPagerActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+</resources>

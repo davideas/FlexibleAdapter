@@ -20,7 +20,7 @@ import eu.davidea.flexibleadapter.helpers.EmptyViewHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.items.ProgressItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ProgressItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 /**

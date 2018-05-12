@@ -11,11 +11,11 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.items.ScrollableExpandableItem;
-import eu.davidea.samples.flexibleadapter.items.ScrollableFooterItem;
-import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
-import eu.davidea.samples.flexibleadapter.items.ScrollableSubItem;
-import eu.davidea.samples.flexibleadapter.items.ScrollableULSItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableExpandableItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableFooterItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableLayoutItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableSubItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableULSItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 
 /**
