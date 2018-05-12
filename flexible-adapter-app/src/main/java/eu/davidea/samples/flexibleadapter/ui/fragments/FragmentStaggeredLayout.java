@@ -19,10 +19,10 @@ import eu.davidea.flexibleadapter.common.TopSnappedSmoothScroller;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
-import eu.davidea.samples.flexibleadapter.items.StaggeredHeaderItem;
-import eu.davidea.samples.flexibleadapter.items.StaggeredItem;
-import eu.davidea.samples.flexibleadapter.items.StaggeredItemStatus;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableUseCaseItem;
+import eu.davidea.samples.flexibleadapter.ui.items.StaggeredHeaderItem;
+import eu.davidea.samples.flexibleadapter.ui.items.StaggeredItem;
+import eu.davidea.samples.flexibleadapter.ui.items.StaggeredItemStatus;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 /**

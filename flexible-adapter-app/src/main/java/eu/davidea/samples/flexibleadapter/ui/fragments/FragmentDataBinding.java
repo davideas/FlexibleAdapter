@@ -20,9 +20,9 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flipview.FlipView;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.animators.GarageDoorItemAnimator;
-import eu.davidea.samples.flexibleadapter.items.AbstractItem;
-import eu.davidea.samples.flexibleadapter.items.HeaderItem;
-import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
+import eu.davidea.samples.flexibleadapter.ui.items.AbstractItem;
+import eu.davidea.samples.flexibleadapter.ui.items.HeaderItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 

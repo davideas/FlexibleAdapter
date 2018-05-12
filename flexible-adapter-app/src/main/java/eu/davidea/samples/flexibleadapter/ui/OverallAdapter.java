@@ -7,7 +7,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableLayoutItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 /**

@@ -37,7 +37,7 @@ import eu.davidea.samples.flexibleadapter.animators.SlideInDownItemAnimator;
 import eu.davidea.samples.flexibleadapter.animators.SlideInLeftItemAnimator;
 import eu.davidea.samples.flexibleadapter.animators.SlideInRightItemAnimator;
 import eu.davidea.samples.flexibleadapter.animators.SlideInUpItemAnimator;
-import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 

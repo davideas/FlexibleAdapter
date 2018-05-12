@@ -25,8 +25,8 @@ import eu.davidea.samples.flexibleadapter.ui.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.ui.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.ui.dialogs.OnParameterSelectedListener;
-import eu.davidea.samples.flexibleadapter.items.HeaderItem;
-import eu.davidea.samples.flexibleadapter.items.ScrollableUseCaseItem;
+import eu.davidea.samples.flexibleadapter.ui.items.HeaderItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableUseCaseItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 

@@ -27,8 +27,8 @@ import eu.davidea.samples.flexibleadapter.ui.ExampleAdapter;
 import eu.davidea.samples.flexibleadapter.ui.MainActivity;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.animators.FadeInDownItemAnimator;
-import eu.davidea.samples.flexibleadapter.items.ProgressItem;
-import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ProgressItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableLayoutItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
