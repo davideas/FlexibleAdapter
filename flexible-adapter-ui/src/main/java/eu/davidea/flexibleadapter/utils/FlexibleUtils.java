@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2017 Davide Steduto
+ * Copyright 2016-2018 Davide Steduto, Davidea Solutions Sprl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,36 +15,82 @@
  */
 package eu.davidea.flexibleadapter.utils;
 
-import android.annotation.SuppressLint;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.support.annotation.ColorInt;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StyleRes;
+import android.text.Html;
 import android.text.Spannable;
+import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
-import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
+import eu.davidea.flexibleadapter.SelectableAdapter;
 import eu.davidea.flexibleadapter.helpers.R;
 
 /**
+ * Set of utility methods most used in all applications.
+ *
  * @author Davide Steduto
+ * @see DrawableUtils
+ * @see LayoutUtils
  * @since 27/01/2016 Created
  * <br>17/12/2017 Moved into UI package
+ * <br>12/05/2018 Added even more utils
  */
-@SuppressWarnings({"WeakerAccess", "unused", "ConstantConditions"})
+@SuppressWarnings({"WeakerAccess", "unused", "ConstantConditions", "deprecation"})
 public final class FlexibleUtils {
 
+    public static final String DATE_TIME_FORMAT = "dd MMM yyyy HH:mm:ss z";
     public static final String SPLIT_EXPRESSION = "([, ]+)";
     public static final int INVALID_COLOR = -1;
     public static int colorAccent = INVALID_COLOR;
+
+    /*----------------*/
+    /* VERSIONS UTILS */
+    /*----------------*/
+
+    public static String getVersionName(Context context) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return "v" + pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return context.getString(android.R.string.unknownName);
+        }
+    }
+
+    public static int getVersionCode(Context context) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            return 0;
+        }
+    }
 
     /**
      * API 26
@@ -91,31 +137,9 @@ public final class FlexibleUtils {
         return Build.VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN;
     }
 
-    /**
-     * @return the string representation of the provided {@link Mode}
-     * @since 5.0.0-rc1
-     */
-    @NonNull
-    @SuppressLint("SwitchIntDef")
-    public static String getModeName(@Mode int mode) {
-        switch (mode) {
-            case Mode.SINGLE:
-                return "SINGLE";
-            case Mode.MULTI:
-                return "MULTI";
-            default:
-                return "IDLE";
-        }
-    }
-
-    /**
-     * @return the SimpleClassName of the provided object
-     * @since 5.0.0-rc1
-     */
-    @NonNull
-    public static String getClassName(@Nullable Object o) {
-        return o == null ? "null" : o.getClass().getSimpleName();
-    }
+    /*---------------------*/
+    /* STRING MANIPULATION */
+    /*---------------------*/
 
     /**
      * Sets a spannable text with the accent color into the provided TextView.
@@ -241,14 +265,84 @@ public final class FlexibleUtils {
         } while (start != -1);
     }
 
+    @NonNull
     public static String toLowerCase(@Nullable String text) {
         if (text == null) text = "";
         return text.toLowerCase(Locale.getDefault());
     }
 
-    /*------------------------------*/
-    /* ACCENT COLOR UTILITY METHODS */
-    /*------------------------------*/
+    public static Spanned fromHtmlCompat(String text) {
+        if (hasNougat()) {
+            return Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(text);
+        }
+    }
+
+    public static void textAppearanceCompat(TextView textView, @StyleRes int resId) {
+        if (hasMarshmallow()) {
+            textView.setTextAppearance(resId);
+        } else {
+            textView.setTextAppearance(textView.getContext(), resId);
+        }
+    }
+
+    /**
+     * Predefined format: <code>dd MMM yyyy HH:mm:ss z</code>
+     *
+     * @param date the date to format
+     * @return The date formatted.
+     */
+    public static String formatDateTime(Date date) {
+        return formatDateTime(date, DATE_TIME_FORMAT);
+    }
+
+    /**
+     * Date formatter with the provided format.
+     *
+     * @param date   the date to format
+     * @param format the format to apply
+     * @return The date formatted.
+     */
+    public static String formatDateTime(Date date, String format) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.getDefault());
+        return dateFormat.format(date);
+    }
+
+    /*-----------*/
+    /* SHORTCUTS */
+    /*-----------*/
+
+    /**
+     * @return the string representation of the provided {@link SelectableAdapter.Mode}
+     */
+    @NonNull
+    public static String getModeName(@SelectableAdapter.Mode int mode) {
+        return LayoutUtils.getModeName(mode);
+    }
+
+    /**
+     * @return the <code>SimpleClassName</code> of the provided object
+     */
+    @NonNull
+    public static String getClassName(@Nullable Object o) {
+        return LayoutUtils.getClassName(o);
+    }
+
+    /*-------------*/
+    /* COLOR UTILS */
+    /*-------------*/
+
+    /**
+     * Adjusts the alpha of a color.
+     *
+     * @param color the color
+     * @param alpha the alpha value we want to set 0-255
+     * @return the adjusted color
+     */
+    public static int adjustAlpha(@ColorInt int color, @IntRange(from = 0, to = 255) int alpha) {
+        return (alpha << 24) | (color & 0x00ffffff);
+    }
 
     /**
      * Reset the internal accent color to {@link #INVALID_COLOR}, to give the possibility
@@ -274,6 +368,131 @@ public final class FlexibleUtils {
             androidAttr.recycle();
         }
         return colorAccent;
+    }
+
+    /*--------------*/
+    /* SCREEN UTILS */
+    /*--------------*/
+
+    @NonNull
+    public static Point getScreenDimensions(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+
+        DisplayMetrics dm = new DisplayMetrics();
+        display.getMetrics(dm);
+
+        Point point = new Point();
+        point.set(dm.widthPixels, dm.heightPixels);
+        return point;
+    }
+
+    public static DisplayMetrics getDisplayMetrics(Context context) {
+        return context.getResources().getDisplayMetrics();
+    }
+
+    public static int dpToPx(Context context, float dp) {
+        return Math.round(dp * getDisplayMetrics(context).density);
+    }
+
+    /*----------------*/
+    /* KEYBOARD UTILS */
+    /*----------------*/
+
+    /**
+     * Show Soft Keyboard with new Thread.
+     */
+    public static void showSoftInput(final Context context, final View view) {
+        new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }.run();
+    }
+
+    /**
+     * Show Soft Keyboard with new Thread.
+     */
+    public static void hideSoftInput(final Activity activity) {
+        if (activity.getCurrentFocus() != null) {
+            new Runnable() {
+                public void run() {
+                    InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+                }
+            }.run();
+        }
+    }
+
+    /**
+     * Hide Soft Keyboard from Dialogs with new Thread.
+     */
+    public static void hideSoftInputFrom(final Context context, final View view) {
+        new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        }.run();
+    }
+
+    /*---------------------*/
+    /* REVEAL EFFECT UTILS */
+    /*---------------------*/
+
+    /**
+     * Create the reveal effect animation.
+     *
+     * @param view    the View to reveal
+     * @param centerX the x coordinate of the center of the animating circle, relative to <code>view</code>.
+     * @param centerY the y coordinate of the center of the animating circle, relative to <code>view</code>.
+     */
+    @TargetApi(VERSION_CODES.LOLLIPOP)
+    public static void reveal(final View view, int centerX, int centerY) {
+        if (!hasLollipop()) {
+            view.setVisibility(View.VISIBLE);
+            return;
+        }
+        // Get the final radius for the clipping circle
+        int finalRadius = Math.max(view.getWidth(), view.getHeight());
+        // Create the animator for this view (the start radius is zero)
+        Animator animator = ViewAnimationUtils.createCircularReveal(view, centerX, centerY, 0, finalRadius);
+        // Make the view visible and start the animation
+        view.setVisibility(View.VISIBLE);
+        animator.start();
+    }
+
+    /**
+     * Create the un-reveal effect animation.
+     * <p>View will be set as visibility <code>GONE</code>.</p>
+     *
+     * @param view    the View to reveal
+     * @param centerX the x coordinate of the center of the animating circle, relative to <code>view</code>.
+     * @param centerY the y coordinate of the center of the animating circle, relative to <code>view</code>.
+     */
+    @TargetApi(VERSION_CODES.LOLLIPOP)
+    public static void unReveal(final View view, int centerX, int centerY) {
+        if (!hasLollipop()) {
+            view.setVisibility(View.GONE);
+            return;
+        }
+        // Get the initial radius for the clipping circle
+        int initialRadius = view.getWidth();
+        // Create the animation (the final radius is zero)
+        Animator animator = ViewAnimationUtils.createCircularReveal(view, centerX, centerY, initialRadius, 0);
+        // Make the view invisible when the animation is done
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                view.setVisibility(View.GONE);
+            }
+        });
+        // Start the animation
+        animator.start();
     }
 
 }
