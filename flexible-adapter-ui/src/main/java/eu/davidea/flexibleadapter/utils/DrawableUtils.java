@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2017 Davide Steduto
+ * Copyright 2016-2018 Davide Steduto, Davidea Solutions Sprl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ import eu.davidea.flexibleadapter.helpers.R;
 
 /**
  * @author Davide Steduto
+ * @see FlexibleUtils
+ * @see LayoutUtils
  * @since 14/06/2016 Created
  * <br>17/12/2017 Moved into UI package
  */
