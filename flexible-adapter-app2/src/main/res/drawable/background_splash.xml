@@ -14,7 +14,7 @@
         android:bottom="@dimen/launchscreen_text_logo_bottom">
         <bitmap
             android:gravity="bottom|center_horizontal"
-            android:src="@drawable/logo_text_small"/>
+            android:src="@drawable/logo_text_smartphone"/>
     </item>
 
 </layer-list>

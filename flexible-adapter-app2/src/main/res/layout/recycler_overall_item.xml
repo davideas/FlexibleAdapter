@@ -1,57 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	xmlns:card_view="http://schemas.android.com/apk/res-auto"
-	android:id="@+id/label_card"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:foreground="?android:attr/selectableItemBackground"
-	card_view:cardElevation="2dp"
-	card_view:cardCornerRadius="1dp">
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/label_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?android:attr/selectableItemBackground"
+    card_view:cardCornerRadius="1dp"
+    card_view:cardElevation="2dp">
 
-	<ImageView
-		android:id="@+id/icon_background"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:paddingTop="10dp"
-		android:paddingBottom="10dp"
-		android:alpha="0.1"
-		android:scaleType="fitCenter"/>
+    <ImageView
+        android:id="@+id/icon_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.1"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:scaleType="fitCenter"/>
 
-	<LinearLayout
-		android:id="@+id/name_container"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_marginLeft="@dimen/margin_small"
-		android:layout_marginStart="@dimen/margin_small"
-		android:layout_marginRight="@dimen/margin_small"
-		android:layout_marginEnd="@dimen/margin_small"
-		android:layout_marginTop="@dimen/margin_top"
-		android:layout_marginBottom="@dimen/margin_bottom"
-		android:gravity="center"
-		android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/name_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/margin_bottom"
+        android:layout_marginEnd="@dimen/margin_small"
+        android:layout_marginLeft="@dimen/margin_small"
+        android:layout_marginRight="@dimen/margin_small"
+        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_top"
+        android:gravity="center"
+        android:orientation="vertical">
 
-		<TextView
-			android:id="@+id/title"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:gravity="center"
-			android:ellipsize="end"
-			android:lines="2"
-			android:singleLine="false"
-			android:textAppearance="@style/TextAppearance.AppCompat.Title"
-			tools:text="@string/endless_scrolling"/>
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:lines="2"
+            android:singleLine="false"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            tools:text="@string/endless_scrolling"/>
 
-		<TextView
-			android:id="@+id/subtitle"
-			android:layout_marginTop="2dp"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:gravity="center"
-			android:ellipsize="end"
-			android:textAppearance="@style/TextAppearance.AppCompat.Small"
-			tools:text="@string/endless_scrolling_description"/>
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            tools:text="@string/endless_scrolling_description"/>
 
-	</LinearLayout>
+    </LinearLayout>
 
 </android.support.v7.widget.CardView>

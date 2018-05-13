@@ -1,4 +1,5 @@
 <resources>
+    <!-- Splash screen margins -->
     <dimen name="launchscreen_product_logo_bottom">250dp</dimen>
     <dimen name="launchscreen_text_logo_bottom">110dp</dimen>
 
@@ -13,35 +14,20 @@
     <dimen name="margin_small">8dp</dimen>
     <dimen name="margin_right">16dp</dimen>
     <dimen name="margin_right_handle">22dp</dimen>
-    <dimen name="icon_width">40dp</dimen>
-    <dimen name="icon_height">40dp</dimen>
-    <dimen name="icon_touchable_component_mini">40dp</dimen>
-    <dimen name="icon_circular_width">24dp</dimen>
-    <dimen name="icon_circular_height">24dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="butterbar_height">3dp</dimen>
     <dimen name="toolbar_height">64dp</dimen><!-- 56 + 8 small margin top -->
-    <dimen name="popup_button_min_height">48dp</dimen>
-    <dimen name="popup_max_height">290dp</dimen>
-    <dimen name="bottom_sheet_peek">312dp</dimen>
-
-    <dimen name="card_height">60dp</dimen>
-    <dimen name="card_extra_height">15dp</dimen>
-    <dimen name="label_height">150dp</dimen>
     <dimen name="dialog_padding_vertical">24dp</dimen>
     <dimen name="dialog_padding_horizontal">24dp</dimen>
-    <dimen name="text_margin">16dp</dimen>
+
     <!-- Default screen margins, per the Android Design guidelines. -->
     <!-- Navigation Drawer -->
-    <dimen name="nav_header_vertical_spacing">16dp</dimen>
-    <dimen name="nav_header_height">160dp</dimen>
     <dimen name="nav_drawer_max_width">320dp</dimen>
+    <dimen name="nav_header_height">164dp</dimen>
 
     <!-- Header View -->
-    <dimen name="header_view_start_margin_left">16dp</dimen>
-    <dimen name="header_view_end_margin_left">40dp</dimen>
-    <dimen name="header_view_end_margin_right">14dp</dimen>
-    <dimen name="header_view_start_margin_bottom">14dp</dimen>
-    <dimen name="appbar_padding_top">8dp</dimen>
+    <dimen name="header_view_top_padding">12dp</dimen>
+    <dimen name="header_view_bottom_padding">16dp</dimen>
+    <dimen name="header_view_start_padding">16dp</dimen>
+    <dimen name="header_view_end_padding">16dp</dimen>
 
 </resources>

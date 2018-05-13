@@ -15,21 +15,21 @@ import butterknife.ButterKnife;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.utils.FlexibleUtils;
 import eu.davidea.samples.flexibleadapter.R;
-import eu.davidea.samples.flexibleadapter.utils.Utils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 /**
  * Model object representing Overall functionality as CardView.
  */
-public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolder> {
+public class FeatureItem extends AbstractFlexibleItem<FeatureItem.LabelViewHolder> {
 
     private int id;
     private String title;
     private String description;
     private Drawable icon;
 
-    public OverallItem(int id, String title) {
+    public FeatureItem(int id, String title) {
         this.id = id;
         this.title = title;
         setSelectable(false);
@@ -37,17 +37,17 @@ public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolde
         setDraggable(true);
     }
 
-    public OverallItem withDescription(String description) {
+    public FeatureItem withDescription(String description) {
         this.description = description;
         return this;
     }
 
-    public OverallItem withIcon(Drawable icon) {
+    public FeatureItem withIcon(Drawable icon) {
         this.icon = icon;
         return this;
     }
 
-    public OverallItem withEnabled(boolean enabled) {
+    public FeatureItem withEnabled(boolean enabled) {
         setEnabled(enabled);
         return this;
     }
@@ -56,7 +56,7 @@ public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolde
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OverallItem that = (OverallItem) o;
+        FeatureItem that = (FeatureItem) o;
         return id == that.id;
     }
 
@@ -77,7 +77,7 @@ public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolde
             holder.mTitle.setEnabled(isEnabled());
         }
         if (getDescription() != null) {
-            holder.mSubtitle.setText(Utils.fromHtmlCompat(getDescription()));
+            holder.mSubtitle.setText(FlexibleUtils.fromHtmlCompat(getDescription()));
             holder.mSubtitle.setEnabled(isEnabled());
         }
         if (getIcon() != null) {

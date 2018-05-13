@@ -69,15 +69,6 @@ public final class Utils {
     }
 
     /**
-     * API 11
-     *
-     * @see VERSION_CODES#HONEYCOMB
-     */
-    public static boolean hasHoneycomb() {
-        return Build.VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB;
-    }
-
-    /**
      * API 14
      *
      * @see VERSION_CODES#ICE_CREAM_SANDWICH
