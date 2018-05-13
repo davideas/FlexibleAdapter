@@ -54,22 +54,12 @@ import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.flexibleadapter.utils.Log.Level;
 import eu.davidea.samples.flexibleadapter.BuildConfig;
 import eu.davidea.samples.flexibleadapter.R;
+import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
+import eu.davidea.samples.flexibleadapter.services.DatabaseService;
+import eu.davidea.samples.flexibleadapter.services.DatabaseType;
 import eu.davidea.samples.flexibleadapter.ui.dialogs.EditItemDialog;
 import eu.davidea.samples.flexibleadapter.ui.dialogs.MessageDialog;
-import eu.davidea.samples.flexibleadapter.ui.fragments.AbstractFragment;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentAnimators;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentAsyncFilter;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentDataBinding;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentEndlessScrolling;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentExpandableMultiLevel;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentExpandableSections;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentHeadersSections;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentHolderSections;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentInstagramHeaders;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentOverall;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentSelectionModes;
-import eu.davidea.samples.flexibleadapter.ui.fragments.FragmentStaggeredLayout;
-import eu.davidea.samples.flexibleadapter.ui.fragments.OnFragmentInteractionListener;
+import eu.davidea.samples.flexibleadapter.ui.fragments.*;
 import eu.davidea.samples.flexibleadapter.ui.items.AbstractItem;
 import eu.davidea.samples.flexibleadapter.ui.items.ExpandableItem;
 import eu.davidea.samples.flexibleadapter.ui.items.HeaderItem;
@@ -77,9 +67,6 @@ import eu.davidea.samples.flexibleadapter.ui.items.OverallItem;
 import eu.davidea.samples.flexibleadapter.ui.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.ui.items.StaggeredItem;
 import eu.davidea.samples.flexibleadapter.ui.items.SubItem;
-import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
-import eu.davidea.samples.flexibleadapter.services.DatabaseService;
-import eu.davidea.samples.flexibleadapter.services.DatabaseType;
 import eu.davidea.samples.flexibleadapter.ui.views.HeaderView;
 import eu.davidea.utils.Utils;
 
@@ -323,7 +310,6 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * IMPORTANT!! READ THE COMMENT FOR THE FRAGMENT REPLACE
      */
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         hideFabSilently();

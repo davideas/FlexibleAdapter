@@ -8,7 +8,7 @@ import android.support.annotation.WorkerThread;
 
 import java.util.List;
 
-import eu.davidea.samples.flexibleadapter.overall.Overall;
+import eu.davidea.samples.flexibleadapter.overall.Feature;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -16,16 +16,16 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
  * Dao for offline experience.
  *
  * @author Davide Steduto
- * @since 10/05/2015
+ * @since 10/05/2018
  */
 @Dao
 public interface FlexibleDao {
 
-    @Query("select * from Overall")
-    LiveData<List<Overall>> getOverallItems();
+    @Query("select * from features")
+    LiveData<List<Feature>> getOverallItems();
 
     @WorkerThread
     @Insert(onConflict = REPLACE)
-    void saveOverallItems(List<Overall> items);
+    void saveOverallItems(List<Feature> items);
 
 }

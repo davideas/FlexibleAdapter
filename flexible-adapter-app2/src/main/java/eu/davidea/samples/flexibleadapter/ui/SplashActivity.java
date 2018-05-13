@@ -1,6 +1,9 @@
 package eu.davidea.samples.flexibleadapter.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Fade;
 import android.view.Window;
@@ -23,10 +26,10 @@ public class SplashActivity extends AppCompatActivity {
             getWindow().setExitTransition(new Fade());
         }
 
-//        Intent intent = new Intent(this, MainActivity.class);
-//        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-//        ActivityCompat.startActivity(this, intent, options.toBundle());
-//        ActivityCompat.finishAfterTransition(this);
+        Intent intent = new Intent(this, MainActivity.class);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+        ActivityCompat.startActivity(this, intent, options.toBundle());
+        ActivityCompat.finishAfterTransition(this);
     }
 
 }

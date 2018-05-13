@@ -61,6 +61,7 @@
     <string name="OK">OK</string>
 
     <!-- Extras -->
+    <string name="work_in_progress">A brand new app experience is growing!</string>
     <string name="no_items">No items</string>
     <string name="no_items_found">No items found</string>
     <string name="err_no_edit">Nothing to modify</string>
@@ -101,7 +102,7 @@ items and higher, due to the calculation of the correct position for each item t
 <br>The slowness is higher when the searchText is cleared out. Try to disable to improve performance.]]></string>
 
     <!-- Menu Drawers -->
-    <string name="overall">Overall</string>
+    <string name="overall">Features overall</string>
     <string name="overall_use_case_title">Showcase of the library capabilities</string>
     <string name="overall_use_case_description"><![CDATA[The demoApp is organized in <b>fragments</b> where the <i>RecyclerView</i> and the <i>Adapter</i> are reinitialized.
 	<br>Each example implements several features of the library. Common listeners are instead implemented in the <i>MainActivity</i>.]]></string>
@@ -171,6 +172,7 @@ items and higher, due to the calculation of the correct position for each item t
     <string name="dialogs_description">Example usage in Dialogs</string>
 
     <!-- About -->
+    <string name="special_layouts_title">Special Layouts</string>
     <string name="app_name">Flexible Adapter</string>
     <string name="github">GitHub page…</string>
     <string name="about_title">About</string>
@@ -182,11 +184,14 @@ items and higher, due to the calculation of the correct position for each item t
 <br><br><b>Author</b><br>
 <a href="https://plus.google.com/u/0/108655371836503419479">Davide Steduto on G+</a>
 
-<br><br><b>Contact</b><br>
-<a href="https://github.com/davideas">Github Profile</a>
+<br><br><b>Author</b><br>
+<a href="https://www.facebook.com/Davidea-Solutions-189679994409375/">Davidea Solutions on Facebook</a>
+
+<br><br><b>Contact Email</b><br>
+<a href="mailto:dave.dna@gmail.com">Email</a>
 
 <br><br><b>Licence</b><br>
-Copyright © 2015-2017 Davide Steduto.
+Copyright © 2015-2018 Davide Steduto, Davidea Solutions Sprl.
 <br><br>Licensed under the Apache License, Version 2.0 (the "License");
 You may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -199,7 +204,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 <br>See the License for the specific language governing permissions and
 limitations under the License.
 ]]></string>
-    <string name="title_activity_view_pager">ViewPagerActivity</string>
-    <string name="section_format">Hello World from section: %1$d</string>
 
 </resources>
