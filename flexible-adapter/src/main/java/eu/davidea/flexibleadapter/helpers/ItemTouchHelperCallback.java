@@ -16,14 +16,14 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.graphics.Canvas;
-import android.support.annotation.FloatRange;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.Adapter;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.support.v7.widget.helper.ItemTouchHelper.Callback;
+import androidx.annotation.FloatRange;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.Adapter;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.ItemTouchHelper.Callback;
 import android.view.View;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemMoveListener;
@@ -262,7 +262,7 @@ public class ItemTouchHelperCallback extends Callback {
         if (layoutManager instanceof GridLayoutManager || layoutManager instanceof StaggeredGridLayoutManager) {
             dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
             swipeFlags = 0;
-        } else if (LayoutUtils.getOrientation(recyclerView) == LinearLayoutManager.HORIZONTAL) {
+        } else if (LayoutUtils.getOrientation(recyclerView) == androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL) {
             dragFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
             swipeFlags = mSwipeFlags > 0 ? mSwipeFlags : ItemTouchHelper.UP | ItemTouchHelper.DOWN;
         } else {
@@ -304,7 +304,7 @@ public class ItemTouchHelperCallback extends Callback {
      * {@inheritDoc}
      */
     @Override
-    public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+    public void clearView(androidx.recyclerview.widget.RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         // Force full Alpha
         viewHolder.itemView.setAlpha(ALPHA_FULL);
         if (viewHolder instanceof ViewHolderCallback) {

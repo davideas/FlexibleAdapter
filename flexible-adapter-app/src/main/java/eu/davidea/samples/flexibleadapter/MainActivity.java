@@ -8,25 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.transition.Fade;
 import android.view.Menu;
@@ -37,10 +18,28 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.core.view.ViewCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
@@ -110,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener,
         FlexibleAdapter.OnItemMoveListener, FlexibleAdapter.OnItemSwipeListener,
         FastScroller.OnScrollStateChangeListener,
-        NavigationView.OnNavigationItemSelectedListener,
+        com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener,
         OnFragmentInteractionListener {
 
     /**
@@ -126,14 +125,14 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * RecyclerView and related objects
      */
-    private RecyclerView mRecyclerView;
+    private androidx.recyclerview.widget.RecyclerView mRecyclerView;
     private FlexibleAdapter<AbstractFlexibleItem> mAdapter;
     private ActionModeHelper mActionModeHelper;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Toolbar mToolbar;
     private HeaderView mHeaderView;
     private DrawerLayout mDrawer;
-    private NavigationView mNavigationView;
+    private com.google.android.material.navigation.NavigationView mNavigationView;
     private AbstractFragment mFragment;
     private SearchView mSearchView;
 
@@ -159,9 +158,9 @@ public class MainActivity extends AppCompatActivity implements
         }
     });
 
-	/* ===================
+    /* ===================
      * ACTIVITY MANAGEMENT
-	 * =================== */
+     * =================== */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -208,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onFragmentChange(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView, int mode) {
+    public void onFragmentChange(SwipeRefreshLayout swipeRefreshLayout, androidx.recyclerview.widget.RecyclerView recyclerView, int mode) {
         mRecyclerView = recyclerView;
         mAdapter = (FlexibleAdapter) recyclerView.getAdapter();
         mSwipeRefreshLayout = swipeRefreshLayout;
@@ -216,9 +215,9 @@ public class MainActivity extends AppCompatActivity implements
         initializeActionModeHelper(mode);
     }
 
-	/* ======================
+    /* ======================
      * INITIALIZATION METHODS
-	 * ====================== */
+     * ====================== */
 
     private void initializeActionModeHelper(@Mode int mode) {
         mActionModeHelper = new ActionModeHelper(mAdapter, mFragment.getContextMenuResId(), this) {
@@ -231,8 +230,8 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         }.withDefaultMode(mode)
-         .disableDragOnActionMode(true)
-         .disableSwipeOnActionMode(true);
+                .disableDragOnActionMode(true)
+                .disableSwipeOnActionMode(true);
     }
 
     private void initializeFragment(Bundle savedInstanceState) {
@@ -284,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView = (com.google.android.material.navigation.NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
         // Version
@@ -293,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initializeFab() {
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab = (com.google.android.material.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -314,9 +313,9 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-	/* =======================================
-	 * NAVIGATION DRAWER & FRAGMENT MANAGEMENT
-	 * ======================================= */
+    /* =======================================
+     * NAVIGATION DRAWER & FRAGMENT MANAGEMENT
+     * ======================================= */
 
     /**
      * IMPORTANT!! READ THE COMMENT FOR THE FRAGMENT REPLACE
@@ -372,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements
                     R.drawable.ic_info_grey600_24dp,
                     getString(R.string.about_title),
                     getString(R.string.about_body, Utils.getVersionName(this)))
-                         .show(getFragmentManager(), MessageDialog.TAG);
+                    .show(getFragmentManager(), MessageDialog.TAG);
             return true;
         } else if (id == R.id.nav_github) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -409,9 +408,9 @@ public class MainActivity extends AppCompatActivity implements
         return false;
     }
 
-	/* ======================
-	 * FLOATING ACTION BUTTON
-	 * ====================== */
+    /* ======================
+     * FLOATING ACTION BUTTON
+     * ====================== */
 
     private void hideFabSilently() {
         mFab.setAlpha(0f);
@@ -419,9 +418,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private void hideFab() {
         ViewCompat.animate(mFab)
-                  .scaleX(0f).scaleY(0f)
-                  .alpha(0f).setDuration(100)
-                  .start();
+                .scaleX(0f).scaleY(0f)
+                .alpha(0f).setDuration(100)
+                .start();
     }
 
     private void showFab() {
@@ -430,16 +429,16 @@ public class MainActivity extends AppCompatActivity implements
                 mFragment instanceof FragmentStaggeredLayout ||
                 mFragment instanceof FragmentAsyncFilter) {
             ViewCompat.animate(mFab)
-                      .scaleX(1f).scaleY(1f)
-                      .alpha(1f).setDuration(200)
-                      .setStartDelay(300L)
-                      .start();
+                    .scaleX(1f).scaleY(1f)
+                    .alpha(1f).setDuration(200)
+                    .setStartDelay(300L)
+                    .start();
         }
     }
 
-	/* ===========
-	 * SEARCH VIEW
-	 * =========== */
+    /* ===========
+     * SEARCH VIEW
+     * =========== */
 
     @Override
     public void initSearchView(final Menu menu) {
@@ -501,9 +500,9 @@ public class MainActivity extends AppCompatActivity implements
         return onQueryTextChange(query);
     }
 
-	/* ====================================
-	 * OPTION MENU PREPARATION & MANAGEMENT
-	 * ==================================== */
+    /* ====================================
+     * OPTION MENU PREPARATION & MANAGEMENT
+     * ==================================== */
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -568,47 +567,47 @@ public class MainActivity extends AppCompatActivity implements
         if (id == R.id.action_animate_on_update) {
             DatabaseConfiguration.animateOnUpdate = !DatabaseConfiguration.animateOnUpdate;
             item.setChecked(DatabaseConfiguration.animateOnUpdate);
-            Snackbar.make(findViewById(R.id.main_view), (DatabaseConfiguration.animateOnUpdate ? "Enabled" : "Disabled") +
-                    " animation on update, now refresh!\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+            com.google.android.material.snackbar.Snackbar.make(findViewById(R.id.main_view), (DatabaseConfiguration.animateOnUpdate ? "Enabled" : "Disabled") +
+                    " animation on update, now refresh!\n(* = persistent)", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
         } else if (id == R.id.action_forward) {
             if (mAdapter.isAnimationOnForwardScrollingEnabled()) {
                 DatabaseConfiguration.animateOnForwardScrolling = false;
                 mAdapter.setAnimationOnForwardScrolling(false);
                 item.setChecked(false);
-                Snackbar.make(findViewById(R.id.main_view), "Disabled forward scrolling animation\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+                com.google.android.material.snackbar.Snackbar.make(findViewById(R.id.main_view), "Disabled forward scrolling animation\n(* = persistent)", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             } else {
                 DatabaseConfiguration.animateOnForwardScrolling = true;
                 mAdapter.setAnimationOnForwardScrolling(true);
                 item.setChecked(true);
-                Snackbar.make(findViewById(R.id.main_view), "Enabled forward scrolling animation\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.main_view), "Enabled forward scrolling animation\n(* = persistent)", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             }
         } else if (id == R.id.action_reverse) {
             if (mAdapter.isAnimationOnReverseScrollingEnabled()) {
                 mAdapter.setAnimationOnReverseScrolling(false);
                 item.setChecked(false);
-                Snackbar.make(findViewById(R.id.main_view), "Disabled reverse scrolling animation", Snackbar.LENGTH_SHORT).show();
+                com.google.android.material.snackbar.Snackbar.make(findViewById(R.id.main_view), "Disabled reverse scrolling animation", Snackbar.LENGTH_SHORT).show();
             } else {
                 mAdapter.setAnimationOnReverseScrolling(true);
                 item.setChecked(true);
-                Snackbar.make(findViewById(R.id.main_view), "Enabled reverse scrolling animation", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.main_view), "Enabled reverse scrolling animation", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             }
-		} else if (id == R.id.action_diff_util) {
-			if (mAdapter.isAnimateChangesWithDiffUtil()) {
-				DatabaseConfiguration.animateWithDiffUtil = false;
-				mAdapter.setAnimateChangesWithDiffUtil(false);
-				item.setChecked(false);
-				Snackbar.make(findViewById(R.id.main_view), "Default calculation is used to animate changes\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
-			} else {
-				DatabaseConfiguration.animateWithDiffUtil = true;
-				mAdapter.setAnimateChangesWithDiffUtil(true);
-				item.setChecked(true);
-				Snackbar.make(findViewById(R.id.main_view), "DiffUtil is used to animate changes\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
-			}
+        } else if (id == R.id.action_diff_util) {
+            if (mAdapter.isAnimateChangesWithDiffUtil()) {
+                DatabaseConfiguration.animateWithDiffUtil = false;
+                mAdapter.setAnimateChangesWithDiffUtil(false);
+                item.setChecked(false);
+                Snackbar.make(findViewById(R.id.main_view), "Default calculation is used to animate changes\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+            } else {
+                DatabaseConfiguration.animateWithDiffUtil = true;
+                mAdapter.setAnimateChangesWithDiffUtil(true);
+                item.setChecked(true);
+                com.google.android.material.snackbar.Snackbar.make(findViewById(R.id.main_view), "DiffUtil is used to animate changes\n(* = persistent)", Snackbar.LENGTH_SHORT).show();
+            }
         } else if (id == R.id.action_auto_collapse) {
             if (mAdapter.isAutoCollapseOnExpand()) {
                 mAdapter.setAutoCollapseOnExpand(false);
                 item.setChecked(false);
-                Snackbar.make(findViewById(R.id.main_view), "Auto-Collapse is disabled", Snackbar.LENGTH_SHORT).show();
+                com.google.android.material.snackbar.Snackbar.make(findViewById(R.id.main_view), "Auto-Collapse is disabled", Snackbar.LENGTH_SHORT).show();
             } else {
                 mAdapter.setAutoCollapseOnExpand(true);
                 item.setChecked(true);
@@ -643,13 +642,13 @@ public class MainActivity extends AppCompatActivity implements
                 mActionModeHelper.withDefaultMode(Mode.SINGLE);
                 item.setIcon(R.drawable.ic_select_off_white_24dp);
                 item.setTitle(R.string.mode_idle);
-                Snackbar.make(findViewById(R.id.main_view), "Selection SINGLE is enabled", Snackbar.LENGTH_SHORT).show();
+                com.google.android.material.snackbar.Snackbar.make(findViewById(R.id.main_view), "Selection SINGLE is enabled", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             } else {
                 mAdapter.setMode(Mode.IDLE);
                 mActionModeHelper.withDefaultMode(Mode.IDLE);
                 item.setIcon(R.drawable.ic_select_white_24dp);
                 item.setTitle(R.string.mode_single);
-                Snackbar.make(findViewById(R.id.main_view), "Selection IDLE is enabled", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.main_view), "Selection IDLE is enabled", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             }
         } else if (id == R.id.action_fast_scroller) {
             mAdapter.toggleFastScroller();
@@ -661,9 +660,9 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-	/* ===============================================================
-	 * DIALOG LISTENER IMPLEMENTATION (For the example of onItemClick)
-	 * =============================================================== */
+    /* ===============================================================
+     * DIALOG LISTENER IMPLEMENTATION (For the example of onItemClick)
+     * =============================================================== */
 
     @Override
     public void onTitleModified(int position, String newTitle) {
@@ -679,14 +678,14 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter.updateItem(position, abstractItem, null);
     }
 
-	/* ========================================================================
-	 * FLEXIBLE ADAPTER LISTENERS IMPLEMENTATION
-	 * Listeners implementation are in MainActivity to easily reuse the common
-	 * components like SwipeToRefresh, ActionMode, NavigationView, etc...
-	 * ======================================================================== */
+    /* ========================================================================
+     * FLEXIBLE ADAPTER LISTENERS IMPLEMENTATION
+     * Listeners implementation are in MainActivity to easily reuse the common
+     * components like SwipeToRefresh, ActionMode, NavigationView, etc...
+     * ======================================================================== */
 
     @Override
-    public boolean onItemClick(View view, int position) {
+    public boolean onItemClick(View view, final int position) {
         IFlexible flexibleItem = mAdapter.getItem(position);
         if (flexibleItem instanceof OverallItem) {
             OverallItem overallItem = (OverallItem) flexibleItem;
@@ -703,12 +702,14 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             // Notify the active callbacks or implement a custom action onClick
             if (flexibleItem instanceof SimpleItem || flexibleItem instanceof SubItem) {
-                mRecyclerView.postDelayed(() -> {
-                    Log.d("scroll to position=%s item=%s", position, mAdapter.getItem(position));
-                    int headers = mAdapter.areHeadersSticky() ? 1 : 0;
-                    mRecyclerView.smoothScrollToPosition(Math.max(0, position - headers));
+                mRecyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("scroll to position=%s item=%s", position, mAdapter.getItem(position));
+                        int headers = mAdapter.areHeadersSticky() ? 1 : 0;
+                        mRecyclerView.smoothScrollToPosition(Math.max(0, position - headers));
+                    }
                 }, 300L);
-
 //                //TODO FOR YOU: call your custom Action on item click
 //                String title = extractTitleFrom(flexibleItem);
 //                EditItemDialog.newInstance(title, position).show(getFragmentManager(), EditItemDialog.TAG);
@@ -724,7 +725,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onActionStateChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+    public void onActionStateChanged(androidx.recyclerview.widget.RecyclerView.ViewHolder viewHolder, int actionState) {
         mSwipeRefreshLayout.setEnabled(actionState == ItemTouchHelper.ACTION_STATE_IDLE);
     }
 
@@ -836,7 +837,7 @@ public class MainActivity extends AppCompatActivity implements
         if (mAdapter != null && !mAdapter.isRestoreInTime() &&
                 DatabaseService.getInstance().getDatabaseType() != DatabaseType.DATA_BINDING) {
             String message = "Filtered " + size + " items in " + mAdapter.getTime() + "ms";
-            Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
+            com.google.android.material.snackbar.Snackbar.make(findViewById(R.id.main_view), message, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -903,9 +904,9 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-	/* ==========================
-	 * ACTION MODE IMPLEMENTATION
-	 * ========================== */
+    /* ==========================
+     * ACTION MODE IMPLEMENTATION
+     * ========================== */
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -1027,10 +1028,10 @@ public class MainActivity extends AppCompatActivity implements
             getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark_light));
         }
     }
-	
-	/* ======
-	 * EXTRAS
-	 * ====== */
+
+    /* ======
+     * EXTRAS
+     * ====== */
 
     @Override
     public void onBackPressed() {

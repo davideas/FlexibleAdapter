@@ -15,7 +15,7 @@
  */
 package eu.davidea.viewholders;
 
-import android.support.annotation.CallSuper;
+import androidx.annotation.CallSuper;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;

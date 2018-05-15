@@ -6,8 +6,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractHeaderItem;
 import eu.davidea.samples.flexibleadapter.R;
@@ -68,12 +66,11 @@ public class StaggeredHeaderItem extends AbstractHeaderItem<StaggeredHeaderItem.
 
     static class HeaderViewHolder extends FlexibleViewHolder {
 
-        @BindView(R.id.title)
         TextView title;
 
         public HeaderViewHolder(View view, FlexibleAdapter adapter) {
             super(view, adapter, true);//True for sticky
-            ButterKnife.bind(this, view);
+            title = view.findViewById(R.id.title);
 
             // Support for StaggeredGridLayoutManager
             setFullSpan(true);

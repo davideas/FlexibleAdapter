@@ -6,7 +6,7 @@
 	android:layout_height="match_parent"
 	android:theme="@style/AppTheme.Base">
 
-	<android.support.v4.widget.SwipeRefreshLayout
+	<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 		android:id="@+id/swipeRefreshLayout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
@@ -20,7 +20,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">
 
-			<android.support.v7.widget.RecyclerView
+			<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/recycler_view"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
@@ -32,7 +32,7 @@
 
 		</FrameLayout>
 
-	</android.support.v4.widget.SwipeRefreshLayout>
+	</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 	<!-- Custom EmptyView for RV when empty-->
 	<include layout="@layout/empty_view"/>

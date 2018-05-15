@@ -21,17 +21,17 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
-import android.support.annotation.ColorInt;
-import android.support.annotation.IdRes;
-import android.support.annotation.IntDef;
-import android.support.annotation.IntRange;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import androidx.annotation.ColorInt;
+import androidx.annotation.IdRes;
+import androidx.annotation.IntDef;
+import androidx.annotation.IntRange;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -85,7 +85,7 @@ public class FastScroller extends FrameLayout {
     protected int height, width, minimumScrollThreshold;
 
     protected RecyclerView recyclerView;
-    protected RecyclerView.LayoutManager layoutManager;
+    protected androidx.recyclerview.widget.RecyclerView.LayoutManager layoutManager;
     protected BubbleTextCreator bubbleTextCreator;
     protected List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<>();
 
@@ -99,7 +99,7 @@ public class FastScroller extends FrameLayout {
 
     protected BubbleAnimator bubbleAnimator;
     protected ScrollbarAnimator scrollbarAnimator;
-    protected RecyclerView.OnScrollListener onScrollListener;
+    protected androidx.recyclerview.widget.RecyclerView.OnScrollListener onScrollListener;
 
     /*--------------*/
     /* CONSTRUCTORS */
@@ -138,7 +138,7 @@ public class FastScroller extends FrameLayout {
         setClipChildren(false);
         onScrollListener = new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(androidx.recyclerview.widget.RecyclerView recyclerView, int dx, int dy) {
                 if (!isEnabled() || bubble == null || handle.isSelected())
                     return;
                 int verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
@@ -353,9 +353,9 @@ public class FastScroller extends FrameLayout {
             int targetPos = getTargetPos(y);
 
             if (layoutManager instanceof StaggeredGridLayoutManager) {
-                ((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(targetPos, 0);
+                ((androidx.recyclerview.widget.StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(targetPos, 0);
             } else {
-                ((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(targetPos, 0);
+                ((androidx.recyclerview.widget.LinearLayoutManager) layoutManager).scrollToPositionWithOffset(targetPos, 0);
             }
 
             updateBubbleText(targetPos);
@@ -630,10 +630,10 @@ public class FastScroller extends FrameLayout {
         private static final String TAG = Delegate.class.getSimpleName();
         private static final boolean DEBUG = false;
 
-        private RecyclerView mRecyclerView;
+        private androidx.recyclerview.widget.RecyclerView mRecyclerView;
         private FastScroller mFastScroller;
 
-        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        public void onAttachedToRecyclerView(androidx.recyclerview.widget.RecyclerView recyclerView) {
             mRecyclerView = recyclerView;
         }
 

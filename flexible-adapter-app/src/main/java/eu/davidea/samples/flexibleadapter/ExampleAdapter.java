@@ -3,8 +3,8 @@ package eu.davidea.samples.flexibleadapter;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import java.util.List;
 
@@ -70,7 +70,7 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
     public void showLayoutInfo(boolean scrollToPosition) {
         if (!hasFilter()) {
             final ScrollableLayoutItem item = new ScrollableLayoutItem("LAY-L");
-            if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+            if (mRecyclerView.getLayoutManager() instanceof androidx.recyclerview.widget.StaggeredGridLayoutManager) {
                 item.setId("LAY-S");
                 item.setTitle(mRecyclerView.getContext().getString(R.string.staggered_layout));
             } else if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {

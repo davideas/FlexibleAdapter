@@ -1,9 +1,9 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -95,7 +95,7 @@ public class FragmentSelectionModes extends AbstractFragment {
         mRecyclerView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Snackbar.make(getView(), "Selection SINGLE is enabled", Snackbar.LENGTH_SHORT).show();
+                com.google.android.material.snackbar.Snackbar.make(getView(), "Selection SINGLE is enabled", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             }
         }, 1500L);
 

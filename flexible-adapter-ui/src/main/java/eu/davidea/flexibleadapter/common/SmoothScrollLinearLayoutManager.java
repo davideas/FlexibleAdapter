@@ -16,8 +16,8 @@
 package eu.davidea.flexibleadapter.common;
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Optimized implementation of LinearLayoutManager to SmoothScroll to a Top position.
@@ -25,7 +25,7 @@ import android.support.v7.widget.RecyclerView;
  * @since 5.0.0-b1
  * <br>17/12/2017 Moved into UI package
  */
-public class SmoothScrollLinearLayoutManager extends LinearLayoutManager implements IFlexibleLayoutManager {
+public class SmoothScrollLinearLayoutManager extends androidx.recyclerview.widget.LinearLayoutManager implements IFlexibleLayoutManager {
 
     private RecyclerView.SmoothScroller mSmoothScroller;
 
@@ -39,7 +39,7 @@ public class SmoothScrollLinearLayoutManager extends LinearLayoutManager impleme
     }
 
     @Override
-    public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
+    public void smoothScrollToPosition(androidx.recyclerview.widget.RecyclerView recyclerView, RecyclerView.State state, int position) {
         mSmoothScroller.setTargetPosition(position);
         startSmoothScroll(mSmoothScroller);
     }

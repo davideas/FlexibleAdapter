@@ -2,8 +2,8 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -283,9 +283,9 @@ public class FragmentEndlessScrolling extends AbstractFragment
     }
 
     @Override
-    protected GridLayoutManager createNewGridLayoutManager() {
-        GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
-        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+    protected androidx.recyclerview.widget.GridLayoutManager createNewGridLayoutManager() {
+        androidx.recyclerview.widget.GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
+        gridLayoutManager.setSpanSizeLookup(new androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 // NOTE: If you use simple integers to identify the ViewType,

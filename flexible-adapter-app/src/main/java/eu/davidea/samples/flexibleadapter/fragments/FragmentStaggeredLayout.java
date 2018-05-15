@@ -1,9 +1,9 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -132,7 +132,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
             // This is necessary if we call updateDataSet() and not removeItems
             DatabaseService.getInstance().resetHeaders();
             // Change fab action (ADD NEW ITEM UNTIL 15)
-            FloatingActionButton fab = getActivity().findViewById(R.id.fab);
+            com.google.android.material.floatingactionbutton.FloatingActionButton fab = getActivity().findViewById(R.id.fab);
             fab.setImageResource(R.drawable.fab_add);
         }
         return super.onOptionsItemSelected(item);
@@ -191,7 +191,7 @@ public class FragmentStaggeredLayout extends AbstractFragment {
 
         // Change fab action (MOVE ITEM)
         if (mAdapter.getItemCountOfTypes(R.layout.recycler_staggered_item) >= 15) {
-            FloatingActionButton fab = getActivity().findViewById(R.id.fab);
+            com.google.android.material.floatingactionbutton.FloatingActionButton fab = getActivity().findViewById(R.id.fab);
             fab.setImageResource(R.drawable.ic_sort_white_24dp);
         }
 

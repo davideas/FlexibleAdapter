@@ -4,10 +4,10 @@ import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -212,7 +212,7 @@ public class SimpleItem extends AbstractItem<SimpleItem.SimpleViewHolder>
         @Override
         public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
             if (mAdapter.getRecyclerView().getLayoutManager() instanceof GridLayoutManager ||
-                    mAdapter.getRecyclerView().getLayoutManager() instanceof StaggeredGridLayoutManager) {
+                    mAdapter.getRecyclerView().getLayoutManager() instanceof androidx.recyclerview.widget.StaggeredGridLayoutManager) {
                 if (position % 2 != 0)
                     AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
                 else

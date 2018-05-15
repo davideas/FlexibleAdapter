@@ -21,13 +21,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.CallSuper;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.CallSuper;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -388,7 +388,7 @@ public class FlexibleAdapter<T extends IFlexible>
      */
     @CallSuper
     @Override
-    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+    public void onAttachedToRecyclerView(@NonNull androidx.recyclerview.widget.RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         log.v("Attached Adapter to RecyclerView");
         if (headersShown && areHeadersSticky()) {
@@ -404,7 +404,7 @@ public class FlexibleAdapter<T extends IFlexible>
      */
     @CallSuper
     @Override
-    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+    public void onDetachedFromRecyclerView(@NonNull androidx.recyclerview.widget.RecyclerView recyclerView) {
         if (areHeadersSticky()) {
             mStickyHeaderHelper.detachFromRecyclerView();
             mStickyHeaderHelper = null;
@@ -1803,7 +1803,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     @CallSuper
     @Override
-    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull androidx.recyclerview.widget.RecyclerView.ViewHolder holder) {
         int position = holder.getAdapterPosition();
         //log.v("onViewDetached Holder=%s position=%s", getClassName(holder), position);
         T item = getItem(position);
@@ -1812,7 +1812,7 @@ public class FlexibleAdapter<T extends IFlexible>
 
     @CallSuper
     @Override
-    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+    public void onViewRecycled(@NonNull androidx.recyclerview.widget.RecyclerView.ViewHolder holder) {
         super.onViewRecycled(holder);
         if (areHeadersSticky()) {
             // #297 - Empty (Invisible) Header Item when Using Sticky Headers
@@ -4787,7 +4787,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @since 5.0.0-b7
      */
     @Override
-    public void onActionStateChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+    public void onActionStateChanged(androidx.recyclerview.widget.RecyclerView.ViewHolder viewHolder, int actionState) {
         if (mItemMoveListener != null)
             mItemMoveListener.onActionStateChanged(viewHolder, actionState);
         else if (mItemSwipeListener != null) {
@@ -5673,9 +5673,9 @@ public class FlexibleAdapter<T extends IFlexible>
          * {@link #areContentsTheSame(int, int)} returns false for them, DiffUtil
          * calls this method to get a payload about the change.
          * <p>
-         * For example, if you are using DiffUtil with {@link RecyclerView}, you can return the
+         * For example, if you are using DiffUtil with {@link androidx.recyclerview.widget.RecyclerView}, you can return the
          * particular field that changed in the item and your
-         * {@link android.support.v7.widget.RecyclerView.ItemAnimator ItemAnimator} can use that
+         * {@link RecyclerView.ItemAnimator ItemAnimator} can use that
          * information to run the correct animation.
          * <p>
          * Default implementation returns {@code null}.

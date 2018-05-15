@@ -1,9 +1,6 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
-import android.databinding.DataBindingUtil;
-import android.databinding.ObservableArrayList;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,6 +8,8 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ObservableArrayList;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
@@ -113,7 +112,7 @@ public class FragmentDataBinding extends AbstractFragment {
                 .setDisplayHeadersAtStartUp(true)
                 .setStickyHeaders(true);
 
-        SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
+        androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setEnabled(true);
         mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 

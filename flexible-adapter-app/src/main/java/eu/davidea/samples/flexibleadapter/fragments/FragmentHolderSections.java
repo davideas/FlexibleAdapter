@@ -1,8 +1,8 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -65,7 +65,7 @@ public class FragmentHolderSections extends AbstractFragment {
         mRecyclerView.setHasFixedSize(true); //Size of RV will not change
         // NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
         // a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setItemAnimator(new androidx.recyclerview.widget.DefaultItemAnimator());
 
         // Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
         FastScroller fastScroller = getView().findViewById(R.id.fast_scroller);
@@ -76,7 +76,7 @@ public class FragmentHolderSections extends AbstractFragment {
                 .setStickyHeaders(true)
                 .setOnlyEntryAnimation(true);
 
-        SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
+        androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setEnabled(true);
         mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 

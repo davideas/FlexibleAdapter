@@ -1,14 +1,14 @@
 package eu.davidea.utils;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewCompat;
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
-public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
+public class ScrollAwareFABBehavior extends com.google.android.material.floatingactionbutton.FloatingActionButton.Behavior {
 
     private boolean enabled;
 
@@ -22,7 +22,7 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
 
     @Override
     public boolean onStartNestedScroll(@NonNull final CoordinatorLayout coordinatorLayout,
-                                       @NonNull final FloatingActionButton child,
+                                       @NonNull final com.google.android.material.floatingactionbutton.FloatingActionButton child,
                                        @NonNull final View directTargetChild,
                                        @NonNull final View target,
                                        final int nestedScrollAxes,
@@ -34,7 +34,7 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
 
     @Override
     public void onNestedScroll(@NonNull final CoordinatorLayout coordinatorLayout,
-                               @NonNull final FloatingActionButton fab,
+                               @NonNull final com.google.android.material.floatingactionbutton.FloatingActionButton fab,
                                @NonNull final View target,
                                final int dxConsumed,
                                final int dyConsumed,

@@ -2,19 +2,15 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.CallSuper;
+import androidx.core.view.ViewCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollGridLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.common.SmoothScrollStaggeredLayoutManager;
@@ -32,8 +28,8 @@ public abstract class AbstractFragment extends Fragment {
 
     protected OnFragmentInteractionListener mListener;
     protected int mColumnCount = 2;
-    protected RecyclerView mRecyclerView;
-    protected FloatingActionButton mFab;
+    protected androidx.recyclerview.widget.RecyclerView mRecyclerView;
+    protected com.google.android.material.floatingactionbutton.FloatingActionButton mFab;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,10 +56,10 @@ public abstract class AbstractFragment extends Fragment {
         mFab = getActivity().findViewById(R.id.fab);
         mFab.setImageResource(R.drawable.fab_add);
         ViewCompat.animate(mFab)
-                  .scaleX(1f).scaleY(1f)
-                  .alpha(1f).setDuration(100)
-                  .setStartDelay(300L)
-                  .start();
+                .scaleX(1f).scaleY(1f)
+                .alpha(1f).setDuration(100)
+                .setStartDelay(300L)
+                .start();
     }
 
     @Override
@@ -88,7 +84,7 @@ public abstract class AbstractFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_list_type) {
-            if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+            if (mRecyclerView.getLayoutManager() instanceof androidx.recyclerview.widget.StaggeredGridLayoutManager) {
                 mRecyclerView.setLayoutManager(createNewLinearLayoutManager());
                 item.setIcon(R.drawable.ic_view_grid_white_24dp);
                 item.setTitle(R.string.grid_layout);//next click
@@ -108,7 +104,7 @@ public abstract class AbstractFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    protected LinearLayoutManager createNewLinearLayoutManager() {
+    protected androidx.recyclerview.widget.LinearLayoutManager createNewLinearLayoutManager() {
         return new SmoothScrollLinearLayoutManager(getActivity());
     }
 
@@ -116,7 +112,7 @@ public abstract class AbstractFragment extends Fragment {
         return new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
     }
 
-    protected StaggeredGridLayoutManager createNewStaggeredGridLayoutManager() {
+    protected androidx.recyclerview.widget.StaggeredGridLayoutManager createNewStaggeredGridLayoutManager() {
         return new SmoothScrollStaggeredLayoutManager(getActivity(), mColumnCount);
     }
 

@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'eu.davidea.grabver'
+apply plugin: 'com.github.dcendents.android-maven'
 
 versioning {
     major 1
@@ -21,7 +22,7 @@ ext {
 }
 
 android {
-    compileSdkVersion targetSdk
+    compileSdkVersion compileSdk
     buildToolsVersion buildTools
 
     defaultConfig {
@@ -42,7 +43,9 @@ android {
 }
 
 dependencies {
-    compileOnly project(":flexible-adapter")
+    compileOnly (project(":flexible-adapter")) {
+        exclude group: 'com.android.databinding'
+    }
     compileOnly supportLib.recyclerView
     implementation supportLib.support_v4
 }

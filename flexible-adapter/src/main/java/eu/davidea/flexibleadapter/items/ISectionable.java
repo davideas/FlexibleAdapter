@@ -15,7 +15,7 @@
  */
 package eu.davidea.flexibleadapter.items;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * This interface represents an item in the section.

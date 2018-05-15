@@ -15,11 +15,11 @@
  */
 package eu.davidea.flexibleadapter.common;
 
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.OrientationHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 /**
  * Internal wrapper class for all conventional LayoutManagers.
@@ -29,7 +29,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
  */
 public class FlexibleLayoutManager implements IFlexibleLayoutManager {
 
-    protected RecyclerView mRecyclerView;
+    protected androidx.recyclerview.widget.RecyclerView mRecyclerView;
     protected RecyclerView.LayoutManager mLayoutManager;
 
     /**
@@ -57,18 +57,18 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
     /**
      * Finds the layout orientation of the RecyclerView, no matter which LayoutManager is in use.
      *
-     * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
+     * @return one of {@link androidx.recyclerview.widget.OrientationHelper#HORIZONTAL}, {@link androidx.recyclerview.widget.OrientationHelper#VERTICAL}
      * @since 5.0.0-rc2
      */
     @Override
     public int getOrientation() {
         RecyclerView.LayoutManager layoutManager = getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager) {
-            return ((LinearLayoutManager) layoutManager).getOrientation();
+            return ((androidx.recyclerview.widget.LinearLayoutManager) layoutManager).getOrientation();
         } else if (layoutManager instanceof StaggeredGridLayoutManager) {
             return ((StaggeredGridLayoutManager) layoutManager).getOrientation();
         }
-        return OrientationHelper.VERTICAL;
+        return androidx.recyclerview.widget.OrientationHelper.VERTICAL;
     }
 
     /**
@@ -81,8 +81,8 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
     @Override
     public int getSpanCount() {
         RecyclerView.LayoutManager layoutManager = getLayoutManager();
-        if (layoutManager instanceof GridLayoutManager) {
-            return ((GridLayoutManager) layoutManager).getSpanCount();
+        if (layoutManager instanceof androidx.recyclerview.widget.GridLayoutManager) {
+            return ((androidx.recyclerview.widget.GridLayoutManager) layoutManager).getSpanCount();
         } else if (layoutManager instanceof StaggeredGridLayoutManager) {
             return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
         }
@@ -110,7 +110,7 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
             }
             return position;
         } else {
-            return ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
+            return ((androidx.recyclerview.widget.LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
         }
     }
 
@@ -125,7 +125,7 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
      */
     @Override
     public int findFirstVisibleItemPosition() {
-        RecyclerView.LayoutManager layoutManager = getLayoutManager();
+        androidx.recyclerview.widget.RecyclerView.LayoutManager layoutManager = getLayoutManager();
         if (layoutManager instanceof StaggeredGridLayoutManager) {
             StaggeredGridLayoutManager staggeredGLM = (StaggeredGridLayoutManager) layoutManager;
             int position = staggeredGLM.findFirstVisibleItemPositions(null)[0];
@@ -175,8 +175,8 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
      */
     @Override
     public int findLastVisibleItemPosition() {
-        RecyclerView.LayoutManager layoutManager = getLayoutManager();
-        if (layoutManager instanceof StaggeredGridLayoutManager) {
+        androidx.recyclerview.widget.RecyclerView.LayoutManager layoutManager = getLayoutManager();
+        if (layoutManager instanceof androidx.recyclerview.widget.StaggeredGridLayoutManager) {
             StaggeredGridLayoutManager staggeredGLM = (StaggeredGridLayoutManager) layoutManager;
             int position = staggeredGLM.findLastVisibleItemPositions(null)[0];
             for (int i = 1; i < getSpanCount(); i++) {
@@ -192,7 +192,7 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
     /**
      * @return the current LayoutManager in use if RecyclerView was set
      */
-    private RecyclerView.LayoutManager getLayoutManager() {
+    private androidx.recyclerview.widget.RecyclerView.LayoutManager getLayoutManager() {
         return mRecyclerView != null ? mRecyclerView.getLayoutManager() : mLayoutManager;
     }
 

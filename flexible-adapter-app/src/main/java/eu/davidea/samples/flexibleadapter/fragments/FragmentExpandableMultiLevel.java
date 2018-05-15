@@ -1,10 +1,10 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -118,7 +118,7 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
 
     @Override
     protected GridLayoutManager createNewGridLayoutManager() {
-        GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
+        androidx.recyclerview.widget.GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
@@ -156,11 +156,11 @@ public class FragmentExpandableMultiLevel extends AbstractFragment {
             if (mAdapter.isRecursiveCollapse()) {
                 mAdapter.setRecursiveCollapse(false);
                 item.setChecked(false);
-                Snackbar.make(getView(), "Recursive-Collapse is disabled", Snackbar.LENGTH_SHORT).show();
+                com.google.android.material.snackbar.Snackbar.make(getView(), "Recursive-Collapse is disabled", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             } else {
                 mAdapter.setRecursiveCollapse(true);
                 item.setChecked(true);
-                Snackbar.make(getView(), "Recursive-Collapse is enabled", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getView(), "Recursive-Collapse is enabled", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             }
         }
 

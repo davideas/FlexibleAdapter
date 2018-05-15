@@ -1,12 +1,12 @@
 package eu.davidea.flexibleadapter.databinding;
 
-import android.databinding.ObservableList;
 import android.os.Looper;
-import android.support.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.databinding.ObservableList;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.IFlexible;
 

@@ -16,40 +16,41 @@ allprojects {
         // SDK and Build tools version
         minSdk = 14
         targetSdk = 27
+        compileSdk = 'android-P'
         buildTools = "27.0.3"
 
         // Android Architecture Components
-        archLifecycleVer = "1.1.1"
-        archExtensionsVer = "1.1.1"
+        archLifecycleVer = "2.0.0-alpha1"
+        archExtensionsVer = "2.0.0-alpha1"
         roomPersistenceVer = "1.1.0-beta2"
         archLib = [
-                lifecycle      : "android.arch.lifecycle:runtime:${archLifecycleVer}",
-                extensions     : "android.arch.lifecycle:extensions:${archExtensionsVer}",
-                compiler       : "android.arch.lifecycle:compiler:${archExtensionsVer}",
-                commonJava8    : "android.arch.lifecycle:common-java8:${archExtensionsVer}",
-                reactiveStreams: "android.arch.lifecycle:reactivestreams:${archExtensionsVer}",
-                coreTesting    : "android.arch.core:core-testing:${archExtensionsVer}",
-                room           : "android.arch.persistence.room:runtime:${roomPersistenceVer}",
-                roomCompiler   : "android.arch.persistence.room:compiler:${roomPersistenceVer}",
-                roomRxJava2    : "android.arch.persistence.room:rxjava2:${roomPersistenceVer}"
+                lifecycle      : "androidx.lifecycle:lifecycle-runtime:${archLifecycleVer}",
+                extensions     : "androidx.lifecycle:lifecycle-extensions:${archExtensionsVer}",
+                compiler       : "androidx.lifecycle:lifecycle-compiler:${archExtensionsVer}",
+                commonJava8    : "androidx.lifecycle:lifecycle-common-java8:${archExtensionsVer}",
+                reactiveStreams: "androidx.lifecycle:lifecycle-reactivestreams:${archExtensionsVer}",
+                coreTesting    : "androidx.arch.core:core-testing:${archExtensionsVer}",
+                room           : "androidx.room:room-runtime:${roomPersistenceVer}",
+                roomCompiler   : "androidx.room:room-compiler:${roomPersistenceVer}",
+                roomRxJava2    : "androidx.room:room-rxjava2:${roomPersistenceVer}"
         ]
 
         // Support Libraries dependencies
-        supportVer = "27.1.1"
+        supportVer = "1.0.0-alpha1"
         constraintVer = "1.1.0"
         supportLib = [
-                design          : "com.android.support:design:${supportVer}",
-                recyclerView    : "com.android.support:recyclerview-v7:${supportVer}",
-                cardView        : "com.android.support:cardview-v7:${supportVer}",
-                appCompat       : "com.android.support:appcompat-v7:${supportVer}",
-                customTabs      : "com.android.support:customtabs:${supportVer}",
-                support_v4      : "com.android.support:support-v4:${supportVer}",
-                support_v13     : "com.android.support:support-v13:${supportVer}",
-                annotations     : "com.android.support:support-annotations:${supportVer}",
-                vectorDrawable  : "com.android.support:support-vector-drawable:${supportVer}",
-                preference_v7   : "com.android.support:preference-v7:${supportVer}",
-                preference_v14  : "com.android.support:preference-v14:${supportVer}",
-                constraintLayout: "com.android.support.constraint:constraint-layout:${constraintVer}",
+                design          : "com.google.android.material:material:${supportVer}",
+                recyclerView    : "androidx.recyclerview:recyclerview:${supportVer}",
+                cardView        : "androidx.cardview:cardview:${supportVer}",
+                appCompat       : "androidx.appcompat:appcompat:${supportVer}",
+                customTabs      : "androidx.browser:browser:${supportVer}",
+                support_v4      : "androidx.legacy:legacy-support-v4:${supportVer}",
+                support_v13     : "androidx.legacy:legacy-support-v13:${supportVer}",
+                annotations     : "androidx.annotation:annotation:${supportVer}",
+                vectorDrawable  : "androidx.vectordrawable:vectordrawable:${supportVer}",
+                preference_v7   : "androidx.preference:preference:${supportVer}",
+                preference_v14  : "androidx.legacy:legacy-preference-v14:${supportVer}",
+                constraintLayout: "androidx.constraintlayout:constraintlayout:${constraintVer}",
         ]
 
         // Widgets
@@ -64,15 +65,12 @@ allprojects {
         ]
 
         // 3rd Libraries
-        butterKnifeVer = "8.8.1"
         timberVer = "4.7.0"
-        glideVer = "4.6.1"
+        glideVer = "4.7.1"
         javaxInjectVer = "1"
         junitPlatformVer = "1.1.0"
         junitJupiterVer = "5.1.0"
         libraries = [
-                butterKnife        : "com.jakewharton:butterknife:${butterKnifeVer}",
-                butterKnifeCompiler: "com.jakewharton:butterknife-compiler:${butterKnifeVer}",
                 timber             : "com.jakewharton.timber:timber:${timberVer}",
                 glide              : "com.github.bumptech.glide:glide:${glideVer}",
                 glideCompiler      : "com.github.bumptech.glide:compiler:${glideVer}",
@@ -103,18 +101,18 @@ buildscript {
     repositories {
         jcenter()
         google()
+        maven { url 'https://jitpack.io' }
         maven { url "http://dl.bintray.com/davideas/maven" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath 'com.android.tools.build:gradle:3.2.0-alpha14'
         classpath "com.neenbedankt.gradle.plugins:android-apt:1.8"
-        classpath "com.github.dcendents:android-maven-gradle-plugin:2.0"
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3"
+        classpath "com.github.dcendents:android-maven-gradle-plugin:2.1"
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0"
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.1"
         classpath "com.vanniktech:gradle-android-javadoc-plugin:0.3.0-SNAPSHOT"
-        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.0.31"
         classpath "eu.davidea:grabver:0.7.0"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

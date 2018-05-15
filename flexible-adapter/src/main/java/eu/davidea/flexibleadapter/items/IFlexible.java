@@ -15,9 +15,9 @@
  */
 package eu.davidea.flexibleadapter.items;
 
-import android.support.annotation.IntRange;
-import android.support.annotation.LayoutRes;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.IntRange;
+import androidx.annotation.LayoutRes;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import java.util.List;
@@ -40,7 +40,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * <br>16/06/2017 Added {@code getBubbleText} method
  * <br>04/09/2017 Added {@code getItemViewType} method
  */
-public interface IFlexible<VH extends RecyclerView.ViewHolder> {
+public interface IFlexible<VH extends androidx.recyclerview.widget.RecyclerView.ViewHolder> {
 
 	/*---------------*/
     /* BASIC METHODS */
@@ -199,7 +199,7 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      * FlexibleAdapter <a href="https://github.com/davideas/FlexibleAdapter/wiki">Wiki Page</a>
      * on GitHub.</p>
      * How to use Payload, please refer to
-     * {@link android.support.v7.widget.RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int, List)}.
+     * {@link androidx.recyclerview.widget.RecyclerView.Adapter#onBindViewHolder(androidx.recyclerview.widget.RecyclerView.ViewHolder, int, List)}.
      *
      * @param adapter  the FlexibleAdapter instance
      * @param holder   the ViewHolder instance

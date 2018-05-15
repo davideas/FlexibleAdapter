@@ -1,8 +1,8 @@
 package eu.davidea.samples.flexibleadapter;
 
 import android.app.Activity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
@@ -38,10 +38,10 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
         if (!hasFilter()) {
             //Define Example View
             final ScrollableLayoutItem item = new ScrollableLayoutItem("LAY-L");
-            if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+            if (mRecyclerView.getLayoutManager() instanceof androidx.recyclerview.widget.StaggeredGridLayoutManager) {
                 item.setId("LAY-S");
                 item.setTitle(mRecyclerView.getContext().getString(R.string.staggered_layout));
-            } else if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+            } else if (mRecyclerView.getLayoutManager() instanceof androidx.recyclerview.widget.GridLayoutManager) {
                 item.setId("LAY-G");
                 item.setTitle(mRecyclerView.getContext().getString(R.string.grid_layout));
             } else {

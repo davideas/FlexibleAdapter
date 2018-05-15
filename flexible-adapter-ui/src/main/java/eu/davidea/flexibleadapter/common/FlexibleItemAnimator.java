@@ -20,13 +20,13 @@ package eu.davidea.flexibleadapter.common;
 
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
-import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorCompat;
-import android.support.v4.view.ViewPropertyAnimatorListener;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.support.v7.widget.SimpleItemAnimator;
+import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.ViewPropertyAnimatorCompat;
+import androidx.core.view.ViewPropertyAnimatorListener;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -44,10 +44,10 @@ import eu.davidea.viewholders.AnimatedViewHolder;
  * animations on remove, add, and move events that happen to the items in
  * a RecyclerView. RecyclerView uses a DefaultItemAnimator by default.
  *
- * @see RecyclerView#setItemAnimator(RecyclerView.ItemAnimator)
+ * @see RecyclerView#setItemAnimator(androidx.recyclerview.widget.RecyclerView.ItemAnimator)
  * @since 17/12/2017 Moved into UI package
  */
-public class FlexibleItemAnimator extends SimpleItemAnimator {
+public class FlexibleItemAnimator extends androidx.recyclerview.widget.SimpleItemAnimator {
 
     private ArrayList<ViewHolder> mPendingRemovals = new ArrayList<>();
     private ArrayList<ViewHolder> mPendingAdditions = new ArrayList<>();

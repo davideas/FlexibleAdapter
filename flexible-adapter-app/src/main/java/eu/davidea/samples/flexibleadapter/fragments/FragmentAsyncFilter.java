@@ -1,9 +1,9 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.view.ViewCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -129,7 +129,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
         }
 
         // Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!
-        SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
+        androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setEnabled(!configure);
         mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 
@@ -168,7 +168,7 @@ public class FragmentAsyncFilter extends AbstractFragment {
                     mSearchView.setVisible(false);
                     configure = false;
                 } else {
-                    Snackbar.make(getView(), "Created list with " + DatabaseConfiguration.size + " items", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(getView(), "Created list with " + DatabaseConfiguration.size + " items", com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show();
                     onActivityCreated(null);
                     mSearchView.setVisible(mAdapter.getItemCount() > 0);
                     configure = true;

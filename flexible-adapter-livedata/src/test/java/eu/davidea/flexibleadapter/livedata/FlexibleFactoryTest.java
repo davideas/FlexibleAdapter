@@ -1,6 +1,6 @@
 package eu.davidea.flexibleadapter.livedata;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.junit.jupiter.api.Test;
 
