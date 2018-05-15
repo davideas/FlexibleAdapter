@@ -15,8 +15,8 @@
  */
 package eu.davidea.viewholders;
 
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -31,9 +31,9 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * @author Davide Steduto
  * @since 18/06/2016 Created
  */
-abstract class ContentViewHolder extends RecyclerView.ViewHolder {
+abstract class ContentViewHolder extends androidx.recyclerview.widget.RecyclerView.ViewHolder {
 
-    private int mBackupPosition = RecyclerView.NO_POSITION;
+    private int mBackupPosition = androidx.recyclerview.widget.RecyclerView.NO_POSITION;
     private View contentView;
 
     /**
@@ -81,13 +81,13 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
      * of StickyHeaders use case.</p>
      *
      * @return the Adapter position result of {@link #getAdapterPosition()} OR the backup position
-     * preset and known, if the previous result was {@link RecyclerView#NO_POSITION}.
+     * preset and known, if the previous result was {@link androidx.recyclerview.widget.RecyclerView#NO_POSITION}.
      * @see #setBackupPosition(int)
      * @since 5.0.0-b6
      */
     public final int getFlexibleAdapterPosition() {
         int position = getAdapterPosition();
-        if (position == RecyclerView.NO_POSITION) {
+        if (position == androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
             position = mBackupPosition;
         }
         return position;

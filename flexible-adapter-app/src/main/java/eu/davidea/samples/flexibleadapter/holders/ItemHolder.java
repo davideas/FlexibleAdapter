@@ -5,8 +5,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
 import eu.davidea.flexibleadapter.items.IFilterable;
@@ -20,7 +18,7 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  *
  * <p>Holder item can be used to display the same modelData in multiple RecyclerViews managed by
  * different Adapters, you can implement a derived IFlexible item to HOLD your data model object!</p>
- *
+ * <p>
  * In this way you can separate the memory zones of the flags (enabled, expanded, hidden,
  * selectable) used by a specific Adapter, to be independent by another Adapter. For instance,
  * an item can be Shown and Expanded in a RV, while in the other RV can be Hidden or Not Expanded!
@@ -90,9 +88,7 @@ public class ItemHolder extends AbstractSectionableItem<ItemHolder.ItemViewHolde
 
     static class ItemViewHolder extends FlexibleViewHolder {
 
-        @BindView(R.id.title)
         public TextView mTitle;
-        @BindView(R.id.subtitle)
         public TextView mSubtitle;
 
         /**
@@ -100,7 +96,8 @@ public class ItemHolder extends AbstractSectionableItem<ItemHolder.ItemViewHolde
          */
         ItemViewHolder(View view, FlexibleAdapter adapter) {
             super(view, adapter);
-            ButterKnife.bind(this, view);
+            mTitle = view.findViewById(R.id.title);
+            mSubtitle = view.findViewById(R.id.subtitle);
         }
     }
 

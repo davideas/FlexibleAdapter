@@ -1,32 +1,34 @@
 package eu.davidea.samples.flexibleadapter;
 
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.OnApplyWindowInsetsListener;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.WindowInsetsCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.material.tabs.TabLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import eu.davidea.samples.flexibleadapter.fragments.FragmentViewPager;
 import eu.davidea.samples.flexibleadapter.views.HeaderView;
 
 public class ViewPagerActivity extends AppCompatActivity {
 
     /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * The {@link PagerAdapter} that will provide
      * fragments for each of the sections. We use a
      * {@link FragmentPagerAdapter} derivative, which will keep every
      * loaded fragment in memory. If this becomes too memory intensive, it
      * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     * {@link androidx.fragment.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -55,7 +57,7 @@ public class ViewPagerActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = (com.google.android.material.tabs.TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
         //Coordinatorlayout Status Bar Padding Disappears From Viewpager 2nd-page

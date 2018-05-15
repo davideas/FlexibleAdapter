@@ -15,7 +15,7 @@
  */
 package eu.davidea.flexibleadapter.common;
 
-import android.support.v7.widget.OrientationHelper;
+import androidx.recyclerview.widget.OrientationHelper;
 
 /**
  * Wrapper interface for any non-conventional LayoutManagers.
@@ -29,7 +29,7 @@ public interface IFlexibleLayoutManager {
     /**
      * Finds the layout orientation of the RecyclerView, no matter which LayoutManager is in use.
      *
-     * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
+     * @return one of {@link OrientationHelper#HORIZONTAL}, {@link androidx.recyclerview.widget.OrientationHelper#VERTICAL}
      * @since 5.0.0-rc2
      */
     int getOrientation();

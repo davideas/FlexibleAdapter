@@ -1,11 +1,11 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -102,7 +102,7 @@ public class FragmentOverall extends AbstractFragment
             @Override
             public void run() {
                 if (getView() != null) { //Fix NPE when closing app before the execution of Runnable
-                    Snackbar.make(getView(), "Long press drag is enabled", Snackbar.LENGTH_SHORT).show();
+                    com.google.android.material.snackbar.Snackbar.make(getView(), "Long press drag is enabled", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
                 }
             }
         }, 4000L);
@@ -126,7 +126,7 @@ public class FragmentOverall extends AbstractFragment
     }
 
     @Override
-    protected LinearLayoutManager createNewLinearLayoutManager() {
+    protected androidx.recyclerview.widget.LinearLayoutManager createNewLinearLayoutManager() {
         mAdapter.setAnimationEntryStep(true);
         return super.createNewLinearLayoutManager();
     }
@@ -134,7 +134,7 @@ public class FragmentOverall extends AbstractFragment
     @Override
     protected GridLayoutManager createNewGridLayoutManager() {
         mAdapter.setAnimationEntryStep(false);
-        GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
+        androidx.recyclerview.widget.GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
@@ -145,7 +145,7 @@ public class FragmentOverall extends AbstractFragment
     }
 
     @Override
-    protected StaggeredGridLayoutManager createNewStaggeredGridLayoutManager() {
+    protected androidx.recyclerview.widget.StaggeredGridLayoutManager createNewStaggeredGridLayoutManager() {
         mAdapter.setAnimationEntryStep(true);
         return super.createNewStaggeredGridLayoutManager();
     }
@@ -161,10 +161,10 @@ public class FragmentOverall extends AbstractFragment
         super.onPrepareOptionsMenu(menu);
 
         MenuItem gridMenuItem = menu.findItem(R.id.action_list_type);
-        if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+        if (mRecyclerView.getLayoutManager() instanceof androidx.recyclerview.widget.StaggeredGridLayoutManager) {
             gridMenuItem.setIcon(R.drawable.ic_view_agenda_white_24dp);
             gridMenuItem.setTitle(R.string.linear_layout);
-        } else if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
+        } else if (mRecyclerView.getLayoutManager() instanceof androidx.recyclerview.widget.GridLayoutManager) {
             gridMenuItem.setIcon(R.drawable.ic_dashboard_white_24dp);
             gridMenuItem.setTitle(R.string.staggered_layout);
         } else {

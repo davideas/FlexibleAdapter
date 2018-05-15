@@ -16,11 +16,11 @@
 package eu.davidea.viewholders;
 
 import android.animation.Animator;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.MotionEvent;
 import android.view.View;
 

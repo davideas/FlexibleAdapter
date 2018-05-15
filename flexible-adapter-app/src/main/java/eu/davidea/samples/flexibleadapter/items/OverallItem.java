@@ -2,8 +2,8 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -136,7 +136,7 @@ public class OverallItem extends AbstractFlexibleItem<OverallItem.LabelViewHolde
 
         @Override
         public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
-            if (mAdapter.getRecyclerView().getLayoutManager() instanceof GridLayoutManager) {
+            if (mAdapter.getRecyclerView().getLayoutManager() instanceof androidx.recyclerview.widget.GridLayoutManager) {
                 if (position % 2 != 0)
                     AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
                 else

@@ -15,8 +15,8 @@
  */
 package eu.davidea.samples.flexibleadapter.animators;
 
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.animation.Interpolator;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
@@ -31,7 +31,7 @@ public class LandingItemAnimator extends FlexibleItemAnimator {
     }
 
     @Override
-    protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, final int index) {
+    protected void animateRemoveImpl(final androidx.recyclerview.widget.RecyclerView.ViewHolder holder, final int index) {
         ViewCompat.animate(holder.itemView)
                   .alpha(0)
                   .scaleX(1.5f)
@@ -43,7 +43,7 @@ public class LandingItemAnimator extends FlexibleItemAnimator {
     }
 
     @Override
-    protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
+    protected boolean preAnimateAddImpl(final androidx.recyclerview.widget.RecyclerView.ViewHolder holder) {
         holder.itemView.setAlpha(0);
         holder.itemView.setScaleX(1.5f);
         holder.itemView.setScaleY(1.5f);
@@ -51,7 +51,7 @@ public class LandingItemAnimator extends FlexibleItemAnimator {
     }
 
     @Override
-    protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
+    protected void animateAddImpl(final androidx.recyclerview.widget.RecyclerView.ViewHolder holder, final int index) {
         ViewCompat.animate(holder.itemView)
                   .alpha(1)
                   .scaleX(1)

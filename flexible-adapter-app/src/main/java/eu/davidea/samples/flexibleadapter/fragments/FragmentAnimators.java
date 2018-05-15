@@ -1,8 +1,8 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -113,7 +113,7 @@ public class FragmentAnimators extends AbstractFragment {
                 .getItemTouchHelperCallback()
                 .setSwipeFlags(ItemTouchHelper.RIGHT); //Enable swipe
 
-        SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
+        androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setEnabled(false);
         mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
 

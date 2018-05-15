@@ -16,10 +16,10 @@
 package eu.davidea.flexibleadapter.utils;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.OrientationHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
 import eu.davidea.flexibleadapter.common.FlexibleLayoutManager;
@@ -65,7 +65,7 @@ public final class LayoutUtils {
      * Finds the layout orientation of the RecyclerView, no matter which LayoutManager is in use.
      *
      * @param recyclerView the RecyclerView with LayoutManager instance in use
-     * @return one of {@link OrientationHelper#HORIZONTAL}, {@link OrientationHelper#VERTICAL}
+     * @return one of {@link androidx.recyclerview.widget.OrientationHelper#HORIZONTAL}, {@link androidx.recyclerview.widget.OrientationHelper#VERTICAL}
      */
     public static int getOrientation(RecyclerView recyclerView) {
         return new FlexibleLayoutManager(recyclerView).getOrientation();
@@ -79,7 +79,7 @@ public final class LayoutUtils {
      * @return the span count
      * @since 5.0.0-b7
      */
-    public static int getSpanCount(RecyclerView recyclerView) {
+    public static int getSpanCount(androidx.recyclerview.widget.RecyclerView recyclerView) {
         return new FlexibleLayoutManager(recyclerView).getSpanCount();
     }
 
@@ -90,10 +90,10 @@ public final class LayoutUtils {
      * @param recyclerView the RecyclerView with LayoutManager instance in use
      * @return the adapter position of the <b>first fully</b> visible item or {@code RecyclerView.NO_POSITION}
      * if there aren't any visible items.
-     * @see #findFirstVisibleItemPosition(RecyclerView)
+     * @see #findFirstVisibleItemPosition(androidx.recyclerview.widget.RecyclerView)
      * @since 5.0.0-b8
      */
-    public static int findFirstCompletelyVisibleItemPosition(RecyclerView recyclerView) {
+    public static int findFirstCompletelyVisibleItemPosition(androidx.recyclerview.widget.RecyclerView recyclerView) {
         return new FlexibleLayoutManager(recyclerView).findFirstCompletelyVisibleItemPosition();
     }
 
@@ -104,10 +104,10 @@ public final class LayoutUtils {
      * @param recyclerView the RecyclerView with LayoutManager instance in use
      * @return the adapter position of the <b>first partially</b> visible item or {@code RecyclerView.NO_POSITION}
      * if there aren't any visible items.
-     * @see #findFirstCompletelyVisibleItemPosition(RecyclerView)
+     * @see #findFirstCompletelyVisibleItemPosition(androidx.recyclerview.widget.RecyclerView)
      * @since 5.0.0-rc1
      */
-    public static int findFirstVisibleItemPosition(RecyclerView recyclerView) {
+    public static int findFirstVisibleItemPosition(androidx.recyclerview.widget.RecyclerView recyclerView) {
         return new FlexibleLayoutManager(recyclerView).findFirstVisibleItemPosition();
     }
 
@@ -118,10 +118,10 @@ public final class LayoutUtils {
      * @param recyclerView the RecyclerView with LayoutManager instance in use
      * @return the adapter position of the <b>last fully</b> visible item or {@code RecyclerView.NO_POSITION}
      * if there aren't any visible items.
-     * @see #findLastVisibleItemPosition(RecyclerView)
+     * @see #findLastVisibleItemPosition(androidx.recyclerview.widget.RecyclerView)
      * @since 5.0.0-b8
      */
-    public static int findLastCompletelyVisibleItemPosition(RecyclerView recyclerView) {
+    public static int findLastCompletelyVisibleItemPosition(androidx.recyclerview.widget.RecyclerView recyclerView) {
         return new FlexibleLayoutManager(recyclerView).findLastCompletelyVisibleItemPosition();
     }
 
@@ -132,10 +132,10 @@ public final class LayoutUtils {
      * @param recyclerView the RecyclerView with LayoutManager instance in use
      * @return the adapter position of the <b>last partially</b> visible item or {@code RecyclerView.NO_POSITION}
      * if there aren't any visible items.
-     * @see #findLastCompletelyVisibleItemPosition(RecyclerView)
+     * @see #findLastCompletelyVisibleItemPosition(androidx.recyclerview.widget.RecyclerView)
      * @since 5.0.0-rc1
      */
-    public static int findLastVisibleItemPosition(RecyclerView recyclerView) {
+    public static int findLastVisibleItemPosition(androidx.recyclerview.widget.RecyclerView recyclerView) {
         return new FlexibleLayoutManager(recyclerView).findLastVisibleItemPosition();
     }
 

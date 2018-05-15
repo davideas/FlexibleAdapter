@@ -1,9 +1,9 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -84,7 +84,7 @@ public class FragmentExpandableSections extends AbstractFragment {
         mRecyclerView.setHasFixedSize(true); //Size of RV will not change
         // NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
         // a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setItemAnimator(new androidx.recyclerview.widget.DefaultItemAnimator());
         // Custom divider item decorator
         mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
                 .addItemViewType(R.layout.recycler_expandable_header_item)
@@ -105,7 +105,7 @@ public class FragmentExpandableSections extends AbstractFragment {
                 //.setDisplayHeadersAtStartUp(true); //Show Headers at startUp: (not necessary if Headers are also Expandable AND expanded at startup)
                 .setStickyHeaders(true);
 
-        SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
+        androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setEnabled(true);
         mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
     }
@@ -130,7 +130,7 @@ public class FragmentExpandableSections extends AbstractFragment {
     }
 
     @Override
-    protected GridLayoutManager createNewGridLayoutManager() {
+    protected androidx.recyclerview.widget.GridLayoutManager createNewGridLayoutManager() {
         GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override

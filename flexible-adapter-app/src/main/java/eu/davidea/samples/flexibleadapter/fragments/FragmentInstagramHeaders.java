@@ -2,9 +2,9 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -81,7 +81,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
         mRecyclerView.setHasFixedSize(true); //Size of RV will not change
         // NOTE: Use default item animator 'canReuseUpdatedViewHolder()' will return true if
         // a Payload is provided. FlexibleAdapter is actually sending Payloads onItemChange.
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setItemAnimator(new androidx.recyclerview.widget.DefaultItemAnimator());
         // 24dpi as empty space between sections (each post)
         mRecyclerView.addItemDecoration(new FlexibleItemDecoration(getActivity())
                 .withSectionGapOffset(24));
@@ -96,7 +96,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
                 .setEndlessScrollListener(this, new ProgressItem())
                 .setEndlessScrollThreshold(1); //Default=1
 
-        SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
+        androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout = getView().findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setEnabled(true);
         mListener.onFragmentChange(swipeRefreshLayout, mRecyclerView, Mode.IDLE);
     }
@@ -171,7 +171,7 @@ public class FragmentInstagramHeaders extends AbstractFragment
     }
 
     @Override
-    protected GridLayoutManager createNewGridLayoutManager() {
+    protected androidx.recyclerview.widget.GridLayoutManager createNewGridLayoutManager() {
         return null;
     }
 }

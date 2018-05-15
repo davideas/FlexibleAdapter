@@ -1,12 +1,11 @@
 package eu.davidea.samples.flexibleadapter.holders;
 
+
 import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractHeaderItem;
 import eu.davidea.flexibleadapter.items.IFilterable;
@@ -82,9 +81,7 @@ public class HeaderHolder
 
     static class HeaderViewHolder extends FlexibleViewHolder {
 
-        @BindView(R.id.title)
         public TextView mTitle;
-        @BindView(R.id.subtitle)
         public TextView mSubtitle;
 
         /**
@@ -92,7 +89,8 @@ public class HeaderHolder
          */
         HeaderViewHolder(View view, FlexibleAdapter adapter) {
             super(view, adapter, true);//true only for header items when will be sticky
-            ButterKnife.bind(this, view);
+            mTitle = view.findViewById(R.id.title);
+            mSubtitle = view.findViewById(R.id.subtitle);
         }
     }
 

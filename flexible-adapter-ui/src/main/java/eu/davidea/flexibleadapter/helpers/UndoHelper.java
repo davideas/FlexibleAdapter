@@ -17,12 +17,12 @@ package eu.davidea.flexibleadapter.helpers;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.ColorInt;
-import android.support.annotation.IntDef;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
+import androidx.annotation.ColorInt;
+import androidx.annotation.IntDef;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
 
 import java.lang.annotation.Retention;
@@ -74,7 +74,7 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
     private Object mPayload = null;
     private FlexibleAdapter<?> mAdapter;
     private OnActionListener mUndoListener;
-    private Snackbar mSnackbar;
+    private com.google.android.material.snackbar.Snackbar mSnackbar;
 
     /**
      * Default constructor.
@@ -145,9 +145,9 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
      * As {@link #start(List, View, CharSequence, CharSequence, int)} but with String
      * resources instead of CharSequence.
      */
-    public Snackbar start(List<Integer> positions, @NonNull View mainView,
-                           @StringRes int messageStringResId, @StringRes int actionStringResId,
-                           @IntRange(from = -1) int duration) {
+    public com.google.android.material.snackbar.Snackbar start(List<Integer> positions, @NonNull View mainView,
+                                                               @StringRes int messageStringResId, @StringRes int actionStringResId,
+                                                               @IntRange(from = -1) int duration) {
         Context context = mainView.getContext();
         return start(positions, mainView, context.getString(messageStringResId),
                 context.getString(actionStringResId), duration);
@@ -163,8 +163,8 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
      * @param mainView   the view to find a parent from
      * @param message    the text to show. Can be formatted text
      * @param actionText the action text to display
-     * @param duration   How long to display the message. Either {@link Snackbar#LENGTH_SHORT} or
-     *                   {@link Snackbar#LENGTH_LONG} or any custom Integer.
+     * @param duration   How long to display the message. Either {@link com.google.android.material.snackbar.Snackbar#LENGTH_SHORT} or
+     *                   {@link com.google.android.material.snackbar.Snackbar#LENGTH_LONG} or any custom Integer.
      * @return The SnackBar instance
      * @see #start(List, View, int, int, int)
      */
@@ -190,7 +190,7 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
                 mSnackbar.setActionTextColor(mActionTextColor);
             }
         } else {
-            mSnackbar = Snackbar.make(mainView, message, duration);
+            mSnackbar = com.google.android.material.snackbar.Snackbar.make(mainView, message, duration);
         }
         mSnackbar.addCallback(this);
         mSnackbar.show(); // Note: show is asynchronous!
@@ -242,7 +242,7 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
      * {@inheritDoc}
      */
     @Override
-    public void onDismissed(Snackbar snackbar, int event) {
+    public void onDismissed(com.google.android.material.snackbar.Snackbar snackbar, int event) {
         // Check if deletion has already been committed
         // Avoid circular calls!
         if (mAdapter == null || (mAction == Action.REMOVE && !mAdapter.isRestoreInTime())) {
@@ -307,8 +307,8 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
          *
          * @param action one of {@link UndoHelper.Action#REMOVE}, {@link UndoHelper.Action#UPDATE}
          * @param event  one of {@link Snackbar.Callback#DISMISS_EVENT_SWIPE},
-         *               {@link Snackbar.Callback#DISMISS_EVENT_MANUAL},
-         *               {@link Snackbar.Callback#DISMISS_EVENT_TIMEOUT},
+         *               {@link com.google.android.material.snackbar.Snackbar.Callback#DISMISS_EVENT_MANUAL},
+         *               {@link com.google.android.material.snackbar.Snackbar.Callback#DISMISS_EVENT_TIMEOUT},
          *               {@link Snackbar.Callback#DISMISS_EVENT_CONSECUTIVE}
          */
         void onActionConfirmed(@Action int action, int event);

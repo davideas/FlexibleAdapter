@@ -15,8 +15,8 @@
  */
 package eu.davidea.samples.flexibleadapter.animators;
 
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.animation.Interpolator;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;
@@ -42,14 +42,14 @@ public class FadeInDownItemAnimator extends FlexibleItemAnimator {
     }
 
     @Override
-    protected boolean preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
+    protected boolean preAnimateAddImpl(final androidx.recyclerview.widget.RecyclerView.ViewHolder holder) {
         holder.itemView.setTranslationY(-holder.itemView.getHeight() * .25f);
         holder.itemView.setAlpha(0);
         return true;
     }
 
     @Override
-    protected void animateAddImpl(final RecyclerView.ViewHolder holder, final int index) {
+    protected void animateAddImpl(final androidx.recyclerview.widget.RecyclerView.ViewHolder holder, final int index) {
         ViewCompat.animate(holder.itemView)
                   .translationY(0)
                   .alpha(1)

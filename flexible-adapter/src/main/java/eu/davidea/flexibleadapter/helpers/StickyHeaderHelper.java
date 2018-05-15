@@ -16,10 +16,10 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.animation.Animator;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.OnScrollListener;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.OrientationHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,11 +44,11 @@ import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
 public final class StickyHeaderHelper extends OnScrollListener {
 
     private FlexibleAdapter mAdapter;
-    private RecyclerView mRecyclerView;
+    private androidx.recyclerview.widget.RecyclerView mRecyclerView;
     private ViewGroup mStickyHolderLayout;
     private FlexibleViewHolder mStickyHeaderViewHolder;
     private OnStickyHeaderChangeListener mStickyHeaderChangeListener;
-    private int mHeaderPosition = RecyclerView.NO_POSITION;
+    private int mHeaderPosition = androidx.recyclerview.widget.RecyclerView.NO_POSITION;
     private boolean displayWithAnimation = false;
     private float mElevation;
 
@@ -62,11 +62,11 @@ public final class StickyHeaderHelper extends OnScrollListener {
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-        displayWithAnimation = mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE;
+        displayWithAnimation = mRecyclerView.getScrollState() == androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
         updateOrClearHeader(false);
     }
 
-    public void attachToRecyclerView(RecyclerView parent) {
+    public void attachToRecyclerView(androidx.recyclerview.widget.RecyclerView parent) {
         if (mRecyclerView != null) {
             mRecyclerView.removeOnScrollListener(this);
             clearHeader();
@@ -121,7 +121,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
     }
 
     private boolean hasStickyHeaderTranslated(int position) {
-        RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(position);
+        androidx.recyclerview.widget.RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(position);
         return vh != null && (vh.itemView.getX() < 0 || vh.itemView.getY() < 0);
     }
 
@@ -136,7 +136,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
             clearHeaderWithAnimation();
             return;
         }
-        int firstHeaderPosition = getStickyPosition(RecyclerView.NO_POSITION);
+        int firstHeaderPosition = getStickyPosition(androidx.recyclerview.widget.RecyclerView.NO_POSITION);
         if (firstHeaderPosition >= 0) {
             updateHeader(firstHeaderPosition, updateHeaderContent);
         } else {
@@ -205,7 +205,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
                 int adapterPos = mRecyclerView.getChildAdapterPosition(nextChild);
                 int nextHeaderPosition = getStickyPosition(adapterPos);
                 if (mHeaderPosition != nextHeaderPosition) {
-                    if (mAdapter.getFlexibleLayoutManager().getOrientation() == OrientationHelper.HORIZONTAL) {
+                    if (mAdapter.getFlexibleLayoutManager().getOrientation() == androidx.recyclerview.widget.OrientationHelper.HORIZONTAL) {
                         if (nextChild.getLeft() > 0) {
                             int headerWidth = mStickyHolderLayout.getMeasuredWidth();
                             int nextHeaderOffsetX = nextChild.getLeft() - headerWidth -
@@ -328,7 +328,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
             mStickyHeaderViewHolder = null;
             restoreHeaderItemVisibility();
             int oldPosition = mHeaderPosition;
-            mHeaderPosition = RecyclerView.NO_POSITION;
+            mHeaderPosition = androidx.recyclerview.widget.RecyclerView.NO_POSITION;
             onStickyHeaderChange(mHeaderPosition, oldPosition);
         }
     }
@@ -338,7 +338,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
             mStickyHolderLayout.animate().setListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
-                    mHeaderPosition = RecyclerView.NO_POSITION;
+                    mHeaderPosition = androidx.recyclerview.widget.RecyclerView.NO_POSITION;
                 }
 
                 @Override
@@ -386,7 +386,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
         IHeader header = mAdapter.getSectionHeader(adapterPosHere);
         // Header cannot be sticky if it's also an Expandable in collapsed status, RV will raise an exception
         if (header == null || mAdapter.isExpandable(header) && !mAdapter.isExpanded(header)) {
-            return RecyclerView.NO_POSITION;
+            return androidx.recyclerview.widget.RecyclerView.NO_POSITION;
         }
         return mAdapter.getGlobalPositionOf(header);
     }
@@ -413,7 +413,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
             // Calculate width and height
             int widthSpec;
             int heightSpec;
-            if (mAdapter.getFlexibleLayoutManager().getOrientation() == OrientationHelper.VERTICAL) {
+            if (mAdapter.getFlexibleLayoutManager().getOrientation() == androidx.recyclerview.widget.OrientationHelper.VERTICAL) {
                 widthSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getWidth(), View.MeasureSpec.EXACTLY);
                 heightSpec = View.MeasureSpec.makeMeasureSpec(mRecyclerView.getHeight(), View.MeasureSpec.UNSPECIFIED);
             } else {

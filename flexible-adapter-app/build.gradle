@@ -7,7 +7,7 @@ versioning {
 }
 
 android {
-    compileSdkVersion targetSdk
+    compileSdkVersion compileSdk
     buildToolsVersion buildTools
 
     defaultConfig {
@@ -21,19 +21,19 @@ android {
         // https://developer.android.com/studio/write/vector-asset-studio.html
         vectorDrawables.useSupportLibrary = true
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath = true
+            }
+        }
 
         android.applicationVariants.all { variant ->
             variant.outputs.all {
                 outputFileName = "flexible-adapter-v" + versioning.name + "-c" + versioning.code + ".apk"
             }
         }
-    }
-    // Configure only for each module that uses Java 8 language features
-    // (either in its source code or through dependencies).
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         debug {
@@ -74,10 +74,6 @@ dependencies {
     // Timber (Logger) - https://github.com/JakeWharton/timber
     implementation libraries.timber
 
-    // Butter Knife (View Injector) - https://github.com/JakeWharton/butterknife
-    implementation libraries.butterKnife
-    annotationProcessor libraries.butterKnifeCompiler
-
     // Glide (Image Loader & Caching)
     implementation libraries.glide
     annotationProcessor libraries.glideCompiler
@@ -91,10 +87,10 @@ dependencies {
     implementation widgets.flipView
 
     // Test libraries
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test:rules:1.0.1'
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
-        exclude group: 'com.android.support', module: 'support-annotations'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha2'
+    androidTestImplementation 'androidx.test:rules:1.1.0-alpha2'
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0-alpha2', {
+        exclude group: 'androidx.annotation', module: 'annotation'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     })
     testImplementation 'org.robolectric:robolectric:3.4.2'

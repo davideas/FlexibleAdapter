@@ -22,7 +22,7 @@ ext {
 }
 
 android {
-    compileSdkVersion targetSdk
+    compileSdkVersion compileSdk
     buildToolsVersion buildTools
 
     defaultConfig {

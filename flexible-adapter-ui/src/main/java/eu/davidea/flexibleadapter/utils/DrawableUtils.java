@@ -24,9 +24,9 @@ import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
-import android.support.annotation.ColorInt;
-import android.support.annotation.DrawableRes;
-import android.support.v4.view.ViewCompat;
+import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
+import androidx.core.view.ViewCompat;
 import android.util.TypedValue;
 import android.view.View;
 

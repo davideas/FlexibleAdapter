@@ -2,15 +2,13 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import androidx.annotation.NonNull;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.helpers.AnimatorHelper;
@@ -93,14 +91,13 @@ public class ProgressItem extends AbstractFlexibleItem<ProgressViewHolder> {
 
     static class ProgressViewHolder extends FlexibleViewHolder {
 
-        @BindView(R.id.progress_bar)
         ProgressBar progressBar;
-        @BindView(R.id.progress_message)
         TextView progressMessage;
 
         ProgressViewHolder(View view, FlexibleAdapter adapter) {
             super(view, adapter);
-            ButterKnife.bind(this, view);
+            progressBar = view.findViewById(R.id.progress_bar);
+            progressMessage = view.findViewById(R.id.progress_message);
         }
 
         @Override

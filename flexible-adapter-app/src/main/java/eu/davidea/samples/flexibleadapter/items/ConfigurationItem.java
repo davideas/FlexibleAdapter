@@ -1,8 +1,8 @@
 package eu.davidea.samples.flexibleadapter.items;
 
 import android.animation.Animator;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
@@ -135,9 +135,9 @@ public class ConfigurationItem extends AbstractFlexibleItem<ConfigurationItem.Vi
             case NONE:
                 holder.mTitle.setText(getTitle());
                 Utils.textAppearanceCompat(holder.mTitle,
-                        android.support.v7.appcompat.R.style.TextAppearance_AppCompat_Display1);
+                        androidx.appcompat.R.style.TextAppearance_AppCompat_Display1);
                 Utils.textAppearanceCompat(holder.mDescription,
-                        android.support.v7.appcompat.R.style.TextAppearance_AppCompat_Subhead);
+                        androidx.appcompat.R.style.TextAppearance_AppCompat_Subhead);
                 holder.mSeekBar.setVisibility(View.GONE);
                 holder.mSwitchView.setVisibility(View.GONE);
                 break;

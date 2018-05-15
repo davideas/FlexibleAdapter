@@ -17,11 +17,11 @@ package eu.davidea.flexibleadapter;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -63,7 +63,7 @@ import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
  * <br>05/06/2017 Improved Log system
  */
 @SuppressWarnings({"unused", "unchecked", "ConstantConditions", "WeakerAccess"})
-public abstract class SelectableAdapter extends RecyclerView.Adapter
+public abstract class SelectableAdapter extends androidx.recyclerview.widget.RecyclerView.Adapter
         implements FastScroller.BubbleTextCreator, FastScroller.OnScrollStateChangeListener, FastScroller.AdapterInterface {
 
     private static final String TAG = SelectableAdapter.class.getSimpleName();
@@ -88,7 +88,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
     private final Set<FlexibleViewHolder> mBoundViewHolders;
     private int mMode;
     private IFlexibleLayoutManager mFlexibleLayoutManager;
-    protected RecyclerView mRecyclerView;
+    protected androidx.recyclerview.widget.RecyclerView mRecyclerView;
     protected FastScroller.Delegate mFastScrollerDelegate;
 
     /**
@@ -172,7 +172,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @since 5.0.0-b6
      */
     @Override
-    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+    public void onDetachedFromRecyclerView(@NonNull androidx.recyclerview.widget.RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         if (mFastScrollerDelegate != null) {
             mFastScrollerDelegate.onDetachedFromRecyclerView(recyclerView);
@@ -185,7 +185,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @return the RecyclerView instance
      * @since 5.0.0-b6
      */
-    public RecyclerView getRecyclerView() {
+    public androidx.recyclerview.widget.RecyclerView getRecyclerView() {
         return mRecyclerView;
     }
 
@@ -199,7 +199,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      */
     public IFlexibleLayoutManager getFlexibleLayoutManager() {
         if (mFlexibleLayoutManager == null) {
-            RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
+            androidx.recyclerview.widget.RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
             if (layoutManager instanceof IFlexibleLayoutManager) {
                 mFlexibleLayoutManager = (IFlexibleLayoutManager) layoutManager;
             } else if (layoutManager != null) {
@@ -474,7 +474,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List payloads) {
+    public void onBindViewHolder(@NonNull androidx.recyclerview.widget.RecyclerView.ViewHolder holder, int position, @NonNull List payloads) {
         // Bind the correct view elevation
         if (holder instanceof FlexibleViewHolder) {
             FlexibleViewHolder flexHolder = (FlexibleViewHolder) holder;
@@ -497,7 +497,7 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
     }
 
     @Override
-    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+    public void onViewRecycled(@NonNull androidx.recyclerview.widget.RecyclerView.ViewHolder holder) {
         if (holder instanceof FlexibleViewHolder) {
             boolean recycled = mBoundViewHolders.remove(holder);
             log.v("onViewRecycled viewSize=%s %s %s recycled=%s", mBoundViewHolders.size(), getClassName(holder), holder, recycled);

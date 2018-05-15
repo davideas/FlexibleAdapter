@@ -21,7 +21,7 @@ ext {
 }
 
 android {
-    compileSdkVersion targetSdk
+    compileSdkVersion compileSdk
     buildToolsVersion buildTools
 
     defaultConfig {
@@ -42,7 +42,9 @@ android {
 }
 
 dependencies {
-    compileOnly project(":flexible-adapter")
+    compileOnly (project(":flexible-adapter")) {
+        exclude group: 'com.android.databinding'
+    }
     compileOnly supportLib.recyclerView
     implementation supportLib.support_v4
 }

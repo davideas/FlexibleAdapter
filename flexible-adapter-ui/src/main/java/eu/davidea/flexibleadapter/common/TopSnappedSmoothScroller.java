@@ -17,9 +17,9 @@ package eu.davidea.flexibleadapter.common;
 
 import android.content.Context;
 import android.graphics.PointF;
-import android.support.v7.widget.LinearSmoothScroller;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearSmoothScroller;
+import androidx.recyclerview.widget.OrientationHelper;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 
 /**

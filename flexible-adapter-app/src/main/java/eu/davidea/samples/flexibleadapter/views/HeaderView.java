@@ -7,15 +7,11 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import eu.davidea.samples.flexibleadapter.R;
 
 public class HeaderView extends LinearLayout {
 
-    @BindView(R.id.header_view_title)
     TextView title;
-    @BindView(R.id.header_view_sub_title)
     TextView subTitle;
 
 
@@ -39,7 +35,8 @@ public class HeaderView extends LinearLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        ButterKnife.bind(this);
+        title = findViewById(R.id.header_view_title);
+        subTitle = findViewById(R.id.header_view_sub_title);
     }
 
     public void bindTo(CharSequence title) {

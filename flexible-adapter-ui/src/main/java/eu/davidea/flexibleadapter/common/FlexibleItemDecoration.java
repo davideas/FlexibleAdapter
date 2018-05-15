@@ -24,14 +24,14 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IntRange;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IntRange;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -179,7 +179,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     @Override
-    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+    public void onDraw(Canvas c, androidx.recyclerview.widget.RecyclerView parent, RecyclerView.State state) {
         if (mDivider != null && !mDrawOver) {
             draw(c, parent);
         }
@@ -510,9 +510,9 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
             orientation = lm.getOrientation();
 
         } else if (recyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-            StaggeredGridLayoutManager.LayoutParams lp = (StaggeredGridLayoutManager.LayoutParams) view.getLayoutParams();
+            androidx.recyclerview.widget.StaggeredGridLayoutManager.LayoutParams lp = (androidx.recyclerview.widget.StaggeredGridLayoutManager.LayoutParams) view.getLayoutParams();
             spanIndex = lp.getSpanIndex();
-            StaggeredGridLayoutManager lm = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
+            androidx.recyclerview.widget.StaggeredGridLayoutManager lm = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
             spanCount = lm.getSpanCount(); // Assume that there are spanCount items in this row/column.
             spanSize = lp.isFullSpan() ? spanCount : 1;
             orientation = lm.getOrientation();
@@ -591,7 +591,7 @@ public class FlexibleItemDecoration extends RecyclerView.ItemDecoration {
                 preRowPos == -1 || itemType != adapter.getItemViewType(preRowPos);
     }
 
-    private boolean isLastRowOrColumn(int position, RecyclerView.Adapter adapter, int spanIndex, int spanCount, int spanSize, int itemType) {
+    private boolean isLastRowOrColumn(int position, androidx.recyclerview.widget.RecyclerView.Adapter adapter, int spanIndex, int spanCount, int spanSize, int itemType) {
         int itemCount = adapter.getItemCount();
         int nextPos = position < itemCount - 1 ? position + 1 : -1;
         // First position on the next row

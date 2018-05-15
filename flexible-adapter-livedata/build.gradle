@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'de.mannodermaus.android-junit5'
 apply plugin: 'eu.davidea.grabver'
 
 versioning {
@@ -22,7 +21,7 @@ ext {
 }
 
 android {
-    compileSdkVersion targetSdk
+    compileSdkVersion compileSdk
     buildToolsVersion buildTools
 
     defaultConfig {
@@ -41,13 +40,6 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
-    testOptions {
-        /* Android-junit5 - https://github.com/mannodermaus/android-junit5 */
-        junitPlatform {
-            jupiterVersion junitJupiterVer
-            platformVersion junitPlatformVer
-        }
-    }
 }
 
 dependencies {
@@ -56,12 +48,10 @@ dependencies {
 
     // Test libraries: from AS3 we'll use JUnit 5 Jupiter, using "android-junit5" plugin
     androidTestImplementation supportLib.annotations
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test:rules:1.0.1'
-    androidTestImplementation("android.arch.core:core-testing:$archExtensionsVer", {
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha2'
+    androidTestImplementation 'androidx.test:rules:1.1.0-alpha2'
+    androidTestImplementation("androidx.arch.core:core-testing:$archExtensionsVer", {
     })
-    testImplementation junit5.unitTests()
-    testCompileOnly junit5.unitTestsRuntime()
     testImplementation "de.mannodermaus.gradle.plugins:android-junit5-embedded-runtime:1.0.31"
     testImplementation supportLib.recyclerView
     testImplementation project(":flexible-adapter")
