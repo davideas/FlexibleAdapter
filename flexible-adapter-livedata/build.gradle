@@ -1,7 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'eu.davidea.grabver'
-apply plugin: 'com.github.dcendents.android-maven'
-group='com.github.tcqq'
 
 versioning {
     major 1
