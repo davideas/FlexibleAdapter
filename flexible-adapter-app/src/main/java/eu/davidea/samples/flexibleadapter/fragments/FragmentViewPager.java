@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -84,6 +85,22 @@ public class FragmentViewPager extends Fragment {
 
         // Settings for FlipView
         FlipView.stopLayoutAnimation();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mAdapter != null) {
+            mAdapter.onSaveInstanceState(outState);
+        }
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null && mAdapter != null) {
+            mAdapter.onRestoreInstanceState(savedInstanceState);
+        }
     }
 
     private void initializeRecyclerView() {

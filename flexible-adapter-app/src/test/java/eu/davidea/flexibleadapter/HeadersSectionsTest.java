@@ -80,7 +80,6 @@ public class HeadersSectionsTest {
         AbstractFlexibleItem item = mAdapter.getItem(0);
         assertNotNull(item);
         assertTrue(mAdapter.isHeader(item));
-
     }
 
     @Test
