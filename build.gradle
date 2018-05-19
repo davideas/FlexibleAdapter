@@ -53,11 +53,13 @@ allprojects {
         ]
 
         // Widgets
+        materialVer = "1.0.0-alpha1"
         flipViewVer = "1.1.3@aar"
         iconicsVer = "3.0.3@aar"
         iconicsCmdVer = "2.0.46.1@aar"
         materialDialogsVer = "0.9.6.0"
         widgets = [
+                material        : "com.google.android.material:material:${materialVer}",
                 flipView        : "eu.davidea:flipview:${flipViewVer}",
                 iconicsCore     : "com.mikepenz:iconics-core:${iconicsVer}",
                 iconicsViews    : "com.mikepenz:iconics-views:${iconicsVer}",

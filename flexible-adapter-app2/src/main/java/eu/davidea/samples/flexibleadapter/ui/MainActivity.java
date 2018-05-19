@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initializeToolbar() {
         Timber.d("initializeToolbar as actionBar");
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mHeaderView = (HeaderView) findViewById(R.id.toolbar_header_view);
+        mToolbar = findViewById(R.id.toolbar);
+        mHeaderView = findViewById(R.id.toolbar_header_view);
         mHeaderView.bindTo(getString(R.string.app_name), getString(R.string.overall));
         // Toolbar will now take on default Action Bar characteristics
         setSupportActionBar(mToolbar);
@@ -66,13 +66,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initializeNavigationDrawer() {
         Timber.d("initializeNavigationDrawer");
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView = findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
         // Version
