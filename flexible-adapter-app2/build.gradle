@@ -36,9 +36,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    dexOptions {
+        preDexLibraries = false
+        maxProcessCount 4
+        javaMaxHeapSize "2g"
+    }
     buildTypes {
         debug {
-            versionNameSuffix ' #' + versioning.build + versioning.builtOn
+            versionNameSuffix '-#' + versioning.build + versioning.builtOn
             minifyEnabled false
         }
         release {
