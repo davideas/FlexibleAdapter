@@ -62,7 +62,7 @@ import eu.davidea.flexibleadapter.utils.LayoutUtils;
  * change that modifies the order of the items.
  *
  * @author Davide Steduto
- * @since 20/07/2015 Created
+ * @since 20/07/2015 Created in main package
  * <br>23/04/2017 Drawing of the divider over or underneath the items
  * <br>26/05/2017 Rewrote the full class to support equal spaces between items in all situations
  * <br>10/09/2017 Optional view types for divider

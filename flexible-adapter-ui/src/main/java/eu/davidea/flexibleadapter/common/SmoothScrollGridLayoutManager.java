@@ -22,7 +22,7 @@ import android.support.v7.widget.RecyclerView;
 /**
  * Optimized implementation of GridLayoutManager to SmoothScroll to a Top position.
  *
- * @since 5.0.0-b6
+ * @since 5.0.0-b6 Creation in main package
  * <br>17/12/2017 Moved into UI package
  */
 public class SmoothScrollGridLayoutManager extends GridLayoutManager implements IFlexibleLayoutManager {

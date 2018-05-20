@@ -22,7 +22,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 /**
  * Optimized implementation of StaggeredGridLayoutManager to SmoothScroll to a Top position.
  *
- * @since 5.0.0-b8
+ * @since 5.0.0-b8 Creation in main package
  * <br>17/12/2017 Moved into UI package
  */
 public class SmoothScrollStaggeredLayoutManager extends StaggeredGridLayoutManager implements IFlexibleLayoutManager {

@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * @author Davide Steduto
- * @since 05/09/2016 Created
+ * @since 05/09/2016 Created in main package
  * <br>17/12/2017 Moved into UI package
  */
 public class AnimatorHelper {

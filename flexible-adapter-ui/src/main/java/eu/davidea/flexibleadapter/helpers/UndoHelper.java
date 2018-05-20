@@ -36,7 +36,7 @@ import eu.davidea.flexibleadapter.utils.Log;
  * Helper Class to simplify the Undo operation with FlexibleAdapter.
  *
  * @author Davide Steduto
- * @since 30/04/2016 Created
+ * @since 30/04/2016 Created in main package
  * <br>07/12/2017 Better use of OnActionListener
  * <br>17/12/2017 Moved into UI package
  */
@@ -283,9 +283,9 @@ public class UndoHelper extends Snackbar.Callback implements FlexibleAdapter.OnD
     }
 
     /**
-     * @since 30/04/2016 - Creation
-     * <br>03/09/2017 - Refactoring methods
-     * <br>06/12/2017 - Refactoring class name and methods
+     * @since 30/04/2016 Creation in main package
+     * <br>03/09/2017 Refactoring methods
+     * <br>06/12/2017 Refactoring class name and methods
      */
     public interface OnActionListener {
         /**

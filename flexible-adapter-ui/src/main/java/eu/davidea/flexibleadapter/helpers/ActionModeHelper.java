@@ -35,7 +35,7 @@ import eu.davidea.flexibleadapter.utils.Log;
  * Helper Class to coordinate the MULTI selection with FlexibleAdapter.
  *
  * @author Davide Steduto
- * @since 30/04/2016 Created
+ * @since 30/04/2016 Created in main package
  * <br>23/08/2017 Option to disable swipe/drag capabilities
  * <br>17/12/2017 Moved into UI package
  */

@@ -31,7 +31,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  * </ul>
  *
  * @author Davide Steduto
- * @since 26/12/2017 Created
+ * @since 26/12/2017 Created in UI package
  * <br>22/04/2018 Added static creator methods
  */
 @SuppressWarnings("WeakerAccess")

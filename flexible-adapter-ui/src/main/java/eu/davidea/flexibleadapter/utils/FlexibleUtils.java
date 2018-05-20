@@ -58,7 +58,7 @@ import eu.davidea.flexibleadapter.helpers.R;
  * @author Davide Steduto
  * @see DrawableUtils
  * @see LayoutUtils
- * @since 27/01/2016 Created
+ * @since 27/01/2016 Created in main package
  * <br>17/12/2017 Moved into UI package
  * <br>12/05/2018 Added even more utils
  */
@@ -77,7 +77,7 @@ public final class FlexibleUtils {
     public static String getVersionName(Context context) {
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            return "v" + pInfo.versionName;
+            return pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             return context.getString(android.R.string.unknownName);
         }
@@ -152,8 +152,7 @@ public final class FlexibleUtils {
      * @param constraint   the text to highlight
      * @see #highlightText(TextView, String, String, int)
      * @see #highlightWords(TextView, String, String)
-     * @since 5.0.0-rc1 Created
-     * <br>5.0.0-rc3 Multi-span
+     * @since 1.0.0-b1
      */
     public static void highlightText(@NonNull final TextView textView,
                                      @Nullable final String originalText,
@@ -173,8 +172,7 @@ public final class FlexibleUtils {
      * @param color        the highlight color
      * @see #highlightText(TextView, String, String)
      * @see #highlightWords(TextView, String, String, int)
-     * @since 5.0.0-rc1 Created
-     * <br>5.0.0-rc3 Multi-span
+     * @since 1.0.0-b1
      */
     public static void highlightText(@NonNull final TextView textView,
                                      @Nullable final String originalText,
@@ -205,7 +203,7 @@ public final class FlexibleUtils {
      * @param constraints  the multiple words to highlight
      * @see #highlightWords(TextView, String, String, int)
      * @see #highlightText(TextView, String, String)
-     * @since 5.0.0-rc3
+     * @since 1.0.0-b1
      */
     public static void highlightWords(@NonNull final TextView textView,
                                       @Nullable final String originalText,
@@ -227,7 +225,7 @@ public final class FlexibleUtils {
      * @param color        the highlight color
      * @see #highlightWords(TextView, String, String)
      * @see #highlightText(TextView, String, String, int)
-     * @since 5.0.0-rc3
+     * @since 1.0.0-b1
      */
     public static void highlightWords(@NonNull final TextView textView,
                                       @Nullable final String originalText,
@@ -449,6 +447,7 @@ public final class FlexibleUtils {
      * @param view    the View to reveal
      * @param centerX the x coordinate of the center of the animating circle, relative to <code>view</code>.
      * @param centerY the y coordinate of the center of the animating circle, relative to <code>view</code>.
+     * @since 1.0.0-b4
      */
     @TargetApi(VERSION_CODES.LOLLIPOP)
     public static void reveal(final View view, int centerX, int centerY) {
@@ -472,6 +471,7 @@ public final class FlexibleUtils {
      * @param view    the View to reveal
      * @param centerX the x coordinate of the center of the animating circle, relative to <code>view</code>.
      * @param centerY the y coordinate of the center of the animating circle, relative to <code>view</code>.
+     * @since 1.0.0-b4
      */
     @TargetApi(VERSION_CODES.LOLLIPOP)
     public static void unReveal(final View view, int centerX, int centerY) {

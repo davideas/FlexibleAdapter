@@ -25,6 +25,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.v4.view.ViewCompat;
 import android.util.TypedValue;
@@ -38,41 +39,73 @@ import eu.davidea.flexibleadapter.helpers.R;
  * @author Davide Steduto
  * @see FlexibleUtils
  * @see LayoutUtils
- * @since 14/06/2016 Created
+ * @since 14/06/2016 Created in main package
  * <br>17/12/2017 Moved into UI package
  */
 @SuppressWarnings("deprecation")
 public final class DrawableUtils {
 
     /**
-     * Helper method to set the background depending on the android version.
+     * Helper method to set the background to a view, depending on the android version.
      *
      * @param view     the view to apply the drawable
      * @param drawable drawable object
-     * @since 5.0.0-rc1
+     * @since 1.0.0-b1
      */
     public static void setBackgroundCompat(View view, Drawable drawable) {
         ViewCompat.setBackground(view, drawable);
     }
 
     /**
-     * Helper method to set the background depending on the android version
+     * Helper method to set the background to a view, depending on the android version
      *
      * @param view        the view to apply the drawable
      * @param drawableRes drawable resource id
-     * @since 5.0.0-rc1
+     * @since 1.0.0-b1
      */
     public static void setBackgroundCompat(View view, @DrawableRes int drawableRes) {
         setBackgroundCompat(view, getDrawableCompat(view.getContext(), drawableRes));
     }
 
     /**
-     * Helper method to get the drawable by its resource. Specific to the correct android version..
+     * Ultra compat method to set the background to a view, providing color resource identifiers.
+     * <p><b>Note:</b> If you already have the color in <i>Integer</i> format, please obtain the
+     * {@code Drawable} object from {@link #getSelectableBackgroundCompat(int, int, int)} and set
+     * it into {@link #setBackgroundCompat(View, Drawable)}.</p>
+     *
+     * @param view            the view interested at the background
+     * @param normalColorRes  the color resource id
+     * @param pressedColorRes the pressed color resource id
+     * @param rippleColorRes  the ripple color resource id
+     * @since 1.0.0-b5
+     */
+    public static void setBackgroundCompat(View view,
+                                           @ColorRes int normalColorRes,
+                                           @ColorRes int pressedColorRes,
+                                           @ColorRes int rippleColorRes) {
+        Context context = view.getContext();
+        Drawable drawable;
+        if (FlexibleUtils.hasMarshmallow()) {
+            drawable = getSelectableBackgroundCompat(
+                    context.getColor(normalColorRes),
+                    context.getColor(pressedColorRes),
+                    context.getColor(rippleColorRes));
+        } else {
+            drawable = getSelectableBackgroundCompat(
+                    context.getResources().getColor(normalColorRes),
+                    context.getResources().getColor(pressedColorRes),
+                    context.getResources().getColor(rippleColorRes));
+        }
+        setBackgroundCompat(view, drawable);
+    }
+
+    /**
+     * Helper method to get the drawable by its resource. Specific to the correct android version.
      *
      * @param context     the context
      * @param drawableRes drawable resource id
      * @return the drawable object
-     * @since 5.0.0-b7
+     * @since 1.0.0-b1
      */
     public static Drawable getDrawableCompat(Context context, @DrawableRes int drawableRes) {
         try {
@@ -87,12 +120,12 @@ public final class DrawableUtils {
     }
 
     /**
-     * Helper to get the default selectableItemBackground drawable of the
-     * {@code R.attr.selectableItemBackground} attribute of the overridden style.
+     * Helper method to get the <i>system (or overridden)</i> default {@code selectableItemBackground} Drawable.
+     * Returns the {@code R.attr.selectableItemBackground} of the style attribute.
      *
      * @param context the context
      * @return Default selectable item background drawable
-     * @since 5.0.0-rc1
+     * @since 1.0.0-b1
      */
     public static Drawable getSelectableItemBackground(Context context) {
         TypedValue outValue = new TypedValue();
@@ -102,33 +135,34 @@ public final class DrawableUtils {
     }
 
     /**
-     * Helper to get the system default Color Control Highlight. Returns the color of the
-     * {@code R.attr.colorControlHighlight} attribute in the overridden style.
+     * Helper method to get the <i>system (or overridden)</i> default {@code colorControlHighlight}.
+     * Returns the color of the {@code R.attr.colorControlHighlight} of the style attribute.
      *
      * @param context the context
      * @return Default Color Control Highlight
-     * @since 5.0.0-b7 Created, returns the resourceId
-     * <br/> 5.0.0-rc1 Now returns the real color (not the resourceId)
+     * @since 1.0.0-b1
      */
     @ColorInt
     public static int getColorControlHighlight(Context context) {
         TypedValue outValue = new TypedValue();
         // It's important to not use the android.R because this wouldn't add the overridden drawable
         context.getTheme().resolveAttribute(R.attr.colorControlHighlight, outValue, true);
-        if (FlexibleUtils.hasMarshmallow()) return context.getColor(outValue.resourceId);
-        else return context.getResources().getColor(outValue.resourceId);
+        if (FlexibleUtils.hasMarshmallow()) {
+            return context.getColor(outValue.resourceId);
+        } else {
+            return context.getResources().getColor(outValue.resourceId);
+        }
     }
 
     /**
-     * Helper to get a custom selectable background with Ripple if device has at least Lollipop.
+     * Helper method to get a custom selectable background with Ripple color, if device has at least Lollipop.
      *
      * @param normalColor  the color in normal state
      * @param pressedColor the pressed color
      * @param rippleColor  the color of the ripple
      * @return the RippleDrawable with StateListDrawable if at least Lollipop, the normal
      * StateListDrawable otherwise
-     * @since 5.0.0-b7 Created
-     * <br/>5.0.0-rc1 RippleColor becomes the 3rd parameter
+     * @since 1.0.0-b1
      */
     public static Drawable getSelectableBackgroundCompat(@ColorInt int normalColor,
                                                          @ColorInt int pressedColor,
@@ -143,13 +177,13 @@ public final class DrawableUtils {
     }
 
     /**
-     * Adds a ripple effect to any background.
+     * Adds a ripple effect to any Drawable background.
      *
      * @param drawable    any background drawable
      * @param rippleColor the color of the ripple
      * @return the RippleDrawable with the chosen background drawable if at least Lollipop,
      * the provided drawable otherwise
-     * @since 5.0.0-rc1
+     * @since 1.0.0-b1
      */
     public static Drawable getRippleDrawable(Drawable drawable, @ColorInt int rippleColor) {
         if (FlexibleUtils.hasLollipop()) {
@@ -189,11 +223,11 @@ public final class DrawableUtils {
     }
 
     /**
-     * Generate the {@code ColorDrawable} object from the provided Color.
+     * Generates the {@code ColorDrawable} object from the provided Color.
      *
      * @param color the color
      * @return the {@code ColorDrawable} object
-     * @since 5.0.0-rc1
+     * @since 1.0.0-b1
      */
     public static ColorDrawable getColorDrawable(@ColorInt int color) {
         return new ColorDrawable(color);

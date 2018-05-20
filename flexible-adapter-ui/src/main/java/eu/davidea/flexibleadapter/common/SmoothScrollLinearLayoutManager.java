@@ -22,7 +22,7 @@ import android.support.v7.widget.RecyclerView;
 /**
  * Optimized implementation of LinearLayoutManager to SmoothScroll to a Top position.
  *
- * @since 5.0.0-b1
+ * @since 5.0.0-b1 Creation in main package
  * <br>17/12/2017 Moved into UI package
  */
 public class SmoothScrollLinearLayoutManager extends LinearLayoutManager implements IFlexibleLayoutManager {
