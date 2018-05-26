@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Light Theme -->
+    <color name="colorPrimary_light">#673ab7</color><!-- Deep Purple 500 -->
+    <color name="colorPrimaryDark_light">#512da8</color><!-- Deep Purple 700 -->
+    <color name="colorAccent_light">#ff4081</color><!-- Pink A200 -->
+    <color name="colorAccentDark_light">#c51162</color><!-- Pink A700: for statusBar in actionMode -->
+    <color name="colorPrimaryText_light">#de000000</color>
 
-	<!-- Light Theme -->
-	<color name="colorPrimary_light">#673ab7</color><!-- Deep Purple 500 -->
-	<color name="colorPrimaryDark_light">#512da8</color><!-- Deep Purple 700 -->
-	<color name="colorAccent_light">#ff4081</color><!-- Pink A200 -->
-	<color name="colorAccentDark_light">#c51162</color><!-- Pink A700: for statusBar in actionMode -->
-	<color name="colorPrimaryText_light">#de000000</color>
+    <!-- Common colors -->
+    <color name="list_choice_normal_bg_light">#fffafafa</color>
+    <color name="list_choice_pressed_bg_light">#fddd</color>
 
-	<!-- Common colors -->
-	<color name="list_choice_normal_bg_light">#fffafafa</color>
-	<color name="list_choice_pressed_bg_light">#fddd</color>
-
+    <!-- Override fastScroller bar color and handle idle color -->
+    <color name="fast_scroller_bar">#bccc</color>
+    <color name="fast_scroller_handle_idle">#caaa</color>
 </resources>

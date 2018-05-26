@@ -67,6 +67,7 @@ public class FastScroller extends FrameLayout {
     protected static final int BUBBLE_ANIMATION_DURATION = 300;
     protected static final int AUTOHIDE_ANIMATION_DURATION = 300;
     protected static final int DEFAULT_AUTOHIDE_DELAY_IN_MILLIS = 1000;
+    protected static final float DEFAULT_HANDLE_OPACITY = 1f;
     protected static final boolean DEFAULT_AUTOHIDE_ENABLED = true;
 
     @Retention(SOURCE)
@@ -91,8 +92,8 @@ public class FastScroller extends FrameLayout {
 
     protected int bubbleAndHandleColor = Color.TRANSPARENT;
     protected long autoHideDelayInMillis;
-    protected boolean isInitialized = false;
-    protected boolean autoHideEnabled, bubbleEnabled, ignoreTouchesOutsideHandle;
+    protected boolean isInitialized, autoHideEnabled, bubbleEnabled,
+            ignoreTouchesOutsideHandle, handleAlwaysVisible;
 
     @FastScrollerBubblePosition
     protected int bubblePosition;
@@ -125,6 +126,7 @@ public class FastScroller extends FrameLayout {
             bubbleEnabled = a.getBoolean(R.styleable.FastScroller_fastScrollerBubbleEnabled, true);
             bubblePosition = a.getInteger(R.styleable.FastScroller_fastScrollerBubblePosition, DEFAULT_BUBBLE_POSITION);
             ignoreTouchesOutsideHandle = a.getBoolean(R.styleable.FastScroller_fastScrollerIgnoreTouchesOutsideHandle, false);
+            handleAlwaysVisible = a.getBoolean(R.styleable.FastScroller_fastScrollerHandleAlwaysVisible, false);
         } finally {
             a.recycle();
         }
@@ -229,7 +231,7 @@ public class FastScroller extends FrameLayout {
 
         // Animators
         bubbleAnimator = new BubbleAnimator(bubble, BUBBLE_ANIMATION_DURATION);
-        scrollbarAnimator = new ScrollbarAnimator(bar, handle, autoHideDelayInMillis, AUTOHIDE_ANIMATION_DURATION);
+        scrollbarAnimator = new ScrollbarAnimator(bar, handle, handleAlwaysVisible, autoHideDelayInMillis, AUTOHIDE_ANIMATION_DURATION);
 
         // Runtime custom color OR the default (accentColor)
         if (bubbleAndHandleColor != Color.TRANSPARENT) {
@@ -505,6 +507,17 @@ public class FastScroller extends FrameLayout {
      */
     public void setIgnoreTouchesOutsideHandle(boolean ignoreFlag) {
         ignoreTouchesOutsideHandle = ignoreFlag;
+    }
+
+    /**
+     * If enabled, it will keep handle always visible with 50% transparency.
+     * <p>Default value is {@code false}.</p>
+     *
+     * @param enabled true to keep the handle always visible, false to hide always
+     * @since 5.0.5
+     */
+    public void setHandleAlwaysVisible(boolean enabled) {
+        ignoreTouchesOutsideHandle = enabled;
     }
 
     /**

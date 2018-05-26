@@ -23,19 +23,19 @@ import android.view.View;
 
 public class ScrollbarAnimator {
 
-    private static final String PROPERTY_NAME = "translationX";
-    protected View bar;
-    protected View handle;
-    protected AnimatorSet scrollbarAnimatorSet;
+    private static final String TRANSLATION_X = "translationX";
 
-    protected long delayInMillis;
-    protected long durationInMillis;
+    protected View bar, handle;
+    protected AnimatorSet scrollbarAnimatorSet;
+    protected long delayInMillis, durationInMillis;
+    protected boolean handleAlwaysVisible;
 
     private boolean isAnimating;
 
-    public ScrollbarAnimator(View bar, View handle, long delayInMillis, long durationInMillis) {
+    public ScrollbarAnimator(View bar, View handle, boolean handleAlwaysVisible, long delayInMillis, long durationInMillis) {
         this.bar = bar;
         this.handle = handle;
+        this.handleAlwaysVisible = handleAlwaysVisible;
         this.delayInMillis = delayInMillis;
         this.durationInMillis = durationInMillis;
     }
@@ -112,16 +112,18 @@ public class ScrollbarAnimator {
     }
 
     protected AnimatorSet createAnimator(View bar, View handle, boolean showFlag) {
-        ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, PROPERTY_NAME, showFlag ? 0 : bar.getWidth());
-        ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, PROPERTY_NAME, showFlag ? 0 : handle.getWidth());
-
+        ObjectAnimator barAnimator = ObjectAnimator.ofFloat(bar, TRANSLATION_X, showFlag ? 0 : bar.getWidth());
         AnimatorSet animator = new AnimatorSet();
-        animator.playTogether(barAnimator, handleAnimator);
+        if (handleAlwaysVisible) {
+            animator.play(barAnimator);
+        } else {
+            ObjectAnimator handleAnimator = ObjectAnimator.ofFloat(handle, TRANSLATION_X, showFlag ? 0 : handle.getWidth());
+            animator.playTogether(barAnimator, handleAnimator);
+        }
         animator.setDuration(durationInMillis);
         if (!showFlag) {
             animator.setStartDelay(delayInMillis);
         }
-
         return animator;
     }
 
@@ -131,7 +133,9 @@ public class ScrollbarAnimator {
 
     protected void onHideAnimationStop(View bar, View handle) {
         bar.setVisibility(View.INVISIBLE);
-        handle.setVisibility(View.INVISIBLE);
+        if (!handleAlwaysVisible) {
+            handle.setVisibility(View.INVISIBLE);
+        }
         bar.setTranslationX(0);
         handle.setTranslationX(0);
     }
