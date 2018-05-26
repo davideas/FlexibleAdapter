@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- https://tips.seebrock3r.me/material-navigation-drawer-sizing-558aea1ad266 -->
+    <!-- Navigation Drawer: 304dp on -sw360dp and 320dp on -sw384dp -->
+    <dimen name="nav_drawer_max_width">320dp</dimen>
+</resources>
