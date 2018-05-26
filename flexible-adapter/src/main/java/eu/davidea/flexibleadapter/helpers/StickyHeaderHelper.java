@@ -20,7 +20,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -28,7 +27,6 @@ import android.widget.FrameLayout;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnStickyHeaderChangeListener;
-import eu.davidea.flexibleadapter.R;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.utils.Log;
 import eu.davidea.viewholders.FlexibleViewHolder;
@@ -100,18 +98,17 @@ public final class StickyHeaderHelper extends OnScrollListener {
         if (mStickyHolderLayout == null) {
             ViewGroup oldParentLayout = getParent(mRecyclerView);
             if (oldParentLayout != null) {
-                // Create stickyContainer for shadow elevation
-                FrameLayout stickyContainer = createContainer(
+                // Initialize Holder Layout, will be also used for elevation
+                mStickyHolderLayout = createContainer(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
-                oldParentLayout.addView(stickyContainer);
-                // Initialize Holder Layout
-                mStickyHolderLayout = (ViewGroup) LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.sticky_header_layout, stickyContainer);
+                oldParentLayout.addView(mStickyHolderLayout);
                 Log.i("Default StickyHolderLayout initialized");
             }
         } else {
             Log.i("User defined StickyHolderLayout initialized");
         }
+        displayWithAnimation = true;
         // Show sticky header if exists already
         updateOrClearHeader(false);
     }
