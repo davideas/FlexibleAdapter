@@ -1062,8 +1062,9 @@ public class FlexibleAdapter<T extends IFlexible>
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (addScrollableHeader(headerItem) && scrollToPosition)
-                    performScroll(getGlobalPositionOf(headerItem));
+                if (addScrollableHeader(headerItem) && scrollToPosition) {
+                    smoothScrollToPosition(getGlobalPositionOf(headerItem));
+                }
             }
         }, delay);
     }
@@ -1084,8 +1085,9 @@ public class FlexibleAdapter<T extends IFlexible>
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (addScrollableFooter(footerItem) && scrollToPosition)
-                    performScroll(getGlobalPositionOf(footerItem));
+                if (addScrollableFooter(footerItem) && scrollToPosition) {
+                    smoothScrollToPosition(getGlobalPositionOf(footerItem));
+                }
             }
         }, delay);
     }
@@ -2879,7 +2881,7 @@ public class FlexibleAdapter<T extends IFlexible>
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (addItem(position, item) && scrollToPosition) performScroll(position);
+                if (addItem(position, item) && scrollToPosition) autoScrollWithDelay(position, -1);
             }
         }, delay);
     }
@@ -3295,8 +3297,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * Removes all items of a section, header included.
      * <p>For header that is also expandable, it's equivalent to remove a single item.</p>
      *
-     * @see #removeItem(int)
      * @param header the head of the section
+     * @see #removeItem(int)
      * @since 5.0.5
      */
     public void removeSection(IHeader header) {
@@ -4955,6 +4957,24 @@ public class FlexibleAdapter<T extends IFlexible>
         return false;
     }
 
+    /**
+     * Performs <i>safe</i> smooth scroll with a delay of {@value #AUTO_SCROLL_DELAY} ms.
+     *
+     * @param position the position to scroll to.
+     * @since 5.0.5
+     */
+    public void smoothScrollToPosition(final int position) {
+        if (mRecyclerView != null) {
+            // Must be delayed to give time at RecyclerView to recalculate positions after a layout change
+            mRecyclerView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    performScroll(position);
+                }
+            }, AUTO_SCROLL_DELAY);
+        }
+    }
+
     private void performScroll(final int position) {
         if (mRecyclerView != null) {
             mRecyclerView.smoothScrollToPosition(Math.min(Math.max(0, position), getItemCount() - 1));
@@ -4962,7 +4982,7 @@ public class FlexibleAdapter<T extends IFlexible>
     }
 
     private void autoScrollWithDelay(final int position, final int subItemsCount) {
-        // Must be delayed to give time at RecyclerView to recalculate positions after an automatic collapse
+        // Must be delayed to give time at RecyclerView to recalculate positions after a layout change
         new Handler(Looper.getMainLooper(), new Handler.Callback() {
             public boolean handleMessage(Message message) {
                 // #492 - NullPointerException when expanding item with auto-scroll
@@ -4970,7 +4990,7 @@ public class FlexibleAdapter<T extends IFlexible>
                 int firstVisibleItem = getFlexibleLayoutManager().findFirstCompletelyVisibleItemPosition();
                 int lastVisibleItem = getFlexibleLayoutManager().findLastCompletelyVisibleItemPosition();
                 int itemsToShow = position + subItemsCount - lastVisibleItem;
-//				log.v("autoScroll itemsToShow=%s firstVisibleItem=%s lastVisibleItem=%s RvChildCount=%s", itemsToShow, firstVisibleItem, lastVisibleItem, mRecyclerView.getChildCount());
+                // log.v("autoScroll itemsToShow=%s firstVisibleItem=%s lastVisibleItem=%s RvChildCount=%s", itemsToShow, firstVisibleItem, lastVisibleItem, mRecyclerView.getChildCount());
                 if (itemsToShow > 0) {
                     int scrollMax = position - firstVisibleItem;
                     int scrollMin = Math.max(0, position + subItemsCount - lastVisibleItem);
@@ -4980,7 +5000,7 @@ public class FlexibleAdapter<T extends IFlexible>
                         scrollBy = scrollBy % spanCount + spanCount;
                     }
                     int scrollTo = firstVisibleItem + scrollBy;
-//					log.v("autoScroll scrollMin=%s scrollMax=%s scrollBy=%s scrollTo=%s", scrollMin, scrollMax, scrollBy, scrollTo);
+                    // log.v("autoScroll scrollMin=%s scrollMax=%s scrollBy=%s scrollTo=%s", scrollMin, scrollMax, scrollBy, scrollTo);
                     performScroll(scrollTo);
                 } else if (position < firstVisibleItem) {
                     performScroll(position);
