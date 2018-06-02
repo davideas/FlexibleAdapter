@@ -51,8 +51,8 @@ public class OverallAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
                     R.string.columns,
                     String.valueOf(getFlexibleLayoutManager().getSpanCount()))
             );
-            addScrollableHeaderWithDelay(item, 500L, scrollToPosition);
-            removeScrollableHeaderWithDelay(item, 3000L);
+            addScrollableHeaderWithDelay(item, 300L, scrollToPosition);
+            removeScrollableHeaderWithDelay(item, 2000L);
         }
     }
 
