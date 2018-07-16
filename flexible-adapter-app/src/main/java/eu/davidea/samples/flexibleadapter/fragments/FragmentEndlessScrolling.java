@@ -131,7 +131,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
         mAdapter.setLoadingMoreAtStartUp(savedInstanceState == null) //To call only if the list is empty
                 //.setEndlessPageSize(3) //Endless is automatically disabled if newItems < 3
                 //.setEndlessTargetCount(15) //Endless is automatically disabled if totalItems >= 15
-                //.setEndlessScrollThreshold(1) //Default=1
+                .setEndlessScrollThreshold(20) //Default=1
                 .setEndlessScrollListener(this, mProgressItem)
                 .setTopEndless(false);
 
@@ -194,7 +194,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
                 final List<AbstractFlexibleItem> newItems = new ArrayList<>();
 
                 // 1. Simulating success/failure with Random
-                int count = new Random().nextInt(7);
+                int count = new Random().nextInt(200);
                 int totalItemsOfType = mAdapter.getItemCountOfTypes(R.layout.recycler_simple_item);
                 for (int i = 1; i <= count; i++) {
                     newItems.add(DatabaseService.newSimpleItem(totalItemsOfType + i, null));
@@ -212,6 +212,7 @@ public class FragmentEndlessScrolling extends AbstractFragment
                 }
                 mAdapter.onLoadMoreComplete(newItems, (newItems.isEmpty() ? -1 : 3000L));
                 // - Retrieve the new page number after adding new items!
+                Log.d(TAG, "LastPosition=" + lastPosition);
                 Log.d(TAG, "EndlessCurrentPage=" + mAdapter.getEndlessCurrentPage());
                 Log.d(TAG, "EndlessPageSize=" + mAdapter.getEndlessPageSize());
                 Log.d(TAG, "EndlessTargetCount=" + mAdapter.getEndlessTargetCount());

@@ -2060,8 +2060,6 @@ public class FlexibleAdapter<T extends IFlexible>
                     log.d("onLoadMore     invoked!");
                     mEndlessScrollListener.onLoadMore(getMainItemCount(), getEndlessCurrentPage());
                 }
-                // Reset the loading status
-                endlessLoading = false;
             }
         });
     }
@@ -2098,6 +2096,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * <br>5.0.0-rc2 Added Top Endless
      */
     public void onLoadMoreComplete(@Nullable List<T> newItems, @IntRange(from = -1) long delay) {
+        // Reset the loading status
+        endlessLoading = false;
         // Calculate new items count
         int newItemsSize = newItems == null ? 0 : newItems.size();
         int totalItemCount = newItemsSize + getMainItemCount();

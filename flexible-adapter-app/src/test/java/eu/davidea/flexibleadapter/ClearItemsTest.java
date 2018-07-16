@@ -13,9 +13,9 @@ import java.util.List;
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IHeader;
-import eu.davidea.samples.flexibleadapter.items.HeaderItem;
-import eu.davidea.samples.flexibleadapter.items.ScrollableFooterItem;
-import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
+import eu.davidea.samples.flexibleadapter.ui.items.HeaderItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableFooterItem;
+import eu.davidea.samples.flexibleadapter.ui.items.ScrollableLayoutItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 import static org.junit.Assert.assertEquals;
@@ -52,7 +52,21 @@ public class ClearItemsTest {
     }
 
     @Test
-    public void testClear_EmptyAdapter() {
+    public void testClearAdapter_NotEmpty() {
+        FlexibleAdapter<AbstractFlexibleItem> adapter = new FlexibleAdapter<AbstractFlexibleItem>(mItems) {
+            @Override
+            public IHeader getHeaderOf(@NonNull AbstractFlexibleItem item) {
+                assertNotNull(item);
+                return super.getHeaderOf(item);
+            }
+        };
+        assertEquals(mItems.size(), adapter.getItemCount());
+        adapter.clear();
+        assertEquals(0, adapter.getItemCount());
+    }
+
+    @Test
+    public void testClearAdapter_Empty() {
         FlexibleAdapter<AbstractFlexibleItem> adapter = new FlexibleAdapter<AbstractFlexibleItem>(null) {
             @Override
             public IHeader getHeaderOf(@NonNull AbstractFlexibleItem item) {
@@ -60,7 +74,7 @@ public class ClearItemsTest {
                 return super.getHeaderOf(item);
             }
         };
-        adapter.updateDataSet(new ArrayList<AbstractFlexibleItem>(), false);
+        adapter.updateDataSet(new ArrayList<>(), false);
         adapter.clear();
         assertEquals(0, adapter.getItemCount());
     }
