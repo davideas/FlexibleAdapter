@@ -4183,8 +4183,11 @@ public class FlexibleAdapter<T extends IFlexible>
             if (isExpandable(item)) {
                 IExpandable expandable = (IExpandable) item;
                 // Reset expanded flag
-                if (mExpandedFilterFlags != null)
+                if (mExpandedFilterFlags != null) {
                     expandable.setExpanded(mExpandedFilterFlags.contains(expandable));
+                } else {
+                    expandable.setExpanded(false);
+                }
                 if (hasSubItems(expandable)) {
                     List<T> subItems = expandable.getSubItems();
                     // Reset subItem hidden flag
