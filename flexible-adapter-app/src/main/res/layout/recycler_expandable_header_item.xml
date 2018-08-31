@@ -22,7 +22,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:ellipsize="end"
-			android:maxLines="1"
+			android:singleLine="true"
 			android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse"
 			tools:text="Header"/>
 
@@ -32,7 +32,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:ellipsize="end"
-			android:maxLines="1"
+			android:singleLine="true"
 			android:textAppearance="@style/TextAppearance.AppCompat.Caption"
 			android:textColor="@color/material_text_color_white_text"
 			tools:text="Subtitle"/>

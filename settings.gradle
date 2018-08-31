@@ -1,1 +1,5 @@
-include ':flexible-adapter-app', ':flexible-adapter'
+include ':flexible-adapter',
+        ':flexible-adapter-app',
+        ':flexible-adapter-databinding',
+        ':flexible-adapter-ui',
+        ':flexible-adapter-livedata'

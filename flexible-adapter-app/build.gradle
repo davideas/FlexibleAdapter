@@ -1,80 +1,104 @@
-apply plugin: "com.android.application"
-apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'com.jakewharton.hugo'
+apply plugin: 'com.android.application'
+apply plugin: 'eu.davidea.grabver'
+
+versioning {
+    major 5
+    minor 0
+}
 
 android {
-	compileSdkVersion targetSdk
-	buildToolsVersion buildTools
+    compileSdkVersion targetSdk
+    buildToolsVersion buildTools
 
-	defaultConfig {
-		applicationId "eu.davidea.examples.flexibleadapter"
-		minSdkVersion minSdk
-		targetSdkVersion targetSdk
-		versionCode libraryCode
-		versionName libraryVersion + libraryDate
+    defaultConfig {
+        applicationId 'eu.davidea.samples.flexibleadapter'
+        minSdkVersion minSdk
+        targetSdkVersion targetSdk
+        versionCode versioning.code
+        versionName versioning.name
 
-		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        // https://medium.com/@chrisbanes/appcompat-v23-2-age-of-the-vectors-91cbafa87c88
+        // https://developer.android.com/studio/write/vector-asset-studio.html
+        vectorDrawables.useSupportLibrary = true
 
-		applicationVariants.all { variant ->
-			variant.outputs.each { output ->
-				def file = output.outputFile
-				def fileName = "flexible-adapter-v" + libraryVersion + "-c" + versionCode + ".apk"
-				output.outputFile = new File(file.parentFile, fileName)
-			}
-		}
-	}
-	buildTypes {
-		debug {
-			versionNameSuffix " build"
-			minifyEnabled false
-		}
-		release {
-			zipAlignEnabled true
-			minifyEnabled false
-		}
-	}
-	testOptions {
-		unitTests.returnDefaultValues = true
-	}
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        android.applicationVariants.all { variant ->
+            variant.outputs.all {
+                outputFileName = "flexible-adapter-v" + versioning.name + "-c" + versioning.code + ".apk"
+            }
+        }
+    }
+    // Configure only for each module that uses Java 8 language features
+    // (either in its source code or through dependencies).
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        debug {
+            versionNameSuffix ' #' + versioning.build + versioning.builtOn
+            minifyEnabled false
+        }
+        release {
+            zipAlignEnabled true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+    lintOptions {
+        abortOnError false
+    }
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
-	//Testing
-	androidTestCompile supportDependencies.annotations
-	androidTestCompile 'com.android.support.test:runner:0.5'
-	androidTestCompile 'com.android.support.test:rules:0.5'
-	testCompile 'org.robolectric:robolectric:3.1.2'
-	testCompile 'junit:junit:4.12'
-	testCompile 'org.mockito:mockito-core:2.0.71-beta'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-	//FlexibleAdapter
-	compile project (":flexible-adapter")
+    // FlexibleAdapter + extensions
+    implementation project(':flexible-adapter')
+    implementation project(':flexible-adapter-ui')
+    implementation project(':flexible-adapter-databinding')
 
-	//FlipView
-	compile "eu.davidea:flipview:1.1.2"
+    // Support Libraries
+    implementation supportLib.appCompat
+    implementation supportLib.cardView
+    implementation supportLib.design
+    implementation supportLib.recyclerView
 
-	//ButterKnife
-	compile 'com.jakewharton:butterknife:8.0.1'
-	apt 'com.jakewharton:butterknife-compiler:8.0.1'
+    // Timber (Logger) - https://github.com/JakeWharton/timber
+    implementation libraries.timber
 
-	//Support Libraries
-	compile supportDependencies.appcompat
-	compile supportDependencies.cardview
-	compile (supportDependencies.design) {
-		exclude module: "support-v4"
-		exclude module: "support-annotations"
-	}
-	compile (supportDependencies.recyclerview) {
-		exclude module: "support-v4";
-		exclude module: "support-annotations"
-	}
+    // Butter Knife (View Injector) - https://github.com/JakeWharton/butterknife
+    implementation libraries.butterKnife
+    annotationProcessor libraries.butterKnifeCompiler
 
-	//Glide (Image Loader)
-	compile 'com.github.bumptech.glide:glide:3.7.0'
+    // Glide (Image Loader & Caching)
+    implementation libraries.glide
+    annotationProcessor libraries.glideCompiler
 
-	//Smooth-app-bar-layout
-	compile ('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
-		exclude group: "com.android.support"
-	}
+    // Smooth-app-bar-layout
+    implementation('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
+        exclude group: 'com.android.support'
+    }
+
+    // UI Widgets
+    implementation widgets.flipView
+
+    // Test libraries
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test:rules:1.0.1'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    })
+    testImplementation 'org.robolectric:robolectric:3.4.2'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.15.0'
 
 }

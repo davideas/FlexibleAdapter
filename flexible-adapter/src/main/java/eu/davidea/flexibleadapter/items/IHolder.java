@@ -28,9 +28,9 @@ package eu.davidea.flexibleadapter.items;
  */
 public interface IHolder<Model> {
 
-	/**
-	 * @return the model object
-	 */
-	Model getModel();
+    /**
+     * @return the model object
+     */
+    Model getModel();
 
 }

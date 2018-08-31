@@ -13,19 +13,19 @@ import eu.davidea.utils.Utils;
 @SuppressWarnings("unchecked")
 public class SplashActivity extends AppCompatActivity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		if (Utils.hasLollipop()) requestWindowFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        if (Utils.hasLollipop()) requestWindowFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        super.onCreate(savedInstanceState);
 
-		if (Utils.hasLollipop()) {
-			getWindow().setExitTransition(new Fade());
-		}
+        if (Utils.hasLollipop()) {
+            getWindow().setExitTransition(new Fade());
+        }
 
-		Intent intent = new Intent(this, MainActivity.class);
-		ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-		ActivityCompat.startActivity(this, intent, options.toBundle());
-		ActivityCompat.finishAfterTransition(this);
-	}
+        Intent intent = new Intent(this, MainActivity.class);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+        ActivityCompat.startActivity(this, intent, options.toBundle());
+        ActivityCompat.finishAfterTransition(this);
+    }
 
 }

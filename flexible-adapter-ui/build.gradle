@@ -1,0 +1,50 @@
+apply plugin: 'com.android.library'
+apply plugin: 'eu.davidea.grabver'
+
+versioning {
+    major 1
+    minor 0
+    preRelease "b5"
+    dependsOn "install"
+}
+// For maven repository
+version = versioning.name
+
+ext {
+    // Library Settings
+    libraryName = "FlexibleAdapter UI extension"
+    libraryDescription = "UI extension for FlexibleAdapter project"
+    libraryLabels = ['android', 'flexibleadapter', 'adapter', 'ui']
+
+    publishedGroupId = "eu.davidea"
+    bintrayName = "flexible-adapter-ui"
+    artifact = bintrayName
+}
+
+android {
+    compileSdkVersion targetSdk
+    buildToolsVersion buildTools
+
+    defaultConfig {
+        minSdkVersion minSdk
+        targetSdkVersion targetSdk
+        versionCode versioning.code
+        versionName versioning.name
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compileOnly project(':flexible-adapter')
+    implementation supportLib.design
+}
+
+if (project.hasProperty('all') || project.hasProperty('ui')) {
+    apply from: '../maven-install.gradle'
+    apply from: '../jfrog-bintray-publish.gradle'
+}

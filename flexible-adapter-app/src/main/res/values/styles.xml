@@ -22,6 +22,13 @@
 		<item name="android:spinnerItemStyle">@style/SpinnerItem</item>
 	</style>
 
+	<!-- ToolBar -->
+	<style name="ToolBarStyle" parent="AppTheme.Base">
+		<item name="android:textColorPrimary">@android:color/white</item>
+		<item name="android:textColorSecondary">@android:color/white</item>
+		<item name="actionMenuTextColor">@android:color/white</item>
+	</style>
+
 	<style name="Spinner" parent="Widget.AppCompat.Spinner">
 		<item name="android:dropDownWidth">160dp</item>
 	</style>

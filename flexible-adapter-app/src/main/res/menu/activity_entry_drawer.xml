@@ -18,7 +18,7 @@
 			android:title="@string/filter"/>
 		<item
 			android:id="@+id/nav_animator"
-			android:icon="@drawable/ic_animation_grey600_24dp"
+			android:icon="@drawable/ic_chart_gantt_grey600_24dp"
 			android:title="@string/animator"/>
 		<item
 			android:id="@+id/nav_headers_and_sections"
@@ -36,6 +36,10 @@
 			android:id="@+id/nav_endless_scrolling"
 			android:icon="@drawable/ic_playlist_play_grey600_24dp"
 			android:title="@string/endless_scrolling"/>
+		<item
+			android:id="@+id/nav_db_headers_and_sections"
+			android:icon="@drawable/ic_link_grey_600_24dp"
+			android:title="@string/databinding"/>
 		<item
 			android:id="@+id/nav_instagram_headers"
 			android:icon="@drawable/ic_instagram_grey600_24dp"
@@ -85,9 +89,6 @@
 				android:id="@+id/nav_github"
 				android:icon="@drawable/ic_github_circle_grey600_24dp"
 				android:title="@string/github"/>
-			<!--<item-->
-				<!--android:id="@+id/nav_empty_space"-->
-				<!--android:title=""/>-->
 		</menu>
 	</item>
 

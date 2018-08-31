@@ -8,8 +8,8 @@ import java.util.List;
  */
 public interface OnParameterSelectedListener {
 
-	void onParameterSelected(int itemType, int referencePosition, int childPosition);
+    void onParameterSelected(int itemType, int referencePosition, int childPosition);
 
-	List<?> getReferenceList();
+    List<?> getReferenceList();
 
 }

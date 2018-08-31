@@ -3,7 +3,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="?android:attr/listPreferredItemHeightSmall"
-	android:background="@color/material_color_grey_600">
+	android:background="@color/material_color_deep_purple_100">
 
 	<LinearLayout
 		android:id="@+id/title_container"
@@ -22,7 +22,7 @@
 			android:layout_height="wrap_content"
 			android:ellipsize="end"
 			android:maxLines="1"
-			android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse"
+			android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
 			tools:text="Header"/>
 
 		<TextView
@@ -33,7 +33,6 @@
 			android:ellipsize="end"
 			android:maxLines="1"
 			android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-			android:textColor="@color/material_text_color_white_text"
 			tools:text="Header Subtitle"/>
 
 	</LinearLayout>

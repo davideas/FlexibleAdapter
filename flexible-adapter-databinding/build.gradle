@@ -1,0 +1,53 @@
+apply plugin: 'com.android.library'
+apply plugin: 'eu.davidea.grabver'
+
+versioning {
+    major 1
+    minor 0
+    preRelease "b3"
+}
+// For maven repository
+version = versioning.name
+
+ext {
+    // Library Settings
+    libraryName = "FlexibleAdapter DataBinding extension"
+    libraryDescription = "DataBinding extension for FlexibleAdapter project"
+    libraryLabels = ['android', 'flexibleadapter', 'adapter', 'databinding', 'binding']
+
+    publishedGroupId = "eu.davidea"
+    bintrayName = "flexible-adapter-databinding"
+    artifact = bintrayName
+}
+
+android {
+    compileSdkVersion targetSdk
+    buildToolsVersion buildTools
+
+    defaultConfig {
+        minSdkVersion minSdk
+        targetSdkVersion targetSdk
+        versionCode versioning.code
+        versionName versioning.name
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    compileOnly project(":flexible-adapter")
+    compileOnly supportLib.recyclerView
+    implementation supportLib.support_v4
+}
+
+if (project.hasProperty('all') || project.hasProperty('databinding')) {
+    apply from: '../maven-install.gradle'
+    apply from: '../jfrog-bintray-publish.gradle'
+}

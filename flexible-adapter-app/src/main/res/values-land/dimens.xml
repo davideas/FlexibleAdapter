@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="launchscreen_product_logo_bottom">172dp</dimen>
+    <dimen name="launchscreen_text_logo_bottom">72dp</dimen>
+</resources>

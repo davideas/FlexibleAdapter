@@ -29,97 +29,115 @@ import eu.davidea.viewholders.ExpandableViewHolder;
  * @param <S>  The sub item of type {@link IFlexible}
  * @author Davide Steduto
  * @since 17/01/2016 Created
- * <br/>18/06/2016 Changed signature with ExpandableViewHolder
+ * <br>18/06/2016 Changed signature with ExpandableViewHolder
  */
 public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S extends IFlexible>
-		extends AbstractFlexibleItem<VH>
-		implements IExpandable<VH, S> {
+        extends AbstractFlexibleItem<VH>
+        implements IExpandable<VH, S> {
 
-	/* Flags for FlexibleAdapter */
-	protected boolean mExpanded = false;
+    /* Flags for FlexibleAdapter */
+    protected boolean mExpanded = false;
 
-	/* subItems list */
-	protected List<S> mSubItems;
+    /* subItems list */
+    protected List<S> mSubItems;
 
 	/*--------------------*/
-	/* EXPANDABLE METHODS */
+    /* EXPANDABLE METHODS */
 	/*--------------------*/
 
-	@Override
-	public boolean isExpanded() {
-		return mExpanded;
-	}
+    @Override
+    public boolean isExpanded() {
+        return mExpanded;
+    }
 
-	@Override
-	public void setExpanded(boolean expanded) {
-		this.mExpanded = expanded;
-	}
+    @Override
+    public void setExpanded(boolean expanded) {
+        this.mExpanded = expanded;
+    }
 
-	@Override
-	public int getExpansionLevel() {
-		return 0;
-	}
+    @Override
+    public int getExpansionLevel() {
+        return 0;
+    }
 
 	/*-------------------*/
 	/* SUB ITEMS METHODS */
 	/*-------------------*/
 
-	@Override
-	public final List<S> getSubItems() {
-		return mSubItems;
-	}
+    @Override
+    public final List<S> getSubItems() {
+        return mSubItems;
+    }
 
-	public final boolean hasSubItems() {
-		return mSubItems != null && mSubItems.size() > 0;
-	}
+    public final boolean hasSubItems() {
+        return mSubItems != null && mSubItems.size() > 0;
+    }
 
-	public IFlexible setSubItems(List<S> subItem) {
-		mSubItems = subItem;
-		return this;
-	}
+    public AbstractExpandableItem setSubItems(List<S> subItems) {
+        mSubItems = subItems;
+        return this;
+    }
 
-	public final int getSubItemsCount() {
-		return mSubItems != null ? mSubItems.size() : 0;
-	}
+    public AbstractExpandableItem addSubItems(int position, List<S> subItems) {
+        if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
+            mSubItems.addAll(position, subItems);
+        } else {
+            if (mSubItems == null)
+                mSubItems = new ArrayList<>();
+            mSubItems.addAll(subItems);
+        }
+        return this;
+    }
 
-	public S getSubItem(int position) {
-		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
-			return mSubItems.get(position);
-		}
-		return null;
-	}
+    public final int getSubItemsCount() {
+        return mSubItems != null ? mSubItems.size() : 0;
+    }
 
-	public final int getSubItemPosition(S subItem) {
-		return mSubItems != null ? mSubItems.indexOf(subItem) : -1;
-	}
+    public S getSubItem(int position) {
+        if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
+            return mSubItems.get(position);
+        }
+        return null;
+    }
 
-	public void addSubItem(S subItem) {
-		if (mSubItems == null)
-			mSubItems = new ArrayList<>();
-		mSubItems.add(subItem);
-	}
+    public final int getSubItemPosition(S subItem) {
+        return mSubItems != null ? mSubItems.indexOf(subItem) : -1;
+    }
 
-	public void addSubItem(int position, S subItem) {
-		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
-			mSubItems.add(position, subItem);
-		} else
-			addSubItem(subItem);
-	}
+    public AbstractExpandableItem addSubItem(S subItem) {
+        if (mSubItems == null)
+            mSubItems = new ArrayList<>();
+        mSubItems.add(subItem);
+        return this;
+    }
 
-	public boolean contains(S subItem) {
-		return mSubItems != null && mSubItems.contains(subItem);
-	}
+    public AbstractExpandableItem addSubItem(int position, S subItem) {
+        if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
+            mSubItems.add(position, subItem);
+        } else {
+            addSubItem(subItem);
+        }
+        return this;
+    }
 
-	public boolean removeSubItem(S item) {
-		return item != null && mSubItems.remove(item);
-	}
+    public boolean contains(S subItem) {
+        return mSubItems != null && mSubItems.contains(subItem);
+    }
 
-	public boolean removeSubItem(int position) {
-		if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
-			mSubItems.remove(position);
-			return true;
-		}
-		return false;
-	}
+    public boolean removeSubItem(S item) {
+        return item != null && mSubItems != null && mSubItems.remove(item);
+    }
+
+    public boolean removeSubItems(List<S> subItems) {
+        return subItems != null && mSubItems != null && mSubItems.removeAll(subItems);
+    }
+
+    public boolean removeSubItem(int position) {
+        if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
+            mSubItems.remove(position);
+            return true;
+        }
+        return false;
+    }
 
 }

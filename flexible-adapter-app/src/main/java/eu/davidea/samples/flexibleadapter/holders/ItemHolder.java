@@ -1,8 +1,6 @@
 package eu.davidea.samples.flexibleadapter.holders;
 
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
@@ -31,79 +29,79 @@ import eu.davidea.viewholders.FlexibleViewHolder;
  * @since 19/10/2016
  */
 public class ItemHolder extends AbstractSectionableItem<ItemHolder.ItemViewHolder, HeaderHolder>
-		implements IFilterable, IHolder<ItemModel> {
+        implements IFilterable<String>, IHolder<ItemModel> {
 
-	private ItemModel model;
+    private ItemModel model;
 
-	/**
-	 * The header item must in its bounds, it must implement IHeader, therefore: HeaderHolder!
-	 */
-	public ItemHolder(ItemModel model, HeaderHolder header) {
-		super(header);
-		this.model = model;
-	}
+    /**
+     * The header item must in its bounds, it must implement IHeader, therefore: HeaderHolder!
+     */
+    public ItemHolder(ItemModel model, HeaderHolder header) {
+        super(header);
+        this.model = model;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof ItemHolder) {
-			ItemHolder inItem = (ItemHolder) o;
-			return model.equals(inItem.getModel());
-		}
-		return false;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ItemHolder) {
+            ItemHolder inItem = (ItemHolder) o;
+            return model.equals(inItem.getModel());
+        }
+        return false;
+    }
 
-	@Override
-	public int hashCode() {
-		return model.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return model.hashCode();
+    }
 
-	/**
-	 * @return the model object
-	 */
-	@Override
-	public ItemModel getModel() {
-		return model;
-	}
+    /**
+     * @return the model object
+     */
+    @Override
+    public ItemModel getModel() {
+        return model;
+    }
 
-	/**
-	 * Filter is applied to the model fields.
-	 */
-	@Override
-	public boolean filter(String constraint) {
-		return model.getTitle() != null && model.getTitle().toLowerCase().trim().contains(constraint) ||
-				model.getSubtitle() != null && model.getSubtitle().toLowerCase().trim().contains(constraint);
-	}
+    /**
+     * Filter is applied to the model fields.
+     */
+    @Override
+    public boolean filter(String constraint) {
+        return model.getTitle() != null && model.getTitle().toLowerCase().trim().contains(constraint) ||
+                model.getSubtitle() != null && model.getSubtitle().toLowerCase().trim().contains(constraint);
+    }
 
-	@Override
-	public int getLayoutRes() {
-		return R.layout.recycler_holder_item;
-	}
+    @Override
+    public int getLayoutRes() {
+        return R.layout.recycler_holder_item;
+    }
 
-	@Override
-	public ItemViewHolder createViewHolder(FlexibleAdapter adapter, LayoutInflater inflater, ViewGroup parent) {
-		return new ItemViewHolder(inflater.inflate(getLayoutRes(), parent, false), adapter);
-	}
+    @Override
+    public ItemViewHolder createViewHolder(View view, FlexibleAdapter adapter) {
+        return new ItemViewHolder(view, adapter);
+    }
 
-	@Override
-	public void bindViewHolder(final FlexibleAdapter adapter, ItemViewHolder holder, int position, List payloads) {
-		holder.mTitle.setText(model.getTitle());
-		holder.mSubtitle.setText(model.getSubtitle());
-	}
+    @Override
+    public void bindViewHolder(final FlexibleAdapter adapter, ItemViewHolder holder, int position, List payloads) {
+        holder.mTitle.setText(model.getTitle());
+        holder.mSubtitle.setText(model.getSubtitle());
+    }
 
-	static class ItemViewHolder extends FlexibleViewHolder {
+    static class ItemViewHolder extends FlexibleViewHolder {
 
-		@BindView(R.id.title)
-		public TextView mTitle;
-		@BindView(R.id.subtitle)
-		public TextView mSubtitle;
+        @BindView(R.id.title)
+        public TextView mTitle;
+        @BindView(R.id.subtitle)
+        public TextView mSubtitle;
 
-		/**
-		 * Default constructor.
-		 */
-		public ItemViewHolder(View view, FlexibleAdapter adapter) {
-			super(view, adapter);
-			ButterKnife.bind(this, view);
-		}
-	}
+        /**
+         * Default constructor.
+         */
+        ItemViewHolder(View view, FlexibleAdapter adapter) {
+            super(view, adapter);
+            ButterKnife.bind(this, view);
+        }
+    }
 
 }

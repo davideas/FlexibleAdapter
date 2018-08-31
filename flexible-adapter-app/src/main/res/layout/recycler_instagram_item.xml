@@ -12,7 +12,6 @@
 		android:layout_width="match_parent"
 		android:layout_height="280dp"
 		android:adjustViewBounds="true"
-		android:scaleType="fitXY"
 		tools:src="@drawable/ic_favorite_border_grey_600_24dp"/>
 
 	<LinearLayout

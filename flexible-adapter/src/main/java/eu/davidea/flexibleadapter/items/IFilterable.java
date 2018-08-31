@@ -15,9 +15,12 @@
  */
 package eu.davidea.flexibleadapter.items;
 
+import java.io.Serializable;
+
 /**
- * When user wants to search through the list, in order to be to collected, an item must implement
- * this interface.
+ * When user wants to search through the list, an item, in order to be to collected, must implement
+ * this interface. The filter object can be of any type and must implement Serializable type
+ * to support configuration changes, for example: String.
  *
  * @author Davide Steduto
  * @see IFlexible
@@ -27,17 +30,17 @@ package eu.davidea.flexibleadapter.items;
  * @see ISectionable
  * @since 18/02/2016 Created
  */
-public interface IFilterable {
+public interface IFilterable<F extends Serializable> {
 
-	/**
-	 * Checks and performs the filter on this item, you can apply the logic and the filter on
-	 * every fields your use case foreseen.
-	 * <p><b>Note:</b> Filter method makes use of {@code HashSet}, in this case you should
-	 * implement {@link #hashCode()} too!</p>
-	 *
-	 * @param constraint the search text typed by the user
-	 * @return true if this item should be collected by the Adapter for the filtered list, false otherwise
-	 */
-	boolean filter(String constraint);
+    /**
+     * Checks and performs the filter on this item. Filter object can be of any type: you can
+     * apply any filter your use case foresees.
+     * <p><b>Note:</b> Filter method makes use of {@code HashSet}, in case you implemented
+     * {@link Object#equals(Object)} you should implement {@link Object#hashCode()} too!</p>
+     *
+     * @param constraint the filter applied by the user. In case of String it's always lowercase.
+     * @return true if this item should be collected by the Adapter for the filtered list, false otherwise
+     */
+    boolean filter(F constraint);
 
 }

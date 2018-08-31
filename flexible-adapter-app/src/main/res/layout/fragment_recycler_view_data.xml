@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="items"
+            type="android.databinding.ObservableArrayList" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:theme="@style/AppTheme.Base">
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:enabled="false">
+
+            <!-- This FrameLayout is needed ONLY IF sticky headers are used, in order to
+                 display the refresh circle on the top of sticky_header_layout.
+                 If you need to drag items, SwipeRefreshLayout must be disabled! -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:items="@{items}"
+                    tools:listitem="@layout/recycler_simple_item" />
+
+                <!-- Needed by FlexibleAdapter for headers to be sticky.
+                     This little layout is included in the library.
+                     If you need to drag items, SwipeRefreshLayout must be disabled!-->
+                <!--<include layout="@layout/sticky_header_layout" />-->
+
+            </FrameLayout>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+        <!-- Custom EmptyView for RV when empty-->
+        <include layout="@layout/empty_view" />
+
+        <!-- Custom ProgressBar (at the moment not used) -->
+        <!--<include layout="@layout/progress_bar"/>-->
+
+        <!-- FastScroller Layout must be at the end of ViewHierarchy
+             in order to be displayed at the top of every views -->
+        <include layout="@layout/fast_scroller" />
+
+    </FrameLayout>
+</layout>

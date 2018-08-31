@@ -24,7 +24,7 @@
 				android:id="@+id/recycler_view"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				tools:listitem="@layout/recycler_expandable_item"/>
+				tools:listitem="@layout/recycler_simple_item"/>
 
 			<!-- NOT NEEDED ANYMORE!! This layout is generated at runtime when
                  sticky headers are enabled. So you can safely remove it. -->
@@ -36,6 +36,9 @@
 
 	<!-- Custom EmptyView for RV when empty-->
 	<include layout="@layout/empty_view"/>
+
+	<!-- Custom EmptyView for RV when filter has empty result-->
+	<include layout="@layout/filter_view"/>
 
 	<!-- Custom ProgressBar (at the moment not used) -->
 	<!--<include layout="@layout/progress_bar"/>-->

@@ -12,6 +12,7 @@
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
+		android:layout_marginBottom="@dimen/margin_bottom"
 		android:orientation="vertical">
 
 		<TextView
@@ -25,7 +26,7 @@
 			android:id="@+id/subtitle"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="@dimen/margin_top_medium"
+			android:layout_marginTop="@dimen/margin_top_small"
 			android:textAppearance="@style/TextAppearance.AppCompat.Small"
 			tools:text="@string/config_notify_move_description"/>
 

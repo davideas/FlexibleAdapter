@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
-	android:layout_height="?android:attr/listPreferredItemHeightLarge"
+	android:layout_height="wrap_content"
 	android:paddingTop="@dimen/margin_top"
 	android:paddingBottom="@dimen/margin_bottom"
-	android:background="?attr/selectableItemBackground"
 	android:descendantFocusability="blocksDescendants">
 
 	<ImageView

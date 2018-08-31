@@ -3,7 +3,6 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:background="@color/material_color_blue_grey_50"
 	android:descendantFocusability="blocksDescendants"
 	android:paddingBottom="@dimen/margin_bottom"
 	android:paddingTop="@dimen/margin_top">
@@ -49,7 +48,7 @@
 			android:layout_height="wrap_content"
 			android:ellipsize="marquee"
 			android:marqueeRepeatLimit="marquee_forever"
-			android:maxLines="1"
+			android:singleLine="true"
 			android:text="@string/overall_use_case_title"
 			android:textAppearance="@style/TextAppearance.AppCompat.Title"
 			android:textColor="?primaryTextSelector"/>
@@ -60,7 +59,7 @@
 			android:layout_height="wrap_content"
 			android:layout_marginTop="2dp"
 			android:text="@string/overall_use_case_description"
-			android:textAppearance="@style/TextAppearance.AppCompat.Notification.Info"
+			android:textAppearance="@style/TextAppearance.AppCompat.Small"
 			android:textColor="?primaryTextSelector"/>
 
 	</LinearLayout>

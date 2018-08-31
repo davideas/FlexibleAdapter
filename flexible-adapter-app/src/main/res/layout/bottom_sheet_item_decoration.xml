@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/bottom_sheet"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:background="@color/cardview_light_background"
+	android:orientation="vertical"
+	android:paddingBottom="@dimen/activity_vertical_margin"
+	android:paddingLeft="@dimen/activity_horizontal_margin"
+	android:paddingRight="@dimen/activity_horizontal_margin">
+
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="?attr/actionBarSize">
+
+		<TextView
+			style="@style/TextAppearance.AppCompat.Medium"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:textStyle="bold"
+			android:textAppearance="@style/TextAppearance.AppCompat.Title"
+			android:text="@string/action_decoration"/>
+
+	</RelativeLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="?attr/listPreferredItemHeightSmall"
+		android:orientation="horizontal">
+
+		<TextView
+			android:layout_width="0dp"
+			android:layout_weight="1"
+			android:layout_height="match_parent"
+			android:gravity="center_vertical"
+			android:text="Edges"/>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_weight="1"
+			android:layout_height="match_parent"
+			android:gravity="end|center_vertical"
+			android:orientation="horizontal">
+
+			<View
+				android:layout_width="2dp"
+				android:layout_height="30dp"
+				android:layout_marginRight="4dp"
+				android:layout_marginEnd="4dp"
+				android:background="@color/material_color_deep_purple_900"/>
+
+			<Switch
+				android:id="@+id/switch_edge_left"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:checked="true"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_weight="1"
+			android:layout_height="match_parent"
+			android:gravity="end|center_vertical"
+			android:orientation="vertical">
+
+			<View
+				android:layout_width="40dp"
+				android:layout_height="2dp"
+				android:background="@color/material_color_deep_purple_900"/>
+
+			<Switch
+				android:id="@+id/switch_edge_top"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:checked="true"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_weight="1"
+			android:layout_height="match_parent"
+			android:gravity="end|center_vertical"
+			android:orientation="horizontal">
+
+			<Switch
+				android:id="@+id/switch_edge_right"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:checked="true"/>
+
+			<View
+				android:layout_width="2dp"
+				android:layout_height="30dp"
+				android:background="@color/material_color_deep_purple_900"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_weight="1"
+			android:layout_height="match_parent"
+			android:gravity="end|center_vertical"
+			android:orientation="vertical">
+
+			<Switch
+				android:id="@+id/switch_edge_bottom"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:checked="true"/>
+
+			<View
+				android:layout_width="40dp"
+				android:layout_height="2dp"
+				android:background="@color/material_color_deep_purple_900"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="?attr/listPreferredItemHeightSmall"
+			android:gravity="center_vertical"
+			android:layout_toLeftOf="@+id/switch_default_divider"
+			android:text="Android Divider"/>
+
+		<Switch
+			android:id="@+id/switch_default_divider"
+			android:layout_width="wrap_content"
+			android:layout_height="?attr/listPreferredItemHeightSmall"
+			android:gravity="center_vertical"
+			android:layout_alignParentRight="true"/>
+
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="?attr/listPreferredItemHeightSmall"
+			android:gravity="center_vertical"
+			android:layout_toLeftOf="@+id/switch_custom_divider"
+			android:text="Custom Divider"/>
+
+		<Switch
+			android:id="@+id/switch_custom_divider"
+			android:layout_width="wrap_content"
+			android:layout_height="?attr/listPreferredItemHeightSmall"
+			android:gravity="center_vertical"
+			android:layout_alignParentRight="true"/>
+
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="?attr/listPreferredItemHeightSmall"
+			android:layout_toLeftOf="@+id/switch_draw_over"
+			android:gravity="center_vertical"
+			android:text="Draw Over"/>
+
+		<Switch
+			android:id="@+id/switch_draw_over"
+			android:layout_width="wrap_content"
+			android:layout_height="?attr/listPreferredItemHeightSmall"
+			android:gravity="center"
+			android:layout_alignParentRight="true"/>
+
+	</RelativeLayout>
+
+</LinearLayout>

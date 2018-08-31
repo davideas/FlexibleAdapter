@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:opacity="opaque">
+
+	<item android:drawable="@color/material_color_grey_300"/>
+	<item
+		android:id="@+id/launchscreen_product_logo"
+		android:bottom="@dimen/launchscreen_product_logo_bottom">
+		<bitmap
+			android:gravity="bottom|center_horizontal"
+			android:src="@drawable/logo_splash_192"/>
+	</item>
+	<item
+		android:id="@+id/launchscreen_text_logo"
+		android:bottom="@dimen/launchscreen_text_logo_bottom">
+		<bitmap
+			android:gravity="bottom|center_horizontal"
+			android:src="@drawable/logo_text_192"/>
+	</item>
+
+</layer-list>
