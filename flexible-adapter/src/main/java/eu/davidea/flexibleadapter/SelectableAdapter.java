@@ -574,8 +574,12 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @since 1.0.0
      */
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        mSelectedPositions.addAll(savedInstanceState.getIntegerArrayList(TAG));
-        if (getSelectedItemCount() > 0) log.d("Restore selection %s", mSelectedPositions);
+        // Fix for #651 - Check nullable: it happens that the list is null in some unknown cases
+        List selectedItems = savedInstanceState.getIntegerArrayList(TAG);
+        if (selectedItems != null) {
+            mSelectedPositions.addAll(selectedItems);
+            if (getSelectedItemCount() > 0) log.d("Restore selection %s", mSelectedPositions);
+        }
     }
 
 	/*---------------*/
