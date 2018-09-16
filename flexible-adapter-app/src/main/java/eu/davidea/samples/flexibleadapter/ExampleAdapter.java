@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 
 import java.util.List;
+import java.util.Random;
 
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
@@ -29,6 +30,8 @@ import eu.davidea.samples.flexibleadapter.services.DatabaseConfiguration;
 public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
 
     private static final String TAG = ExampleAdapter.class.getSimpleName();
+
+    ScrollableFooterItem scrollableFooterItem = new ScrollableFooterItem("SFI");
 
     public ExampleAdapter(List<AbstractFlexibleItem> items, Object listeners) {
         // stableIds ? true = Items implement hashCode() so they can have stableIds!
@@ -111,10 +114,14 @@ public class ExampleAdapter extends FlexibleAdapter<AbstractFlexibleItem> {
      * The view is represented by a custom Item type to better represent any dynamic content.
      */
     public void addScrollableFooter() {
-        final ScrollableFooterItem item = new ScrollableFooterItem("SFI");
-        item.setTitle(mRecyclerView.getContext().getString(R.string.scrollable_footer_title));
-        item.setSubtitle(mRecyclerView.getContext().getString(R.string.scrollable_footer_subtitle));
-        addScrollableFooterWithDelay(item, 1000L, false);
+        scrollableFooterItem.setTitle(mRecyclerView.getContext().getString(R.string.scrollable_footer_title));
+        scrollableFooterItem.setSubtitle(mRecyclerView.getContext().getString(R.string.scrollable_footer_subtitle));
+        addScrollableFooterWithDelay(scrollableFooterItem, 1000L, false);
+    }
+
+    public void updateScrollableFooter() {
+        scrollableFooterItem.setTitle("Title update for SFI r" + new Random().nextInt(10));
+        updateItem(scrollableFooterItem);
     }
 
     /*
