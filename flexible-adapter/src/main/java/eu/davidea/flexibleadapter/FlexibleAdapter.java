@@ -147,7 +147,7 @@ public class FlexibleAdapter<T extends IFlexible>
     private boolean autoMap = false;
 
     /* Filter */
-    private Serializable mFilterEntity = null, mOldFilterEntity = null;
+    private Serializable mFilterEntity = null, mOldFilterEntity = "";
     private Set<IExpandable> mExpandedFilterFlags;
     private boolean notifyChangeOfUnfilteredItems = true, filtering = false,
             notifyMoveOfFilteredItems = false;
@@ -4123,8 +4123,9 @@ public class FlexibleAdapter<T extends IFlexible>
             IExpandable expandable = (IExpandable) item;
             // Save which expandable was originally expanded before filtering it out
             if (expandable.isExpanded()) {
-                if (mExpandedFilterFlags == null)
+                if (mExpandedFilterFlags == null) {
                     mExpandedFilterFlags = new HashSet<>();
+                }
                 mExpandedFilterFlags.add(expandable);
             }
             // SubItems scan filter
@@ -4183,11 +4184,10 @@ public class FlexibleAdapter<T extends IFlexible>
             if (isExpandable(item)) {
                 IExpandable expandable = (IExpandable) item;
                 // Reset expanded flag
-                if (mExpandedFilterFlags != null)
-                    expandable.setExpanded(mExpandedFilterFlags.contains(expandable));
+                expandable.setExpanded(mExpandedFilterFlags != null && mExpandedFilterFlags.contains(expandable));
                 if (hasSubItems(expandable)) {
                     List<T> subItems = expandable.getSubItems();
-                    // Reset subItem hidden flag
+                    // Reset subItem hidden flag2
                     for (T subItem : subItems) {
                         subItem.setHidden(false);
                         if (subItem instanceof IExpandable) {

@@ -11,6 +11,7 @@ import java.util.List;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.items.IExpandable;
+import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.samples.flexibleadapter.R;
 import eu.davidea.samples.flexibleadapter.items.ExpandableHeaderItem.ExpandableHeaderViewHolder;
@@ -107,16 +108,30 @@ public class ExpandableHeaderItem
     }
 
     @Override
-    public void bindViewHolder(FlexibleAdapter adapter, ExpandableHeaderViewHolder holder, int position, List payloads) {
+    public void bindViewHolder(FlexibleAdapter<IFlexible> adapter, ExpandableHeaderViewHolder holder, int position, List<Object> payloads) {
         if (payloads.size() > 0) {
             Log.d(this.getClass().getSimpleName(), "ExpandableHeaderItem Payload " + payloads + " - " + getTitle());
         } else {
             Log.d(this.getClass().getSimpleName(), "ExpandableHeaderItem NoPayload - " + getTitle());
             holder.mTitle.setText(getTitle());
         }
-        setSubtitle(String.valueOf(adapter.getCurrentChildren(this).size()) +
-                " subItems (" + (isExpanded() ? "expanded" : "collapsed") + ")");
+        setSubtitle(String.format("%s subItems %s(%s)",
+                countFilteredChildren(adapter),
+                (adapter.hasFilter() ? "found " : ""),
+                (isExpanded() ? "expanded" : "collapsed")));
         holder.mSubtitle.setText(getSubtitle());
+    }
+
+    private int countFilteredChildren(FlexibleAdapter<IFlexible> adapter) {
+        if (adapter.hasFilter()) {
+            String filter = adapter.getFilter(String.class);
+            int size = 0;
+            for (SubItem s : mSubItems) {
+                if (s.filter(filter)) size++;
+            }
+            return size;
+        }
+        return adapter.getCurrentChildren(this).size();
     }
 
     /**
