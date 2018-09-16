@@ -21,6 +21,7 @@
 		<!-- #139 Test for Automatic configuration change -->
 		<activity android:name=".MainActivity"
 			android:configChanges="orientation|screenSize">
+		<!--<activity android:name=".MainActivity">-->
 			<meta-data
 				android:name="android.app.searchable"
 				android:resource="@xml/searchable"/>

@@ -5,7 +5,7 @@
 ![Methods and Size](https://img.shields.io/badge/Methods%20and%20size-Core:%20759,%20124%20KB%20|%20UI:%20267,%2068%20KB-e91e63.svg)
 
 # FlexibleAdapter
-- [v5.0.5](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.5) built on 2018.06.03
+- [v5.0.6](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.6) built on 2018.09.16
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 - Please read also [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -63,7 +63,7 @@ repositories {
 ```
 dependencies {
     // Using JCenter
-    implementation 'eu.davidea:flexible-adapter:5.0.5'
+    implementation 'eu.davidea:flexible-adapter:5.0.6'
     implementation 'eu.davidea:flexible-adapter-ui:1.0.0-b5'
     implementation 'eu.davidea:flexible-adapter-livedata:1.0.0-b2'
     // From 1.0.0-b3, library is compiled with data binding v2
@@ -73,7 +73,7 @@ dependencies {
 #### Stay Updated
 |Flexible Adapter|UI|Live Data|Data Binding|
 |---|---|---|---|
-|<div align="center">5.0.5</div>|<div align="center">1.0.0-b5</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b3</div>|
+|<div align="center">5.0.6</div>|<div align="center">1.0.0-b5</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b3</div>|
 |<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-ui?source=watch' alt='Get automatic notifications about new "flexible-adapter-ui" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-livedata?source=watch' alt='Get automatic notifications about new "flexible-adapter-livedata" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-databinding?source=watch' alt='Get automatic notifications about new "flexible-adapter-databinding" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|
 
 # Wiki!
@@ -120,18 +120,15 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 
 # Change Log
 ###### Latest release
-[v5.0.5](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.5) - 2018.06.03
+[v5.0.6](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.6) - 2018.09.16 |
 
 ###### Old releases
+[v5.0.5](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.5) - 2018.06.03 |
 [v5.0.4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.4) - 2018.05.01 |
 [v5.0.3](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.3) - 2018.03.23 |
 [v5.0.2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.2) - 2018.03.17 |
 [v5.0.1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.1) - 2018.03.11 |
-[v5.0.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0) - 2018.03.04<br>
-[v5.0.0-rc4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc4) - 2017.12.17 |
-[v5.0.0-rc3](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc3) - 2017.10.20 |
-[v5.0.0-rc2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc2) - 2017.06.10 |
-[v5.0.0-rc1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0-rc1) - 2017.01.14
+[v5.0.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0) - 2018.03.04
 
 # Limitations
 Item half swipe cannot be implemented due to how the `android.support.v7.widget.helper.ItemTouchHelper` is done, also clicks on rear view are not possible, same reason.

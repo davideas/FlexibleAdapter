@@ -4,6 +4,7 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 5
     minor 0
+    patch 6
 }
 
 android {
