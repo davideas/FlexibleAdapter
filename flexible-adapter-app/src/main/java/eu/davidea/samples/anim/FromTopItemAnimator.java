@@ -1,9 +1,9 @@
 package eu.davidea.samples.anim;
 
 import android.graphics.Point;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorCompat;
-import android.support.v7.widget.RecyclerView.ViewHolder;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.ViewPropertyAnimatorCompat;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 

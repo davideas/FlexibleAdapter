@@ -17,11 +17,6 @@ package eu.davidea.flexibleadapter;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.RecyclerView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -34,6 +29,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.common.FlexibleLayoutManager;
 import eu.davidea.flexibleadapter.common.IFlexibleLayoutManager;
@@ -43,9 +43,7 @@ import eu.davidea.flexibleadapter.utils.Log.Level;
 import eu.davidea.flexibleadapter.utils.Logger;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
-import static eu.davidea.flexibleadapter.SelectableAdapter.Mode.IDLE;
-import static eu.davidea.flexibleadapter.SelectableAdapter.Mode.MULTI;
-import static eu.davidea.flexibleadapter.SelectableAdapter.Mode.SINGLE;
+import static eu.davidea.flexibleadapter.SelectableAdapter.Mode.*;
 import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
 
 /**

@@ -1,7 +1,5 @@
 package eu.davidea.flexibleadapter.livedata;
 
-import android.support.annotation.NonNull;
-
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -9,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.livedata.items.HeaderHolder;
@@ -16,10 +15,7 @@ import eu.davidea.flexibleadapter.livedata.items.ItemHolder;
 import eu.davidea.flexibleadapter.livedata.models.HeaderModel;
 import eu.davidea.flexibleadapter.livedata.models.ItemModel;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /*
  * Test Case Definitions

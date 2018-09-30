@@ -5,7 +5,8 @@
 ![Methods and Size](https://img.shields.io/badge/Methods%20and%20size-Core:%20759,%20124%20KB%20|%20UI:%20267,%2068%20KB-e91e63.svg)
 
 # FlexibleAdapter
-- [v5.0.6](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.6) built on 2018.09.16
+- [v5.0.7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.7) built on 2018.09.30 last with Support v28
+- [v5.1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.1.0) built on 2018.09.30 with AndroidX
 - If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
 - Please read also [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
 
@@ -63,17 +64,17 @@ repositories {
 ```
 dependencies {
     // Using JCenter
-    implementation 'eu.davidea:flexible-adapter:5.0.6'
-    implementation 'eu.davidea:flexible-adapter-ui:1.0.0-b5'
-    implementation 'eu.davidea:flexible-adapter-livedata:1.0.0-b2'
+    implementation 'eu.davidea:flexible-adapter:5.1.0'
+    implementation 'eu.davidea:flexible-adapter-ui:1.0.0-b6'
+    implementation 'eu.davidea:flexible-adapter-livedata:1.0.0-b3'
     // From 1.0.0-b3, library is compiled with data binding v2
-    implementation 'eu.davidea:flexible-adapter-databinding:1.0.0-b3'
+    implementation 'eu.davidea:flexible-adapter-databinding:1.0.0-b4'
 }
 ```
 #### Stay Updated
 |Flexible Adapter|UI|Live Data|Data Binding|
 |---|---|---|---|
-|<div align="center">5.0.6</div>|<div align="center">1.0.0-b5</div>|<div align="center">1.0.0-b2</div>|<div align="center">1.0.0-b3</div>|
+|<div align="center">5.1.0</div>|<div align="center">1.0.0-b6</div>|<div align="center">1.0.0-b3</div>|<div align="center">1.0.0-b4</div>|
 |<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-ui?source=watch' alt='Get automatic notifications about new "flexible-adapter-ui" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-livedata?source=watch' alt='Get automatic notifications about new "flexible-adapter-livedata" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-databinding?source=watch' alt='Get automatic notifications about new "flexible-adapter-databinding" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|
 
 # Wiki!
@@ -120,9 +121,11 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 
 # Change Log
 ###### Latest release
-[v5.0.6](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.6) - 2018.09.16 |
+[v5.0.7](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.7) - 2018.09.30 |
+[v5.1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.1.0) - 2018.09.30
 
 ###### Old releases
+[v5.0.6](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.6) - 2018.09.16 |
 [v5.0.5](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.5) - 2018.06.03 |
 [v5.0.4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.4) - 2018.05.01 |
 [v5.0.3](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.3) - 2018.03.23 |

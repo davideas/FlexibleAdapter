@@ -16,8 +16,8 @@
 package eu.davidea.flexibleadapter.common;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 /**
  * Optimized implementation of StaggeredGridLayoutManager to SmoothScroll to a Top position.

@@ -2,10 +2,10 @@ package eu.davidea.samples.flexibleadapter.dialogs;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
@@ -15,6 +15,9 @@ import android.widget.Button;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import eu.davidea.common.SimpleOnTouchListener;
 import eu.davidea.samples.flexibleadapter.R;
 
@@ -23,13 +26,13 @@ import eu.davidea.samples.flexibleadapter.R;
  * @since 20/04/2016
  */
 @SuppressWarnings({"ConstantConditions", "unchecked"})
-public class BottomSheetSectionDialog extends android.support.design.widget.BottomSheetDialogFragment
+public class BottomSheetSectionDialog extends BottomSheetDialogFragment
         implements View.OnClickListener, AdapterView.OnItemClickListener {
 
     public static final String TAG = BottomSheetSectionDialog.class.getSimpleName();
     public static final String ARG_LAYOUT = "layout";
 
-    private android.support.design.widget.BottomSheetDialog mBottomSheetDialog;
+    private BottomSheetDialog mBottomSheetDialog;
     private ArrayAdapter mAdapterItemType;
     private ArrayAdapter mAdapterReference;
     private ListPopupWindow mPopupItemType;
@@ -77,7 +80,7 @@ public class BottomSheetSectionDialog extends android.support.design.widget.Bott
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        mBottomSheetDialog = new android.support.design.widget.BottomSheetDialog(getActivity(), R.style.AppTheme_BottomSheetDialog);
+        mBottomSheetDialog = new BottomSheetDialog(getActivity(), R.style.AppTheme_BottomSheetDialog);
         mBottomSheetDialog.setContentView(getArguments().getInt(ARG_LAYOUT));
         mBottomSheetDialog.findViewById(R.id.select_item_type).setOnClickListener(this);
         mBottomSheetDialog.findViewById(R.id.select_item_type).setOnTouchListener(new SimpleOnTouchListener(getContext()));

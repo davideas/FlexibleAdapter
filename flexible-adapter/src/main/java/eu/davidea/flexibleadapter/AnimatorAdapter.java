@@ -20,9 +20,9 @@ import android.animation.AnimatorSet;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -424,7 +424,7 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
     /**
      * Observer Class responsible to skip animation when items are notified to avoid
-     * double animation with {@link android.support.v7.widget.RecyclerView.ItemAnimator}.
+     * double animation with {@link RecyclerView.ItemAnimator}.
      * <p>Also, some items at the edge, are rebound by Android and should not be animated.</p>
      */
     private class AnimatorAdapterDataObserver extends RecyclerView.AdapterDataObserver {

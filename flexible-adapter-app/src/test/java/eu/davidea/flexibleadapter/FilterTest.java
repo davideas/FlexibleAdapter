@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
-import eu.davidea.samples.flexibleadapter.ui.items.SimpleItem;
+import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 import static org.junit.Assert.assertEquals;

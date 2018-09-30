@@ -5,7 +5,7 @@
 	android:layout_height="match_parent"
 	android:orientation="horizontal">
 
-	<android.support.v7.widget.SwitchCompat
+	<androidx.appcompat.widget.SwitchCompat
 		android:layout_width="fill_parent"
 		android:layout_height="match_parent"
 		android:text="Switch"/>

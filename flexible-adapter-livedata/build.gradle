@@ -5,7 +5,7 @@ apply plugin: 'eu.davidea.grabver'
 versioning {
     major 1
     minor 0
-    preRelease "b2"
+    preRelease "b3"
 }
 // For maven repository
 version = versioning.name
@@ -42,28 +42,29 @@ android {
         sourceCompatibility 1.8
     }
     testOptions {
-        /* Android-junit5 - https://github.com/mannodermaus/android-junit5 */
+        /* Android-junit5 - https://github.com/mannodermaus/android-junit5/wiki/Migrating-from-1.0.x */
         junitPlatform {
-            jupiterVersion junitJupiterVer
-            platformVersion junitPlatformVer
+           // options
         }
     }
 }
 
 dependencies {
     // Android Arch
-    implementation archLib.extensions
+    implementation androidx.lifecycleExtensions
 
-    // Test libraries: from AS3 we'll use JUnit 5 Jupiter, using "android-junit5" plugin
-    androidTestImplementation supportLib.annotations
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test:rules:1.0.1'
-    androidTestImplementation("android.arch.core:core-testing:$archExtensionsVer", {
+    // Test libraries
+    androidTestImplementation androidx.annotation
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test:rules:1.1.0-alpha4'
+    androidTestImplementation('androidx.arch.core:core-testing:2.0.0', {
     })
-    testImplementation junit5.unitTests()
-    testCompileOnly junit5.unitTestsRuntime()
-    testImplementation "de.mannodermaus.gradle.plugins:android-junit5-embedded-runtime:1.0.31"
-    testImplementation supportLib.recyclerView
+
+    // (Required) Writing and executing Unit Tests on the JUnit Platform
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.2.0"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.2.0"
+
+    testImplementation androidx.recyclerView
     testImplementation project(":flexible-adapter")
 }
 

@@ -1,7 +1,5 @@
 package eu.davidea.flexibleadapter;
 
-import android.support.annotation.NonNull;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,16 +9,15 @@ import org.robolectric.annotation.Config;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IHeader;
-import eu.davidea.samples.flexibleadapter.ui.items.HeaderItem;
-import eu.davidea.samples.flexibleadapter.ui.items.ScrollableFooterItem;
-import eu.davidea.samples.flexibleadapter.ui.items.ScrollableLayoutItem;
+import eu.davidea.samples.flexibleadapter.items.HeaderItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableFooterItem;
+import eu.davidea.samples.flexibleadapter.items.ScrollableLayoutItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Davide

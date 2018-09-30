@@ -16,10 +16,10 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.animation.Animator;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.OnScrollListener;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.OrientationHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;

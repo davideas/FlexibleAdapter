@@ -15,7 +15,7 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.utils.Log;
-import eu.davidea.samples.flexibleadapter.ui.items.SimpleItem;
+import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
 import static org.junit.Assert.assertEquals;

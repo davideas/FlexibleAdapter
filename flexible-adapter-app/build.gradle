@@ -3,8 +3,8 @@ apply plugin: 'eu.davidea.grabver'
 
 versioning {
     major 5
-    minor 0
-    patch 6
+    minor 1
+    patch 0
 }
 
 android {
@@ -22,7 +22,7 @@ android {
         // https://developer.android.com/studio/write/vector-asset-studio.html
         vectorDrawables.useSupportLibrary = true
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         android.applicationVariants.all { variant ->
             variant.outputs.all {
@@ -66,11 +66,11 @@ dependencies {
     implementation project(':flexible-adapter-ui')
     implementation project(':flexible-adapter-databinding')
 
-    // Support Libraries
-    implementation supportLib.appCompat
-    implementation supportLib.cardView
-    implementation supportLib.design
-    implementation supportLib.recyclerView
+    // AndroidX Libraries
+    implementation androidx.appCompat
+    implementation androidx.cardView
+    implementation androidx.recyclerView
+    implementation google.material
 
     // Timber (Logger) - https://github.com/JakeWharton/timber
     implementation libraries.timber
@@ -92,14 +92,14 @@ dependencies {
     implementation widgets.flipView
 
     // Test libraries
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test:rules:1.0.1'
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test:rules:1.1.0-alpha4'
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0-alpha4', {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     })
     testImplementation 'org.robolectric:robolectric:3.4.2'
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.15.0'
+    testImplementation 'org.mockito:mockito-core:2.21.0'
 
 }

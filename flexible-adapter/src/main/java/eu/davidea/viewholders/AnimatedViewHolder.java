@@ -15,7 +15,7 @@
  */
 package eu.davidea.viewholders;
 
-import android.support.v4.view.ViewPropertyAnimatorListener;
+import androidx.core.view.ViewPropertyAnimatorListener;
 
 /**
  * Interface for {@code itemView} addition/removal animation.

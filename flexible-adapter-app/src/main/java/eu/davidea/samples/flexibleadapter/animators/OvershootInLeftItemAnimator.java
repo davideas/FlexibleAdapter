@@ -15,8 +15,8 @@
  */
 package eu.davidea.samples.flexibleadapter.animators;
 
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.animation.OvershootInterpolator;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemAnimator;

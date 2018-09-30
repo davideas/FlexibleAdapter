@@ -15,7 +15,7 @@
  */
 package eu.davidea.flexibleadapter.helpers;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 

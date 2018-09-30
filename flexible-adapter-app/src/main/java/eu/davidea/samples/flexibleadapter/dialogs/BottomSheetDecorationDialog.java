@@ -2,13 +2,16 @@ package eu.davidea.samples.flexibleadapter.dialogs;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration;
 import eu.davidea.samples.flexibleadapter.R;
@@ -18,7 +21,7 @@ import eu.davidea.samples.flexibleadapter.R;
  * @since 08/06/2017
  */
 @SuppressWarnings("ConstantConditions")
-public class BottomSheetDecorationDialog extends android.support.design.widget.BottomSheetDialogFragment
+public class BottomSheetDecorationDialog extends BottomSheetDialogFragment
         implements CompoundButton.OnCheckedChangeListener {
 
     public static final String TAG = BottomSheetDecorationDialog.class.getSimpleName();
@@ -27,7 +30,7 @@ public class BottomSheetDecorationDialog extends android.support.design.widget.B
     private static final int STEP_INCREMENT = 2; //dpi
 
 
-    private android.support.design.widget.BottomSheetDialog mBottomSheetDialog;
+    private BottomSheetDialog mBottomSheetDialog;
     private SeekBar mSeekBar;
     private OnDecorationSelectedListener mListener;
 
@@ -70,7 +73,7 @@ public class BottomSheetDecorationDialog extends android.support.design.widget.B
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        mBottomSheetDialog = new android.support.design.widget.BottomSheetDialog(getActivity(), R.style.AppTheme_BottomSheetDialog);
+        mBottomSheetDialog = new BottomSheetDialog(getActivity(), R.style.AppTheme_BottomSheetDialog);
         mBottomSheetDialog.setContentView(getArguments().getInt(ARG_LAYOUT));
 
         setListener();

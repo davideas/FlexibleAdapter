@@ -15,7 +15,7 @@
  */
 package eu.davidea.flexibleadapter.common;
 
-import android.support.v7.widget.OrientationHelper;
+import androidx.recyclerview.widget.OrientationHelper;
 
 /**
  * Wrapper interface for any non-conventional LayoutManagers.

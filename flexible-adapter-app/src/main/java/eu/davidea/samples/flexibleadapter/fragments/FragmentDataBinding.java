@@ -1,9 +1,9 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
-import android.databinding.DataBindingUtil;
-import android.databinding.ObservableArrayList;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ObservableArrayList;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
