@@ -15,7 +15,7 @@ allprojects {
 
         // SDK and Build tools version
         minSdk = 14
-        targetSdk = 28
+        targetSdk = 28 // Android Pie
         buildTools = "28.0.3"
 
         // Android Architecture Components
@@ -37,12 +37,14 @@ allprojects {
         // AndroidX
         androidxVer = "1.0.0"
         lifecycleVer = "2.0.0"
+        constraintVer = "1.1.2"
         androidx = [
                 recyclerView        : "androidx.recyclerview:recyclerview:${androidxVer}",
                 appCompat           : "androidx.appcompat:appcompat:${androidxVer}",
                 cardView            : "androidx.cardview:cardview:${androidxVer}",
                 annotation          : "androidx.annotation:annotation:${androidxVer}",
-                lifecycleExtensions : "androidx.lifecycle:lifecycle-extensions:${lifecycleVer}"
+                lifecycleExtensions : "androidx.lifecycle:lifecycle-extensions:${lifecycleVer}",
+                constraintLayout    : "com.android.support.constraint:constraint-layout:${constraintVer}"
         ]
 
         // Google Material
@@ -51,28 +53,10 @@ allprojects {
                 material        : "com.google.android.material:material:${androidxVer}"
         ]
 
-        // Support Libraries dependencies
-        supportVer = "28.0.0"
-        constraintVer = "1.1.2"
-        supportLib = [
-                design          : "com.android.support:design:${supportVer}",
-                recyclerView    : "com.android.support:recyclerview-v7:${supportVer}",
-                cardView        : "com.android.support:cardview-v7:${supportVer}",
-                appCompat       : "com.android.support:appcompat-v7:${supportVer}",
-                customTabs      : "com.android.support:customtabs:${supportVer}",
-                support_v4      : "com.android.support:support-v4:${supportVer}",
-                support_v13     : "com.android.support:support-v13:${supportVer}",
-                annotations     : "com.android.support:support-annotations:${supportVer}",
-                vectorDrawable  : "com.android.support:support-vector-drawable:${supportVer}",
-                preference_v7   : "com.android.support:preference-v7:${supportVer}",
-                preference_v14  : "com.android.support:preference-v14:${supportVer}",
-                constraintLayout: "com.android.support.constraint:constraint-layout:${constraintVer}",
-        ]
-
         // Widgets
         flipViewVer = "1.1.3@aar"
-        iconicsVer = "3.0.3@aar"
-        iconicsCmdVer = "2.0.46.1@aar"
+        iconicsVer = "3.1.0@aar"
+        iconicsCmdVer = "2.7.94.1@aar"
         widgets = [
                 flipView        : "eu.davidea:flipview:${flipViewVer}",
                 iconicsCore     : "com.mikepenz:iconics-core:${iconicsVer}",
