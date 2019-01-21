@@ -29,4 +29,3 @@ proguard/
 tools/
 .DS_Store
 *.iml
-gradle.properties
