@@ -92,14 +92,14 @@ dependencies {
     implementation widgets.flipView
 
     // Test libraries
-    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
-    androidTestImplementation 'androidx.test:rules:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0-alpha4', {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     })
     testImplementation 'org.robolectric:robolectric:3.4.2'
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.21.0'
+    testImplementation 'org.mockito:mockito-core:2.23.4'
 
 }

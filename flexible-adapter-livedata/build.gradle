@@ -55,8 +55,8 @@ dependencies {
 
     // Test libraries
     androidTestImplementation androidx.annotation
-    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
-    androidTestImplementation 'androidx.test:rules:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation('androidx.arch.core:core-testing:2.0.0', {
     })
 
