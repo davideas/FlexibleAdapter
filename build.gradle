@@ -22,6 +22,7 @@ allprojects {
         archLifecycleVer = "1.1.1"
         archExtensionsVer = "1.1.1"
         roomPersistenceVer = "1.1.0"
+        navigationVer = "1.0.0-alpha09"
         archLib = [
                 lifecycle      : "android.arch.lifecycle:runtime:${archLifecycleVer}",
                 extensions     : "android.arch.lifecycle:extensions:${archExtensionsVer}",
@@ -31,7 +32,8 @@ allprojects {
                 coreTesting    : "android.arch.core:core-testing:${archExtensionsVer}",
                 room           : "android.arch.persistence.room:runtime:${roomPersistenceVer}",
                 roomCompiler   : "android.arch.persistence.room:compiler:${roomPersistenceVer}",
-                roomRxJava2    : "android.arch.persistence.room:rxjava2:${roomPersistenceVer}"
+                roomRxJava2    : "android.arch.persistence.room:rxjava2:${roomPersistenceVer}",
+                navigation     : "android.arch.navigation:navigation-fragment:${navigationVer}"
         ]
 
         // AndroidX
@@ -53,15 +55,15 @@ allprojects {
         ]
 
         // Google Material
-        googleVer = "1.1.0-alpha02"
+        googleVer = "1.1.0-alpha04"
         google = [
                 material: "com.google.android.material:material:${androidxVer}"
         ]
 
         // Widgets
         flipViewVer = "1.2.0@aar"
-        iconicsVer = "3.1.0@aar"
-        iconicsCmdVer = "2.7.94.1@aar"
+        iconicsVer = "3.2.2@aar"
+        iconicsCmdVer = "3.5.95.1@aar"
         widgets = [
                 flipView        : "eu.davidea:flipview:${flipViewVer}",
                 iconicsCore     : "com.mikepenz:iconics-core:${iconicsVer}",
@@ -70,9 +72,9 @@ allprojects {
         ]
 
         // 3rd Libraries
-        butterKnifeVer = "10.0.0"
+        butterKnifeVer = "10.1.0"
         timberVer = "4.7.1"
-        glideVer = "4.6.1"
+        glideVer = "4.9.0"
         javaxInjectVer = "1"
         junitPlatformVer = "1.1.0"
         junitJupiterVer = "5.2.0"
@@ -114,7 +116,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0'
+        classpath 'com.android.tools.build:gradle:3.3.2'
         classpath "com.neenbedankt.gradle.plugins:android-apt:1.8"
         classpath "com.github.dcendents:android-maven-gradle-plugin:2.1"
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4"
