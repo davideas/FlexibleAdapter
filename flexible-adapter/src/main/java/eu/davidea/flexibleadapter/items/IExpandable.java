@@ -36,9 +36,9 @@ import eu.davidea.viewholders.ExpandableViewHolder;
 public interface IExpandable<VH extends ExpandableViewHolder, S extends IFlexible>
         extends IFlexible<VH> {
 
-	/*--------------------*/
+    /*--------------------*/
     /* EXPANDABLE METHODS */
-	/*--------------------*/
+    /*--------------------*/
 
     boolean isExpanded();
 
@@ -53,9 +53,9 @@ public interface IExpandable<VH extends ExpandableViewHolder, S extends IFlexibl
      */
     int getExpansionLevel();
 
-	/*-------------------*/
-	/* SUB ITEMS METHODS */
-	/*-------------------*/
+    /*-------------------*/
+    /* SUB ITEMS METHODS */
+    /*-------------------*/
 
     List<S> getSubItems();
 

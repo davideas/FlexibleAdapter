@@ -84,20 +84,15 @@ public class FastScroller extends FrameLayout {
     protected ImageView handle;
     protected View bar;
     protected int height, width, minimumScrollThreshold;
-
     protected RecyclerView recyclerView;
     protected RecyclerView.LayoutManager layoutManager;
     protected BubbleTextCreator bubbleTextCreator;
     protected List<OnScrollStateChangeListener> scrollStateChangeListeners = new ArrayList<>();
-
     protected int bubbleAndHandleColor = Color.TRANSPARENT;
     protected long autoHideDelayInMillis;
-    protected boolean isInitialized, autoHideEnabled, bubbleEnabled,
-            ignoreTouchesOutsideHandle, handleAlwaysVisible;
-
+    protected boolean isInitialized, autoHideEnabled, bubbleEnabled, ignoreTouchesOutsideHandle, handleAlwaysVisible;
     @FastScrollerBubblePosition
     protected int bubblePosition;
-
     protected BubbleAnimator bubbleAnimator;
     protected ScrollbarAnimator scrollbarAnimator;
     protected RecyclerView.OnScrollListener onScrollListener;
@@ -135,14 +130,17 @@ public class FastScroller extends FrameLayout {
     }
 
     protected void init() {
-        if (isInitialized) return;
+        if (isInitialized) {
+            return;
+        }
         isInitialized = true;
         setClipChildren(false);
         onScrollListener = new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (!isEnabled() || bubble == null || handle.isSelected())
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (!isEnabled() || bubble == null || handle.isSelected()) {
                     return;
+                }
                 int verticalScrollOffset = recyclerView.computeVerticalScrollOffset();
                 int verticalScrollRange = recyclerView.computeVerticalScrollRange();
                 float proportion = (float) verticalScrollOffset / (float) (verticalScrollRange - height);
@@ -165,7 +163,9 @@ public class FastScroller extends FrameLayout {
      */
     public void setRecyclerView(final RecyclerView recyclerView) {
         this.recyclerView = recyclerView;
-        if (onScrollListener != null) this.recyclerView.removeOnScrollListener(onScrollListener);
+        if (onScrollListener != null) {
+            this.recyclerView.removeOnScrollListener(onScrollListener);
+        }
         this.recyclerView.addOnScrollListener(onScrollListener);
         this.recyclerView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
             @Override
@@ -174,16 +174,20 @@ public class FastScroller extends FrameLayout {
             }
         });
 
-        if (recyclerView.getAdapter() instanceof BubbleTextCreator)
+        if (recyclerView.getAdapter() instanceof BubbleTextCreator) {
             setBubbleTextCreator((BubbleTextCreator) recyclerView.getAdapter());
-        if (recyclerView.getAdapter() instanceof OnScrollStateChangeListener)
+        }
+        if (recyclerView.getAdapter() instanceof OnScrollStateChangeListener) {
             addOnScrollStateChangeListener((OnScrollStateChangeListener) recyclerView.getAdapter());
+        }
 
         this.recyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
                 FastScroller.this.recyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-                if (bubble == null || handle.isSelected()) return true;
+                if (bubble == null || handle.isSelected()) {
+                    return true;
+                }
                 int verticalScrollOffset = FastScroller.this.recyclerView.computeVerticalScrollOffset();
                 int verticalScrollRange = FastScroller.this.computeVerticalScrollRange();
                 float proportion = (float) verticalScrollOffset / (float) (verticalScrollRange - height);
@@ -198,8 +202,9 @@ public class FastScroller extends FrameLayout {
     }
 
     public void addOnScrollStateChangeListener(OnScrollStateChangeListener stateChangeListener) {
-        if (stateChangeListener != null && !scrollStateChangeListeners.contains(stateChangeListener))
+        if (stateChangeListener != null && !scrollStateChangeListeners.contains(stateChangeListener)) {
             scrollStateChangeListeners.add(stateChangeListener);
+        }
     }
 
     public void removeOnScrollStateChangeListener(OnScrollStateChangeListener stateChangeListener) {
@@ -221,11 +226,15 @@ public class FastScroller extends FrameLayout {
      * @param handleResId Drawable resource for the Handle
      */
     public void setViewsToUse(@LayoutRes int layoutResId, @IdRes int bubbleResId, @IdRes int handleResId) {
-        if (bubble != null) return; //Already inflated
+        if (bubble != null) {
+            return; //Already inflated
+        }
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(layoutResId, this, true);
         bubble = findViewById(bubbleResId);
-        if (bubble != null) bubble.setVisibility(INVISIBLE);
+        if (bubble != null) {
+            bubble.setVisibility(INVISIBLE);
+        }
         handle = findViewById(handleResId);
         bar = findViewById(R.id.fast_scroller_bar);
 
@@ -305,7 +314,9 @@ public class FastScroller extends FrameLayout {
         int action = event.getAction();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                if (event.getX() < handle.getX() - ViewCompat.getPaddingStart(handle)) return false;
+                if (event.getX() < handle.getX() - ViewCompat.getPaddingStart(handle)) {
+                    return false;
+                }
 
                 if (ignoreTouchesOutsideHandle &&
                         (event.getY() < handle.getY() || event.getY() > handle.getY() + handle.getHeight())) {
@@ -424,7 +435,9 @@ public class FastScroller extends FrameLayout {
      * @param y current active y height in the scrollbar
      */
     protected void setBubbleAndHandlePosition(float y) {
-        if (height == 0) return; // Happens at startup
+        if (height == 0) {
+            return; // Happens at startup
+        }
         int handleHeight = handle.getHeight();
         // #605 - Remove small proportions of handleHeight at each scroll event,
         // so the handle moves from top to bottom edges as its value changes.
@@ -567,7 +580,9 @@ public class FastScroller extends FrameLayout {
      * @since 5.0.0-rc2
      */
     private void autoHideScrollbar() {
-        if (autoHideEnabled) hideScrollbar();
+        if (autoHideEnabled) {
+            hideScrollbar();
+        }
     }
 
     /**
@@ -709,11 +724,15 @@ public class FastScroller extends FrameLayout {
                         R.layout.library_fast_scroller_layout,
                         R.id.fast_scroller_bubble,
                         R.id.fast_scroller_handle);
-                if (DEBUG) Log.i(TAG, "FastScroller initialized");
+                if (DEBUG) {
+                    Log.i(TAG, "FastScroller initialized");
+                }
             } else if (mFastScroller != null) {
                 mFastScroller.setEnabled(false);
                 mFastScroller = null;
-                if (DEBUG) Log.i(TAG, "FastScroller removed");
+                if (DEBUG) {
+                    Log.i(TAG, "FastScroller removed");
+                }
             }
         }
     }

@@ -15,13 +15,13 @@
  */
 package eu.davidea.flexibleadapter.items;
 
-import androidx.annotation.IntRange;
-import androidx.annotation.LayoutRes;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import java.util.List;
 
+import androidx.annotation.IntRange;
+import androidx.annotation.LayoutRes;
+import androidx.recyclerview.widget.RecyclerView;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 /**
@@ -42,9 +42,9 @@ import eu.davidea.flexibleadapter.FlexibleAdapter;
  */
 public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 
-	/*---------------*/
+    /*---------------*/
     /* BASIC METHODS */
-	/*---------------*/
+    /*---------------*/
 
     /**
      * Returns if the Item is enabled.
@@ -110,9 +110,9 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      */
     boolean shouldNotifyChange(IFlexible newItem);
 
-	/*--------------------*/
-	/* SELECTABLE METHODS */
-	/*--------------------*/
+    /*--------------------*/
+    /* SELECTABLE METHODS */
+    /*--------------------*/
 
     /**
      * Checks if the item can be selected.
@@ -142,9 +142,9 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
      */
     String getBubbleText(int position);
 
-	/*-------------------*/
-	/* TOUCHABLE METHODS */
-	/*-------------------*/
+    /*-------------------*/
+    /* TOUCHABLE METHODS */
+    /*-------------------*/
 
     boolean isDraggable();
 
@@ -154,9 +154,9 @@ public interface IFlexible<VH extends RecyclerView.ViewHolder> {
 
     void setSwipeable(boolean swipeable);
 
-	/*---------------------*/
-	/* VIEW HOLDER METHODS */
-	/*---------------------*/
+    /*---------------------*/
+    /* VIEW HOLDER METHODS */
+    /*---------------------*/
 
     /**
      * Identifies a specific view type for this item, used by FlexibleAdapter to auto-map

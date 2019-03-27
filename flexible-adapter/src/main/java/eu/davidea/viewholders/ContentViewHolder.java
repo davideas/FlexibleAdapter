@@ -15,11 +15,11 @@
  */
 package eu.davidea.viewholders;
 
-import androidx.core.view.ViewCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 /**
@@ -48,7 +48,7 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
 
         if (stickyHeader) {
             itemView.setLayoutParams(adapter.getRecyclerView().getLayoutManager()
-                                            .generateLayoutParams(view.getLayoutParams()));
+                    .generateLayoutParams(view.getLayoutParams()));
             ((FrameLayout) itemView).addView(view); //Add View after setLayoutParams
             float elevation = ViewCompat.getElevation(view);
             if (elevation > 0) {
@@ -59,9 +59,9 @@ abstract class ContentViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-	/*-----------------------*/
+    /*-----------------------*/
     /* STICKY HEADER METHODS */
-	/*-----------------------*/
+    /*-----------------------*/
 
     /**
      * In case this ViewHolder represents a Header Item, this method returns the contentView of the

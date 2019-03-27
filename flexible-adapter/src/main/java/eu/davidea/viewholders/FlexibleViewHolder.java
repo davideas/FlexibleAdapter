@@ -52,19 +52,17 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
 
     // FlexibleAdapter is needed to retrieve listeners and item status
     protected final FlexibleAdapter mAdapter;
-
+    // State for Dragging & Swiping actions
+    protected int mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
     // These 2 fields avoid double tactile feedback triggered by Android during the touch event
     // (Drag or Swipe), also assure the LongClick event is correctly fired for ActionMode if that
     // was the user intention.
     private boolean mLongClickSkipped = false;
     private boolean alreadySelected = false;
 
-    // State for Dragging & Swiping actions
-    protected int mActionState = ItemTouchHelper.ACTION_STATE_IDLE;
-
-	/*--------------*/
+    /*--------------*/
     /* CONSTRUCTORS */
-	/*--------------*/
+    /*--------------*/
 
     /**
      * Default constructor.
@@ -99,9 +97,9 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
         }
     }
 
-	/*--------------------------------*/
-	/* CLICK LISTENERS IMPLEMENTATION */
-	/*--------------------------------*/
+    /*--------------------------------*/
+    /* CLICK LISTENERS IMPLEMENTATION */
+    /*--------------------------------*/
 
     /**
      * {@inheritDoc}
@@ -113,7 +111,9 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
     @CallSuper
     public void onClick(View view) {
         int position = getFlexibleAdapterPosition();
-        if (!mAdapter.isItemEnabled(position)) return;
+        if (!mAdapter.isItemEnabled(position)) {
+            return;
+        }
         // Experimented that, if LongClick is not consumed, onClick is fired. We skip the
         // call to the listener in this case, which is allowed only in ACTION_STATE_IDLE.
         if (mAdapter.mItemClickListener != null && mActionState == ItemTouchHelper.ACTION_STATE_IDLE) {
@@ -136,7 +136,9 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
     @CallSuper
     public boolean onLongClick(View view) {
         int position = getFlexibleAdapterPosition();
-        if (!mAdapter.isItemEnabled(position)) return false;
+        if (!mAdapter.isItemEnabled(position)) {
+            return false;
+        }
         // If LongPressDrag is enabled, then LongClick must be skipped and the listener will
         // be called in onActionStateChanged in Drag mode.
         if (mAdapter.mItemLongClickListener != null && !mAdapter.isLongPressDragEnabled()) {
@@ -171,9 +173,9 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
         return false;
     }
 
-	/*--------------*/
-	/* MAIN METHODS */
-	/*--------------*/
+    /*--------------*/
+    /* MAIN METHODS */
+    /*--------------*/
 
     /**
      * Support for StaggeredGridLayoutManager.
@@ -196,7 +198,9 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
     @CallSuper
     @SuppressWarnings("ConstantConditions")
     protected void setDragHandleView(@NonNull View view) {
-        if (view != null) view.setOnTouchListener(this);
+        if (view != null) {
+            view.setOnTouchListener(this);
+        }
     }
 
     /**
@@ -222,17 +226,23 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
     public void toggleActivation() {
         // Only for selectable items
         int position = getFlexibleAdapterPosition();
-        if (!mAdapter.isSelectable(position)) return;
+        if (!mAdapter.isSelectable(position)) {
+            return;
+        }
         // [De]Activate the view
         boolean selected = mAdapter.isSelected(position);
         if (getContentView().isActivated() && !selected || !getContentView().isActivated() && selected) {
             getContentView().setActivated(selected);
-            if (mAdapter.getStickyPosition() == position) mAdapter.ensureHeaderParent();
+            if (mAdapter.getStickyPosition() == position) {
+                mAdapter.ensureHeaderParent();
+            }
             // Apply elevation
-            if (getContentView().isActivated() && getActivationElevation() > 0)
+            if (getContentView().isActivated() && getActivationElevation() > 0) {
                 ViewCompat.setElevation(itemView, getActivationElevation());
-            else if (getActivationElevation() > 0) //Leave unaltered the default elevation
+            } else if (getActivationElevation() > 0) {
+                // Leave unaltered the default elevation
                 ViewCompat.setElevation(itemView, 0);
+            }
         }
     }
 
@@ -275,9 +285,9 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
         return false;
     }
 
-	/*-----------*/
-	/* ANIMATION */
-	/*-----------*/
+    /*-----------*/
+    /* ANIMATION */
+    /*-----------*/
 
     /**
      * This method is automatically called by FlexibleAdapter to animate the View while the user
@@ -296,9 +306,9 @@ public abstract class FlexibleViewHolder extends ContentViewHolder
         // Free to implement
     }
 
-	/*--------------------------------*/
-	/* TOUCH LISTENERS IMPLEMENTATION */
-	/*--------------------------------*/
+    /*--------------------------------*/
+    /* TOUCH LISTENERS IMPLEMENTATION */
+    /*--------------------------------*/
 
     /**
      * Here we handle the event of when the {@code ItemTouchHelper} first registers an item

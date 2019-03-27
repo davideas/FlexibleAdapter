@@ -20,9 +20,6 @@ import android.animation.AnimatorSet;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -31,6 +28,9 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
@@ -52,6 +52,8 @@ import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class AnimatorAdapter extends SelectableAdapter {
+
+    private static long DEFAULT_DURATION = 300L;
 
     private Interpolator mInterpolator = new LinearInterpolator();
     private AnimatorAdapterDataObserver mAnimatorNotifierObserver;
@@ -83,8 +85,6 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
 
     private boolean isReverseEnabled = false, isForwardEnabled = false,
             onlyEntryAnimation = false, animateFromObserver = false;
-
-    private static long DEFAULT_DURATION = 300L;
     private long mInitialDelay = 0L,
             mStepDelay = 100L,
             mDuration = DEFAULT_DURATION;
@@ -209,7 +209,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      */
     public AnimatorAdapter setAnimationOnForwardScrolling(boolean enabled) {
         log.i("Set animationOnForwardScrolling=%s", enabled);
-        if (enabled) this.onlyEntryAnimation = false;
+        if (enabled) {
+            this.onlyEntryAnimation = false;
+        }
         isForwardEnabled = enabled;
         return this;
     }
@@ -248,6 +250,15 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
     }
 
     /**
+     * @return true if the scrolling animation will occur only at startup until the screen is
+     * filled with the items, false animation will be performed when scrolling too.
+     * @since 5.0.0-b8
+     */
+    public boolean isOnlyEntryAnimation() {
+        return onlyEntryAnimation;
+    }
+
+    /**
      * Performs only entry animation during the initial loading. Stops the animation after
      * the last visible item in the RecyclerView has been animated.
      * <p><b>Note:</b> Loading animation can only be performed if the Adapter is initialized
@@ -261,31 +272,26 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      */
     public AnimatorAdapter setOnlyEntryAnimation(boolean enabled) {
         log.i("Set onlyEntryAnimation=%s", enabled);
-        if (enabled) this.isForwardEnabled = true;
+        if (enabled) {
+            this.isForwardEnabled = true;
+        }
         this.onlyEntryAnimation = enabled;
         return this;
     }
-
-    /**
-     * @return true if the scrolling animation will occur only at startup until the screen is
-     * filled with the items, false animation will be performed when scrolling too.
-     * @since 5.0.0-b8
-     */
-    public boolean isOnlyEntryAnimation() {
-        return onlyEntryAnimation;
-    }
-
-    /*--------------*/
-    /* MAIN METHODS */
-    /*--------------*/
 
     /**
      * Cancels any existing animations for given View. Useful when fling.
      */
     private void cancelExistingAnimation(final int hashCode) {
         Animator animator = mAnimators.get(hashCode);
-        if (animator != null) animator.end();
+        if (animator != null) {
+            animator.end();
+        }
     }
+
+    /*--------------*/
+    /* MAIN METHODS */
+    /*--------------*/
 
     /**
      * Checks if at the provided position, the item is a Header or Footer.
@@ -307,7 +313,9 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
      * @since 5.0.0-b1
      */
     protected final void animateView(final RecyclerView.ViewHolder holder, final int position) {
-        if (mRecyclerView == null) return;
+        if (mRecyclerView == null) {
+            return;
+        }
 
         // Use always the max child count reached
         if (mMaxChildViews < mRecyclerView.getChildCount()) {
@@ -375,12 +383,14 @@ public abstract class AnimatorAdapter extends SelectableAdapter {
         int lastVisiblePosition = getFlexibleLayoutManager().findLastCompletelyVisibleItemPosition();
 
         // Fix for high delay on the first visible item on rotation
-        if (firstVisiblePosition < 0 && position >= 0)
+        if (firstVisiblePosition < 0 && position >= 0) {
             firstVisiblePosition = position - 1;
+        }
 
         // Last visible position is the last animated when initially loading
-        if (position - 1 > lastVisiblePosition)
+        if (position - 1 > lastVisiblePosition) {
             lastVisiblePosition = position - 1;
+        }
 
         int visibleItems = lastVisiblePosition - firstVisiblePosition;
         int numberOfAnimatedItems = position - 1;

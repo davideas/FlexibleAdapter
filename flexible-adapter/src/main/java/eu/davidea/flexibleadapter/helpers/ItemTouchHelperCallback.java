@@ -16,16 +16,16 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.graphics.Canvas;
+import android.view.View;
+
 import androidx.annotation.FloatRange;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.ItemTouchHelper.Callback;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.ItemTouchHelper.Callback;
-import android.view.View;
-
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemMoveListener;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnItemSwipeListener;
 import eu.davidea.flexibleadapter.utils.LayoutUtils;
@@ -49,19 +49,27 @@ public class ItemTouchHelperCallback extends Callback {
     protected float mSwipeThreshold = 0.5f, mMoveThreshold = 0.5f;
     protected int mSwipeFlags = -1;
 
-	/*-------------*/
+    /*-------------*/
     /* CONSTRUCTOR */
-	/*-------------*/
+    /*-------------*/
 
     public ItemTouchHelperCallback(AdapterCallback adapterCallback) {
         this.mAdapterCallback = adapterCallback;
     }
 
-	/*-----------------------*/
-	/* CONFIGURATION SETTERS */
-	/*-----------------------*/
-	/* DRAG */
-	/*------*/
+    /*-----------------------*/
+    /* CONFIGURATION SETTERS */
+    /*-----------------------*/
+    /* DRAG */
+    /*------*/
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isLongPressDragEnabled() {
+        return longPressDragEnabled;
+    }
 
     /**
      * Enable / Disable the drag operation with long press on the ViewHolder.
@@ -71,14 +79,6 @@ public class ItemTouchHelperCallback extends Callback {
      */
     public void setLongPressDragEnabled(boolean isLongPressDragEnabled) {
         this.longPressDragEnabled = isLongPressDragEnabled;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isLongPressDragEnabled() {
-        return longPressDragEnabled;
     }
 
     /**
@@ -127,9 +127,9 @@ public class ItemTouchHelperCallback extends Callback {
         return mMoveThreshold;
     }
 
-	/*-------*/
-	/* SWIPE */
-	/*-------*/
+    /*-------*/
+    /* SWIPE */
+    /*-------*/
 
     /**
      * Enable the swipe operation on the ViewHolder.
@@ -220,9 +220,9 @@ public class ItemTouchHelperCallback extends Callback {
         return animationType == ItemTouchHelper.ANIMATION_TYPE_DRAG ? mDragAnimationDuration : mSwipeAnimationDuration;
     }
 
-	/*--------------*/
-	/* MAIN METHODS */
-	/*--------------*/
+    /*--------------*/
+    /* MAIN METHODS */
+    /*--------------*/
 
     /**
      * {@inheritDoc}
@@ -245,8 +245,9 @@ public class ItemTouchHelperCallback extends Callback {
         // Notify the adapter of the swipe
         if (viewHolder instanceof ViewHolderCallback) {
             ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
-            if (viewHolderCallback.getFrontView().getTranslationX() != 0)
+            if (viewHolderCallback.getFrontView().getTranslationX() != 0) {
                 mAdapterCallback.onItemSwiped(viewHolder.getAdapterPosition(), direction);
+            }
         }
     }
 
@@ -272,8 +273,12 @@ public class ItemTouchHelperCallback extends Callback {
         // Disallow item swiping or dragging
         if (viewHolder instanceof ViewHolderCallback) {
             ViewHolderCallback viewHolderCallback = (ViewHolderCallback) viewHolder;
-            if (!viewHolderCallback.isDraggable()) dragFlags = 0;
-            if (!viewHolderCallback.isSwipeable()) swipeFlags = 0;
+            if (!viewHolderCallback.isDraggable()) {
+                dragFlags = 0;
+            }
+            if (!viewHolderCallback.isSwipeable()) {
+                swipeFlags = 0;
+            }
         }
         return makeMovementFlags(dragFlags, swipeFlags);
     }
@@ -332,7 +337,9 @@ public class ItemTouchHelperCallback extends Callback {
 
             // Orientation independent
             float dragAmount = dX;
-            if (dY != 0) dragAmount = dY;
+            if (dY != 0) {
+                dragAmount = dY;
+            }
 
             // Manage opening - Is Left or Right View?
             int swipingDirection = 0;//0 is to reset the frontView
@@ -352,17 +359,19 @@ public class ItemTouchHelperCallback extends Callback {
     }
 
     private static void setLayoutVisibility(ViewHolderCallback viewHolderCallback, int swipeDirection) {
-        if (viewHolderCallback.getRearRightView() != null)
+        if (viewHolderCallback.getRearRightView() != null) {
             viewHolderCallback.getRearRightView().setVisibility(
                     swipeDirection == ItemTouchHelper.LEFT ? View.VISIBLE : View.GONE);
-        if (viewHolderCallback.getRearLeftView() != null)
+        }
+        if (viewHolderCallback.getRearLeftView() != null) {
             viewHolderCallback.getRearLeftView().setVisibility(
                     swipeDirection == ItemTouchHelper.RIGHT ? View.VISIBLE : View.GONE);
+        }
     }
 
-	/*------------------*/
-	/* INNER INTERFACES */
-	/*------------------*/
+    /*------------------*/
+    /* INNER INTERFACES */
+    /*------------------*/
 
     /**
      * Internal interface for Adapter to listen for a move or swipe dismissal event

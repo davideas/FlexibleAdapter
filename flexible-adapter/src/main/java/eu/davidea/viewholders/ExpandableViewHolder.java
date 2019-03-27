@@ -15,11 +15,11 @@
  */
 package eu.davidea.viewholders;
 
-import androidx.annotation.CallSuper;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 
+import androidx.annotation.CallSuper;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 
@@ -34,9 +34,9 @@ import eu.davidea.flexibleadapter.Payload;
  */
 public abstract class ExpandableViewHolder extends FlexibleViewHolder {
 
-	/*--------------*/
+    /*--------------*/
     /* CONSTRUCTORS */
-	/*--------------*/
+    /*--------------*/
 
     /**
      * Default constructor.
@@ -63,9 +63,9 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
         super(view, adapter, stickyHeader);
     }
 
-	/*--------------*/
-	/* MAIN METHODS */
-	/*--------------*/
+    /*--------------*/
+    /* MAIN METHODS */
+    /*--------------*/
 
     /**
      * Allows to expand or collapse child views of this itemView when {@link OnClickListener}
@@ -171,9 +171,9 @@ public abstract class ExpandableViewHolder extends FlexibleViewHolder {
         }
     }
 
-	/*---------------------------------*/
-	/* CUSTOM LISTENERS IMPLEMENTATION */
-	/*---------------------------------*/
+    /*---------------------------------*/
+    /* CUSTOM LISTENERS IMPLEMENTATION */
+    /*---------------------------------*/
 
     /**
      * Called when user taps once on the ItemView.

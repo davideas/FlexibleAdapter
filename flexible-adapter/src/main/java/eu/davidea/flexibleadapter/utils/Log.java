@@ -15,18 +15,13 @@
  */
 package eu.davidea.flexibleadapter.utils;
 
-import androidx.annotation.IntDef;
-import androidx.annotation.Nullable;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import static eu.davidea.flexibleadapter.utils.Log.Level.DEBUG;
-import static eu.davidea.flexibleadapter.utils.Log.Level.ERROR;
-import static eu.davidea.flexibleadapter.utils.Log.Level.INFO;
-import static eu.davidea.flexibleadapter.utils.Log.Level.SUPPRESS;
-import static eu.davidea.flexibleadapter.utils.Log.Level.VERBOSE;
-import static eu.davidea.flexibleadapter.utils.Log.Level.WARN;
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
+
+import static eu.davidea.flexibleadapter.utils.Log.Level.*;
 
 /**
  * Utility class for Android libraries, that simplifies the use of {@link android.util.Log} by improving
@@ -58,10 +53,10 @@ import static eu.davidea.flexibleadapter.utils.Log.Level.WARN;
 public class Log {
 
     private static final String SOURCE_FILE = "SourceFile";
+    public static String customTag;
     private static int LEVEL = SUPPRESS;
     private static boolean withMethodName;
     private static boolean withLineNumber;
-    public static String customTag;
 
     private Log() {
     }
@@ -257,10 +252,14 @@ public class Log {
     }
 
     private static String getTag() {
-        if (customTag != null) return customTag;
+        if (customTag != null) {
+            return customTag;
+        }
         StackTraceElement traceElement = new Throwable().getStackTrace()[2];
         String fileName = traceElement.getFileName();
-        if (fileName == null) return SOURCE_FILE;
+        if (fileName == null) {
+            return SOURCE_FILE;
+        }
         return fileName.split("[.]")[0];
     }
 

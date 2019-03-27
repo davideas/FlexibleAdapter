@@ -107,15 +107,17 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      */
     protected boolean mLastItemInActionMode = false;
 
-	/*--------------*/
+    /*--------------*/
     /* CONSTRUCTORS */
-	/*--------------*/
+    /*--------------*/
 
     /**
      * @since 1.0.0
      */
     public SelectableAdapter() {
-        if (Log.customTag == null) Log.useTag("FlexibleAdapter");
+        if (Log.customTag == null) {
+            Log.useTag("FlexibleAdapter");
+        }
         log = new Logger(Log.customTag);
         log.i("Running version %s", BuildConfig.VERSION_NAME);
         mSelectedPositions = Collections.synchronizedSet(new TreeSet<Integer>());
@@ -125,9 +127,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
         mFastScrollerDelegate = new FastScroller.Delegate();
     }
 
-	/*----------------*/
-	/* STATIC METHODS */
-	/*----------------*/
+    /*----------------*/
+    /* STATIC METHODS */
+    /*----------------*/
 
     /**
      * Call this once, to enable or disable internal logs with custom level.<br>
@@ -144,9 +146,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
         Log.useTag(tag);
     }
 
-	/*--------------*/
-	/* MAIN METHODS */
-	/*--------------*/
+    /*--------------*/
+    /* MAIN METHODS */
+    /*--------------*/
 
     /**
      * {@inheritDoc}
@@ -218,6 +220,20 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
     }
 
     /**
+     * The current selection mode of the Adapter.
+     *
+     * @return current mode
+     * @see Mode#IDLE
+     * @see Mode#SINGLE
+     * @see Mode#MULTI
+     * @since 2.1.0
+     */
+    @Mode
+    public int getMode() {
+        return mMode;
+    }
+
+    /**
      * Sets the mode of the selection:
      * <ul>
      * <li>{@link Mode#IDLE} Default. Configures the adapter so that no item can be selected;
@@ -237,20 +253,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
         }
         this.mMode = mode;
         this.mLastItemInActionMode = (mode != MULTI);
-    }
-
-    /**
-     * The current selection mode of the Adapter.
-     *
-     * @return current mode
-     * @see Mode#IDLE
-     * @see Mode#SINGLE
-     * @see Mode#MULTI
-     * @since 2.1.0
-     */
-    @Mode
-    public int getMode() {
-        return mMode;
     }
 
     /**
@@ -330,7 +332,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @since 1.0.0
      */
     public void toggleSelection(int position) {
-        if (position < 0) return;
+        if (position < 0) {
+            return;
+        }
         if (mMode == SINGLE) {
             clearSelection();
         }
@@ -550,9 +554,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
         return mSelectedPositions;
     }
 
-	/*----------------*/
-	/* INSTANCE STATE */
-	/*----------------*/
+    /*----------------*/
+    /* INSTANCE STATE */
+    /*----------------*/
 
     /**
      * Saves the state of the current selection on the items.
@@ -562,7 +566,9 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      */
     public void onSaveInstanceState(Bundle outState) {
         outState.putIntegerArrayList(TAG, new ArrayList<>(mSelectedPositions));
-        if (getSelectedItemCount() > 0) log.d("Saving selection %s", mSelectedPositions);
+        if (getSelectedItemCount() > 0) {
+            log.d("Saving selection %s", mSelectedPositions);
+        }
     }
 
     /**
@@ -576,13 +582,15 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
         List selectedItems = savedInstanceState.getIntegerArrayList(TAG);
         if (selectedItems != null) {
             mSelectedPositions.addAll(selectedItems);
-            if (getSelectedItemCount() > 0) log.d("Restore selection %s", mSelectedPositions);
+            if (getSelectedItemCount() > 0) {
+                log.d("Restore selection %s", mSelectedPositions);
+            }
         }
     }
 
-	/*---------------*/
-	/* FAST SCROLLER */
-	/*---------------*/
+    /*---------------*/
+    /* FAST SCROLLER */
+    /*---------------*/
 
     /**
      * Displays or Hides the {@link FastScroller} if previously configured.
@@ -607,7 +615,8 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
      * @return the current instance of the {@link FastScroller} object
      * @since 5.0.0-b1
      */
-    public @Nullable FastScroller getFastScroller() {
+    public @Nullable
+    FastScroller getFastScroller() {
         return mFastScrollerDelegate.getFastScroller();
     }
 
@@ -623,7 +632,6 @@ public abstract class SelectableAdapter extends RecyclerView.Adapter
     public void setFastScroller(@Nullable FastScroller fastScroller) {
         mFastScrollerDelegate.setFastScroller(fastScroller);
     }
-
 
     /**
      * @param position the position of the handle

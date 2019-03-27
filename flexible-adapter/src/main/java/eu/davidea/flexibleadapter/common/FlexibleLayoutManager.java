@@ -106,7 +106,9 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
             int position = staggeredGLM.findFirstCompletelyVisibleItemPositions(null)[0];
             for (int i = 1; i < getSpanCount(); i++) {
                 int nextPosition = staggeredGLM.findFirstCompletelyVisibleItemPositions(null)[i];
-                if (nextPosition < position) position = nextPosition;
+                if (nextPosition < position) {
+                    position = nextPosition;
+                }
             }
             return position;
         } else {
@@ -131,7 +133,9 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
             int position = staggeredGLM.findFirstVisibleItemPositions(null)[0];
             for (int i = 1; i < getSpanCount(); i++) {
                 int nextPosition = staggeredGLM.findFirstVisibleItemPositions(null)[i];
-                if (nextPosition < position) position = nextPosition;
+                if (nextPosition < position) {
+                    position = nextPosition;
+                }
             }
             return position;
         } else {
@@ -156,7 +160,9 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
             int position = staggeredGLM.findLastCompletelyVisibleItemPositions(null)[0];
             for (int i = 1; i < getSpanCount(); i++) {
                 int nextPosition = staggeredGLM.findLastCompletelyVisibleItemPositions(null)[i];
-                if (nextPosition > position) position = nextPosition;
+                if (nextPosition > position) {
+                    position = nextPosition;
+                }
             }
             return position;
         } else {
@@ -181,7 +187,9 @@ public class FlexibleLayoutManager implements IFlexibleLayoutManager {
             int position = staggeredGLM.findLastVisibleItemPositions(null)[0];
             for (int i = 1; i < getSpanCount(); i++) {
                 int nextPosition = staggeredGLM.findLastVisibleItemPositions(null)[i];
-                if (nextPosition > position) position = nextPosition;
+                if (nextPosition > position) {
+                    position = nextPosition;
+                }
             }
             return position;
         } else {

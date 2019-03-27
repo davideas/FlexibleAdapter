@@ -41,9 +41,9 @@ public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S 
     /* subItems list */
     protected List<S> mSubItems;
 
-	/*--------------------*/
+    /*--------------------*/
     /* EXPANDABLE METHODS */
-	/*--------------------*/
+    /*--------------------*/
 
     @Override
     public boolean isExpanded() {
@@ -60,17 +60,13 @@ public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S 
         return 0;
     }
 
-	/*-------------------*/
-	/* SUB ITEMS METHODS */
-	/*-------------------*/
+    /*-------------------*/
+    /* SUB ITEMS METHODS */
+    /*-------------------*/
 
     @Override
     public final List<S> getSubItems() {
         return mSubItems;
-    }
-
-    public final boolean hasSubItems() {
-        return mSubItems != null && mSubItems.size() > 0;
     }
 
     public AbstractExpandableItem setSubItems(List<S> subItems) {
@@ -78,12 +74,17 @@ public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S 
         return this;
     }
 
+    public final boolean hasSubItems() {
+        return mSubItems != null && mSubItems.size() > 0;
+    }
+
     public AbstractExpandableItem addSubItems(int position, List<S> subItems) {
         if (mSubItems != null && position >= 0 && position < mSubItems.size()) {
             mSubItems.addAll(position, subItems);
         } else {
-            if (mSubItems == null)
+            if (mSubItems == null) {
                 mSubItems = new ArrayList<>();
+            }
             mSubItems.addAll(subItems);
         }
         return this;
@@ -105,8 +106,9 @@ public abstract class AbstractExpandableItem<VH extends ExpandableViewHolder, S 
     }
 
     public AbstractExpandableItem addSubItem(S subItem) {
-        if (mSubItems == null)
+        if (mSubItems == null) {
             mSubItems = new ArrayList<>();
+        }
         mSubItems.add(subItem);
         return this;
     }

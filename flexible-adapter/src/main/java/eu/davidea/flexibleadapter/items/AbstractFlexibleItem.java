@@ -15,11 +15,11 @@
  */
 package eu.davidea.flexibleadapter.items;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import java.util.List;
 
+import androidx.recyclerview.widget.RecyclerView;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 /**
@@ -41,7 +41,7 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
     protected boolean mEnabled = true, mHidden = false,
             mSelectable = true, mDraggable = true, mSwipeable = true;
 
-	/*---------------*/
+    /*---------------*/
     /* BASIC METHODS */
     /*---------------*/
 
@@ -97,9 +97,9 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
         return true;
     }
 
-	/*--------------------*/
-	/* SELECTABLE METHODS */
-	/*--------------------*/
+    /*--------------------*/
+    /* SELECTABLE METHODS */
+    /*--------------------*/
 
     @Override
     public boolean isSelectable() {
@@ -116,9 +116,9 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
         return String.valueOf(position + 1);
     }
 
-	/*-------------------*/
-	/* TOUCHABLE METHODS */
-	/*-------------------*/
+    /*-------------------*/
+    /* TOUCHABLE METHODS */
+    /*-------------------*/
 
     @Override
     public boolean isDraggable() {
@@ -140,9 +140,9 @@ public abstract class AbstractFlexibleItem<VH extends RecyclerView.ViewHolder>
         mSwipeable = swipeable;
     }
 
-	/*---------------------*/
-	/* VIEW HOLDER METHODS */
-	/*---------------------*/
+    /*---------------------*/
+    /* VIEW HOLDER METHODS */
+    /*---------------------*/
 
     /**
      * {@inheritDoc}
