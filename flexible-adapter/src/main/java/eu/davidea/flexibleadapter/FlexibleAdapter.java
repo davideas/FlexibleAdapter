@@ -129,6 +129,7 @@ public class FlexibleAdapter<T extends IFlexible>
     private boolean headersShown = false, recursive = false;
     private int mStickyElevation;
     private StickyHeaderHelper mStickyHeaderHelper;
+    private boolean mStickyHeadersEnabled = false;
     private ViewGroup mStickyContainer;
 
     /* ViewTypes */
@@ -382,8 +383,9 @@ public class FlexibleAdapter<T extends IFlexible>
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         log.v("Attached Adapter to RecyclerView");
-        if (headersShown && areHeadersSticky()) {
-            mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
+
+        if (mStickyHeadersEnabled) {
+            this.setStickyHeadersHelper(true);
         }
     }
 
@@ -396,10 +398,8 @@ public class FlexibleAdapter<T extends IFlexible>
     @CallSuper
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
-        if (areHeadersSticky()) {
-            mStickyHeaderHelper.detachFromRecyclerView();
-            mStickyHeaderHelper = null;
-        }
+        this.setStickyHeadersHelper(false);
+
         super.onDetachedFromRecyclerView(recyclerView);
         log.v("Detached Adapter from RecyclerView");
     }
@@ -1379,27 +1379,38 @@ public class FlexibleAdapter<T extends IFlexible>
 
         // With user defined container
         mStickyContainer = stickyContainer;
+        mStickyHeadersEnabled = sticky;
 
-        // Run in post to be sure about the RecyclerView initialization
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                // Enable or Disable the sticky headers layout
-                if (sticky) {
-                    if (mStickyHeaderHelper == null) {
-                        mStickyHeaderHelper = new StickyHeaderHelper(FlexibleAdapter.this,
-                                mStickyHeaderChangeListener, mStickyContainer);
-                        mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
-                        log.i("Sticky headers enabled");
-                    }
-                } else if (areHeadersSticky()) {
+        this.setStickyHeadersHelper(sticky);
+
+        return this;
+    }
+
+    /**
+     * Enable or disable sticky headers helper
+     * @param enabled true to initialize & attach sticky headers helper, false to dispose it.
+     */
+    private void setStickyHeadersHelper(final boolean enabled) {
+        if (mRecyclerView != null) {
+            // Enable or disable the sticky headers layout
+            if (enabled) {
+                if (mStickyHeaderHelper == null) {
+                    mStickyHeaderHelper = new StickyHeaderHelper(
+                            FlexibleAdapter.this,
+                            mStickyHeaderChangeListener,
+                            mStickyContainer
+                    );
+                    mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
+                    log.i("Sticky headers enabled");
+                }
+            } else {
+                if (mStickyHeaderHelper != null) {
                     mStickyHeaderHelper.detachFromRecyclerView();
                     mStickyHeaderHelper = null;
                     log.i("Sticky headers disabled");
                 }
             }
-        });
-        return this;
+        }
     }
 
     /**

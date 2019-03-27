@@ -22,3 +22,6 @@
 -printmapping out.map
 -renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable
+
+# TODO: complains about non-existent referenced method. check upstream
+-dontwarn me.henrytao.smoothappbarlayout.BaseBehavior
