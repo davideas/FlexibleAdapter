@@ -16,15 +16,15 @@
 package eu.davidea.flexibleadapter.helpers;
 
 import android.animation.Animator;
-import androidx.core.view.ViewCompat;
-import androidx.recyclerview.widget.OrientationHelper;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.OrientationHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.FlexibleAdapter.OnStickyHeaderChangeListener;
 import eu.davidea.flexibleadapter.items.IHeader;
@@ -117,8 +117,8 @@ public final class StickyHeaderHelper extends OnScrollListener {
         return mHeaderPosition;
     }
 
-    private boolean hasStickyHeaderTranslated(int position) {
-        RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(position);
+    private boolean hasStickyHeaderTranslated() {
+        RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(0);
         return vh != null && (vh.itemView.getX() < 0 || vh.itemView.getY() < 0);
     }
 
@@ -376,7 +376,7 @@ public final class StickyHeaderHelper extends OnScrollListener {
     private int getStickyPosition(int adapterPosHere) {
         if (adapterPosHere == RecyclerView.NO_POSITION) {
             adapterPosHere = mAdapter.getFlexibleLayoutManager().findFirstVisibleItemPosition();
-            if (adapterPosHere == 0 && !hasStickyHeaderTranslated(0)) {
+            if (adapterPosHere == 0 && !hasStickyHeaderTranslated()) {
                 return RecyclerView.NO_POSITION;
             }
         }

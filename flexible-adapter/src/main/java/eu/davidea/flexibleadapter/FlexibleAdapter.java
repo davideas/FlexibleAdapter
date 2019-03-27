@@ -1388,27 +1388,24 @@ public class FlexibleAdapter<T extends IFlexible>
 
     /**
      * Enable or disable sticky headers helper
+     *
      * @param enabled true to initialize & attach sticky headers helper, false to dispose it.
      */
     private void setStickyHeadersHelper(final boolean enabled) {
         if (mRecyclerView != null) {
             // Enable or disable the sticky headers layout
-            if (enabled) {
-                if (mStickyHeaderHelper == null) {
-                    mStickyHeaderHelper = new StickyHeaderHelper(
-                            FlexibleAdapter.this,
-                            mStickyHeaderChangeListener,
-                            mStickyContainer
-                    );
-                    mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
-                    log.i("Sticky headers enabled");
-                }
-            } else {
-                if (mStickyHeaderHelper != null) {
-                    mStickyHeaderHelper.detachFromRecyclerView();
-                    mStickyHeaderHelper = null;
-                    log.i("Sticky headers disabled");
-                }
+            if (enabled && mStickyHeaderHelper == null) {
+                mStickyHeaderHelper = new StickyHeaderHelper(
+                        FlexibleAdapter.this,
+                        mStickyHeaderChangeListener,
+                        mStickyContainer
+                );
+                mStickyHeaderHelper.attachToRecyclerView(mRecyclerView);
+                log.i("Sticky headers enabled");
+            } else if (mStickyHeaderHelper != null) {
+                mStickyHeaderHelper.detachFromRecyclerView();
+                mStickyHeaderHelper = null;
+                log.i("Sticky headers disabled");
             }
         }
     }
@@ -1600,7 +1597,6 @@ public class FlexibleAdapter<T extends IFlexible>
                 if (areHeadersSticky()) {
                     mStickyHeaderHelper.clearHeaderWithAnimation();
                 }
-                // setStickyHeaders(false);
                 multiRange = false;
             }
         });
@@ -4365,8 +4361,7 @@ public class FlexibleAdapter<T extends IFlexible>
                 from.remove(i);
                 mNotifications.add(new Notification(i, Notification.REMOVE));
                 out++;
-            } else if (notifyChangeOfUnfilteredItems) {
-                assert unfilteredItems != null;
+            } else if (notifyChangeOfUnfilteredItems && unfilteredItems != null) {
                 T newItem = newItems.get(unfilteredItems.get(item));
                 // Check whether the old content should be updated with the new one
                 // Always true in case filter is active
