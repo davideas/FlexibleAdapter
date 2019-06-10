@@ -368,11 +368,8 @@ public class MainActivity extends AppCompatActivity implements
             });
             return true;
         } else if (id == R.id.nav_about) {
-            MessageDialog.newInstance(
-                    R.drawable.ic_info_grey600_24dp,
-                    getString(R.string.about_title),
-                    getString(R.string.about_body, Utils.getVersionName(this)))
-                         .show(getFragmentManager(), MessageDialog.TAG);
+            Intent intent = new Intent(this, TravelRequestDemo.class);
+            startActivity(intent);
             return true;
         } else if (id == R.id.nav_github) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
