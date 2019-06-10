@@ -92,6 +92,7 @@ dependencies {
 
     // UI Widgets
     implementation widgets.flipView
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta1'
 
     // Test libraries
     androidTestImplementation 'androidx.test:runner:1.1.1'

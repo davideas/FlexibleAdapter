@@ -41,7 +41,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="eu.davidea.samples.flexibleadapter.MainActivity" />
         </activity>
-        <activity android:name=".TravelRequestDemo" />
+        <activity android:name=".TravelRequestDemo" android:label="Trave Details" />
     </application>
 
 </manifest>

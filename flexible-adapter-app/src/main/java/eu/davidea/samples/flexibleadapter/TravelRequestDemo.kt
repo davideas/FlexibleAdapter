@@ -1,6 +1,7 @@
 package eu.davidea.samples.flexibleadapter
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,9 +18,18 @@ import eu.davidea.viewholders.FlexibleViewHolder
 import kotlinx.android.synthetic.main.tr_demo.*
 
 class TravelRequestDemo : AppCompatActivity() {
+    private val handler = Handler()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tr_demo)
+        setSupportActionBar(toolbar)
+
+        swipeRefreshLayout?.setOnRefreshListener {
+            handler.postDelayed({
+                swipeRefreshLayout.isRefreshing = false
+            }, 200)
+        }
 
         val exampleAdapter = FlexibleAdapter(emptyList(), null).apply {
             setStickyHeaders(true)
@@ -52,6 +62,7 @@ class TravelRequestDemo : AppCompatActivity() {
         val tabSelected: (Int) -> Unit = { index ->
             when {
                 index == 0 -> {
+                    tr_recycler_view.stopScroll()
                     exampleAdapter.updateDataSet(
                         listOf(
                             requestDetailsHeader,
@@ -60,6 +71,7 @@ class TravelRequestDemo : AppCompatActivity() {
                     )
                 }
                 index == 1 -> {
+                    tr_recycler_view.stopScroll()
                     exampleAdapter.updateDataSet(
                         listOf(
                             requestDetailsHeader,
@@ -172,6 +184,11 @@ class RequestDetailsTab(
 
         fun bind(model: RequestDetailsTabModel, onTabSelected: ((Int) -> Unit)?) {
             tabListener?.let { tabLayout.removeOnTabSelectedListener(it) }
+
+            tabLayout.getTabAt(0)?.text = model.title1
+            tabLayout.getTabAt(1)?.text = model.title2
+            tabLayout.getTabAt(model.selected)?.select()
+
             if (onTabSelected == null) {
                 tabListener = null
             } else {
@@ -179,10 +196,6 @@ class RequestDetailsTab(
                 tabListener = listener
                 tabLayout.addOnTabSelectedListener(listener)
             }
-
-            tabLayout.getTabAt(0)?.text = model.title1
-            tabLayout.getTabAt(1)?.text = model.title2
-            tabLayout.getTabAt(model.selected)?.select()
         }
 
         private inner class TabListener(
