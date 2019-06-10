@@ -32,11 +32,45 @@ class TravelRequestDemo : AppCompatActivity() {
         }
 
         val requestDetailsHeader = RequestDetailsHeader(RequestDetailsModel("Here go details"))
-        val detailsTabLayout = RequestDetailsTab(RequestDetailsTabModel("Details", "Expenses"))
+
+        val detailsTabLayout = RequestDetailsTab(
+            RequestDetailsTabModel("Details", "Expenses", 0)
+        )
         val details = ContainerItem(
             ContainerItemModel.details(),
             detailsTabLayout
         )
+
+        val expenseTabLayout = RequestDetailsTab(
+            RequestDetailsTabModel("Details", "Expenses", 1)
+        )
+        val expenses = ContainerItem(
+            ContainerItemModel.expenses(),
+            expenseTabLayout
+        )
+
+        val tabSelected: (Int) -> Unit = { index ->
+            when {
+                index == 0 -> {
+                    exampleAdapter.updateDataSet(
+                        listOf(
+                            requestDetailsHeader,
+                            details
+                        )
+                    )
+                }
+                index == 1 -> {
+                    exampleAdapter.updateDataSet(
+                        listOf(
+                            requestDetailsHeader,
+                            expenses
+                        )
+                    )
+                }
+            }
+        }
+        detailsTabLayout.tabListener = tabSelected
+        expenseTabLayout.tabListener = tabSelected
 
         exampleAdapter.updateDataSet(
             listOf(
@@ -97,6 +131,8 @@ class RequestDetailsTab(
 ) : AbstractHeaderItem<RequestDetailsTab.RequestDetailsTabViewHolder>(),
     IHolder<RequestDetailsTabModel> {
 
+    var tabListener: ((Int) -> Unit)? = null
+
     override fun createViewHolder(
         view: View,
         adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>
@@ -110,8 +146,7 @@ class RequestDetailsTab(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        holder.tab1(model.title1)
-        holder.tab2(model.title2)
+        holder.bind(model, tabListener)
     }
 
     override fun getModel(): RequestDetailsTabModel = internalModel
@@ -130,23 +165,46 @@ class RequestDetailsTab(
 
     class RequestDetailsTabViewHolder(val view: View, adapter: FlexibleAdapter<*>) :
         FlexibleViewHolder(view, adapter, true) {
+        private var tabListener: TabListener? = null
         private val tabLayout by lazy(LazyThreadSafetyMode.NONE) {
             view.findViewById<TabLayout>(R.id.tabLayout)
         }
 
-        fun tab1(text: String) {
-            tabLayout.getTabAt(0)?.text = text
+        fun bind(model: RequestDetailsTabModel, onTabSelected: ((Int) -> Unit)?) {
+            tabListener?.let { tabLayout.removeOnTabSelectedListener(it) }
+            if (onTabSelected == null) {
+                tabListener = null
+            } else {
+                val listener = TabListener(onTabSelected)
+                tabListener = listener
+                tabLayout.addOnTabSelectedListener(listener)
+            }
+
+            tabLayout.getTabAt(0)?.text = model.title1
+            tabLayout.getTabAt(1)?.text = model.title2
+            tabLayout.getTabAt(model.selected)?.select()
         }
 
-        fun tab2(text: String) {
-            tabLayout.getTabAt(1)?.text = text
+        private inner class TabListener(
+            private val onTabSelected: (Int) -> Unit
+        ) : TabLayout.BaseOnTabSelectedListener<TabLayout.Tab> {
+            override fun onTabReselected(tab: TabLayout.Tab) {
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                onTabSelected(tab.position)
+            }
         }
     }
 }
 
 data class RequestDetailsTabModel(
     val title1: String,
-    val title2: String
+    val title2: String,
+    val selected: Int
 )
 
 class ContainerItem(
