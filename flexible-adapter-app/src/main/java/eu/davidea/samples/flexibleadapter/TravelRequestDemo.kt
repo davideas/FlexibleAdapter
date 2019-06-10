@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager
@@ -263,6 +264,7 @@ class ContainerItem(
         fun bind(items: List<String>) {
             val dummyAdapter = DummyAdapter(items)
             recyclerView.apply {
+                isNestedScrollingEnabled = false
                 layoutManager = LinearLayoutManager(context)
                 itemAnimator = null
                 adapter = dummyAdapter
