@@ -49,6 +49,6 @@ dependencies {
 if (project.hasProperty('all') || project.hasProperty('adapter')) {
     apply from: '../maven-install.gradle'
     apply from: '../maven-publish.gradle'
-    apply from: '../jfrog-bintray-publish.gradle'
+    //apply from: '../jfrog-bintray-publish.gradle'
     //apply from: '../jfrog-artifactory-publish.gradle'
 }
