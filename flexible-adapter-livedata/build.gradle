@@ -23,7 +23,6 @@ ext {
 
 android {
     compileSdkVersion targetSdk
-    buildToolsVersion buildTools
 
     defaultConfig {
         minSdkVersion minSdk
@@ -61,8 +60,8 @@ dependencies {
     })
 
     // (Required) Writing and executing Unit Tests on the JUnit Platform
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.2.0"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.2.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.4.1"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.4.1"
 
     testImplementation androidx.recyclerView
     testImplementation project(":flexible-adapter")

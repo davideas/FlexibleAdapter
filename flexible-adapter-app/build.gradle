@@ -9,7 +9,6 @@ versioning {
 
 android {
     compileSdkVersion targetSdk
-    buildToolsVersion buildTools
 
     defaultConfig {
         applicationId 'eu.davidea.samples.flexibleadapter'
