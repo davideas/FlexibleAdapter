@@ -38,8 +38,8 @@ android {
         }
     }
     compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
     }
     testOptions {
         /* Android-junit5 - https://github.com/mannodermaus/android-junit5/wiki/Migrating-from-1.0.x */

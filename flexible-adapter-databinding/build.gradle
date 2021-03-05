@@ -46,6 +46,8 @@ android {
 dependencies {
     compileOnly project(":flexible-adapter")
     compileOnly androidx.recyclerView
+    // for NestedScrollingChild3
+    implementation androidx.core
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }
 
