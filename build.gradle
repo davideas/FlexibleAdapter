@@ -15,7 +15,7 @@ allprojects {
 
         // SDK and Build tools version
         minSdk = 14
-        targetSdk = 30 // Android Pie
+        targetSdk = 30 // Android 11
         buildTools = "29.0.2"
 
         // AndroidX
