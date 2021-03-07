@@ -52,5 +52,4 @@ dependencies {
 
 if (project.hasProperty('all') || project.hasProperty('databinding')) {
     apply from: '../maven-install.gradle'
-    apply from: '../jfrog-bintray-publish.gradle'
 }

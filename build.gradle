@@ -24,10 +24,11 @@ allprojects {
         annotationVer = '1.1.0'
         vectorDrawableVer = '1.1.0'
         recyclerViewVer = '1.1.0'
-        lifecycleVer = "2.2.0"
-        constraintVer = "2.0.0-alpha3"
+        lifecycleVer = "2.3.0"
+        constraintVer = "2.0.4"
         coreVer = "1.3.2"
         swipeRefreshVer = "1.1.0"
+        transitionVer = "1.4.0"
 
         androidx = [
                 recyclerView       : "androidx.recyclerview:recyclerview:${recyclerViewVer}",
@@ -37,9 +38,7 @@ allprojects {
                 annotation         : "androidx.annotation:annotation:${annotationVer}",
                 browser            : "androidx.browser:browser:${androidxVer}",
                 vectorDrawable     : "androidx.vectordrawable:vectordrawable:${vectorDrawableVer}",
-                support_v4         : "androidx.legacy:legacy-support-v4:${androidxVer}",
-                support_v13        : "androidx.legacy:legacy-support-v13:${androidxVer}",
-                transition         : "androidx.transition:transition:${androidxVer}",
+                transition         : "androidx.transition:transition:${transitionVer}",
                 lifecycleExtensions: "androidx.lifecycle:lifecycle-extensions:${lifecycleVer}",
                 constraintLayout   : "androidx.constraintlayout:constraintlayout:${constraintVer}",
                 core               : "androidx.core:core:${coreVer}",
@@ -68,7 +67,6 @@ allprojects {
         timberVer = "4.7.1"
         glideVer = "4.12.0"
         javaxInjectVer = "1"
-        junitPlatformVer = "1.1.0"
         junitJupiterVer = "5.2.0"
         libraries = [
                 butterKnife        : "com.jakewharton:butterknife:${butterKnifeVer}",
@@ -111,7 +109,6 @@ buildscript {
         gradle_plugin_version = '4.1.0'
         android_apt_version = '1.8'
         maven_gradle_plugin_version = '2.1'
-        gradle_bintray_plugin_version = '1.8.4'
         javadoc_plugin_version = '0.3.0'
         android_junit5_version = '1.7.1.1'
         grabver_version = '1.0.1'
