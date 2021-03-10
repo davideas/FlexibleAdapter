@@ -39,7 +39,7 @@ allprojects {
                 browser            : "androidx.browser:browser:${androidxVer}",
                 vectorDrawable     : "androidx.vectordrawable:vectordrawable:${vectorDrawableVer}",
                 transition         : "androidx.transition:transition:${transitionVer}",
-                lifecycleExtensions: "androidx.lifecycle:lifecycle-extensions:${lifecycleVer}",
+                lifecycleExtensions: "androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycleVer}",
                 constraintLayout   : "androidx.constraintlayout:constraintlayout:${constraintVer}",
                 core               : "androidx.core:core:${coreVer}",
                 swipeRefreshLayout : "androidx.swiperefreshlayout:swiperefreshlayout:${swipeRefreshVer}"
@@ -106,7 +106,7 @@ buildscript {
     }
 
     ext {
-        gradle_plugin_version = '4.1.0'
+        gradle_plugin_version = '4.0.0'
         android_apt_version = '1.8'
         maven_gradle_plugin_version = '2.1'
         javadoc_plugin_version = '0.3.0'

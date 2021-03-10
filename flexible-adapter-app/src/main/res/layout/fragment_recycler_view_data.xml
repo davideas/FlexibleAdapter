@@ -31,8 +31,8 @@
                     android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:items="@{items}"
                     tools:listitem="@layout/recycler_simple_item" />
+                <!-- app:items="@{items}" was causing build error, temporarily removed -->
 
                 <!-- Needed by FlexibleAdapter for headers to be sticky.
                      This little layout is included in the library.

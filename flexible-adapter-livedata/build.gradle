@@ -49,7 +49,7 @@ android {
 }
 
 dependencies {
-    // Android Arch
+    // Lifecycle
     implementation androidx.lifecycleExtensions
 
     // Test libraries
