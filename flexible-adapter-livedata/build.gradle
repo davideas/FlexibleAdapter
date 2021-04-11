@@ -23,7 +23,6 @@ ext {
 
 android {
     compileSdkVersion targetSdk
-    buildToolsVersion buildTools
 
     defaultConfig {
         minSdkVersion minSdk
@@ -38,8 +37,8 @@ android {
         }
     }
     compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
     }
     testOptions {
         /* Android-junit5 - https://github.com/mannodermaus/android-junit5/wiki/Migrating-from-1.0.x */
@@ -50,19 +49,19 @@ android {
 }
 
 dependencies {
-    // Android Arch
+    // Lifecycle
     implementation androidx.lifecycleExtensions
 
     // Test libraries
     androidTestImplementation androidx.annotation
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test:rules:1.1.1'
+    androidTestImplementation 'androidx.test:runner:1.3.0'
+    androidTestImplementation 'androidx.test:rules:1.3.0'
     androidTestImplementation('androidx.arch.core:core-testing:2.0.0', {
     })
 
     // (Required) Writing and executing Unit Tests on the JUnit Platform
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.2.0"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.2.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
 
     testImplementation androidx.recyclerView
     testImplementation project(":flexible-adapter")
@@ -70,5 +69,4 @@ dependencies {
 
 if (project.hasProperty('all') || project.hasProperty('livedata')) {
     apply from: '../maven-install.gradle'
-    apply from: '../jfrog-bintray-publish.gradle'
 }

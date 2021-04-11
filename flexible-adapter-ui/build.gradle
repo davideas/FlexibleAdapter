@@ -24,7 +24,6 @@ ext {
 
 android {
     compileSdkVersion targetSdk
-    buildToolsVersion buildTools
 
     defaultConfig {
         minSdkVersion minSdk
@@ -47,5 +46,4 @@ dependencies {
 
 if (project.hasProperty('all') || project.hasProperty('ui')) {
     apply from: '../maven-install.gradle'
-    apply from: '../jfrog-bintray-publish.gradle'
 }
