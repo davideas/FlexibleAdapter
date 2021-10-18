@@ -50,6 +50,7 @@ android {
 
 dependencies {
     // Lifecycle
+    implementation androidx.lifecycleLiveData
     implementation androidx.lifecycleExtensions
 
     // Test libraries
