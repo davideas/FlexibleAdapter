@@ -570,8 +570,8 @@ public class FlexibleAdapter<T extends IFlexible>
      * <br>5.0.0-rc2 Copy of the Original List done internally
      */
     @CallSuper
-    public void updateDataSet(@Nullable List<T> items) {
-        updateDataSet(items, false);
+    public void updateDataSet(@Nullable List<T> items, boolean hasVideoHeader) {
+        updateDataSet(items, false, hasVideoHeader);
     }
 
     /**
@@ -601,7 +601,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * <br>5.0.0-rc2 Copy of the Original List done internally
      */
     @CallSuper
-    public void updateDataSet(@Nullable List<T> items, boolean animate) {
+    public void updateDataSet(@Nullable List<T> items, boolean animate, boolean hasVideoHeader) {
         mOriginalList = null; // Reset original list from filter
         if (items == null) {
             items = new ArrayList<>();
@@ -616,7 +616,12 @@ public class FlexibleAdapter<T extends IFlexible>
             mItems = newItems;
             // Execute instant reset on init
             log.w("updateDataSet with notifyDataSetChanged!");
-            notifyDataSetChanged();
+            if (hasVideoHeader) {
+                int startPosition = 1;
+                notifyItemRangeChanged(startPosition, items.size());
+            } else {
+                notifyDataSetChanged();
+            }
             onPostUpdate();
         }
     }
