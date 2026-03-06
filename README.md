@@ -1,13 +1,23 @@
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-FlexibleAdapter-green.svg?style=flat)](http://android-arsenal.com/details/1/2207)
-[![Download](https://api.bintray.com/packages/davideas/maven/flexible-adapter/images/download.svg)](https://bintray.com/davideas/maven/flexible-adapter/_latestVersion)
-[![API](https://img.shields.io/badge/API-14%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=14)
 [![Licence](https://img.shields.io/badge/Licence-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 ![Methods and Size](https://img.shields.io/badge/Methods%20and%20size-Core:%20759,%20124%20KB%20|%20UI:%20267,%2068%20KB-e91e63.svg)
 
+# FlexibleAdapter: A finished chapter (2015–2026)
+FlexibleAdapter is now officially a legacy archive. It was built to solve the complexities of `RecyclerView`, and it did so for a decade. Today, the industry has moved to a different paradigm, and this project has reached a rare milestone in open-source and its natural conclusion.
+
+### The current reality
+This library remains 100% stable for projects using the legacy Android View system (XML) for `Android API 14-30`. The API has been frozen for years because it fulfills its original purpose.
+
+### The industry has moved toward Declarative UI
+The arrival of Jetpack Compose and Compose Multiplatform has replaced the need for complex Adapters. What used to take hundreds of lines in this library now takes tens of lines of native Kotlin code.
+
+- Jetpack Compose: For new Android-only projects, we recommend migrating to `LazyColumn` & `LazyRow`.
+- Kotlin Multiplatform (KMP): For projects targeting Android and iOS, use Compose Multiplatform. Since FlexibleAdapter depends on the Android View system, it is not compatible with multiplatform targets.
+
+### A final word
+No further feature requests or pull requests will be processed, also it will not be migrated to a modern repository center, as the library is considered a "finished" product. Thank you to have adopted this library in your project.
+
 # FlexibleAdapter
-- [v5.1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.1.0) built on 2018.09.30 with AndroidX
-- If you come from previous versions, update your code following the Wiki page [Migrations](https://github.com/davideas/FlexibleAdapter/wiki/Migrations).
-- Please read also [issues](https://github.com/davideas/FlexibleAdapter/issues) and [releases](https://github.com/davideas/FlexibleAdapter/releases).
+- Last build: [v5.1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.1.0) on 2018.09.30 with AndroidX
 
 ### One Adapter many Apps
 > :mega: When initially Android:registered: team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.<br/>
@@ -53,7 +63,10 @@ This library is configurable and it guides the developers to create a better use
 * [Live Data](https://github.com/davideas/FlexibleAdapter/wiki/Extensions-%7C-LiveData).
 * Data Binding.
 
-# Setup
+# Setup (JCenter repository shutdown)
+The original artifacts were never migrated to Maven Central. As a result, adding implementation `eu.davidea:flexible-adapter:5.1.0` to your project will now result in a `404 Not Found` error.
+There are no plans to republish the legacy version to Maven Central. The library served its purpose during the RecyclerView era, and that era has now passed.
+
 #### build.gradle
 ```
 repositories {
@@ -70,11 +83,6 @@ dependencies {
     implementation 'eu.davidea:flexible-adapter-databinding:1.0.0'
 }
 ```
-#### Stay Updated
-|Flexible Adapter|UI|Live Data|Data Binding|
-|---|---|---|---|
-|<div align="center">5.1.0</div>|<div align="center">1.0.0</div>|<div align="center">1.0.0-b3</div>|<div align="center">1.0.0</div>|
-|<a href='https://bintray.com/davideas/maven/flexible-adapter?source=watch' alt='Get automatic notifications about new "flexible-adapter" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-ui?source=watch' alt='Get automatic notifications about new "flexible-adapter-ui" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-livedata?source=watch' alt='Get automatic notifications about new "flexible-adapter-livedata" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|<a href='https://bintray.com/davideas/maven/flexible-adapter-databinding?source=watch' alt='Get automatic notifications about new "flexible-adapter-databinding" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_bw.png'></a>|
 
 # Wiki!
 I strongly recommend to read the **[Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial.<br/>
@@ -118,19 +126,6 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 ![Search Filter](/screenshots/demo20_search_filter.png)
 ![Search Sections](/screenshots/demo20_search_sections.png)
 
-# Change Log
-###### Latest release
-[v5.1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.1.0) - 2018.09.30
-
-###### Old releases
-[v5.0.6](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.6) - 2018.09.16 |
-[v5.0.5](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.5) - 2018.06.03 |
-[v5.0.4](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.4) - 2018.05.01 |
-[v5.0.3](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.3) - 2018.03.23 |
-[v5.0.2](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.2) - 2018.03.17 |
-[v5.0.1](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.1) - 2018.03.11 |
-[v5.0.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.0.0) - 2018.03.04
-
 # Limitations
 Item half swipe cannot be implemented due to how the `android.support.v7.widget.helper.ItemTouchHelper` is done, also clicks on rear view are not possible, same reason.
 Half swipe can be done with others means, please see issues #98 and #100. See also commits of Apr 25, 2016. 
@@ -168,7 +163,7 @@ It will be a pleasure to add your App here, once it is published.
 
 #### FlexibleAdapter & Extensions
 
-    Copyright 2015-2018 Davide Steduto, Davidea Solutions Sprl
+    Copyright 2015-2018 Davide Steduto, Davidea Solutions Srl
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
