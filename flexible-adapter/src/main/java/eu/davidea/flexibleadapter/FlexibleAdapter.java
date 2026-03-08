@@ -2982,7 +2982,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #addItemWithDelay(int, IFlexible, long, boolean)
      * @since 1.0.0
      */
-    public boolean addItem(@IntRange(from = 0) int position, @NonNull T item) {
+    public boolean addItem(int position, @NonNull T item) {
         if (item == null) {
             log.e("addItem No item to add!");
             return false;
@@ -3007,7 +3007,7 @@ public class FlexibleAdapter<T extends IFlexible>
      * @see #addSubItems(int, int, IExpandable, List, boolean, Object)
      * @since 5.0.0-b1
      */
-    public boolean addItems(@IntRange(from = 0) int position, @NonNull List<T> items) {
+    public boolean addItems(int position, @NonNull List<T> items) {
         if (items == null || items.isEmpty()) {
             log.e("addItems No items to add!");
             return false;
@@ -5319,15 +5319,12 @@ public class FlexibleAdapter<T extends IFlexible>
         /**
          * Called when single tap occurs.
          * <p>The click event is generated from the itemView or any view inside it (if registered).</p>
-         * Here, we check if one of the selection mode ({@code SINGLE or MULTI}) is enabled in order
-         * to activate the itemView.</p>
-         * To register the click event to any subview, just assign the ViewHolder instance as click
-         * listener to that view.
+         * <p>To register the click event to any subview, just assign the ViewHolder instance as click
+         * listener to that view.</p>
          *
          * @param view     the view that generated the event
          * @param position the adapter position of the item clicked
-         * @return true if the click should activate the itemView according to the selection mode,
-         * false for no change to the itemView.
+         * @return true if the click should toggle activation of the itemView, false otherwise.
          * @since 5.0.0-b1
          */
         boolean onItemClick(View view, int position);
