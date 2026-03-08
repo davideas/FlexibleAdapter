@@ -1,5 +1,7 @@
 package eu.davidea.flexibleadapter;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,14 +16,12 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.items.SimpleItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author Davide Steduto
  * @since 18/10/2016
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 25)
+@Config(sdk = 25)
 public class FilterTest {
 
     private FlexibleAdapter<AbstractFlexibleItem> mAdapter;

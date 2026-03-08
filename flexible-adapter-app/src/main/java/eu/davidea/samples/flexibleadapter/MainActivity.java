@@ -8,25 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import androidx.annotation.NonNull;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.core.view.GravityCompat;
-import androidx.core.view.MenuItemCompat;
-import androidx.core.view.ViewCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.InputType;
 import android.transition.Fade;
 import android.view.Menu;
@@ -37,11 +18,33 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.core.view.ViewCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.BuildConfig;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.Payload;
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode;
@@ -888,17 +891,16 @@ public class MainActivity extends AppCompatActivity implements
         // Removing items from Database. Example:
         for (AbstractFlexibleItem adapterItem : mAdapter.getDeletedItems()) {
             // NEW! You can take advantage of AutoMap and differentiate logic by viewType using "switch" statement
-            switch (adapterItem.getLayoutRes()) {
-                case R.layout.recycler_sub_item:
-                    SubItem subItem = (SubItem) adapterItem;
-                    DatabaseService.getInstance().removeSubItem(mAdapter.getExpandableOfDeletedChild(subItem), subItem);
-                    Log.d("Confirm removed %s", subItem);
-                    break;
-                case R.layout.recycler_simple_item:
-                case R.layout.recycler_expandable_item:
-                    DatabaseService.getInstance().removeItem(adapterItem);
-                    Log.d("Confirm removed %s", adapterItem);
-                    break;
+            int layoutRes = adapterItem.getLayoutRes();
+            if (layoutRes == R.layout.recycler_sub_item) {
+                SubItem subItem = (SubItem) adapterItem;
+                DatabaseService.getInstance()
+                        .removeSubItem(mAdapter.getExpandableOfDeletedChild(subItem), subItem);
+                Log.d("Confirm removed %s", subItem);
+            } else if (layoutRes == R.layout.recycler_simple_item ||
+                    layoutRes == R.layout.recycler_expandable_item) {
+                DatabaseService.getInstance().removeItem(adapterItem);
+                Log.d("Confirm removed %s", adapterItem);
             }
         }
     }
@@ -925,97 +927,90 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_select_all:
-                mAdapter.selectAll();
-                mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
-                // We consume the event
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_select_all) {
+            mAdapter.selectAll();
+            mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
+            // We consume the event
+            return true;
+        } else if (itemId == R.id.action_delete) {// Build message before delete, for the SnackBar
+            StringBuilder message = new StringBuilder();
+            message.append(getString(R.string.action_deleted)).append(" ");
+            for (Integer pos : mAdapter.getSelectedPositions()) {
+                message.append(extractTitleFrom(mAdapter.getItem(pos)));
+                if (mAdapter.getSelectedItemCount() > 1)
+                    message.append(", ");
+            }
 
-            case R.id.action_delete:
-                // Build message before delete, for the SnackBar
-                StringBuilder message = new StringBuilder();
-                message.append(getString(R.string.action_deleted)).append(" ");
-                for (Integer pos : mAdapter.getSelectedPositions()) {
-                    message.append(extractTitleFrom(mAdapter.getItem(pos)));
-                    if (mAdapter.getSelectedItemCount() > 1)
-                        message.append(", ");
+            // Experimenting NEW feature
+            mAdapter.setRestoreSelectionOnUndo(true);
+            mAdapter.setPermanentDelete(false);
+
+            // New Undo Helper (Basic usage)
+            new UndoHelper(mAdapter, this)
+                    .withPayload(Payload.CHANGE)
+                    .start(mAdapter.getSelectedPositions(),
+                            findViewById(R.id.main_view), message,
+                            getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
+
+            // Enable Refreshing
+            mRefreshHandler.sendEmptyMessage(REFRESH_START);
+            mRefreshHandler.sendEmptyMessageDelayed(REFRESH_STOP, UndoHelper.UNDO_TIMEOUT);
+
+            // Finish the action mode
+            mActionModeHelper.destroyActionModeIfCan();
+
+            // We consume the event
+            return true;
+        } else if (itemId == R.id.action_merge) {
+            if (mAdapter.getSelectedItemCount() > 1) {
+                // Selected positions are sorted by default, we take the first item of the set
+                int mainPosition = mAdapter.getSelectedPositions().get(0);
+                mAdapter.removeSelection(mainPosition);
+                StaggeredItem mainItem = (StaggeredItem) mAdapter.getItem(mainPosition);
+                for (Integer position : mAdapter.getSelectedPositions()) {
+                    // Merge item - Save the modification in the memory for next refresh
+                    DatabaseService.getInstance().mergeItem(mainItem, (StaggeredItem) mAdapter.getItem(position));
                 }
-
-                // Experimenting NEW feature
-                mAdapter.setRestoreSelectionOnUndo(true);
-                mAdapter.setPermanentDelete(false);
-
-                // New Undo Helper (Basic usage)
-                new UndoHelper(mAdapter, this)
-                        .withPayload(Payload.CHANGE)
-                        .start(mAdapter.getSelectedPositions(),
-                                findViewById(R.id.main_view), message,
-                                getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
-
-                // Enable Refreshing
-                mRefreshHandler.sendEmptyMessage(REFRESH_START);
-                mRefreshHandler.sendEmptyMessageDelayed(REFRESH_STOP, UndoHelper.UNDO_TIMEOUT);
-
-                // Finish the action mode
-                mActionModeHelper.destroyActionModeIfCan();
-
-                // We consume the event
-                return true;
-
-            case R.id.action_merge:
-                if (mAdapter.getSelectedItemCount() > 1) {
-                    // Selected positions are sorted by default, we take the first item of the set
-                    int mainPosition = mAdapter.getSelectedPositions().get(0);
-                    mAdapter.removeSelection(mainPosition);
-                    StaggeredItem mainItem = (StaggeredItem) mAdapter.getItem(mainPosition);
-                    for (Integer position : mAdapter.getSelectedPositions()) {
-                        // Merge item - Save the modification in the memory for next refresh
-                        DatabaseService.getInstance().mergeItem(mainItem, (StaggeredItem) mAdapter.getItem(position));
+                // Remove merged item from the list
+                mAdapter.removeAllSelectedItems();
+                // Keep selection on mainItem & Skip default notification by calling addSelection
+                mAdapter.addSelection(mainPosition);
+                // Custom notification to bind again (ripple only)
+                mAdapter.notifyItemChanged(mainPosition, "blink");
+                // New title for context
+                mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
+                // Item decorations must be invalidated and rebuilt
+                mAdapter.invalidateItemDecorations(100L);
+            }
+            // We consume always the event, never finish the ActionMode
+            return true;
+        } else if (itemId == R.id.action_split) {
+            if (mAdapter.getSelectedItemCount() == 1) {
+                StaggeredItem mainItem = (StaggeredItem) mAdapter.getItem(mAdapter.getSelectedPositions().get(0));
+                if (mainItem.getMergedItems() != null) {
+                    List<StaggeredItem> itemsToSplit = new ArrayList<>(mainItem.getMergedItems());
+                    for (StaggeredItem itemToSplit : itemsToSplit) {
+                        // Split item - Save the modification in the memory for next refresh
+                        DatabaseService.getInstance().splitItem(mainItem, itemToSplit);
+                        // We know the section object, so we can insert directly the item at the right position
+                        // The calculated position is then returned
+                        int position = mAdapter.addItemToSection(itemToSplit, mainItem.getHeader(), new DatabaseService.ItemComparatorById());
+                        mAdapter.toggleSelection(position); //Execute default notification
+                        mAdapter.notifyItemChanged(position, "blink");
                     }
-                    // Remove merged item from the list
-                    mAdapter.removeAllSelectedItems();
-                    // Keep selection on mainItem & Skip default notification by calling addSelection
-                    mAdapter.addSelection(mainPosition);
                     // Custom notification to bind again (ripple only)
-                    mAdapter.notifyItemChanged(mainPosition, "blink");
+                    mAdapter.notifyItemChanged(mAdapter.getGlobalPositionOf(mainItem), "blink");
                     // New title for context
                     mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
-                    // Item decorations must be invalidated and rebuilt
-                    mAdapter.invalidateItemDecorations(100L);
                 }
-                // We consume always the event, never finish the ActionMode
-                return true;
-
-            case R.id.action_split:
-                if (mAdapter.getSelectedItemCount() == 1) {
-                    StaggeredItem mainItem = (StaggeredItem) mAdapter.getItem(mAdapter.getSelectedPositions().get(0));
-                    if (mainItem.getMergedItems() != null) {
-                        List<StaggeredItem> itemsToSplit = new ArrayList<>(mainItem.getMergedItems());
-                        for (StaggeredItem itemToSplit : itemsToSplit) {
-                            // Split item - Save the modification in the memory for next refresh
-                            DatabaseService.getInstance().splitItem(mainItem, itemToSplit);
-                            // We know the section object, so we can insert directly the item at the right position
-                            // The calculated position is then returned
-                            int position = mAdapter.addItemToSection(itemToSplit, mainItem.getHeader(), new DatabaseService.ItemComparatorById());
-                            mAdapter.toggleSelection(position); //Execute default notification
-                            mAdapter.notifyItemChanged(position, "blink");
-                        }
-                        // Custom notification to bind again (ripple only)
-                        mAdapter.notifyItemChanged(mAdapter.getGlobalPositionOf(mainItem), "blink");
-                        // New title for context
-                        mActionModeHelper.updateContextTitle(mAdapter.getSelectedItemCount());
-                    }
-                    // Item decorations must be invalidated and rebuilt
-                    mAdapter.invalidateItemDecorations(100L);
-                }
-                // We consume always the event, never finish the ActionMode
-                return true;
-
-            default:
-                // If an item is not implemented we don't consume the event, so we finish the ActionMode
-                return false;
-        }
+                // Item decorations must be invalidated and rebuilt
+                mAdapter.invalidateItemDecorations(100L);
+            }
+            // We consume always the event, never finish the ActionMode
+            return true;
+        }// If an item is not implemented we don't consume the event, so we finish the ActionMode
+        return false;
     }
 
     @Override
@@ -1027,7 +1022,7 @@ public class MainActivity extends AppCompatActivity implements
             getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark_light));
         }
     }
-	
+
 	/* ======
 	 * EXTRAS
 	 * ====== */

@@ -1,44 +1,50 @@
-apply plugin: 'com.android.library'
-apply plugin: 'eu.davidea.grabver'
+plugins {
+    id 'com.android.library'
+    id 'eu.davidea.grabver'
+}
 
 versioning {
     major 1
     minor 0
-    patch 0
-    //preRelease "b4"
-    dependsOn "install"
 }
-// For maven repository
-version = versioning.name
 
 ext {
     // Library Settings
+    artifact = "flexible-adapter-databinding"
     libraryName = "FlexibleAdapter DataBinding extension"
     libraryDescription = "DataBinding extension for FlexibleAdapter project"
     libraryLabels = ['android', 'flexibleadapter', 'adapter', 'databinding', 'binding']
-
-    publishedGroupId = "eu.davidea"
-    bintrayName = "flexible-adapter-databinding"
-    artifact = bintrayName
 }
 
 android {
     compileSdkVersion targetSdk
+    namespace 'eu.davidea.flexibleadapter.databinding'
 
     defaultConfig {
-        minSdkVersion minSdk
-        targetSdkVersion targetSdk
+        minSdk = rootProject.ext.minSdk
+        targetSdk = rootProject.ext.targetSdk
         versionCode versioning.code
         versionName versioning.name
     }
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility JavaVersion.VERSION_21
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     dataBinding {
         enabled = true
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -51,5 +57,5 @@ dependencies {
 }
 
 if (project.hasProperty('all') || project.hasProperty('databinding')) {
-    apply from: '../maven-install.gradle'
+    apply from: '../publish.gradle'
 }

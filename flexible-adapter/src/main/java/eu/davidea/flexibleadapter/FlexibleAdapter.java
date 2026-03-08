@@ -15,6 +15,8 @@
  */
 package eu.davidea.flexibleadapter;
 
+import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
+
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,9 +28,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.Serializable;
-import java.util.*;
-
 import androidx.annotation.CallSuper;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
@@ -36,6 +35,19 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import eu.davidea.flexibleadapter.helpers.ItemTouchHelperCallback;
 import eu.davidea.flexibleadapter.helpers.StickyHeaderHelper;
 import eu.davidea.flexibleadapter.items.IExpandable;
@@ -45,8 +57,6 @@ import eu.davidea.flexibleadapter.items.IHeader;
 import eu.davidea.flexibleadapter.items.ISectionable;
 import eu.davidea.viewholders.ExpandableViewHolder;
 import eu.davidea.viewholders.FlexibleViewHolder;
-
-import static eu.davidea.flexibleadapter.utils.LayoutUtils.getClassName;
 
 /**
  * This Adapter is backed by an ArrayList of arbitrary objects of class <b>T</b>, where <b>T</b>
@@ -607,8 +617,10 @@ public class FlexibleAdapter<T extends IFlexible>
             items = new ArrayList<>();
         }
         if (animate) {
-            mHandler.removeMessages(UPDATE);
-            mHandler.sendMessage(Message.obtain(mHandler, UPDATE, items));
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler.sendMessage(Message.obtain(mHandler, (hasFilter() ? FILTER : UPDATE), items));
+        } else if (hasFilter()) {
+            filterItems(items);
         } else {
             // Copy of the original list
             List<T> newItems = new ArrayList<>(items);
@@ -5244,6 +5256,10 @@ public class FlexibleAdapter<T extends IFlexible>
             this.mSelectedLevel = savedInstanceState.getInt(EXTRA_LEVEL);
             // Current filter (old filter must not be saved)
             this.mFilterEntity = savedInstanceState.getSerializable(EXTRA_FILTER);
+            if (hasFilter()) {
+                mOriginalList = mItems;
+                mItems = new ArrayList<>();
+            }
         }
     }
 

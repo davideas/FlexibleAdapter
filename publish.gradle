@@ -1,0 +1,36 @@
+apply plugin: 'com.vanniktech.maven.publish'
+
+mavenPublishing {
+    // Only configure Central publishing and signing if -Prelease is provided
+    publishToMavenCentral()
+    signAllPublications()
+
+    coordinates(publishedGroupId, artifact, versioning.name)
+
+    pom {
+        name = libraryName
+        description = libraryDescription
+        url = siteUrl
+
+        licenses {
+            license {
+                name = licenseName
+                url = licenseUrl
+            }
+        }
+
+        developers {
+            developer {
+                id = developerId
+                name = developerName
+                email = developerEmail
+            }
+        }
+
+        scm {
+            connection = gitUrl
+            developerConnection = gitUrl
+            url = siteUrl
+        }
+    }
+}

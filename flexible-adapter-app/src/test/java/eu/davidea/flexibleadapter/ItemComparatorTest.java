@@ -1,5 +1,7 @@
 package eu.davidea.flexibleadapter;
 
+import static org.junit.Assert.assertEquals;
+
 import android.view.View;
 
 import org.junit.Before;
@@ -19,10 +21,8 @@ import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
-import static org.junit.Assert.assertEquals;
-
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 25)
+@Config(sdk = 25)
 public class ItemComparatorTest {
 
     private SimpleHeader[] headers;

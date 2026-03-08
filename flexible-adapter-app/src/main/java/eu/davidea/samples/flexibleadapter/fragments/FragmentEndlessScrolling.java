@@ -2,13 +2,14 @@ package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -286,24 +287,26 @@ public class FragmentEndlessScrolling extends AbstractFragment
     @Override
     protected GridLayoutManager createNewGridLayoutManager() {
         GridLayoutManager gridLayoutManager = new SmoothScrollGridLayoutManager(getActivity(), mColumnCount);
+
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                // NOTE: If you use simple integers to identify the ViewType,
-                // here, you should use them and not Layout integers
-                switch (mAdapter.getItemViewType(position)) {
-                    case R.layout.recycler_scrollable_expandable_item:
-                    case R.layout.recycler_scrollable_header_item:
-                    case R.layout.recycler_scrollable_footer_item:
-                    case R.layout.recycler_scrollable_layout_item:
-                    case R.layout.recycler_scrollable_uls_item:
-                    case R.layout.progress_item:
-                        return mColumnCount;
-                    default:
-                        return 1;
+                int viewType = mAdapter.getItemViewType(position);
+                // Using if-else because Resource IDs are not final constants
+                if (viewType == R.layout.recycler_scrollable_expandable_item ||
+                        viewType == R.layout.recycler_scrollable_header_item ||
+                        viewType == R.layout.recycler_scrollable_footer_item ||
+                        viewType == R.layout.recycler_scrollable_layout_item ||
+                        viewType == R.layout.recycler_scrollable_uls_item ||
+                        viewType == R.layout.progress_item) {
+
+                    return mColumnCount;
+                } else {
+                    return 1;
                 }
             }
         });
+
         return gridLayoutManager;
     }
 

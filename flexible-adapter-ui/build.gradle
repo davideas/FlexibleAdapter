@@ -1,41 +1,53 @@
-apply plugin: 'com.android.library'
-apply plugin: 'eu.davidea.grabver'
+plugins {
+    id 'com.android.library'
+    id 'eu.davidea.grabver'
+}
 
 versioning {
     major 1
     minor 0
-    patch 0
-    //preRelease "b6"
-    dependsOn "install"
 }
-// For maven repository
-version = versioning.name
 
 ext {
     // Library Settings
+    artifact = "flexible-adapter-ui"
     libraryName = "FlexibleAdapter UI extension"
     libraryDescription = "UI extension for FlexibleAdapter project"
     libraryLabels = ['android', 'flexibleadapter', 'adapter', 'ui']
-
-    publishedGroupId = "eu.davidea"
-    bintrayName = "flexible-adapter-ui"
-    artifact = bintrayName
 }
 
 android {
-    compileSdkVersion targetSdk
+    compileSdk targetSdk
+    namespace 'eu.davidea.flexibleadapter.ui'
 
     defaultConfig {
-        minSdkVersion minSdk
-        targetSdkVersion targetSdk
+        minSdk = rootProject.ext.minSdk
+        targetSdk = rootProject.ext.targetSdk
         versionCode versioning.code
         versionName versioning.name
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+
+    androidComponents {
+        beforeVariants(selector().all()) { variantBuilder ->
+            variantBuilder.enableAndroidTest = false
+            variantBuilder.enableUnitTest = false
+        }
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -44,6 +56,7 @@ dependencies {
     implementation google.material
 }
 
+// Apply publishing configuration when -Pall or module-specific property is set
 if (project.hasProperty('all') || project.hasProperty('ui')) {
-    apply from: '../maven-install.gradle'
+    apply from: '../publish.gradle'
 }

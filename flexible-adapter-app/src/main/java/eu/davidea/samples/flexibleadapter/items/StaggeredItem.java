@@ -2,15 +2,14 @@ package eu.davidea.samples.flexibleadapter.items;
 
 import android.content.Context;
 import android.graphics.Color;
-import androidx.cardview.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.cardview.widget.CardView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
 import eu.davidea.flexibleadapter.utils.DrawableUtils;
@@ -170,13 +169,9 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
 
     static class ViewHolder extends FlexibleViewHolder {
 
-        @BindView(R.id.card_view)
         CardView cardView;
-        @BindView(R.id.item_id)
         TextView itemTextView;
-        @BindView(R.id.text_merged)
         TextView mergedTextView;
-        @BindView(R.id.text_status)
         TextView statusTextView;
 
         /**
@@ -187,7 +182,10 @@ public class StaggeredItem extends AbstractSectionableItem<StaggeredItem.ViewHol
          */
         public ViewHolder(View view, FlexibleAdapter adapter) {
             super(view, adapter);
-            ButterKnife.bind(this, view);
+            cardView = view.findViewById(R.id.card_view);
+            itemTextView = view.findViewById(R.id.item_id);
+            mergedTextView = view.findViewById(R.id.text_merged);
+            statusTextView = view.findViewById(R.id.text_status);
         }
 
     }

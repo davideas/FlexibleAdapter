@@ -1,19 +1,21 @@
-apply plugin: 'com.android.application'
-apply plugin: 'eu.davidea.grabver'
+plugins {
+    id 'com.android.application'
+    id 'eu.davidea.grabver'
+}
 
 versioning {
     major 5
     minor 1
-    patch 0
 }
 
 android {
-    compileSdkVersion targetSdk
+    compileSdk targetSdk
+    namespace 'eu.davidea.samples.flexibleadapter'
 
     defaultConfig {
         applicationId 'eu.davidea.samples.flexibleadapter'
-        minSdkVersion minSdk
-        targetSdkVersion targetSdk
+        minSdk = rootProject.ext.minSdk
+        targetSdk = rootProject.ext.targetSdk
         versionCode versioning.code
         versionName versioning.name
 
@@ -21,20 +23,16 @@ android {
         // https://developer.android.com/studio/write/vector-asset-studio.html
         vectorDrawables.useSupportLibrary = true
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
 
-        android.applicationVariants.all { variant ->
-            variant.outputs.all {
-                outputFileName = "flexible-adapter-v" + versioning.name + "-c" + versioning.code + ".apk"
-            }
-        }
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    // Configure only for each module that uses Java 8 language features
-    // (either in its source code or through dependencies).
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
+
     buildTypes {
         debug {
             versionNameSuffix ' #' + versioning.build + versioning.builtOn
@@ -43,15 +41,29 @@ android {
         release {
             zipAlignEnabled true
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    androidComponents {
+        onVariants(selector().all(), { variant ->
+            variant.outputs.each { output ->
+                output.outputFileName.set("flexible-adapter-v${versioning.name}-c${versioning.code}.apk")
+            }
+        })
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
+        unitTests.all {
+            enabled = false
+        }
     }
+
     lintOptions {
         abortOnError false
     }
+
     dataBinding {
         enabled = true
     }
@@ -71,35 +83,20 @@ dependencies {
     implementation androidx.recyclerView
     implementation google.material
     implementation androidx.swipeRefreshLayout
+    implementation 'androidx.multidex:multidex:2.0.1'
 
-    // Timber (Logger) - https://github.com/JakeWharton/timber
+    // Timber (Logger)
     implementation libraries.timber
-
-    // Butter Knife (View Injector) - https://github.com/JakeWharton/butterknife
-    implementation libraries.butterKnife
-    annotationProcessor libraries.butterKnifeCompiler
 
     // Glide (Image Loader & Caching)
     implementation libraries.glide
     annotationProcessor libraries.glideCompiler
 
-    // Smooth-app-bar-layout
-    implementation('me.henrytao:smooth-app-bar-layout:24.1.1.0') {
-        exclude group: 'com.android.support'
-    }
-
     // UI Widgets
-    implementation widgets.flipView
+    implementation 'eu.davidea:flipview:1.2.0'
 
     // Test libraries
-    androidTestImplementation 'androidx.test:runner:1.3.0'
-    androidTestImplementation 'androidx.test:rules:1.3.0'
-    androidTestImplementation('androidx.test.espresso:espresso-core:3.4.0-alpha04', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-        exclude group: 'com.google.code.findbugs', module: 'jsr305'
-    })
-    testImplementation 'org.robolectric:robolectric:4.5.1'
+    testImplementation 'org.robolectric:robolectric:4.16.1'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:2.23.4'
-
+    testImplementation 'org.hamcrest:hamcrest:3.0'
 }

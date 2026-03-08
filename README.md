@@ -1,11 +1,11 @@
-[![Licence](https://img.shields.io/badge/Licence-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-![Methods and Size](https://img.shields.io/badge/Methods%20and%20size-Core:%20759,%20124%20KB%20|%20UI:%20267,%2068%20KB-e91e63.svg)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+![Size](https://img.shields.io/badge/Size-Core:%20124%20KB%20|%20UI:%2068%20KB-e91e63.svg)
 
 # FlexibleAdapter: A finished chapter (2015–2026)
-FlexibleAdapter is now officially a legacy archive. It was built to solve the complexities of `RecyclerView`, and it did so for a decade. Today, the industry has moved to a different paradigm, and this project has reached a rare milestone in open-source and its natural conclusion.
+FlexibleAdapter is now officially a legacy archive. It was built to solve the complexities of `RecyclerView`, and it did so for a decade. Today, the industry has moved to a different paradigm, and this project has reached a rare milestone in open-source and got its natural conclusion.
 
 ### The current reality
-This library remains 100% stable for projects using the legacy Android View system (XML) for `Android API 14-30`. The API has been frozen for years because it fulfills its original purpose.
+This library remains 100% stable for projects using the legacy Android View system (XML). The API has been frozen for years because it fulfills its original purpose.
 
 ### The industry has moved toward Declarative UI
 The arrival of Jetpack Compose and Compose Multiplatform has replaced the need for complex Adapters. What used to take hundreds of lines in this library now takes tens of lines of native Kotlin code.
@@ -14,7 +14,11 @@ The arrival of Jetpack Compose and Compose Multiplatform has replaced the need f
 - Kotlin Multiplatform (KMP): For projects targeting Android and iOS, use Compose Multiplatform. Since FlexibleAdapter depends on the Android View system, it is not compatible with multiplatform targets.
 
 ### A final word
-No further feature requests or pull requests will be processed, also it will not be migrated to a modern repository center, as the library is considered a "finished" product. Thank you to have adopted this library in your project.
+No further feature requests or pull requests will be processed, as the library is considered a "finished" product.
+
+As last contribution to the community the library has been published to Maven Central Repository.
+
+Thank you to have adopted this library in your project.
 
 # FlexibleAdapter
 - Last build: [v5.1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.1.0) on 2018.09.30 with AndroidX
@@ -36,7 +40,7 @@ This library is configurable and it guides the developers to create a better use
 * Async [Updates](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Update-Data-Set) with optional _DiffUtil_ for small lists.
 * Async [Filter](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter) with spannable text (:eyeglasses:); Result list is animated; With optional original list; Works with sub items; Multi filter.
 * [High performance](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Search-Filter#performance-result-when-animations-are-active) filter and updates for medium and big lists.
-* [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behaviour fully clickable and collapsible, elevation, transparency and automatic linkage on item move!
+* [Headers and Sections](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Headers-and-Sections) with sticky behavior fully clickable and collapsible, elevation, transparency and automatic linkage on item move!
 * [Scrollable Headers and Footers](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Scrollable-Headers-and-Footers) items that lay respectively at the top and at the bottom of the main items.
 * [Expandable items](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Expandable-items) with _Selection Coherence_ and multi-level expansion.
 * [Drag&Drop and Swipe-To-Dismiss](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Drag&Drop-and-Swipe#swiping-the-front-view) with Leave-Behind pattern and with _Selection Coherence_.
@@ -48,7 +52,7 @@ This library is configurable and it guides the developers to create a better use
 * Support for any [thirds LayoutManagers](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Thirds-Layout-Managers).
 * Easy runtime position calculation for adding/moving items in sections.
 * Custom Tags for multiple adapter instances that ease our debug.
-* Comprehensive [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages and JavaDoc documentation.
+* Comprehensive [Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages and Javadoc documentation.
 
 ### UI extension library :eyeglasses:
 * Faster setup selection with [ActionModeHelper](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ActionModeHelper).
@@ -63,23 +67,21 @@ This library is configurable and it guides the developers to create a better use
 * [Live Data](https://github.com/davideas/FlexibleAdapter/wiki/Extensions-%7C-LiveData).
 * Data Binding.
 
-# Setup (JCenter repository shutdown)
-The original artifacts were never migrated to Maven Central. As a result, adding implementation `eu.davidea:flexible-adapter:5.1.0` to your project will now result in a `404 Not Found` error.
-There are no plans to republish the legacy version to Maven Central. The library served its purpose during the RecyclerView era, and that era has now passed.
+# Setup
+The original artifacts were hosted on JCenter. Since its shutdown, the old dependency will result in a `404 Not Found` error.
+As last contribution to the community the library has been published to Maven Central Repository.
 
 #### build.gradle
 ```
 repositories {
-    jcenter()
+    mavenCentral()
 }
 ```
 ```
 dependencies {
-    // Using JCenter
     implementation 'eu.davidea:flexible-adapter:5.1.0'
     implementation 'eu.davidea:flexible-adapter-ui:1.0.0'
-    implementation 'eu.davidea:flexible-adapter-livedata:1.0.0-b3'
-    // From 1.0.0-b3, library is compiled with data binding v2
+    implementation 'eu.davidea:flexible-adapter-livedata:1.0.0'
     implementation 'eu.davidea:flexible-adapter-databinding:1.0.0'
 }
 ```
@@ -87,10 +89,8 @@ dependencies {
 # Wiki!
 I strongly recommend to read the **[Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial.<br/>
 
-### Pull requests / Issues / Improvement requests
-Feel free to contribute and ask!<br/>
-Active discussions:
-- [The next steps of development: New demoApp > Extensions](https://github.com/davideas/FlexibleAdapter/issues/361).
+### History of last active development
+[The next steps of development: New demoApp > Extensions](https://github.com/davideas/FlexibleAdapter/issues/361).
 
 ### Under the hood
 Some simple features have been implemented, thanks to some Blogs (see at the bottom of the page), merged and methods have been improved for speed and scalability.
@@ -127,7 +127,7 @@ This [Wiki page](https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-Demo-A
 ![Search Sections](/screenshots/demo20_search_sections.png)
 
 # Limitations
-Item half swipe cannot be implemented due to how the `android.support.v7.widget.helper.ItemTouchHelper` is done, also clicks on rear view are not possible, same reason.
+Item half swipe cannot be implemented due to how the `android.support.v7.widget.helper.ItemTouchHelper` is done, also clicks on rearview are not possible, same reason.
 Half swipe can be done with others means, please see issues #98 and #100. See also commits of Apr 25, 2016. 
 
 # Thanks
@@ -147,7 +147,7 @@ This library is currently free to use and modify, if you would like to say _Than
 # Imported libraries
 - The library [LollipopContactsRecyclerViewFastScroller](https://github.com/AndroidDeveloperLB/LollipopContactsRecyclerViewFastScroller) has been imported, heavily improved and adapted to work in conjunction with `AnimatorAdapter`.
 - The library [sticky-headers-recyclerview](https://github.com/timehop/sticky-headers-recyclerview) was initially imported, then it was removed in favor of the new technique able to manage a real _View_ and so to handle the click events properly.
-- The item spacing technique comes from the library [CommonItemDecoration](https://github.com/ibosong/CommonItemDecoration) and it has been improved with new features.
+- The item spacing technique comes from the library [CommonItemDecoration,](https://github.com/ibosong/CommonItemDecoration) and it has been improved with new features.
 
 # Apps that use this Adapter
 It will be a pleasure to add your App here, once it is published.
@@ -163,7 +163,7 @@ It will be a pleasure to add your App here, once it is published.
 
 #### FlexibleAdapter & Extensions
 
-    Copyright 2015-2018 Davide Steduto, Davidea Solutions Srl
+    Copyright 2015-2026 Davide Steduto, Davidea Solutions Srl
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

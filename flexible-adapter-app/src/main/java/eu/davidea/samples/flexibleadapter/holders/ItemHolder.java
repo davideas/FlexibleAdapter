@@ -5,8 +5,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractSectionableItem;
 import eu.davidea.flexibleadapter.items.IFilterable;
@@ -68,8 +66,8 @@ public class ItemHolder extends AbstractSectionableItem<ItemHolder.ItemViewHolde
      */
     @Override
     public boolean filter(String constraint) {
-        return model.getTitle() != null && model.getTitle().toLowerCase().trim().contains(constraint) ||
-                model.getSubtitle() != null && model.getSubtitle().toLowerCase().trim().contains(constraint);
+        return (model.getTitle() != null && model.getTitle().toLowerCase().trim().contains(constraint)) ||
+                (model.getSubtitle() != null && model.getSubtitle().toLowerCase().trim().contains(constraint));
     }
 
     @Override
@@ -90,17 +88,16 @@ public class ItemHolder extends AbstractSectionableItem<ItemHolder.ItemViewHolde
 
     static class ItemViewHolder extends FlexibleViewHolder {
 
-        @BindView(R.id.title)
-        public TextView mTitle;
-        @BindView(R.id.subtitle)
-        public TextView mSubtitle;
+        public final TextView mTitle;
+        public final TextView mSubtitle;
 
         /**
          * Default constructor.
          */
         ItemViewHolder(View view, FlexibleAdapter adapter) {
             super(view, adapter);
-            ButterKnife.bind(this, view);
+            mTitle = view.findViewById(R.id.title);
+            mSubtitle = view.findViewById(R.id.subtitle);
         }
     }
 

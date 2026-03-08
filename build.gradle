@@ -6,89 +6,57 @@ allprojects {
         developerName = "Davide Steduto"
         developerEmail = "dave.dna@gmail.com"
 
-        // Library Repository
+        // Library
+        publishedGroupId = "eu.davidea"
         libraryName = "FlexibleAdapter"
-        bintrayRepo = "maven"
-        packageExt = "aar"
+        libraryDate = " of 2018.09.30"
         siteUrl = "https://github.com/davideas/FlexibleAdapter"
         gitUrl = "https://github.com/davideas/FlexibleAdapter.git"
 
-        // SDK and Build tools version
+        // Android SDK
         minSdk = 14
-        targetSdk = 30 // Android 11
-
-        // AndroidX
-        androidxVer = '1.3.0'
-        appCompatVer = '1.2.0'
-        cardviewVer = '1.0.0'
-        annotationVer = '1.1.0'
-        vectorDrawableVer = '1.1.0'
-        recyclerViewVer = '1.1.0'
-        lifecycleVer = "2.3.0"
-        constraintVer = "2.0.4"
-        coreVer = "1.3.2"
-        swipeRefreshVer = "1.1.0"
-        transitionVer = "1.4.0"
+        targetSdk = 35
 
         androidx = [
-                recyclerView       : "androidx.recyclerview:recyclerview:${recyclerViewVer}",
-                recyclerViewSelection : "androidx.recyclerview:recyclerview-selection:${recyclerViewVer}",
-                appCompat          : "androidx.appcompat:appcompat:${appCompatVer}",
-                cardView           : "androidx.cardview:cardview:${cardviewVer}",
-                annotation         : "androidx.annotation:annotation:${annotationVer}",
-                browser            : "androidx.browser:browser:${androidxVer}",
-                vectorDrawable     : "androidx.vectordrawable:vectordrawable:${vectorDrawableVer}",
-                transition         : "androidx.transition:transition:${transitionVer}",
-                lifecycleExtensions: "androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycleVer}",
-                constraintLayout   : "androidx.constraintlayout:constraintlayout:${constraintVer}",
-                core               : "androidx.core:core:${coreVer}",
-                swipeRefreshLayout : "androidx.swiperefreshlayout:swiperefreshlayout:${swipeRefreshVer}"
+                recyclerView       : "androidx.recyclerview:recyclerview:1.2.1",
+                recyclerViewSelection : "androidx.recyclerview:recyclerview-selection:1.2.1",
+                appCompat          : "androidx.appcompat:appcompat:1.5.1",
+                cardView           : "androidx.cardview:cardview:1.0.0",
+                annotation         : "androidx.annotation:annotation:1.5.0",
+                browser            : "androidx.browser:browser:1.8.0",
+                vectorDrawable     : "androidx.vectordrawable:vectordrawable:1.1.0",
+                transition         : "androidx.transition:transition:1.4.1",
+                lifecycleExtensions: "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1",
+                lifecycleLiveData  : "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1",
+                constraintLayout   : "androidx.constraintlayout:constraintlayout:2.1.4",
+                core               : "androidx.core:core:1.9.0",
+                swipeRefreshLayout : "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
         ]
 
         // Google Material
-        googleVer = "1.3.0"
         google = [
-                material: "com.google.android.material:material:${googleVer}"
-        ]
-
-        // Widgets
-        flipViewVer = "1.2.0@aar"
-        iconicsVer = "3.2.2@aar"
-        iconicsCmdVer = "3.5.95.1@aar"
-        widgets = [
-                flipView        : "eu.davidea:flipview:${flipViewVer}",
-                iconicsCore     : "com.mikepenz:iconics-core:${iconicsVer}",
-                iconicsViews    : "com.mikepenz:iconics-views:${iconicsVer}",
-                iconicsCommunity: "com.mikepenz:community-material-typeface:${iconicsCmdVer}",
+                material: "com.google.android.material:material:1.7.0"
         ]
 
         // 3rd Libraries
-        butterKnifeVer = "10.2.3"
-        timberVer = "4.7.1"
-        glideVer = "4.12.0"
-        javaxInjectVer = "1"
-        junitJupiterVer = "5.2.0"
         libraries = [
-                butterKnife        : "com.jakewharton:butterknife:${butterKnifeVer}",
-                butterKnifeCompiler: "com.jakewharton:butterknife-compiler:${butterKnifeVer}",
-                timber             : "com.jakewharton.timber:timber:${timberVer}",
-                glide              : "com.github.bumptech.glide:glide:${glideVer}",
-                glideCompiler      : "com.github.bumptech.glide:compiler:${glideVer}",
-                javaxInject        : "javax.inject:javax.inject:${javaxInjectVer}",
+                timber             : "com.jakewharton.timber:timber:4.7.1",
+                glide              : "com.github.bumptech.glide:glide:4.12.0",
+                glideCompiler      : "com.github.bumptech.glide:compiler:4.12.0",
+                javaxInject        : "javax.inject:javax.inject:1"
         ]
 
         // License stuff
         licenseName = "The Apache Software License, Version 2.0"
         licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-        licenseDist = "repo"
         allLicenses = ["Apache-2.0"]
     }
 
     repositories {
-        mavenCentral()
-        gradlePluginPortal()
         google()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        mavenCentral()
+        mavenLocal()
+        maven { url "https://central.sonatype.com/repository/maven-snapshots/" }
     }
 
     tasks.withType(Javadoc) {
@@ -99,29 +67,15 @@ allprojects {
 
 buildscript {
     repositories {
+        google()
         mavenCentral()
         gradlePluginPortal()
-        google()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    }
-
-    ext {
-        gradle_plugin_version = '4.0.0'
-        android_apt_version = '1.8'
-        maven_gradle_plugin_version = '2.1'
-        javadoc_plugin_version = '0.3.0'
-        android_junit5_version = '1.7.1.1'
-        grabver_version = '1.0.1'
     }
 
     dependencies {
-        classpath "com.android.tools.build:gradle:$gradle_plugin_version"
-        classpath "com.neenbedankt.gradle.plugins:android-apt:$android_apt_version"
-        classpath "com.github.dcendents:android-maven-gradle-plugin:$maven_gradle_plugin_version"
-        classpath "com.vanniktech:gradle-android-javadoc-plugin:$javadoc_plugin_version"
-        classpath "de.mannodermaus.gradle.plugins:android-junit5:$android_junit5_version"
-        classpath "eu.davidea:grabver:$grabver_version"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath "com.android.tools.build:gradle:9.1.0"
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.36.0'
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:2.0.1"
+        classpath "eu.davidea:grabver:2.0.3"
     }
 }

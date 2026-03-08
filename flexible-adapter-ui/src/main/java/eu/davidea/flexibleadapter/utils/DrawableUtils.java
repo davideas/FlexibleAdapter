@@ -24,16 +24,17 @@ import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.util.TypedValue;
+import android.view.View;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.core.view.ViewCompat;
-import android.util.TypedValue;
-import android.view.View;
 
 import java.util.Arrays;
 
-import eu.davidea.flexibleadapter.helpers.R;
+import eu.davidea.flexibleadapter.ui.R;
 
 /**
  * @author Davide Steduto

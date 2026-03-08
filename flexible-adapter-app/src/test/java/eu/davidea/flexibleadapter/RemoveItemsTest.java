@@ -1,5 +1,7 @@
 package eu.davidea.flexibleadapter;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,14 +15,12 @@ import java.util.concurrent.TimeUnit;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
 import eu.davidea.samples.flexibleadapter.services.DatabaseService;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author Davide
  * @since 29/08/2017
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 25)
+@Config(sdk = 25)
 public class RemoveItemsTest {
 
     private FlexibleAdapter<AbstractFlexibleItem> mAdapter;

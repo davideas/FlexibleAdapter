@@ -1,12 +1,13 @@
 package eu.davidea.samples.flexibleadapter.fragments;
 
 import android.os.Bundle;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.GridLayoutManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
@@ -137,15 +138,16 @@ public class FragmentExpandableSections extends AbstractFragment {
             public int getSpanSize(int position) {
                 // NOTE: If you use simple integers to identify the ViewType,
                 // here, you should use them and not Layout integers
-                switch (mAdapter.getItemViewType(position)) {
-                    case R.layout.recycler_scrollable_layout_item:
-                    case R.layout.recycler_scrollable_uls_item:
-                    case R.layout.recycler_header_item:
-                    case R.layout.recycler_expandable_header_item:
-                    case R.layout.recycler_expandable_item:
-                        return mColumnCount;
-                    default:
-                        return 1;
+                int viewType = mAdapter.getItemViewType(position);
+                // Using if-else because Resource IDs are not final constants
+                if (viewType == R.layout.recycler_scrollable_layout_item ||
+                        viewType == R.layout.recycler_scrollable_uls_item ||
+                        viewType == R.layout.recycler_header_item ||
+                        viewType == R.layout.recycler_expandable_header_item ||
+                        viewType == R.layout.recycler_expandable_item) {
+                    return mColumnCount;
+                } else {
+                    return 1;
                 }
             }
         });

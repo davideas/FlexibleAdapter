@@ -1,56 +1,54 @@
-apply plugin: 'com.android.library'
-apply plugin: 'de.mannodermaus.android-junit5'
-apply plugin: 'eu.davidea.grabver'
+plugins {
+    id 'com.android.library'
+    id 'eu.davidea.grabver'
+    id 'de.mannodermaus.android-junit5'
+}
 
 versioning {
     major 1
     minor 0
-    preRelease "b3"
 }
-// For maven repository
-version = versioning.name
 
 ext {
     // Library Settings
+    artifact = "flexible-adapter-livedata"
     libraryName = "FlexibleAdapter LiveData extension"
     libraryDescription = "LiveData extension for FlexibleAdapter project"
     libraryLabels = ['android', 'flexibleadapter', 'adapter', 'livedata', 'lifecycle', 'viewmodel', 'androidarch']
-
-    publishedGroupId = "eu.davidea"
-    bintrayName = "flexible-adapter-livedata"
-    artifact = bintrayName
 }
 
 android {
-    compileSdkVersion targetSdk
+    compileSdk targetSdk
+    namespace 'eu.davidea.flexibleadapter.livedata'
 
     defaultConfig {
-        minSdkVersion minSdk
-        targetSdkVersion targetSdk
+        minSdk = rootProject.ext.minSdk
+        targetSdk = rootProject.ext.targetSdk
         versionCode versioning.code
         versionName versioning.name
     }
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility JavaVersion.VERSION_21
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        targetCompatibility JavaVersion.VERSION_1_8
-        sourceCompatibility JavaVersion.VERSION_1_8
-    }
-    testOptions {
-        /* Android-junit5 - https://github.com/mannodermaus/android-junit5/wiki/Migrating-from-1.0.x */
-        junitPlatform {
-           // options
-        }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
 dependencies {
     // Lifecycle
     implementation androidx.lifecycleExtensions
+    implementation androidx.lifecycleLiveData
 
     // Test libraries
     androidTestImplementation androidx.annotation
@@ -68,5 +66,5 @@ dependencies {
 }
 
 if (project.hasProperty('all') || project.hasProperty('livedata')) {
-    apply from: '../maven-install.gradle'
+    apply from: '../publish.gradle'
 }
