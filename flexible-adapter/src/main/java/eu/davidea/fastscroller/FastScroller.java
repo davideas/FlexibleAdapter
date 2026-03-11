@@ -15,6 +15,8 @@
  */
 package eu.davidea.fastscroller;
 
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -30,11 +32,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.lang.annotation.Retention;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.ColorInt;
 import androidx.annotation.IdRes;
 import androidx.annotation.IntDef;
@@ -46,10 +43,14 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
+import java.lang.annotation.Retention;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.davidea.flexibleadapter.R;
 import eu.davidea.flexibleadapter.utils.Log;
-
-import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Class taken from GitHub, customized and optimized for FlexibleAdapter project.
@@ -530,7 +531,7 @@ public class FastScroller extends FrameLayout {
      * @since 5.0.5
      */
     public void setHandleAlwaysVisible(boolean enabled) {
-        ignoreTouchesOutsideHandle = enabled;
+        handleAlwaysVisible = enabled;
     }
 
     /**
