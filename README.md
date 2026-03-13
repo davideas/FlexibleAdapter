@@ -1,3 +1,4 @@
+[![API](https://img.shields.io/badge/API-30%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=30)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 ![Size](https://img.shields.io/badge/Size-Core:%20124%20KB%20|%20UI:%2068%20KB-e91e63.svg)
 
@@ -15,13 +16,14 @@ The arrival of Jetpack Compose and Compose Multiplatform has replaced the need f
 
 ### A final word
 No further feature requests or pull requests will be processed, as the library is considered a "finished" product.
-
 As last contribution to the community the library has been published to Maven Central Repository.
 
 Thank you to have adopted this library in your project.
 
 # FlexibleAdapter
-- Last build: [v5.1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.1.0) on 2018.09.30 with AndroidX
+- Last version [5.1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.1.0)
+- Originally released with AndroidX on September 30, 2018.
+- Republished to Maven Central in March 2026.
 
 ### One Adapter many Apps
 > :mega: When initially Android:registered: team introduced the RecyclerView widget, we had to implement a custom Adapter in several applications, again and again to provide the items for our views.<br/>
@@ -32,6 +34,40 @@ The idea behind is to regroup multiple features in a unique library, without the
 
 The FlexibleAdapter helps developers to simplify this process without worrying too much about the Adapter anymore. It's easy to use, it has predefined logic for different situations and prevents common mistakes.<br/>
 This library is configurable and it guides the developers to create a better user experience and now, even more with the new features.
+
+# Setup
+The original artifacts were hosted on JCenter. Since its shutdown, the old dependency will result in a `404 Not Found` error.
+As last contribution to the community the library has been published to Maven Central Repository.<br>
+I tried to keep the requirements as low as possible.
+
+### Minimum Requirements
+To use this library in your project, ensure your environment meets at least the following requirements:
+
+- **compileSdk** 30+ (Android 11)
+- **Gradle** 7.6+
+- **Android Gradle Plugin (AGP)** 7.4+
+- **JDK** 11+
+- **Kotlin** 1.7+
+
+### build.gradle
+```
+repositories {
+    mavenCentral()
+}
+```
+```
+dependencies {
+    // Core library (required)
+    implementation 'eu.davidea:flexible-adapter:5.1.0'
+    
+    // UI extensions (recommended)
+    implementation 'eu.davidea:flexible-adapter-ui:1.0.0'
+    
+    // Optional extensions
+    implementation 'eu.davidea:flexible-adapter-livedata:1.0.0'
+    implementation 'eu.davidea:flexible-adapter-databinding:1.0.0'
+}
+```
 
 ### Features in main library
 * Simple, Single & Multi selection mode.
@@ -66,25 +102,6 @@ This library is configurable and it guides the developers to create a better use
 ### Others _experimental_ extension libraries
 * [Live Data](https://github.com/davideas/FlexibleAdapter/wiki/Extensions-%7C-LiveData).
 * Data Binding.
-
-# Setup
-The original artifacts were hosted on JCenter. Since its shutdown, the old dependency will result in a `404 Not Found` error.
-As last contribution to the community the library has been published to Maven Central Repository.
-
-#### build.gradle
-```
-repositories {
-    mavenCentral()
-}
-```
-```
-dependencies {
-    implementation 'eu.davidea:flexible-adapter:5.1.0'
-    implementation 'eu.davidea:flexible-adapter-ui:1.0.0'
-    implementation 'eu.davidea:flexible-adapter-livedata:1.0.0'
-    implementation 'eu.davidea:flexible-adapter-databinding:1.0.0'
-}
-```
 
 # Wiki!
 I strongly recommend to read the **[Wiki](https://github.com/davideas/FlexibleAdapter/wiki) pages**, where you can find a comprehensive Tutorial.<br/>

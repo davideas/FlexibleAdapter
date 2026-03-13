@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.library'
     id 'eu.davidea.grabver'
-    id 'de.mannodermaus.android-junit5'
 }
 
 versioning {
@@ -18,19 +17,16 @@ ext {
 }
 
 android {
-    compileSdk targetSdk
+    compileSdk rootProject.ext.compileSdk
     namespace 'eu.davidea.flexibleadapter.livedata'
 
     defaultConfig {
         minSdk = rootProject.ext.minSdk
-        targetSdk = rootProject.ext.targetSdk
-        versionCode versioning.code
-        versionName versioning.name
     }
 
     compileOptions {
-        targetCompatibility JavaVersion.VERSION_21
-        sourceCompatibility JavaVersion.VERSION_21
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildTypes {
@@ -65,6 +61,7 @@ dependencies {
     testImplementation project(":flexible-adapter")
 }
 
+// Apply publishing configuration when -Pall or module-specific property is set
 if (project.hasProperty('all') || project.hasProperty('livedata')) {
     apply from: '../publish.gradle'
 }

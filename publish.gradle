@@ -1,9 +1,10 @@
 apply plugin: 'com.vanniktech.maven.publish'
 
+// NOTE: When "Unable to find variant to publish named release" try to wrap it in afterEvaluate
 mavenPublishing {
-    // Only configure Central publishing and signing if -Prelease is provided
-    publishToMavenCentral()
-    signAllPublications()
+    if (!versioning.name.endsWith('SNAPSHOT')) {
+        signAllPublications()
+    }
 
     coordinates(publishedGroupId, artifact, versioning.name)
 
@@ -32,5 +33,57 @@ mavenPublishing {
             developerConnection = gitUrl
             url = siteUrl
         }
+    }
+}
+
+// Manual repository configuration for 2026 Central Portal
+publishing {
+    repositories {
+        maven {
+            // RELEASES: Go to a LOCAL folder to be zipped into a bundle later
+            url = layout.buildDirectory.dir("publishing/bundle")
+            def isSnapshot = project.versioning.name.endsWith('SNAPSHOT')
+            // Avoid remote publication when we only want to zip locally
+            def isZipping = gradle.startParameter.taskNames.any { it.contains('zip') }
+            // ONLY apply credentials for remote snapshots, not for local file protocol
+            if (isSnapshot && !isZipping) {
+                url = "https://central.sonatype.com/repository/maven-snapshots/"
+                credentials {
+                    username = mavenCentralUsername
+                    password = mavenCentralPassword
+                }
+            }
+        }
+    }
+}
+
+// Task to create the 2026 Maven Central Bundle with SHA/MD5 Checksums
+tasks.register("zipBundle", Zip) {
+    group = "publishing"
+    description = "Zips the library artifacts into a Maven Central bundle for the 2026 Portal."
+
+    doFirst {
+        println "Executing zipBundle..."
+    }
+
+    // Skip creating the zip for snapshots (bundles are for releases)
+    onlyIf {
+        if (project.versioning.name.endsWith('SNAPSHOT')) {
+            println "Skipping zipBundle for SNAPSHOT version: ${project.name}"
+            return false
+        }
+        return true
+    }
+
+    // Ensure files are in the local bundle folder (which generates checksums) before zipping
+    dependsOn "publish"
+
+    from layout.buildDirectory.dir("publishing/bundle")
+
+    archiveFileName = "${publishedGroupId}-${artifact}-${versioning.name}-bundle.zip"
+    destinationDirectory = layout.buildDirectory.dir("distributions")
+
+    doLast {
+        println "Zipped bundle: ${archiveFileName.get()}"
     }
 }

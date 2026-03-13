@@ -9,7 +9,7 @@ versioning {
 }
 
 android {
-    compileSdk targetSdk
+    compileSdk = 30
     namespace 'eu.davidea.samples.flexibleadapter'
 
     defaultConfig {
@@ -29,8 +29,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildTypes {
@@ -39,7 +39,6 @@ android {
             minifyEnabled false
         }
         release {
-            zipAlignEnabled true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -96,7 +95,7 @@ dependencies {
     implementation 'eu.davidea:flipview:1.2.0'
 
     // Test libraries
-    testImplementation 'org.robolectric:robolectric:4.16.1'
+    testImplementation 'org.robolectric:robolectric:4.5.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.hamcrest:hamcrest:3.0'
 }

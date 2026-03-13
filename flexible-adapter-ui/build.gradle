@@ -17,19 +17,16 @@ ext {
 }
 
 android {
-    compileSdk targetSdk
+    compileSdk = rootProject.ext.compileSdk
     namespace 'eu.davidea.flexibleadapter.ui'
 
     defaultConfig {
         minSdk = rootProject.ext.minSdk
-        targetSdk = rootProject.ext.targetSdk
-        versionCode versioning.code
-        versionName versioning.name
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildTypes {
