@@ -21,7 +21,7 @@ As last contribution to the community the library has been published to Maven Ce
 Thank you to have adopted this library in your project.
 
 # FlexibleAdapter
-- Last version [5.1.0](https://github.com/davideas/FlexibleAdapter/releases/tag/5.1.0)
+- Last version [5.1.0](https://github.com/davideas/FlexibleAdapter/releases)
 - Originally released with AndroidX on September 30, 2018.
 - Republished to Maven Central in March 2026.
 
