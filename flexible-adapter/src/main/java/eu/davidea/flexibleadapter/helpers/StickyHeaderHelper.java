@@ -203,9 +203,9 @@ public final class StickyHeaderHelper extends OnScrollListener {
                 int nextHeaderPosition = getStickyPosition(adapterPos);
                 if (mHeaderPosition != nextHeaderPosition) {
                     if (mAdapter.getFlexibleLayoutManager().getOrientation() == OrientationHelper.HORIZONTAL) {
-                        if (nextChild.getLeft() > 0) {
-                            int headerWidth = mStickyHolderLayout.getMeasuredWidth();
-                            int nextHeaderOffsetX = nextChild.getLeft() - headerWidth -
+                        if (nextChild.getRight() > 0) {
++                            int headerWidth = mStickyHeaderViewHolder.getContentView().getMeasuredWidth();
+                             int nextHeaderOffsetX = nextChild.getLeft() - headerWidth -
                                     mRecyclerView.getLayoutManager().getLeftDecorationWidth(nextChild) -
                                     mRecyclerView.getLayoutManager().getRightDecorationWidth(nextChild);
                             headerOffsetX = Math.min(nextHeaderOffsetX, 0);
@@ -218,8 +218,8 @@ public final class StickyHeaderHelper extends OnScrollListener {
                             }
                         }
                     } else {
-                        if (nextChild.getTop() > 0) {
-                            int headerHeight = mStickyHolderLayout.getMeasuredHeight();
+                        if (nextChild.getBottom() > 0) {
++                           int headerHeight = mStickyHeaderViewHolder.getContentView().getMeasuredHeight();
                             int nextHeaderOffsetY = nextChild.getTop() - headerHeight -
                                     mRecyclerView.getLayoutManager().getTopDecorationHeight(nextChild) -
                                     mRecyclerView.getLayoutManager().getBottomDecorationHeight(nextChild);
